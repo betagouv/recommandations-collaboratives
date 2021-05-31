@@ -1,0 +1,33 @@
+# encoding: utf-8
+
+"""
+Settings for development
+
+author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
+created : 2021-05-31 11:54:53 CEST
+"""
+
+from .common import *
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = [
+    "localhost",
+]
+
+INSTALLED_APPS += ("debug_toolbar",)
+
+MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
+
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+
+# eof

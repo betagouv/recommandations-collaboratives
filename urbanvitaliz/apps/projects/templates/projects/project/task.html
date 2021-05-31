@@ -1,0 +1,47 @@
+{% extends "site.html" %}
+
+{% block content %}
+<h2 class="display-3">Accompagnement de projet</h2>
+
+<section>
+
+	<h3 class="display-4">Contexte</h3>
+
+	<table class="table table-bordered">
+		<tr>
+			<th>Nom</th>
+			<td>{{ project.name }}</td>
+		</tr>
+		<tr>
+			<th>Localisation</th>
+			<td>{{ project.location }}</td>
+		</tr>
+		<tr>
+			<th>Date de création</th>
+			<td>{{ project.created_on }}</td>
+		</tr>
+	</table>
+
+</section>
+
+<section>
+
+	<form id="form-projects-add-task"
+				method="post"
+				action="."
+				class="form-horizontal">
+
+		{% csrf_token %}
+
+		{{ form.as_p }}
+
+		<button type="submit" class="btn btn-primary">
+			Enregistrer
+		</button>
+	</form>
+
+</section>
+
+{% endblock %}
+
+

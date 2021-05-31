@@ -1,0 +1,24 @@
+{% extends "site.html" %}
+
+{% block content %}
+<h2 class="display-3">Je lance mon projet</h2>
+
+<section>
+
+	<form id="form-projects-onboarding"
+				method="post"
+				action="."
+				class="form">
+
+		{% csrf_token %}
+
+		{{ form.as_p }}
+
+		<button type="submit" class="btn btn-primary">
+			C'est parti!
+		</button>
+	</form>
+
+</section>
+
+{% endblock %}

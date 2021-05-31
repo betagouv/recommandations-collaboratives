@@ -1,0 +1,17 @@
+black
+coverage
+django
+django-debug-toolbar
+django-magicauth
+django_otp
+ipython
+model_bakery
+pip
+psycopg2-binary
+pytest
+pytest-cov
+pytest-coverage
+pytest-django
+pytest-xdist
+pytz
+semgrep

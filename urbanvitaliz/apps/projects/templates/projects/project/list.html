@@ -1,0 +1,40 @@
+{% extends "site.html" %}
+
+{% block content %}
+	<h2 class="display-3">Liste des projets</h2>
+
+<section>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Date de création</th>
+				<th>Nom</th>
+				<th>Localisation</th>
+				<th>Actions</th>
+				<th>Notes</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for project in projects %}
+			<tr>
+				<td>{{ project.created_on }}</td>
+				<td>
+					<a href="{% url 'projects-project-detail' project.id %}">
+						{{ project.name }}
+					</a>
+				</td>
+				<td>{{ project.location }}</td>
+				<td>{{ project.tasks.count }}</td>
+				<td>{{ project.notes.count }}</td>
+			</tr>
+			{% empty %}
+			<tr>
+				<td colspan="5">Rien à faire ici.</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+</section>
+{% endblock %}
