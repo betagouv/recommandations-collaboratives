@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "magicauth",
     "sass_processor",
+    "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
 ]
 
