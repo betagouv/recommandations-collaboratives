@@ -1,4 +1,7 @@
+.venv
+dist
 *.sqlite3
+*.egg-info
 __pycache__
 *.pyc
 *.swp

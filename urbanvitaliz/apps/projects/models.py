@@ -19,8 +19,11 @@ class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
 
     email = models.CharField(max_length=128)
-    contact = models.CharField(
+    last_name = models.CharField(
         max_length=128, default="", verbose_name="Nom du contact"
+    )
+    first_name = models.CharField(
+        max_length=128, default="", verbose_name="Prénom du contact"
     )
 
     created_on = models.DateTimeField(
