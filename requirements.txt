@@ -15,3 +15,8 @@ pytest-django
 pytest-xdist
 pytz
 semgrep
+
+# STATIC FILES
+django-sass-processor
+libsass
+django-compressor

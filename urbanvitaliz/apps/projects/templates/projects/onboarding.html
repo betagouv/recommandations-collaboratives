@@ -1,22 +1,108 @@
-{% extends "site.html" %}
+{% extends "base.html" %}
+
+{% load static %}
 
 {% block content %}
-<h2 class="display-3">Je lance mon projet</h2>
 
-<section>
+<section class="col-md-8 py-5 mx-auto">
 
-	<form id="form-projects-onboarding"
-				method="post"
-				action="."
-				class="form">
+    <h2>
+        <svg class="bi me-2" width="32" height="32">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#megaphone"/>
+        </svg>
+        Solliciter l'équipe UrbanVitaliz
+    </h2>
 
-		{% csrf_token %}
 
-		{{ form.as_p }}
+    <div class="bd-callout bd-callout-info mb-4">
+        <strong>Comment démarrer ?</strong>
 
-		<button type="submit" class="btn btn-primary">
-			C'est parti!
-		</button>
+        Une fois ces quelques informations transmises, un <strong>membre de l'équipe</strong> vous contactera rapidement pour <strong>organiser un échange</strong> en <strong>visio</strong> ou <strong>téléphonique</strong> afin de mieux <strong>saisir vos enjeux</strong> et <strong>démarrer votre accompagnement</strong>.
+    </div>
+
+
+	  <form id="form-projects-onboarding"
+				      method="post"
+				  action="."
+	  >
+
+        {% csrf_token %}
+
+        <div id="form-leader" class="mb-5">
+
+            <h3 class="mb-3">
+                <svg class="bi me-2" width="28" height="28">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
+                </svg>
+                Le/la référent&middot;e
+            </h3>
+
+
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="input-firstname" placeholder="Camille">
+                        <label for="input-firstname">{{ form.first_name.label }}</label>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="input-lastname" placeholder="Dupont">
+                        <label for="input-lastname">{{ form.last_name.label }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-floating">
+                <input type="email" class="form-control" id="input-email" placeholder="name@example.com">
+                <div id="input-email-help" class="form-text">Votre courriel ne sera jamais partagé en dehors de notre équipe.</div>
+                <label for="input-email">{{ form.email.label }}</label>
+            </div>
+        </div>
+
+
+        <div id="form-project" class="mb-3">
+
+            <h3 class="mb-3">
+                <svg class="bi me-2" width="28" height="28">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#cone-striped"/>
+                </svg>
+                Identité de la Friche
+            </h3>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="input-project-name" placeholder="Mon projet de friche">
+                <label for="input-project-name">{{ form.name.label }}</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <textarea class="form-control" style="height: 100px;" id="input-project-description" placeholder="Une courte description"></textarea>
+                <label for="input-project-description">{{ form.description.label }}</label>
+            </div>
+
+            <div class="form-floating mb-5">
+                <input type="text" class="form-control" id="input-project-address" placeholder="Adresse">
+                <label for="input-project-address">{{ form.location.label }}</label>
+                <div id="input-email-help" class="form-text">Si la friche n'a pas d'adresse exacte, utilisez le nom de la commune.</div>
+            </div>
+
+            <h3 class="mb-3">
+                <svg class="bi me-2" width="28" height="28">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#life-preserver"/>
+                </svg>
+                Quelles difficultés rencontrez-vous ?
+            </h3>
+
+            <div class="mb-3">
+                <textarea class="form-control" style="height: 100px;" id="input-project-impediments" placeholder="Décrivez-nous en quelques mots ce qui vous bloque vis-à-vis de ce projet"></textarea>
+                <label class="visually-hidden" for="input-project-impediments">{{ form.impediments.label }}</label>
+            </div>
+
+        </div>
+
+		    <button type="submit" class="btn btn-primary">
+			      Transmettre
+		    </button>
 	</form>
 
 </section>
