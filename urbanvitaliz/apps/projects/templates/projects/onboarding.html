@@ -20,12 +20,16 @@
     </div>
 
 
+    
+
 	  <form id="form-projects-onboarding"
-				      method="post"
-				  action="."
+				  method="post"
+				  action="{% url 'projects-onboarding' %}"
 	  >
 
         {% csrf_token %}
+
+        {{ form.errors }}
 
         <div id="form-leader" class="mb-5">
 
@@ -40,22 +44,22 @@
             <div class="row mb-3">
                 <div class="col">
                     <div class="form-floating">
-                        <input type="text" class="form-control" id="input-firstname" placeholder="Camille">
-                        <label for="input-firstname">{{ form.first_name.label }}</label>
+                        <input type="text" class="form-control" name="{{ form.first_name.name }}" placeholder="Camille" value="{{ form.first_name.value }}">
+                        <label for="{{ form.first_name.name }}">{{ form.first_name.label }}</label>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-floating">
-                        <input type="text" class="form-control" id="input-lastname" placeholder="Dupont">
-                        <label for="input-lastname">{{ form.last_name.label }}</label>
+                        <input type="text" class="form-control" name="{{ form.last_name.name }}" placeholder="Dupont" value="{{ form.last_name.value }}">
+                        <label for="{{ form.first_name.name }}">{{ form.last_name.label }}</label>
                     </div>
                 </div>
             </div>
 
             <div class="form-floating">
-                <input type="email" class="form-control" id="input-email" placeholder="name@example.com">
+                <input type="email" class="form-control" name="{{ form.email.name }}" placeholder="name@example.com" value="{{ form.email.value|default:'' }}">
                 <div id="input-email-help" class="form-text">Votre courriel ne sera jamais partagé en dehors de notre équipe.</div>
-                <label for="input-email">{{ form.email.label }}</label>
+                <label for="{{ form.email.name }}">{{ form.email.label }}</label>
             </div>
         </div>
 
@@ -70,17 +74,17 @@
             </h3>
 
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="input-project-name" placeholder="Mon projet de friche">
-                <label for="input-project-name">{{ form.name.label }}</label>
+                <input type="text" class="form-control" name="{{ form.name.name }}" placeholder="Mon projet de friche" value="{{ form.name.value|default:'' }}">
+                <label for="{{ form.name.name }}">{{ form.name.label }}</label>
             </div>
 
             <div class="form-floating mb-3">
-                <textarea class="form-control" style="height: 100px;" id="input-project-description" placeholder="Une courte description"></textarea>
+                <textarea class="form-control" style="height: 100px;" id="input-project-description" name="{{ form.description.name }}" placeholder="Une courte description">{{ form.description.value|default:'' }}</textarea>
                 <label for="input-project-description">{{ form.description.label }}</label>
             </div>
 
             <div class="form-floating mb-5">
-                <input type="text" class="form-control" id="input-project-address" placeholder="Adresse">
+                <input type="text" class="form-control" id="input-project-address" name="{{ form.location.name }}" placeholder="Adresse" value="{{ form.location.value|default:'' }}">
                 <label for="input-project-address">{{ form.location.label }}</label>
                 <div id="input-email-help" class="form-text">Si la friche n'a pas d'adresse exacte, utilisez le nom de la commune.</div>
             </div>
@@ -93,7 +97,7 @@
             </h3>
 
             <div class="mb-3">
-                <textarea class="form-control" style="height: 100px;" id="input-project-impediments" placeholder="Décrivez-nous en quelques mots ce qui vous bloque vis-à-vis de ce projet"></textarea>
+                <textarea class="form-control" style="height: 100px;" id="input-project-impediments" name="{{ form.impediments.name }}" value="{{ form.impediments.value|default:'' }}" placeholder="Décrivez-nous en quelques mots ce qui vous bloque vis-à-vis de ce projet"></textarea>
                 <label class="visually-hidden" for="input-project-impediments">{{ form.impediments.label }}</label>
             </div>
 
