@@ -1,0 +1,52 @@
+{% load static %}
+{% load sass_tags %}
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <title>UrbanVitaliz, réhabilitez vos friches plus sereinement</title>
+
+        <!-- Bootstrap core CSS -->
+		    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+        <link href="{% sass_src 'css/base.scss' %}" rel="stylesheet" type="text/css">
+        <link href="{% sass_src 'css/sidebars.scss' %}" rel="stylesheet" type="text/css">
+        {% block css %}
+        {% endblock %}
+
+        <!-- Favicons -->
+        <link rel="apple-touch-icon" href="{% static 'img/favicons/apple-touch-icon.png' %}" sizes="180x180">
+        <link rel="icon" href="{% static 'img/favicons/favicon-32x32.png' %}" sizes="32x32" type="image/png">
+        <link rel="icon" href="{% static 'img/favicons/favicon-16x16.png' %}" sizes="16x16" type="image/png">
+        <link rel="icon" href="{% static 'img/favicons/favicon.ico' %}">
+
+    </head>
+    <body>
+        <main>
+            <h1 class="visually-hidden">Urban Vitaliz</h1>
+
+            {% include "sidebar.html" %}
+
+            <div class="b-page-divider"></div>
+
+            <div class="container-fluid">
+                <div class="row">
+                    {% block content %}
+			              {% endblock %}
+                </div>
+
+                <div class="row justify-content-md-center">
+                        {% include 'footer.html' %}
+                </div>
+            </div>
+            <div class="b-page-divider"></div>
+
+        </main>
+
+
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'js/sidebars.js' %}"></script>
+    </body>
+</html>
