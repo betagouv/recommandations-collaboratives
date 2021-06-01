@@ -21,8 +21,9 @@ from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("nimda/", admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 
 urlpatterns.extend(magicauth_urls)
 urlpatterns.extend(home_urls)
