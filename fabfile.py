@@ -24,6 +24,7 @@ def deploy(cnx):
         "cd urbanvitaliz-site "
         "&& ./venv/bin/pip install ./dist/urbanvitaliz-django-0.1.0.tar.gz"
         "&& ./manage.py migrate"
+        "&& ./manage.py compilescss"
         "&& ./manage.py collectstatic --noinput"
     )
 
