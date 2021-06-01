@@ -9,100 +9,212 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Project',
+            name="Project",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('email', models.CharField(max_length=128)),
-                ('contact', models.CharField(default='', max_length=128, verbose_name='Nom du contact')),
-                ('created_on', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Date de création')),
-                ('updated_on', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Dernière mise à jour')),
-                ('tags', models.CharField(blank=True, default='', max_length=256)),
-                ('name', models.CharField(max_length=128, verbose_name='Nom du projet')),
-                ('description', models.TextField(verbose_name='Description')),
-                ('location', models.CharField(max_length=256, verbose_name='Localisation')),
-                ('impediments', models.TextField(blank=True, default='', verbose_name='Difficultés')),
-                ('deleted', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("email", models.CharField(max_length=128)),
+                (
+                    "contact",
+                    models.CharField(
+                        default="", max_length=128, verbose_name="Nom du contact"
+                    ),
+                ),
+                (
+                    "created_on",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        verbose_name="Date de création",
+                    ),
+                ),
+                (
+                    "updated_on",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        verbose_name="Dernière mise à jour",
+                    ),
+                ),
+                ("tags", models.CharField(blank=True, default="", max_length=256)),
+                (
+                    "name",
+                    models.CharField(max_length=128, verbose_name="Nom du projet"),
+                ),
+                ("description", models.TextField(verbose_name="Description")),
+                (
+                    "location",
+                    models.CharField(max_length=256, verbose_name="Localisation"),
+                ),
+                (
+                    "impediments",
+                    models.TextField(
+                        blank=True, default="", verbose_name="Difficultés"
+                    ),
+                ),
+                ("deleted", models.DateTimeField(blank=True, null=True)),
             ],
             options={
-                'verbose_name': 'project',
-                'verbose_name_plural': 'projects',
-                'ordering': [],
+                "verbose_name": "project",
+                "verbose_name_plural": "projects",
+                "ordering": [],
             },
         ),
         migrations.CreateModel(
-            name='Resource',
+            name="Resource",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('public', models.BooleanField(blank=True, default=False)),
-                ('created_on', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date de création')),
-                ('tags', models.CharField(blank=True, default='', max_length=256)),
-                ('title', models.CharField(max_length=128)),
-                ('content', models.TextField()),
-                ('deleted', models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("public", models.BooleanField(blank=True, default=False)),
+                (
+                    "created_on",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        verbose_name="date de création",
+                    ),
+                ),
+                ("tags", models.CharField(blank=True, default="", max_length=256)),
+                ("title", models.CharField(max_length=128)),
+                ("content", models.TextField()),
+                ("deleted", models.DateTimeField(blank=True, null=True)),
             ],
             options={
-                'verbose_name': 'ressource',
-                'verbose_name_plural': 'ressources',
-                'ordering': [],
+                "verbose_name": "ressource",
+                "verbose_name_plural": "ressources",
+                "ordering": [],
             },
         ),
         migrations.CreateModel(
-            name='Task',
+            name="Task",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('public', models.BooleanField(blank=True, default=False)),
-                ('created_on', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date de création')),
-                ('tags', models.CharField(blank=True, default='', max_length=256)),
-                ('content', models.TextField(default='')),
-                ('deadline', models.DateField(blank=True, null=True)),
-                ('done', models.BooleanField(blank=True, default=False)),
-                ('deleted', models.DateTimeField(blank=True, null=True)),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='projects.project')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("public", models.BooleanField(blank=True, default=False)),
+                (
+                    "created_on",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        verbose_name="date de création",
+                    ),
+                ),
+                ("tags", models.CharField(blank=True, default="", max_length=256)),
+                ("content", models.TextField(default="")),
+                ("deadline", models.DateField(blank=True, null=True)),
+                ("done", models.BooleanField(blank=True, default=False)),
+                ("deleted", models.DateTimeField(blank=True, null=True)),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="projects.project",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'action',
-                'verbose_name_plural': 'actions',
-                'ordering': [],
+                "verbose_name": "action",
+                "verbose_name_plural": "actions",
+                "ordering": [],
             },
         ),
         migrations.CreateModel(
-            name='Note',
+            name="Note",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('public', models.BooleanField(blank=True, default=False)),
-                ('created_on', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date de création')),
-                ('tags', models.CharField(blank=True, default='', max_length=256)),
-                ('content', models.TextField(default='')),
-                ('deleted', models.DateTimeField(blank=True, null=True)),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='projects.project')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("public", models.BooleanField(blank=True, default=False)),
+                (
+                    "created_on",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        verbose_name="date de création",
+                    ),
+                ),
+                ("tags", models.CharField(blank=True, default="", max_length=256)),
+                ("content", models.TextField(default="")),
+                ("deleted", models.DateTimeField(blank=True, null=True)),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="projects.project",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'note',
-                'verbose_name_plural': 'notes',
-                'ordering': [],
+                "verbose_name": "note",
+                "verbose_name_plural": "notes",
+                "ordering": [],
             },
         ),
         migrations.CreateModel(
-            name='Document',
+            name="Document",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('public', models.BooleanField(blank=True, default=False)),
-                ('created_on', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date de création')),
-                ('tags', models.CharField(blank=True, default='', max_length=256)),
-                ('description', models.CharField(blank=True, default='', max_length=256)),
-                ('the_file', models.FileField(upload_to='')),
-                ('deleted', models.DateTimeField(blank=True, null=True)),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='projects.project')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("public", models.BooleanField(blank=True, default=False)),
+                (
+                    "created_on",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        verbose_name="date de création",
+                    ),
+                ),
+                ("tags", models.CharField(blank=True, default="", max_length=256)),
+                (
+                    "description",
+                    models.CharField(blank=True, default="", max_length=256),
+                ),
+                ("the_file", models.FileField(upload_to="")),
+                ("deleted", models.DateTimeField(blank=True, null=True)),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="projects.project",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'document',
-                'verbose_name_plural': 'documents',
-                'ordering': [],
+                "verbose_name": "document",
+                "verbose_name_plural": "documents",
+                "ordering": [],
             },
         ),
     ]
