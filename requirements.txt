@@ -4,6 +4,7 @@ django
 django-debug-toolbar
 django-magicauth
 django_otp
+fabric
 ipython
 model_bakery
 pip

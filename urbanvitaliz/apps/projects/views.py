@@ -44,7 +44,15 @@ class OnboardingForm(forms.ModelForm):
 
     class Meta:
         model = models.Project
-        fields = ["email", "contact", "name", "location", "description", "impediments"]
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "name",
+            "location",
+            "description",
+            "impediments",
+        ]
 
 
 ########################################################################
