@@ -7,6 +7,7 @@ authors : raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created : 2021-06-01 09:54:36 CEST
 """
 
+import os
 import pytest
 
 from distutils.core import run_setup
@@ -14,7 +15,22 @@ from fabric import task
 
 
 @task
+def check(cnx):
+    os.system("bandit -x tests,development.py -r urbanvitaliz")
+    os.system("semgrep --config=p/ci urbanvitaliz")
+
+@task
+def upgrade(cnx):
+    """Upgrade requirements to last version of server"""
+    cnx.run(
+        "cd urbanvitaliz-site "
+        "&& venv/bin/pip install --upgrade -r requirements.txt"
+    )
+
+
+@task
 def deploy(cnx):
+    """Deploy new version of project to server"""
     run_setup("setup.py", script_args=["sdist"])
     cnx.put(
         "./dist/urbanvitaliz-django-0.1.0.tar.gz",
