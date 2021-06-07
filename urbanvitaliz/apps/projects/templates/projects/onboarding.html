@@ -56,10 +56,15 @@
                 </div>
             </div>
 
-            <div class="form-floating">
+            <div class="form-floating mb-3">
                 <input type="email" class="form-control" id="{{ form.email.id_for_label }}" name="{{ form.email.name }}" placeholder="name@example.com" value="{{ form.email.value|default:'' }}">
                 <div class="form-text">Votre courriel ne sera jamais partagé en dehors de notre équipe.</div>
                 <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            </div>
+
+            <div class="form-floating">
+                <input type="text" class="form-control" id="{{ form.org_name.id_for_label }}" name="{{ form.org_name.name }}" placeholder="Mon organisatino" value="{{ form.org_name.value|default:'' }}">
+                <label for="{{ form.org_name.id_for_label }}">{{ form.org_name.label }}</label>
             </div>
         </div>
 
