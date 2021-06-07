@@ -10,6 +10,7 @@ created : 2021-05-26 11:29:25 CEST
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 
 from django.urls import path
 
@@ -21,6 +22,7 @@ from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
 
 
 urlpatterns = [
+    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("nimda/", admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
