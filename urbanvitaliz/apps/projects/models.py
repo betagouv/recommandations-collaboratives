@@ -26,7 +26,7 @@ class Project(models.Model):
         max_length=128, default="", verbose_name="Prénom du contact"
     )
     org_name = models.CharField(
-        max_length=256, blank=True, verbose_name="Nom de votre structure"
+        max_length=256, blank=True, default="", verbose_name="Nom de votre structure"
     )
 
     created_on = models.DateTimeField(
