@@ -48,6 +48,7 @@ class OnboardingForm(forms.ModelForm):
             "email",
             "first_name",
             "last_name",
+            "org_name",
             "name",
             "location",
             "description",
