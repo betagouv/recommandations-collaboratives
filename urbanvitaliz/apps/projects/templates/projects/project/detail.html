@@ -1,120 +1,250 @@
-{% extends "site.html" %}
+{% extends "base.html" %}
+
+{% load humanize %}
+{% load static %}
 
 {% block content %}
-	<h2 class="display-3">Accompagnement de projet</h2>
 
-<a href="{% url 'projects-project-list' %}" class="btn btn-outline-secondary btn-sm">
-retour liste des projets
-</a>
+<div class="col-9 py-5 mx-auto">
+
+    <h1 class=" align-items-center">
+        <svg class="bi" width="40" height="40" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+        </svg>
+        {{ project.name|title }}
+    </h1>
+
+    <div class="row">
+        <div class="col-md-9">
+
+            <span class="align-items-center link-dark text-decoration-none">
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill"/>
+                </svg>
+
+                <strong>Référent&middot;e : {{ project.first_name }} {{ project.last_name }}</strong>
+                <a class="d-inline" href="mailto:{{ project.email }}"  data-bs-toggle="tooltip" title="Envoyer un courriel">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+                        <span class="visually-hidden">envoyer un courriel</span>
+                    </svg>
+                </a>
+            </span>
+
+
+            <div class="col-lg-10 py-3 px-0">
+                <p class="lead">{{ project.description|linebreaks|default:'Aucune description.' }}</p>
+
+                <!--<p>Le site est situé sur la commune d'<a href="#">Attignéville (88015), rue des Viviers</a>. Il concerne la parcelle cadastrale numéro <a href="#">A59</a>.</p> -->
+
+                <p>Le site est situé à <a href="https://nominatim.openstreetmap.org/ui/search.html?q={{ project.location|urlencode }}" target="_new" >{{ project.location }}</a>.</p>
+            </div>
+
+        </div>
+        <div class="col-md-3 border-start"">
+            <svg class="bi" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+            </svg>
+            <p class="small text-secondary d-inline">Fiche crée <em>{{ project.created_on|naturalday }}</em> et modifiée <em>{{ project.updated_on|naturaltime }}</em>.</p>
+
+
+            <!--
+                 <p>
+                 <span class="align-items-center link-dark text-decoration-none">
+                 <img src="https://github.com/salomeDeschenes.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                 <strong>Salomé D.</strong>
+                 </span> est votre <strong>accompagnatrice</strong> UrbanVitaliz sur ce projet. N'hésitez pas à <strong>prendre rendez-vous</strong> pour lui <strong>poser vos questions</strong> et faire avancer votre projet.
+
+                 </p>
+
+                 <button type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#exampleModal">
+                 <svg class="bi" width="16" height="16" fill="currentColor">
+                 <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#telephone"/>
+                 </svg>
+                 Prendre rendez-vous
+                 </button>
+
+                 ou <a href="#">poser une question</a>.
+                 </button>
+
+            -->
+
+        </div>
+    </div>
+
+    <!--
+         <iframe width="250"
+         height="250"
+         frameborder="0"
+         scrolling="no"
+         marginheight="0"
+         marginwidth="0"
+         src="http://www.openstreetmap.org/export/embed.html?bbox=79.84942674636841%2C6.899900944350287%2C79.85650777816772%2C6.90436374803887&amp;layers=ND"
+         style="border: 1px solid black">
+         </iframe>
+    -->
+
+    <h2 class="mb-3">
+        <svg class="bi" width="28" height="28" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
+        </svg>
+        Connaissances du site</h2>
+
+    <!-- 
+         <p>
+         Voici la liste des faîts collectés sur votre projet. N'hésitez pas à <a href="#">répondre au questionnaire d'approfondissement</a> pour vous permettre de mieux cerner l'état actuel de votre projet.
+         </p>
+
+    -->
+
+    <!-- <p><a href="#">Ajouter une connaissance</a></p> -->
+
+    <div class="accordion mb-5" id="knowledge">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <svg class="bi align-middle" width="16" height="16">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-inbound"/>
+                    </svg>
+                    &nbsp;
+                    Demande initiale
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    {{ project.impediments|linebreaks }}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Devenir
+         <h2 class="py-3">
+         <svg class="bi" width="32" height="32" fill="currentColor">
+         <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#lightbulb"/>
+         </svg>
+
+         Devenir du site
+         </h2>
+
+         <p>Besoin d'inspiration ?</p>
+
+         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog modal-dialog-centered" role="document">
+         <div class="modal-content">
+         <div class="modal-header">
+         <h5 class="modal-title" id="exampleModalLabel">Success!</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+         <span aria-hidden="true">&times;</span>
+         </button>
+         </div>
+         <div class="modal-body">
+         If you're seeing this modal after clicking the button on the page, Bootstrap's CSS and JS are both working properly.
+         </div>
+         <div class="modal-footer">
+         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         <button type="button" class="btn btn-primary">Save changes</button>
+         </div>
+         </div>
+         </div>
+         </div>
+    -->
+
+    <!-- Actions -->
+    <h2 class="mb-3">
+        <svg class="bi" width="28" height="28" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightning"/>
+        </svg>
+        Actions
+    </h2>
+
+    {% if not project.tasks.count %}
+
+    <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
+        <div>
+            Aucune action actuellement pour ce projet. C'est le bon moment pour
+            <a href="{% url 'projects-create-task' project.id %}">
+		            créer une première action.
+	          </a>
+        </div>
+    </div>
+	  {% else %}
+	  <p>
+	      <a href="{% url 'projects-create-task' project.id %}" class="">
+		        Ajouter une action
+	      </a>
+	  </p>
+    <table class="table">
+		    <thead>
+			      <tr>
+				        <th>Échéance</th>
+				        <th>Description</th>
+				        <th>Complétée</th>
+			      </tr>
+		    </thead>
+		    <tbody>
+			      {% for task in project.tasks %}
+			      <tr>
+				        <td>{{ task.deadline|default:"" }}</td>
+				        <td>{{ task.content|linebreaks }}</td>
+				        <td>{% if task.done %}oui{% endif %}</td>
+			      </tr>
+			      {% endfor %}
+			      </tr>
+		    </tbody>
+	  </table>
+	  {% endif %}
+
+    <!-- Notes de suivi -->
+    <h2>
+        <svg class="bi" width="28" height="28" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+        </svg>
+        Notes de suivi
+    </h2>
+    {% if not project.notes.count %}
+
+    <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
+        <div>
+            Aucune note actuellement pour ce projet. C'est le bon moment pour
+            <a href="{% url 'projects-create-note' project.id %}">
+		            en créer une première.
+	          </a>
+        </div>
+    </div>
+	  {% else %}
+	  <p>
+	      <a href="{% url 'projects-create-note' project.id %}" class="">
+		        Ajouter une note
+	      </a>
+	  </p>
+
+	  {% for note in project.notes %}
+	  <div class="card mb-3">
+        <div class="card-body">
+		        <span>{{ note.content|linebreaks }}</span>
+
+            <span class="small text-secondary">
+                {{ note.tags }}
+            </span>
+        </div>
+        <div class="card-footer">
+		        <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em></span>
+        </div>
+		    
+	  </div>
+	  {% endfor %}
+	  {% endif %}
+
+
+
+
+</div>
 
 <section>
 
-	<h3 class="display-4">Contexte</h3>
-
-	<table class="table table-bordered">
-		<tr>
-			<th>Nom</th>
-			<td>{{ project.name }}</td>
-		</tr>
-		<tr>
-			<th>Localisation</th>
-			<td>{{ project.location }}</td>
-		</tr>
-		<tr>
-			<th>Date de création</th>
-			<td>{{ project.created_on }}</td>
-		</tr>
-	</table>
-
-</section>
-
-<section>
-
-	<h3 class="display-4">Demande initiale</h3>
-
-	<table class="table table-bordered">
-		<tr>
-			<th>Description</th>
-			<td>{{ project.description|linebreaks }}</td>
-		</tr>
-		<tr>
-			<th>Attentes</th>
-			<td>{{ project.impediments|linebreaks }}</td>
-		</tr>
-	</table>
-
-</section>
-
-<section>
-
-	<h3 class="display-4">Actions</h3>
-
-	{% if not project.tasks.count %}
-	<p>
-	Aucune action actuellement pour ce projet. C'est le bon moment pour
-	<a href="{% url 'projects-create-task' project.id %}">
-		créer une première action.
-	</a>
-	</p>
-	{% else %}
-	<p>
-	<a href="{% url 'projects-create-task' project.id %}" class="btn btn-primary btn-sm">
-		ajouter une action
-	</a>
-	</p>
-
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Échéance</th>
-				<th>Description</th>
-				<th>Complétée</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for task in project.tasks %}
-			<tr>
-				<td>{{ task.deadline|default:"" }}</td>
-				<td>{{ task.content|linebreaks }}</td>
-				<td>{% if task.done %}oui{% endif %}</td>
-			</tr>
-			{% endfor %}
-			</tr>
-		</tbody>
-	</table>
-	{% endif %}
-
-</section>
-
-<section>
-
-	<h3 class="display-4">Notes de suivi</h3>
-
-	{% if not project.notes.count %}
-
-	<p>
-	Aucune note actuellement pour ce projet. C'est le bon moment pour
-	<a href="{% url 'projects-create-note' project.id %}">
-		créer une première note.
-	</a>
-	</p>
-	{% else %}
-	<p>
-	<a href="{% url 'projects-create-note' project.id %}" class="btn btn-primary btn-sm">
-		ajouter une note
-	</a>
-	</p>
-
-	{% for note in project.notes %}
-	<div class="card" style="margin:1em;padding:1em">
-		<p>{{ note.content|linebreaks }}</p>
-		<p>Tags: {{ note.tags }}</p>
-		<p>Rédigée le {{ note.created_on }}</p>
-	</div>
-	{% endfor %}
-	{% endif %}
-
-</section>
+	  </section>
 
 {% endblock %}
 
