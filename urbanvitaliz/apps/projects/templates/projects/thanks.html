@@ -1,15 +1,31 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block content %}
-<header>
-	<h2>Merci !</h2>
-</header>
+<div class="col-9 py-5 mx-auto">
 
-<section>
+    <h2 class="mb-3">
+        <svg class="bi me-2" width="28" height="28">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-circle"/>
+        </svg>
+        Merci !
+    </h2>
 
-	<p>Votre demande est actuellment acheminée vers nos aiguilleuses et
-	aiguilleurs qui vont revenir rapidement vers vous pour vous accompagner au
-	mieux dans votre projet.</p>
+    <div class="bd-callout bd-callout-info">
+        <p><strong>Nous avons bien reçu votre demande.</strong></p>
 
-</section>
+        <p>Votre demande est actuellement acheminée vers nos aiguilleuses et
+	          aiguilleurs qui vont revenir rapidement vers vous pour vous accompagner
+	          au mieux dans votre projet.
+        </p>
+    </div>
+
+    <p class="small alert">
+        <a href="{% url 'home' %}"  class="small">Revenir à la page d'accueil.</a>
+    </p>
+
+
+</div>
+
 {% endblock %}
