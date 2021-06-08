@@ -127,10 +127,11 @@ SASS_PRECISION = 8
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # MagicAuth configuration
+LOGIN_URL = "/login/"
 LOGOUT_REDIRECT_URL = "/"
 MAGICAUTH_FROM_EMAIL = "no-reply@urbanvitaliz.fr"
-MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "/"
 MAGICAUTH_EMAIL_FIELD = "email"
 MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "home"
+MAGICAUTH_EMAIL_UNKNOWN_CALLBACK = "urbanvitaliz.apps.home.utils.create_user"
 
 # eof
