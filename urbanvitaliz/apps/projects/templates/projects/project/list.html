@@ -1,40 +1,43 @@
-{% extends "site.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-	<h2 class="display-3">Liste des projets</h2>
 
-<section>
+<div class="col-9 py-5 mx-auto">
+	  <h2>Liste des projets</h2>
 
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Date de création</th>
-				<th>Nom</th>
-				<th>Localisation</th>
-				<th>Actions</th>
-				<th>Notes</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for project in projects %}
-			<tr>
-				<td>{{ project.created_on }}</td>
-				<td>
-					<a href="{% url 'projects-project-detail' project.id %}">
-						{{ project.name }}
-					</a>
-				</td>
-				<td>{{ project.location }}</td>
-				<td>{{ project.tasks.count }}</td>
-				<td>{{ project.notes.count }}</td>
-			</tr>
-			{% empty %}
-			<tr>
-				<td colspan="5">Rien à faire ici.</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+    <section>
 
-</section>
+	      <table class="table table-striped">
+		        <thead>
+			          <tr>
+				            <th>Date de création</th>
+				            <th>Nom</th>
+				            <th>Localisation</th>
+				            <th>Actions</th>
+				            <th>Notes</th>
+			          </tr>
+		        </thead>
+		        <tbody>
+			          {% for project in projects %}
+			          <tr>
+				            <td>{{ project.created_on }}</td>
+				            <td>
+					              <a href="{% url 'projects-project-detail' project.id %}">
+						                {{ project.name }}
+					              </a>
+				            </td>
+				            <td>{{ project.location }}</td>
+				            <td>{{ project.tasks.count }}</td>
+				            <td>{{ project.notes.count }}</td>
+			          </tr>
+			          {% empty %}
+			          <tr>
+				            <td colspan="5">Rien à faire ici.</td>
+			          </tr>
+			          {% endfor %}
+		        </tbody>
+	      </table>
+
+    </section>
+</div>
 {% endblock %}
