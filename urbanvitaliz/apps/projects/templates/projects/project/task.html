@@ -1,46 +1,50 @@
-{% extends "site.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-<h2 class="display-3">Accompagnement de projet</h2>
+<div class="col-9 py-5 mx-auto">
 
-<section>
+    <h2>Ajouter une action</h2>
 
-	<h3 class="display-4">Contexte</h3>
+    <section>
 
-	<table class="table table-bordered">
-		<tr>
-			<th>Nom</th>
-			<td>{{ project.name }}</td>
-		</tr>
-		<tr>
-			<th>Localisation</th>
-			<td>{{ project.location }}</td>
-		</tr>
-		<tr>
-			<th>Date de création</th>
-			<td>{{ project.created_on }}</td>
-		</tr>
-	</table>
+	      <h3>Contexte</h3>
 
-</section>
+	      <table class="table table-bordered">
+		        <tr>
+			          <th>Nom</th>
+			          <td>{{ project.name }}</td>
+		        </tr>
+		        <tr>
+			          <th>Localisation</th>
+			          <td>{{ project.location }}</td>
+		        </tr>
+		        <tr>
+			          <th>Date de création</th>
+			          <td>{{ project.created_on }}</td>
+		        </tr>
+	      </table>
 
-<section>
+    </section>
 
-	<form id="form-projects-add-task"
-				method="post"
-				action="."
-				class="form-horizontal">
+    <section>
 
-		{% csrf_token %}
+	      <form id="form-projects-add-task"
+				          method="post"
+				          action="."
+				          class="form-horizontal">
 
-		{{ form.as_p }}
+		        {% csrf_token %}
 
-		<button type="submit" class="btn btn-primary">
-			Enregistrer
-		</button>
-	</form>
+		        {{ form.as_p }}
 
-</section>
+		        <button type="submit" class="btn btn-primary">
+			          Enregistrer
+		        </button>
+	      </form>
+
+    </section>
+
+</div>
 
 {% endblock %}
 
