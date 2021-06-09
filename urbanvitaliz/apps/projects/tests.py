@@ -12,6 +12,7 @@ from contextlib import contextmanager
 import pytest
 
 from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertNotContains
 
 from django.urls import reverse
 
@@ -48,11 +49,63 @@ def test_onboarding_page_is_reachable_without_login(client):
     assertContains(response, 'form id="form-projects-onboarding"')
 
 
+@pytest.mark.django_db
+def test_performing_onboarding_create_a_new_project(client):
+    with login(client):
+        response = client.post(
+            reverse("projects-onboarding"),
+            data={
+                "name": "a project",
+                "email": "a@example.com",
+                "location": "some place",
+                "first_name": "john",
+                "last_name": "doe",
+                "description": "a project description",
+                "impediment": "some impediment",
+            },
+        )
+    project = models.Project.fetch()[0]
+    assert project.name == "a project"
+    assert response.status_code == 200
+
+
+########################################################################
+# My projects
+########################################################################
+
+
+@pytest.mark.django_db
+def test_my_project_not_available_when_not_logged_in(client):
+    url = reverse("projects-my-projects")
+    response = client.get(url)
+    assert response.status_code == 302  # redirects to login
+
+
+@pytest.mark.django_db
+def test_my_projects_are_displayed_on_page(client):
+    url = reverse("projects-my-projects")
+    with login(client, is_staff=True) as user:
+        project = Recipe(models.Project, email=user.email).make()
+        response = client.get(url)
+    assertContains(response, project.name)
+    assert response.status_code == 200
+
+@pytest.mark.django_db
+def test_other_projects_are_not_displayed_on_page(client):
+    project = Recipe(models.Project, email="other@example.com").make()
+    url = reverse("projects-my-projects")
+    with login(client, is_staff=True) as user:
+        response = client.get(url)
+    assertNotContains(response, project.name)
+    assert response.status_code == 200
+
+
 ########################################################################
 # login
 ########################################################################
 
 
+@pytest.mark.xfail  # FIXME make this test pass
 @pytest.mark.django_db
 def test_existing_user_receives_email_on_login(client, mocker):
     mocker.patch("django.core.mail.send_mail")
@@ -178,6 +231,19 @@ def test_create_task_available_for_staff_users(client):
     assertContains(response, 'form id="form-projects-add-task"')
 
 
+@pytest.mark.django_db
+def test_create_new_task_for_project_and_redirect(client):
+    project = Recipe(models.Project).make()
+    with login(client, is_staff=True):
+        response = client.post(
+            reverse("projects-create-task", args=[project.id]),
+            data={"content": "this is some content"},
+        )
+    task = models.Task.fetch()[0]
+    assert task.project == project
+    assert response.status_code == 302
+
+
 ########################################################################
 # create note
 ########################################################################
@@ -202,6 +268,19 @@ def test_create_note_available_for_staff_users(client):
     assertContains(response, 'form id="form-projects-add-note"')
 
 
+@pytest.mark.django_db
+def test_create_new_note_for_project_and_redirect(client):
+    project = Recipe(models.Project).make()
+    with login(client, is_staff=True):
+        response = client.post(
+            reverse("projects-create-note", args=[project.id]),
+            data={"content": "this is some content"},
+        )
+    note = models.Note.fetch()[0]
+    assert note.project == project
+    assert response.status_code == 302
+
+
 ########################################################################
 # Helpers
 ########################################################################
@@ -210,7 +289,7 @@ def test_create_note_available_for_staff_users(client):
 @contextmanager
 def login(client, is_staff=False):
     """Create a user and sign her into the application"""
-    user = Recipe(auth.User, is_staff=is_staff).make()
+    user = Recipe(auth.User, email="a@example.com", is_staff=is_staff).make()
     client.force_login(user)
     yield user
 

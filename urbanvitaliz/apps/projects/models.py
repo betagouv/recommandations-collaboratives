@@ -50,8 +50,11 @@ class Project(models.Model):
         return f"{self.name} {self.location}"
 
     @classmethod
-    def fetch(cls):
-        return cls.objects.filter(deleted=None)
+    def fetch(cls, email=None):
+        projects = cls.objects.filter(deleted=None)
+        if email:
+            projects = projects.filter(email=email)
+        return projects
 
     def notes(self):
         return Note.fetch().filter(project=self).order_by("created_on")
