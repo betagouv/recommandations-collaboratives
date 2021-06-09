@@ -1,0 +1,6 @@
+[run]
+# plugins = django_coverage_plugin
+source =
+    urbanvitaliz
+omit =
+    *test*
