@@ -9,6 +9,8 @@ created : 2021-05-26 15:56:20 CEST
 
 from django.contrib.auth.decorators import login_required
 
+from django.core.exceptions import PermissionDenied
+
 from django import forms
 
 from django.urls import reverse
@@ -25,7 +27,6 @@ from . import models
 ########################################################################
 
 
-# @login_required
 def onboarding(request):
     """Return the onboarding page"""
     if request.method == "POST":
@@ -61,11 +62,11 @@ class OnboardingForm(forms.ModelForm):
 ########################################################################
 
 
-# @login_required
-def local_authorities(request):
+@login_required
+def myprojects(request):
     """Return the project followup for local authorities"""
     projects = models.Project.fetch(email=request.user.email)
-    return render(request, "projects/collectivite.html", locals())
+    return render(request, "projects/myprojects.html", locals())
 
 
 ########################################################################
@@ -73,23 +74,26 @@ def local_authorities(request):
 ########################################################################
 
 
-# @login_required
+@login_required
 def project_list(request):
     """Return the projects for the switchtender"""
+    is_staff_or_403(request.user)
     projects = models.Project.fetch().order_by("-created_on")
     return render(request, "projects/project/list.html", locals())
 
 
-# @login_required
+@login_required
 def project_detail(request, project_id=None):
     """Return the details of given project for switchtender"""
+    is_staff_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     return render(request, "projects/project/detail.html", locals())
 
 
-# @login_required
+@login_required
 def create_note(request, project_id=None):
     """Create a new note for a project"""
+    is_staff_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
         form = NoteForm(request.POST)
@@ -111,9 +115,10 @@ class NoteForm(forms.ModelForm):
         fields = ["content", "tags", "public"]
 
 
-# @login_required
+@login_required
 def create_task(request, project_id=None):
     """Create a new task for a project"""
+    is_staff_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
         form = TaskForm(request.POST)
@@ -133,6 +138,17 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = models.Task
         fields = ["content", "tags", "public", "deadline"]
+
+
+########################################################################
+# Helpers
+########################################################################
+
+
+def is_staff_or_403(user):
+    """Raise a 403 error is user is not a staff member"""
+    if not user or not user.is_staff:
+        raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
 # eof

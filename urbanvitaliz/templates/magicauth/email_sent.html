@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-9 py-5 mx-auto">
+
+    <h2 class="mb-3">
+        <svg class="bi me-2" width="28" height="28">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-circle"/>
+        </svg>
+        Un lien de connexion vous a été envoyé !
+    </h2>
+
+
+    <div class="bd-callout bd-callout-info mb-2">
+        <p>
+            Vous y êtes presque : <strong>consultez maintenant votre messagerie (Gmail, Orange, ...)</strong> puis <strong>cliquez sur le lien</strong> que nous vous avons envoyé.
+        </p>
+        Vous serez alors <strong>connecté&middot;e</strong>.
+    </div>
+
+    <p class="small alert">
+        <span class="text-secondary">Toujours rien reçu de notre part après quelques minutes ?</span>
+        <span class="">Pensez à vérifier dans votre dossier <em>Pourriel</em> ou <em>Spam</em>.</span>
+            <a href="{% url 'magicauth-login' %}?next={{ next_url|urlencode }}" class="small">Vous pouvez aussi ré-essayer.</a>
+    </p>
+
+</div>
+
+{% endblock %}
