@@ -90,11 +90,12 @@ def test_my_projects_are_displayed_on_page(client):
     assertContains(response, project.name)
     assert response.status_code == 200
 
+
 @pytest.mark.django_db
 def test_other_projects_are_not_displayed_on_page(client):
     project = Recipe(models.Project, email="other@example.com").make()
     url = reverse("projects-my-projects")
-    with login(client, is_staff=True) as user:
+    with login(client, is_staff=True):
         response = client.get(url)
     assertNotContains(response, project.name)
     assert response.status_code == 200
@@ -105,27 +106,25 @@ def test_other_projects_are_not_displayed_on_page(client):
 ########################################################################
 
 
-@pytest.mark.xfail  # FIXME make this test pass
 @pytest.mark.django_db
-def test_existing_user_receives_email_on_login(client, mocker):
-    mocker.patch("django.core.mail.send_mail")
+def test_existing_user_receives_email_on_login(client):
     user = Recipe(auth.User, email="jdoe@example.com").make()
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": user.email})
     assert response.status_code == 302
-    django.core.mail.send_mail.assert_called_once()
+    assert len(django.core.mail.outbox) == 1
+    assert user.email in django.core.mail.outbox[0].to
 
 
-@pytest.mark.xfail  # FIXME make this test pass
 @pytest.mark.django_db
-def test_unknown_user_is_created_and_receives_email_on_login(client, mocker):
-    mocker.patch("django.core.mail.send_mail")
+def test_unknown_user_is_created_and_receives_email_on_login(client):
     email = "jdoe@example.com"
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": email})
     assert response.status_code == 302
     assert auth.User.objects.get(email=email)
-    django.core.mail.send_mail.assert_called_once()
+    assert len(django.core.mail.outbox) == 1
+    assert email in django.core.mail.outbox[0].to
 
 
 ########################################################################
