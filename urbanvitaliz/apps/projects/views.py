@@ -107,6 +107,21 @@ def create_note(request, project_id=None):
     return render(request, "projects/project/note.html", locals())
 
 
+@login_required
+def update_note(request, note_id=None):
+    """Update an existing note for a project"""
+    is_staff_or_403(request.user)
+    note = get_object_or_404(models.Note, pk=note_id)
+    if request.method == "POST":
+        form = NoteForm(request.POST, instance=note)
+        if form.is_valid():
+            form.save(commit=True)
+            return redirect(reverse("projects-project-detail", args=[note.project_id]))
+    else:
+        form = NoteForm(instance=note)
+    return render(request, "projects/project/note.html", locals())
+
+
 class NoteForm(forms.ModelForm):
     """Form new project note creation"""
 
@@ -129,6 +144,21 @@ def create_task(request, project_id=None):
             return redirect(reverse("projects-project-detail", args=[project_id]))
     else:
         form = TaskForm()
+    return render(request, "projects/project/task.html", locals())
+
+
+@login_required
+def update_task(request, task_id=None):
+    """Update an existing task for a project"""
+    is_staff_or_403(request.user)
+    task = get_object_or_404(models.Task, pk=task_id)
+    if request.method == "POST":
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save(commit=True)
+            return redirect(reverse("projects-project-detail", args=[task.project_id]))
+    else:
+        form = TaskForm(instance=task)
     return render(request, "projects/project/task.html", locals())
 
 
