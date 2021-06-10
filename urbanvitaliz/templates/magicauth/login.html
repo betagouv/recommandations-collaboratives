@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-9 py-5 mx-auto">
+
+    <h2 class="mb-3">
+        <svg class="bi me-2" width="28" height="28">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle"/>
+        </svg>
+        Se connecter ou créer un compte
+    </h2>
+
+    <div class="bd-callout bd-callout-info mb-5">
+        <p><strong>2 en 1 : c'est plus simple !</strong></p>
+
+        <p>
+        Que vous ayez <strong>déjà un compte</strong> ou que vous <strong>souhaitiez
+            en créer un</strong>, il vous suffit de <strong>renseigner votre courriel</strong>.
+        </p>
+
+
+        Un <strong>lien</strong> vous sera envoyé dans votre <strong>boîte aux lettres</strong>
+        : vous n'aurez plus qu'à <strong>cliquer dessus pour accéder au site</strong>.
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control {% if form.errors %}state-invalid {% endif %}" id="{{ form.email.id_for_label }}" name="{{ form.email.name }}" placeholder="nom@exemple.fr" value="{{ form.email.value|default:'' }}">
+            <div class="form-text">Votre courriel ne sera jamais partagé en dehors de notre équipe.</div>
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+
+            {% for error in form.email.errors %}
+            <div class="alert alert-danger text-center">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+            <svg class="bi me-2 align-middle" width="20" height="20">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+            </svg>
+            Recevoir mon lien de connexion
+        </button>
+    </form>
+</div>
+{% endblock %}

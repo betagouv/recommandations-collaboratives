@@ -19,12 +19,12 @@ def check(cnx):
     os.system("bandit -x tests,development.py -r urbanvitaliz")
     os.system("semgrep --config=p/ci urbanvitaliz")
 
+
 @task
 def upgrade(cnx):
     """Upgrade requirements to last version of server"""
     cnx.run(
-        "cd urbanvitaliz-site "
-        "&& venv/bin/pip install --upgrade -r requirements.txt"
+        "cd urbanvitaliz-site " "&& venv/bin/pip install --upgrade -r requirements.txt"
     )
 
 
