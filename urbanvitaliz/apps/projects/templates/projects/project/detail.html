@@ -187,7 +187,10 @@
 			      {% for task in project.tasks %}
 			      <tr>
 				        <td>{{ task.deadline|default:"" }}</td>
-				        <td>{{ task.content|linebreaks }}</td>
+				        <td>
+									{{ task.content|linebreaks }}
+									<a href="{% url 'projects-update-task' task.id %}">éditer</a>
+								</td>
 				        <td>{% if task.done %}oui{% endif %}</td>
 			      </tr>
 			      {% endfor %}
@@ -223,7 +226,11 @@
 	  {% for note in project.notes %}
 	  <div class="card mb-3">
         <div class="card-body">
-		        <span>{{ note.content|linebreaks }}</span>
+		        <span>
+							{{ note.content|linebreaks }}
+						</span>
+
+						<p><a href="{% url 'projects-update-note' note.id %}">éditer</a></p>
 
             <span class="small text-secondary">
                 {{ note.tags }}
