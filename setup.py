@@ -11,7 +11,7 @@ from setuptools import find_packages
 
 setup(
     name="urbanvitaliz-django",
-    version="0.3.0",
+    version="0.4.0",
     description="Urbavitaliz application -django version",
     packages=find_packages(),
     include_package_data=True,
