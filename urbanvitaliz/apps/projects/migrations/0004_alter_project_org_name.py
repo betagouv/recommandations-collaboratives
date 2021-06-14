@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0003_project_org_name'),
+        ("projects", "0003_project_org_name"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='project',
-            name='org_name',
-            field=models.CharField(blank=True, default='', max_length=256, verbose_name='Nom de votre structure'),
+            model_name="project",
+            name="org_name",
+            field=models.CharField(
+                blank=True,
+                default="",
+                max_length=256,
+                verbose_name="Nom de votre structure",
+            ),
         ),
     ]

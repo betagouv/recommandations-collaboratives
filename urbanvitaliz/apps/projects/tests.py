@@ -25,6 +25,9 @@ from model_bakery.recipe import Recipe
 from . import models
 
 
+# TODO when local authority can see & update her project
+# TODO check that project, note, and task belong to her
+
 ########################################################################
 # Landing page
 ########################################################################
@@ -90,11 +93,12 @@ def test_my_projects_are_displayed_on_page(client):
     assertContains(response, project.name)
     assert response.status_code == 200
 
+
 @pytest.mark.django_db
 def test_other_projects_are_not_displayed_on_page(client):
     project = Recipe(models.Project, email="other@example.com").make()
     url = reverse("projects-my-projects")
-    with login(client, is_staff=True) as user:
+    with login(client, is_staff=True):
         response = client.get(url)
     assertNotContains(response, project.name)
     assert response.status_code == 200
@@ -105,27 +109,25 @@ def test_other_projects_are_not_displayed_on_page(client):
 ########################################################################
 
 
-@pytest.mark.xfail  # FIXME make this test pass
 @pytest.mark.django_db
-def test_existing_user_receives_email_on_login(client, mocker):
-    mocker.patch("django.core.mail.send_mail")
+def test_existing_user_receives_email_on_login(client):
     user = Recipe(auth.User, email="jdoe@example.com").make()
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": user.email})
     assert response.status_code == 302
-    django.core.mail.send_mail.assert_called_once()
+    assert len(django.core.mail.outbox) == 1
+    assert user.email in django.core.mail.outbox[0].to
 
 
-@pytest.mark.xfail  # FIXME make this test pass
 @pytest.mark.django_db
-def test_unknown_user_is_created_and_receives_email_on_login(client, mocker):
-    mocker.patch("django.core.mail.send_mail")
+def test_unknown_user_is_created_and_receives_email_on_login(client):
     email = "jdoe@example.com"
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": email})
     assert response.status_code == 302
     assert auth.User.objects.get(email=email)
-    django.core.mail.send_mail.assert_called_once()
+    assert len(django.core.mail.outbox) == 1
+    assert email in django.core.mail.outbox[0].to
 
 
 ########################################################################
@@ -208,8 +210,12 @@ def test_project_detail_contains_actions(client):
 
 
 ########################################################################
-# create task
+# tasks
 ########################################################################
+
+
+#
+# create
 
 
 @pytest.mark.django_db
@@ -244,9 +250,51 @@ def test_create_new_task_for_project_and_redirect(client):
     assert response.status_code == 302
 
 
+#
+# update
+
+
+@pytest.mark.django_db
+def test_update_task_not_available_for_non_staff_users(client):
+    task = Recipe(models.Task).make()
+    url = reverse("projects-update-task", args=[task.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_update_task_available_for_staff_users(client):
+    task = Recipe(models.Task).make()
+    url = reverse("projects-update-task", args=[task.id])
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+    # FIXME rename add-task to edit-task ?
+    assertContains(response, 'form id="form-projects-add-task"')
+
+
+@pytest.mark.django_db
+def test_update_task_for_project_and_redirect(client):
+    task = Recipe(models.Task).make()
+    url = reverse("projects-update-task", args=[task.id])
+    data = {"content": "this is some content"}
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    task = models.Task.objects.get(id=task.id)
+    assert task.content == data["content"]
+    assert response.status_code == 302
+
+
 ########################################################################
-# create note
+# notes
 ########################################################################
+
+
+#
+# create
 
 
 @pytest.mark.django_db
@@ -278,6 +326,44 @@ def test_create_new_note_for_project_and_redirect(client):
         )
     note = models.Note.fetch()[0]
     assert note.project == project
+    assert response.status_code == 302
+
+
+#
+# update
+
+
+@pytest.mark.django_db
+def test_update_note_not_available_for_non_staff_users(client):
+    note = Recipe(models.Note).make()
+    url = reverse("projects-update-note", args=[note.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_update_note_available_for_staff_users(client):
+    note = Recipe(models.Note).make()
+    url = reverse("projects-update-note", args=[note.id])
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+    # FIXME rename add-note to edit-note ?
+    assertContains(response, 'form id="form-projects-add-note"')
+
+
+@pytest.mark.django_db
+def test_update_note_for_project_and_redirect(client):
+    note = Recipe(models.Note).make()
+    url = reverse("projects-update-note", args=[note.id])
+    data = {"content": "this is some content"}
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    note = models.Note.objects.get(id=note.id)
+    assert note.content == data["content"]
     assert response.status_code == 302
 
 
