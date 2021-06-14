@@ -30,9 +30,19 @@ urlpatterns = [
         name="projects-create-task",
     ),
     path(
+        r"task/<int:task_id>/",
+        views.update_task,
+        name="projects-update-task",
+    ),
+    path(
         r"project/<int:project_id>/note/",
         views.create_note,
         name="projects-create-note",
+    ),
+    path(
+        r"note/<int:note_id>/",
+        views.update_note,
+        name="projects-update-note",
     ),
 ]
 
