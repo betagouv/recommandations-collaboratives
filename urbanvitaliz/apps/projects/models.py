@@ -14,6 +14,9 @@ from django.contrib.auth import models as auth
 
 from django.utils import timezone
 
+from markdownx.models import MarkdownxField
+from markdownx.utils import markdownify
+
 
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
@@ -76,7 +79,25 @@ class Note(models.Model):
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
+    def tags_as_list(self):
+        """
+        Needed since django doesn't provide a split template tag
+        """
+        tags = []
+
+        words = self.tags.split(" ")
+        for word in words:
+            tag = word.strip(" ")
+            if tag != "":
+                tags.append(tag)
+
+        return tags
+
     content = models.TextField(default="")
+
+    def content_rendered(self):
+        """Return content as markdown"""
+        return markdownify(self.content)
 
     deleted = models.DateTimeField(null=True, blank=True)
 

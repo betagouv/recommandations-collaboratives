@@ -1,49 +1,34 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block content %}
 
 <div class="col-9 py-5 mx-auto">
 
+		<h1>{{ project.name }}</h1>
+
     <h2>Ajouter une note</h2>
-    
-	  <section>
 
-	<h3>Contexte</h3>
+    <section>
 
-	<table class="table table-bordered">
-		<tr>
-			<th>Nom</th>
-			<td>{{ project.name }}</td>
-		</tr>
-		<tr>
-			<th>Localisation</th>
-			<td>{{ project.location }}</td>
-		</tr>
-		<tr>
-			<th>Date de création</th>
-			<td>{{ project.created_on }}</td>
-		</tr>
-	</table>
+	      <form id="form-projects-add-note"
+				      method="post"
+				      action="."
+				      class="form">
 
-</section>
+		        {% csrf_token %}
 
-<section>
+            {{ form.as_p }}
 
-	<form id="form-projects-add-note"
-				method="post"
-				action="."
-				class="form">
+		        <button type="submit" class="btn btn-primary">
+			          Enregistrer
+		        </button>
+	      </form>
 
-		{% csrf_token %}
+        {{ form.media }}
 
-		{{ form.as_p }}
-
-		<button type="submit" class="btn btn-primary">
-			Enregistrer
-		</button>
-	</form>
-
-</section>
+    </section>
 
 {% endblock %}
 

@@ -19,6 +19,8 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 
+from markdownx.fields import MarkdownxFormField
+
 from . import models
 
 
@@ -128,6 +130,8 @@ class NoteForm(forms.ModelForm):
     class Meta:
         model = models.Note
         fields = ["content", "tags", "public"]
+
+    content = MarkdownxFormField()
 
 
 @login_required
