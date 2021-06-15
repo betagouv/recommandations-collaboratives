@@ -13,6 +13,8 @@
 		    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
         <link href="{% sass_src 'css/base.scss' %}" rel="stylesheet" type="text/css">
         <link href="{% sass_src 'css/sidebars.scss' %}" rel="stylesheet" type="text/css">
+        <link href="{% sass_src 'css/markdownx.scss' %}" rel="stylesheet" type="text/css">
+
         {% block css %}
         {% endblock %}
 
@@ -48,5 +50,7 @@
 
         <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
         <script src="{% static 'js/sidebars.js' %}"></script>
+        {% block js %}
+        {% endblock %}
     </body>
 </html>

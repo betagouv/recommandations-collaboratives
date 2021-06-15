@@ -6,13 +6,16 @@ Models for project
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
-
+from datetime import date
 
 from django.db import models
 
 from django.contrib.auth import models as auth
 
 from django.utils import timezone
+
+from markdownx.models import MarkdownxField
+from markdownx.utils import markdownify
 
 
 class Project(models.Model):
@@ -76,7 +79,25 @@ class Note(models.Model):
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
+    def tags_as_list(self):
+        """
+        Needed since django doesn't provide a split template tag
+        """
+        tags = []
+
+        words = self.tags.split(" ")
+        for word in words:
+            tag = word.strip(" ")
+            if tag != "":
+                tags.append(tag)
+
+        return tags
+
     content = models.TextField(default="")
+
+    def content_rendered(self):
+        """Return content as markdown"""
+        return markdownify(self.content)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
@@ -105,6 +126,11 @@ class Task(models.Model):
 
     content = models.TextField(default="")
     deadline = models.DateField(null=True, blank=True)
+
+    @property
+    def is_deadline_past_due(self):
+        return date.today() > self.deadline
+
     done = models.BooleanField(default=False, blank=True)
 
     deleted = models.DateTimeField(null=True, blank=True)
