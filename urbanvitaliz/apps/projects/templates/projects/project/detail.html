@@ -179,20 +179,31 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Échéance</th>
+                    <th class="col-3">Échéance</th>
                     <th>Description</th>
-                    <th>Complétée</th>
+                    <th class="col-2">Complétée ?</th>
                 </tr>
             </thead>
             <tbody>
-                {% for task in project.tasks %}
+                {% for task in project.tasks|dictsort:"deadline" %}
                 <tr>
-                    <td>{{ task.deadline|default:"" }}</td>
+                    <td class="{% if task.is_deadline_past_due %}text-danger{%endif%}">{{ task.deadline|default:"" }}</td>
                     <td>
                         {{ task.content|linebreaks }}
-                        <a href="{% url 'projects-update-task' task.id %}">éditer</a>
+                        <a class="small" href="{% url 'projects-update-task' task.id %}">éditer</a>
                     </td>
-                    <td>{% if task.done %}oui{% endif %}</td>
+                    <td>
+                        {% if task.done %}
+                        <svg class="bi" width="20" height="20" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-square"/>
+                        </svg>
+                        {% else %}
+                        <svg class="bi" width="20" height="20" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#square"/>
+                        </svg>
+                        {% endif %}
+
+                    </td>
                 </tr>
                 {% endfor %}
                 </tr>

@@ -6,7 +6,7 @@ Models for project
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
-
+from datetime import date
 
 from django.db import models
 
@@ -126,6 +126,11 @@ class Task(models.Model):
 
     content = models.TextField(default="")
     deadline = models.DateField(null=True, blank=True)
+
+    @property
+    def is_deadline_past_due(self):
+        return date.today() > self.deadline
+
     done = models.BooleanField(default=False, blank=True)
 
     deleted = models.DateTimeField(null=True, blank=True)
