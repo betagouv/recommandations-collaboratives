@@ -171,7 +171,7 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = models.Task
-        fields = ["content", "tags", "public", "deadline"]
+        fields = ["content", "tags", "public", "deadline", "done"]
 
 
 ########################################################################
