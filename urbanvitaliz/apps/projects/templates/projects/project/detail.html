@@ -3,6 +3,7 @@
 {% load humanize %}
 {% load static %}
 
+
 {% block content %}
 
 <div class="col-9 py-5 mx-auto">
@@ -97,152 +98,182 @@
 
     -->
 
-    <!-- <p><a href="#">Ajouter une connaissance</a></p> -->
+        <!-- <p><a href="#">Ajouter une connaissance</a></p> -->
 
-    <div class="accordion mb-5" id="knowledge">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    <svg class="bi align-middle" width="16" height="16">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-inbound"/>
-                    </svg>
-                    &nbsp;
-                    Demande initiale
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                    {{ project.impediments|linebreaks }}
+        <div class="accordion mb-5" id="knowledge">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <svg class="bi align-middle" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-inbound"/>
+                        </svg>
+                        &nbsp;
+                        Demande initiale
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        {{ project.impediments|linebreaks }}
+                    </div>
                 </div>
             </div>
+
         </div>
 
-    </div>
+        <!-- Devenir
+             <h2 class="py-3">
+             <svg class="bi" width="32" height="32" fill="currentColor">
+             <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#lightbulb"/>
+             </svg>
 
-    <!-- Devenir
-         <h2 class="py-3">
-         <svg class="bi" width="32" height="32" fill="currentColor">
-         <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#lightbulb"/>
-         </svg>
+             Devenir du site
+             </h2>
 
-         Devenir du site
-         </h2>
+             <p>Besoin d'inspiration ?</p>
 
-         <p>Besoin d'inspiration ?</p>
+             <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+             <div class="modal-dialog modal-dialog-centered" role="document">
+             <div class="modal-content">
+             <div class="modal-header">
+             <h5 class="modal-title" id="exampleModalLabel">Success!</h5>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+             <span aria-hidden="true">&times;</span>
+             </button>
+             </div>
+             <div class="modal-body">
+             If you're seeing this modal after clicking the button on the page, Bootstrap's CSS and JS are both working properly.
+             </div>
+             <div class="modal-footer">
+             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+             <button type="button" class="btn btn-primary">Save changes</button>
+             </div>
+             </div>
+             </div>
+             </div>
+        -->
 
-         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-         <div class="modal-dialog modal-dialog-centered" role="document">
-         <div class="modal-content">
-         <div class="modal-header">
-         <h5 class="modal-title" id="exampleModalLabel">Success!</h5>
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-         <span aria-hidden="true">&times;</span>
-         </button>
-         </div>
-         <div class="modal-body">
-         If you're seeing this modal after clicking the button on the page, Bootstrap's CSS and JS are both working properly.
-         </div>
-         <div class="modal-footer">
-         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-         <button type="button" class="btn btn-primary">Save changes</button>
-         </div>
-         </div>
-         </div>
-         </div>
-    -->
+        <!-- Actions -->
+        <h2 class="mb-3">
+            <svg class="bi" width="28" height="28" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightning"/>
+            </svg>
+            Actions
+        </h2>
 
-    <!-- Actions -->
-    <h2 class="mb-3">
-        <svg class="bi" width="28" height="28" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightning"/>
-        </svg>
-        Actions
-    </h2>
+        {% if not project.tasks.count %}
 
-    {% if not project.tasks.count %}
-
-    <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
-        <div>
-            Aucune action actuellement pour ce projet. C'est le bon moment pour
-            <a href="{% url 'projects-create-task' project.id %}">
-		            créer une première action.
-	          </a>
+        <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
+            <div>
+                Aucune action actuellement pour ce projet. C'est le bon moment pour
+                <a href="{% url 'projects-create-task' project.id %}">
+                    créer une première action.
+                </a>
+            </div>
         </div>
-    </div>
-	  {% else %}
-	  <p>
-	      <a href="{% url 'projects-create-task' project.id %}" class="">
-		        Ajouter une action
-	      </a>
-	  </p>
-    <table class="table">
-		    <thead>
-			      <tr>
-				        <th>Échéance</th>
-				        <th>Description</th>
-				        <th>Complétée</th>
-			      </tr>
-		    </thead>
-		    <tbody>
-			      {% for task in project.tasks %}
-			      <tr>
-				        <td>{{ task.deadline|default:"" }}</td>
-				        <td>
-									{{ task.content|linebreaks }}
-									<a href="{% url 'projects-update-task' task.id %}">éditer</a>
-								</td>
-				        <td>{% if task.done %}oui{% endif %}</td>
-			      </tr>
-			      {% endfor %}
-			      </tr>
-		    </tbody>
-	  </table>
-	  {% endif %}
+        {% else %}
+        <p>
+            <a href="{% url 'projects-create-task' project.id %}" class="">
+                Ajouter une action
+            </a>
+        </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="col-3">Échéance</th>
+                    <th>Description</th>
+                    <th class="col-2">Complétée ?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in project.tasks|dictsort:"deadline" %}
+                <tr>
+                    <td class="{% if task.is_deadline_past_due %}text-danger{%endif%}">{{ task.deadline|default:"" }}</td>
+                    <td>
+                        {{ task.content|linebreaks }}
+                        <a class="small" href="{% url 'projects-update-task' task.id %}">éditer</a>
+                    </td>
+                    <td>
+                        {% if task.done %}
+                        <svg class="bi" width="20" height="20" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-square"/>
+                        </svg>
+                        {% else %}
+                        <svg class="bi" width="20" height="20" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#square"/>
+                        </svg>
+                        {% endif %}
 
-    <!-- Notes de suivi -->
-    <h2>
-        <svg class="bi" width="28" height="28" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
-        </svg>
-        Notes de suivi
-    </h2>
-    {% if not project.notes.count %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
 
-    <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
-        <div>
-            Aucune note actuellement pour ce projet. C'est le bon moment pour
-            <a href="{% url 'projects-create-note' project.id %}">
-		            en créer une première.
-	          </a>
+        <!-- Notes de suivi -->
+        <h2>
+            <svg class="bi" width="28" height="28" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+            </svg>
+            Notes de suivi
+        </h2>
+        {% if not project.notes.count %}
+
+        <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
+            <div>
+                Aucune note actuellement pour ce projet. C'est le bon moment pour
+                <a href="{% url 'projects-create-note' project.id %}">
+                    en créer une première.
+                </a>
+            </div>
         </div>
-    </div>
-	  {% else %}
-	  <p>
-	      <a href="{% url 'projects-create-note' project.id %}" class="">
-		        Ajouter une note
-	      </a>
-	  </p>
+        {% else %}
+        <p>
+            <a href="{% url 'projects-create-note' project.id %}" class="">
+                Ajouter une note
+            </a>
+        </p>
 
-	  {% for note in project.notes %}
-	  <div class="card mb-3">
-        <div class="card-body">
-		        <span>
-							{{ note.content|linebreaks }}
-						</span>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
 
-						<p><a href="{% url 'projects-update-note' note.id %}">éditer</a></p>
+            {% for note in project.notes %}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="card-subtitle mb-2 text-muted">
+                            {% for tag in note.tags_as_list %}
+                            #{{ tag }}&nbsp;
+                            {% endfor %}
+                        </div>
 
-            <span class="small text-secondary">
-                {{ note.tags }}
-            </span>
+                        <div class="card-text">
+                            {{ note.content_rendered|safe  }}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        {% if note.public %}
+                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note publique">
+                            <svg class="bi" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
+                            </svg>
+                        </span>
+                        {% else %}
+                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note privée">
+                            <svg class="bi" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-slash"/>
+                            </svg>
+                        </span>
+                        {% endif %}
+                        &nbsp;
+                        <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em> - <a href="{% url 'projects-update-note' note.id %}">éditer</a></span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
         </div>
-        <div class="card-footer">
-		        <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em></span>
-        </div>
-
-	  </div>
-	  {% endfor %}
-	  {% endif %}
+        {% endif %}
 
 
 
@@ -251,7 +282,7 @@
 
 <section>
 
-	  </section>
+</section>
 
 {% endblock %}
 

@@ -12,7 +12,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
-from django.urls import path
+from django.urls import path, include
 
 from magicauth import views as magicauth_views
 from magicauth.urls import urlpatterns as magicauth_urls
@@ -23,9 +23,9 @@ from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
 
 urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("markdownx/", include("markdownx.urls")),
     path("nimda/", admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 
 urlpatterns.extend(magicauth_urls)
 urlpatterns.extend(home_urls)

@@ -1,0 +1,13 @@
+.markdownx {
+    display: flex;
+
+    textarea {
+        margin-right: 50px;
+        min-height: 300px;
+        width: 50%;
+    }
+
+    .markdownx-preview {
+        flex-grow: 1;
+    }
+}

@@ -19,6 +19,8 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 
+from markdownx.fields import MarkdownxFormField
+
 from . import models
 
 
@@ -129,6 +131,8 @@ class NoteForm(forms.ModelForm):
         model = models.Note
         fields = ["content", "tags", "public"]
 
+    content = MarkdownxFormField()
+
 
 @login_required
 def create_task(request, project_id=None):
@@ -167,7 +171,7 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = models.Task
-        fields = ["content", "tags", "public", "deadline"]
+        fields = ["content", "tags", "public", "deadline", "done"]
 
 
 ########################################################################
