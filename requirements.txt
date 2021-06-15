@@ -4,6 +4,7 @@ coverage
 django
 django-debug-toolbar
 django-magicauth
+django-markdownx
 django_otp
 fabric
 ipython

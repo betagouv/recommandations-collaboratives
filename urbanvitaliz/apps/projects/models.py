@@ -129,7 +129,7 @@ class Task(models.Model):
 
     @property
     def is_deadline_past_due(self):
-        return date.today() > self.deadline
+        return date.today() > self.deadline if self.deadline else False
 
     done = models.BooleanField(default=False, blank=True)
 
