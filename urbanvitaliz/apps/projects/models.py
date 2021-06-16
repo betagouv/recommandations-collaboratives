@@ -77,6 +77,9 @@ class Note(models.Model):
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )
+    updated_on = models.DateTimeField(
+        default=timezone.now, verbose_name="Dernière mise à jour"
+    )
     tags = models.CharField(max_length=256, blank=True, default="")
 
     def tags_as_list(self):
@@ -121,6 +124,9 @@ class Task(models.Model):
     public = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
+    )
+    updated_on = models.DateTimeField(
+        default=timezone.now, verbose_name="Dernière mise à jour"
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
