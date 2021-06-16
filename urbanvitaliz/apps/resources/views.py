@@ -46,6 +46,7 @@ def resource_detail(request, resource_id=None):
 @login_required
 def resource_update(request, resource_id=None):
     """Update informations for resource"""
+    is_staff_or_403(request.user)
     resource = get_object_or_404(models.Resource, pk=resource_id)
     next_url = reverse("resources-resource-detail", args=[resource.id])
     if request.method == "POST":
@@ -61,6 +62,7 @@ def resource_update(request, resource_id=None):
 @login_required
 def resource_create(request):
     """Create new resource"""
+    is_staff_or_403(request.user)
     if request.method == "POST":
         form = EditResourceForm(request.POST)
         if form.is_valid():
@@ -81,5 +83,15 @@ class EditResourceForm(forms.ModelForm):
         model = models.Resource
         fields = ["title", "content"]
 
+
+########################################################################
+# Helpers
+########################################################################
+
+
+def is_staff_or_403(user):
+    """Raise a 403 error is user is not a staff member"""
+    if not user or not user.is_staff:
+        raise PermissionDenied("L'information demandée n'est pas disponible")
 
 # eof
