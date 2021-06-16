@@ -49,11 +49,4 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display = ["created_on", "description", "the_file"]
 
 
-@admin.register(models.Resource)
-class ResourceAdmin(admin.ModelAdmin):
-    search_fields = ["title", "content"]
-    list_filter = ["created_on"]
-    list_display = ["created_on", "title"]
-
-
 # eof

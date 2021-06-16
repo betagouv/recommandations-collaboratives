@@ -19,6 +19,7 @@ from magicauth.urls import urlpatterns as magicauth_urls
 
 from urbanvitaliz.apps.home.urls import urlpatterns as home_urls
 from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
+from urbanvitaliz.apps.resources.urls import urlpatterns as resources_urls
 
 
 urlpatterns = [
@@ -30,5 +31,6 @@ urlpatterns = [
 urlpatterns.extend(magicauth_urls)
 urlpatterns.extend(home_urls)
 urlpatterns.extend(projects_urls)
+urlpatterns.extend(resources_urls)
 
 # eof
