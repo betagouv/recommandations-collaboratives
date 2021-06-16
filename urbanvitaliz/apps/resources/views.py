@@ -94,4 +94,5 @@ def is_staff_or_403(user):
     if not user or not user.is_staff:
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
+
 # eof
