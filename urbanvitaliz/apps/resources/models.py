@@ -1,8 +1,19 @@
+# encoding: utf-8
+
+"""
+Models for resources application
+
+authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
+created: 2021-06-16 10:57:13 CEST
+"""
+
 from django.db import models
+
+from django.utils import timezone
 
 
 class Resource(models.Model):
-    """Représente une ressource du système"""
+    """Représente une ressource pour les utilisateur·ices d'UV"""
 
     public = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(
@@ -25,3 +36,10 @@ class Resource(models.Model):
     @classmethod
     def fetch(cls):
         return cls.objects.filter(deleted=None)
+
+    @classmethod
+    def search(cls, criterias):
+        return cls.fetch()
+
+
+# eof

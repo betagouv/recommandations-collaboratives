@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "markdownx",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
+    "urbanvitaliz.apps.resources",
 ]
 
 MIDDLEWARE = [
