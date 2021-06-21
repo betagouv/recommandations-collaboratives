@@ -15,6 +15,13 @@ from django.contrib import admin
 from . import models
 
 
+@admin.register(models.Category)
+class CategoryAdmin(admin.ModelAdmin):
+    search_fields = ["name", "icon"]
+    list_filter = []
+    list_display = ["name", "icon", "color"]
+
+
 @admin.register(models.Resource)
 class ResourceAdmin(admin.ModelAdmin):
     search_fields = ["title", "content"]
