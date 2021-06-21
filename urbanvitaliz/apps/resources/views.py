@@ -29,8 +29,8 @@ def resource_search(request):
     """Search existing resources"""
     form = SearchForm(request.GET)
     form.is_valid()
-    query = form.cleaned_data.get("query")
-    categories = form.cleaned_data.get("categories")
+    query = form.cleaned_data.get("query", "")
+    categories = form.cleaned_data.get("categories", [])
     resources = models.Resource.search(query, categories)
     return render(request, "resources/resource/list.html", locals())
 
