@@ -48,6 +48,8 @@ class Resource(models.Model):
     category = models.ForeignKey("Category", null=True, on_delete=models.CASCADE)
 
     title = models.CharField(max_length=128)
+    subtitle = models.CharField(max_length=128, default="")
+    quote = models.CharField(max_length=256, default="")
     content = models.TextField()
 
     deleted = models.DateTimeField(null=True, blank=True)
