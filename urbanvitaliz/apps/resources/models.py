@@ -45,7 +45,9 @@ class Resource(models.Model):
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
-    category = models.ForeignKey("Category", null=True, on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        "Category", null=True, on_delete=models.CASCADE
+    )
 
     title = models.CharField(max_length=128)
     subtitle = models.CharField(max_length=128, default="")
@@ -66,8 +68,21 @@ class Resource(models.Model):
         return cls.objects.filter(deleted=None)
 
     @classmethod
-    def search(cls, criterias):
-        return cls.fetch()
+    def search(cls, query="", categories=None):
+        # A very basic search strategy to be replaced by postgres full text search
+        categories = categories or []
+        resources = cls.fetch()
+        if categories:
+            resources = resources.filter(category__in=categories)
+        for word in query.split():
+            resources = resources.filter(
+                models.Q(title__icontains=word)
+                | models.Q(subtitle__icontains=word)
+                | models.Q(content__icontains=word)
+                | models.Q(quote__icontains=word)
+                | models.Q(tags__icontains=word)
+            )
+        return resources
 
 
 # eof
