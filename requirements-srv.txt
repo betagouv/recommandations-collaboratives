@@ -1,0 +1,9 @@
+Django
+ipython
+django-markdownx
+django-magicauth
+django_otp
+# STATIC FILES
+django-sass-processor
+libsass
+django-compressor

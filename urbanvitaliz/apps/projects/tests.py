@@ -13,6 +13,7 @@ import pytest
 
 from pytest_django.asserts import assertContains
 from pytest_django.asserts import assertNotContains
+from pytest_django.asserts import assertRedirects
 
 from django.urls import reverse
 
@@ -210,6 +211,76 @@ def test_project_detail_contains_actions(client):
 
 
 ########################################################################
+# update project
+########################################################################
+
+
+@pytest.mark.django_db
+def test_update_project_not_available_for_non_staff_users(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-update", args=[project.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.xfail
+@pytest.mark.django_db
+def test_update_project_available_for_staff_users(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-update", args=[project.id])
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+    assertContains(response, 'form id="form-project-update"')
+
+
+@pytest.mark.django_db
+def test_update_project_and_redirect(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-update", args=[project.id])
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "location": "some place",
+        "first_name": "john",
+        "last_name": "doe",
+        "description": "a project description",
+        "impediment": "some impediment",
+    }
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    project = models.Project.objects.get(id=project.id)
+    assert project.name == data["name"]
+    detail_url = reverse("projects-project-detail", args=[project.id])
+    assertRedirects(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_update_project_update_project_updated_on(client):
+    project = Recipe(models.Project).make()
+    updated_on_before = project.updated_on
+    url = reverse("projects-project-update", args=[project.id])
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "location": "some place",
+        "first_name": "john",
+        "last_name": "doe",
+        "description": "a project description",
+        "impediment": "some impediment",
+    }
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    project = models.Project.objects.get(id=project.id)
+    assert project.updated_on > updated_on_before
+
+
+########################################################################
 # tasks
 ########################################################################
 
@@ -286,6 +357,21 @@ def test_update_task_for_project_and_redirect(client):
     task = models.Task.objects.get(id=task.id)
     assert task.content == data["content"]
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_update_task_update_both_task_and_project_updated_on(client):
+    task = Recipe(models.Task).make()
+    updated_on_before = task.updated_on
+    url = reverse("projects-update-task", args=[task.id])
+    data = {"content": "this is some content"}
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    task = models.Task.objects.get(id=task.id)
+    assert task.updated_on > updated_on_before
+    assert task.project.updated_on == task.updated_on
 
 
 ########################################################################
@@ -365,6 +451,21 @@ def test_update_note_for_project_and_redirect(client):
     note = models.Note.objects.get(id=note.id)
     assert note.content == data["content"]
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_update_note_update_both_note_and_project_updated_on(client):
+    note = Recipe(models.Note).make()
+    updated_on_before = note.updated_on
+    url = reverse("projects-update-note", args=[note.id])
+    data = {"content": "this is some content"}
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    note = models.Note.objects.get(id=note.id)
+    assert note.updated_on > updated_on_before
+    assert note.project.updated_on == note.updated_on
 
 
 ########################################################################
