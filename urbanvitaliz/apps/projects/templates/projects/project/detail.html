@@ -185,7 +185,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for task in project.tasks|dictsort:"deadline" %}
+                {% for task in project.tasks %}
                 <tr>
                     <td class="{% if task.is_deadline_past_due %}text-danger{%endif%}">{{ task.deadline|default:"" }}</td>
                     <td>
