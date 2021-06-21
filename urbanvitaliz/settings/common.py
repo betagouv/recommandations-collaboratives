@@ -125,7 +125,7 @@ STATICFILES_FINDERS = [
 SASS_PRECISION = 8
 
 SASS_PROCESSOR_INCLUDE_DIRS = [
-    os.path.join(BASE_DIR, 'urbanvitaliz/static/css'),
+    os.path.join(BASE_DIR, "urbanvitaliz/static/css"),
 ]
 
 # Default primary key field type
