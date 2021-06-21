@@ -7,6 +7,8 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-16 10:57:13 CEST
 """
 
+from markdownx.utils import markdownify
+
 from django.db import models
 
 from django.utils import timezone
@@ -23,6 +25,10 @@ class Resource(models.Model):
 
     title = models.CharField(max_length=128)
     content = models.TextField()
+
+    def content_rendered(self):
+        """Return content as markdown"""
+        return markdownify(self.content)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
