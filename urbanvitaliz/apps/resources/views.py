@@ -26,14 +26,22 @@ from . import models
 
 @login_required
 def resource_search(request):
-    """Search exisiting resources"""
-    if request.method == "POST":
-        request.session["resources_resource_search_criterias"] = request.POST.get(
-            "criterias", ""
-        )
-    criterias = request.session.get("resources_resource_search_criterias", "")
-    resources = models.Resource.search(criterias)
+    """Search existing resources"""
+    form = SearchForm(request.GET)
+    form.is_valid()
+    query = form.cleaned_data.get("query")
+    categories = form.cleaned_data.get("categories")
+    resources = models.Resource.search(query, categories)
     return render(request, "resources/resource/list.html", locals())
+
+
+class SearchForm(forms.Form):
+    """Form to search for resources"""
+
+    categories = forms.ModelMultipleChoiceField(
+        queryset=models.Category.fetch(), required=False
+    )
+    query = forms.CharField(required=False)
 
 
 @login_required

@@ -184,6 +184,60 @@ def test_update_resource_and_redirect(client):
 
 
 ########################################################################
+# Resource searching
+########################################################################
+
+
+@pytest.mark.django_db
+def test_search_resources_do_not_match_query():
+    resource = Recipe(models.Resource).make()
+    unmatched = models.Resource.search(query="notfound")
+    assert resource not in unmatched
+
+
+@pytest.mark.django_db
+def test_search_resources_by_tag():
+    resource = Recipe(models.Resource, tags="atag").make()
+    matched = models.Resource.search(query="tag")
+    assert resource in matched
+
+
+@pytest.mark.django_db
+def test_search_resources_by_quote():
+    resource = Recipe(models.Resource, quote="a quote").make()
+    matched = models.Resource.search(query="quot")
+    assert resource in matched
+
+
+@pytest.mark.django_db
+def test_search_resources_by_title():
+    resource = Recipe(models.Resource, title="a title").make()
+    matched = models.Resource.search(query="titl")
+    assert resource in matched
+
+
+@pytest.mark.django_db
+def test_search_resources_by_content():
+    resource = Recipe(models.Resource, content="some content...").make()
+    matched = models.Resource.search(query="cont")
+    assert resource in matched
+
+
+@pytest.mark.django_db
+def test_search_resources_by_category():
+    # categories are search like: any category that fits
+    categories = [
+        Recipe(models.Category).make(),
+        Recipe(models.Category).make(),
+    ]
+    resources = [
+        Recipe(models.Resource, category=category).make() for category in categories
+    ]
+    matched = models.Resource.search(categories=categories)
+    assert set(resources) == set(matched)
+
+
+########################################################################
 # Helpers
 ########################################################################
 
