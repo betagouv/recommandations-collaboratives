@@ -14,7 +14,6 @@ from django.contrib.auth import views as auth_views
 
 from django.urls import path, include
 
-from magicauth import views as magicauth_views
 from magicauth.urls import urlpatterns as magicauth_urls
 
 from urbanvitaliz.apps.home.urls import urlpatterns as home_urls

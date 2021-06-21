@@ -14,6 +14,27 @@ from django.db import models
 from django.utils import timezone
 
 
+class Category(models.Model):
+    """Représente une categorie de ressource"""
+
+    name = models.CharField(max_length=128)
+    color = models.CharField(max_length=16)
+    icon = models.CharField(max_length=32)
+
+    deleted = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "catégorie"
+        verbose_name_plural = "catégories"
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def fetch(cls):
+        return cls.objects.filter(deleted=None)
+
+
 class Resource(models.Model):
     """Représente une ressource pour les utilisateur·ices d'UV"""
 
@@ -21,7 +42,12 @@ class Resource(models.Model):
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )
+    created_on = models.DateTimeField(
+        default=timezone.now, verbose_name="dernière modification"
+    )
     tags = models.CharField(max_length=256, blank=True, default="")
+
+    category = models.ForeignKey("Category", null=True, on_delete=models.CASCADE)
 
     title = models.CharField(max_length=128)
     content = models.TextField()

@@ -89,8 +89,10 @@ def project_list(request):
 @login_required
 def project_detail(request, project_id=None):
     """Return the details of given project for switchtender"""
-    is_staff_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
+    # if user is not the owner then check for admin rights
+    if project.email != request.user.email:
+        is_staff_or_403(request.user)
     return render(request, "projects/project/detail.html", locals())
 
 
