@@ -8,6 +8,7 @@
     }
 
     .markdownx-preview {
-        flex-grow: 1;
+        width: 50%;
+        overflow-wrap: break-word;
     }
 }
