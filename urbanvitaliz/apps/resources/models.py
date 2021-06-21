@@ -17,8 +17,18 @@ from django.utils import timezone
 class Category(models.Model):
     """Représente une categorie de ressource"""
 
+    COLOR_CHOICES = (
+        ("blue", "Bleu"),
+        ("black", "Black"),
+        ("yellow", "Jaune"),
+        ("orange", "Orange"),
+        ("red", "Rouge"),
+        ("green", "Vert"),
+        ("violet", "Violet"),
+    )
+
     name = models.CharField(max_length=128)
-    color = models.CharField(max_length=16)
+    color = models.CharField(max_length=16, choices=COLOR_CHOICES)
     icon = models.CharField(max_length=32)
 
     deleted = models.DateTimeField(null=True, blank=True)
@@ -42,10 +52,26 @@ class Resource(models.Model):
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )
-    created_on = models.DateTimeField(
+    updated_on = models.DateTimeField(
         default=timezone.now, verbose_name="dernière modification"
     )
     tags = models.CharField(max_length=256, blank=True, default="")
+
+    def tags_as_list(self):
+        """
+        Needed since django doesn't provide a split template tag
+        XXX: Temp Duplicated before introducing a Tag manager
+        """
+        tags = []
+
+        words = self.tags.split(" ")
+        for word in words:
+            tag = word.strip(" ")
+            if tag != "":
+                tags.append(tag)
+
+        return tags
+
 
     category = models.ForeignKey("Category", null=True, on_delete=models.CASCADE)
 

@@ -1,0 +1,89 @@
+.card-resource {
+
+    .card-title {
+
+        /* Icon background colors based on Tango */
+        .bg-color-orange {
+            background-color: #ce5c00;
+        }
+
+        .bg-color-black {
+            background-color: black;
+        }
+
+        .bg-color-yellow {
+            background-color: #edd400;
+        }
+
+        .bg-color-green {
+            background-color: #4e9a06
+        }
+
+        .bg-color-blue {
+            background-color: #204a87;
+        }
+
+        .bg-color-violet {
+            background-color: #5c3566;
+        }
+
+        .bg-color-red {
+            background-color: #a40000;
+        }
+
+        span {
+            font-variant: small-caps;
+        }
+    }
+
+    .card-body {
+        z-index: 1;
+    }
+
+    .subtitle {
+        font-variant: small-caps;
+    }
+
+    .middle-hr {
+        position: absolute;
+        top: 25px;
+        border: 1px solid #bbb;
+        width: 100%;
+        z-index: 0;
+    }
+
+    .icon-placeholder {
+        width: 80px;
+        display: inline-block;
+
+    }
+
+    .resource-icon {
+        vertical-align: middle;
+        background-color: black;
+        color: white;
+        //border: 8px solid black;
+
+        padding: 5px;
+        width: 50px;
+        height: 50px;
+    };
+
+    .category {
+        height: 100%;
+
+        span {
+            font-size: 15px;
+            margin-top: 12px;
+        }
+    }
+
+    .title {
+        text-align: left;
+        font-size: 20px;
+        font-weight: 700;
+    }
+}
+
+
+
