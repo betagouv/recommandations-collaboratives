@@ -25,6 +25,11 @@ urlpatterns = [
         name="projects-project-detail",
     ),
     path(
+        r"project/<int:project_id>/update/",
+        views.project_update,
+        name="projects-project-update",
+    ),
+    path(
         r"project/<int:project_id>/task/",
         views.create_task,
         name="projects-create-task",

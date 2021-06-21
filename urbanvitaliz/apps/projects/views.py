@@ -15,6 +15,8 @@ from django import forms
 
 from django.urls import reverse
 
+from django.utils import timezone
+
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -93,6 +95,40 @@ def project_detail(request, project_id=None):
 
 
 @login_required
+def project_update(request, project_id=None):
+    """Update the base information of a project"""
+    is_staff_or_403(request.user)
+    project = get_object_or_404(models.Project, pk=project_id)
+    if request.method == "POST":
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.updated_on = timezone.now()
+            instance.save()
+            return redirect(reverse("projects-project-detail", args=[project_id]))
+    else:
+        form = ProjectForm(instance=project)
+    return render(request, "projects/project/update.html", locals())
+
+
+class ProjectForm(forms.ModelForm):
+    """Form for updating the base information of a project"""
+
+    class Meta:
+        model = models.Project
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "org_name",
+            "name",
+            "location",
+            "description",
+            "impediments",
+        ]
+
+
+@login_required
 def create_note(request, project_id=None):
     """Create a new note for a project"""
     is_staff_or_403(request.user)
@@ -117,7 +153,11 @@ def update_note(request, note_id=None):
     if request.method == "POST":
         form = NoteForm(request.POST, instance=note)
         if form.is_valid():
-            form.save(commit=True)
+            instance = form.save(commit=False)
+            instance.updated_on = timezone.now()
+            instance.save()
+            instance.project.updated_on = instance.updated_on
+            instance.project.save()
             return redirect(reverse("projects-project-detail", args=[note.project_id]))
     else:
         form = NoteForm(instance=note)
@@ -159,7 +199,11 @@ def update_task(request, task_id=None):
     if request.method == "POST":
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
-            form.save(commit=True)
+            instance = form.save(commit=False)
+            instance.updated_on = timezone.now()
+            instance.save()
+            instance.project.updated_on = instance.updated_on
+            instance.project.save()
             return redirect(reverse("projects-project-detail", args=[task.project_id]))
     else:
         form = TaskForm(instance=task)

@@ -22,7 +22,11 @@ def check(cnx):
 
 @task
 def upgrade(cnx):
-    """Upgrade requirements to last version of server"""
+    """Upgrade requirements to last version on server"""
+    cnx.put(
+        "./requirements-srv.txt",
+        remote="./urbanvitaliz-site/requirements.txt",
+    )
     cnx.run(
         "cd urbanvitaliz-site " "&& venv/bin/pip install --upgrade -r requirements.txt"
     )
