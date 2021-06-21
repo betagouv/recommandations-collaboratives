@@ -14,7 +14,6 @@ from django.contrib.auth import models as auth
 
 from django.utils import timezone
 
-from markdownx.models import MarkdownxField
 from markdownx.utils import markdownify
 
 

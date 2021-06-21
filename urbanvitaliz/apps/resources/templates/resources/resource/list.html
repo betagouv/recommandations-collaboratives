@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-9 py-5 mx-auto">
+
+    <h1 class=" align-items-center">
+        <svg class="bi" width="38" height="38" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#book"/>
+        </svg>
+        Ressources
+    </h1>
+
+    <div class="">
+        Ici on trouve des trucs
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+
+            {% for resource in resources %}
+            <div class="col-2">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="card-title mb-2">
+                            {{ resource.title|title }}
+                        </div>
+
+                        <div class="card-text">
+                            {{ resource.content|safe  }}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        {% if note.public %}
+                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note publique">
+                            <svg class="bi" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
+                            </svg>
+                        </span>
+                        {% else %}
+                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note privée">
+                            <svg class="bi" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-slash"/>
+                            </svg>
+                        </span>
+                        {% endif %}
+                        &nbsp;
+                        <span class="small text-secondary"><em>Rédigée </em> - <a href="#">éditer</a></span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+    </div>
+    
+
+</div>
+
+{% endblock %}
