@@ -66,7 +66,7 @@ class Project(models.Model):
         return Note.fetch().filter(project=self).order_by("created_on")
 
     def tasks(self):
-        return Task.fetch().filter(project=self).order_by("created_on")
+        return Task.fetch().filter(project=self).order_by("deadline", "created_on")
 
 
 class Note(models.Model):
