@@ -177,6 +177,16 @@ def test_project_detail_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
+def test_project_detail_available_for_owner(client):
+    # project email is same as test user to be logged in
+    project = Recipe(models.Project, email="test@example.com").make()
+    url = reverse("projects-project-detail", args=[project.id])
+    with login(client, is_staff=False):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
 def test_project_detail_available_for_staff_users(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-project-detail", args=[project.id])
@@ -476,7 +486,7 @@ def test_update_note_update_both_note_and_project_updated_on(client):
 @contextmanager
 def login(client, is_staff=False):
     """Create a user and sign her into the application"""
-    user = Recipe(auth.User, email="a@example.com", is_staff=is_staff).make()
+    user = Recipe(auth.User, email="test@example.com", is_staff=is_staff).make()
     client.force_login(user)
     yield user
 
