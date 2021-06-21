@@ -1,35 +1,54 @@
+/* Icon background colors based on Tango */
+.bg-color-orange {
+    background-color: #ce5c00 !important;
+}
+
+.bg-color-black {
+    background-color: black !important;
+}
+
+.bg-color-yellow {
+    background-color: #edd400  !important;
+}
+
+.bg-color-green {
+    background-color: #4e9a06 !important;
+}
+
+.bg-color-blue {
+    background-color: #204a87  !important;
+}
+
+.bg-color-violet {
+    background-color: #5c3566  !important;
+}
+
+.bg-color-red {
+    background-color: #a40000 !important;
+}
+
+.resource-icon {
+    vertical-align: middle;
+    background-color: black;
+    color: white;
+    //border: 8px solid black;
+
+    padding: 5px;
+    width: 50px;
+    height: 50px;
+};
+
+.resource-details {
+
+    .subtitle {
+        font-variant: small-caps;
+    }
+}
+
+
 .card-resource {
 
     .card-title {
-
-        /* Icon background colors based on Tango */
-        .bg-color-orange {
-            background-color: #ce5c00;
-        }
-
-        .bg-color-black {
-            background-color: black;
-        }
-
-        .bg-color-yellow {
-            background-color: #edd400;
-        }
-
-        .bg-color-green {
-            background-color: #4e9a06
-        }
-
-        .bg-color-blue {
-            background-color: #204a87;
-        }
-
-        .bg-color-violet {
-            background-color: #5c3566;
-        }
-
-        .bg-color-red {
-            background-color: #a40000;
-        }
 
         span {
             font-variant: small-caps;
@@ -58,16 +77,6 @@
 
     }
 
-    .resource-icon {
-        vertical-align: middle;
-        background-color: black;
-        color: white;
-        //border: 8px solid black;
-
-        padding: 5px;
-        width: 50px;
-        height: 50px;
-    };
 
     .category {
         height: 100%;
