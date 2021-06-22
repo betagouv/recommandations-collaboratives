@@ -65,11 +65,11 @@
 
 
             <span class="small text-secondary">Catégories :</span>&nbsp;
-            {% for category in form.categories %}
+            {% for category in form.category_fields %}
             <span class="form-check form-switch form-check-inline">
                 <input class="form-check-input" type="checkbox" name="{{ category.the_category.form_label }}"
                        id="check-{{ category.the_category.form_label }}"
-                       {% if category %}checked{% endif %}
+                       {% if category.checked %}checked{% endif %}
                 >
                 <label class="form-check-label" for="check-{{ category.the_category.form_label }}">{{ category.the_category }}</label>
             </span>
