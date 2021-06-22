@@ -80,9 +80,9 @@ class Resource(models.Model):
         "Category", null=True, blank=True, on_delete=models.CASCADE
     )
 
-    title = models.CharField(max_length=128)
-    subtitle = models.CharField(max_length=128, default="")
-    quote = models.CharField(max_length=256, default="")
+    title = models.CharField(max_length=256)
+    subtitle = models.CharField(max_length=512, default="")
+    quote = models.CharField(max_length=512, default="")
     content = models.TextField()
 
     def content_rendered(self):
@@ -108,7 +108,9 @@ class Resource(models.Model):
         categories = categories or []
         resources = cls.fetch()
         if categories:
-            resources = resources.filter(category__in=categories)
+            resources = resources.filter(
+                models.Q(category__in=categories) | models.Q(category=None)
+            )
         for word in query.split():
             resources = resources.filter(
                 models.Q(title__icontains=word)
