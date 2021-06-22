@@ -34,5 +34,7 @@ migrate:
 	./manage.py migrate
 
 safe:
-	bandit urbanvitaliz
+	bandit -x tests,development.py -r urbanvitaliz
 	semgrep --config=p/ci urbanvitaliz
+
+# eof
