@@ -94,7 +94,7 @@ class Resource(models.Model):
         verbose_name_plural = "ressources"
 
     def __str__(self):
-        return "Resource".format()
+        return self.title
 
     @classmethod
     def fetch(cls):
