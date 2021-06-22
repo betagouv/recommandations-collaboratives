@@ -25,8 +25,8 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(models.Resource)
 class ResourceAdmin(admin.ModelAdmin):
     search_fields = ["title", "content"]
-    list_filter = ["created_on"]
-    list_display = ["created_on", "title"]
+    list_filter = ["updated_on"]
+    list_display = ["updated_on", "title"]
 
 
 # eof

@@ -72,7 +72,9 @@ class Resource(models.Model):
 
         return tags
 
-    category = models.ForeignKey("Category", null=True, on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        "Category", null=True, blank=True, on_delete=models.CASCADE
+    )
 
     title = models.CharField(max_length=128)
     subtitle = models.CharField(max_length=128, default="")
