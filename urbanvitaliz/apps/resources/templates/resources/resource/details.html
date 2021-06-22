@@ -20,10 +20,10 @@
                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#book"/>
                 </svg>&nbsp;
-                <a href="{% url 'resources-resource-search' %}">Resources</a>
+                <a href="{% url 'resources-resource-search' %}">Ressources</a>
             </li>
             <li class="breadcrumb-item active">{{ resource.title|title|truncatechars:20 }}
-                <span class="badge bg-light text-dark align-middle">{{ resource.category.name|default:"Resource" }}</span>
+                <span class="badge bg-light text-dark align-middle">{{ resource.category.name|default:"Ressource" }}</span>
             </li>
         </ol>
     </nav>
@@ -31,8 +31,8 @@
     <div class="row resource-details mb-3">
         <div class="col-sm-12 col-lg-8 col-xl-9">
 
-            <h1 class="mb-3">
-                <span data-bs-toggle="tooltip" data-bs-placement="left" title="{{ resource.category.name|default:"Resource" }}">
+            <h1 class="mb-3 text-break">
+                <span data-bs-toggle="tooltip" data-bs-placement="left" title="{{ resource.category.name|default:"Ressource" }}">
                     <svg class="bi me-2 rounded-circle align-middle resource-icon bg-color-{{ resource.category.color|default:"black" }}">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"book" }}"/>
                     </svg>
@@ -70,7 +70,7 @@
                 <svg class="bi" width="20" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-history"/>
                 </svg>
-                Crée le <em>{{ resource.created_on|naturalday }}</em> et modifiée <em>{{ resource.updated_on|naturaltime }}</em>.
+                Crée <em>{{ resource.created_on|naturalday }}</em> et modifiée <em>{{ resource.updated_on|naturaltime }}</em>.
             </p>
 
             <!-- User actions -->

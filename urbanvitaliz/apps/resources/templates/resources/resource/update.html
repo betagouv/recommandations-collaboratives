@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load humanize %}
+
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#book"/>
+                </svg>&nbsp;
+                <a href="{% url 'resources-resource-search' %}">Ressources</a>
+            </li>
+            <li class="breadcrumb-item active">
+                <a href="{% url 'resources-resource-detail' resource.id %}">
+                    {{ resource.title|title|truncatechars:20 }}
+                </a>
+                <span class="badge bg-light text-dark align-middle">
+                    {{ resource.category.name|default:"Ressource" }}
+                </a>
+                </span>
+            </li>
+        </ol>
+    </nav>
+
+    <section>
+
+	      <form id="form-resource-update"
+				      method="post"
+				      action="."
+				      class="form">
+
+		        {% csrf_token %}
+
+            {{ form.as_p }}
+
+		        <button type="submit" class="btn btn-primary">
+			          Mettre à jour
+		        </button>
+	      </form>
+
+        {{ form.media }}
+
+    </section>
+
+</div>
+
+{% endblock %}

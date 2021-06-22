@@ -104,9 +104,21 @@ class EditResourceForm(forms.ModelForm):
 
     content = MarkdownxFormField()
 
+    title = forms.CharField(
+        label="Titre", widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    subtitle = forms.CharField(
+        label="Sous-Titre", widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    quote = forms.CharField(
+        label="Phrase d'accroche",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    tags = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
+
     class Meta:
         model = models.Resource
-        fields = ["title", "content"]
+        fields = ["title", "subtitle", "quote", "tags", "category", "content"]
 
 
 ########################################################################
