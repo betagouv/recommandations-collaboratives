@@ -13,11 +13,10 @@ import pytest
 from distutils.core import run_setup
 from fabric import task
 
+import urbanvitaliz
 
-@task
-def check(cnx):
-    os.system("bandit -x tests,development.py -r urbanvitaliz")
-    os.system("semgrep --config=p/ci urbanvitaliz")
+
+PACKAGE = f"urbanvitaliz-django-{urbanvitaliz.VERSION}.tar.gz"
 
 
 @task
@@ -28,7 +27,8 @@ def upgrade(cnx):
         remote="./urbanvitaliz-site/requirements.txt",
     )
     cnx.run(
-        "cd urbanvitaliz-site " "&& venv/bin/pip install --upgrade -r requirements.txt"
+        "cd urbanvitaliz-site "
+        "&& venv/bin/pip install --upgrade -r requirements.txt"
     )
 
 
@@ -37,12 +37,12 @@ def deploy(cnx):
     """Deploy new version of project to server"""
     run_setup("setup.py", script_args=["sdist"])
     cnx.put(
-        "./dist/urbanvitaliz-django-0.6.0.tar.gz",
-        remote="./urbanvitaliz-site/dist/urbanvitaliz-django-0.6.0.tar.gz",
+        "./dist/{PACKAGE}",
+        remote=f"./urbanvitaliz-site/dist/{PACKAGE}",
     )
     cnx.run(
         "cd urbanvitaliz-site "
-        "&& ./venv/bin/pip install ./dist/urbanvitaliz-django-0.6.0.tar.gz"
+        "&& ./venv/bin/pip install ./dist/{PACKAGE}"
         "&& ./manage.py migrate"
         "&& ./manage.py compilescss"
         "&& ./manage.py collectstatic --noinput"
