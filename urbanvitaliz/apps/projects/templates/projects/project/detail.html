@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<div class="col-9 py-5 mx-auto">
+<div class="col-11 py-5 mx-auto">
 
     <h1 class=" align-items-center">
         <svg class="bi" width="40" height="40" fill="currentColor">
@@ -43,10 +43,13 @@
 
         </div>
         <div class="col-md-3 border-start">
-            <svg class="bi" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
-            </svg>
-            <p class="small text-secondary d-inline">Fiche crée <em>{{ project.created_on|naturalday }}</em> et modifiée <em>{{ project.updated_on|naturaltime }}</em>.</p>
+            <p class="small text-secondary d-inline">
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-history"/>
+                </svg>
+                &nbsp;
+                Fiche crée <em>{{ project.created_on|naturalday }}</em> et modifiée <em>{{ project.updated_on|naturaltime }}</em>.
+            </p>
 
 
             <!--

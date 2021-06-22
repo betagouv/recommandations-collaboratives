@@ -1,9 +1,21 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block content %}
 
-<div class="col-9 py-5 mx-auto">
+<div class="col-11 py-5 mx-auto">
 	  <h2>Liste des projets</h2>
+
+    <!-- Staff actions -->
+    <a class="btn btn-secondary btn-sm" href="{% url 'projects-onboarding' %}" role="button">
+        <svg class="bi" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+        </svg>
+        &nbsp;
+        Ajouter un projet
+    </a>
+
 
     <section>
 
