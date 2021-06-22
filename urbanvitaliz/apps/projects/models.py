@@ -10,8 +10,6 @@ from datetime import date
 
 from django.db import models
 
-from django.contrib.auth import models as auth
-
 from django.utils import timezone
 
 from markdownx.utils import markdownify
