@@ -45,11 +45,11 @@ class SearchForm(forms.Form):
         self.the_categories = models.Category.fetch()
         self.categories = []
         for category in self.the_categories:
-            name = category.form_label
-            attr = forms.BooleanField(initial=True)
-            setattr(self, name, attr)
-            attr.input_name = name
-            self.categories.append(category)
+            name = f"cat{category.id}"
+            field = forms.BooleanField(initial=True)
+            setattr(self, name, field)
+            field.the_category = category
+            self.categories.append(field)
 
     @property
     def selected_categories(self):
