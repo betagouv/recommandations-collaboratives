@@ -35,14 +35,18 @@ def resource_search(request):
     return render(request, "resources/resource/list.html", locals())
 
 
+# NOTE both using search and filter in same action is slippy
+
+
 class SearchForm(forms.Form):
-    """Form to search for resources"""
+    """Form to search for resources and filter by category"""
 
     query = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.the_categories = models.Category.fetch()
+        # add one field per category defined in the database
         for category in self.the_categories:
             name = category.form_label
             field = forms.BooleanField(initial=True, required=False)
@@ -54,18 +58,17 @@ class SearchForm(forms.Form):
         """Return the fields for each category with their status"""
         categories = []
         for category in self.the_categories:
-            # get the state of the category in request using true as default
+            # get the state of the category filter from the request
             checked = self.cleaned_data.get(category.form_label)
             categories.append(dict(the_category=category, checked=checked))
         return categories
 
     @property
     def selected_categories(self):
-        # NOTE to be used after is_valid on the form
+        """Return the list of selected categories to be filtered"""
         selected = []
         for category in self.the_categories:
-            name = f"cat{category.id}"
-            if self.cleaned_data.get(name):
+            if self.cleaned_data.get(category.form_label):
                 selected.append(category)
         return selected
 
