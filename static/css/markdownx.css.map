@@ -1,9 +1,0 @@
-{
-	"version": 3,
-	"file": "markdownx.css",
-	"sources": [
-		"markdownx.scss"
-	],
-	"names": [],
-	"mappings": "AAAA,AAAA,UAAU,CAAC;EACP,OAAO,EAAE,IAAI,GAYhB;EAbD,AAGI,UAHM,CAGN,QAAQ,CAAC;IACL,YAAY,EAAE,IAAI;IAClB,UAAU,EAAE,KAAK;IACjB,KAAK,EAAE,GAAG,GACb;EAPL,AASI,UATM,CASN,kBAAkB,CAAC;IACf,KAAK,EAAE,GAAG;IACV,aAAa,EAAE,UAAU,GAC5B"
-}
