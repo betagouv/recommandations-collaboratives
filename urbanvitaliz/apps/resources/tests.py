@@ -17,6 +17,8 @@ from pytest_django.asserts import assertRedirects
 
 from django.urls import reverse
 
+from django.template import defaultfilters
+
 from django.contrib.auth import models as auth
 
 from model_bakery.recipe import Recipe
@@ -54,10 +56,24 @@ def test_resource_list_contains_resource_title_and_link(client):
     url = reverse("resources-resource-search")
     with login(client):
         response = client.get(url)
-    # FIXME is title modified in rendering?
-    # assertContains(responsei.lower(), resource.title)
+    assertContains(response, defaultfilters.title(resource.title))
     detail_url = reverse("resources-resource-detail", args=[resource.id])
     assertContains(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_resource_list_contains_only_resource_with_category(client):
+    category = Recipe(models.Category).make()
+    resource1 = Recipe(models.Resource, title="selected resource", category=category).make()
+    resource2 = Recipe(models.Resource, title="unselected resource").make()
+    url = reverse("resources-resource-search")
+    url = f"{url}?cat{category.id}=true&query=resource"
+    with login(client):
+        response = client.get(url)
+    detail_url = reverse("resources-resource-detail", args=[resource1.id])
+    assertContains(response, detail_url)
+    detail_url = reverse("resources-resource-detail", args=[resource2.id])
+    assertNotContains(response, detail_url)
 
 
 #
@@ -89,8 +105,7 @@ def test_resource_detail_contains_informations(client):
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client):
         response = client.get(url)
-    # FIXME is title modified on rendering?
-    assertContains(response, resource.title)
+    assertContains(response, defaultfilters.title(resource.title))
 
 
 @pytest.mark.xfail
@@ -195,6 +210,7 @@ def test_search_resources_without_query():
     unmatched = models.Resource.search()
     assert resource in unmatched
 
+
 @pytest.mark.django_db
 def test_search_resources_do_not_match_query():
     resource = Recipe(models.Resource).make()
@@ -238,7 +254,8 @@ def test_search_resources_by_category():
         Recipe(models.Category).make(),
     ]
     resources = [
-        Recipe(models.Resource, category=category).make() for category in categories
+        Recipe(models.Resource, category=category).make()
+        for category in categories
     ]
     matched = models.Resource.search(categories=categories)
     assert set(resources) == set(matched)

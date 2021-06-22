@@ -30,7 +30,7 @@ def resource_search(request):
     form = SearchForm(request.GET)
     form.is_valid()
     query = form.cleaned_data.get("query", "")
-    categories = form.cleaned_data.get("categories", [])
+    categories = form.selected_categories
     resources = models.Resource.search(query, categories)
     return render(request, "resources/resource/list.html", locals())
 
@@ -38,10 +38,25 @@ def resource_search(request):
 class SearchForm(forms.Form):
     """Form to search for resources"""
 
-    categories = forms.ModelMultipleChoiceField(
-        queryset=models.Category.fetch(), required=False
-    )
     query = forms.CharField(required=False)
+    categories = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.the_categories = models.Category.fetch()
+        for category in self.the_categories:
+            name = f"cat{category.id}"
+            setattr(self, name, forms.BooleanField())
+            self.categories.append(name)
+
+    @property
+    def selected_categories(self):
+        selected = []
+        for category in self.the_categories:
+            name = f"cat{category.id}"
+            if hasattr(self, name) and getattr(self, name):
+                selected.append(category)
+        return selected
 
 
 @login_required
