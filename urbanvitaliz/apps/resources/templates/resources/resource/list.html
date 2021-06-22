@@ -26,44 +26,62 @@
 
     <!-- Search -->
     <div class="quick-search mb-5">
-        <form>
+        <form method="GET">
             <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Saisisez vos mots clés (ex: coworking, pollution, ...)" aria-label="Text input">
+                <input type="text" name="{{ form.query.name }}" value="{{ form.query.value|default:"" }}"
+                       class="form-control" placeholder="Saisisez vos mots clés (ex: coworking, pollution, ...)"
+                       aria-label="Search Text input" />
+
                 <button class="btn btn-outline-secondary" type="submit">
                     <svg class="bi" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
                     </svg>&nbsp;
                     Rechercher
                 </button>
+
             </div>
 
+
+            <span class="small text-secondary">Catégories :</span>&nbsp;
             {% for category in form.categories %}
-              {{ category }}
+            <span class="form-check form-switch form-check-inline">
+                <input class="form-check-input" type="checkbox" name="{{ category.form_label }}"
+                       id="check-{{ category.form_label }}"
+                       {% if form. %}checked{% endif %}
+                >
+                <label class="form-check-label" for="check-{{ category.form_label }}">{{ category.the_category }}</label>
+            </span>
             {% endfor %}
-            <span class="form-check form-switch form-check-inline">
-                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-                <label class="form-check-label" for="flexSwitchCheckDefault">Méthodo</label>
-            </span>
 
-            <span class="form-check form-switch form-check-inline">
-                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-                <label class="form-check-label" for="flexSwitchCheckDefault">Financement</label>
-            </span>
-
-            <span class="form-check form-switch form-check-inline">
-                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-                <label class="form-check-label" for="flexSwitchCheckDefault">Cat1</label>
-            </span>
-
-            <div class="form-check form-switch form-check-inline">
-                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-                <label class="form-check-label" for="flexSwitchCheckDefault">Cat1</label>
-            </div>
         </form>
 
     </div>
 
     <!-- Results -->
+    {% if query %}
+    <div class="row align-center mb-3">
+
+        {% if not resources %}
+        <div class="col-6 offset-md-3 fs-5">
+            <svg class="bi" width="20" height="20" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-split-fill"/>
+            </svg>&nbsp;
+            Aucun résulat trouvé pour "<em>{{ query }}</em>" ;-( <br/>
+            <span class="text-secondary">Essayez de supprimer des mots-clés ou d'ajouter des catégories.</span>
+            <br/>
+            <span class="small">Vous pouvez aussi <a href="{% url 'resources-resource-search' %}">réinitialiser</a> vos critères de recherche.</span>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <span class="text-secondary">
+                {{ resources.count }} résultat{{ resources|pluralize }} trouvé{{ resources|pluralize }} pour "<em>{{ query }}</em>".
+            </span>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Result cards -->
     <div class="row row-cols-1 row-cols-md-4 g-4">
 
         {% for resource in resources %}
