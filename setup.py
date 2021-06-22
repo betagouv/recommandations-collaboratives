@@ -9,9 +9,11 @@ For sdist deployments, do not forget MANIFEST.in file to include all the data fi
 from setuptools import setup
 from setuptools import find_packages
 
+import urbanvitaliz
+
 setup(
     name="urbanvitaliz-django",
-    version="0.6.0",
+    version=urbanvitaliz.VERSION,
     description="Urbavitaliz application -django version",
     packages=find_packages(),
     include_package_data=True,
