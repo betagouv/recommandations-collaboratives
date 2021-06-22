@@ -114,7 +114,7 @@ def resource_create(request):
 class EditResourceForm(forms.ModelForm):
     """Create and update form for resources"""
 
-    content = MarkdownxFormField()
+    content = MarkdownxFormField(label="Contenu")
 
     title = forms.CharField(
         label="Titre", widget=forms.TextInput(attrs={"class": "form-control"})
