@@ -61,16 +61,18 @@ def test_resource_list_contains_resource_title_and_link(client):
     assertContains(response, detail_url)
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_resource_list_contains_only_resource_with_category(client):
-    category = Recipe(models.Category).make()
+    category1 = Recipe(models.Category).make()
     resource1 = Recipe(
-        models.Resource, title="selected resource", category=category
+        models.Resource, title="selected resource", category=category1
     ).make()
-    resource2 = Recipe(models.Resource, title="unselected resource").make()
+    category2 = Recipe(models.Category).make()
+    resource2 = Recipe(
+        models.Resource, title="unselected resource", category=category2
+    ).make()
     url = reverse("resources-resource-search")
-    url = f"{url}?cat{category.id}=true&query=resource"
+    url = f"{url}?cat{category1.id}=true&query=resource"
     with login(client):
         response = client.get(url)
     detail_url = reverse("resources-resource-detail", args=[resource1.id])

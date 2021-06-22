@@ -1,5 +1,6 @@
 tmp
 .venv
+.vscode
 dist
 *.sqlite3
 *.egg-info

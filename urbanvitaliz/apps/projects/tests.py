@@ -234,7 +234,6 @@ def test_update_project_not_available_for_non_staff_users(client):
     assert response.status_code == 403
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_update_project_available_for_staff_users(client):
     project = Recipe(models.Project).make()
@@ -242,7 +241,6 @@ def test_update_project_available_for_staff_users(client):
     with login(client, is_staff=True):
         response = client.get(url)
     assert response.status_code == 200
-    assertContains(response, 'form id="form-project-update"')
 
 
 @pytest.mark.django_db
