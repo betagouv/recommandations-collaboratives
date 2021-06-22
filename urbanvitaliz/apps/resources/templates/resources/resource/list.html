@@ -13,15 +13,37 @@
 
 <div class="col-11 py-5 mx-auto">
 
-    <h1 class=" align-items-center mb-3">
-        <svg class="bi" width="38" height="38" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#book"/>
-        </svg>
-        Ressources
-    </h1>
+    <div class="row">
+        <div class="col">
+            <h1 class=" align-items-center mb-3">
+                <svg class="bi" width="38" height="38" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#book"/>
+                </svg>
+                Ressources
+            </h1>
 
-    <div class="text-secondary small mb-3">
-        Vous trouverez ici toutes nos ressources ayant pour but de vous guider à travers votre parcours.
+            <div class="text-secondary small mb-3">
+                Vous trouverez ici toutes nos ressources ayant pour but de vous guider à travers votre parcours.
+            </div>
+
+        </div>
+
+        {% if user.is_staff %}
+        <!-- Sidebar -->
+        <div class="col-sm-4 col-lg-2 col-xl-2 align-content-top border-start mb-3">
+            <span class="text-secondary small smallcaps">Administration</span>
+            <!-- Staff actions -->
+            <div class="d-grid gap-2 mt-3">
+                <a class="btn btn-light btn-sm" href="{% url 'resources-resource-create' %}" role="button">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+                    </svg>
+                    &nbsp;
+                    Créer une ressource
+                </a>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Search -->
@@ -45,17 +67,17 @@
             <span class="small text-secondary">Catégories :</span>&nbsp;
             {% for category in form.categories %}
             <span class="form-check form-switch form-check-inline">
-                <input class="form-check-input" type="checkbox" name="{{ category.form_label }}"
-                       id="check-{{ category.form_label }}"
-                       {% if form. %}checked{% endif %}
+                <input class="form-check-input" type="checkbox" name="{{ category.the_category.form_label }}"
+                       id="check-{{ category.the_category.form_label }}"
+                       {% if category %}checked{% endif %}
                 >
-                <label class="form-check-label" for="check-{{ category.form_label }}">{{ category.the_category }}</label>
+                <label class="form-check-label" for="check-{{ category.the_category.form_label }}">{{ category.the_category }}</label>
             </span>
             {% endfor %}
 
         </form>
-
     </div>
+
 
     <!-- Results -->
     {% if query %}

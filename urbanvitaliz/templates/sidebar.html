@@ -25,6 +25,16 @@
                     </svg>
                     Ressources
                 </a>
+                {% if user.is_staff %}
+                <ul class="submenu">
+                    <li class="list-group-item bg-light border-0">
+                        <svg class="bi me-2" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus"/>
+                        </svg>
+                        <a class="text-secondary" href="{% url 'resources-resource-create' %}">Créer</a>
+                    </li>
+                </ul>
+                {% endif %}
             </li>
 
             <li>
@@ -44,6 +54,14 @@
                     </svg>
                     Projets
                 </a>
+                <ul class="submenu">
+                    <li class="list-group-item bg-light border-0">
+                        <svg class="bi me-2" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus"/>
+                        </svg>
+                        <a class="text-secondary" href="{% url 'projects-onboarding' %}">Créer</a>
+                    </li>
+                </ul>
             </li>
             {% endif %}
 
