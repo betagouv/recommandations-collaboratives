@@ -64,7 +64,9 @@ def test_resource_list_contains_resource_title_and_link(client):
 @pytest.mark.django_db
 def test_resource_list_contains_only_resource_with_category(client):
     category = Recipe(models.Category).make()
-    resource1 = Recipe(models.Resource, title="selected resource", category=category).make()
+    resource1 = Recipe(
+        models.Resource, title="selected resource", category=category
+    ).make()
     resource2 = Recipe(models.Resource, title="unselected resource").make()
     url = reverse("resources-resource-search")
     url = f"{url}?cat{category.id}=true&query=resource"
@@ -254,8 +256,7 @@ def test_search_resources_by_category():
         Recipe(models.Category).make(),
     ]
     resources = [
-        Recipe(models.Resource, category=category).make()
-        for category in categories
+        Recipe(models.Resource, category=category).make() for category in categories
     ]
     matched = models.Resource.search(categories=categories)
     assert set(resources) == set(matched)
