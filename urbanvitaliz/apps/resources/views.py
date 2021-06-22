@@ -39,15 +39,17 @@ class SearchForm(forms.Form):
     """Form to search for resources"""
 
     query = forms.CharField(required=False)
-    categories = []
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.the_categories = models.Category.fetch()
+        self.categories = []
         for category in self.the_categories:
-            name = f"cat{category.id}"
-            setattr(self, name, forms.BooleanField())
-            self.categories.append(name)
+            name = category.form_label
+            attr = forms.BooleanField(initial=True)
+            setattr(self, name, attr)
+            attr.input_name = name
+            self.categories.append(category)
 
     @property
     def selected_categories(self):

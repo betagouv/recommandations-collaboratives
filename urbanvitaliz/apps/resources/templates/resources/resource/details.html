@@ -84,6 +84,7 @@
                 </a>
             </div>
 
+            {% if user.is_staff %}
             <!-- Staff actions -->
             <div class="d-grid gap-2 mt-3">
                 <a class="btn btn-light btn-sm" href="{% url 'resources-resource-update' resource.id %}" role="button">
@@ -94,6 +95,7 @@
                     Éditer
                 </a>
             </div>
+            {% endif %}
 
         </div>
 
