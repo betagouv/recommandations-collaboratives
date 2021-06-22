@@ -43,20 +43,29 @@ class SearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.the_categories = models.Category.fetch()
-        self.categories = []
         for category in self.the_categories:
-            name = f"cat{category.id}"
-            field = forms.BooleanField(initial=True)
-            setattr(self, name, field)
+            name = category.form_label
+            field = forms.BooleanField(initial=True, required=False)
+            self.fields[name] = field
             field.the_category = category
-            self.categories.append(field)
+
+    @property
+    def category_fields(self):
+        """Return the fields for each category with their status"""
+        categories = []
+        for category in self.the_categories:
+            # get the state of the category in request using true as default
+            checked = self.cleaned_data.get(category.form_label)
+            categories.append(dict(the_category=category, checked=checked))
+        return categories
 
     @property
     def selected_categories(self):
+        # NOTE to be used after is_valid on the form
         selected = []
         for category in self.the_categories:
             name = f"cat{category.id}"
-            if hasattr(self, name) and getattr(self, name):
+            if self.cleaned_data.get(name):
                 selected.append(category)
         return selected
 
@@ -108,7 +117,8 @@ class EditResourceForm(forms.ModelForm):
         label="Titre", widget=forms.TextInput(attrs={"class": "form-control"})
     )
     subtitle = forms.CharField(
-        label="Sous-Titre", widget=forms.TextInput(attrs={"class": "form-control"})
+        label="Sous-Titre",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
     )
     quote = forms.CharField(
         label="Phrase d'accroche",

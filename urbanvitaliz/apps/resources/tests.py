@@ -61,6 +61,7 @@ def test_resource_list_contains_resource_title_and_link(client):
     assertContains(response, detail_url)
 
 
+@pytest.mark.xfail
 @pytest.mark.django_db
 def test_resource_list_contains_only_resource_with_category(client):
     category = Recipe(models.Category).make()
@@ -100,7 +101,6 @@ def test_resource_detail_available_for_logged_users(client):
     assert response.status_code == 200
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_resource_detail_contains_informations(client):
     resource = Recipe(models.Resource, title="a nice title").make()
@@ -110,7 +110,6 @@ def test_resource_detail_contains_informations(client):
     assertContains(response, defaultfilters.title(resource.title))
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_resource_detail_contains_update_for_staff(client):
     resource = Recipe(models.Resource).make()
@@ -143,7 +142,6 @@ def test_create_resource_not_available_for_non_staff_users(client):
     assert response.status_code == 403
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_create_resource_available_for_staff_users(client):
     url = reverse("resources-resource-create")
@@ -155,7 +153,13 @@ def test_create_resource_available_for_staff_users(client):
 
 @pytest.mark.django_db
 def test_create_new_resource_and_redirect(client):
-    data = {"title": "a title", "content": "this is some content"}
+    data = {
+        "title": "a title",
+        "subtitle": "a sub title",
+        "quote": "a quote",
+        "tags": "#tag",
+        "content": "this is some content",
+    }
     with login(client, is_staff=True):
         response = client.post(reverse("resources-resource-create"), data=data)
     resource = models.Resource.fetch()[0]
@@ -176,7 +180,6 @@ def test_update_resource_not_available_for_non_staff_users(client):
     assert response.status_code == 403
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_update_resource_available_for_staff_users(client):
     resource = Recipe(models.Resource).make()
@@ -191,7 +194,13 @@ def test_update_resource_available_for_staff_users(client):
 def test_update_resource_and_redirect(client):
     resource = Recipe(models.Resource).make()
     url = reverse("resources-resource-update", args=[resource.id])
-    data = {"title": "a title", "content": "this is some content"}
+    data = {
+        "title": "a title",
+        "subtitle": "a sub title",
+        "quote": "a quote",
+        "tags": "#tag",
+        "content": "this is some content",
+    }
 
     with login(client, is_staff=True):
         response = client.post(url, data=data)
