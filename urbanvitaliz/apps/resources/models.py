@@ -40,6 +40,10 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def form_label(self):
+        return f"cat{self.id}"
+
     @classmethod
     def fetch(cls):
         return cls.objects.filter(deleted=None)
