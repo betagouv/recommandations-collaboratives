@@ -37,12 +37,12 @@ def deploy(cnx):
     """Deploy new version of project to server"""
     run_setup("setup.py", script_args=["sdist"])
     cnx.put(
-        "./dist/{PACKAGE}",
+        f"./dist/{PACKAGE}",
         remote=f"./urbanvitaliz-site/dist/{PACKAGE}",
     )
     cnx.run(
         "cd urbanvitaliz-site "
-        "&& ./venv/bin/pip install ./dist/{PACKAGE}"
+        f"&& ./venv/bin/pip install ./dist/{PACKAGE}"
         "&& ./manage.py migrate"
         "&& ./manage.py compilescss"
         "&& ./manage.py collectstatic --noinput"
