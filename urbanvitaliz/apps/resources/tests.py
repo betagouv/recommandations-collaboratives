@@ -289,6 +289,33 @@ def test_search_resources_by_category():
 
 
 @pytest.mark.django_db
+def test_staff_push_resource_to_project_needs_project_id(client):
+    project = Recipe(projects.Project).make()
+    resource = Recipe(models.Resource, public=True).make()
+
+    url = reverse("resources-push-to-project", args=[resource.id])
+    with login(client, is_staff=True):
+        session = client.session
+        session["project_id"] = project.id
+        session.save()
+        response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(response, 'form id="form-create-bookmark"')
+
+
+@pytest.mark.django_db
+def test_staff_push_resource_to_project_fails_if_no_project_in_session(client):
+    resource = Recipe(models.Resource, public=True).make()
+
+    url = reverse("resources-push-to-project", args=[resource.id])
+    with login(client, is_staff=True):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
 def test_staff_push_resource_to_project(client):
     project = Recipe(projects.Project).make()
     resource = Recipe(models.Resource, public=True).make()
