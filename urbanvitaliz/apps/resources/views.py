@@ -119,11 +119,13 @@ class EditResourceForm(forms.ModelForm):
     """Create and update form for resources"""
 
     def __init__(self, *args, **kwargs):
-        super(EditResourceForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # Try to load the Markdown template into 'content' field
         try:
-            tmpl = get_template(template_name="resources/resource/md_template.md")
+            tmpl = get_template(
+                template_name="resources/resource/create_md_template.md"
+            )
             self.fields["content"].initial = tmpl.render()
         except TemplateDoesNotExist:
             pass
