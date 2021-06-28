@@ -80,14 +80,14 @@ def test_performing_onboarding_create_a_new_project(client):
 
 @pytest.mark.django_db
 def test_my_project_not_available_when_not_logged_in(client):
-    url = reverse("projects-my-projects")
+    url = reverse("projects-local-authority")
     response = client.get(url)
     assert response.status_code == 302  # redirects to login
 
 
 @pytest.mark.django_db
 def test_my_projects_are_displayed_on_page(client):
-    url = reverse("projects-my-projects")
+    url = reverse("projects-local-authority")
     with login(client, is_staff=True) as user:
         project = Recipe(models.Project, email=user.email).make()
         response = client.get(url)
@@ -98,7 +98,7 @@ def test_my_projects_are_displayed_on_page(client):
 @pytest.mark.django_db
 def test_other_projects_are_not_displayed_on_page(client):
     project = Recipe(models.Project, email="other@example.com").make()
-    url = reverse("projects-my-projects")
+    url = reverse("projects-local-authority")
     with login(client, is_staff=True):
         response = client.get(url)
     assertNotContains(response, project.name)
