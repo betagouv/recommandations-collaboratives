@@ -3,4 +3,4 @@
 source =
     urbanvitaliz
 omit =
-    *test*
+    *test*,*migrations*,*sgi.py,*production.py
