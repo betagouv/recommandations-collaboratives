@@ -166,7 +166,7 @@ def test_create_new_resource_and_redirect(client):
     data = {
         "title": "a title",
         "subtitle": "a sub title",
-        "quote": "a quote",
+        "summary": "a summary",
         "tags": "#tag",
         "content": "this is some content",
     }
@@ -207,7 +207,7 @@ def test_update_resource_and_redirect(client):
     data = {
         "title": "a title",
         "subtitle": "a sub title",
-        "quote": "a quote",
+        "summary": "a summary",
         "tags": "#tag",
         "content": "this is some content",
     }
@@ -247,9 +247,9 @@ def test_search_resources_by_tag():
 
 
 @pytest.mark.django_db
-def test_search_resources_by_quote():
-    resource = Recipe(models.Resource, quote="a quote").make()
-    matched = models.Resource.search(query="quot")
+def test_search_resources_by_summary():
+    resource = Recipe(models.Resource, summary="a summary").make()
+    matched = models.Resource.search(query="summa")
     assert resource in matched
 
 

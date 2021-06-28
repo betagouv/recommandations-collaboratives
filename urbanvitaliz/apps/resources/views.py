@@ -124,7 +124,7 @@ class EditResourceForm(forms.ModelForm):
         label="Sous-Titre",
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
-    quote = forms.CharField(
+    summary = forms.CharField(
         label="Phrase d'accroche",
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
@@ -132,7 +132,7 @@ class EditResourceForm(forms.ModelForm):
 
     class Meta:
         model = models.Resource
-        fields = ["title", "subtitle", "quote", "tags", "category", "content"]
+        fields = ["title", "subtitle", "summary", "tags", "category", "content"]
 
 
 ########################################################################
