@@ -36,7 +36,7 @@
                 <svg class="bi me-2" width="28" height="28">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
                 </svg>
-                Le/la référent&middot;e
+                Qui êtes-vous ?
             </h3>
 
 
@@ -64,7 +64,11 @@
             </div>
 
             <div class="form-floating mb-3">
+                {% if user.is_authenticated %}
+                <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" id="{{ form.email.id_for_label }}" name="{{ form.email.name }}" placeholder="nom@organisme.fr" value="{{ form.email.value|default:user.email }}" required>
+                {% else %}
                 <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" id="{{ form.email.id_for_label }}" name="{{ form.email.name }}" placeholder="nom@organisme.fr" value="{{ form.email.value|default:'' }}" required>
+                {% endif %}
                 <div class="form-text">Votre courriel ne sera jamais partagé en dehors de notre équipe.</div>
                 <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
 
@@ -74,7 +78,7 @@
             </div>
 
             <div class="form-floating">
-                <input type="text" class="form-control {% if form.org_name.errors %}is-invalid{% endif %}" id="{{ form.org_name.id_for_label }}" name="{{ form.org_name.name }}" placeholder="Mon organisatino" value="{{ form.org_name.value|default:'' }}">
+                <input type="text" class="form-control {% if form.org_name.errors %}is-invalid{% endif %}" id="{{ form.org_name.id_for_label }}" name="{{ form.org_name.name }}" placeholder="Mon organisatino" value="{{ form.org_name.value|default:'' }}" required>
                 <label for="{{ form.org_name.id_for_label }}">{{ form.org_name.label }}</label>
 
                 {% for error in form.org_name.errors %}
