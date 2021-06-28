@@ -270,6 +270,20 @@ def test_update_project_and_redirect(client):
 
 
 ########################################################################
+# Project syndication feed
+########################################################################
+
+
+@pytest.mark.django_db
+def test_projects_feed_available_for_all_users(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-feed")
+    response = client.get(url)
+    detail_url = reverse("projects-project-detail", args=[project.id])
+    assertContains(response, detail_url)
+
+
+########################################################################
 # tasks
 ########################################################################
 

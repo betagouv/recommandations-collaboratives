@@ -19,6 +19,9 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 
+from django.template import TemplateDoesNotExist
+from django.template.loader import get_template
+
 from markdownx.fields import MarkdownxFormField
 
 from urbanvitaliz.apps.projects import models as projects
@@ -26,7 +29,6 @@ from urbanvitaliz.apps.projects import models as projects
 from . import models
 
 
-@login_required
 def resource_search(request):
     """Search existing resources"""
     form = SearchForm(request.GET)
@@ -34,6 +36,8 @@ def resource_search(request):
     query = form.cleaned_data.get("query", "")
     categories = form.selected_categories
     resources = models.Resource.search(query, categories)
+    if not request.user.is_staff:
+        resources = resources.filter(public=True)
     return render(request, "resources/resource/list.html", locals())
 
 
@@ -116,6 +120,16 @@ def resource_create(request):
 class EditResourceForm(forms.ModelForm):
     """Create and update form for resources"""
 
+    def __init__(self, *args, **kwargs):
+        super(EditResourceForm, self).__init__(*args, **kwargs)
+
+        # Try to load the Markdown template into 'content' field
+        try:
+            tmpl = get_template(template_name="resources/resource/md_template.md")
+            self.fields["content"].initial = tmpl.render()
+        except TemplateDoesNotExist:
+            pass
+
     content = MarkdownxFormField(label="Contenu")
 
     title = forms.CharField(
@@ -125,15 +139,17 @@ class EditResourceForm(forms.ModelForm):
         label="Sous-Titre",
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
-    quote = forms.CharField(
-        label="Phrase d'accroche",
+    summary = forms.CharField(
+        label="Résumé bref",
         widget=forms.TextInput(attrs={"class": "form-control"}),
     )
-    tags = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
+    tags = forms.CharField(
+        label="Mots-clés", widget=forms.TextInput(attrs={"class": "form-control"})
+    )
 
     class Meta:
         model = models.Resource
-        fields = ["title", "subtitle", "quote", "tags", "category", "content"]
+        fields = ["title", "subtitle", "summary", "tags", "category", "content"]
 
 
 ########################################################################

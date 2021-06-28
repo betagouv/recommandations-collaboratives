@@ -101,13 +101,13 @@
 
     </div>
 
-    {% if resource.quote %}
+    {% if resource.summary %}
     <div class="bd-callout text-secondary">
         <svg class="bi me-2 align-middle" width="16" height="16">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-right-quote"/>
         </svg>
-        &nbsp;
-        {{ resource.quote }}
+        &nbsp; 
+        {{ resource.summary }}
     </div>
     {% endif %}
 

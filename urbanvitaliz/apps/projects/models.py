@@ -38,6 +38,9 @@ class Project(models.Model):
     tags = models.CharField(max_length=256, blank=True, default="")
 
     name = models.CharField(max_length=128, verbose_name="Nom du projet")
+    phone = models.CharField(
+        max_length=16, default="", blank=True, verbose_name="Téléphone"
+    )
     description = models.TextField(verbose_name="Description")
     location = models.CharField(max_length=256, verbose_name="Localisation")
     impediments = models.TextField(default="", blank=True, verbose_name="Difficultés")

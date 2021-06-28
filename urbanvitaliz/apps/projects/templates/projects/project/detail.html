@@ -24,13 +24,29 @@
                 </svg>
 
                 <strong>Référent&middot;e : {{ project.first_name }} {{ project.last_name }}</strong>
-                <a class="d-inline" href="mailto:{{ project.email }}"  data-bs-toggle="tooltip" title="Envoyer un courriel">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
-                        <span class="visually-hidden">envoyer un courriel</span>
-                    </svg>
-                </a>
+                {% if project.org_name %}
+                <span class="text-secondary">({{ project.org_name|title }})</span>
+                {% endif %}
             </span>
+            <div>
+                <!-- Email -->
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+                </svg>
+                <a class="d-inline" href="mailto:{{ project.email }}"  data-bs-toggle="tooltip" title="Envoyer un courriel">{{ project.email }}</a>
+
+                <!-- Phone -->
+                {% if project.phone %}
+                &nbsp;&nbsp;
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone"/>
+                </svg>
+                <a class="d-inline" href="tel:{{ project.phone }}"  data-bs-toggle="tooltip" title="Appeler">
+                    {{ project.phone }}
+                    <span class="visually-hidden">Téléphoner</span>
+                </a>
+                {% endif %}
+            </div>
 
 
             <div class="col-lg-10 py-3 px-0">

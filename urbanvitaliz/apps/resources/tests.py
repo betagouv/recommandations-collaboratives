@@ -37,28 +37,37 @@ from . import models
 
 
 @pytest.mark.django_db
-def test_resource_list_not_available_for_non_logged_users(client):
+def test_resource_list_available_for_every_one(client):
     url = reverse("resources-resource-search")
     response = client.get(url)
-    login_url = "{}?next={}".format(reverse("magicauth-login"), url)
-    assertRedirects(response, login_url)
-
-
-@pytest.mark.django_db
-def test_resource_list_available_for_logged_users(client):
-    url = reverse("resources-resource-search")
-    with login(client):
-        response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_resource_list_contains_resource_title_and_link(client):
-    resource = Recipe(models.Resource, title="a nice title").make()
+def test_resource_list_contains_public_resource_title_and_link(client):
+    resource = Recipe(models.Resource, public=True, title=" public resource").make()
     url = reverse("resources-resource-search")
-    with login(client):
-        response = client.get(url)
+    response = client.get(url)
     assertContains(response, defaultfilters.title(resource.title))
+    detail_url = reverse("resources-resource-detail", args=[resource.id])
+    assertContains(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_private_resources_are_not_available_to_non_staff_users(client):
+    resource = Recipe(models.Resource, public=False, title="private resource").make()
+    url = reverse("resources-resource-search")
+    response = client.get(url)
+    detail_url = reverse("resources-resource-detail", args=[resource.id])
+    assertNotContains(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_private_resources_are_available_to_staff_users(client):
+    resource = Recipe(models.Resource, public=False, title="a public resource").make()
+    url = reverse("resources-resource-search")
+    with login(client, is_staff=True):
+        response = client.get(url)
     detail_url = reverse("resources-resource-detail", args=[resource.id])
     assertContains(response, detail_url)
 
@@ -67,16 +76,15 @@ def test_resource_list_contains_resource_title_and_link(client):
 def test_resource_list_contains_only_resource_with_category(client):
     category1 = Recipe(models.Category).make()
     resource1 = Recipe(
-        models.Resource, title="selected resource", category=category1
+        models.Resource, title="selected resource", public=True, category=category1
     ).make()
     category2 = Recipe(models.Category).make()
     resource2 = Recipe(
-        models.Resource, title="unselected resource", category=category2
+        models.Resource, title="unselected resource", public=True, category=category2
     ).make()
     url = reverse("resources-resource-search")
     url = f"{url}?cat{category1.id}=true&query=resource"
-    with login(client):
-        response = client.get(url)
+    response = client.get(url)
     detail_url = reverse("resources-resource-detail", args=[resource1.id])
     assertContains(response, detail_url)
     detail_url = reverse("resources-resource-detail", args=[resource2.id])
@@ -160,7 +168,7 @@ def test_create_new_resource_and_redirect(client):
     data = {
         "title": "a title",
         "subtitle": "a sub title",
-        "quote": "a quote",
+        "summary": "a summary",
         "tags": "#tag",
         "content": "this is some content",
     }
@@ -201,7 +209,7 @@ def test_update_resource_and_redirect(client):
     data = {
         "title": "a title",
         "subtitle": "a sub title",
-        "quote": "a quote",
+        "summary": "a summary",
         "tags": "#tag",
         "content": "this is some content",
     }
@@ -241,9 +249,9 @@ def test_search_resources_by_tag():
 
 
 @pytest.mark.django_db
-def test_search_resources_by_quote():
-    resource = Recipe(models.Resource, quote="a quote").make()
-    matched = models.Resource.search(query="quot")
+def test_search_resources_by_summary():
+    resource = Recipe(models.Resource, summary="a summary").make()
+    matched = models.Resource.search(query="summa")
     assert resource in matched
 
 
