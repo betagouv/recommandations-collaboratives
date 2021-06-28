@@ -33,11 +33,27 @@
 	      <form id="form-resource-create"
 				      method="post"
 				      action="."
-				      >
+				>
 
 		        {% csrf_token %}
 
+
+            <h2>
+                <svg class="bi " width="32" height="32" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#book"/>
+                </svg>&nbsp;
+                Créer une ressource
+            </h2>
+
+            <div class="bd-callout bd-info" >
+                <svg class="bi " width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightbulb"/>
+                </svg>&nbsp;
+                Veuillez utiliser un titre qui reprend le problème de l'utilisateur, court et parlant.
+                <p class="mb-0">Par ex : <em class="text-secondary">"Financer des travaux de récupération des eaux pluviales"</em> plutôt que <em class="text-secondary">"Financements de l'Agence de l'eau"</em></p>
+            </div>
             {{ form.as_p }}
+
 
 		        <button type="submit" class="btn btn-primary">
 			          Créer
