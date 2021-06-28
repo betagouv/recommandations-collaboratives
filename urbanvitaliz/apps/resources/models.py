@@ -86,7 +86,7 @@ class Resource(models.Model):
 
     title = models.CharField(max_length=256)
     subtitle = models.CharField(max_length=512, default="")
-    quote = models.CharField(max_length=512, default="")
+    summary = models.CharField(max_length=512, default="")
     content = models.TextField()
 
     def content_rendered(self):
@@ -120,7 +120,7 @@ class Resource(models.Model):
                 models.Q(title__icontains=word)
                 | models.Q(subtitle__icontains=word)
                 | models.Q(content__icontains=word)
-                | models.Q(quote__icontains=word)
+                | models.Q(summary__icontains=word)
                 | models.Q(tags__icontains=word)
             )
         return resources
