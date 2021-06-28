@@ -24,7 +24,6 @@ from markdownx.fields import MarkdownxFormField
 from . import models
 
 
-@login_required
 def resource_search(request):
     """Search existing resources"""
     form = SearchForm(request.GET)
@@ -32,6 +31,8 @@ def resource_search(request):
     query = form.cleaned_data.get("query", "")
     categories = form.selected_categories
     resources = models.Resource.search(query, categories)
+    if not request.user.is_staff:
+        resources = resources.filter(public=True)
     return render(request, "resources/resource/list.html", locals())
 
 
