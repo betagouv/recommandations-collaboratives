@@ -16,7 +16,7 @@ from . import views
 urlpatterns = [
     path(r"onboarding/", views.onboarding, name="projects-onboarding"),
     # my projects for local authorities
-    path(r"myprojects/", views.myprojects, name="projects-my-projects"),
+    path(r"macollectivite/", views.local_authority, name="projects-local-authority"),
     # projects for switchtenders
     path(r"projects/", views.project_list, name="projects-project-list"),
     path(

@@ -67,10 +67,10 @@ class OnboardingForm(forms.ModelForm):
 
 
 @login_required
-def myprojects(request):
-    """Return the project followup for local authorities"""
+def local_authority(request):
+    """Return the projects followup for local authorities"""
     projects = models.Project.fetch(email=request.user.email)
-    return render(request, "projects/myprojects.html", locals())
+    return render(request, "projects/local_authority.html", locals())
 
 
 ########################################################################
