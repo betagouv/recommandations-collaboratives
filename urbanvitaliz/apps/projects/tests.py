@@ -436,6 +436,23 @@ def test_update_note_for_project_and_redirect(client):
 
 
 ########################################################################
+# pushing a resource to a project's owner
+########################################################################
+
+
+@pytest.mark.django_db
+def test_staff_push_resource_to_project(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-push-resource", args=[project.id])
+    with login(client, is_staff=True):
+        response = client.post(url)
+    # project is stored in session and user redirected to resource app.
+    assert client.session["project_id"] == project.id
+    newurl = reverse("resources-push-resource", args=[project.id])
+    assertRedirects(response, newurl)
+
+
+########################################################################
 # Helpers
 ########################################################################
 
