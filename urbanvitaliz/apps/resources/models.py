@@ -13,6 +13,10 @@ from django.db import models
 
 from django.utils import timezone
 
+from django.contrib.auth import models as auth
+
+from urbanvitaliz.apps.projects import models as projects
+
 
 class Category(models.Model):
     """Représente une categorie de ressource"""
@@ -120,6 +124,30 @@ class Resource(models.Model):
                 | models.Q(tags__icontains=word)
             )
         return resources
+
+
+class Bookmark(models.Model):
+    """Represents a bookmark to a resource"""
+
+    resource = models.ForeignKey("Resource", on_delete=models.CASCADE)
+    created_by = models.ForeignKey(auth.User, on_delete=models.CASCADE)
+
+    project = models.ForeignKey(projects.Project, null=True, on_delete=models.CASCADE)
+    comments = models.TextField(default="", blank=True)
+
+    deleted = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = []
+        verbose_name = "bookmark"
+        verbose_name_plural = "bookmarks"
+
+    def __str__(self):
+        return f"{self.resource.title}"
+
+    @classmethod
+    def fetch(cls):
+        return cls.objects.filter(deleted=None)
 
 
 # eof

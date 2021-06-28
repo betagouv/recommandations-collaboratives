@@ -21,6 +21,8 @@ from django.shortcuts import render
 
 from markdownx.fields import MarkdownxFormField
 
+from urbanvitaliz.apps.projects import models as projects
+
 from . import models
 
 
@@ -132,6 +134,46 @@ class EditResourceForm(forms.ModelForm):
     class Meta:
         model = models.Resource
         fields = ["title", "subtitle", "quote", "tags", "category", "content"]
+
+
+########################################################################
+# push resource to project
+########################################################################
+
+
+@login_required
+def push_to_project(request, resource_id=None):
+    """Push given resource to project stored in session"""
+    is_staff_or_403(request.user)
+    project_id = request.session.get("project_id")
+    resource = get_object_or_404(models.Resource, pk=resource_id)
+    project = get_object_or_404(projects.Project, pk=project_id)
+    if request.method == "POST":
+        form = BookmarkForm(request.POST)
+        if form.is_valid():
+            # create a new bookmark with provided information
+            bookmark = form.save(commit=False)
+            bookmark.project = project
+            bookmark.resource = resource
+            bookmark.created_by = request.user
+            bookmark.save()
+            # cleanup the session
+            session = request.session
+            del session["project_id"]
+            session.save()
+            next_url = reverse("projects-project-detail", args=[resource.id])
+            return redirect(next_url)
+    else:
+        form = BookmarkForm()
+    return render(request, "resources/bookmark/create.html", locals())
+
+
+class BookmarkForm(forms.ModelForm):
+    """Create and update bookmark"""
+
+    class Meta:
+        model = models.Bookmark
+        fields = ["comments"]
 
 
 ########################################################################

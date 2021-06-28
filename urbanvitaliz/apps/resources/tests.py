@@ -23,6 +23,8 @@ from django.contrib.auth import models as auth
 
 from model_bakery.recipe import Recipe
 
+from urbanvitaliz.apps.projects import models as projects
+
 from . import models
 
 
@@ -271,6 +273,38 @@ def test_search_resources_by_category():
     ]
     matched = models.Resource.search(categories=categories)
     assert set(resources) == set(matched)
+
+
+########################################################################
+# pushing a resource to a project's owner
+########################################################################
+
+
+@pytest.mark.django_db
+def test_staff_push_resource_to_project(client):
+    project = Recipe(projects.Project).make()
+    resource = Recipe(models.Resource, public=True).make()
+
+    url = reverse("resources-push-to-project", args=[resource.id])
+    with login(client, is_staff=True) as user:
+        # project_id should be in session
+        session = client.session
+        session["project_id"] = project.id
+        session.save()
+        data = {"comments": "some nice comments"}
+        response = client.post(url, data=data)
+
+    # a new Recommmendation is created
+    bookmark = models.Bookmark.fetch()[0]
+    assert bookmark.created_by == user
+    assert bookmark.project == project
+    assert bookmark.resource == resource
+    assert bookmark.comments == data["comments"]
+    # user is redirected to poject
+    newurl = reverse("projects-project-detail", args=[project.id])
+    assertRedirects(response, newurl)
+    # sessions is cleaned up
+    assert "project_id" not in client.session
 
 
 ########################################################################

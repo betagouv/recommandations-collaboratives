@@ -30,6 +30,11 @@ urlpatterns = [
         views.resource_update,
         name="resources-resource-update",
     ),
+    path(
+        r"resource/<int:resource_id>/push/",
+        views.push_to_project,
+        name="resources-push-to-project",
+    ),
 ]
 
 # eof
