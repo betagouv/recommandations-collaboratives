@@ -49,6 +49,11 @@ urlpatterns = [
         views.update_note,
         name="projects-update-note",
     ),
+    path(
+        r"project/<int:project_id>/push/",
+        views.push_resource,
+        name="projects-push-resource",
+    ),
 ]
 
 # eof

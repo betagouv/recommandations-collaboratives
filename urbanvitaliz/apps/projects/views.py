@@ -220,6 +220,17 @@ class TaskForm(forms.ModelForm):
         fields = ["content", "tags", "public", "deadline", "done"]
 
 
+@login_required
+def push_resource(request, project_id=None):
+    """Start the process of pushing a resource to given project"""
+    is_staff_or_403(request.user)
+    project = get_object_or_404(models.Project, pk=project_id)
+    if request.method == "POST":
+        request.session["project_id"] = project.id
+        return redirect(reverse("resources-resource-search"))
+    return redirect(reverse("projects-project-detail", args=[project_id]))
+
+
 ########################################################################
 # Helpers
 ########################################################################
