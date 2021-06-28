@@ -53,6 +53,7 @@ class OnboardingForm(forms.ModelForm):
             "email",
             "first_name",
             "last_name",
+            "phone",
             "org_name",
             "name",
             "location",
