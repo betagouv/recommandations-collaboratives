@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 """
-Admin for project application
+Admin for resources application
 
 authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-06-16 11:10:27 CEST
@@ -25,6 +25,13 @@ class ResourceAdmin(admin.ModelAdmin):
     search_fields = ["title", "content"]
     list_filter = ["updated_on"]
     list_display = ["updated_on", "title"]
+
+
+@admin.register(models.Bookmark)
+class BookmarkAdmin(admin.ModelAdmin):
+    search_fields = ["resource__title", "comments"]
+    list_filter = []
+    list_display = ["resource", "created_by"]
 
 
 # eof
