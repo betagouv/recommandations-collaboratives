@@ -176,9 +176,7 @@ def push_to_project(request, resource_id=None):
             bookmark.created_by = request.user
             bookmark.save()
             # cleanup the session
-            session = request.session
-            del session["project_id"]
-            session.save()
+            del request.session["project_id"]
             next_url = reverse("projects-project-detail", args=[resource.id])
             return redirect(next_url)
     else:
