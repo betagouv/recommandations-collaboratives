@@ -7,8 +7,6 @@ authors : raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
-from contextlib import contextmanager
-
 import pytest
 
 from pytest_django.asserts import assertContains
@@ -22,6 +20,8 @@ import django.core.mail
 from django.contrib.auth import models as auth
 
 from model_bakery.recipe import Recipe
+
+from urbanvitaliz.utils import login
 
 from . import models
 
@@ -464,19 +464,6 @@ def test_staff_push_resource_to_project(client):
     assert client.session["project_id"] == project.id
     newurl = reverse("resources-resource-search")
     assertRedirects(response, newurl)
-
-
-########################################################################
-# Helpers
-########################################################################
-
-
-@contextmanager
-def login(client, is_staff=False):
-    """Create a user and sign her into the application"""
-    user = Recipe(auth.User, email="test@example.com", is_staff=is_staff).make()
-    client.force_login(user)
-    yield user
 
 
 # eof
