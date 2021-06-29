@@ -23,6 +23,8 @@ from model_bakery.recipe import Recipe
 
 from urbanvitaliz.utils import login
 
+from .templatetags import projects_extra
+
 from . import models
 
 
@@ -464,6 +466,18 @@ def test_staff_push_resource_to_project(client):
     assert client.session["project_id"] == project.id
     newurl = reverse("resources-resource-search")
     assertRedirects(response, newurl)
+
+
+########################################################################
+# template tags and filters
+########################################################################
+
+
+@pytest.mark.django_db
+def test_current_project_tag():
+    project = Recipe(models.Project).make()
+    session = {"project_id": project.id}
+    assert projects_extra.current_project(session) == project
 
 
 # eof

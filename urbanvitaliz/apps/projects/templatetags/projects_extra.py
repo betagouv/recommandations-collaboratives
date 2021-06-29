@@ -9,6 +9,8 @@ created: 2021-06-29 11:30:42 CEST
 
 from django import template
 
+from .. import models
+
 register = template.Library()
 
 
