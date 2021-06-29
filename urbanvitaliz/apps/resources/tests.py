@@ -344,4 +344,68 @@ def test_staff_push_resource_to_project(client):
     assert "project_id" not in client.session
 
 
+########################################################################
+# Bookmarking a resource
+########################################################################
+
+
+@pytest.mark.django_db
+def test_user_has_access_to_page_for_bookmark_with_notes(client):
+    resource = Recipe(models.Resource, public=True).make()
+
+    url = reverse("resources-bookmark-create", args=[resource.id])
+    with login(client, is_staff=True):
+        response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(response, 'form id="form-create-bookmark"')
+
+
+@pytest.mark.django_db
+def test_user_bookmarks_a_resource(client):
+    resource = Recipe(models.Resource, public=True).make()
+
+    url = reverse("resources-bookmark-create", args=[resource.id])
+    with login(client) as user:
+        data = {"comments": "some nice comments"}
+        response = client.post(url, data=data)
+
+    # a new bookmark is created
+    bookmark = models.Bookmark.fetch()[0]
+    assert bookmark.created_by == user
+    assert bookmark.resource == resource
+    assert bookmark.comments == data["comments"]
+    # user is redirected to resource details
+    newurl = reverse("resources-resource-detail", args=[resource.id])
+    assertRedirects(response, newurl)
+
+
+@pytest.mark.django_db
+def test_user_deletes_a_personal_bookmark(client):
+
+    with login(client) as user:
+        bookmark = Recipe(models.Bookmark, created_by=user).make()
+        url = reverse("resources-bookmark-delete", args=[bookmark.id])
+        response = client.post(url)
+
+    bookmark = models.Bookmark.objects.get(id=bookmark.id)
+    assert bookmark.deleted
+    newurl = reverse("resources-resource-detail", args=[bookmark.resource.id])
+    assertRedirects(response, newurl)
+
+
+@pytest.mark.django_db
+def test_user_cannot_delete_someone_else_bookmark(client):
+    bookmark = Recipe(models.Bookmark).make()
+    url = reverse("resources-bookmark-delete", args=[bookmark.id])
+
+    with login(client) as user:
+        response = client.post(url)
+
+    bookmark = models.Bookmark.objects.get(id=bookmark.id)
+    assert not bookmark.deleted
+    newurl = reverse("resources-resource-detail", args=[bookmark.resource.id])
+    assertRedirects(response, newurl)
+
+
 # eof
