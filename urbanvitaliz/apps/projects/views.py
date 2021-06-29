@@ -13,6 +13,7 @@ from django import forms
 
 from django.urls import reverse
 
+from django.contrib.syndication.views import Feed
 from django.utils import timezone
 
 from django.shortcuts import get_object_or_404
@@ -220,6 +221,28 @@ class TaskForm(forms.ModelForm):
         model = models.Task
         fields = ["content", "tags", "public", "deadline", "done"]
 
+
+########################################################################
+# RSS Feeds
+########################################################################
+
+
+class LatestProjectsFeed(Feed):
+    title = "Derniers projets"
+    link = "/projects/feed"
+    description = "Derniers ajouts de projets"
+
+    def items(self):
+        return models.Project.objects.order_by("-created_on")[:5]
+
+    def item_title(self, item):
+        return item.name
+
+    def item_description(self, item):
+        return item.description
+
+    def item_link(self, item):
+        return reverse("projects-project-detail", args=[item.pk])
 
 
 # eof

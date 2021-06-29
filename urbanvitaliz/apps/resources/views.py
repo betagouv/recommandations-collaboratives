@@ -19,6 +19,9 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 
+from django.template import TemplateDoesNotExist
+from django.template.loader import get_template
+
 from markdownx.fields import MarkdownxFormField
 
 from urbanvitaliz.utils import is_staff_or_403
@@ -131,6 +134,18 @@ def resource_create(request):
 
 class EditResourceForm(forms.ModelForm):
     """Create and update form for resources"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Try to load the Markdown template into 'content' field
+        try:
+            tmpl = get_template(
+                template_name="resources/resource/create_md_template.md"
+            )
+            self.fields["content"].initial = tmpl.render()
+        except TemplateDoesNotExist:
+            pass
 
     content = MarkdownxFormField(label="Contenu")
 
