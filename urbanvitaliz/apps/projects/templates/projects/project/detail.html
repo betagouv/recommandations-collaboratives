@@ -230,6 +230,17 @@
         </table>
         {% endif %}
 
+        <h3>Ressources</h3>
+
+        <form method="POST" action="{% url 'projects-push-resource' project.id %}">
+            {% csrf_token %}
+            <input type="submit" value="Pousser une ressource">
+        </form>
+
+        {% for bookmark in project.bookmarks.all %}
+        dkdk
+        {% endfor %}
+
         <!-- Notes de suivi -->
         <h2>
             <svg class="bi" width="28" height="28" fill="currentColor">

@@ -25,6 +25,11 @@ class Project(models.Model):
     first_name = models.CharField(
         max_length=128, default="", verbose_name="Prénom du contact"
     )
+
+    @property
+    def full_name(self):
+        return " ".join([self.first_name, self.last_name])
+
     org_name = models.CharField(
         max_length=256, blank=True, default="", verbose_name="Nom de votre structure"
     )

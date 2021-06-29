@@ -141,7 +141,7 @@
 
                         <div class="title">
                             <a href="{% url 'resources-resource-detail' resource.id %}" class="text-reset text-decoration-none stretched-link">
-                                {{ resource.title|title|truncatechars:35 }}
+                                {{ resource.title|title|truncatechars:50 }}
                             </a>
                         </div>
 
@@ -155,24 +155,31 @@
 
                     </div>
                 </div>
-                <div class="card-footer">
+                <div class="card-footer" style="z-index: 10;">
                     {% if user.is_staff %}
                     {% if resource.public %}
-                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Publiée">
+                    <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="Publiée">
                         <svg class="bi" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
                         </svg>
                     </span>
                     {% else %}
-                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Non publiée">
+                    <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="Non publiée">
                         <svg class="bi" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-slash"/>
                         </svg>
                     </span>
                     {% endif %}
                     &nbsp;
+                    {% if "project_id" in request.session %}
+                    <a class="text-reset text-decoration-none align-baseline" href="{% url "resources-push-to-project" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Pousser cette ressource">
+                        <svg class="bi align-baseline" width="14" height="14" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
+                        </svg>
+                    </a>
+                    &nbsp;
                     {% endif %}
-                    <span class="small text-secondary">Mis à jour le {{ resource.updated_on|date|naturaltime }}</span>
+                    {% endif %}
                 </div>
             </div>
         </div>

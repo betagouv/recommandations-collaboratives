@@ -86,6 +86,33 @@
 
             {% if user.is_staff %}
             <!-- Staff actions -->
+
+            <!-- Push Resource -->
+            <div class="d-grid gap-2 mt-3">
+                {% if "project_id" in request.session %}
+                <form action="{% url "resources-push-to-project" resource.id %}" method="GET">
+                    <button type="submit" class="btn btn-success w-100 btn-sm" role="submit">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
+                        </svg>
+                        &nbsp;
+                        Pousser la ressource
+                    </button>
+                </form>
+                {% else %}
+                <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="left" title="Sélectionner un projet pour pousser une ressource">
+                    <button type="submit" class="btn btn-light w-100 btn-sm" role="submit" disabled>
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
+                        </svg>
+                        &nbsp;
+                        Pousser la ressource
+                    </button>
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Edit -->
             <div class="d-grid gap-2 mt-3">
                 <a class="btn btn-light btn-sm" href="{% url 'resources-resource-update' resource.id %}" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
@@ -95,7 +122,10 @@
                     Éditer
                 </a>
             </div>
+
             {% endif %}
+
+
 
         </div>
 

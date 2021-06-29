@@ -132,7 +132,9 @@ class Bookmark(models.Model):
     resource = models.ForeignKey("Resource", on_delete=models.CASCADE)
     created_by = models.ForeignKey(auth.User, on_delete=models.CASCADE)
 
-    project = models.ForeignKey(projects.Project, null=True, on_delete=models.CASCADE)
+    project = models.ForeignKey(
+        projects.Project, null=True, on_delete=models.CASCADE, related_name="bookmarks"
+    )
     comments = models.TextField(default="", blank=True)
 
     deleted = models.DateTimeField(null=True, blank=True)
