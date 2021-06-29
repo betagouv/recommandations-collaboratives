@@ -21,7 +21,14 @@ from django.shortcuts import render
 
 from markdownx.fields import MarkdownxFormField
 
+from urbanvitaliz.utils import is_staff_or_403
+
 from . import models
+
+
+########################################################################
+# Searching resources
+########################################################################
 
 
 def resource_search(request):
@@ -74,11 +81,21 @@ class SearchForm(forms.Form):
         return selected
 
 
+########################################################################
+# Seeing resources
+########################################################################
+
+
 @login_required
 def resource_detail(request, resource_id=None):
     """Return the details of given resource"""
     resource = get_object_or_404(models.Resource, pk=resource_id)
     return render(request, "resources/resource/details.html", locals())
+
+
+########################################################################
+# Creating and updating resources
+########################################################################
 
 
 @login_required
@@ -135,17 +152,6 @@ class EditResourceForm(forms.ModelForm):
     class Meta:
         model = models.Resource
         fields = ["title", "subtitle", "summary", "tags", "category", "content"]
-
-
-########################################################################
-# Helpers
-########################################################################
-
-
-def is_staff_or_403(user):
-    """Raise a 403 error is user is not a staff member"""
-    if not user or not user.is_staff:
-        raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
 # eof

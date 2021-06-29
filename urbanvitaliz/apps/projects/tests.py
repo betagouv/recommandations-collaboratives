@@ -7,8 +7,6 @@ authors : raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
-from contextlib import contextmanager
-
 import pytest
 
 from pytest_django.asserts import assertContains
@@ -22,6 +20,8 @@ import django.core.mail
 from django.contrib.auth import models as auth
 
 from model_bakery.recipe import Recipe
+
+from urbanvitaliz.utils import login
 
 from . import models
 
@@ -433,19 +433,6 @@ def test_update_note_for_project_and_redirect(client):
     assert note.project.updated_on == note.updated_on
 
     assert response.status_code == 302
-
-
-########################################################################
-# Helpers
-########################################################################
-
-
-@contextmanager
-def login(client, is_staff=False):
-    """Create a user and sign her into the application"""
-    user = Recipe(auth.User, email="test@example.com", is_staff=is_staff).make()
-    client.force_login(user)
-    yield user
 
 
 # eof

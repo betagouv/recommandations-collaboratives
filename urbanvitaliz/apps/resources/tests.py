@@ -23,6 +23,8 @@ from django.contrib.auth import models as auth
 
 from model_bakery.recipe import Recipe
 
+from urbanvitaliz.utils import login
+
 from . import models
 
 
@@ -281,15 +283,4 @@ def test_search_resources_by_category():
     assert set(resources) == set(matched)
 
 
-########################################################################
-# Helpers
-########################################################################
-
-
-# FIXME duplicated from projects
-@contextmanager
-def login(client, is_staff=False):
-    """Create a user and sign her into the application"""
-    user = Recipe(auth.User, email="a@example.com", is_staff=is_staff).make()
-    client.force_login(user)
-    yield user
+# eof
