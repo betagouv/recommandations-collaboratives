@@ -58,7 +58,7 @@
             </div>
 
         </div>
-        <div id="project-sidebar" class="col-md-3 border-start">
+        <div id="project-sidebar" class="col-md-3 border-start h-100">
             <p class="small text-secondary d-inline">
                 <svg class="bi" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-history"/>
@@ -67,6 +67,20 @@
                 Fiche crée <em>{{ project.created_on|naturalday }}</em> et modifiée <em>{{ project.updated_on|naturaltime }}</em>.
             </p>
 
+            <div class="d-grid gap-2 mt-3">
+                <span class="d-inline-block">
+                    <form method="POST" action="{% url 'projects-push-resource' project.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-light w-100 btn-sm" role="submit">
+                            <svg class="bi" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
+                            </svg>
+                            &nbsp;
+                            Pousser une ressource
+                        </button>
+                    </form>
+                </span>
+            </div>
 
             <!--
                  <p>
@@ -230,16 +244,27 @@
         </table>
         {% endif %}
 
-        <h3>Ressources</h3>
-
-        <form method="POST" action="{% url 'projects-push-resource' project.id %}">
-            {% csrf_token %}
-            <input type="submit" value="Pousser une ressource">
-        </form>
-
+        <h4>Ressources connexes</h4>
+        <div class="text-secondary">
         {% for bookmark in project.bookmarks.all %}
-        dkdk
+        <ul>
+            <li><a href="{% url "resources-resource-detail" bookmark.resource.id %}">{{ bookmark.resource.title }}</a>
+                {% if bookmark.comments %}
+                <q>{{ bookmark.comments }}</q>
+                {% endif %}
+                <br/>
+                <span class="small text-secondary">{% if bookmark.created_by %}(via {{ bookmark.created_by.get_full_name|default:bookmark.created_by }}){% endif %}</span>
+            </li>
+        </ul>
+        {% empty %}
+        <div class="mb-3 mt-3">
+            <svg class="bi me-1" width="20" height="20" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightbulb"/>
+            </svg>
+            Pour vous aider dans vos démarches, n'hésitez pas à <a href="{% url 'resources-resource-search' %}">identifier des ressources et les mettre en favoris</a>.
+        </div>
         {% endfor %}
+        </div>
 
         <!-- Notes de suivi -->
         <h2>
