@@ -24,9 +24,16 @@ from django.template.loader import get_template
 
 from markdownx.fields import MarkdownxFormField
 
+from urbanvitaliz.utils import is_staff_or_403
+
 from urbanvitaliz.apps.projects import models as projects
 
 from . import models
+
+
+########################################################################
+# Searching resources
+########################################################################
 
 
 def resource_search(request):
@@ -79,11 +86,21 @@ class SearchForm(forms.Form):
         return selected
 
 
+########################################################################
+# Seeing resources
+########################################################################
+
+
 @login_required
 def resource_detail(request, resource_id=None):
     """Return the details of given resource"""
     resource = get_object_or_404(models.Resource, pk=resource_id)
     return render(request, "resources/resource/details.html", locals())
+
+
+########################################################################
+# Creating and updating resources
+########################################################################
 
 
 @login_required
@@ -176,9 +193,7 @@ def push_to_project(request, resource_id=None):
             bookmark.created_by = request.user
             bookmark.save()
             # cleanup the session
-            session = request.session
-            del session["project_id"]
-            session.save()
+            del request.session["project_id"]
             next_url = reverse("projects-project-detail", args=[resource.id])
             return redirect(next_url)
     else:
@@ -192,17 +207,6 @@ class BookmarkForm(forms.ModelForm):
     class Meta:
         model = models.Bookmark
         fields = ["comments"]
-
-
-########################################################################
-# Helpers
-########################################################################
-
-
-def is_staff_or_403(user):
-    """Raise a 403 error is user is not a staff member"""
-    if not user or not user.is_staff:
-        raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
 # eof
