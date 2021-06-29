@@ -232,7 +232,7 @@ def push_to_project(request, resource_id=None):
             bookmark.save()
             # cleanup the session
             del request.session["project_id"]
-            next_url = reverse("projects-project-detail", args=[resource.id])
+            next_url = reverse("projects-project-detail", args=[project.id])
             return redirect(next_url)
     else:
         form = BookmarkForm()
