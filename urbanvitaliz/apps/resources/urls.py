@@ -31,9 +31,19 @@ urlpatterns = [
         name="resources-resource-update",
     ),
     path(
-        r"resource/<int:resource_id>/push/",
+        r"ressource/<int:resource_id>/push/",
         views.push_to_project,
         name="resources-push-to-project",
+    ),
+    path(
+        r"ressource/<int:resource_id>/bookmark/",
+        views.create_bookmark,
+        name="resources-bookmark-create",
+    ),
+    path(
+        r"ressource/bookmark/<int:bookmark_id>/delete/",
+        views.delete_bookmark,
+        name="resources-bookmark-delete",
     ),
 ]
 
