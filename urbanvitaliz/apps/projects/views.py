@@ -9,8 +9,6 @@ created : 2021-05-26 15:56:20 CEST
 
 from django.contrib.auth.decorators import login_required
 
-from django.core.exceptions import PermissionDenied
-
 from django import forms
 
 from django.urls import reverse
@@ -23,6 +21,8 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 
 from markdownx.fields import MarkdownxFormField
+
+from urbanvitaliz.utils import is_staff_or_403
 
 from . import models
 
@@ -254,17 +254,6 @@ class LatestProjectsFeed(Feed):
 
     def item_link(self, item):
         return reverse("projects-project-detail", args=[item.pk])
-
-
-########################################################################
-# Helpers
-########################################################################
-
-
-def is_staff_or_403(user):
-    """Raise a 403 error is user is not a staff member"""
-    if not user or not user.is_staff:
-        raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
 # eof
