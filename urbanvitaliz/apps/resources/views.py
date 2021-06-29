@@ -13,6 +13,8 @@ from django.core.exceptions import PermissionDenied
 
 from django import forms
 
+from django.utils import timezone
+
 from django.urls import reverse
 
 from django.shortcuts import get_object_or_404
@@ -169,6 +171,42 @@ class EditResourceForm(forms.ModelForm):
     class Meta:
         model = models.Resource
         fields = ["title", "subtitle", "summary", "tags", "category", "content"]
+
+
+########################################################################
+# bookmark resources
+########################################################################
+
+
+@login_required
+def create_bookmark(request, resource_id=None):
+    """Create bookmark for resource and and connected user"""
+    resource = get_object_or_404(models.Resource, pk=resource_id)
+    if request.method == "POST":
+        form = BookmarkForm(request.POST)
+        if form.is_valid():
+            # create a new bookmark with provided information
+            bookmark = form.save(commit=False)
+            bookmark.resource = resource
+            bookmark.created_by = request.user
+            bookmark.save()
+            next_url = reverse("resources-resource-detail", args=[resource.id])
+            return redirect(next_url)
+    else:
+        form = BookmarkForm()
+    return render(request, "resources/bookmark/create.html", locals())
+
+
+@login_required
+def delete_bookmark(request, bookmark_id=None):
+    """Delete bookmark if user is owner"""
+    bookmark = get_object_or_404(models.Bookmark, pk=bookmark_id)
+    # only delete my own bookmark and as post request
+    if request.method == "POST" and bookmark.created_by == request.user:
+        bookmark.deleted = timezone.now()
+        bookmark.save()
+    next_url = reverse("resources-resource-detail", args=[bookmark.resource_id])
+    return redirect(next_url)
 
 
 ########################################################################
