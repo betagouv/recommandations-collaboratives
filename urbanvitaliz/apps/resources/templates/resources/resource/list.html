@@ -25,7 +25,7 @@
         <div class="col">
             <h1 class=" align-items-center mb-3">
                 <svg class="bi" width="38" height="38" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#book"/>
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
                 </svg>
                 Ressources
             </h1>
@@ -79,7 +79,7 @@
                        id="check-{{ category.the_category.form_label }}"
                        {% if category.checked %}checked{% endif %}
                 >
-                <label class="form-check-label" for="check-{{ category.the_category.form_label }}">{{ category.the_category }}</label>
+                <label class="form-check-label text-secondary" for="check-{{ category.the_category.form_label }}">{{ category.the_category }}</label>
             </span>
             {% endfor %}
 
@@ -120,66 +120,99 @@
 
             <!-- Card -->
             <div class="card-resource card h-100" style="min-height: 300px;">
-                <hr class="middle-hr" />
+                <!-- <hr class="middle-hr" /> -->
                 <div class="card-body">
                     <div class="card-title mb-4">
                         <div class="row">
-                            <div class="icon-placeholder col-4">
-                                <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ resource.category.color|default:"black" }}">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"book" }}"/>
+                            <!-- <div class="icon-placeholder  d-inline"> -->
+                            <!--</div> -->
+                                 <!-- <span class="col-8 category">
+                                 <span class="badge bg-light text-dark">
+                                 {{ resource.category.name|default:"Ressource" }}
+                                 </span>
+                                 </span>
+                            -->
+                            <div class="title">
+                                <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"key" }}"/>
                                 </svg>
+                                <a href="{% url 'resources-resource-detail' resource.id %}" class="text-reset text-decoration-none stretched-link">
+                                    {{ resource.title|capfirst }}
+                                </a>
                             </div>
-                            <span class="col-8 category">
-                                <span class="badge bg-light text-dark">
-                                    {{ resource.category.name|default:"Ressource" }}
-                                </span>
-                            </span>
                         </div>
                     </div>
 
                     <div class="card-text">
 
-                        <div class="title">
-                            <a href="{% url 'resources-resource-detail' resource.id %}" class="text-reset text-decoration-none stretched-link">
-                                {{ resource.title|title|truncatechars:50 }}
-                            </a>
-                        </div>
+                        <!-- 
+                             <div class="mb-2">
+                             {% for tag in  resource.tags_as_list  %}
+                             <span class="badge rounded-pill bg-light text-dark">#{{ tag }}</span>
+                             {% endfor %}
+                             </div>
+                        -->
 
-                        <div class="mb-2">
-                            {% for tag in  resource.tags_as_list  %}
-                            <span class="badge rounded-pill bg-light text-dark">#{{ tag }}</span>
-                            {% endfor %}
-                        </div>
-
-                        <div class="small text-secondary subtitle">{{ resource.subtitle|truncatechars:100 }}</div>
+                        <div class="small text-secondary subtitle">{{ resource.subtitle|truncatechars:120 }}</div>
 
                     </div>
                 </div>
                 <div class="card-footer" style="z-index: 10;">
-                    {% if user.is_staff %}
-                    {% if resource.public %}
-                    <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="Publiée">
-                        <svg class="bi" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
-                        </svg>
-                    </span>
-                    {% else %}
-                    <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="Non publiée">
-                        <svg class="bi" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-slash"/>
-                        </svg>
-                    </span>
-                    {% endif %}
-                    &nbsp;
-                    {% if "project_id" in request.session %}
-                    <a class="text-reset text-decoration-none align-baseline" href="{% url "resources-push-to-project" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Pousser cette ressource">
-                        <svg class="bi align-baseline" width="14" height="14" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
-                        </svg>
-                    </a>
-                    &nbsp;
-                    {% endif %}
-                    {% endif %}
+                    <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+                        <div class="btn-group" role="group" aria-label="Etat">
+                            {% if user.is_staff %}
+                            {% if resource.public %}
+                            <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="Publiée">
+                                <svg class="bi" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
+                                </svg>
+                            </span>
+                            {% else %}
+                            <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="Non publiée">
+                                <svg class="bi" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-slash"/>
+                                </svg>
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                        <!-- Admin Actions -->
+                        {% if user.is_staff %}
+                        <div class="btn-group" role="group" aria-label="Admin Actions">
+                            <!-- Push -->
+                            {% if "project_id" in request.session %}
+                            <a class="text-reset text-decoration-none align-baseline" href="{% url "resources-push-to-project" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Pousser cette ressource">
+                                <svg class="bi text-success align-baseline" width="14" height="14" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
+                                </svg>
+                            </a>
+                            {% else %}
+                            <span class="align-baseline" href="{% url "resources-push-to-project" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Sélectionnez d'abord un projet pour pousser cette ressource">
+                                <svg class="bi  text-secondary align-baseline" width="14" height="14" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
+                                </svg>
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <div class="btn-group" role="group" aria-label="Actions">
+                            <!-- Bookmark -->
+                            {% if False %}
+                            <a class="text-reset text-decoration-none align-baseline" href="{% url "resources-push-to-project" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Retirer de vos favoris">
+                                <svg class="bi text-warning align-baseline" width="14" height="14" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill"/>
+                                </svg>
+                            </a>
+                            {% else %}
+                            <span class="align-baseline" href="{% url "resources-push-to-project" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ajouter à vos favoris - BIENTÔT DISPONIBLE">
+                                <svg class="bi  text-secondary align-baseline" width="14" height="14" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
+                                </svg>
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>

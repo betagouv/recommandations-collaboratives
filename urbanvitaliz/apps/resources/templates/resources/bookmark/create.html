@@ -35,14 +35,14 @@
         </svg>
         Pousser une ressource
     </h2>
-    <p class="fs-5">Envoyer la ressource "<span class="text-secondary">{{ resource.title|title }}</span>" au projet "<span class="text-secondary">{{ project.name|title }}</span>".</p>
+    <p class="fs-5">Recommander la ressource "<span class="text-secondary">{{ resource.title|title }}</span>" au projet "<span class="text-secondary">{{ project.name|title }}</span>".</p>
 
     <form class="form" id="form-create-bookmark" action="." method="POST">
         {% csrf_token %}
 
         <div class="mb-3">
             <label class="mb-2" for="input-project-comments">Pourquoi poussez-vous cette ressource ?</label>
-            <textarea required class="form-control {% if form.comments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-comments" comments="{{ form.comments.comments }}" placeholder="Veuillez saisir quelques mots pour motiver la raison de cette suggestion." required>{{ form.comments.value|default:'' }}</textarea>
+            <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-bookmark-comments" name="{{ form.comments.name }}" placeholder="Veuillez saisir quelques mots pour motiver la raison de cette suggestion." required>{{ form.comments.value|default:'' }}</textarea>
 
             {% for error in form.comments.errors %}
             <div class="text-danger text-end">{{ error }}</div>

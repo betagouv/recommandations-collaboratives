@@ -18,7 +18,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#book"/>
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
                 </svg>&nbsp;
                 <a href="{% url 'resources-resource-search' %}">Ressources</a>
             </li>
@@ -33,8 +33,8 @@
 
             <h1 class="mb-3 text-break">
                 <span data-bs-toggle="tooltip" data-bs-placement="left" title="{{ resource.category.name|default:"Ressource" }}">
-                    <svg class="bi me-2 rounded-circle align-middle resource-icon bg-color-{{ resource.category.color|default:"black" }}">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"book" }}"/>
+                    <svg class="bi me-2 rounded-circle align-middle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"key" }}"/>
                     </svg>
                 </span>
                 {{ resource.title|title }}
@@ -100,7 +100,7 @@
                     </button>
                 </form>
                 {% else %}
-                <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="left" title="Sélectionner un projet pour pousser une ressource">
+                <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="left" title="Sélectionner d'abord un projet pour pousser une ressource">
                     <button type="submit" class="btn btn-light w-100 btn-sm" role="submit" disabled>
                         <svg class="bi" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
