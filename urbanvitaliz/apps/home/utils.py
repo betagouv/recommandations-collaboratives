@@ -7,6 +7,8 @@ authors: raphael@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-08 09:56:53 CEST
 """
 
+from django import forms
+
 from django.contrib.auth import models as auth
 
 

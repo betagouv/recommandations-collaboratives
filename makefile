@@ -15,6 +15,7 @@ test:
 
 nice:
 	black urbanvitaliz
+	flake8 urbanvitaliz
 
 coverage:
 	pytest --cov
