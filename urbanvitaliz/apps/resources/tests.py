@@ -360,6 +360,7 @@ def test_user_has_access_to_page_for_bookmark_with_notes(client):
     assert response.status_code == 200
     assertContains(response, 'form id="form-create-bookmark"')
 
+
 @pytest.mark.django_db
 def test_user_bookmarks_a_resource(client):
     resource = Recipe(models.Resource, public=True).make()
