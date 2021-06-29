@@ -23,6 +23,8 @@ from django.contrib.auth import models as auth
 
 from model_bakery.recipe import Recipe
 
+from urbanvitaliz.utils import login
+
 from urbanvitaliz.apps.projects import models as projects
 
 from . import models
@@ -342,15 +344,4 @@ def test_staff_push_resource_to_project(client):
     assert "project_id" not in client.session
 
 
-########################################################################
-# Helpers
-########################################################################
-
-
-# FIXME duplicated from projects
-@contextmanager
-def login(client, is_staff=False):
-    """Create a user and sign her into the application"""
-    user = Recipe(auth.User, email="a@example.com", is_staff=is_staff).make()
-    client.force_login(user)
-    yield user
+# eof
