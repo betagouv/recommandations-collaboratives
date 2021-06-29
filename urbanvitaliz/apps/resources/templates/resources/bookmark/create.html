@@ -23,7 +23,7 @@
                 <a href="{% url 'resources-resource-search' %}">Ressources</a>
             </li>
             <li class="breadcrumb-item">
-                <a href="{% url 'resources-resource-detail' project.id %}">{{ resource.title|title|truncatechars:20 }}</a>
+                <a href="{% url 'resources-resource-detail' resource.id %}">{{ resource.title|title|truncatechars:20 }}</a>
             </li>
             <li class="breadcrumb-item active">Pousser la ressource
             </li>

@@ -9,8 +9,6 @@ created : 2021-06-16 10:59:08 CEST
 
 from django.contrib.auth.decorators import login_required
 
-from django.core.exceptions import PermissionDenied
-
 from django import forms
 
 from django.utils import timezone
