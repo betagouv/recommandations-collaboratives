@@ -381,26 +381,26 @@ def test_user_deletes_a_personal_bookmark(client):
 
     with login(client) as user:
         bookmark = Recipe(models.Bookmark, created_by=user).make()
-        url = reverse("resources-bookmark-delete", args=[bookmark.id])
+        url = reverse("resources-bookmark-delete", args=[bookmark.resource_id])
         response = client.post(url)
 
     bookmark = models.Bookmark.objects.get(id=bookmark.id)
     assert bookmark.deleted
-    newurl = reverse("resources-resource-detail", args=[bookmark.resource.id])
+    newurl = reverse("resources-resource-detail", args=[bookmark.resource_id])
     assertRedirects(response, newurl)
 
 
 @pytest.mark.django_db
 def test_user_cannot_delete_someone_else_bookmark(client):
     bookmark = Recipe(models.Bookmark).make()
-    url = reverse("resources-bookmark-delete", args=[bookmark.id])
+    url = reverse("resources-bookmark-delete", args=[bookmark.resource_id])
 
     with login(client):
         response = client.post(url)
 
     bookmark = models.Bookmark.objects.get(id=bookmark.id)
     assert not bookmark.deleted
-    newurl = reverse("resources-resource-detail", args=[bookmark.resource.id])
+    newurl = reverse("resources-resource-detail", args=[bookmark.resource_id])
     assertRedirects(response, newurl)
 
 
