@@ -7,6 +7,8 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-16 17:56:10 CEST
 """
 
+from datetime import datetime
+
 import pytest
 
 from pytest_django.asserts import assertContains
@@ -373,6 +375,27 @@ def test_user_bookmarks_a_resource(client):
     assert bookmark.comments == data["comments"]
     # user is redirected to resource details
     newurl = reverse("resources-resource-detail", args=[resource.id])
+    assertRedirects(response, newurl)
+
+
+@pytest.mark.django_db
+def test_user_refresh_bookmark_of_a_resource(client):
+
+    with login(client) as user:
+        bookmark = Recipe(
+            models.Bookmark, created_by=user, deleted=datetime.now()
+        ).make()
+        url = reverse("resources-bookmark-create", args=[bookmark.resource_id])
+        data = {"comments": "some nice comments"}
+        response = client.post(url, data=data)
+
+    # existing deleted bookmark is reactivated
+    updated_bookmark = models.Bookmark.fetch()[0]
+    assert updated_bookmark == bookmark
+    assert not updated_bookmark.deleted
+    assert updated_bookmark.comments == data["comments"]
+    # user is redirected to resource details
+    newurl = reverse("resources-resource-detail", args=[bookmark.resource_id])
     assertRedirects(response, newurl)
 
 
