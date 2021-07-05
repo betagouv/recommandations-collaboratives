@@ -1,44 +1,144 @@
 {% extends "base.html" %}
 
+{% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
 {% block content %}
-	<h2 class="display-3">Liste de mes projets</h2>
 
-<section>
+<div class="col-11 py-5 mx-auto">
+    <h1 class="align-items-center">
+        <svg class="bi" width="40" height="40" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
+        </svg>
+        Ma Collectivité
+    </h1>
 
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Date de création</th>
-				<th>Nom</th>
-				<th>Localisation</th>
-				<th>Actions</th>
-				<th>Notes</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for project in projects %}
-			<tr>
-				<td>{{ project.created_on }}</td>
-				<td>
-					<a href="#">
-						{{ project.name }}
-					</a>
-				</td>
-				<td>{{ project.location }}</td>
-				<td>{{ project.tasks.count }}</td>
-				<td>{{ project.notes.count }}</td>
-			</tr>
-			{% empty %}
-			<tr>
-				<td colspan="5">
-					Je n'ai pas encore de projet ?
-					C'est le bon moment pour commencer !
-				</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
 
-</section>
+    <div class="row resource-details mb-3">
+        <div class="col-sm-12 col-lg-8 col-xl-9">
+
+
+            <div class="bd-callout bd-callout-info">
+                Bienvenue sur votre tableau de bord ! Vous y trouverez un résumé de
+                vos informations ainsi que les éventuelles notifications.
+            </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
+            <p class="small text-secondary">
+                <a href="#" class="d-flex align-items-center link-dark text-decoration-none" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="align-items-center link-dark text-decoration-none">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#life-preserver"/>
+                        </svg>
+                    </span>
+                    &nbsp;
+                    <strong>Besoin d'aide ?</strong>&nbsp;
+                    Une question ?
+                </a>
+
+                <div class="d-grid gap-2 mt-3">
+                    <a class="btn btn-primary btn-sm" href="mailto:contact@urbanvitaliz.fr?subject=UrbanVitaliz" role="button">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+                        </svg>
+                        &nbsp;
+                        Écrire à l'équipe UrbanVitaliz
+                    </a>
+                </div>
+            </p>
+        </div>
+
+    </div>
+
+    <h2 class="mt-5 mb-3">
+        <svg class="bi align-baseline" width="24" height="24" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+        </svg>
+        Mes Friches en projet
+    </h2>
+
+    <table class="table">
+		    <thead>
+			      <tr>
+				        <th>Date de création</th>
+				        <th>Nom</th>
+				        <th>Localisation</th>
+				        <th>Actions</th>
+				        <th>Notes</th>
+			      </tr>
+		    </thead>
+		    <tbody>
+			      {% for project in projects %}
+			      <tr>
+				        <td>{{ project.created_on }}</td>
+				        <td>
+					          <a href="#">
+						            {{ project.name }}
+					          </a>
+				        </td>
+				        <td>{{ project.location }}</td>
+				        <td>{{ project.tasks.count }}</td>
+				        <td>{{ project.notes.count }}</td>
+			      </tr>
+			      {% empty %}
+			      <tr>
+				        <td colspan="5">
+					          Je n'ai pas encore de projet ?
+					          C'est le bon moment pour commencer !
+				        </td>
+			      </tr>
+			      {% endfor %}
+		    </tbody>
+
+	  </table>
+
+    <h2 class="mb-4 mt-5">
+        <svg class="bi align-baseline" width="24" height="24" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
+        </svg>
+        Mes Ressources sauvegardées
+    </h2>
+
+    {% if user.bookmarks.personal %}
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        {% for bookmark in user.bookmarks.personal %}
+        <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-12">
+            {% include "resources/resource/widgets/card_standard.html" with resource=bookmark.resource %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bd-callout bd-callout-info">
+        <p>
+            <svg class="bi ms-1 me-1 align-middle" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
+            </svg>
+
+            Vous n'avez ajouté aucune ressource en favoris pour l'instant.
+        </p>
+        <p>
+            Vous pouvez le faire à tout moment en <strong>cliquant sur l'icône
+            <svg class="bi ms-1 me-1 align-baseline text-warning" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
+            </svg>
+            </strong> :
+            <ul>
+                <li>Dans la <a href="{% url "resources-resource-search" %}">liste des ressources</a>, en <strong>bas de la carte</strong> ;</li>
+                <li>Sur <a href="{% url "resources-resource-detail" 1 %}">une ressource</a>, <strong>à côté du titre</strong>.</li>
+            </ul>
+        </p>
+        <p class="text-secondary">Il vous suffira de cliquer à nouveau sur l'étoile pour retirer la ressource de votre liste.</p>
+    </div>
+    {% endif %}
+
+</div>
+
 {% endblock %}
 
