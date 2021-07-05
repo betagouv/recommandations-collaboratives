@@ -13,8 +13,6 @@ from django.core.exceptions import PermissionDenied
 
 from django.contrib.auth import models as auth
 
-from model_bakery.recipe import Recipe
-
 
 ########################################################################
 # View helpers
@@ -35,7 +33,9 @@ def is_staff_or_403(user):
 @contextmanager
 def login(client, is_staff=False):
     """Create a user and sign her into the application"""
-    user = Recipe(auth.User, email="test@example.com", is_staff=is_staff).make()
+    user = auth.User.objects.create_user(
+        username="test", email="test@example.com", is_staff=is_staff
+    )
     client.force_login(user)
     yield user
 
