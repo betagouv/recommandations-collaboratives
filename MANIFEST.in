@@ -1,4 +1,5 @@
 recursive-include urbanvitaliz/static *.*
 recursive-include urbanvitaliz/apps/home/static *.*
 recursive-include urbanvitaliz/apps/resources/static *.*
+recursive-include urbanvitaliz/apps/resources *.md
 recursive-include urbanvitaliz *.html
