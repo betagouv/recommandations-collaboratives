@@ -218,7 +218,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for task in project.tasks %}
+                {% for task in project.tasks.all %}
                 <tr>
                     <td class="{% if task.is_deadline_past_due %}text-danger{%endif%}">{{ task.deadline|default:"" }}</td>
                     <td>

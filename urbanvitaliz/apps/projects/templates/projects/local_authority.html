@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load sass_tags %}
+{% load humanize %}
 
 {% block css %}
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
@@ -64,30 +65,53 @@
         Mes Friches en projet
     </h2>
 
-    <table class="table">
-		    <thead>
-			      <tr>
-				        <th>Date de création</th>
-				        <th>Nom</th>
-				        <th>Localisation</th>
-				        <th>Actions</th>
-				        <th>Notes</th>
-			      </tr>
-		    </thead>
-		    <tbody>
-			      {% for project in projects %}
-			      <tr>
-				        <td>{{ project.created_on }}</td>
-				        <td>
-					          <a href="#">
-						            {{ project.name }}
-					          </a>
-				        </td>
-				        <td>{{ project.location }}</td>
-				        <td>{{ project.tasks.count }}</td>
-				        <td>{{ project.notes.count }}</td>
-			      </tr>
-			      {% empty %}
+    <ul class="list-group">
+			  {% for project in projects %}
+        <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-action">
+            <div class="d-flex me-auto justify-content-between">
+                <h4 class="mb-1">
+                    <a class="text-reset stretched-link" href="{% url "projects-project-detail" project.id %}">{{ project.name|title }}</a>
+                    <span class="d-block fs-6 text-secondary">{{ project.location|capfirst }}</span>
+                </h4>
+            </div>
+            <div class="d-flex me-5 ms-5 justify-content-between">
+                {% if project.tasks.open.count > 0 %}
+                <div class="text-center">
+                    <span class="badge bg-primary">
+                        <svg class="bi align-middle" width="24" height="24" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
+                        </svg>
+                        &nbsp;
+                        {{ project.tasks.done.count }} / {{ project.tasks.count }}
+                    </span>
+                    <br/>
+                    <span class="small text-secondary">Actions à prendre</span>
+                </div>
+                {% else %}
+                <span class="text-secondary small text-center">
+                    Aucune action à prendre,<br/>
+                    vous êtes à jour !
+                    <svg class="bi align-middle text-success" width="24" height="24" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
+                    </svg>
+                </span>
+                {% endif %}
+            </div>
+            <div class="d-flex me-5 ms-5 justify-content-between">
+                <div class="text-center">
+                <svg class="bi align-middle" width="20" height="20" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
+                </svg>
+                <span class="align-middle fs-4">{{ project.bookmarks.count }}</span>
+                <br/>
+                <span class="text-secondary small">Ressources associées</span>
+                </div>
+            </div>
+            <div class="d-flex ms-5 ">
+                <small>Modifié {{ project.updated_on|naturaltime }}</small>
+            </div>
+        </li>
+		{% empty %}
 			      <tr>
 				        <td colspan="5">
 					          Je n'ai pas encore de projet ?
@@ -95,9 +119,7 @@
 				        </td>
 			      </tr>
 			      {% endfor %}
-		    </tbody>
-
-	  </table>
+    </ul>
 
     <h2 class="mb-4 mt-5">
         <svg class="bi align-baseline" width="24" height="24" fill="currentColor">

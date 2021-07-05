@@ -122,10 +122,22 @@ class Note(models.Model):
         return cls.objects.filter(deleted=None)
 
 
+class TaskManager(models.Manager):
+    def done(self):
+        return self.filter(done=True)
+
+    def open(self):
+        return self.filter(done=False)
+
+
 class Task(models.Model):
     """Représente une action pour faire avancer un project"""
 
-    project = models.ForeignKey("Project", on_delete=models.CASCADE)
+    objects = TaskManager()
+
+    project = models.ForeignKey(
+        "Project", on_delete=models.CASCADE, related_name="tasks"
+    )
     public = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
