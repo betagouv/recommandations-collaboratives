@@ -180,30 +180,36 @@ class EditResourceForm(forms.ModelForm):
 def create_bookmark(request, resource_id=None):
     """Create bookmark for resource and and connected user"""
     resource = get_object_or_404(models.Resource, pk=resource_id)
+    bookmark, created = models.Bookmark.objects.get_or_create(
+        resource=resource, created_by=request.user
+    )
     if request.method == "POST":
-        form = BookmarkForm(request.POST)
+        form = BookmarkForm(request.POST, instance=bookmark)
         if form.is_valid():
-            # create a new bookmark with provided information
-            bookmark = form.save(commit=False)
-            bookmark.resource = resource
-            bookmark.created_by = request.user
-            bookmark.save()
+            # save bookmark with comments
+            instance = form.save(commit=False)
+            instance.deleted = None
+            instance.save()
             next_url = reverse("resources-resource-detail", args=[resource.id])
             return redirect(next_url)
     else:
-        form = BookmarkForm()
+        form = BookmarkForm(instance=bookmark)
     return render(request, "resources/bookmark/create.html", locals())
 
 
 @login_required
-def delete_bookmark(request, bookmark_id=None):
-    """Delete bookmark if user is owner"""
-    bookmark = get_object_or_404(models.Bookmark, pk=bookmark_id)
-    # only delete my own bookmark and as post request
-    if request.method == "POST" and bookmark.created_by == request.user:
-        bookmark.deleted = timezone.now()
-        bookmark.save()
-    next_url = reverse("resources-resource-detail", args=[bookmark.resource_id])
+def delete_bookmark(request, resource_id=None):
+    """Delete (soft) user bookmark associated to resource if exists"""
+    if request.method == "POST":
+        try:
+            bookmark = models.Bookmark.objects.get(
+                resource_id=resource_id, created_by=request.user
+            )
+            bookmark.deleted = timezone.now()
+            bookmark.save()
+        except models.Bookmark.DoesNotExist:
+            pass
+    next_url = reverse("resources-resource-detail", args=[resource_id])
     return redirect(next_url)
 
 

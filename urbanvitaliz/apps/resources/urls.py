@@ -36,12 +36,12 @@ urlpatterns = [
         name="resources-push-to-project",
     ),
     path(
-        r"ressource/<int:resource_id>/bookmark/",
+        r"ressource/<int:resource_id>/bookmark/create/",
         views.create_bookmark,
         name="resources-bookmark-create",
     ),
     path(
-        r"ressource/bookmark/<int:bookmark_id>/delete/",
+        r"ressource/<int:resource_id>/bookmark/delete/",
         views.delete_bookmark,
         name="resources-bookmark-delete",
     ),
