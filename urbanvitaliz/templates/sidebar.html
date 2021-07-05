@@ -78,7 +78,17 @@
             </li>
             {% endif %}
 
-            {% if not user.is_staff %}
+            {% if user.projects.count >= 0 %}
+            <ul>
+                {% for project in user.projects %}
+                <li>
+                     {{ project.title|truncatechars:20 }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if not user.is_staff and user.projects.count == 0 %}
             <hr>
 
             <div class="card">
@@ -125,6 +135,8 @@
                  </a>
                  </li>
             -->
+
+
         </ul>
 
         <div>
