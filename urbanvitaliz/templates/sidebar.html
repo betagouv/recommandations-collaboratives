@@ -20,6 +20,17 @@
                 </a>
             </li>
 
+            {% if not user.is_staff %}
+            <li>
+                <a href="{% url 'projects-local-authority' %}" class="nav-link link-dark">
+                    <svg class="bi me-2" width="16" height="16">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
+                    </svg>
+                    Ma Collectivité
+                </a>
+            </li>
+            {% endif %}
+
             <li>
                 <a href="{% url 'resources-resource-search' %}" class="nav-link link-dark">
                     <svg class="bi me-2" width="16" height="16">

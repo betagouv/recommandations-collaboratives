@@ -126,11 +126,23 @@ class Resource(models.Model):
         return resources
 
 
+class BookmarkManager(models.Manager):
+    def personal(self):
+        return self.filter(project=None).all()
+
+    def personal_list(self):
+        return self.personal().values_list("resource", flat=True)
+
+
 class Bookmark(models.Model):
     """Represents a bookmark to a resource"""
 
+    objects = BookmarkManager()
+
     resource = models.ForeignKey("Resource", on_delete=models.CASCADE)
-    created_by = models.ForeignKey(auth.User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(
+        auth.User, on_delete=models.CASCADE, related_name="bookmarks"
+    )
 
     project = models.ForeignKey(
         projects.Project, null=True, on_delete=models.CASCADE, related_name="bookmarks"
