@@ -22,9 +22,12 @@
     </div>
 
     <p class="small alert">
+        {% if user.is_authenticated %}
+        <a href="{% url 'projects-local-authority' %}"  class="small">Retourner à votre tableau de bord.</a>
+        {% else %}
         <a href="{% url 'home' %}"  class="small">Revenir à la page d'accueil.</a>
+        {% endif %}
     </p>
-
 
 </div>
 

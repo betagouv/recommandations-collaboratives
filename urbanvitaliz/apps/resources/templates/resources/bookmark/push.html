@@ -25,29 +25,31 @@
             <li class="breadcrumb-item">
                 <a href="{% url 'resources-resource-detail' resource.id %}">{{ resource.title|title|truncatechars:20 }}</a>
             </li>
-            <li class="breadcrumb-item active">Mettre en favori
+            <li class="breadcrumb-item active">Pousser la ressource
             </li>
         </ol>
     </nav>
     <h2>
         <svg class="bi me-1 " width="32" height="32" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
         </svg>
-        Ajouter une ressource en favori
+        Pousser une ressource
     </h2>
+    <p class="fs-5">Recommander la ressource "<span class="text-secondary">{{ resource.title|title }}</span>" au projet "<span class="text-secondary">{{ project.name|title }}</span>".</p>
 
     <form class="form" id="form-create-bookmark" action="." method="POST">
         {% csrf_token %}
 
         <div class="mb-3">
-            <label class="mb-2" for="input-project-comments">Vous pouvez ajouter une note privée si vous le souhaitez :</label>
-            <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-bookmark-comments" name="{{ form.comments.name }}" placeholder="Vous pouvez par exemple donner du contexte, ajouter un mémo, ..." required>{{ form.comments.value|default:'' }}</textarea>
+            <label class="mb-2" for="input-project-comments">Pourquoi poussez-vous cette ressource ?</label>
+            <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-bookmark-comments" name="{{ form.comments.name }}" placeholder="Veuillez saisir quelques mots pour motiver la raison de cette suggestion." required>{{ form.comments.value|default:'' }}</textarea>
 
             {% for error in form.comments.errors %}
             <div class="text-danger text-end">{{ error }}</div>
             {% endfor %}
         </div>
-        <button class="btn btn-primary" type="submit">Ajouter aux favoris</button>
+        <p class="small text-secondary">Le contact de ce projet ({{ project.full_name }}) sera notifié par courriel de votre proposition.</p>
+        <button class="btn btn-primary" type="submit">Pousser la ressource</button>
     </form>
 </div>
 {% endblock %}

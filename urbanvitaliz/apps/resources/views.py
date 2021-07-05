@@ -240,7 +240,7 @@ def push_to_project(request, resource_id=None):
             return redirect(next_url)
     else:
         form = BookmarkForm()
-    return render(request, "resources/bookmark/create.html", locals())
+    return render(request, "resources/bookmark/push.html", locals())
 
 
 class BookmarkForm(forms.ModelForm):

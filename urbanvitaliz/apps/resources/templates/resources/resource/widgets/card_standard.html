@@ -61,14 +61,14 @@
             <!-- Action toolbar -->
             <div class="btn-group" role="group" aria-label="Actions">
                 <!-- Bookmark -->
-                {% if False %}
-                <a class="me-2 text-reset text-decoration-none align-baseline" href="{% url "resources-push-to-project" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Retirer de vos favoris">
+                {% if resource.id in user.bookmarks.personal_list %}
+                <a class="me-2 text-reset text-decoration-none align-baseline" href="{% url "resources-bookmark-delete" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Retirer de vos favoris">
                     <svg class="bi text-warning align-baseline" width="14" height="14" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill"/>
                     </svg>
                 </a>
                 {% else %}
-                <a class="me-2 align-baseline text-secondary" href="{% url "resources-bookmark-create" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ajouter à vos favoris">
+                <a class="me-2 align-baseline text-secondary" href="{% url "resources-bookmark-create" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Ajouter à vos favoris">
                     <svg class="bi align-baseline" width="14" height="14" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
                     </svg>

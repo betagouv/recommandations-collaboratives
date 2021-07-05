@@ -99,7 +99,7 @@
             </div>
             <div class="d-flex me-5 ms-5 justify-content-between">
                 <div class="text-center">
-                <svg class="bi align-middle" width="20" height="20" fill="currentColor">
+                    <svg class="bi align-middle" width="20" height="20" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
                 </svg>
                 <span class="align-middle fs-4">{{ project.bookmarks.count }}</span>
@@ -111,14 +111,24 @@
                 <small>Modifié {{ project.updated_on|naturaltime }}</small>
             </div>
         </li>
-		{% empty %}
-			      <tr>
-				        <td colspan="5">
-					          Je n'ai pas encore de projet ?
-					          C'est le bon moment pour commencer !
-				        </td>
-			      </tr>
-			      {% endfor %}
+		    {% empty %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="w-100">
+                <div class="text-center mt-3 mb-3">
+                    <svg class="bi me-2" width="32" height="32">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#megaphone"/>
+                    </svg>
+
+                    <h4 class="mt-1">
+                        Un Projet à nous soumettre ?
+                    </h4>
+				            <a class="mt-3 mb-3  btn btn-primary" href="{% url "projects-onboarding" %}" >Prenez contact dès maintenant !</a>
+                    <br/>
+                    <span class="text-secondary small">Tous les projets déposés sont accompagnés gratuitement par l'équipe UrbanVitaliz.</span>
+                </div>
+            </div>
+        </li>
+				{% endfor %}
     </ul>
 
     <h2 class="mb-4 mt-5">
