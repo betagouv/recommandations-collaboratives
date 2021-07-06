@@ -110,7 +110,9 @@ def test_my_projects_are_stored_in_session(client):
     with login(client, is_staff=False) as user:
         project = Recipe(models.Project, email=user.email).make()
         client.get(url)
-    assert {"name": project.name, "id": project.id} in client.session["projects"]
+    assert len(client.session["projects"]) == 1
+    session_project = client.session["projects"][0]
+    assert session_project["id"] == project.id
 
 
 @pytest.mark.django_db
