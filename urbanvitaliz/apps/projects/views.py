@@ -117,6 +117,29 @@ def project_update(request, project_id=None):
     return render(request, "projects/project/update.html", locals())
 
 
+@login_required
+def project_accept(request, project_id=None):
+    """Update project as accepted for processing"""
+    is_staff_or_403(request.user)
+    project = get_object_or_404(models.Project, pk=project_id)
+    if request.method == "POST":
+        project.is_draft = False
+        project.updated_on = timezone.now()
+        project.save()
+    return redirect(reverse("projects-project-detail", args=[project_id]))
+
+
+@login_required
+def project_delete(request, project_id=None):
+    """Mark project as deleted in the DB"""
+    is_staff_or_403(request.user)
+    project = get_object_or_404(models.Project, pk=project_id)
+    if request.method == "POST":
+        project.deleted = project.updated_on = timezone.now()
+        project.save()
+    return redirect(reverse("projects-project-list"))
+
+
 class ProjectForm(forms.ModelForm):
     """Form for updating the base information of a project"""
 
