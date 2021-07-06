@@ -69,12 +69,15 @@ def test_performing_onboarding_create_a_new_project(client):
                 "first_name": "john",
                 "last_name": "doe",
                 "description": "a project description",
-                "impediment": "some impediment",
+                "impediments": "some impediment",
             },
         )
     project = models.Project.fetch()[0]
     assert project.name == "a project"
     assert project.is_draft
+    note = models.Note.objects.all()[0]
+    assert note.project == project
+    assert note.content == f"# Demande initiale\n\n{project.impediments}"
     assert response.status_code == 200
 
 

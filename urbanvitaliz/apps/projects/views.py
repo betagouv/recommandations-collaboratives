@@ -39,8 +39,11 @@ def onboarding(request):
     if request.method == "POST":
         form = OnboardingForm(request.POST)
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
+            project = form.save(commit=False)
+            project.save()
+            models.Note(
+                project=project, content=f"# Demande initiale\n\n{project.impediments}"
+            ).save()
             return render(request, "projects/thanks.html", locals())
     else:
         form = OnboardingForm()
