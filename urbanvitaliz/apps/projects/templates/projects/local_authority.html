@@ -107,7 +107,7 @@
                     <svg class="bi align-middle" width="20" height="20" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
                 </svg>
-                <span class="align-middle fs-4">{{ project.bookmarks.count }}</span>
+                <span class="align-middle fs-4">{{ project.resources.count }}</span>
                 <br/>
                 <span class="text-secondary small">Ressources associées</span>
                 </div>
@@ -152,11 +152,20 @@
         Mes Ressources sauvegardées
     </h2>
 
-    {% if user.bookmarks.personal %}
+    {% if user.bookmarks.count %}
     <div class="row row-cols-1 row-cols-md-4 g-4">
-        {% for bookmark in user.bookmarks.personal %}
+        {% for bookmark in user.bookmarks.all %}
         <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-12">
             {% include "resources/resource/widgets/card_standard.html" with resource=bookmark.resource %}
+
+            {% if bookmark.comments %}
+            <div class="text-secondary mt-2 p-1">
+                <svg class="bi align-baseline" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+                </svg>
+                {{ bookmark.comments }} &#8210; <a href="{% url "resources-bookmark-create" bookmark.resource.id %}">éditer votre note</a>
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
     </div>

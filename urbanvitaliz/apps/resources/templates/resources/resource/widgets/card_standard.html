@@ -61,7 +61,7 @@
             <!-- Action toolbar -->
             <div class="btn-group" role="group" aria-label="Actions">
                 <!-- Bookmark -->
-                {% if resource.id in user.bookmarks.personal_list %}
+                {% if resource.id in user.bookmarks.as_list %}
                 <form method="POST" action="{% url "resources-bookmark-delete" resource.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-text p-0 m-0 me-2 text-reset text-decoration-none align-baseline"   data-bs-toggle="tooltip" data-bs-placement="top" title="Retirer de vos favoris">

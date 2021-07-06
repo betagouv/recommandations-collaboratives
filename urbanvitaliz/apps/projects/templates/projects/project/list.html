@@ -27,6 +27,8 @@
 				            <th>Localisation</th>
 				            <th>Actions</th>
 				            <th>Notes</th>
+                    <th>Etat</th>
+                    <th>Actions</th>
 			          </tr>
 		        </thead>
 		        <tbody>
@@ -41,6 +43,38 @@
 				            <td>{{ project.location }}</td>
 				            <td>{{ project.tasks.count }}</td>
 				            <td>{{ project.notes.count }}</td>
+                    <td>
+                        {% if project.is_draft %}
+                        Nouveau
+                        {% else %}
+                        Validé
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group" aria-label="actions">
+                            {% if project.is_draft %}
+                            <form method="POST" action="{% url "projects-project-accept" project.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-primary btn-sm">
+                                    <svg class="bi" width="16" height="16" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check2-circle"/>
+                                    </svg>
+                                    Accepter
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            <form method="POST" action="{% url "projects-project-delete" project.id %}">
+                                {% csrf_token %}
+                                <button class="btn btn-secondary btn-sm">
+                                    <svg class="bi" width="16" height="16" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-circle"/>
+                                    </svg>
+                                    Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </td>
 			          </tr>
 			          {% empty %}
 			          <tr>

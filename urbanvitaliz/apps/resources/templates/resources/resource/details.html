@@ -40,7 +40,7 @@
                 {{ resource.title|title }}
 
                 <!-- Toggle Bookmarking -->
-                {% if resource.id in user.bookmarks.personal_list %}
+                {% if resource.id in user.bookmarks.as_list %}
                 <form class="d-inline align-middle" method="POST" action="{% url "resources-bookmark-delete" resource.id %}">
                     {% csrf_token %}
                     <button class="d-inline-block btn btn-text"  data-bs-toggle="tooltip" data-bs-placement="right" title="Retirer de vos favoris">
@@ -53,7 +53,6 @@
                 {% else %}
 
                 <form class="d-inline align-middle" method="GET" action="{% url "resources-bookmark-create" resource.id %}">
-                    {% csrf_token %}
                     <button class="d-inline-block btn btn-text"  data-bs-toggle="tooltip" data-bs-placement="right" title="Ajouter à vos favoris">
                         <svg class="bi align-baseline text-warning" width="24" height="24">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
@@ -72,7 +71,21 @@
 
 
             {% if resource.subtitle %}
-                <h3 class="subtitle text-secondary mt-3">{{ resource.subtitle }}</h3>
+            <h3 class="subtitle text-secondary mt-3">{{ resource.subtitle }}</h3>
+            {% endif %}
+
+            {% if bookmark and bookmark.comments %}
+            <div class="text-secondary mt-2 p-1">
+                <svg class="bi align-baseline" width="12" height="12" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+                </svg>
+                <span class="small">Note personnelle</span>
+                <br/>
+                <q> {{ bookmark.comments }} </q>
+                -
+                <a href="{% url "resources-bookmark-create" bookmark.resource.id %}" class="small">éditer</a>
+
+            </div>
             {% endif %}
 
         </div>

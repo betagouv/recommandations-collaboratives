@@ -54,6 +54,10 @@ class Project(models.Model):
     location = models.CharField(max_length=256, verbose_name="Localisation")
     impediments = models.TextField(default="", blank=True, verbose_name="Difficultés")
 
+    @property
+    def resources(self):
+        return self.tasks.exclude(resource=None)
+
     deleted = models.DateTimeField(null=True, blank=True)
 
     class Meta:

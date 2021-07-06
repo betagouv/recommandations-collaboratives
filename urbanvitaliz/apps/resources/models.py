@@ -130,11 +130,8 @@ class BookmarkManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=None)
 
-    def personal(self, user):
-        return self.all()
-
-    def personal_list(self):
-        return self.personal().values_list("resource", flat=True)
+    def as_list(self):
+        return self.values_list("resource", flat=True)
 
 
 class DeletedBookmarkManager(models.Manager):
