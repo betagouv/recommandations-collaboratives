@@ -90,7 +90,7 @@ def test_my_project_not_available_when_not_logged_in(client):
 @pytest.mark.django_db
 def test_my_projects_are_displayed_on_page(client):
     url = reverse("projects-local-authority")
-    with login(client, is_staff=True) as user:
+    with login(client, is_staff=False) as user:
         project = Recipe(models.Project, email=user.email).make()
         response = client.get(url)
     assertContains(response, project.name)
@@ -100,9 +100,9 @@ def test_my_projects_are_displayed_on_page(client):
 @pytest.mark.django_db
 def test_my_projects_are_stored_in_session(client):
     url = reverse("projects-local-authority")
-    with login(client, is_staff=True) as user:
+    with login(client, is_staff=False) as user:
         project = Recipe(models.Project, email=user.email).make()
-        response = client.get(url)
+        client.get(url)
     assert {"name": project.name, "id": project.id} in client.session["projects"]
 
 
@@ -110,10 +110,19 @@ def test_my_projects_are_stored_in_session(client):
 def test_other_projects_are_not_displayed_on_page(client):
     project = Recipe(models.Project, email="other@example.com").make()
     url = reverse("projects-local-authority")
-    with login(client, is_staff=True):
+    with login(client, is_staff=False):
         response = client.get(url)
     assertNotContains(response, project.name)
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_other_projects_are_not_stored_in_session(client):
+    project = Recipe(models.Project, email="other@exmaple.com").make()
+    url = reverse("projects-local-authority")
+    with login(client, is_staff=False):
+        client.get(url)
+    assert {"name": project.name, "id": project.id} not in client.session["projects"]
 
 
 ########################################################################
@@ -278,6 +287,68 @@ def test_update_project_and_redirect(client):
 
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertRedirects(response, detail_url)
+
+
+########################################################################
+# accept project
+########################################################################
+
+
+@pytest.mark.django_db
+def test_accept_project_not_available_for_non_staff_users(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-accept", args=[project.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_accept_project_and_redirect(client):
+    project = Recipe(models.Project).make()
+    updated_on_before = project.updated_on
+    url = reverse("projects-project-accept", args=[project.id])
+
+    with login(client, is_staff=True):
+        response = client.post(url)
+
+    project = models.Project.objects.get(id=project.id)
+    assert not project.is_draft
+    assert project.updated_on > updated_on_before
+
+    detail_url = reverse("projects-project-detail", args=[project.id])
+    assertRedirects(response, detail_url)
+
+
+########################################################################
+# delete project
+########################################################################
+
+
+@pytest.mark.django_db
+def test_delete_project_not_available_for_non_staff_users(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-delete", args=[project.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_delete_project_and_redirect(client):
+    project = Recipe(models.Project).make()
+    updated_on_before = project.updated_on
+    url = reverse("projects-project-delete", args=[project.id])
+
+    with login(client, is_staff=True):
+        response = client.post(url)
+
+    project = models.Project.objects.get(id=project.id)
+    assert project.deleted
+    assert project.updated_on > updated_on_before
+
+    list_url = reverse("projects-project-list")
+    assertRedirects(response, list_url)
 
 
 ########################################################################
