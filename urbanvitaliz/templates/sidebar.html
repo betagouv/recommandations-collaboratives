@@ -28,6 +28,30 @@
                     </svg>
                     Ma Collectivité
                 </a>
+                {% if request.session.projects %}
+                <ul class="list-group ms-2 me-3">
+                    {% for project in request.session.projects %}
+                    <li class="list-group-item list-group-item-action bg-light border-0 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-break text-truncate">
+                                <svg class="bi me-1" width="16" height="16">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                                </svg>
+                                <a class="stretched-link text-reset text-decoration-none" href="{% url "projects-project-detail" project.id %}">{{ project.name|capfirst }}</a>
+                            </span>
+                            {% if project.actions_open > 0 %}
+                            <div>
+                                <span class="align-middle badge bg-primary rounded-pill">
+                                {{ project.actions_open }}
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <span class="text-secondary small text-break text-truncate">{{ project.location }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
             </li>
             {% endif %}
 
@@ -76,16 +100,6 @@
                     </li>
                 </ul>
             </li>
-            {% endif %}
-
-            {% if user.projects.count >= 0 %}
-            <ul>
-                {% for project in user.projects %}
-                <li>
-                     {{ project.title|truncatechars:20 }}
-                </li>
-                {% endfor %}
-            </ul>
             {% endif %}
 
             {% if not user.is_staff and user.projects.count == 0 %}

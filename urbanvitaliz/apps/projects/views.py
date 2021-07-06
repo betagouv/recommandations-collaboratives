@@ -78,7 +78,15 @@ def local_authority(request):
     """Return the projects followup for logged in local authority"""
     projects = models.Project.fetch(email=request.user.email)
     # store my projects in the session
-    request.session["projects"] = list({"name": p.name, "id": p.id} for p in projects)
+    request.session["projects"] = list(
+        {
+            "name": p.name,
+            "id": p.id,
+            "location": p.location,
+            "actions_open": p.tasks.open().count(),
+        }
+        for p in projects
+    )
     return render(request, "projects/local_authority.html", locals())
 
 

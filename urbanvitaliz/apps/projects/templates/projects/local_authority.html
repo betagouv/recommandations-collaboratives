@@ -59,12 +59,16 @@
 
     </div>
 
-    <h2 class="mt-5 mb-3">
-        <svg class="bi align-baseline" width="24" height="24" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
-        </svg>
-        Mes Friches en projet
-    </h2>
+    <!-- Actions -->
+    <div class="w-100">
+        <h2 class="mt-5 mb-3 d-inline-block">
+            <svg class="bi align-baseline" width="24" height="24" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+            </svg>
+            Mes Friches en projet
+        </h2> 
+    </div>
+
 
     <ul class="list-group">
 			  {% for project in projects %}
@@ -131,6 +135,15 @@
         </li>
 				{% endfor %}
     </ul>
+
+    {% if projects %}
+    <a class="btn btn-primary btn-sm mb-1 mt-3 d-inline-block float-end"  href="{% url 'projects-onboarding'  %}">
+        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+        </svg>
+        Nouveau projet
+    </a>
+    {% endif %}
 
     <h2 class="mb-4 mt-5">
         <svg class="bi align-baseline" width="24" height="24" fill="currentColor">
