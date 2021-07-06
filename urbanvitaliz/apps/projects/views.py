@@ -295,7 +295,7 @@ def create_resource_action(request, resource_id=None):
             return redirect(next_url)
     else:
         form = ResourceTaskForm()
-    return render(request, "resources/bookmark/push.html", locals())
+    return render(request, "projects/project/push.html", locals())
 
 
 class ResourceTaskForm(forms.ModelForm):
