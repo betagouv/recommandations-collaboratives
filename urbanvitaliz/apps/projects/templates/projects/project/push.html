@@ -37,14 +37,24 @@
     </h2>
     <p class="fs-5">Recommander la ressource "<span class="text-secondary">{{ resource.title|title }}</span>" au projet "<span class="text-secondary">{{ project.name|title }}</span>".</p>
 
-    <form class="form" id="form-create-bookmark" action="." method="POST">
+    <form class="form" id="form-push-resource" action="{% url "projects-create-resource-action" resource.id %}" method="POST">
         {% csrf_token %}
 
         <div class="mb-3">
-            <label class="mb-2" for="input-project-comments">Pourquoi poussez-vous cette ressource ?</label>
-            <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-bookmark-comments" name="{{ form.comments.name }}" placeholder="Veuillez saisir quelques mots pour motiver la raison de cette suggestion." required>{{ form.comments.value|default:'' }}</textarea>
+            <label class="mb-2" for="input-project-intent">Quel est l'objectif de cette recommandation ?</label>
+            <input type="text" class="form-control {% if form.intent.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.intent.name }}" placeholder="ex: Trouver le propriétaire" value="{{ form.intent.value|default:'' }}" required>
 
-            {% for error in form.comments.errors %}
+            {% for error in form.intent.errors %}
+            <div class="text-danger text-end">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+
+        <div class="mb-3">
+            <label class="mb-2" for="input-project-content">Que souhaitez-vous communiquer à la collectivité ?</label>
+            <textarea class="form-control {% if form.content.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-bookmark-content" name="{{ form.content.name }}" placeholder="Veuillez saisir quelques mots pour motiver la raison de cette suggestion." required>{{ form.content.value|default:'' }}</textarea>
+
+            {% for error in form.content.errors %}
             <div class="text-danger text-end">{{ error }}</div>
             {% endfor %}
         </div>
