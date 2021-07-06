@@ -31,11 +31,6 @@ urlpatterns = [
         name="resources-resource-update",
     ),
     path(
-        r"ressource/<int:resource_id>/push/",
-        views.push_to_project,
-        name="resources-push-to-project",
-    ),
-    path(
         r"ressource/<int:resource_id>/bookmark/create/",
         views.create_bookmark,
         name="resources-bookmark-create",

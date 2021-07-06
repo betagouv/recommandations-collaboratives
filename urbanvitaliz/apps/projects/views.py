@@ -24,6 +24,8 @@ from markdownx.fields import MarkdownxFormField
 
 from urbanvitaliz.utils import is_staff_or_403
 
+from urbanvitaliz.apps.resources import models as resources
+
 from . import models
 
 
@@ -244,7 +246,12 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = models.Task
-        fields = ["content", "tags", "public", "deadline", "done"]
+        fields = ["intent", "content", "tags", "public", "deadline", "done"]
+
+
+########################################################################
+# push resource to project
+########################################################################
 
 
 @login_required
@@ -256,6 +263,39 @@ def push_resource(request, project_id=None):
         request.session["project_id"] = project.id
         return redirect(reverse("resources-resource-search"))
     return redirect(reverse("projects-project-detail", args=[project_id]))
+
+
+@login_required
+def create_resource_action(request, resource_id=None):
+    """Create action for given resource to project stored in session"""
+    is_staff_or_403(request.user)
+    project_id = request.session.get("project_id")
+    resource = get_object_or_404(resources.Resource, pk=resource_id)
+    project = get_object_or_404(models.Project, pk=project_id)
+    if request.method == "POST":
+        form = ResourceTaskForm(request.POST)
+        if form.is_valid():
+            # create a new bookmark with provided information
+            task = form.save(commit=False)
+            task.project = project
+            task.resource = resource
+            task.created_by = request.user
+            task.save()
+            # cleanup the session
+            del request.session["project_id"]
+            next_url = reverse("projects-project-detail", args=[project.id])
+            return redirect(next_url)
+    else:
+        form = ResourceTaskForm()
+    return render(request, "resources/bookmark/push.html", locals())
+
+
+class ResourceTaskForm(forms.ModelForm):
+    """Create and task for push resource"""
+
+    class Meta:
+        model = models.Task
+        fields = ["intent", "content"]
 
 
 ########################################################################
