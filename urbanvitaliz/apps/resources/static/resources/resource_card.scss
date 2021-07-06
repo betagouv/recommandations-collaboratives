@@ -1,0 +1,50 @@
+.card-resource {
+
+    .card-title {
+
+        span {
+            font-variant: small-caps;
+        }
+    }
+
+    .card-body {
+        z-index: 1;
+    }
+
+    .subtitle {
+        font-variant: small-caps;
+    }
+
+    .middle-hr {
+        position: absolute;
+        top: 25px;
+        border: 1px solid #bbb;
+        width: 100%;
+        z-index: 0;
+    }
+
+    .icon-placeholder {
+        width: 80px;
+        display: inline-block;
+
+    }
+
+
+    .category {
+        height: 100%;
+
+        span {
+            font-size: 15px;
+            margin-top: 12px;
+        }
+    }
+
+    .title {
+        text-align: left;
+        font-size: 20px;
+        font-weight: 700;
+    }
+}
+
+
+
