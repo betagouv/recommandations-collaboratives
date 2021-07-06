@@ -96,7 +96,8 @@ def test_my_projects_are_displayed_on_page(client):
     with login(client, is_staff=False) as user:
         project = Recipe(models.Project, email=user.email).make()
         response = client.get(url)
-    assertContains(response, project.name)
+    # template does a capfirst that capitalize the first word of title
+    assertContains(response, project.name.capitalize())
     assert response.status_code == 200
 
 
