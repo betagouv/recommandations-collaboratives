@@ -6,6 +6,7 @@
 
 {% block css %}
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block content %}
@@ -82,10 +83,10 @@
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
                         </svg>
                         &nbsp;
-                        {{ project.tasks.done.count }} / {{ project.tasks.count }}
+                        {{ project.tasks.open.count }}
                     </span>
                     <br/>
-                    <span class="small text-secondary">Actions à prendre</span>
+                    <span class="small text-secondary">Proposition{{ project.tasks.open.count|pluralize }} d'action à prendre</span>
                 </div>
                 {% else %}
                 <span class="text-secondary small text-center">
@@ -147,6 +148,7 @@
         {% endfor %}
     </div>
     {% else %}
+    <span class="">Les ressources <strong>documentent vos démarches</strong>. Cet espace vous permet de les collecter.</span>
     <div class="bd-callout bd-callout-info">
         <p>
             <svg class="bi ms-1 me-1 align-middle" width="16" height="16" fill="currentColor">
@@ -154,6 +156,7 @@
             </svg>
 
             Vous n'avez ajouté aucune ressource en favoris pour l'instant.
+            <br/>
         </p>
         <p>
             Vous pouvez le faire à tout moment en <strong>cliquant sur l'icône
