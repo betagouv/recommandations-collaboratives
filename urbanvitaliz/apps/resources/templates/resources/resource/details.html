@@ -52,7 +52,7 @@
 
                 {% else %}
 
-                <form class="d-inline align-middle" method="POST" action="{% url "resources-bookmark-create" resource.id %}">
+                <form class="d-inline align-middle" method="GET" action="{% url "resources-bookmark-create" resource.id %}">
                     {% csrf_token %}
                     <button class="d-inline-block btn btn-text"  data-bs-toggle="tooltip" data-bs-placement="right" title="Ajouter à vos favoris">
                         <svg class="bi align-baseline text-warning" width="24" height="24">

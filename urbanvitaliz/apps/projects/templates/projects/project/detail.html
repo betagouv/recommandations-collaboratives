@@ -3,6 +3,13 @@
 {% load humanize %}
 {% load static %}
 
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
 
 {% block content %}
 
@@ -67,6 +74,7 @@
                 Fiche crée <em>{{ project.created_on|naturalday }}</em> et modifiée <em>{{ project.updated_on|naturaltime }}</em>.
             </p>
 
+            {% if user.is_staff %}
             <div class="d-grid gap-2 mt-3">
                 <span class="d-inline-block">
                     <form method="POST" action="{% url 'projects-push-resource' project.id %}">
@@ -81,6 +89,7 @@
                     </form>
                 </span>
             </div>
+            {% endif %}
 
             <!--
                  <p>
@@ -118,40 +127,40 @@
          </iframe>
     -->
 
+    <!-- 
     <h2 class="mb-3">
         <svg class="bi" width="28" height="28" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
         </svg>
         Connaissances du site</h2>
 
-    <!--
+
          <p>
          Voici la liste des faîts collectés sur votre projet. N'hésitez pas à <a href="#">répondre au questionnaire d'approfondissement</a> pour vous permettre de mieux cerner l'état actuel de votre projet.
          </p>
 
-    -->
 
-        <!-- <p><a href="#">Ajouter une connaissance</a></p> -->
 
-        <div class="accordion mb-5" id="knowledge">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        <svg class="bi align-middle" width="16" height="16">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-inbound"/>
-                        </svg>
-                        &nbsp;
-                        Demande initiale
-                    </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                        {{ project.impediments|linebreaks }}
-                    </div>
-                </div>
-            </div>
+             <div class="accordion mb-5" id="knowledge">
+             <div class="accordion-item">
+             <h2 class="accordion-header" id="headingOne">
+             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+             <svg class="bi align-middle" width="16" height="16">
+             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-inbound"/>
+             </svg>
+             &nbsp;
+             Demande initiale
+             </button>
+             </h2>
+             <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+             <div class="accordion-body">
+             {{ project.impediments|linebreaks }}
+             </div>
+             </div>
+             </div>
 
-        </div>
+             </div>
+        -->
 
         <!-- Devenir
              <h2 class="py-3">
@@ -193,18 +202,94 @@
             Actions
         </h2>
 
+        {% if user.is_staff %}
+        <span class="mb-1">Ajouter <a href="{% url 'projects-create-task' project.id %}">une Action</a> ;</span>
+        {% endif %}
+
         {% if not project.tasks.count %}
 
+        <p>
+            Les <strong><em>Actions</em></strong> vous aident à baliser votre parcours et à avancer méthodiquement.
+            <br/>
+            <span class="text-secondary">Par exemple, il peut s'agir d'une étape pour  <q><em> Identifier le propriétaire </em></q> ou encore de <q><em> Vérifier la pollution des sols </em></q></span>.
+        </p>
+
         <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
-            <div>
-                Aucune action actuellement pour ce projet. C'est le bon moment pour
-                <a href="{% url 'projects-create-task' project.id %}">
-                    créer une première action.
-                </a>
+            <div class="w-100">
+                <p class="text-center">
+                    <img src="https://github.com/salomeDeschenes.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Salomé" alt="Salomé" width="32" height="32" class="rounded-circle me-2">
+                    <svg class="bi align-middle" width="40" height="40" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eyeglasses"/>
+                    </svg>
+                    <img src="https://github.com/anoukjn.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Anouk" alt="Anouk" width="32" height="32" class="rounded-circle ms-2">
+                    <br/>
+
+                    <h4 class="mt-1 text-center">
+                        UrbanVitaliz diagnostique en ce moment votre dossier !
+                    </h4>
+                </p>
+
+                <p class="text-center">
+                    L'équipe d'aiguillage vous proposera des <strong><em>Actions</em></strong> à prendre dès l'étude terminée.
+
+                    <br/><span class="text-secondary small">Vous serez alors prévenu.e par courriel.</span>
+                </p>
             </div>
         </div>
         {% else %}
-        <p>
+        <!-- New one-->
+
+        <ul class="list-group">
+			  {% for task in project.tasks.all %}
+        <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-action">
+            <div class="d-flex me-auto justify-content-between">
+                <h4 class="mb-1">
+                    <a class="text-reset" href="{% url "projects-project-detail" project.id %}">{{ project.name|title }}</a>
+                    <span class="d-block fs-6 text-secondary">{{ project.location|capfirst }}</span>
+                </h4>
+            </div>
+            <div class="d-flex me-5 ms-5 justify-content-between">
+                {% if project.tasks.open.count > 0 %}
+                <div class="text-center">
+                    <span class="badge bg-primary">
+                        <svg class="bi align-middle" width="24" height="24" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
+                        </svg>
+                        &nbsp;
+                        {{ project.tasks.done.count }} / {{ project.tasks.count }}
+                    </span>
+                    <br/>
+                    <span class="small text-secondary">Actions à prendre</span>
+                </div>
+                {% else %}
+                <span class="text-secondary small text-center">
+                    Aucune action à prendre,<br/>
+                    vous êtes à jour !
+                    <svg class="bi align-middle text-success" width="24" height="24" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
+                    </svg>
+                </span>
+                {% endif %}
+            </div>
+            <div class="d-flex me-5 ms-5 justify-content-between">
+                <div class="text-center">
+                    <svg class="bi align-middle" width="20" height="20" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
+                </svg>
+                <span class="align-middle fs-4">{{ project.bookmarks.count }}</span>
+                <br/>
+                <span class="text-secondary small">Ressources associées</span>
+                </div>
+            </div>
+            <div class="d-flex ms-5 ">
+                <small>Modifié {{ project.updated_on|naturaltime }}</small>
+            </div>
+        </li>
+				{% endfor %}
+            </ul>
+
+            <!-- old one -->
+            <p>
             <a href="{% url 'projects-create-task' project.id %}" class="">
                 Ajouter une action
             </a>
@@ -214,6 +299,7 @@
                 <tr>
                     <th class="col-3">Échéance</th>
                     <th>Description</th>
+                    <th>Ressource</th>
                     <th class="col-2">Complétée ?</th>
                 </tr>
             </thead>
@@ -222,8 +308,17 @@
                 <tr>
                     <td class="{% if task.is_deadline_past_due %}text-danger{%endif%}">{{ task.deadline|default:"" }}</td>
                     <td>
-                        {{ task.content|linebreaks }}
+                        <h4 class="mb-1">
+                            <a class="text-reset" href="{% url "projects-project-detail" project.id %}">{{ project.name|title }}</a>
+                            <span class="d-block fs-6 text-secondary">{{ task.content|linebreaks|capfirst }}</span>
+                        </h4>
+
+                        {% include "resources/resource/widgets/card_horizontal.html" with resource=project %}
+                        
                         <a class="small" href="{% url 'projects-update-task' task.id %}">éditer</a>
+                    </td>
+                    <td>
+
                     </td>
                     <td>
                         {% if task.done %}

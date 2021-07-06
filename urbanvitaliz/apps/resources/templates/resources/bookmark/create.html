@@ -41,7 +41,7 @@
 
         <div class="mb-3">
             <label class="mb-2" for="input-project-comments">Vous pouvez ajouter une note privée si vous le souhaitez :</label>
-            <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-bookmark-comments" name="{{ form.comments.name }}" placeholder="Vous pouvez par exemple donner du contexte, ajouter un mémo, ..." required>{{ form.comments.value|default:'' }}</textarea>
+            <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-bookmark-comments" name="{{ form.comments.name }}" placeholder="Vous pouvez par exemple donner du contexte, ajouter un mémo, ...">{{ form.comments.value|default:'' }}</textarea>
 
             {% for error in form.comments.errors %}
             <div class="text-danger text-end">{{ error }}</div>
