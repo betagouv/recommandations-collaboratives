@@ -180,9 +180,15 @@ class EditResourceForm(forms.ModelForm):
 def create_bookmark(request, resource_id=None):
     """Create bookmark for resource and and connected user"""
     resource = get_object_or_404(models.Resource, pk=resource_id)
-    bookmark, created = models.Bookmark.objects.get_or_create(
-        resource=resource, created_by=request.user
-    )
+    try:
+        # look if bookmark exists and is deleted
+        bookmark = models.Bookmark.deleted_objects.get(
+            resource=resource, created_by=request.user
+        )
+    except models.Bookmark.DoesNotExist:
+        bookmark, _ = models.Bookmark.objects.get_or_create(
+            resource=resource, created_by=request.user
+        )
     if request.method == "POST":
         form = BookmarkForm(request.POST, instance=bookmark)
         if form.is_valid():

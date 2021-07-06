@@ -127,6 +127,11 @@ class Resource(models.Model):
 
 
 class BookmarkManager(models.Manager):
+    """Manager for active bookmarks"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
     def personal(self):
         return self.filter(project=None).all()
 
@@ -134,10 +139,18 @@ class BookmarkManager(models.Manager):
         return self.personal().values_list("resource", flat=True)
 
 
+class DeletedBookmarkManager(models.Manager):
+    """Manager for deleted bookmarks"""
+
+    def get_queryset(self):
+        return super().get_queryset().exclude(deleted=None)
+
+
 class Bookmark(models.Model):
     """Represents a bookmark to a resource"""
 
     objects = BookmarkManager()
+    deleted_objects = DeletedBookmarkManager()
 
     resource = models.ForeignKey("Resource", on_delete=models.CASCADE)
     created_by = models.ForeignKey(
