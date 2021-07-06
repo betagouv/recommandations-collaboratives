@@ -23,6 +23,8 @@ from model_bakery.recipe import Recipe
 
 from urbanvitaliz.utils import login
 
+from urbanvitaliz.apps.resources import models as resources
+
 from .templatetags import projects_extra
 
 from . import models
@@ -547,6 +549,59 @@ def test_staff_push_resource_to_project(client):
     assert client.session["project_id"] == project.id
     newurl = reverse("resources-resource-search")
     assertRedirects(response, newurl)
+
+
+@pytest.mark.django_db
+def test_staff_push_resource_to_project_needs_project_id(client):
+    project = Recipe(models.Project).make()
+    resource = Recipe(resources.Resource, public=True).make()
+
+    url = reverse("projects-create-resource-action", args=[resource.id])
+    with login(client, is_staff=True):
+        session = client.session
+        session["project_id"] = project.id
+        session.save()
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_staff_push_resource_to_project_fails_if_no_project_in_session(client):
+    resource = Recipe(resources.Resource, public=True).make()
+
+    url = reverse("projects-create-resource-action", args=[resource.id])
+    with login(client, is_staff=True):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_staff_create_action_for_resource_push(client):
+    project = Recipe(models.Project).make()
+    resource = Recipe(resources.Resource, public=True).make()
+
+    url = reverse("projects-create-resource-action", args=[resource.id])
+    with login(client, is_staff=True):
+        # project_id should be in session
+        session = client.session
+        session["project_id"] = project.id
+        session.save()
+        data = {"intent": "read this", "content": "some nice content"}
+        response = client.post(url, data=data)
+
+    # a new Recommmendation is created
+    task = models.Task.objects.all()[0]
+    assert task.project == project
+    assert task.resource == resource
+    assert task.content == data["content"]
+    assert task.intent == data["intent"]
+    # user is redirected to poject
+    newurl = reverse("projects-project-detail", args=[project.id])
+    assertRedirects(response, newurl)
+    # sessions is cleaned up
+    assert "project_id" not in client.session
 
 
 ########################################################################

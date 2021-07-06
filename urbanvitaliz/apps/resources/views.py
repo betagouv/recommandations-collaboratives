@@ -26,8 +26,6 @@ from markdownx.fields import MarkdownxFormField
 
 from urbanvitaliz.utils import is_staff_or_403
 
-from urbanvitaliz.apps.projects import models as projects
-
 from . import models
 
 
@@ -225,44 +223,6 @@ def delete_bookmark(request, resource_id=None):
             pass
     next_url = reverse("resources-resource-detail", args=[resource_id])
     return redirect(next_url)
-
-
-########################################################################
-# push resource to project
-########################################################################
-
-
-@login_required
-def push_to_project(request, resource_id=None):
-    """Push given resource to project stored in session"""
-    is_staff_or_403(request.user)
-    project_id = request.session.get("project_id")
-    resource = get_object_or_404(models.Resource, pk=resource_id)
-    project = get_object_or_404(projects.Project, pk=project_id)
-    if request.method == "POST":
-        form = TaskForm(request.POST)
-        if form.is_valid():
-            # create a new bookmark with provided information
-            task = form.save(commit=False)
-            task.project = project
-            task.resource = resource
-            task.created_by = request.user
-            task.save()
-            # cleanup the session
-            del request.session["project_id"]
-            next_url = reverse("projects-project-detail", args=[project.id])
-            return redirect(next_url)
-    else:
-        form = TaskForm()
-    return render(request, "resources/bookmark/push.html", locals())
-
-
-class TaskForm(forms.ModelForm):
-    """Create and task for push resource"""
-
-    class Meta:
-        model = projects.Task
-        fields = ["intent", "content"]
 
 
 # eof

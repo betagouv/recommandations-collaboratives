@@ -113,7 +113,7 @@
             <!-- Push Resource -->
             <div class="d-grid gap-2 mt-3">
                 {% if "project_id" in request.session %}
-                <form action="{% url "resources-push-to-project" resource.id %}" method="GET">
+                <form action="{% url "projects-create-resource-action" resource.id %}" method="GET">
                     <button type="submit" class="btn btn-success w-100 btn-sm" role="submit">
                         <svg class="bi" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
