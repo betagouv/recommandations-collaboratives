@@ -330,7 +330,7 @@ def test_staff_push_resource_to_project(client):
         response = client.post(url, data=data)
 
     # a new Recommmendation is created
-    bookmark = models.Bookmark.fetch()[0]
+    bookmark = models.Bookmark.objects.all()[0]
     assert bookmark.created_by == user
     assert bookmark.project == project
     assert bookmark.resource == resource
@@ -369,7 +369,7 @@ def test_user_bookmarks_a_resource(client):
         response = client.post(url, data=data)
 
     # a new bookmark is created
-    bookmark = models.Bookmark.fetch()[0]
+    bookmark = models.Bookmark.objects.all()[0]
     assert bookmark.created_by == user
     assert bookmark.resource == resource
     assert bookmark.comments == data["comments"]
@@ -390,9 +390,8 @@ def test_user_refresh_bookmark_of_a_resource(client):
         response = client.post(url, data=data)
 
     # existing deleted bookmark is reactivated
-    updated_bookmark = models.Bookmark.fetch()[0]
+    updated_bookmark = models.Bookmark.objects.all()[0]
     assert updated_bookmark == bookmark
-    assert not updated_bookmark.deleted
     assert updated_bookmark.comments == data["comments"]
     # user is redirected to resource details
     newurl = reverse("resources-resource-detail", args=[bookmark.resource_id])
@@ -407,7 +406,7 @@ def test_user_deletes_a_personal_bookmark(client):
         url = reverse("resources-bookmark-delete", args=[bookmark.resource_id])
         response = client.post(url)
 
-    bookmark = models.Bookmark.objects.get(id=bookmark.id)
+    bookmark = models.Bookmark.deleted_objects.get(id=bookmark.id)
     assert bookmark.deleted
     newurl = reverse("resources-resource-detail", args=[bookmark.resource_id])
     assertRedirects(response, newurl)
