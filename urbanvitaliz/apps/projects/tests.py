@@ -72,6 +72,7 @@ def test_performing_onboarding_create_a_new_project(client):
         )
     project = models.Project.fetch()[0]
     assert project.name == "a project"
+    assert project.is_draft
     assert response.status_code == 200
 
 
