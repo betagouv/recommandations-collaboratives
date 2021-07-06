@@ -70,8 +70,10 @@ class OnboardingForm(forms.ModelForm):
 
 @login_required
 def local_authority(request):
-    """Return the projects followup for local authorities"""
+    """Return the projects followup for logged in local authority"""
     projects = models.Project.fetch(email=request.user.email)
+    # store my projects in the session
+    request.session["projects"] = list({"name": p.name, "id": p.id} for p in projects)
     return render(request, "projects/local_authority.html", locals())
 
 

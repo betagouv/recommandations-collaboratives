@@ -98,6 +98,15 @@ def test_my_projects_are_displayed_on_page(client):
 
 
 @pytest.mark.django_db
+def test_my_projects_are_stored_in_session(client):
+    url = reverse("projects-local-authority")
+    with login(client, is_staff=True) as user:
+        project = Recipe(models.Project, email=user.email).make()
+        response = client.get(url)
+    assert {"name": project.name, "id": project.id} in client.session["projects"]
+
+
+@pytest.mark.django_db
 def test_other_projects_are_not_displayed_on_page(client):
     project = Recipe(models.Project, email="other@example.com").make()
     url = reverse("projects-local-authority")
