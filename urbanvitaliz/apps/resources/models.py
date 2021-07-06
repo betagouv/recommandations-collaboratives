@@ -15,8 +15,6 @@ from django.utils import timezone
 
 from django.contrib.auth import models as auth
 
-from urbanvitaliz.apps.projects import models as projects
-
 
 class Category(models.Model):
     """Représente une categorie de ressource"""
@@ -132,8 +130,8 @@ class BookmarkManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=None)
 
-    def personal(self):
-        return self.filter(project=None).all()
+    def personal(self, user):
+        return self.all()
 
     def personal_list(self):
         return self.personal().values_list("resource", flat=True)
@@ -157,9 +155,6 @@ class Bookmark(models.Model):
         auth.User, on_delete=models.CASCADE, related_name="bookmarks"
     )
 
-    project = models.ForeignKey(
-        projects.Project, null=True, on_delete=models.CASCADE, related_name="bookmarks"
-    )
     comments = models.TextField(default="", blank=True)
 
     deleted = models.DateTimeField(null=True, blank=True)

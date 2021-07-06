@@ -203,6 +203,14 @@ def create_bookmark(request, resource_id=None):
     return render(request, "resources/bookmark/create.html", locals())
 
 
+class BookmarkForm(forms.ModelForm):
+    """Create and update bookmark"""
+
+    class Meta:
+        model = models.Bookmark
+        fields = ["comments"]
+
+
 @login_required
 def delete_bookmark(request, resource_id=None):
     """Delete (soft) user bookmark associated to resource if exists"""
@@ -232,29 +240,29 @@ def push_to_project(request, resource_id=None):
     resource = get_object_or_404(models.Resource, pk=resource_id)
     project = get_object_or_404(projects.Project, pk=project_id)
     if request.method == "POST":
-        form = BookmarkForm(request.POST)
+        form = TaskForm(request.POST)
         if form.is_valid():
             # create a new bookmark with provided information
-            bookmark = form.save(commit=False)
-            bookmark.project = project
-            bookmark.resource = resource
-            bookmark.created_by = request.user
-            bookmark.save()
+            task = form.save(commit=False)
+            task.project = project
+            task.resource = resource
+            task.created_by = request.user
+            task.save()
             # cleanup the session
             del request.session["project_id"]
             next_url = reverse("projects-project-detail", args=[project.id])
             return redirect(next_url)
     else:
-        form = BookmarkForm()
+        form = TaskForm()
     return render(request, "resources/bookmark/push.html", locals())
 
 
-class BookmarkForm(forms.ModelForm):
-    """Create and update bookmark"""
+class TaskForm(forms.ModelForm):
+    """Create and task for push resource"""
 
     class Meta:
-        model = models.Bookmark
-        fields = ["comments"]
+        model = projects.Task
+        fields = ["intent", "content"]
 
 
 # eof

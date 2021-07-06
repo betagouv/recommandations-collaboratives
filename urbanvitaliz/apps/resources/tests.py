@@ -321,20 +321,20 @@ def test_staff_push_resource_to_project(client):
     resource = Recipe(models.Resource, public=True).make()
 
     url = reverse("resources-push-to-project", args=[resource.id])
-    with login(client, is_staff=True) as user:
+    with login(client, is_staff=True):
         # project_id should be in session
         session = client.session
         session["project_id"] = project.id
         session.save()
-        data = {"comments": "some nice comments"}
+        data = {"intent": "read this", "content": "some nice content"}
         response = client.post(url, data=data)
 
     # a new Recommmendation is created
-    bookmark = models.Bookmark.objects.all()[0]
-    assert bookmark.created_by == user
-    assert bookmark.project == project
-    assert bookmark.resource == resource
-    assert bookmark.comments == data["comments"]
+    task = projects.Task.objects.all()[0]
+    assert task.project == project
+    assert task.resource == resource
+    assert task.content == data["content"]
+    assert task.intent == data["intent"]
     # user is redirected to poject
     newurl = reverse("projects-project-detail", args=[project.id])
     assertRedirects(response, newurl)

@@ -14,6 +14,8 @@ from django.utils import timezone
 
 from markdownx.utils import markdownify
 
+from urbanvitaliz.apps.resources import models as resources
+
 
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
@@ -125,6 +127,11 @@ class Note(models.Model):
 
 
 class TaskManager(models.Manager):
+    """Manager for active tasks"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
     def done(self):
         return self.filter(done=True)
 
@@ -132,10 +139,18 @@ class TaskManager(models.Manager):
         return self.filter(done=False)
 
 
+class DeletedTaskManager(models.Manager):
+    """Manager for deleted tasks"""
+
+    def get_queryset(self):
+        return super().get_queryset().exclude(deleted=None)
+
+
 class Task(models.Model):
     """Représente une action pour faire avancer un project"""
 
     objects = TaskManager()
+    deleted_objects = DeletedTaskManager()
 
     project = models.ForeignKey(
         "Project", on_delete=models.CASCADE, related_name="tasks"
@@ -149,8 +164,13 @@ class Task(models.Model):
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
+    intent = models.CharField(max_length=256, blank=True, default="")
     content = models.TextField(default="")
     deadline = models.DateField(null=True, blank=True)
+
+    resource = models.ForeignKey(
+        resources.Resource, on_delete=models.CASCADE, null=True
+    )
 
     @property
     def is_deadline_past_due(self):
