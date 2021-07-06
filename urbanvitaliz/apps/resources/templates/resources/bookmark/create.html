@@ -36,7 +36,7 @@
         Ajouter une ressource en favori
     </h2>
 
-    <form class="form" id="form-create-bookmark" action="." method="POST">
+    <form class="form" id="form-create-bookmark" action="{% url "resources-bookmark-create" resource.id %}" method="POST">
         {% csrf_token %}
 
         <div class="mb-3">

@@ -93,6 +93,11 @@ class SearchForm(forms.Form):
 def resource_detail(request, resource_id=None):
     """Return the details of given resource"""
     resource = get_object_or_404(models.Resource, pk=resource_id)
+
+    bookmark = models.Bookmark.objects.filter(
+        resource=resource, created_by=request.user
+    ).first()
+
     return render(request, "resources/resource/details.html", locals())
 
 

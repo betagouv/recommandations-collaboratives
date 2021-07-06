@@ -306,7 +306,7 @@
                                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check2-circle"/>
                                 </svg>
-                                Terminée
+                                Terminé
                             </button>
                         </div>
 
@@ -369,10 +369,13 @@
 
     <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
         <div>
-            Aucune note actuellement pour ce projet. C'est le bon moment pour
+            Aucune note actuellement pour ce projet.
+            {% if user.is_staff %}
+            C'est le bon moment pour
             <a href="{% url 'projects-create-note' project.id %}">
                 en créer une première.
             </a>
+            {% endif %}
         </div>
     </div>
     {% else %}
