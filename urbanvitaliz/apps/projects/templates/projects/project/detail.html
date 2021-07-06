@@ -8,6 +8,7 @@
 {% block css %}
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
+
 {% endblock %}
 
 
@@ -194,24 +195,30 @@
              </div>
         -->
 
-        <!-- Actions -->
-        <h2 class="mb-3">
-            <svg class="bi" width="28" height="28" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightning"/>
-            </svg>
-            Actions
-        </h2>
-
-        {% if user.is_staff %}
-        <span class="mb-1">Ajouter <a href="{% url 'projects-create-task' project.id %}">une Action</a> ;</span>
-        {% endif %}
+             <!-- Actions -->
+             <div class="w-100">
+                 <h2 class="mb-3 d-inline-block">
+                     <svg class="bi" width="28" height="28" fill="currentColor">
+                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
+                     </svg>
+                     Actions
+                 </h2>
+                 {% if user.is_staff %}
+                     <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-task' project.id %}">
+                     <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+                     </svg>
+                     Ajouter une action
+                     </a>
+                 {% endif %}
+             </div>
 
         {% if not project.tasks.count %}
 
         <p>
             Les <strong><em>Actions</em></strong> vous aident à baliser votre parcours et à avancer méthodiquement.
             <br/>
-            <span class="text-secondary">Par exemple, il peut s'agir d'une étape pour  <q><em> Identifier le propriétaire </em></q> ou encore de <q><em> Vérifier la pollution des sols </em></q></span>.
+            <span class="text-secondary">Par exemple, il peut s'agir d'une étape pour  <q><em> Identifier le propriétaire </em></q> ou encore <q><em> Vérifier la pollution des sols </em></q></span>.
         </p>
 
         <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
@@ -239,128 +246,103 @@
         {% else %}
         <!-- New one-->
 
-        <ul class="list-group">
-			  {% for task in project.tasks.all %}
-        <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-action">
-            <div class="d-flex me-auto justify-content-between">
-                <h4 class="mb-1">
-                    <a class="text-reset" href="{% url "projects-project-detail" project.id %}">{{ project.name|title }}</a>
-                    <span class="d-block fs-6 text-secondary">{{ project.location|capfirst }}</span>
-                </h4>
-            </div>
-            <div class="d-flex me-5 ms-5 justify-content-between">
-                {% if project.tasks.open.count > 0 %}
-                <div class="text-center">
-                    <span class="badge bg-primary">
-                        <svg class="bi align-middle" width="24" height="24" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
-                        </svg>
-                        &nbsp;
-                        {{ project.tasks.done.count }} / {{ project.tasks.count }}
-                    </span>
-                    <br/>
-                    <span class="small text-secondary">Actions à prendre</span>
+        <ul class="list-group mb-3">
+			      {% for task in project.tasks.all %}
+            <li class="list-group-item border-0 p-0 mb-3">
+                <div class="action-main shadow p-3 border-0 mb-2 d-flex justify-content-between">
+                    <div class="d-flex me-auto justify-content-between align-items-start flex-column" style="width: 25%" >
+                        <div>
+                        <h4 class="mb-1">
+                            <a class="text-reset" href="{% url "projects-project-detail" project.id %}">{{ task.intent|title|default:"Action" }}</a>
+                        </h4>
+                        {% if task.tags %}
+                        <div class="mb-2">
+                            {% for tag in task.tags_as_list  %}
+                            <span class="badge rounded-pill bg-light text-dark">#{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        </div>
+
+
+                        {% if task.deadline %}
+                        <div class="d-flex align-items-center" data-bs-toggle="tooltip" data-bs-placement="left" title="Cette proposition expire à cette date.">
+                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar-date"/>
+                            </svg>
+                            <div class="position-relative d-flex">
+                                <span class="text-danger badge bg-light rounded-pill">{{ task.deadline }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex flex-grow-1 ms-2 justify-content-between flex-column">
+                        <div class="align-self-end mb-3">
+                            <div class="btn-group" role="group" aria-label="Etat de l'action">
+                                <button class="btn btn-outline-primary btn-sm">
+                                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-circle"/>
+                                </svg>
+                                Rejeter
+                            </button>
+
+                            <button class="btn btn-primary btn-sm">
+                                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check2-circle"/>
+                                </svg>
+                                Indiquer comme terminée
+                            </button>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <div class="relative w-100 me-3">
+                                {% include "resources/resource/widgets/card_horizontal.html" with resource=project %}
+                            </div>
+                            <div class="relative w-100">
+                                {% include "resources/resource/widgets/card_horizontal.html" with resource=project %}
+                            </div>
+                        </div>
+                        <span class="">{{ task.content|linebreaks|capfirst }}</span>
+                        
+                        <span class="text-secondary small align-self-end">Créée {{ task.created_on|naturaltime }}</span>
+                        {% if user.is_staff %}
+                        <a class="small" href="{% url 'projects-update-task' task.id %}">éditer</a>
+                        {% endif %}
+                    </div>
+
                 </div>
-                {% else %}
-                <span class="text-secondary small text-center">
-                    Aucune action à prendre,<br/>
-                    vous êtes à jour !
-                    <svg class="bi align-middle text-success" width="24" height="24" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
-                    </svg>
-                </span>
-                {% endif %}
-            </div>
-            <div class="d-flex me-5 ms-5 justify-content-between">
-                <div class="text-center">
-                    <svg class="bi align-middle" width="20" height="20" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
-                </svg>
-                <span class="align-middle fs-4">{{ project.bookmarks.count }}</span>
-                <br/>
-                <span class="text-secondary small">Ressources associées</span>
-                </div>
-            </div>
-            <div class="d-flex ms-5 ">
-                <small>Modifié {{ project.updated_on|naturaltime }}</small>
-            </div>
-        </li>
-				{% endfor %}
+            </li>
+				    {% endfor %}
             </ul>
 
             <!-- old one -->
-            <p>
-            <a href="{% url 'projects-create-task' project.id %}" class="">
-                Ajouter une action
-            </a>
-        </p>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th class="col-3">Échéance</th>
-                    <th>Description</th>
-                    <th>Ressource</th>
-                    <th class="col-2">Complétée ?</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for task in project.tasks.all %}
-                <tr>
-                    <td class="{% if task.is_deadline_past_due %}text-danger{%endif%}">{{ task.deadline|default:"" }}</td>
-                    <td>
-                        <h4 class="mb-1">
-                            <a class="text-reset" href="{% url "projects-project-detail" project.id %}">{{ project.name|title }}</a>
-                            <span class="d-block fs-6 text-secondary">{{ task.content|linebreaks|capfirst }}</span>
-                        </h4>
+            
 
-                        {% include "resources/resource/widgets/card_horizontal.html" with resource=project %}
-                        
-                        <a class="small" href="{% url 'projects-update-task' task.id %}">éditer</a>
-                    </td>
-                    <td>
+            {% endif %}
 
-                    </td>
-                    <td>
-                        {% if task.done %}
-                        <svg class="bi" width="20" height="20" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-square"/>
-                        </svg>
-                        {% else %}
-                        <svg class="bi" width="20" height="20" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#square"/>
-                        </svg>
-                        {% endif %}
-
-                    </td>
-                </tr>
-                {% endfor %}
-                </tr>
-            </tbody>
-        </table>
-        {% endif %}
-
-        <h4>Ressources connexes</h4>
-        <div class="text-secondary">
-        {% for bookmark in project.bookmarks.all %}
-        <ul>
-            <li><a href="{% url "resources-resource-detail" bookmark.resource.id %}">{{ bookmark.resource.title }}</a>
-                {% if bookmark.comments %}
-                <q>{{ bookmark.comments }}</q>
-                {% endif %}
-                <br/>
-                <span class="small text-secondary">{% if bookmark.created_by %}(via {{ bookmark.created_by.get_full_name|default:bookmark.created_by }}){% endif %}</span>
-            </li>
-        </ul>
-        {% empty %}
-        <div class="mb-3 mt-3">
-            <svg class="bi me-1" width="20" height="20" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightbulb"/>
-            </svg>
-            Pour vous aider dans vos démarches, n'hésitez pas à <a href="{% url 'resources-resource-search' %}">identifier des ressources et les mettre en favoris</a>.
-        </div>
-        {% endfor %}
-        </div>
-
+            <!-- 
+                 <h4>Ressources connexes</h4>
+                 <div class="text-secondary">
+                 {% for bookmark in project.bookmarks.all %}
+                 <ul>
+                 <li><a href="{% url "resources-resource-detail" bookmark.resource.id %}">{{ bookmark.resource.title }}</a>
+                 {% if bookmark.comments %}
+                 <q>{{ bookmark.comments }}</q>
+                 {% endif %}
+                 <br/>
+                 <span class="small text-secondary">{% if bookmark.created_by %}(via {{ bookmark.created_by.get_full_name|default:bookmark.created_by }}){% endif %}</span>
+                 </li>
+                 </ul>
+                 {% empty %}
+                 <div class="mb-3 mt-3">
+                 <svg class="bi me-1" width="20" height="20" fill="currentColor">
+                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightbulb"/>
+                 </svg>
+                 Pour vous aider dans vos démarches, n'hésitez pas à <a href="{% url 'resources-resource-search' %}">identifier des ressources et les mettre en favoris</a>.
+                 </div>
+                 {% endfor %}
+                 </div>
+            -->
         <!-- Notes de suivi -->
         <h2>
             <svg class="bi" width="28" height="28" fill="currentColor">
