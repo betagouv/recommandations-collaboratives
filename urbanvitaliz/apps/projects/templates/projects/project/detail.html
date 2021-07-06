@@ -136,123 +136,123 @@
         Connaissances du site</h2>
 
 
-         <p>
-         Voici la liste des faîts collectés sur votre projet. N'hésitez pas à <a href="#">répondre au questionnaire d'approfondissement</a> pour vous permettre de mieux cerner l'état actuel de votre projet.
-         </p>
+    <p>
+        Voici la liste des faîts collectés sur votre projet. N'hésitez pas à <a href="#">répondre au questionnaire d'approfondissement</a> pour vous permettre de mieux cerner l'état actuel de votre projet.
+    </p>
 
 
 
-             <div class="accordion mb-5" id="knowledge">
-             <div class="accordion-item">
-             <h2 class="accordion-header" id="headingOne">
-             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-             <svg class="bi align-middle" width="16" height="16">
-             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-inbound"/>
-             </svg>
-             &nbsp;
-             Demande initiale
-             </button>
-             </h2>
-             <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-             <div class="accordion-body">
-             {{ project.impediments|linebreaks }}
-             </div>
-             </div>
-             </div>
-
-             </div>
-        -->
-
-        <!-- Devenir
-             <h2 class="py-3">
-             <svg class="bi" width="32" height="32" fill="currentColor">
-             <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#lightbulb"/>
-             </svg>
-
-             Devenir du site
-             </h2>
-
-             <p>Besoin d'inspiration ?</p>
-
-             <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-             <div class="modal-dialog modal-dialog-centered" role="document">
-             <div class="modal-content">
-             <div class="modal-header">
-             <h5 class="modal-title" id="exampleModalLabel">Success!</h5>
-             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-             <span aria-hidden="true">&times;</span>
-             </button>
-             </div>
-             <div class="modal-body">
-             If you're seeing this modal after clicking the button on the page, Bootstrap's CSS and JS are both working properly.
-             </div>
-             <div class="modal-footer">
-             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-             <button type="button" class="btn btn-primary">Save changes</button>
-             </div>
-             </div>
-             </div>
-             </div>
-        -->
-
-             <!-- Actions -->
-             <div class="w-100">
-                 <h2 class="mb-3 d-inline-block">
-                     <svg class="bi" width="28" height="28" fill="currentColor">
-                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
-                     </svg>
-                     Actions
-                 </h2>
-                 {% if user.is_staff %}
-                     <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-task' project.id %}">
-                     <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
-                     </svg>
-                     Ajouter une action
-                     </a>
-                 {% endif %}
-             </div>
-
-        {% if not project.tasks.count %}
-
-        <p>
-            Les <strong><em>Actions</em></strong> vous aident à baliser votre parcours et à avancer méthodiquement.
-            <br/>
-            <span class="text-secondary">Par exemple, il peut s'agir d'une étape pour  <q><em> Identifier le propriétaire </em></q> ou encore <q><em> Vérifier la pollution des sols </em></q></span>.
-        </p>
-
-        <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
-            <div class="w-100">
-                <p class="text-center">
-                    <img src="https://github.com/salomeDeschenes.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Salomé" alt="Salomé" width="32" height="32" class="rounded-circle me-2">
-                    <svg class="bi align-middle" width="40" height="40" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eyeglasses"/>
+    <div class="accordion mb-5" id="knowledge">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <svg class="bi align-middle" width="16" height="16">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-inbound"/>
                     </svg>
-                    <img src="https://github.com/anoukjn.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Anouk" alt="Anouk" width="32" height="32" class="rounded-circle ms-2">
-                    <br/>
-
-                    <h4 class="mt-1 text-center">
-                        UrbanVitaliz diagnostique en ce moment votre dossier !
-                    </h4>
-                </p>
-
-                <p class="text-center">
-                    L'équipe d'aiguillage vous proposera des <strong><em>Actions</em></strong> à prendre dès l'étude terminée.
-
-                    <br/><span class="text-secondary small">Vous serez alors prévenu.e par courriel.</span>
-                </p>
+                    &nbsp;
+                    Demande initiale
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    {{ project.impediments|linebreaks }}
+                </div>
             </div>
         </div>
-        {% else %}
-        <!-- New one-->
 
-        <ul class="list-group mb-3">
-			      {% for task in project.tasks.all %}
-            <li class="list-group-item border-0 p-0 mb-3">
-                <div class="action-main shadow p-3 border-0 mb-2 d-flex justify-content-start">
-                    <div class="d-flex  justify-content-between align-items-start flex-column" style="min-width: 25%">
-                        <div>
-                            <h4 class="mb-1"> 
+    </div>
+    -->
+
+    <!-- Devenir
+         <h2 class="py-3">
+         <svg class="bi" width="32" height="32" fill="currentColor">
+         <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#lightbulb"/>
+         </svg>
+
+         Devenir du site
+         </h2>
+
+         <p>Besoin d'inspiration ?</p>
+
+         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog modal-dialog-centered" role="document">
+         <div class="modal-content">
+         <div class="modal-header">
+         <h5 class="modal-title" id="exampleModalLabel">Success!</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+         <span aria-hidden="true">&times;</span>
+         </button>
+         </div>
+         <div class="modal-body">
+         If you're seeing this modal after clicking the button on the page, Bootstrap's CSS and JS are both working properly.
+         </div>
+         <div class="modal-footer">
+         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         <button type="button" class="btn btn-primary">Save changes</button>
+         </div>
+         </div>
+         </div>
+         </div>
+    -->
+
+    <!-- Actions -->
+    <div class="w-100">
+        <h2 class="mb-3 d-inline-block">
+            <svg class="bi" width="28" height="28" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
+            </svg>
+            Actions
+        </h2>
+        {% if user.is_staff %}
+        <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-task' project.id %}">
+            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+            </svg>
+            Ajouter une action
+        </a>
+        {% endif %}
+    </div>
+
+    {% if not project.tasks.count %}
+
+    <p>
+        Les <strong><em>Actions</em></strong> vous aident à baliser votre parcours et à avancer méthodiquement.
+        <br/>
+        <span class="text-secondary">Par exemple, il peut s'agir d'une étape pour  <q><em> Identifier le propriétaire </em></q> ou encore <q><em> Vérifier la pollution des sols </em></q></span>.
+    </p>
+
+    <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
+        <div class="w-100">
+            <p class="text-center">
+                <img src="https://github.com/salomeDeschenes.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Salomé" alt="Salomé" width="32" height="32" class="rounded-circle me-2">
+                <svg class="bi align-middle" width="40" height="40" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eyeglasses"/>
+                </svg>
+                <img src="https://github.com/anoukjn.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Anouk" alt="Anouk" width="32" height="32" class="rounded-circle ms-2">
+                <br/>
+
+                <h4 class="mt-1 text-center">
+                    UrbanVitaliz diagnostique en ce moment votre dossier !
+                </h4>
+            </p>
+
+            <p class="text-center">
+                L'équipe d'aiguillage vous proposera des <strong><em>Actions</em></strong> à prendre dès l'étude terminée.
+
+                <br/><span class="text-secondary small">Vous serez alors prévenu.e par courriel.</span>
+            </p>
+        </div>
+    </div>
+    {% else %}
+    <!-- New one-->
+
+    <ul class="list-group mb-3">
+			  {% for task in project.tasks.all %}
+        <li class="list-group-item border-0 p-0 mb-3">
+            <div class="action-main shadow p-3 border-0 mb-2 d-flex justify-content-start">
+                <div class="d-flex  justify-content-between align-items-start flex-column" style="min-width: 25%">
+                    <div>
+                        <h4 class="mb-1"> 
                             {{ task.intent|capfirst|default:"Action" }}
                         </h4>
                         {% if task.tags %}
@@ -262,165 +262,165 @@
                             {% endfor %}
                         </div>
                         {% endif %}
-                        </div>
-
-
-                        {% if task.deadline %}
-                        <div class="d-flex align-items-center mt-3" data-bs-toggle="tooltip" data-bs-placement="left" title="Cette proposition expire à cette date.">
-                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar-date"/>
-                            </svg>
-                            <div class="position-relative d-flex">
-                                <span class="text-danger badge bg-light rounded-pill">{{ task.deadline }}</span>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="d-flex flex-grow-2 w-100 ms-2 justify-content-start flex-column" >
-                        {% if task.resource %}
-                        <div class="d-flex justify-content-between mb-3">
-                            <div class="relative w-100">
-                                {% include "resources/resource/widgets/card_horizontal.html" with resource=task.resource %}
-                            </div>
-                        </div>
-                        {% endif %}
-                        <div class="w-100 relative">
-                            <svg class="bi me-2 align-baseline" width="18" height="18" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-right-quote"/>
-                            </svg>
-                            <span class="text-break text-secondary">{{ task.content|capfirst }}</span>
-                        </div>
                     </div>
 
-                    <div class="d-flex ms-2 w-100 justify-content-between flex-column">
-                        <div class="align-self-end mb-3">
-                            <div class="btn-group" role="group" aria-label="Etat de l'action">
-                                <button class="btn btn-outline-primary btn-sm">
+
+                    {% if task.deadline %}
+                    <div class="d-flex align-items-center mt-3" data-bs-toggle="tooltip" data-bs-placement="left" title="Cette proposition expire à cette date.">
+                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar-date"/>
+                        </svg>
+                        <div class="position-relative d-flex">
+                            <span class="text-danger badge bg-light rounded-pill">{{ task.deadline }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-grow-2 w-100 ms-2 justify-content-start flex-column" >
+                    {% if task.resource %}
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="relative w-100">
+                            {% include "resources/resource/widgets/card_horizontal.html" with resource=task.resource %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="w-100 relative">
+                        <svg class="bi me-2 align-baseline" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-right-quote"/>
+                        </svg>
+                        <span class="text-break text-secondary">{{ task.content|capfirst }}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex ms-2 w-100 justify-content-between flex-column">
+                    <div class="align-self-end mb-3">
+                        <div class="btn-group" role="group" aria-label="Etat de l'action">
+                            <button class="btn btn-outline-primary btn-sm">
                                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-circle"/>
                                 </svg>
                                 Rejeter
-                                </button>
+                            </button>
 
-                                <button class="btn btn-primary btn-sm">
-                                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check2-circle"/>
-                                    </svg>
-                                    Terminée
-                                </button>
-                            </div>
-
-                            {% if user.is_staff %}
-                            <div class="btn-group ms-2" role="group" aria-label="Admin action">
-                                <a class="btn btn-outline-secondary btn-sm" href="{% url 'projects-update-task' task.id %}">
-                                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
-                                    </svg>
-                                    Éditer
-                                </a>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="d-flex align-self-end text-secondary small">
-                            <span class="small align-self-end">Créée {{ task.created_on|naturaltime }}</span>
-                        </div>
-                    </div>
-                </div>
-            </li>
-				    {% endfor %}
-            </ul>
-
-            <!-- old one -->
-            
-
-            {% endif %}
-
-            <!-- 
-                 <h4>Ressources connexes</h4>
-                 <div class="text-secondary">
-                 {% for bookmark in project.bookmarks.all %}
-                 <ul>
-                 <li><a href="{% url "resources-resource-detail" bookmark.resource.id %}">{{ bookmark.resource.title }}</a>
-                 {% if bookmark.comments %}
-                 <q>{{ bookmark.comments }}</q>
-                 {% endif %}
-                 <br/>
-                 <span class="small text-secondary">{% if bookmark.created_by %}(via {{ bookmark.created_by.get_full_name|default:bookmark.created_by }}){% endif %}</span>
-                 </li>
-                 </ul>
-                 {% empty %}
-                 <div class="mb-3 mt-3">
-                 <svg class="bi me-1" width="20" height="20" fill="currentColor">
-                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightbulb"/>
-                 </svg>
-                 Pour vous aider dans vos démarches, n'hésitez pas à <a href="{% url 'resources-resource-search' %}">identifier des ressources et les mettre en favoris</a>.
-                 </div>
-                 {% endfor %}
-                 </div>
-            -->
-        <!-- Notes de suivi -->
-        <h2>
-            <svg class="bi" width="28" height="28" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
-            </svg>
-            Notes de suivi
-        </h2>
-        {% if not project.notes.count %}
-
-        <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
-            <div>
-                Aucune note actuellement pour ce projet. C'est le bon moment pour
-                <a href="{% url 'projects-create-note' project.id %}">
-                    en créer une première.
-                </a>
-            </div>
-        </div>
-        {% else %}
-        <p>
-            <a href="{% url 'projects-create-note' project.id %}" class="">
-                Ajouter une note
-            </a>
-        </p>
-
-        <div class="row row-cols-1 row-cols-md-2 g-4">
-
-            {% for note in project.notes %}
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="card-subtitle mb-2 text-muted">
-                            {% for tag in note.tags_as_list %}
-                            #{{ tag }}&nbsp;
-                            {% endfor %}
+                            <button class="btn btn-primary btn-sm">
+                                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check2-circle"/>
+                                </svg>
+                                Terminée
+                            </button>
                         </div>
 
-                        <div class="card-text">
-                            {{ note.content_rendered|safe  }}
+                        {% if user.is_staff %}
+                        <div class="btn-group ms-2" role="group" aria-label="Admin action">
+                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'projects-update-task' task.id %}">
+                                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
+                                </svg>
+                                Éditer
+                            </a>
                         </div>
-                    </div>
-                    <div class="card-footer">
-                        {% if note.public %}
-                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note publique">
-                            <svg class="bi" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
-                            </svg>
-                        </span>
-                        {% else %}
-                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note privée">
-                            <svg class="bi" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-slash"/>
-                            </svg>
-                        </span>
                         {% endif %}
-                        &nbsp;
-                        <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em> - <a href="{% url 'projects-update-note' note.id %}">éditer</a></span>
+                    </div>
+                    <div class="d-flex align-self-end text-secondary small">
+                        <span class="small align-self-end">Créée {{ task.created_on|naturaltime }}</span>
                     </div>
                 </div>
             </div>
-            {% endfor %}
+        </li>
+				{% endfor %}
+    </ul>
 
+    <!-- old one -->
+    
+
+    {% endif %}
+
+    <!-- 
+         <h4>Ressources connexes</h4>
+         <div class="text-secondary">
+         {% for bookmark in project.bookmarks.all %}
+         <ul>
+         <li><a href="{% url "resources-resource-detail" bookmark.resource.id %}">{{ bookmark.resource.title }}</a>
+         {% if bookmark.comments %}
+         <q>{{ bookmark.comments }}</q>
+         {% endif %}
+         <br/>
+         <span class="small text-secondary">{% if bookmark.created_by %}(via {{ bookmark.created_by.get_full_name|default:bookmark.created_by }}){% endif %}</span>
+         </li>
+         </ul>
+         {% empty %}
+         <div class="mb-3 mt-3">
+         <svg class="bi me-1" width="20" height="20" fill="currentColor">
+         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightbulb"/>
+         </svg>
+         Pour vous aider dans vos démarches, n'hésitez pas à <a href="{% url 'resources-resource-search' %}">identifier des ressources et les mettre en favoris</a>.
+         </div>
+         {% endfor %}
+         </div>
+    -->
+    <!-- Notes de suivi -->
+    <h2>
+        <svg class="bi" width="28" height="28" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+        </svg>
+        Notes de suivi
+    </h2>
+    {% if not project.notes.count %}
+
+    <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
+        <div>
+            Aucune note actuellement pour ce projet. C'est le bon moment pour
+            <a href="{% url 'projects-create-note' project.id %}">
+                en créer une première.
+            </a>
         </div>
-        {% endif %}
+    </div>
+    {% else %}
+    <p>
+        <a href="{% url 'projects-create-note' project.id %}" class="">
+            Ajouter une note
+        </a>
+    </p>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+
+        {% for note in project.notes %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="card-subtitle mb-2 text-muted">
+                        {% for tag in note.tags_as_list %}
+                        #{{ tag }}&nbsp;
+                        {% endfor %}
+                    </div>
+
+                    <div class="card-text">
+                        {{ note.content_rendered|safe  }}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    {% if note.public %}
+                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note publique">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
+                        </svg>
+                    </span>
+                    {% else %}
+                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note privée">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-slash"/>
+                        </svg>
+                    </span>
+                    {% endif %}
+                    &nbsp;
+                    <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em> - <a href="{% url 'projects-update-note' note.id %}">éditer</a></span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+    {% endif %}
 
 
 
