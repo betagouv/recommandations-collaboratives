@@ -164,6 +164,20 @@ class Task(models.Model):
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
+    def tags_as_list(self):
+        """
+        Needed since django doesn't provide a split template tag
+        """
+        tags = []
+
+        words = self.tags.split(" ")
+        for word in words:
+            tag = word.strip(" ")
+            if tag != "":
+                tags.append(tag)
+
+        return tags
+
     intent = models.CharField(max_length=256, blank=True, default="")
     content = models.TextField(default="")
     deadline = models.DateField(null=True, blank=True)
