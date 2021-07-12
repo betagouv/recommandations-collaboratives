@@ -173,7 +173,15 @@ class EditResourceForm(forms.ModelForm):
 
     class Meta:
         model = models.Resource
-        fields = ["title", "subtitle", "summary", "tags", "category", "content"]
+        fields = [
+            "title",
+            "subtitle",
+            "summary",
+            "tags",
+            "category",
+            "departments",
+            "content",
+        ]
 
 
 ########################################################################
