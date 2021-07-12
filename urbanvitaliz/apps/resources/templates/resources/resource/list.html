@@ -13,7 +13,7 @@
 {% block js %}
 <script type="text/javascript">
  $(document).ready(function() {
-     $(".form-check-input").click(function() { $("form").submit(); });
+     $(".filters-categories .form-check-input").click(function() { $(".quick-search form").submit(); });
  });
 </script>
 {% endblock %}
@@ -59,11 +59,34 @@
     <div class="quick-search mb-5">
         <form method="GET">
             <div class="input-group mb-3">
+
+                <div class="input-group-text">
+                    <input name="limit_area" class="form-check-input mt-0" type="checkbox" value="" aria-label="Checkbox for following text input"
+                           {% if limit_area %}checked{% endif %}>
+                    &nbsp;
+                    Seulement pour ma région
+                </div>
+
                 <input type="text" name="{{ form.query.name }}" value="{{ form.query.value|default:"" }}"
-                       class="form-control" placeholder="Saisisez vos mots clés (ex: coworking, pollution, ...)"
+                       class="form-control" placeholder="Saisissez vos mots clés (ex: coworking, pollution, ...)"
                        aria-label="Search Text input" />
 
-                <button class="btn btn-outline-secondary" type="submit">
+
+                {% if my_xdepartments %}
+                <div class="">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#globe"/>
+                    </svg>
+                    <!-- Geo filters -->
+                    {% for department in my_departments %}
+                    <label class="">{{ department.name }}</label>
+                    {% endfor %}
+                    )
+                </div>
+                {% endif %}
+
+
+                <button class="btn btn-outline-primary" type="submit">
                     <svg class="bi" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
                     </svg>&nbsp;
@@ -73,16 +96,19 @@
             </div>
 
 
-            <span class="small text-secondary">Catégories :</span>&nbsp;
-            {% for category in form.category_fields %}
-            <span class="form-check form-switch form-check-inline">
-                <input class="form-check-input" type="checkbox" name="{{ category.the_category.form_label }}"
-                       id="check-{{ category.the_category.form_label }}"
-                       {% if category.checked %}checked{% endif %}
-                >
-                <label class="form-check-label text-secondary" for="check-{{ category.the_category.form_label }}">{{ category.the_category }}</label>
-            </span>
-            {% endfor %}
+            <!-- Categories -->
+            <div class="filters-categories">
+                <span class="small text-secondary">Catégories :</span>&nbsp;
+                {% for category in form.category_fields %}
+                <span class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="{{ category.the_category.form_label }}"
+                           id="check-{{ category.the_category.form_label }}"
+                           {% if category.checked %}checked{% endif %}
+                    >
+                    <label class="form-check-label text-secondary" for="check-{{ category.the_category.form_label }}">{{ category.the_category }}</label>
+                </span>
+                {% endfor %}
+            </div>
 
         </form>
     </div>

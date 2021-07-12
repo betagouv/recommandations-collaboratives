@@ -41,6 +41,8 @@ def resource_search(request):
     query = form.cleaned_data.get("query", "")
     categories = form.selected_categories
     resources = models.Resource.search(query, categories)
+    limit_area = True  # XXX Boolean to toggle search geography
+
     if not request.user.is_staff:
         resources = resources.filter(public=True)
     return render(request, "resources/resource/list.html", locals())

@@ -69,9 +69,23 @@
                 {% endfor %}
             </div>
 
-
             {% if resource.subtitle %}
             <h3 class="subtitle text-secondary mt-3">{{ resource.subtitle }}</h3>
+            {% endif %}
+
+            <!-- Area -->
+            {% if resource.departments.count %}
+            <div>
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#globe"/>
+                </svg>&nbsp;
+                <span class="small text-secondary">
+                    {% for department in resource.departments.all %}
+                    {{ department.name }}
+                    {% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </span>
+            </div>
             {% endif %}
 
             {% if bookmark and bookmark.comments %}
