@@ -331,5 +331,8 @@ class LatestProjectsFeed(Feed):
     def item_link(self, item):
         return reverse("projects-project-detail", args=[item.pk])
 
+    def item_pubdate(self, item):
+        return item.created_on
+
 
 # eof
