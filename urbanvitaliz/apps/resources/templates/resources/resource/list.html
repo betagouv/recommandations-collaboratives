@@ -60,12 +60,14 @@
         <form method="GET">
             <div class="input-group mb-3">
 
+                {% if user.is_authenticated %}
                 <div class="input-group-text">
                     <input name="limit_area" class="form-check-input mt-0" type="checkbox" value="" aria-label="Checkbox for following text input"
                            {% if limit_area %}checked{% endif %}>
                     &nbsp;
                     Seulement pour ma région
                 </div>
+                {% endif %}
 
                 <input type="text" name="{{ form.query.name }}" value="{{ form.query.value|default:"" }}"
                        class="form-control" placeholder="Saisissez vos mots clés (ex: coworking, pollution, ...)"
