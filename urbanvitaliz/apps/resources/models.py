@@ -15,6 +15,8 @@ from django.utils import timezone
 
 from django.contrib.auth import models as auth
 
+from urbanvitaliz.apps.geomatics import models as geomatics_models
+
 
 class Category(models.Model):
     """Représente une categorie de ressource"""
@@ -86,6 +88,13 @@ class Resource(models.Model):
     subtitle = models.CharField(max_length=512, default="")
     summary = models.CharField(max_length=512, default="")
     content = models.TextField()
+
+    departments = models.ManyToManyField(
+        geomatics_models.Department,
+        null=True,
+        blank=True,
+        verbose_name="Départements concernés",
+    )
 
     def content_rendered(self):
         """Return content as markdown"""
