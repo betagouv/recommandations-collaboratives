@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 
@@ -24,7 +25,6 @@
 			          <tr>
 				            <th>Date de création</th>
 				            <th>Nom</th>
-				            <th>Localisation</th>
 				            <th>Actions</th>
 				            <th>Notes</th>
                     <th>Etat</th>
@@ -34,13 +34,24 @@
 		        <tbody>
 			          {% for project in projects %}
 			          <tr>
-				            <td>{{ project.created_on }}</td>
+				            <td>
+                        {{ project.created_on }}
+                        <br/>
+                        <span class="text-secondary small">({{ project.created_on|naturaltime }})</span>
+                    </td>
 				            <td>
 					              <a href="{% url 'projects-project-detail' project.id %}">
-						                {{ project.name }}
+						                {{ project.name|capfirst }}
 					              </a>
+                        <br/>
+                        <span class="text-secondary">{{ project.location }}</span>
+                        {% if project.commune %}
+                        <br/>
+                        <span class="text-secondary small">{{ project.commune.postal }}, {{ project.commune.name }}</span>
+                        <br/>
+                        <span class="text-secondary small">INSEE: {{ project.commune.insee }}</span>
+                        {% endif %}
 				            </td>
-				            <td>{{ project.location }}</td>
 				            <td>{{ project.tasks.count }}</td>
 				            <td>{{ project.notes.count }}</td>
                     <td>
