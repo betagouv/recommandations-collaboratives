@@ -57,5 +57,13 @@ class Commune(models.Model):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def get_by_postal_code(cls, code):
+        """Return first commune matching given postal code or None"""
+        try:
+            return cls.objects.filter(postal=code)[0]
+        except IndexError:
+            return
+
 
 # eof
