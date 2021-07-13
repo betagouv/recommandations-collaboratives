@@ -13,7 +13,9 @@ from django import forms
 
 from django.urls import reverse
 
+from django.contrib import messages
 from django.contrib.syndication.views import Feed
+
 from django.utils import timezone
 
 from django.shortcuts import get_object_or_404
@@ -310,6 +312,14 @@ def create_resource_action(request, resource_id=None):
                         "project": project,
                         "resource": resource,
                     },
+                )
+
+                messages.success(
+                    request,
+                    '{0} a été notifié(e) par courriel de l\'action "{1}".'.format(
+                        project.full_name, task.intent
+                    ),
+                    extra_tags=["email"],
                 )
 
             next_url = reverse("projects-project-detail", args=[project.id])

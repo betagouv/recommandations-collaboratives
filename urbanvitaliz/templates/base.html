@@ -27,7 +27,34 @@
 
     </head>
     <body>
+
         <main>
+            {% if messages %}
+            <div id="notification-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                {% for message in messages %}
+                <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}bg-success text-white{% endif %}">
+                        {% if "email" in message.tags %}
+                        <strong class="me-auto">
+                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+                            </svg>&nbsp;
+                            Courriel envoyé !
+                        </strong>
+                        {% else %}
+                        <strong class="me-auto">Notification</strong>
+                        {% endif %}
+                        <small></small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        {{ message|capfirst }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             <h1 class="visually-hidden">Urban Vitaliz</h1>
 
             {% include "sidebar.html" %}
@@ -52,6 +79,15 @@
         <script src="{% static 'js/jquery-3.6.0.slim.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
         <script src="{% static 'js/sidebars.js' %}"></script>
+
+
+        <!-- bs5 notifications  -->
+        <script type="text/javascript">
+         $(function() {
+             $('.toast').toast('show');
+         });
+        </script>
+
         {% block js %}
         {% endblock %}
     </body>
