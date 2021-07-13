@@ -8,6 +8,7 @@ created : 2021-06-16 10:59:08 CEST
 """
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.syndication.views import Feed
 
 from django import forms
 
@@ -172,6 +173,32 @@ class EditResourceForm(forms.ModelForm):
     class Meta:
         model = models.Resource
         fields = ["title", "subtitle", "summary", "tags", "category", "content"]
+
+
+########################################################################
+# RSS Feeds
+########################################################################
+
+
+class LatestResourcesFeed(Feed):
+    title = "Nouvelles Ressources"
+    link = "/resources/feed"
+    description = "Derniers ajouts de ressources"
+
+    def items(self):
+        return models.Resource.objects.order_by("-created_on")[:5]
+
+    def item_title(self, item):
+        return item.title
+
+    def item_description(self, item):
+        return item.summary
+
+    def item_link(self, item):
+        return reverse("resources-resource-detail", args=[item.pk])
+
+    def item_pubdate(self, item):
+        return item.created_on
 
 
 ########################################################################
