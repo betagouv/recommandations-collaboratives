@@ -25,6 +25,7 @@ from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.utils import is_staff_or_403
 
 from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.apps.geomatics import models as geomatics
 
 from . import models
 
@@ -40,6 +41,8 @@ def onboarding(request):
         form = OnboardingForm(request.POST)
         if form.is_valid():
             project = form.save(commit=False)
+            postcode = form.cleaned_data.get("postcode")
+            project.commune = geomatics.Commune.get_by_postal_code(postcode)
             project.save()
             models.Note(
                 project=project, content=f"# Demande initiale\n\n{project.impediments}"
@@ -52,6 +55,8 @@ def onboarding(request):
 
 class OnboardingForm(forms.ModelForm):
     """Form for onboarding a new local authority"""
+
+    postcode = forms.CharField(max_length=5, required=False)
 
     class Meta:
         model = models.Project
