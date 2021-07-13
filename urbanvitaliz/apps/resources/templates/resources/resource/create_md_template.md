@@ -1,7 +1,3 @@
-## 💡 En bref :
-
-...
-
 ## 🚀 Plus de détails !
 
 ### →  L'appui proposé

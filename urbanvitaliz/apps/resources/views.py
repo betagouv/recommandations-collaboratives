@@ -163,10 +163,13 @@ class EditResourceForm(forms.ModelForm):
     )
     summary = forms.CharField(
         label="Résumé bref",
-        widget=forms.TextInput(attrs={"class": "form-control"}),
+        widget=forms.Textarea(
+            attrs={"class": "form-control", "rows": "3", "maxlength": 400}
+        ),
     )
     tags = forms.CharField(
-        label="Mots-clés", widget=forms.TextInput(attrs={"class": "form-control"})
+        label="Mots-clés",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
     )
 
     class Meta:
