@@ -50,6 +50,9 @@ class Commune(models.Model):
     postal = models.CharField(max_length=5)
     name = models.CharField(max_length=64)
 
+    longitude = models.FloatField(default=0.0)
+    latitude = models.FloatField(default=0.0)
+
     class Meta:
         verbose_name = "commune"
         verbose_name_plural = "communes"
