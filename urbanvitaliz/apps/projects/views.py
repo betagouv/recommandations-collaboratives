@@ -23,6 +23,7 @@ from django.shortcuts import render
 from markdownx.fields import MarkdownxFormField
 
 from urbanvitaliz.utils import is_staff_or_403
+from urbanvitaliz.utils import send_email
 
 from urbanvitaliz.apps.resources import models as resources
 
@@ -294,6 +295,23 @@ def create_resource_action(request, resource_id=None):
             task.save()
             # cleanup the session
             del request.session["project_id"]
+
+            # Send notifications
+            if form.cleaned_data["notify_email"]:
+                send_email(
+                    request,
+                    user_email=project.email,
+                    email_subject="[{0}] UrbanVitaliz vous propose une action".format(
+                        project.name
+                    ),
+                    template_base_name="projects/notifications/task_new_email",
+                    extra_context={
+                        "task": task,
+                        "project": project,
+                        "resource": resource,
+                    },
+                )
+
             next_url = reverse("projects-project-detail", args=[project.id])
             return redirect(next_url)
     else:
@@ -304,9 +322,11 @@ def create_resource_action(request, resource_id=None):
 class ResourceTaskForm(forms.ModelForm):
     """Create and task for push resource"""
 
+    notify_email = forms.BooleanField(initial=True, required=False)
+
     class Meta:
         model = models.Task
-        fields = ["intent", "content"]
+        fields = ["intent", "content", "notify_email"]
 
 
 ########################################################################

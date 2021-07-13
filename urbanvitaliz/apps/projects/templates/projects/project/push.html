@@ -58,7 +58,14 @@
             <div class="text-danger text-end">{{ error }}</div>
             {% endfor %}
         </div>
-        <p class="small text-secondary">Le contact de ce projet ({{ project.full_name }}) sera notifié par courriel de votre proposition.</p>
+
+        <div class="form-check form-switch">
+            <input name="{{ form.notify_email.name }}" class="form-check-input" type="checkbox" id="input-email-notification" checked>
+            <label class="form-check-label" for="input-email-notification">
+                <p class="small text-secondary">Notifier le contact de ce projet ({{ project.full_name }}) par courriel de votre proposition.</p>
+            </label>
+        </div>
+
         <button class="btn btn-primary" type="submit">Pousser la ressource</button>
     </form>
 </div>

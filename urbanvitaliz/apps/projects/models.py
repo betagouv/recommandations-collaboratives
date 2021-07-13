@@ -11,6 +11,7 @@ from datetime import date
 from django.db import models
 
 from django.utils import timezone
+from django.urls import reverse
 
 from markdownx.utils import markdownify
 
@@ -59,6 +60,9 @@ class Project(models.Model):
         return self.tasks.exclude(resource=None)
 
     deleted = models.DateTimeField(null=True, blank=True)
+
+    def get_absolute_url(self):
+        return reverse("projects-project-detail", kwargs={"project_id": self.pk})
 
     class Meta:
         ordering = []
