@@ -91,7 +91,6 @@ class Resource(models.Model):
 
     departments = models.ManyToManyField(
         geomatics_models.Department,
-        null=True,
         blank=True,
         verbose_name="Départements concernés",
     )
