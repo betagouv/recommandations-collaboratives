@@ -23,6 +23,9 @@ from model_bakery.recipe import Recipe
 
 from urbanvitaliz.utils import login
 
+from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.projects import models as projects
+
 from . import models
 
 
@@ -83,6 +86,34 @@ def test_resource_list_contains_only_resource_with_category(client):
     url = reverse("resources-resource-search")
     url = f"{url}?cat{category1.id}=true&query=resource"
     response = client.get(url)
+    detail_url = reverse("resources-resource-detail", args=[resource1.id])
+    assertContains(response, detail_url)
+    detail_url = reverse("resources-resource-detail", args=[resource2.id])
+    assertNotContains(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_resource_list_contains_only_resource_with_area(client):
+    departments = Recipe(geomatics.Department).make(_quantity=3)
+    resource1 = Recipe(
+        models.Resource,
+        title="selected resource",
+        public=True,
+        departments=departments[1:],
+    ).make()
+    resource2 = Recipe(
+        models.Resource,
+        title="unselected resource",
+        public=True,
+        departments=departments[:1],
+    ).make()
+    url = reverse("resources-resource-search")
+    url = f"{url}?limit_area=true&query=resource"
+    with login(client) as user:
+        Recipe(
+            projects.Project, email=user.email, commune__department=departments[1]
+        ).make()
+        response = client.get(url)
     detail_url = reverse("resources-resource-detail", args=[resource1.id])
     assertContains(response, detail_url)
     detail_url = reverse("resources-resource-detail", args=[resource2.id])
