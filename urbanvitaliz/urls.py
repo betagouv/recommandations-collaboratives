@@ -14,6 +14,7 @@ from django.contrib.auth import views as auth_views
 
 from django.urls import path, include
 
+import debug_toolbar
 from magicauth.urls import urlpatterns as magicauth_urls
 
 from urbanvitaliz.apps.home.urls import urlpatterns as home_urls
@@ -25,7 +26,9 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
     path("nimda/", admin.site.urls),
+    path('__debug__/', include(debug_toolbar.urls))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 
 urlpatterns.extend(magicauth_urls)
 urlpatterns.extend(home_urls)

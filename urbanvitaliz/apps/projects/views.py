@@ -192,6 +192,8 @@ def update_note(request, note_id=None):
     """Update an existing note for a project"""
     is_staff_or_403(request.user)
     note = get_object_or_404(models.Note, pk=note_id)
+    project = note.project  # For template consistency
+
     if request.method == "POST":
         form = NoteForm(request.POST, instance=note)
         if form.is_valid():
