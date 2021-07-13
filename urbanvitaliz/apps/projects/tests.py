@@ -18,6 +18,7 @@ from django.urls import reverse
 import django.core.mail
 
 from django.contrib.auth import models as auth
+from django.contrib.messages import get_messages
 
 from model_bakery.recipe import Recipe
 
@@ -634,7 +635,11 @@ def test_staff_create_action_for_resource_push_with_notification(client):
     assert task.resource == resource
     assert task.content == data["content"]
     assert task.intent == data["intent"]
-    # user is redirected to poject
+
+    # notification is found
+    assert len(get_messages(response.wsgi_request)) > 0
+
+    # user is redirected to project
     newurl = reverse("projects-project-detail", args=[project.id])
     assertRedirects(response, newurl)
     # sessions is cleaned up
