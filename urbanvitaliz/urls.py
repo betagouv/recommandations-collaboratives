@@ -26,7 +26,7 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
     path("nimda/", admin.site.urls),
-    path('__debug__/', include(debug_toolbar.urls))
+    path("__debug__/", include(debug_toolbar.urls)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
