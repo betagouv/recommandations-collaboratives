@@ -2,6 +2,15 @@
 
 {% load static %}
 
+{% block js %}
+<script type="text/javascript">
+ // Bootstrap needs collapse/show class to toggle correctly
+ $(document).ready(function() {
+     $(".markdownx-preview").addClass("collapse show");
+ });
+</script>
+{% endblock %}
+
 {% block content %}
 
 <div class="col-11 py-5 mx-auto">
@@ -42,7 +51,8 @@
 		        {% csrf_token %}
 
             <div class="p-1">
-                <button class="btn btn-outline-primary float-end" type="button" data-bs-toggle="collapse" data-bs-target=".markdownx-preview" aria-expanded="false" aria-controls="collapseExample">
+                <button class="btn btn-outline-primary float-end" type="button" data-bs-toggle="collapse"
+                        data-bs-target=".markdownx-preview" aria-expanded="true" aria-controls="markdownXCollapse">
                 Afficher/Masquer la prévisulation
                 </button>
             </div>
