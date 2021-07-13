@@ -56,7 +56,7 @@ def onboarding(request):
 class OnboardingForm(forms.ModelForm):
     """Form for onboarding a new local authority"""
 
-    postcode = forms.CharField(max_length=5, required=False)
+    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
 
     class Meta:
         model = models.Project
