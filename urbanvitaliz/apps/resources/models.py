@@ -53,8 +53,20 @@ class Category(models.Model):
         return cls.objects.filter(deleted=None)
 
 
+class ResourceManager(models.Manager):
+    """Specific filters for resources"""
+
+    def limit_area(self, communes):
+        if not communes:
+            return self
+        departments = set(c.department for c in communes)
+        return self.filter(departments__in=departments).distinct()
+
+
 class Resource(models.Model):
     """Représente une ressource pour les utilisateur·ices d'UV"""
+
+    objects = ResourceManager()
 
     public = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(
