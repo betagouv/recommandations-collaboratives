@@ -60,9 +60,9 @@
         <form method="GET">
             <div class="input-group mb-3">
 
-                {% if user.is_authenticated %}
+                {% if limit_area != None and user.is_authenticated %}
                 <div class="input-group-text">
-                    <input name="limit_area" class="form-check-input mt-0" type="checkbox" value="" aria-label="Checkbox for following text input"
+                    <input name="limit_area" class="form-check-input mt-0" type="checkbox" aria-label="Limiter à ma zone géographique"
                            {% if limit_area %}checked{% endif %}>
                     &nbsp;
                     Seulement pour ma région
