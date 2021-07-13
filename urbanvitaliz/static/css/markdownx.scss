@@ -2,13 +2,16 @@
     display: flex;
 
     textarea {
-        margin-right: 50px;
         min-height: 300px;
-        width: 50%;
+        flex-grow: 1;
     }
 
     .markdownx-preview {
+        margin-left: 20px;
         width: 50%;
         overflow-wrap: break-word;
+
+        border: 1px solid #eee;
+        padding: 10px;
     }
 }
