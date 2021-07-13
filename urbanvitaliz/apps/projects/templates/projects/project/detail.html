@@ -11,6 +11,26 @@
 
 {% endblock %}
 
+{% block js %}
+<script type="text/javascript">
+ function textFoldToggle(id) {
+     var excerpt = document.getElementById("excerpt-" + id);
+     var moreText = document.getElementById("more-" + id);
+     var btnText = document.getElementById("foldBtn-" + id);
+
+     if (moreText.style.display === "inline") {
+         excerpt.style.display = "inline";
+         btnText.innerHTML = "[Lire tout]";
+         moreText.style.display = "none";
+     } else {
+         excerpt.style.display = "none";
+         btnText.innerHTML = "[Réduire]";
+         moreText.style.display = "inline";
+     }
+ }
+</script>
+{% endblock %}
+
 
 {% block content %}
 
@@ -398,8 +418,13 @@
                     </div>
 
                     <div class="card-text">
-                        {{ note.content_rendered|safe  }}
+                        <span id="excerpt-{{ forloop.counter }}">{{ note.content_rendered|safe|truncatechars_html:500  }}</span>
+                        {% if note.content_rendered|safe|truncatechars_html:501|length > 500 %}
+                        <span id="more-{{ forloop.counter }}" style="display: none;">{{ note.content_rendered|safe }}</span>
+                        <a class="" href="#more-{{ forloop.counter }}" onclick="textFoldToggle({{ forloop.counter }})" id="foldBtn-{{ forloop.counter }}">[Lire tout]</a>
+                        {% endif %}
                     </div>
+
                 </div>
                 <div class="card-footer">
                     {% if note.public %}
