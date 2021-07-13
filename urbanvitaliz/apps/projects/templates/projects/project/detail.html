@@ -379,12 +379,23 @@
          </div>
     -->
     <!-- Notes de suivi -->
-    <h2>
-        <svg class="bi" width="28" height="28" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
-        </svg>
-        Notes de suivi
-    </h2>
+    <div class="w-100">
+        <h2 class="mb-3 d-inline-block">
+            <svg class="bi" width="28" height="28" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+            </svg>
+            Notes de suivi
+        </h2>
+        {% if user.is_staff %}
+        <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-note' project.id %}">
+            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+            </svg>
+            Ajouter une note
+        </a>
+        {% endif %}
+    </div>
+
     {% if not project.notes.count %}
 
     <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
@@ -399,13 +410,8 @@
         </div>
     </div>
     {% else %}
-    <p>
-        <a href="{% url 'projects-create-note' project.id %}" class="">
-            Ajouter une note
-        </a>
-    </p>
 
-    <div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="row row-cols-1 row-cols-md-2">
 
         {% for note in project.notes %}
         <div class="col">
