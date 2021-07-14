@@ -27,9 +27,15 @@ urlpatterns = [
     path("nimda/", admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
+
 urlpatterns.extend(magicauth_urls)
 urlpatterns.extend(home_urls)
 urlpatterns.extend(projects_urls)
 urlpatterns.extend(resources_urls)
+
+if settings.DEBUG:
+    import debug_toolbar
+
+    urlpatterns += [path(r"__debug__/", include(debug_toolbar.urls))]
 
 # eof
