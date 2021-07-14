@@ -30,7 +30,7 @@ class Department(models.Model):
 
     region = models.ForeignKey("Region", on_delete=models.CASCADE)
 
-    code = models.CharField(max_length=2, primary_key=True)
+    code = models.CharField(max_length=3, primary_key=True)
     name = models.CharField(max_length=64)
 
     class Meta:
