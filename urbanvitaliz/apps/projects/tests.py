@@ -24,6 +24,7 @@ from model_bakery.recipe import Recipe
 from urbanvitaliz.utils import login
 
 from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.apps.geomatics import models as geomatics
 
 from .templatetags import projects_extra
 
@@ -79,6 +80,49 @@ def test_performing_onboarding_create_a_new_project(client):
     assert note.project == project
     assert note.content == f"# Demande initiale\n\n{project.impediments}"
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_sets_existing_postal_code(client):
+    commune = Recipe(geomatics.Commune, postal="12345").make()
+    with login(client):
+        response = client.post(
+            reverse("projects-onboarding"),
+            data={
+                "name": "a project",
+                "email": "a@example.com",
+                "location": "some place",
+                "first_name": "john",
+                "last_name": "doe",
+                "postcode": commune.postal,
+                "description": "a project description",
+                "impediments": "some impediment",
+            },
+        )
+    assert response.status_code == 200
+    project = models.Project.fetch()[0]
+    assert project.commune == commune
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_discard_unknown_postal_code(client):
+    with login(client):
+        response = client.post(
+            reverse("projects-onboarding"),
+            data={
+                "name": "a project",
+                "email": "a@example.com",
+                "location": "some place",
+                "first_name": "john",
+                "last_name": "doe",
+                "postcode": "12345",
+                "description": "a project description",
+                "impediments": "some impediment",
+            },
+        )
+    assert response.status_code == 200
+    project = models.Project.fetch()[0]
+    assert project.commune is None
 
 
 ########################################################################

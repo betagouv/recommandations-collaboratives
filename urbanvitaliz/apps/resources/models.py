@@ -15,6 +15,8 @@ from django.utils import timezone
 
 from django.contrib.auth import models as auth
 
+from urbanvitaliz.apps.geomatics import models as geomatics_models
+
 
 class Category(models.Model):
     """Représente une categorie de ressource"""
@@ -51,8 +53,21 @@ class Category(models.Model):
         return cls.objects.filter(deleted=None)
 
 
+class ResourceQuerySet(models.QuerySet):
+    """Specific filters for resources"""
+
+    def limit_area(self, communes):
+        """Limit resources that match at least one department of communes"""
+        if not communes:
+            return self
+        departments = set(c.department for c in communes)
+        return self.filter(departments__in=departments).distinct()
+
+
 class Resource(models.Model):
     """Représente une ressource pour les utilisateur·ices d'UV"""
+
+    objects = ResourceQuerySet.as_manager()
 
     public = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(
@@ -86,6 +101,12 @@ class Resource(models.Model):
     subtitle = models.CharField(max_length=512, default="")
     summary = models.CharField(max_length=512, default="")
     content = models.TextField()
+
+    departments = models.ManyToManyField(
+        geomatics_models.Department,
+        blank=True,
+        verbose_name="Départements concernés",
+    )
 
     def content_rendered(self):
         """Return content as markdown"""
