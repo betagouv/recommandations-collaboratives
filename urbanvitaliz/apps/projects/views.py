@@ -28,6 +28,7 @@ from urbanvitaliz.utils import is_staff_or_403
 from urbanvitaliz.utils import send_email
 
 from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.apps.geomatics import models as geomatics
 
 from . import models
 
@@ -43,6 +44,8 @@ def onboarding(request):
         form = OnboardingForm(request.POST)
         if form.is_valid():
             project = form.save(commit=False)
+            postcode = form.cleaned_data.get("postcode")
+            project.commune = geomatics.Commune.get_by_postal_code(postcode)
             project.save()
             models.Note(
                 project=project, content=f"# Demande initiale\n\n{project.impediments}"
@@ -55,6 +58,8 @@ def onboarding(request):
 
 class OnboardingForm(forms.ModelForm):
     """Form for onboarding a new local authority"""
+
+    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
 
     class Meta:
         model = models.Project
@@ -195,6 +200,8 @@ def update_note(request, note_id=None):
     """Update an existing note for a project"""
     is_staff_or_403(request.user)
     note = get_object_or_404(models.Note, pk=note_id)
+    project = note.project  # For template consistency
+
     if request.method == "POST":
         form = NoteForm(request.POST, instance=note)
         if form.is_valid():

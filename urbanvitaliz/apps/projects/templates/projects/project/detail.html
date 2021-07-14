@@ -11,6 +11,26 @@
 
 {% endblock %}
 
+{% block js %}
+<script type="text/javascript">
+ function textFoldToggle(id) {
+     var excerpt = document.getElementById("excerpt-" + id);
+     var moreText = document.getElementById("more-" + id);
+     var btnText = document.getElementById("foldBtn-" + id);
+
+     if (moreText.style.display === "inline") {
+         excerpt.style.display = "inline";
+         btnText.innerHTML = "[Lire tout]";
+         moreText.style.display = "none";
+     } else {
+         excerpt.style.display = "none";
+         btnText.innerHTML = "[Réduire]";
+         moreText.style.display = "inline";
+     }
+ }
+</script>
+{% endblock %}
+
 
 {% block content %}
 
@@ -62,7 +82,16 @@
 
                 <!--<p>Le site est situé sur la commune d'<a href="#">Attignéville (88015), rue des Viviers</a>. Il concerne la parcelle cadastrale numéro <a href="#">A59</a>.</p> -->
 
-                <p>Le site est situé à <a href="https://nominatim.openstreetmap.org/ui/search.html?q={{ project.location|urlencode }}" target="_new" >{{ project.location }}</a>.</p>
+                <p>
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#geo-alt"/>
+                    </svg>
+                    Le site est situé à <a href="https://nominatim.openstreetmap.org/ui/search.html?q={{ project.location|urlencode }}" target="_new" >{{ project.location }}</a>
+                    {% if project.commune %}
+                    ({{ project.commune.postal }} {{ project.commune }}, {{ project.commune.department }} - {{ project.commune.department.region }})
+                    {% endif %}
+                    .
+                </p>
             </div>
 
         </div>
@@ -294,12 +323,12 @@
 
                 <div class="d-flex ms-2 w-100 justify-content-between flex-column">
                     <div class="align-self-end mb-3">
-                        <div class="btn-group" role="group" aria-label="Etat de l'action">
+                        <div class="btn-group align-end w-100" role="group" aria-label="Etat de l'action">
                             <button class="btn btn-outline-primary btn-sm">
                                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-circle"/>
                                 </svg>
-                                Rejeter
+                                Décliner
                             </button>
 
                             <button class="btn btn-primary btn-sm">
@@ -310,8 +339,17 @@
                             </button>
                         </div>
 
+                        <div class="text-secondary small mt-1">
+                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+                            </svg>
+                            <a class="text-reset" href="mailto:contact@urbanvitaliz.fr?subject=[{{ project.name|truncatechars:10 }}] {{ task.intent|truncatewords:10 }}">En discuter avec l'équipe UrbanVitaliz</a>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-self-end">
                         {% if user.is_staff %}
-                        <div class="btn-group ms-2" role="group" aria-label="Admin action">
+                        <div class="btn-group mb-1" role="group" aria-label="Admin action">
                             <a class="btn btn-outline-secondary btn-sm" href="{% url 'projects-update-task' task.id %}">
                                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
@@ -321,6 +359,7 @@
                         </div>
                         {% endif %}
                     </div>
+
                     <div class="d-flex align-self-end text-secondary small">
                         <span class="small align-self-end">Créée {{ task.created_on|naturaltime }}</span>
                     </div>
@@ -359,12 +398,23 @@
          </div>
     -->
     <!-- Notes de suivi -->
-    <h2>
-        <svg class="bi" width="28" height="28" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
-        </svg>
-        Notes de suivi
-    </h2>
+    <div class="w-100">
+        <h2 class="mb-3 d-inline-block">
+            <svg class="bi" width="28" height="28" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+            </svg>
+            Notes de suivi
+        </h2>
+        {% if user.is_staff %}
+        <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-note' project.id %}">
+            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+            </svg>
+            Ajouter une note
+        </a>
+        {% endif %}
+    </div>
+
     {% if not project.notes.count %}
 
     <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
@@ -379,13 +429,8 @@
         </div>
     </div>
     {% else %}
-    <p>
-        <a href="{% url 'projects-create-note' project.id %}" class="">
-            Ajouter une note
-        </a>
-    </p>
 
-    <div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="row row-cols-1 row-cols-md-2">
 
         {% for note in project.notes %}
         <div class="col">
@@ -398,8 +443,13 @@
                     </div>
 
                     <div class="card-text">
-                        {{ note.content_rendered|safe  }}
+                        <span id="excerpt-{{ forloop.counter }}">{{ note.content_rendered|safe|truncatechars_html:500  }}</span>
+                        {% if note.content_rendered|safe|truncatechars_html:501|length > 500 %}
+                        <span id="more-{{ forloop.counter }}" style="display: none;">{{ note.content_rendered|safe }}</span>
+                        <a class="" href="#more-{{ forloop.counter }}" onclick="textFoldToggle({{ forloop.counter }})" id="foldBtn-{{ forloop.counter }}">[Lire tout]</a>
+                        {% endif %}
                     </div>
+
                 </div>
                 <div class="card-footer">
                     {% if note.public %}

@@ -27,6 +27,8 @@ from markdownx.fields import MarkdownxFormField
 
 from urbanvitaliz.utils import is_staff_or_403
 
+from urbanvitaliz.apps.projects import models as projects
+
 from . import models
 
 
@@ -37,13 +39,25 @@ from . import models
 
 def resource_search(request):
     """Search existing resources"""
-    form = SearchForm(request.GET)
+    form = SearchForm(request.GET, initial={"limit_area": True})
     form.is_valid()
     query = form.cleaned_data.get("query", "")
+    limit_area = form.cleaned_data.get("limit_area", True)
     categories = form.selected_categories
+
+    # user communes from her projects if applicable
+    communes = []
+    if hasattr(request.user, "email"):
+        communes = [p.commune for p in projects.Project.fetch(email=request.user.email)]
+    if not communes:
+        limit_area = None  # does not apply if no projects
+
     resources = models.Resource.search(query, categories)
     if not request.user.is_staff:
         resources = resources.filter(public=True)
+    if limit_area:
+        resources = resources.limit_area(communes)
+
     return render(request, "resources/resource/list.html", locals())
 
 
@@ -54,6 +68,8 @@ class SearchForm(forms.Form):
     """Form to search for resources and filter by category"""
 
     query = forms.CharField(required=False)
+
+    limit_area = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -164,15 +180,26 @@ class EditResourceForm(forms.ModelForm):
     )
     summary = forms.CharField(
         label="Résumé bref",
-        widget=forms.TextInput(attrs={"class": "form-control"}),
+        widget=forms.Textarea(
+            attrs={"class": "form-control", "rows": "3", "maxlength": 400}
+        ),
     )
     tags = forms.CharField(
-        label="Mots-clés", widget=forms.TextInput(attrs={"class": "form-control"})
+        label="Mots-clés",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
     )
 
     class Meta:
         model = models.Resource
-        fields = ["title", "subtitle", "summary", "tags", "category", "content"]
+        fields = [
+            "title",
+            "subtitle",
+            "summary",
+            "tags",
+            "category",
+            "departments",
+            "content",
+        ]
 
 
 ########################################################################

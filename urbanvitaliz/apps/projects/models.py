@@ -16,6 +16,7 @@ from django.urls import reverse
 from markdownx.utils import markdownify
 
 from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.apps.geomatics import models as geomatics_models
 
 
 class Project(models.Model):
@@ -53,6 +54,12 @@ class Project(models.Model):
     )
     description = models.TextField(verbose_name="Description")
     location = models.CharField(max_length=256, verbose_name="Localisation")
+    commune = models.ForeignKey(
+        geomatics_models.Commune,
+        null=True,
+        on_delete=models.CASCADE,
+        verbose_name="Commune",
+    )
     impediments = models.TextField(default="", blank=True, verbose_name="Difficultés")
 
     @property
