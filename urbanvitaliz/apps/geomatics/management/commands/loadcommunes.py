@@ -44,14 +44,8 @@ def load_communes_from_csv(filename):
 
 def load_commune(row):
     """Create commune department region from row if unknown"""
-    region, _ = models.Region.objects.get_or_create(
-        code=row["code_region"], defaults={"name": row["nom_region"]}
-    )
-    department, _ = models.Department.objects.get_or_create(
-        region=region,
-        code=row["code_departement"],
-        defaults={"name": row["nom_departement"]},
-    )
+    region = get_region(row["code_region"], row["nom_region"])
+    department = get_department(region, row["code_departement"], row["nom_departement"])
     commune, _ = models.Commune.objects.get_or_create(
         department=department,
         insee=row["code_commune_INSEE"],
@@ -63,6 +57,32 @@ def load_commune(row):
         },
     )
     return commune
+
+
+def memoize(function):
+    """Memoize departments and regions to reduce db queries"""
+    memory = {}
+
+    def wrapper(*args, **kwargs):
+        if args not in memory:
+            memory[args] = function(*args)
+        return memory[args]
+
+    return wrapper
+
+
+@memoize
+def get_region(code, name):
+    region, _ = models.Region.objects.get_or_create(code=code, defaults={"name": name})
+    return region
+
+
+@memoize
+def get_department(region, code, name):
+    departement, _ = models.Department.objects.get_or_create(
+        region=region, code=code, defaults={"name": name}
+    )
+    return departement
 
 
 # eof
