@@ -2,13 +2,44 @@
 
 {% load static %}
 
+{% block js %}
+<script type="text/javascript">
+ // Bootstrap needs collapse/show class to toggle correctly
+ $(document).ready(function() {
+     $(".markdownx-preview").addClass("collapse show");
+ });
+</script>
+{% endblock %}
+
 {% block content %}
 
-<div class="col-9 py-5 mx-auto">
+<div class="col-11 py-5 mx-auto">
 
-		<h1>{{ project.name }}</h1>
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                </svg>&nbsp;
+                <a href="{% url 'projects-project-list' %}">Projets</a>
+            </li>
+            <li class="breadcrumb-item">
+                <span class="text-secondary">
+                    <a href="{% url 'projects-project-detail' project.pk %}">
+                        {{ project.name|capfirst }}
+                    </a>
+                </span>
+            </li>
+        </ol>
+    </nav>
 
-    <h2>Ajouter une note</h2>
+    <h2>
+        <svg class="bi" width="28" height="28" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+        </svg>
+        Ajouter une note
+    </h2>
 
     <section>
 
@@ -19,6 +50,12 @@
 
 		        {% csrf_token %}
 
+            <div class="p-1">
+                <button class="btn btn-outline-primary float-end" type="button" data-bs-toggle="collapse"
+                        data-bs-target=".markdownx-preview" aria-expanded="true" aria-controls="markdownXCollapse">
+                Afficher/Masquer la prévisulation
+                </button>
+            </div>
             {{ form.as_p }}
 
 		        <button type="submit" class="btn btn-primary">

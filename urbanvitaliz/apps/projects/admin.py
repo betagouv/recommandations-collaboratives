@@ -26,8 +26,8 @@ class NoteAdmin(admin.ModelAdmin):
     list_filter = ["tags", "created_on"]
     list_display = ["created_on", "project_name", "tags"]
 
-    def project_name(self):
-        return self.project.name
+    def project_name(self, o):
+        return o.project.name
 
 
 @admin.register(models.Task)
@@ -36,8 +36,8 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = ["deadline", "tags"]
     list_display = ["created_on", "deadline", "project_name", "tags"]
 
-    def project_name(self):
-        return self.project.name
+    def project_name(self, o):
+        return o.project.name
 
 
 @admin.register(models.Document)
