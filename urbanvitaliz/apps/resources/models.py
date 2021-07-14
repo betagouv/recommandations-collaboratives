@@ -53,10 +53,11 @@ class Category(models.Model):
         return cls.objects.filter(deleted=None)
 
 
-class ResourceManager(models.Manager):
+class ResourceQuerySet(models.QuerySet):
     """Specific filters for resources"""
 
     def limit_area(self, communes):
+        """Limit resources that match at least one department of communes"""
         if not communes:
             return self
         departments = set(c.department for c in communes)
@@ -66,7 +67,7 @@ class ResourceManager(models.Manager):
 class Resource(models.Model):
     """Représente une ressource pour les utilisateur·ices d'UV"""
 
-    objects = ResourceManager()
+    objects = ResourceQuerySet.as_manager()
 
     public = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(
