@@ -60,7 +60,7 @@ class ResourceQuerySet(models.QuerySet):
         """Limit resources that match at least one department of communes"""
         if not communes:
             return self
-        departments = set(c.department for c in communes)
+        departments = set(c.department for c in communes if c)
         return self.filter(departments__in=departments).distinct()
 
 
