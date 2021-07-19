@@ -66,13 +66,21 @@
                 {{ contact.last_name }}
             </td>
             <td>
-                {{ contact.service }}
+                {{ contact.service|default:"-" }}
             </td>
             <td>
-                {{ contact.phone_no }}
+                {% if contact.phone_no %}
+                <a href="tel:{{contact.email}}">{{ contact.phone_no }}</a>
+                {% else %}
+                -
+                {% endif %}
             </td>
             <td>
-                {{ contact.email }}
+                {% if contact.email %}
+                <a href="mailto:{{contact.email}}">{{ contact.email }}</a>
+                {% else %}
+                -
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
