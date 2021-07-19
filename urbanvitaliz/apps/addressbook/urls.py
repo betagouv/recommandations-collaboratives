@@ -29,4 +29,9 @@ urlpatterns = [
         views.organization_details,
         name="addressbook-organization-details",
     ),
+    path(
+        r"addressbook/organization/<int:organization_id>/create",
+        views.contact_create,
+        name="addressbook-organization-contact-create",
+    ),
 ]
