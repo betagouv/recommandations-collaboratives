@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",
     "urbanvitaliz.apps.geomatics",
+    "urbanvitaliz.apps.addressbook",
 ]
 
 MIDDLEWARE = [
