@@ -59,14 +59,17 @@
     <!-- Search -->
     <div class="quick-search mb-5">
         <form method="GET">
+            <input id='searching' type='hidden' value='on' name='searching'>
+
             <div class="input-group mb-3">
 
                 {% if limit_area != None and user.is_authenticated %}
                 <div class="input-group-text">
                     <input name="limit_area" class="form-check-input mt-0" type="checkbox" aria-label="Limiter à ma zone géographique"
-                           {% if limit_area %}checked{% endif %}>
+                           {% if limit_area  %}checked{% endif %}>
                     &nbsp;
                     Seulement pour ma région
+
                 </div>
                 {% endif %}
 

@@ -42,7 +42,13 @@ def resource_search(request):
     form = SearchForm(request.GET, initial={"limit_area": True})
     form.is_valid()
     query = form.cleaned_data.get("query", "")
-    limit_area = form.cleaned_data.get("limit_area", True)
+
+    searching = request.GET.get("searching", False)
+    if not searching:
+        limit_area = True
+    else:
+        limit_area = form.cleaned_data.get("limit_area", True)
+
     categories = form.selected_categories
 
     # user communes from her projects if applicable
