@@ -156,6 +156,7 @@
     <div class="row row-cols-1 row-cols-md-4 g-4">
         {% for bookmark in user.bookmarks.all %}
         <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-12">
+            <div>
             {% include "resources/resource/widgets/card_standard.html" with resource=bookmark.resource %}
 
             {% if bookmark.comments %}
@@ -166,6 +167,7 @@
                 {{ bookmark.comments }} &#8210; <a href="{% url "resources-bookmark-create" bookmark.resource.id %}">éditer votre note</a>
             </div>
             {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
