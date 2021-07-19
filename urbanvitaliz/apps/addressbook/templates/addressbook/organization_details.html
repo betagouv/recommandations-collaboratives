@@ -25,14 +25,14 @@
     <div class="w-100">
         <h2 class="mb-3 d-inline-block">
             <svg class="bi" width="28" height="28" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-lines-fill"/>
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
             </svg>
-            Organisations
+            {{ organization.name }}
         </h2>
         {% if user.is_staff %}
-        <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'addressbook-organization-create' %}">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+        <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'addressbook-organization-contact-create' organization.id %}">
+            <svg class="bi me-1" width="16" height="16" fill="currentColor"> 
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-plus"/>
             </svg>
             Ajouter
         </a>
@@ -42,24 +42,37 @@
     <table class="table">
         <tr>
             <th>
+                Prénom
+            </th>
+            <th>
                 Nom
             </th>
             <th>
-                Départements
+                Service
+            </th>
+            <th>
+                Téléphone
+            </th>
+            <th>
+                Courriel
             </th>
         </tr>
-        {% for organization in organizations %}
+        {% for contact in organization.contacts.all %}
         <tr>
-            <td><a class="" href="{% url "addressbook-organization-details" organization.pk %}">{{organization.name }}</a></td>
             <td>
-                {% for department in organization.departments.all %}
-                {{ department.name }} ({{ department.code }})
-                {% if not forloop.last %}
-                /
-                {% endif %}
-                {% empty %}
-                France
-                {% endfor %}
+                {{ contact.first_name }}
+            </td>
+            <td>
+                {{ contact.last_name }}
+            </td>
+            <td>
+                {{ contact.service }}
+            </td>
+            <td>
+                {{ contact.phone_no }}
+            </td>
+            <td>
+                {{ contact.email }}
             </td>
         </tr>
         {% endfor %}
