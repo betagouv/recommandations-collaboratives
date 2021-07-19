@@ -61,7 +61,9 @@ class ResourceQuerySet(models.QuerySet):
         if not communes:
             return self
         departments = set(c.department for c in communes if c)
-        return self.filter(departments__in=departments).distinct()
+        return self.filter(
+            models.Q(departments__in=departments) | models.Q(departments=None)
+        ).distinct()
 
 
 class Resource(models.Model):

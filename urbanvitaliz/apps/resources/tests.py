@@ -107,6 +107,10 @@ def test_resource_list_contains_only_resource_with_area(client):
         public=True,
         departments=departments[:1],
     ).make()
+    resource_national = Recipe(
+        models.Resource, title="national resource", public=True
+    ).make()
+
     url = reverse("resources-resource-search")
     url = f"{url}?limit_area=true&query=resource"
     with login(client) as user:
@@ -115,6 +119,8 @@ def test_resource_list_contains_only_resource_with_area(client):
         ).make()
         response = client.get(url)
     detail_url = reverse("resources-resource-detail", args=[resource1.id])
+    assertContains(response, detail_url)
+    detail_url = reverse("resources-resource-detail", args=[resource_national.id])
     assertContains(response, detail_url)
     detail_url = reverse("resources-resource-detail", args=[resource2.id])
     assertNotContains(response, detail_url)
