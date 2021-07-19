@@ -11,6 +11,9 @@ class Organization(models.Model):
         verbose_name="Départements concernés",
     )
 
+    def __str__(self):
+        return "Organization: {0}".format(self.name)
+
 
 class Contact(models.Model):
     first_name = models.CharField(max_length=50, blank=True)
