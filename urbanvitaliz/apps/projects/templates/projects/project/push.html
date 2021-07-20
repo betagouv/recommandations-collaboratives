@@ -59,6 +59,22 @@
             {% endfor %}
         </div>
 
+        <div class="mb-3">
+            <label class="mb-2" for="input-project-contact">Ajouter un contact ?</label>
+            <select class="form-select form-select-sm {% if form.contact.errors %}is-invalid{% endif %}" id="input-project-contact" name="{{ form.contact.name }}" placeholder="Optionnel, si vous souhaitez recommander aussi un contact." value="{{ form.contact.value|default:'' }}">
+                {% for choice in form.contact.field.choices %}
+                <option value="{{choice.0.instance.id}}"{% if choice == fom.contact.value %}selected="selected"{% endif %}>
+                    {{ choice.0.instance.organization.name|capfirst }} - {{ choice.0.instance.full_name|capfirst }}
+                </option>
+                {% endfor %}
+            </select>
+
+            {% for error in form.contact.errors %}
+            <div class="text-danger text-end">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+
         <div class="form-check form-switch">
             <input name="{{ form.notify_email.name }}" class="form-check-input" type="checkbox" id="input-email-notification" checked>
             <label class="form-check-label" for="input-email-notification">

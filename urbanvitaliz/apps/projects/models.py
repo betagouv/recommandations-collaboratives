@@ -15,8 +15,9 @@ from django.urls import reverse
 
 from markdownx.utils import markdownify
 
-from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
+from urbanvitaliz.apps.resources import models as resources
 
 
 class Project(models.Model):
@@ -193,12 +194,18 @@ class Task(models.Model):
 
         return tags
 
-    intent = models.CharField(max_length=256, blank=True, default="")
-    content = models.TextField(default="")
+    intent = models.CharField(
+        max_length=256, blank=True, default="", verbose_name="Intention"
+    )
+    content = models.TextField(default="", verbose_name="Contenu")
     deadline = models.DateField(null=True, blank=True)
 
     resource = models.ForeignKey(
-        resources.Resource, on_delete=models.CASCADE, null=True
+        resources.Resource, on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    contact = models.ForeignKey(
+        addressbook_models.Contact, on_delete=models.CASCADE, null=True, blank=True
     )
 
     @property
