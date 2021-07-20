@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                </svg>&nbsp;
+                <a href="{% url 'projects-project-list' %}">Projets</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'projects-project-detail' task.project.id %}">{{ task.project.name|title|truncatechars:20 }}</a>
+            </li>
+            <li class="breadcrumb-item active">{{ task.intent|truncatechars:20 }}
+            </li>
+        </ol>
+    </nav>
+
+    <h1 class=" align-items-center">
+        <svg class="bi" width="40" height="40" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
+        </svg>
+        Mettre à jour une action
+    </h1>
+
+    <section>
+
+	      <form id="form-projects-add-task"
+				          method="post"
+				          action="."
+				          class="form-horizontal">
+
+		        {% csrf_token %}
+
+		        {{ form.as_p }}
+
+		        <button type="submit" class="btn btn-primary">
+			          Enregistrer
+		        </button>
+	      </form>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+

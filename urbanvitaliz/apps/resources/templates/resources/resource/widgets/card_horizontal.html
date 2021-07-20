@@ -18,7 +18,7 @@
                     <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"key" }}"/>
                     </svg>
-                    <a href="{% url 'resources-resource-detail' resource.id %}" class="text-reset text-decoration-none stretched-link">
+                    <a href="{% url 'resources-resource-detail' resource.id %}" class="text-break text-reset text-decoration-none stretched-link">
                         {{ resource.title|capfirst }}
                     </a>
                 </div>

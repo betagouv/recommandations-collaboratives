@@ -29,6 +29,7 @@ from urbanvitaliz.utils import send_email
 
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.addressbook import models as addressbook_models
 
 from . import models
 
@@ -240,7 +241,7 @@ def create_task(request, project_id=None):
             return redirect(reverse("projects-project-detail", args=[project_id]))
     else:
         form = TaskForm()
-    return render(request, "projects/project/task.html", locals())
+    return render(request, "projects/project/task_create.html", locals())
 
 
 @login_required
@@ -259,7 +260,7 @@ def update_task(request, task_id=None):
             return redirect(reverse("projects-project-detail", args=[task.project_id]))
     else:
         form = TaskForm(instance=task)
-    return render(request, "projects/project/task.html", locals())
+    return render(request, "projects/project/task_update.html", locals())
 
 
 class TaskForm(forms.ModelForm):
@@ -267,7 +268,16 @@ class TaskForm(forms.ModelForm):
 
     class Meta:
         model = models.Task
-        fields = ["intent", "content", "tags", "public", "deadline", "done"]
+        fields = [
+            "intent",
+            "content",
+            "tags",
+            "public",
+            "deadline",
+            "resource",
+            "contact",
+            "done",
+        ]
 
 
 ########################################################################
@@ -343,7 +353,7 @@ class ResourceTaskForm(forms.ModelForm):
 
     class Meta:
         model = models.Task
-        fields = ["intent", "content", "notify_email"]
+        fields = ["intent", "content", "contact", "notify_email"]
 
 
 ########################################################################
