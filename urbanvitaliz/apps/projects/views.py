@@ -33,6 +33,36 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 
 from . import models
 
+########################################################################
+# notifications
+########################################################################
+
+
+def notify_action_created(request, project, task, resource=None):
+    """
+    Notify the creation of an Action the user by sending an email and displaying
+    a UI popup
+    """
+    send_email(
+        request,
+        user_email=project.email,
+        email_subject="[{0}] UrbanVitaliz vous propose une action".format(project.name),
+        template_base_name="projects/notifications/task_new_email",
+        extra_context={
+            "task": task,
+            "project": project,
+            "resource": resource,
+        },
+    )
+
+    messages.success(
+        request,
+        '{0} a été notifié(e) par courriel de l\'action "{1}".'.format(
+            project.full_name, task.intent
+        ),
+        extra_tags=["email"],
+    )
+
 
 ########################################################################
 # On boarding
@@ -233,14 +263,19 @@ def create_task(request, project_id=None):
     is_staff_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
-        form = TaskForm(request.POST)
+        form = CreateTaskForm(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.project = project
             instance.save()
+
+            # Send notifications
+            if form.cleaned_data["notify_email"]:
+                notify_action_created(request, project, task=instance)
+
             return redirect(reverse("projects-project-detail", args=[project_id]))
     else:
-        form = TaskForm()
+        form = CreateTaskForm()
     return render(request, "projects/project/task_create.html", locals())
 
 
@@ -250,7 +285,7 @@ def update_task(request, task_id=None):
     is_staff_or_403(request.user)
     task = get_object_or_404(models.Task, pk=task_id)
     if request.method == "POST":
-        form = TaskForm(request.POST, instance=task)
+        form = UpdateTaskForm(request.POST, instance=task)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.updated_on = timezone.now()
@@ -259,12 +294,32 @@ def update_task(request, task_id=None):
             instance.project.save()
             return redirect(reverse("projects-project-detail", args=[task.project_id]))
     else:
-        form = TaskForm(instance=task)
+        form = UpdateTaskForm(instance=task)
     return render(request, "projects/project/task_update.html", locals())
 
 
-class TaskForm(forms.ModelForm):
+class CreateTaskForm(forms.ModelForm):
     """Form new project task creation"""
+
+    notify_email = forms.BooleanField(initial=True, required=False)
+
+    class Meta:
+        model = models.Task
+        fields = [
+            "intent",
+            "content",
+            "tags",
+            "public",
+            "deadline",
+            "resource",
+            "contact",
+            "done",
+            "notify_email",
+        ]
+
+
+class UpdateTaskForm(forms.ModelForm):
+    """Form for task update"""
 
     class Meta:
         model = models.Task
@@ -317,27 +372,7 @@ def create_resource_action(request, resource_id=None):
 
             # Send notifications
             if form.cleaned_data["notify_email"]:
-                send_email(
-                    request,
-                    user_email=project.email,
-                    email_subject="[{0}] UrbanVitaliz vous propose une action".format(
-                        project.name
-                    ),
-                    template_base_name="projects/notifications/task_new_email",
-                    extra_context={
-                        "task": task,
-                        "project": project,
-                        "resource": resource,
-                    },
-                )
-
-                messages.success(
-                    request,
-                    '{0} a été notifié(e) par courriel de l\'action "{1}".'.format(
-                        project.full_name, task.intent
-                    ),
-                    extra_tags=["email"],
-                )
+                notify_action_created(request, project, task, resource)
 
             next_url = reverse("projects-project-detail", args=[project.id])
             return redirect(next_url)
