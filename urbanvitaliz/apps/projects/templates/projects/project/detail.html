@@ -315,7 +315,7 @@
                         {% endif %}
                         {% if task.contact %}
                         <div class="relative  {% if task.resource %}ms-2{% endif %}" style="width: 50%;">
-                            {% include "resources/resource/widgets/card_contact_horizontal.html" with contact=task.contact %}
+                            {% include "addressbook/widgets/card_contact_horizontal.html" with contact=task.contact %}
                         </div>
                         {% endif %}
                     </div>
@@ -350,7 +350,7 @@
                             <svg class="bi me-1" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
                             </svg>
-                            <a class="text-reset" href="mailto:contact@urbanvitaliz.fr?subject=[{{ project.name|truncatechars:10 }}] {{ task.intent|truncatewords:10 }}">En discuter avec l'équipe UrbanVitaliz</a>
+                            <a class="text-reset" href="mailto:contact@urbanvitaliz.fr?subject=[{{ project.name|truncatechars:10 }}] {{ task.intent|truncatewords:10 }}">J'ai une question/un problème</a>
                         </div>
                     </div>
 
