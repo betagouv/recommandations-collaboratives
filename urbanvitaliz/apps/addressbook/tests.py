@@ -64,7 +64,7 @@ def test_organization_list_available_for_staff_users(client):
 
 @pytest.mark.django_db
 def test_create_contact_not_available_for_non_staff_users(client):
-    organization = Recipe(models.Contact).make()
+    organization = Recipe(models.Organization).make()
     url = reverse(
         "addressbook-organization-contact-create",
         args=[organization.id],
@@ -76,7 +76,7 @@ def test_create_contact_not_available_for_non_staff_users(client):
 
 @pytest.mark.django_db
 def test_create_contact_available_for_staff_users(client):
-    organization = Recipe(models.Contact).make()
+    organization = Recipe(models.Organization).make()
     url = reverse(
         "addressbook-organization-contact-create",
         args=[organization.id],
