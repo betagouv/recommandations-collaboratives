@@ -94,8 +94,20 @@ class Project(models.Model):
         return Task.fetch().filter(project=self).order_by("deadline", "created_on")
 
 
+class NoteManager(models.Manager):
+    """Manager for active tasks"""
+
+    def public(self):
+        return self.filter(private=False)
+
+    def private(self):
+        return self.filter(private=True)
+
+
 class Note(models.Model):
     """Représente un suivi de project"""
+
+    objects = NoteManager()
 
     project = models.ForeignKey("Project", on_delete=models.CASCADE)
     public = models.BooleanField(default=False, blank=True)

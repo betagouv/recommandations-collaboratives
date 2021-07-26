@@ -506,7 +506,6 @@ def test_update_task_for_project_and_redirect(client):
 # notes
 ########################################################################
 
-
 #
 # create
 
@@ -541,6 +540,24 @@ def test_create_new_note_for_project_and_redirect(client):
     note = models.Note.fetch()[0]
     assert note.project == project
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_private_note_shown_only_to_staff(client):
+    user_email = "not@admin.here"
+    note_content = "this is a private note"
+    project = Recipe(models.Project, email=user_email).make()
+    with login(client, is_staff=True):
+        response = client.post(
+            reverse("projects-create-note", args=[project.id]),
+            data={"content": note_content},
+        )
+
+    with login(client, username="project_owner", email=user_email, is_staff=False):
+        response = client.get(project.get_absolute_url())
+
+    assertNotContains(response, note_content)
+
 
 
 #

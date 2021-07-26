@@ -1,0 +1,62 @@
+{% load static %}
+{% load humanize %}
+
+{% if not notes.count %}
+
+<div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
+    <div>
+        Aucune note actuellement pour ce projet.
+        {% if user.is_staff %}
+        C'est le bon moment pour
+        <a href="{% url 'projects-create-note' project.id %}">
+            en créer une première.
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{% else %}
+
+<div class="row row-cols-1 row-cols-md-2">
+
+    {% for note in notes %}
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="card-subtitle mb-2 text-muted">
+                    {% for tag in note.tags_as_list %}
+                    #{{ tag }}&nbsp;
+                    {% endfor %}
+                </div>
+
+                <div class="card-text">
+                    <span id="excerpt-{{ forloop.counter }}">{{ note.content_rendered|safe|truncatechars_html:500  }}</span>
+                    {% if note.content_rendered|safe|truncatechars_html:501|length > 500 %}
+                    <span id="more-{{ forloop.counter }}" style="display: none;">{{ note.content_rendered|safe }}</span>
+                    <a class="" href="#more-{{ forloop.counter }}" onclick="textFoldToggle({{ forloop.counter }})" id="foldBtn-{{ forloop.counter }}">[Lire tout]</a>
+                    {% endif %}
+                </div>
+
+            </div>
+            <div class="card-footer">
+                {% if note.public %}
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note publique">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
+                    </svg>
+                </span>
+                {% else %}
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note privée">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-slash"/>
+                    </svg>
+                </span>
+                {% endif %}
+                &nbsp;
+                <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em> - <a href="{% url 'projects-update-note' note.id %}">éditer</a></span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
