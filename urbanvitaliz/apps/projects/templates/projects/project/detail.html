@@ -333,7 +333,7 @@
                         <svg class="bi me-2 align-baseline" width="18" height="18" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-right-quote"/>
                         </svg>
-                        <span class="text-break text-secondary">{{ task.content|linebreaksbr|capfirst }}</span>
+                        <span class="text-break text-secondary">{{ task.content_rendered|safe }}</span>
                     </div>
                 </div>
 

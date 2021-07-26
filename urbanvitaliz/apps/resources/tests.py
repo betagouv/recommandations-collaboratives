@@ -135,7 +135,7 @@ def test_resource_detail_available_for_all_users(client):
     resource = Recipe(models.Resource).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     response = client.get(url)
-    
+
     assert response.status_code == 200
 
 

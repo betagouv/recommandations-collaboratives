@@ -7,30 +7,42 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('resources', '0014_alter_resource_departments'),
-        ('addressbook', '0002_auto_20210720_0948'),
-        ('projects', '0012_task_contact'),
+        ("resources", "0014_alter_resource_departments"),
+        ("addressbook", "0002_auto_20210720_0948"),
+        ("projects", "0012_task_contact"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='task',
-            name='contact',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='addressbook.contact'),
+            model_name="task",
+            name="contact",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="addressbook.contact",
+            ),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='content',
-            field=models.TextField(default='', verbose_name='Contenu'),
+            model_name="task",
+            name="content",
+            field=models.TextField(default="", verbose_name="Contenu"),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='intent',
-            field=models.CharField(blank=True, default='', max_length=256, verbose_name='Intention'),
+            model_name="task",
+            name="intent",
+            field=models.CharField(
+                blank=True, default="", max_length=256, verbose_name="Intention"
+            ),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='resource',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='resources.resource'),
+            model_name="task",
+            name="resource",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="resources.resource",
+            ),
         ),
     ]

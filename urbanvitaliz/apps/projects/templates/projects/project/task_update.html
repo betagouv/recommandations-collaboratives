@@ -2,6 +2,7 @@
 
 {% load static %}
 
+
 {% block content %}
 
 <div class="col-11 py-5 mx-auto">
@@ -34,7 +35,7 @@
 	      <form id="form-projects-add-task"
 				          method="post"
 				          action="."
-				          class="form-horizontal">
+				          class="form">
 
 		        {% csrf_token %}
 
@@ -43,7 +44,11 @@
 		        <button type="submit" class="btn btn-primary">
 			          Enregistrer
 		        </button>
+
+            {{ form.media }}
 	      </form>
+
+        
 
     </section>
 

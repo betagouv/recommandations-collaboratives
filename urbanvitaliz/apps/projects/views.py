@@ -171,7 +171,7 @@ def project_update(request, project_id=None):
             postcode = project.commune.postal
         else:
             postcode = None
-        form = ProjectForm(instance=project, initial={'postcode': postcode})
+        form = ProjectForm(instance=project, initial={"postcode": postcode})
     return render(request, "projects/project/update.html", locals())
 
 
@@ -326,6 +326,8 @@ def update_task(request, task_id=None):
 class CreateTaskForm(forms.ModelForm):
     """Form new project task creation"""
 
+    content = MarkdownxFormField()
+
     notify_email = forms.BooleanField(initial=True, required=False)
 
     class Meta:
@@ -345,6 +347,8 @@ class CreateTaskForm(forms.ModelForm):
 
 class UpdateTaskForm(forms.ModelForm):
     """Form for task update"""
+
+    content = MarkdownxFormField()
 
     class Meta:
         model = models.Task
