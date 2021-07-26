@@ -106,7 +106,16 @@
 
             {% if user.is_staff %}
             <div class="d-grid gap-2 mt-3">
-                <span class="d-inline-block">
+                <span class="d-inline-block"> 
+                    <a href="{% url 'projects-project-update' project.id %}" class="btn btn-light w-100 btn-sm">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
+                        </svg>
+                        &nbsp;
+                        Éditer
+                    </a>
+                </span>
+                <span class="d-inline-block"> 
                     <form method="POST" action="{% url 'projects-push-resource' project.id %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-light w-100 btn-sm" role="submit">
