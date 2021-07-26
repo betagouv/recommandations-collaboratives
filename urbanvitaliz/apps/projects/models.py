@@ -135,6 +135,7 @@ class Note(models.Model):
 
     content = models.TextField(default="")
 
+    @property
     def content_rendered(self):
         """Return content as markdown"""
         return markdownify(self.content)
@@ -210,6 +211,12 @@ class Task(models.Model):
         max_length=256, blank=True, default="", verbose_name="Intention"
     )
     content = models.TextField(default="", verbose_name="Contenu")
+
+    @property
+    def content_rendered(self):
+        """Return content as markdown"""
+        return markdownify(self.content)
+
     deadline = models.DateField(null=True, blank=True)
 
     resource = models.ForeignKey(
