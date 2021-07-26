@@ -40,6 +40,7 @@
                 {{ resource.title|title }}
 
                 <!-- Toggle Bookmarking -->
+                {% if user.is_authenticated %}
                 {% if resource.id in user.bookmarks.as_list %}
                 <form class="d-inline align-middle" method="POST" action="{% url "resources-bookmark-delete" resource.id %}">
                     {% csrf_token %}
@@ -60,6 +61,7 @@
                     </button>
                 </form>
 
+                {% endif %}
                 {% endif %}
             </h1>
 

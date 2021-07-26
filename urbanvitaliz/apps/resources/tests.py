@@ -131,12 +131,12 @@ def test_resource_list_contains_only_resource_with_area(client):
 
 
 @pytest.mark.django_db
-def test_resource_detail_not_available_for_non_logged_users(client):
+def test_resource_detail_available_for_all_users(client):
     resource = Recipe(models.Resource).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     response = client.get(url)
-    login_url = "{}?next={}".format(reverse("magicauth-login"), url)
-    assertRedirects(response, login_url)
+    
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
