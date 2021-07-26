@@ -223,7 +223,7 @@ def create_note(request, project_id=None):
             return redirect(reverse("projects-project-detail", args=[project_id]))
     else:
         form = NoteForm()
-    return render(request, "projects/project/note.html", locals())
+    return render(request, "projects/project/note_create.html", locals())
 
 
 @login_required
@@ -244,7 +244,24 @@ def update_note(request, note_id=None):
             return redirect(reverse("projects-project-detail", args=[note.project_id]))
     else:
         form = NoteForm(instance=note)
-    return render(request, "projects/project/note.html", locals())
+    return render(request, "projects/project/note_update.html", locals())
+
+
+@login_required
+def delete_note(request, note_id=None):
+    """Delete existing note for a project"""
+    is_staff_or_403(request.user)
+    note = get_object_or_404(models.Note, pk=note_id)
+    project = note.project  # For template consistency
+
+    if request.method == "POST":
+        note.updated_on = timezone.now()
+        note.deleted = timezone.now()
+        note.save()
+        note.project.updated_on = note.updated_on
+        note.project.save()
+
+    return redirect(reverse("projects-project-detail", args=[note.project_id]))
 
 
 class NoteForm(forms.ModelForm):
