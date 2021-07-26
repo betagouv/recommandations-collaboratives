@@ -27,13 +27,13 @@ DEBUG = False
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.humanize",
     "django.contrib.staticfiles",
+    "django.contrib.admin",
     "magicauth",
     "sass_processor",
     "markdownx",
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",
     "urbanvitaliz.apps.geomatics",
+    "urbanvitaliz.apps.addressbook",
 ]
 
 MIDDLEWARE = [

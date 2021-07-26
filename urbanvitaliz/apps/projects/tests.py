@@ -598,6 +598,7 @@ def test_staff_push_resource_to_project(client):
         response = client.post(url)
     # project is stored in session and user redirected to resource app.
     assert client.session["project_id"] == project.id
+
     newurl = reverse("resources-resource-search")
     assertRedirects(response, newurl)
 

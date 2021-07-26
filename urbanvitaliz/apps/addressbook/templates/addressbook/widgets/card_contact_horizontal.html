@@ -1,0 +1,32 @@
+{% load static %}
+
+<!-- Horizontal Card -->
+<div class="card-resource card-resource-horizontal card h-100" style="min-height: 100px;">
+    <!-- <hr class="middle-hr" /> -->
+    <div class="card-body">
+        <div class="card-title mb-4">
+            <div class="row">
+                <!-- <div class="icon-placeholder  d-inline"> -->
+                <!--</div> -->
+                <!-- <span class="col-8 category">
+                     <span class="badge bg-light text-dark">
+                     {{ resource.category.name|default:"Ressource" }}
+                     </span>
+                     </span>
+                -->
+                <div class="title">
+                    <svg class="bi me-2 bg-color-darkgrey resource-icon">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
+                    </svg>
+                    {{ contact.full_name|title }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-text">
+            <div class="small text-secondary subtitle">{{ contact.organization.name|truncatechars:120 }}</div>
+            <div class="small text-secondary">{{ contact.phone_no }}</div>
+            <div class="small text-secondary"><a href="mailto:{{contact.email}}">{{ contact.email }}</a></div>
+        </div>
+    </div>
+</div>
