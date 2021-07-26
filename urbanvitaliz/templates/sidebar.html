@@ -33,12 +33,12 @@
                     {% for project in request.session.projects %}
                     <li class="list-group-item list-group-item-action bg-light border-0 border-bottom">
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-break text-truncate">
+                            <span class="text-break text-truncate"">
 
                                 <svg class="bi me-1" width="16" height="16">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
                                 </svg>
-                                <a class="stretched-link text-reset text-decoration-none" href="{% url "projects-project-detail" project.id %}">{{ project.name|capfirst }}</a>
+                                <a class="stretched-link text-reset text-decoration-none" href="{% url "projects-project-detail" project.id %}">{{ project.name|truncatechars:12|capfirst }}</a>
                             </span>
                             {% if project.actions_open > 0 %}
                             <div>
