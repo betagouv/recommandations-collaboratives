@@ -56,6 +56,11 @@ urlpatterns = [
         name="projects-create-note",
     ),
     path(
+        r"note/<int:note_id>/delete/",
+        views.delete_note,
+        name="projects-delete-note",
+    ),
+    path(
         r"note/<int:note_id>/",
         views.update_note,
         name="projects-update-note",

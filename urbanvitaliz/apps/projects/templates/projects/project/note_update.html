@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block js %}
+<script type="text/javascript">
+ // Bootstrap needs collapse/show class to toggle correctly
+ $(document).ready(function() {
+     $(".markdownx-preview").addClass("collapse show");
+ });
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                </svg>&nbsp;
+                <a href="{% url 'projects-project-list' %}">Projets</a>
+            </li>
+            <li class="breadcrumb-item">
+                <span class="text-secondary">
+                    <a href="{% url 'projects-project-detail' project.pk %}">
+                        {{ project.name|capfirst }}
+                    </a>
+                </span>
+            </li>
+        </ol>
+    </nav>
+
+    <h2>
+        <svg class="bi" width="28" height="28" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+        </svg>
+        Mettre à jour une note
+    </h2>
+
+    <section>
+
+	      <form id="form-projects-add-note"
+				      method="post"
+				      action="."
+				      class="form">
+
+		        {% csrf_token %}
+
+            <div class="p-1">
+                <button class="btn btn-outline-primary float-end" type="button" data-bs-toggle="collapse"
+                        data-bs-target=".markdownx-preview" aria-expanded="true" aria-controls="markdownXCollapse">
+                Afficher/Masquer la prévisulation
+                </button>
+            </div>
+            {{ form.as_p }}
+
+		        <button type="submit" class="btn btn-primary">
+			          Enregistrer
+		        </button>
+
+	      </form>
+
+        <hr/>
+        <div class="d-flex justify-content-end">
+            <form id="form-projects-delete-note" method="POST" action="{% url 'projects-delete-note' note.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <svg class="bi " width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash"/>
+                    </svg>
+			              Supprimer
+		            </button>
+            </form>
+        </div>
+
+        {{ form.media }}
+
+    </section>
+
+{% endblock %}
+
+
+

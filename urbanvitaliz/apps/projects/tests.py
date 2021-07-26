@@ -145,7 +145,7 @@ def test_my_projects_are_displayed_on_page(client):
         project = Recipe(models.Project, email=user.email).make()
         response = client.get(url)
     # template does a capfirst that capitalize the first word of title
-    assertContains(response, project.name.capitalize())
+    assertContains(response, project.name.capitalize()[:20]) # truncated name
     assert response.status_code == 200
 
 
@@ -598,6 +598,20 @@ def test_update_note_for_project_and_redirect(client):
     assert note.content == data["content"]
     assert note.updated_on > updated_on_before
     assert note.project.updated_on == note.updated_on
+
+    assert response.status_code == 302
+
+@pytest.mark.django_db
+def test_delete_note_for_project_and_redirect(client):
+    project = Recipe(models.Project).make()
+    note = Recipe(models.Note, project=project).make()
+    url = reverse("projects-delete-note", args=[note.id])
+
+    with login(client, is_staff=True):
+        response = client.post(url)
+
+    note = models.Note.objects.get(id=note.id)
+    assert note.deleted != None
 
     assert response.status_code == 302
 
