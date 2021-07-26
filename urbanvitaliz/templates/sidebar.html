@@ -85,6 +85,7 @@
             </li>
 
             {% if user.is_staff %}
+            <!-- Project List -->
             <li>
                 <a href="{% url 'projects-project-list' %}" class="nav-link link-dark">
                     <svg class="bi me-2" width="16" height="16">
@@ -101,6 +102,18 @@
                     </li>
                 </ul>
             </li>
+
+
+            <!-- Address Book -->
+            <li>
+                <a href="{% url 'addressbook-organization-list' %}" class="nav-link link-dark">
+                    <svg class="bi me-2" width="16" height="16">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-lines-fill"/>
+                    </svg>
+                    Carnet d'adresses
+                </a>
+            </li>
+
             {% endif %}
 
             {% if not user.is_staff %}
