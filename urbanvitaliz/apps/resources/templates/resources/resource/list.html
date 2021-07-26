@@ -28,7 +28,7 @@
                 <svg class="bi" width="38" height="38" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
                 </svg>
-                Ressources
+                Ressources {% if resources.count %}<span class="text-secondary">({{ resources.count }})</span>{% endif %}
             </h1>
 
             <div class="text-secondary small mb-3">
@@ -68,7 +68,7 @@
                     <input name="limit_area" class="form-check-input mt-0" type="checkbox" aria-label="Limiter à ma zone géographique"
                            {% if limit_area  %}checked{% endif %}>
                     &nbsp;
-                    Seulement pour ma région
+                    Seulement pour mon département
 
                 </div>
                 {% endif %}
@@ -132,7 +132,7 @@
             Aucun résulat trouvé pour "<em>{{ query }}</em>" ;-( <br/>
             <span class="text-secondary">Essayez de supprimer des mots-clés ou d'ajouter des catégories.</span>
             <br/>
-            <span class="small">Vous pouvez aussi <a href="{% url 'resources-resource-search' %}">réinitialiser</a> vos critères de recherche.</span>
+            <span class="small">Vous pouvez aussi <a href="{% url 'resources-resource-search' %}">réinitialiser</a> vos critères de recherche ou <a href="?searching=on">élargir la zone géographique</a>.</span>
         </div>
         {% else %}
         <div class="col-12">
