@@ -201,6 +201,25 @@
         {{ resource.content_rendered|safe }}
     </div>
 
+    {% if resource.contacts.count %}
+    <div class="contact-list mt-5 mb-5">
+        <h3>
+            <svg class="bi me-2 align-middle" width="24" height="24">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
+            </svg>
+            Contact{{ resource.contacts.count|pluralize }}
+        </h3>
+        <div class="row row-cols-1 row-cols-md-2">
+            {% for contact in resource.contacts.all %}
+            <div class="col" id="contact-{{ contact.id }}">
+                {% include 'addressbook/widgets/card_contact_horizontal.html' with contact=contact show_id=True %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <li class="list-group-item border-0 p-0 mb-3">
     <div class="bd-callout mt-6">
         <svg class="bi me-2 align-middle" width="24" height="24">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle-fill"/>

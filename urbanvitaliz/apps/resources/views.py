@@ -207,6 +207,7 @@ class EditResourceForm(forms.ModelForm):
             "category",
             "departments",
             "content",
+            "contacts",
         ]
 
 
