@@ -18,15 +18,33 @@
                     <svg class="bi me-2 bg-color-darkgrey resource-icon">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
                     </svg>
-                    {{ contact.full_name|title }}
+                    {{ contact.full_name|title }} {% if show_id and user.is_staff %}
+                    <span class="text-secondary">#contact-{{ contact.id }}</span>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
         <div class="card-text">
             <div class="small text-secondary subtitle">{{ contact.organization.name|truncatechars:120 }}</div>
-            <div class="small text-secondary">{{ contact.phone_no }}</div>
-            <div class="small text-secondary"><a href="mailto:{{contact.email}}">{{ contact.email }}</a></div>
+            {% if contact.phone_no %}
+            <div class="small text-secondary">
+                <svg class="bi" width="12" height="12" >
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone"/>
+                </svg>
+                &nbsp;
+                <a href="tel:{{contact.phone_no}}">{{ contact.phone_no }}</a>
+            </div>
+            {% endif %}
+            {% if contact.email %}
+            <div class="small text-secondary">
+                <svg class="bi" width="12" height="12" >
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+                </svg>
+                &nbsp;
+                <a href="mailto:{{contact.email}}">{{ contact.email }}</a>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

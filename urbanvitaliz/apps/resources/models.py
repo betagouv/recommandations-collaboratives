@@ -15,6 +15,7 @@ from django.utils import timezone
 
 from django.contrib.auth import models as auth
 
+from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 
 
@@ -103,6 +104,10 @@ class Resource(models.Model):
     subtitle = models.CharField(max_length=512, default="")
     summary = models.CharField(max_length=512, default="")
     content = models.TextField()
+
+    contacts = models.ManyToManyField(
+        addressbook_models.Contact, blank=True, verbose_name="Contacts associés"
+    )
 
     departments = models.ManyToManyField(
         geomatics_models.Department,
