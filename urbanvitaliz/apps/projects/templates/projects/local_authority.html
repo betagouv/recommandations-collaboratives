@@ -75,7 +75,7 @@
         <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-action">
             <div class="d-flex me-auto justify-content-between">
                 <h4 class="mb-1">
-                    <a class="text-reset stretched-link" href="{% url "projects-project-detail" project.id %}">{{ project.name|title }}</a>
+                    <a class="text-reset stretched-link" href="{% url "projects-project-detail" project.id %}">{{ project.name|title|truncatechars:40 }}</a>
                     <span class="d-block fs-6 text-secondary">{{ project.location|capfirst }}</span>
                 </h4>
             </div>
