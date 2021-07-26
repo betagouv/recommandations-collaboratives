@@ -161,11 +161,17 @@ def project_update(request, project_id=None):
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
             instance = form.save(commit=False)
+            postcode = form.cleaned_data.get("postcode")
+            project.commune = geomatics.Commune.get_by_postal_code(postcode)
             instance.updated_on = timezone.now()
             instance.save()
             return redirect(reverse("projects-project-detail", args=[project_id]))
     else:
-        form = ProjectForm(instance=project)
+        if project.commune:
+            postcode = project.commune.postal
+        else:
+            postcode = None
+        form = ProjectForm(instance=project, initial={'postcode': postcode})
     return render(request, "projects/project/update.html", locals())
 
 
@@ -195,6 +201,8 @@ def project_delete(request, project_id=None):
 class ProjectForm(forms.ModelForm):
     """Form for updating the base information of a project"""
 
+    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
+
     class Meta:
         model = models.Project
         fields = [
@@ -203,9 +211,9 @@ class ProjectForm(forms.ModelForm):
             "last_name",
             "org_name",
             "name",
+            "postcode",
             "location",
             "description",
-            "impediments",
         ]
 
 
