@@ -7,25 +7,34 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('survey', '0002_question_text'),
+        ("survey", "0002_question_text"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='answer',
-            name='session',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='answers', to='survey.session'),
+            model_name="answer",
+            name="session",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="answers",
+                to="survey.session",
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='answer',
-            name='value',
-            field=models.CharField(default='', max_length=30),
+            model_name="answer",
+            name="value",
+            field=models.CharField(default="", max_length=30),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='question',
-            name='question_set',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='questions', to='survey.questionset'),
+            model_name="question",
+            name="question_set",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="questions",
+                to="survey.questionset",
+            ),
         ),
     ]

@@ -8,12 +8,11 @@ created: 2021-06-27 12:06:10 CEST
 """
 
 import pytest
-from django.test import TestCase
 from django.urls import reverse
 from model_bakery.recipe import Recipe
 from urbanvitaliz.utils import login
 
-from . import forms, models
+from . import models
 
 
 #####
@@ -28,7 +27,7 @@ def test_session_next_question_if_none():
     session = Recipe(models.Session, survey=survey).make()
 
     next_q = session.next_question()
-    assert next_q == None
+    assert next_q is None
 
 
 @pytest.mark.django_db
