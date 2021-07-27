@@ -29,7 +29,6 @@ from urbanvitaliz.utils import send_email
 
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.addressbook import models as addressbook_models
 
 from . import models
 
@@ -260,7 +259,6 @@ def delete_note(request, note_id=None):
     """Delete existing note for a project"""
     is_staff_or_403(request.user)
     note = get_object_or_404(models.Note, pk=note_id)
-    project = note.project  # For template consistency
 
     if request.method == "POST":
         note.updated_on = timezone.now()
