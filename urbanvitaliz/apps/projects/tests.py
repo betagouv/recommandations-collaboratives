@@ -611,7 +611,7 @@ def test_delete_note_for_project_and_redirect(client):
         response = client.post(url)
 
     note = models.Note.objects.get(id=note.id)
-    assert note.deleted != None
+    assert note.deleted is not None
 
     assert response.status_code == 302
 
