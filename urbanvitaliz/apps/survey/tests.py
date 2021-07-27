@@ -17,6 +17,33 @@ from . import forms, models
 
 
 #####
+# Session
+#####
+@pytest.mark.django_db
+def test_session_next_question_if_none():
+    survey = Recipe(models.Survey).make()
+    Recipe(models.QuestionSet, survey=survey).make()
+    Recipe(models.QuestionSet, survey=survey).make()
+
+    session = Recipe(models.Session, survey=survey).make()
+
+    next_q = session.next_question()
+    assert next_q == None
+
+
+@pytest.mark.django_db
+def test_session_next_question_succeed():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, text="Q1", question_set=qs).make()
+
+    session = Recipe(models.Session, survey=survey).make()
+    next_q = session.next_question()
+
+    assert next_q == q1
+
+
+#####
 # Question Sets
 #####
 @pytest.mark.django_db
@@ -80,9 +107,32 @@ def test_answered_question_is_saved_to_session(client):
     with login(client, is_staff=False):
         client.post(url, data={"answer": choice.value})
 
-    # Fetch persisted asnwer
+    # Fetch persisted answer
     answer = models.Answer.objects.get(session=session, question=q1)
     assert answer.value == choice.value
+
+
+@pytest.mark.django_db
+def test_answered_question_is_updated_to_session(client):
+    """Make sure we update and don't duplicated Answer on update"""
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    Recipe(models.Question, question_set=qs).make()
+    choice1 = Recipe(models.Choice, question=q1, value="yep").make()
+    choice2 = Recipe(models.Choice, question=q1, value="nope").make()
+
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+    with login(client, is_staff=False):
+        client.post(url, data={"answer": choice1.value})
+        client.post(url, data={"answer": choice2.value})
+
+    # Fetch persisted answer
+    assert models.Answer.objects.filter(session=session, question=q1).count() == 1
+
+    answer = models.Answer.objects.get(session=session, question=q1)
+    assert answer.value == choice2.value
 
 
 @pytest.mark.django_db
