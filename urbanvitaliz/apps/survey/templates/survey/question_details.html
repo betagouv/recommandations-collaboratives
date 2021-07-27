@@ -4,15 +4,29 @@
 
 <div class="col-11 py-5 mx-auto">
 
-        <h2>{{ question.question_set.heading }}</h2>
+        <h2>Thématique : {{ question.question_set.heading }}</h2>
+        <p>{{ question.question_set.subheading }}</p>
 
-        <h3>{{ question.text }}</h3>
+        <h3>Q : {{ question.text }}</h3>
+
         <form method="POST">
             {% csrf_token %}
             {{ form.as_p }}
 
-            <button class="btn btn-primary" type="submit">Suivant</button>
+            <button class="btn btn-primary" type="submit">Valider</button>
+            {% if question.next %}
+            <a class="btn btn-secondary" href="{% url 'survey-question-details' session.id question.next.id %}">Je ne sais pas, je passe</a>
+            {% else %}
+            <a class="btn btn-warning" href="{% url 'survey-session-details' session.id %}">Je Break!</a>
+            {% endif %}
         </form>
+
+        {% if question.previous %}
+        <ul>
+            <li><a href="{% url 'survey-question-details' session.id question.previous.id %}">Revenir à la question précédente</a></li>
+            <li>        <a href="{% url 'survey-session-details' session.id %}">Revenir au tableau de bord</a></li>
+        </ul>
+        {% endif %}
 
 </div>
 

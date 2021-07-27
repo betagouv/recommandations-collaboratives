@@ -31,9 +31,13 @@ def survey_question_details(request, session_id, question_id):
     """Display a single question and go to next"""
     session = get_object_or_404(models.Session, pk=session_id)
     question = get_object_or_404(models.Question, pk=question_id)
+    try:
+        answer = models.Answer.objects.get(question=question, session=session)
+    except models.Answer.DoesNotExist:
+        answer = None
 
     if request.method == "POST":
-        form = AnswerForm(question, request.POST)
+        form = AnswerForm(question, answer, request.POST)
         if form.is_valid():
             form.update_session(session)
             next_question = question.next()
@@ -55,6 +59,6 @@ def survey_question_details(request, session_id, question_id):
                 # Nothing more, send to done page
                 return redirect("survey-session-done", session_id=session.pk)
     else:
-        form = AnswerForm(question)
+        form = AnswerForm(question, answer)
 
     return render(request, "survey/question_details.html", locals())
