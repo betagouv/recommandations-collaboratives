@@ -4,31 +4,53 @@
 
 <div class="col-11 py-5 mx-auto">
 
-    <h1>Bienvenue chez Julien Lepers</h1>
+    <h1>Questions pour un·e Champion·ne</h1>
+
+    <p>
+        Ce qui vous attend :
+
+        <ul>
+            {% for qs in session.survey.question_sets.all %}
+            <li>{{ qs.questions.count }} question{{ qs.questions.count|pluralize }} dans la thématique  <strong>{{ qs.heading }}</strong></li>
+            {% endfor %}
+        </ul>
+    </p>
 
     {% if session.answers.count %}
 
     {% if session.next_question %}
-    Vous avez déjà commencé à répondre aux questions. <a href="{% url 'survey-question-details' session.id session.next_question.id %}">Continuer</a> ?
+    <p>
+        Vous avez déjà commencé à répondre aux questions. <a href="{% url 'survey-question-details' session.id session.next_question.id %}">Continuer</a> ?
+    </p>
     {% else %}
-    Vous avez tout fini!
+    <p>
+        Wahooo, vous avez <strong>tout fini</strong>!
+    </p>
     {% endif %}
 
 
-    <h2>Vous avez déjà répondu à</h2>
+    <h4>Vous avez déjà répondu à</h4>
 
-    <table>
+    <table class="table">
         <tr>
+            <th>Section</th>
             <th>Question</th>
             <th>Réponse</th>
+            <th>Commentaire</th>
         </tr>
         {% for answer in session.answers.all %}
         <tr>
+            <td>
+                {{ answer.question.question_set }}
+            </td>
             <td>
                 <a href="{% url 'survey-question-details' session.id answer.question.id %}">{{ answer.question.text }}</a>
             </td>
             <td>
                 {{ answer.value }}
+            </td>
+            <td>
+                {{ answer.comment }}
             </td>
         </tr>
         {% endfor %}

@@ -142,4 +142,6 @@ class Answer(models.Model):
         Question, related_name="answers", on_delete=models.CASCADE
     )
     value = models.CharField(max_length=30)
+    comment = models.TextField(blank=True)
+
     # tags =

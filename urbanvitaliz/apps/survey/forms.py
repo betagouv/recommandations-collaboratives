@@ -14,8 +14,11 @@ from . import models
 
 class AnswerForm(forms.Form):
     answer = forms.ChoiceField(widget=forms.RadioSelect())
+    comment = forms.CharField(widget=forms.Textarea, required=False)
 
-    def __init__(self, question: models.Question, *args, **kwargs):
+    def __init__(
+        self, question: models.Question, answer: models.Answer, *args, **kwargs
+    ):
         self.question = question
         super().__init__(*args, **kwargs)
 
@@ -24,15 +27,22 @@ class AnswerForm(forms.Form):
             choices.append((choice.value, choice.text))
         self.fields["answer"].choices = choices
 
+        # If we already have an answer, prefill
+        if answer:
+            self.fields["answer"].initial = answer.value
+            self.fields["comment"].initial = answer.comment
+
     def update_session(self, session: models.Session):
         answer_value = self.cleaned_data.get("answer")
+        comment = self.cleaned_data.get("comment", None)
         answer, created = models.Answer.objects.get_or_create(
             session=session,
             question=self.question,
-            defaults={"value": answer_value},
+            defaults={"value": answer_value, "comment": comment},
         )
         if not created:
             answer.value = answer_value
+            answer.comment = comment
             answer.save()
 
         return True
