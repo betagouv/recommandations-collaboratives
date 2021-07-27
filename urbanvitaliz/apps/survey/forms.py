@@ -16,9 +16,18 @@ class AnswerForm(forms.Form):
     answer = forms.ChoiceField(widget=forms.RadioSelect())
 
     def __init__(self, question: models.Question, *args, **kwargs):
+        self.question = question
         super().__init__(*args, **kwargs)
 
         choices = []
         for choice in question.choices.all():
             choices.append((choice.value, choice.text))
         self.fields["answer"].choices = choices
+
+    def update_session(self, session: models.Session):
+        answer_value = self.cleaned_data.get("answer")
+        models.Answer.objects.get_or_create(
+            session=session, question=self.question, value=answer_value
+        )
+
+        return True

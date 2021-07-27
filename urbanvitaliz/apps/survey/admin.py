@@ -12,6 +12,15 @@ class SurveyAdmin(admin.ModelAdmin):
         return obj.question_sets.count()
 
 
+@admin.register(models.Session)
+class SessionAdmin(admin.ModelAdmin):
+    list_display = ["answers_count"]
+
+    @admin.display(description="Answers count")
+    def answers_count(self, obj):
+        return obj.answers.count()
+
+
 @admin.register(models.QuestionSet)
 class QuestionSetAdmin(admin.ModelAdmin):
     list_display = ["heading", "q_count"]
@@ -33,4 +42,4 @@ class ChoiceAdmin(admin.ModelAdmin):
 
 @admin.register(models.Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("session", "question", "value")

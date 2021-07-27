@@ -2,10 +2,18 @@
 
 {% block content %}
 
-{{ question.text }}
-<form>
-    {{ form.as_p }}
-</form>
+<div class="col-11 py-5 mx-auto">
 
+        <h2>{{ question.question_set.heading }}</h2>
+
+        <h3>{{ question.text }}</h3>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button class="btn btn-primary" type="submit">Suivant</button>
+        </form>
+
+</div>
 
 {% endblock %}
