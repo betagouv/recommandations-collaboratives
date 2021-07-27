@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <h1>Bienvenue chez Julien Lepers</h1>
+
+    {% if session.answers.count %}
+
+    {% if session.next_question %}
+    Vous avez déjà commencé à répondre aux questions. <a href="{% url 'survey-question-details' session.id session.next_question.id %}">Continuer</a> ?
+    {% else %}
+    Vous avez tout fini!
+    {% endif %}
+
+
+    <h2>Vous avez déjà répondu à</h2>
+
+    <table>
+        <tr>
+            <th>Question</th>
+            <th>Réponse</th>
+        </tr>
+        {% for answer in session.answers.all %}
+        <tr>
+            <td>
+                <a href="{% url 'survey-question-details' session.id answer.question.id %}">{{ answer.question.text }}</a>
+            </td>
+            <td>
+                {{ answer.value }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    {% else %}
+    C'est la première fois que vous venez ! 
+    <a href="{% url 'survey-question-details' session.id session.first_question.id %}">
+        Commençons !
+    </a>
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

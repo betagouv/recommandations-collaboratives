@@ -19,6 +19,11 @@ urlpatterns = [
         name="survey-question-details",
     ),
     path(
+        "projects/survey/<int:session_id>/",
+        views.SessionDetailsView.as_view(),
+        name="survey-session-details",
+    ),
+    path(
         "projects/survey/<int:session_id>/done",
         views.SessionDoneView.as_view(),
         name="survey-session-done",

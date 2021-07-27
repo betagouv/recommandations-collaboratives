@@ -38,11 +38,19 @@ class QuestionSet(models.Model):
         """Return the previous question set"""
         return self._following(order_by="-id")
 
+    def first_question(self):
+        for question in self.questions.all():
+            return question
+
+        return None
+
     def __str__(self):
         return self.heading
 
 
 class Question(models.Model):
+    """A question with mutliple choices"""
+
     # tags_required =
     question_set = models.ForeignKey(
         QuestionSet, on_delete=models.CASCADE, related_name="questions"
@@ -75,7 +83,9 @@ class Question(models.Model):
         return self.text
 
 
-class Choice(models.Model):  # ManyToOne?
+class Choice(models.Model):
+    """A choice for a given Question"""
+
     class Meta:
         unique_together = [["value", "question"]]
 
@@ -91,11 +101,40 @@ class Choice(models.Model):  # ManyToOne?
 class Session(models.Model):
     """A pausable user session with checkpoint for resuming"""
 
-    pass
+    survey = models.ForeignKey(
+        Survey, related_name="sessions", on_delete=models.CASCADE
+    )
+
+    def next_question(self):
+        """Return the first unanswered question"""
+        answered_questions = Answer.objects.filter(session=self).values_list(
+            "question__id", flat=True
+        )
+
+        for qs in self.survey.question_sets.all():
+            for question in qs.questions.all():
+                if question.id not in answered_questions:
+                    return question
+
+        return None
+
+    def first_question(self):
+        """Return the first Question of the first Question Set"""
+        for qs in self.survey.question_sets.all():
+            for question in qs.questions.all():
+                return question
+
+        return None
+
+    def __str__(self):
+        return "Session #{0}".format(self.id)
 
 
 class Answer(models.Model):
     """Actual answer to a question"""
+
+    class Meta:
+        unique_together = (("session", "question"),)
 
     session = models.ForeignKey(
         Session, related_name="answers", on_delete=models.CASCADE

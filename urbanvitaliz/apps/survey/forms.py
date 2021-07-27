@@ -26,8 +26,13 @@ class AnswerForm(forms.Form):
 
     def update_session(self, session: models.Session):
         answer_value = self.cleaned_data.get("answer")
-        models.Answer.objects.get_or_create(
-            session=session, question=self.question, value=answer_value
+        answer, created = models.Answer.objects.get_or_create(
+            session=session,
+            question=self.question,
+            defaults={"value": answer_value},
         )
+        if not created:
+            answer.value = answer_value
+            answer.save()
 
         return True
