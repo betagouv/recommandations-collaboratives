@@ -57,7 +57,8 @@ class EditQuestionSetForm(forms.ModelForm):
     class Meta:
         model = models.QuestionSet
         fields = [
-            # TODO specify required fields
+            "heading",
+            "subheading"
         ]
 
 

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-square-fill"/>
+                </svg>&nbsp;
+                Questionnaire
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'survey-editor-survey-details' survey.id %}">
+                    {{ survey.title|default:"Questionnaire"|title|truncatechars:20 }}
+                </a>
+            </li>
+            <li class="breadcrumb-item active">
+                Ajouter un groupe de questions
+            </li>
+        </ol>
+    </nav>
+
+    <form method="POST" action=".">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input class="btn btn-primary" type="submit" value="Créer"/>
+    </form>
+
+
+
+</div>
+
+{% endblock %}
