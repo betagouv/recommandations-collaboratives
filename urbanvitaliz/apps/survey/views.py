@@ -116,7 +116,9 @@ def editor_question_set_create(request, survey_id=None):
     if request.method == "POST":
         form = forms.EditQuestionSetForm(request.POST)
         if form.is_valid():
-            question_set = form.save()
+            question_set = form.save(commit=False)
+            question_set.survey = survey
+            question_set.save()
             next_url = reverse("survey-question-set-details", args=[question_set.id])
             return redirect(next_url)
     else:
@@ -169,7 +171,9 @@ def editor_question_create(request, question_set_id=None):
     if request.method == "POST":
         form = forms.EditQuestionForm(request.POST)
         if form.is_valid():
-            question = form.save()
+            question = form.save(commit=False)
+            question.question_set = question_set
+            question.save()
             next_url = reverse("survey-question-details", args=[question.id])
             return redirect(next_url)
     else:
@@ -209,13 +213,15 @@ def editor_choice_update(request, choice_id=None):
 
 
 @login_required
-def editor_choice_create(request, choice_id=None):
+def editor_choice_create(request, question_id=None):
     """Create new choice"""
-    choice = get_object_or_404(models.Choice, pk=choice_id)
+    question = get_object_or_404(models.Question, pk=question_id)
     if request.method == "POST":
         form = forms.EditChoiceForm(request.POST)
         if form.is_valid():
-            form.save()
+            choice = form.save(commit=False)
+            choice.question = question
+            choice.save()
             next_url = reverse("survey-question-details", args=[choice.question_id])
             return redirect(next_url)
     else:
