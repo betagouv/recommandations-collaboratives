@@ -46,3 +46,36 @@ class AnswerForm(forms.Form):
             answer.save()
 
         return True
+
+
+# editor forms
+
+
+class EditQuestionSetForm(forms.ModelForm):
+    """Create and update form for question_sets"""
+
+    class Meta:
+        model = models.QuestionSet
+        fields = [
+            # TODO specify required fields
+        ]
+
+
+class EditQuestionForm(forms.ModelForm):
+    """Create and update form for questions"""
+
+    class Meta:
+        model = models.Question
+        fields = [
+            # TODO specify required fields
+        ]
+
+
+class EditChoiceForm(forms.ModelForm):
+    """Create and update form for choices"""
+
+    class Meta:
+        model = models.Choice
+        fields = [
+            # TODO specify required fields
+        ]
