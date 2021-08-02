@@ -91,7 +91,7 @@ def editor_survey_details(request, survey_id=None):
 def editor_question_set_details(request, question_set_id=None):
     """Return the details of given question_set"""
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
-    return render(request, "survey/question_set/details.html", locals())
+    return render(request, "survey/editor/question_set/details.html", locals())
 
 
 @login_required
@@ -106,7 +106,7 @@ def editor_question_set_update(request, question_set_id=None):
             return redirect(next_url)
     else:
         form = forms.EditQuestionSetForm(instance=question_set)
-    return render(request, "survey/question_set/update.html", locals())
+    return render(request, "survey/editor/question_set/update.html", locals())
 
 
 @login_required
@@ -121,7 +121,7 @@ def editor_question_set_create(request, survey_id=None):
             return redirect(next_url)
     else:
         form = forms.EditQuestionSetForm()
-    return render(request, "survey/question_set/create.html", locals())
+    return render(request, "survey/editor/question_set/create.html", locals())
 
 
 @login_required
@@ -144,7 +144,7 @@ def editor_question_set_delete(request, question_set_id=None):
 def editor_question_details(request, question_id=None):
     """Return the details of given question"""
     question = get_object_or_404(models.Question, pk=question_id)
-    return render(request, "survey/question/details.html", locals())
+    return render(request, "survey/editor/question/details.html", locals())
 
 
 @login_required
@@ -159,7 +159,7 @@ def editor_question_update(request, question_id=None):
             return redirect(next_url)
     else:
         form = forms.EditQuestionForm(instance=question)
-    return render(request, "survey/question/update.html", locals())
+    return render(request, "survey/editor/question/update.html", locals())
 
 
 @login_required
@@ -174,7 +174,7 @@ def editor_question_create(request, question_set_id=None):
             return redirect(next_url)
     else:
         form = forms.EditQuestionForm()
-    return render(request, "survey/question/create.html", locals())
+    return render(request, "survey/editor/question/create.html", locals())
 
 
 @login_required
@@ -205,7 +205,7 @@ def editor_choice_update(request, choice_id=None):
             return redirect(next_url)
     else:
         form = forms.EditChoiceForm(instance=choice)
-    return render(request, "survey/choice/update.html", locals())
+    return render(request, "survey/editor/choice/update.html", locals())
 
 
 @login_required
@@ -220,7 +220,7 @@ def editor_choice_create(request, choice_id=None):
             return redirect(next_url)
     else:
         form = forms.EditChoiceForm()
-    return render(request, "survey/choice/create.html", locals())
+    return render(request, "survey/editor/choice/create.html", locals())
 
 
 @login_required
