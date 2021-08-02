@@ -102,7 +102,7 @@ def editor_question_set_update(request, question_set_id=None):
         form = forms.EditQuestionSetForm(request.POST, instance=question_set)
         if form.is_valid():
             form.save()
-            next_url = reverse("survey-question-set-details", args=[question_set.id])
+            next_url = reverse("survey-editor-question-set-details", args=[question_set.id])
             return redirect(next_url)
     else:
         form = forms.EditQuestionSetForm(instance=question_set)
@@ -119,7 +119,7 @@ def editor_question_set_create(request, survey_id=None):
             question_set = form.save(commit=False)
             question_set.survey = survey
             question_set.save()
-            next_url = reverse("survey-question-set-details", args=[question_set.id])
+            next_url = reverse("survey-editor-question-set-details", args=[question_set.id])
             return redirect(next_url)
     else:
         form = forms.EditQuestionSetForm()
@@ -130,7 +130,7 @@ def editor_question_set_create(request, survey_id=None):
 def editor_question_set_delete(request, question_set_id=None):
     """Delete question_set (mark as deleted)"""
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
-    next_url = reverse("survey-survey-details", question_set.survey_id)
+    next_url = reverse("survey-editor-survey-details", question_set.survey_id)
     if request.method == "POST":
         question_set.deleted = timezone.now()
         question_set.save()
@@ -157,7 +157,7 @@ def editor_question_update(request, question_id=None):
         form = forms.EditQuestionForm(request.POST, instance=question)
         if form.is_valid():
             form.save()
-            next_url = reverse("survey-question-details", args=[question.id])
+            next_url = reverse("survey-editor-question-details", args=[question.id])
             return redirect(next_url)
     else:
         form = forms.EditQuestionForm(instance=question)
@@ -174,7 +174,7 @@ def editor_question_create(request, question_set_id=None):
             question = form.save(commit=False)
             question.question_set = question_set
             question.save()
-            next_url = reverse("survey-question-details", args=[question.id])
+            next_url = reverse("survey-editor-question-details", args=[question.id])
             return redirect(next_url)
     else:
         form = forms.EditQuestionForm()
@@ -185,7 +185,7 @@ def editor_question_create(request, question_set_id=None):
 def editor_question_delete(request, question_id=None):
     """Delete question (mark as deleted)"""
     question = get_object_or_404(models.Question, pk=question_id)
-    next_url = reverse("survey-question-set-details", question.question_set_id)
+    next_url = reverse("survey-editor-question-set-details", question.question_set_id)
     if request.method == "POST":
         question.deleted = timezone.now()
         question.save()
@@ -205,7 +205,7 @@ def editor_choice_update(request, choice_id=None):
         form = forms.EditChoiceForm(request.POST, instance=choice)
         if form.is_valid():
             form.save()
-            next_url = reverse("survey-question-details", args=[choice.question_id])
+            next_url = reverse("survey-editor-question-details", args=[choice.question_id])
             return redirect(next_url)
     else:
         form = forms.EditChoiceForm(instance=choice)
@@ -222,7 +222,7 @@ def editor_choice_create(request, question_id=None):
             choice = form.save(commit=False)
             choice.question = question
             choice.save()
-            next_url = reverse("survey-question-details", args=[choice.question_id])
+            next_url = reverse("survey-editor-question-details", args=[choice.question_id])
             return redirect(next_url)
     else:
         form = forms.EditChoiceForm()
@@ -233,7 +233,7 @@ def editor_choice_create(request, question_id=None):
 def editor_choice_delete(request, choice_id=None):
     """Delete choice (mark as deleted)"""
     choice = get_object_or_404(models.Choice, pk=choice_id)
-    next_url = reverse("survey-question-details", choice.question_id)
+    next_url = reverse("survey-editor-question-details", choice.question_id)
     if request.method == "POST":
         choice.deleted = timezone.now()
         choice.save()
