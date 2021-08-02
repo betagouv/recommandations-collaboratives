@@ -12,7 +12,7 @@ from django.urls import reverse
 from model_bakery.recipe import Recipe
 from urbanvitaliz.utils import login
 
-from . import models
+from .. import models
 
 
 #####

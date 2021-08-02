@@ -32,59 +32,65 @@ urlpatterns = [
     # editor
 
     path(
-        r"survey/<int:survey_id>/question_set/create/",
+        r"survey/editor/survey/<int:survey_id>/",
+        views.editor_survey_details,
+        name="survey-editor-survey-details",
+    ),
+
+    path(
+        r"survey/editor/survey/<int:survey_id>/question_set/create/",
         views.editor_question_set_create,
         name="survey-editor-question-set-create",
     ),
     path(
-        r"survey/question_set/<int:question_set_id>/",
+        r"survey/editor/question_set/<int:question_set_id>/",
         views.editor_question_set_details,
         name="survey-editor-question-set-details",
     ),
     path(
-        r"survey/question_set/<int:question_set_id>/update/",
+        r"survey/editor/question_set/<int:question_set_id>/update/",
         views.editor_question_set_update,
         name="survey-editor-question-set-update",
     ),
     path(
-        r"survey/question_set/<int:question_set_id>/delete/",
+        r"survey/editor/question_set/<int:question_set_id>/delete/",
         views.editor_question_set_delete,
         name="survey-editor-question-set-delete",
     ),
 
     path(
-        r"survey/question_set/<int:question_set_id>/question/create/",
+        r"survey/editor/question_set/<int:question_set_id>/question/create/",
         views.editor_question_create,
         name="survey-editor-question-create",
     ),
     path(
-        r"survey/question/<int:question_id>/",
+        r"survey/editor/question/<int:question_id>/",
         views.editor_question_details,
         name="survey-editor-question-details",
     ),
     path(
-        r"survey/question/<int:question_id>/update/",
+        r"survey/editor/question/<int:question_id>/update/",
         views.editor_question_update,
         name="survey-editor-question-update",
     ),
     path(
-        r"survey/question/<int:question_id>/delete/",
+        r"survey/editor/question/<int:question_id>/delete/",
         views.editor_question_delete,
         name="survey-editor-question-delete",
     ),
 
     path(
-        r"survey/question/<int:question_id>/choice/create/",
+        r"survey/editor/question/<int:question_id>/choice/create/",
         views.editor_choice_create,
         name="survey-editor-choice-create",
     ),
     path(
-        r"survey/choice/<int:choice_id>/update/",
+        r"survey/editor/choice/<int:choice_id>/update/",
         views.editor_choice_update,
         name="survey-editor-choice-update",
     ),
     path(
-        r"survey/choice/<int:choice_id>/delete/",
+        r"survey/editor/choice/<int:choice_id>/delete/",
         views.editor_choice_delete,
         name="survey-editor-choice-delete",
     ),
