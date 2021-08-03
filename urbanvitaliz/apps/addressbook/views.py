@@ -40,11 +40,11 @@ def organization_update(request, organization_id=None):
     """Update an Organization"""
     is_staff_or_403(request.user)
 
+    organization = get_object_or_404(models.Organization, pk=organization_id)
     if request.method == "POST":
         form = OrganizationForm(request.POST, intance=organization)
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
+            form.save()
             form.save_m2m()
             return redirect(reverse("addressbook-organization-list"))
     else:
@@ -108,3 +108,23 @@ def contact_create(request, organization_id: int):
     else:
         form = ContactForm()
     return render(request, "addressbook/contact_create.html", locals())
+
+
+@login_required
+def contact_update(request, contact_id=None):
+    """Update a Contact"""
+    is_staff_or_403(request.user)
+
+    contact = get_object_or_404(models.Contact, pk=contact_id)
+    if request.method == "POST":
+        form = ContactForm(request.POST, intance=contact)
+        if form.is_valid():
+            form.save()
+            form.save_m2m()
+            return redirect(reverse("addressbook-contact-list"))
+    else:
+        form = ContactForm(intance=contact)
+    return render(request, "addressbook/contact_update.html", locals())
+
+
+# eof
