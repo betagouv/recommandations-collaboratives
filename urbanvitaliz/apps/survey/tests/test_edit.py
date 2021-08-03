@@ -146,9 +146,7 @@ def test_question_set_delete_and_redirect(client):
     qs = models.QuestionSet.objects.get(id=qs.id)
     assert qs.deleted
 
-    new_url = reverse(
-        "survey-editor-survey-details", args=[qs.survey_id]
-    )
+    new_url = reverse("survey-editor-survey-details", args=[qs.survey_id])
     assertRedirects(response, new_url)
 
 

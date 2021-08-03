@@ -7,13 +7,13 @@ import tagging.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('survey', '0008_auto_20210803_1554'),
+        ("survey", "0008_auto_20210803_1554"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='choice',
-            name='signals',
+            model_name="choice",
+            name="signals",
             field=tagging.fields.TagField(blank=True, max_length=255),
         ),
     ]
