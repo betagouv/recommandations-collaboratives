@@ -30,7 +30,7 @@
         </ol>
     </nav>
 
-    <form id="form-organization-create" class="form" method="POST">
+    <form id="form-organization-update" action="." method="POST" class="form">
         {% csrf_token %}
         {{ form.as_p }}
         <input class="btn btn-primary" type="submit" value="Mettre à jour">
