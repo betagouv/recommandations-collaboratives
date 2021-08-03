@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-07-20 15:56:20 CEST
 """
 from django.db import models
-
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 
 
@@ -34,6 +33,7 @@ class Contact(models.Model):
         return "{0} {1}".format(self.first_name, self.last_name)
 
     phone_no = models.CharField(blank=True, max_length=20, verbose_name="Téléphone")
+    mobile_no = models.CharField(blank=True, max_length=20, verbose_name="GSM")
     email = models.EmailField(blank=True, verbose_name="Courriel")
     division = models.CharField(verbose_name="Service", max_length=100, blank=True)
     organization = models.ForeignKey(
