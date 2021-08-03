@@ -118,7 +118,9 @@
                 <div>{{ choice.text }} (<span class="fw-bold">{{ choice.value }}</span>)</div>
                 <a href="{% url 'survey-editor-choice-update' choice.pk %}">éditer</a>
             </div>
-            <span class="badge bg-secondary rounded-pill">pollution</span>
+            {% for tag in choice.tags %}
+            <span class="badge bg-secondary rounded-pill">{{ tag }}</span>
+            {% endfor %}
         </li>
         {% endfor %}
     </ul>

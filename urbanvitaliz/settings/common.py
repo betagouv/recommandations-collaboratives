@@ -149,4 +149,7 @@ MAGICAUTH_EMAIL_FIELD = "email"
 MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "projects-local-authority"
 MAGICAUTH_EMAIL_UNKNOWN_CALLBACK = "urbanvitaliz.apps.home.utils.create_user"
 
+# Tagging
+FORCE_LOWERCASE_TAGS = True
+
 # eof
