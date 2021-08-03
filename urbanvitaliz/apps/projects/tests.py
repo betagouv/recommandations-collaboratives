@@ -502,6 +502,29 @@ def test_update_task_for_project_and_redirect(client):
     assert response.status_code == 302
 
 
+#
+# delete
+
+
+@pytest.mark.django_db
+def test_delete_task_not_available_for_non_staff_users(client):
+    task = Recipe(models.Task).make()
+    url = reverse("projects-delete-task", args=[task.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_delete_task_from_project_and_redirect(client):
+    task = Recipe(models.Task).make()
+    with login(client, is_staff=True):
+        response = client.post(reverse("projects-delete-task", args=[task.id]))
+    task = models.Task.deleted_objects.get(id=task.id)
+    assert task.deleted
+    assert response.status_code == 302
+
+
 ########################################################################
 # notes
 ########################################################################
