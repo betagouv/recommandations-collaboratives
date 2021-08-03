@@ -12,8 +12,10 @@ class QuestionSet(models.Model):
         Survey, related_name="question_sets", on_delete=models.CASCADE
     )
 
-    heading = models.CharField(max_length=255)
-    subheading = models.TextField()
+    heading = models.CharField(max_length=255, verbose_name="En-tête")
+    icon = models.CharField(max_length=80, verbose_name="Icône")
+
+    subheading = models.TextField(verbose_name="Sous-titre")
 
     def _following(self, order_by):
         """return the following question set defined by the given order_by"""
@@ -54,7 +56,7 @@ class Question(models.Model):
     question_set = models.ForeignKey(
         QuestionSet, on_delete=models.CASCADE, related_name="questions"
     )
-    text = models.CharField(max_length=255)
+    text = models.CharField(max_length=255, verbose_name="Texte de la question")
 
     def _following(self, order_by):
         """return the following question defined by the given order_by"""

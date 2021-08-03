@@ -29,7 +29,7 @@
             <svg class="bi" width="28" height="28" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#stack"/>
             </svg>&nbsp;
-            {{ survey }}
+            {{ survey.name }}
         </h2>
 
         <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'survey-editor-question-set-create' survey.id %}">
