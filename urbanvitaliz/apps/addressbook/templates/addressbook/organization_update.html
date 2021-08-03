@@ -24,16 +24,16 @@
             </li>
             <li class="breadcrumb-item">
                 <span class="text-secondary">
-                    Ajouter
+                    Mettre à jour
                 </span>
             </li>
         </ol>
     </nav>
 
-    <form class="form" id="form-organization-create" method="POST">
+    <form id="form-organization-update" action="." method="POST" class="form">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Créer" class="btn btn-primary">
+        <input class="btn btn-primary" type="submit" value="Mettre à jour">
     </form>
 
 </div>

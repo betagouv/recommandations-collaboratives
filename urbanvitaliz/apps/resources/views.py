@@ -57,6 +57,7 @@ def resource_search(request):
         communes = [p.commune for p in projects.Project.fetch(email=request.user.email)]
     if not communes:
         limit_area = None  # does not apply if no projects
+    departments = set(c.department for c in communes if c)
 
     resources = models.Resource.search(query, categories)
     if not request.user.is_staff:
