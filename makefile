@@ -25,6 +25,7 @@ clean:
 	find . -name __pycache__ -delete
 	rm -rf ./static
 	rm -rf ./htmlcov .coverage
+	rm -rf ./urbanvitaliz_django.egg-info/
 
 deploy:
 	fab deploy
