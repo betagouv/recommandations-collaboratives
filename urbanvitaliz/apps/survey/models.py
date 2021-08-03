@@ -17,6 +17,8 @@ class QuestionSet(models.Model):
 
     subheading = models.TextField(verbose_name="Sous-titre")
 
+    deleted = models.DateTimeField(null=True)
+
     def _following(self, order_by):
         """return the following question set defined by the given order_by"""
         question_sets = self.survey.question_sets
@@ -58,6 +60,8 @@ class Question(models.Model):
     )
     text = models.CharField(max_length=255, verbose_name="Texte de la question")
 
+    deleted = models.DateTimeField(null=True)
+
     def _following(self, order_by):
         """return the following question defined by the given order_by"""
         questions = self.question_set.questions
@@ -93,6 +97,8 @@ class Choice(models.Model):
     value = models.CharField(max_length=30)
     text = models.CharField(max_length=255)
     # tags =
+
+    deleted = models.DateTimeField(null=True)
 
     question = models.ForeignKey(
         Question, related_name="choices", on_delete=models.CASCADE
