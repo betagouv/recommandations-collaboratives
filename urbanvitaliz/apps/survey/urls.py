@@ -30,13 +30,11 @@ urlpatterns = [
     ),
     #
     # editor
-
     path(
         r"survey/editor/survey/<int:survey_id>/",
         views.editor_survey_details,
         name="survey-editor-survey-details",
     ),
-
     path(
         r"survey/editor/survey/<int:survey_id>/question_set/create/",
         views.editor_question_set_create,
@@ -57,7 +55,6 @@ urlpatterns = [
         views.editor_question_set_delete,
         name="survey-editor-question-set-delete",
     ),
-
     path(
         r"survey/editor/question_set/<int:question_set_id>/question/create/",
         views.editor_question_create,
@@ -78,7 +75,6 @@ urlpatterns = [
         views.editor_question_delete,
         name="survey-editor-question-delete",
     ),
-
     path(
         r"survey/editor/question/<int:question_id>/choice/create/",
         views.editor_choice_create,

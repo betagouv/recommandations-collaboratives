@@ -16,12 +16,17 @@
                 Questionnaire
             </li>
             <li class="breadcrumb-item">
-                <a href="{% url 'survey-editor-survey-details' survey.id %}">
+                <a href="{% url 'survey-editor-survey-details' question.question_set.survey.id %}">
                     {{ survey.name|default:"Questionnaire"|title|truncatechars:20 }}
                 </a>
             </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'survey-editor-question-set-details' question.question_set.id %}">
+                    {{ question.question_set.heading|default:"Ensemble de Questions"|title|truncatechars:20 }}
+                </a>
+            </li>
             <li class="breadcrumb-item active">
-                Ajouter un groupe de questions
+                Ajouter un choix de réponse
             </li>
         </ol>
     </nav>

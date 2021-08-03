@@ -56,10 +56,7 @@ class EditQuestionSetForm(forms.ModelForm):
 
     class Meta:
         model = models.QuestionSet
-        fields = [
-            "heading",
-            "subheading"
-        ]
+        fields = ["heading", "subheading"]
 
 
 class EditQuestionForm(forms.ModelForm):
@@ -79,4 +76,6 @@ class EditChoiceForm(forms.ModelForm):
         model = models.Choice
         fields = [
             # TODO specify required fields
+            "text",
+            "value",
         ]

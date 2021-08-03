@@ -102,7 +102,9 @@ def editor_question_set_update(request, question_set_id=None):
         form = forms.EditQuestionSetForm(request.POST, instance=question_set)
         if form.is_valid():
             form.save()
-            next_url = reverse("survey-editor-question-set-details", args=[question_set.id])
+            next_url = reverse(
+                "survey-editor-question-set-details", args=[question_set.id]
+            )
             return redirect(next_url)
     else:
         form = forms.EditQuestionSetForm(instance=question_set)
@@ -119,7 +121,9 @@ def editor_question_set_create(request, survey_id=None):
             question_set = form.save(commit=False)
             question_set.survey = survey
             question_set.save()
-            next_url = reverse("survey-editor-question-set-details", args=[question_set.id])
+            next_url = reverse(
+                "survey-editor-question-set-details", args=[question_set.id]
+            )
             return redirect(next_url)
     else:
         form = forms.EditQuestionSetForm()
@@ -205,7 +209,9 @@ def editor_choice_update(request, choice_id=None):
         form = forms.EditChoiceForm(request.POST, instance=choice)
         if form.is_valid():
             form.save()
-            next_url = reverse("survey-editor-question-details", args=[choice.question_id])
+            next_url = reverse(
+                "survey-editor-question-details", args=[choice.question_id]
+            )
             return redirect(next_url)
     else:
         form = forms.EditChoiceForm(instance=choice)
@@ -222,7 +228,10 @@ def editor_choice_create(request, question_id=None):
             choice = form.save(commit=False)
             choice.question = question
             choice.save()
-            next_url = reverse("survey-editor-question-details", args=[choice.question_id])
+            next_url = reverse(
+                "survey-editor-question-set-details",
+                args=[choice.question.question_set.id],
+            )
             return redirect(next_url)
     else:
         form = forms.EditChoiceForm()
