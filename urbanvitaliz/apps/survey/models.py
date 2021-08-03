@@ -1,4 +1,6 @@
 from django.db import models
+from tagging.fields import TagField
+from tagging.registry import register as tagging_register
 
 
 class Survey(models.Model):
@@ -95,14 +97,17 @@ class Choice(models.Model):
         unique_together = [["value", "question"]]
 
     value = models.CharField(max_length=30)
+    signals = TagField(verbose_name="Signaux")
     text = models.CharField(max_length=255)
-    # tags =
 
     deleted = models.DateTimeField(null=True)
 
     question = models.ForeignKey(
         Question, related_name="choices", on_delete=models.CASCADE
     )
+
+
+tagging_register(Choice, tag_descriptor_attr="tags")
 
 
 class Session(models.Model):
