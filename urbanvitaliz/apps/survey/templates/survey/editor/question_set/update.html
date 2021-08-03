@@ -16,12 +16,12 @@
                 Questionnaire
             </li>
             <li class="breadcrumb-item">
-                <a href="{% url 'survey-editor-survey-details' survey.id %}">
-                    {{ survey.name|default:"Questionnaire"|title|truncatechars:20 }}
+                <a href="{% url 'survey-editor-survey-details' question_set.survey.id %}">
+                    {{ question_set.survey.name|default:"Questionnaire"|title|truncatechars:20 }}
                 </a>
             </li>
             <li class="breadcrumb-item active">
-                Ajouter un groupe de questions
+                Editer un groupe de questions
             </li>
         </ol>
     </nav>
@@ -29,7 +29,7 @@
     <form method="POST" action=".">
         {% csrf_token %}
         {{ form.as_p }}
-        <input class="btn btn-primary" type="submit" value="Créer"/>
+        <input class="btn btn-primary" type="submit" value="Mettre à jour"/>
     </form>
 
 

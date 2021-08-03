@@ -17,7 +17,7 @@
             </li>
             <li class="breadcrumb-item">
                 <a href="{% url 'survey-editor-survey-details' question_set.survey.id %}">
-                    {{ survey.title|default:"Questionnaire"|title|truncatechars:20 }}
+                    {{ question_set.survey.name|default:"Questionnaire"|title|truncatechars:20 }}
                 </a>
             </li>
             <li class="breadcrumb-item active">
@@ -44,14 +44,37 @@
 
         <!-- Sidebar -->
         <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
+            <!-- Preview -->
+            <div class="d-grid gap-2 mb-3">
+                <a class="btn btn-primary btn-sm" href="{% url 'survey-question-details' 1 question_set.id %}" role="button">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightning"/>
+                    </svg>
+                    &nbsp;
+                    Essayer ce questionnaire
+                </a>
+            </div>
+
+
             <!-- Edit -->
-            <div class="d-grid gap-2">
+            <div class="d-grid gap-2 mb-3">
                 <a class="btn btn-light btn-sm" href="{% url 'survey-editor-question-set-update' question_set.id %}" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
                     </svg>
                     &nbsp;
                     Éditer
+                </a>
+            </div>
+
+            <!-- Ajouter -->
+            <div class="d-grid gap-2">
+                <a class="btn btn-light btn-sm" href="{% url 'survey-editor-question-create' question_set.id %}" role="button">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+                    </svg>
+                    &nbsp;
+                    Ajouter une question
                 </a>
             </div>
 
@@ -70,12 +93,22 @@
             {{ question.text }}
         </h3>
 
-        <a class="btn btn-light mb-1 d-inline-block btn-outline-primary float-end"  href="{% url 'survey-editor-choice-create' question.id %}">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
-            </svg>
-            Ajouter un choix de réponse
-        </a>
+        <div class="btn-group ms-5 align-middle" role="group" aria-label="Basic example">
+
+            <a class="btn btn-light mb-1 d-inline-block btn-outline-primary btn-sm"  href="{% url 'survey-editor-question-update' question.id %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+                </svg>
+                Éditer
+            </a>
+
+            <a class="btn btn-light mb-1 d-inline-block btn-outline-primary btn-sm"  href="{% url 'survey-editor-choice-create' question.id %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+                </svg>
+                Ajouter un choix de réponse
+            </a>
+        </div>
     </div>
 
     <ul class="list-group list-group-numbered list-group-flush">
@@ -83,12 +116,17 @@
         <li class="list-group-item d-flex justify-content-between align-items-start">
             <div class="ms-2 me-auto">
                 <div>{{ choice.text }} (<span class="fw-bold">{{ choice.value }}</span>)</div>
-                <a href="{% url 'survey-editor-question-set-details' question_set.pk %}">éditer</a>
+                <a href="{% url 'survey-editor-choice-update' choice.pk %}">éditer</a>
             </div>
             <span class="badge bg-secondary rounded-pill">pollution</span>
         </li>
         {% endfor %}
     </ul>
+    {% empty %}
+    <div class="bd-callout bd-callout-info">
+        Il n'y a pas de question pour l'instant.
+        <a href="{% url 'survey-editor-question-create' question_set.id %}">Créez-en une</a>.
+    </div>
     {% endfor %}
 
 

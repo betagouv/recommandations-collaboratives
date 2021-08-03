@@ -17,7 +17,7 @@
             </li>
             <li class="breadcrumb-item active">
                 <a href="{% url 'survey-editor-survey-details' survey.id %}">
-                    {{ survey.title|default:"Questionnaire"|title|truncatechars:20 }}
+                    {{ survey.name|default:"Questionnaire"|title|truncatechars:20 }}
                 </a>
             </li>
         </ol>
