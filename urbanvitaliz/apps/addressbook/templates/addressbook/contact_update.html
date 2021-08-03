@@ -17,7 +17,7 @@
             </li>
             <li class="breadcrumb-item">
                 <span class="text-secondary">
-                    <a href="{% url "addressbook-organization-details" organization.id %}">
+                    <a href="{% url "addressbook-organization-details" contact.organization_id %}">
                         {{ organization.name }}
                     </a>
                 </span>
@@ -30,7 +30,7 @@
         </ol>
     </nav>
 
-    <form id="form-contact-create" class="form" method="POST">
+    <form id="form-contact-update" class="form" method="POST" action=".">
         {% csrf_token %}
         {{ form.as_p }}
         <input class="btn btn-primary" type="submit" value="Mettre à jour">
