@@ -8,9 +8,14 @@ created: 2021-08-02 16:24:35 CEST
 """
 
 import pytest
+
 from django.urls import reverse
+
 from model_bakery.recipe import Recipe
+
 from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertRedirects
+
 from urbanvitaliz.utils import login
 
 from .. import models
@@ -46,6 +51,24 @@ def test_question_set_detail_contains_update_links(client):
         response = client.get(url)
     update_url = reverse("survey-editor-question-set-update", args=[qs.id])
     assertContains(response, f'href="{update_url}"')
+
+
+@pytest.mark.django_db
+def test_question_set_update_and_redirect(client):
+    qs = Recipe(models.QuestionSet).make()
+    url = reverse("survey-editor-question-set-details", args=[qs.id])
+    data = {"title": "new title", "subtitle": "new sub title"}
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    qs = models.QuestionSet.objects.get(id=qs.id)
+    assert qs.title == data["title"]
+    assert qs.subtitle == data["subtitle"]
+
+    update_url = reverse("survey-editor-question-set-details", args=[qs.id])
+    assertRedirects(response, update_url)
+
 
 
 ########################################################################
