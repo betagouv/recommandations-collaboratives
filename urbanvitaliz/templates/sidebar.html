@@ -20,7 +20,7 @@
                 </a>
             </li>
 
-            {% if not user.is_staff %}
+            {% if not user.is_staff or request.session.projects %}
             <li>
                 <a href="{% url 'projects-local-authority' %}" class="nav-link link-dark">
                     <svg class="bi me-2" width="16" height="16">
@@ -48,7 +48,7 @@
                             </div>
                             {% endif %}
                         </div>
-                        <span class="text-secondary small text-break text-truncate">{{ project.location }}</span>
+                        <span class="text-secondary small text-break text-truncate">{{ project.location|truncatechars:20|capfirst }}</span>
                     </li>
                     {% endfor %}
                 </ul>

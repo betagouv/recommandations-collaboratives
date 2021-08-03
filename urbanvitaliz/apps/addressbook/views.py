@@ -1,11 +1,6 @@
-from django.contrib.auth.decorators import login_required
-
 from django import forms
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.shortcuts import reverse
-
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render, reverse
 from urbanvitaliz.utils import is_staff_or_403
 
 from . import models
@@ -67,7 +62,14 @@ class ContactForm(forms.ModelForm):
 
     class Meta:
         model = models.Contact
-        fields = ["first_name", "last_name", "division", "email", "phone_no"]
+        fields = [
+            "first_name",
+            "last_name",
+            "division",
+            "email",
+            "phone_no",
+            "mobile_no",
+        ]
 
 
 @login_required
