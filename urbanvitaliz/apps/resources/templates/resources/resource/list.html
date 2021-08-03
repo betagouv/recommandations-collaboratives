@@ -64,32 +64,17 @@
             <div class="input-group mb-3">
 
                 {% if limit_area != None and user.is_authenticated %}
-                <div class="input-group-text">
-                    <input name="limit_area" class="form-check-input mt-0" type="checkbox" aria-label="Limiter à ma zone géographique"
-                           {% if limit_area  %}checked{% endif %}>
-                    &nbsp;
-                    Seulement pour mon département
-
-                </div>
+                <select name="limit_area" class="form-select" style="flex: 0 0 auto !important; min-width: 200px" aria-label="Limiter la zone géographique">
+                    <option {% if not limit_area %}selected{% endif %} value="false">France entière</option>
+                    <option {% if limit_area %}selected{% endif %} value="1">
+                        {% for department in departments %}{{ department.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                    </option>
+                </select>
                 {% endif %}
 
                 <input type="text" name="{{ form.query.name }}" value="{{ form.query.value|default:"" }}"
                        class="form-control" placeholder="Saisissez vos mots clés (ex: coworking, pollution, ...)"
                        aria-label="Search Text input" />
-
-
-                {% if my_xdepartments %}
-                <div class="">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#globe"/>
-                    </svg>
-                    <!-- Geo filters -->
-                    {% for department in my_departments %}
-                    <label class="">{{ department.name }}</label>
-                    {% endfor %}
-                    )
-                </div>
-                {% endif %}
 
 
                 <button class="btn btn-outline-primary" type="submit">
