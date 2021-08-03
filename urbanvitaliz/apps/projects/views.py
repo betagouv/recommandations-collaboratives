@@ -362,6 +362,18 @@ class UpdateTaskForm(forms.ModelForm):
         ]
 
 
+@login_required
+def delete_task(request, task_id=None):
+    """Delete a task from a project"""
+    is_staff_or_403(request.user)
+    task = get_object_or_404(models.Task, pk=task_id)
+    if request.method == "POST":
+        task.deleted = timezone.now()
+        task.save()
+    next_url = reverse("projects-project-detail", args=[task.project_id])
+    return redirect(next_url)
+
+
 ########################################################################
 # push resource to project
 ########################################################################
