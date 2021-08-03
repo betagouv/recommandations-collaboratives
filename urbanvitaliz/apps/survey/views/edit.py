@@ -1,101 +1,49 @@
+# encoding: utf-8
+
+"""
+views to fill surveys
+
+authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
+created: 2021-08-03 14:26:39 CEST
+"""
+
 from django.urls import reverse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import DetailView
-from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.shortcuts import render
+from django.utils import timezone
 
-from . import models
-from . import forms
-
-#####
-# Session
-#####
-
-
-class SessionDetailsView(DetailView):
-    model = models.Session
-    pk_url_kwarg = "session_id"
-    context_object_name = "session"
-    template_name = "survey/session_details.html"
-
-
-class SessionDoneView(DetailView):
-    model = models.Session
-    pk_url_kwarg = "session_id"
-    template_name = "survey/session_done.html"
-
-
-#####
-# Questions
-#####
-
-
-def survey_question_details(request, session_id, question_id):
-    """Display a single question and go to next"""
-    session = get_object_or_404(models.Session, pk=session_id)
-    question = get_object_or_404(models.Question, pk=question_id)
-    try:
-        answer = models.Answer.objects.get(question=question, session=session)
-    except models.Answer.DoesNotExist:
-        answer = None
-
-    if request.method == "POST":
-        form = forms.AnswerForm(question, answer, request.POST)
-        if form.is_valid():
-            form.update_session(session)
-            next_question = question.next()
-            if not next_question:
-                # Next QuestionSet?
-                next_question_set = question.question_set.next()
-                if next_question_set:
-                    # Next Question in next Question Set
-                    next_question = next_question_set.first_question()
-
-            if next_question:
-                # Next Question please
-                return redirect(
-                    "survey-question-details",
-                    session_id=session.pk,
-                    question_id=next_question.pk,
-                )
-            else:
-                # Nothing more, send to done page
-                return redirect("survey-session-done", session_id=session.pk)
-    else:
-        form = forms.AnswerForm(question, answer)
-
-    return render(request, "survey/question_details.html", locals())
+from .. import models
+from .. import forms
 
 
 ########################################################################
-# Administration views
+# survey
 ########################################################################
-
-
-#
-# survey views
 
 
 @login_required
-def editor_survey_details(request, survey_id=None):
+def survey_details(request, survey_id=None):
     """List question sets for given survey"""
     survey = get_object_or_404(models.Survey, pk=survey_id)
     return render(request, "survey/editor/survey/details.html", locals())
 
 
-#
-# question_set views
+########################################################################
+# question_set
+########################################################################
 
 
 @login_required
-def editor_question_set_details(request, question_set_id=None):
+def question_set_details(request, question_set_id=None):
     """Return the details of given question_set"""
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
     return render(request, "survey/editor/question_set/details.html", locals())
 
 
 @login_required
-def editor_question_set_update(request, question_set_id=None):
+def question_set_update(request, question_set_id=None):
     """Update informations for question_set"""
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
     if request.method == "POST":
@@ -112,7 +60,7 @@ def editor_question_set_update(request, question_set_id=None):
 
 
 @login_required
-def editor_question_set_create(request, survey_id=None):
+def question_set_create(request, survey_id=None):
     """Create new question_set"""
     survey = get_object_or_404(models.Survey, pk=survey_id)
     if request.method == "POST":
@@ -131,7 +79,7 @@ def editor_question_set_create(request, survey_id=None):
 
 
 @login_required
-def editor_question_set_delete(request, question_set_id=None):
+def question_set_delete(request, question_set_id=None):
     """Delete question_set (mark as deleted)"""
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
     next_url = reverse("survey-editor-survey-details", args=[question_set.survey_id])
@@ -142,19 +90,20 @@ def editor_question_set_delete(request, question_set_id=None):
     return render(request, "survey/editor/question_set/delete.html", locals())
 
 
-#
-# question views
+#######################################################################
+# question
+#######################################################################
 
 
 @login_required
-def editor_question_details(request, question_id=None):
+def question_details(request, question_id=None):
     """Return the details of given question"""
     question = get_object_or_404(models.Question, pk=question_id)
     return render(request, "survey/editor/question/details.html", locals())
 
 
 @login_required
-def editor_question_update(request, question_id=None):
+def question_update(request, question_id=None):
     """Update informations for question"""
     question = get_object_or_404(models.Question, pk=question_id)
     if request.method == "POST":
@@ -171,7 +120,7 @@ def editor_question_update(request, question_id=None):
 
 
 @login_required
-def editor_question_create(request, question_set_id=None):
+def question_create(request, question_set_id=None):
     """Create new question"""
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
     if request.method == "POST":
@@ -190,7 +139,7 @@ def editor_question_create(request, question_set_id=None):
 
 
 @login_required
-def editor_question_delete(request, question_id=None):
+def question_delete(request, question_id=None):
     """Delete question (mark as deleted)"""
     question = get_object_or_404(models.Question, pk=question_id)
     next_url = reverse(
@@ -203,12 +152,13 @@ def editor_question_delete(request, question_id=None):
     return render(request, "survey/editor/question/delete.html", locals())
 
 
-#
-# choice views
+#######################################################################
+# choice
+#######################################################################
 
 
 @login_required
-def editor_choice_update(request, choice_id=None):
+def choice_update(request, choice_id=None):
     """Update informations for choice"""
     choice = get_object_or_404(models.Choice, pk=choice_id)
     if request.method == "POST":
@@ -226,7 +176,7 @@ def editor_choice_update(request, choice_id=None):
 
 
 @login_required
-def editor_choice_create(request, question_id=None):
+def choice_create(request, question_id=None):
     """Create new choice"""
     question = get_object_or_404(models.Question, pk=question_id)
     if request.method == "POST":
@@ -246,7 +196,7 @@ def editor_choice_create(request, question_id=None):
 
 
 @login_required
-def editor_choice_delete(request, choice_id=None):
+def choice_delete(request, choice_id=None):
     """Delete choice (mark as deleted)"""
     choice = get_object_or_404(models.Choice, pk=choice_id)
     next_url = reverse(
