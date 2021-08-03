@@ -16,12 +16,17 @@
                 Questionnaire
             </li>
             <li class="breadcrumb-item">
-                <a href="{% url 'survey-editor-survey-details' question_set.survey.id %}">
-                    {{ question_set.survey.name|default:"Questionnaire"|title|truncatechars:20 }}
+                <a href="{% url 'survey-editor-survey-details' choice.question.question_set.survey.id %}">
+                    {{ choice.question.question_set.survey.name|default:"Questionnaire"|title|truncatechars:20 }}
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'survey-editor-question-set-details' choice.question.question_set.id %}">
+                    {{ choice.question.question_set.heading|default:"Ensemble de Questions"|title|truncatechars:20 }}
                 </a>
             </li>
             <li class="breadcrumb-item active">
-                Editer un groupe de questions
+                Ajouter un choix de réponse
             </li>
         </ol>
     </nav>
@@ -32,18 +37,6 @@
         <input class="btn btn-primary" type="submit" value="Mettre à jour"/>
     </form>
 
-    <hr/>
-    <div class="d-flex justify-content-end">
-        <form id="form-survey-delete-question-set" method="POST" action="{% url 'survey-editor-question-set-delete' question_set.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">
-                <svg class="bi " width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash"/>
-                </svg>
-			          Supprimer
-		        </button>
-        </form>
-    </div>
 
 
 </div>

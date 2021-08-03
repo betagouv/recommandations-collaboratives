@@ -20,8 +20,13 @@
                     {{ question_set.survey.name|default:"Questionnaire"|title|truncatechars:20 }}
                 </a>
             </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'survey-editor-question-set-details' question_set.id %}">
+                    {{ question_set.heading|default:"Ensemble de Questions"|title|truncatechars:20 }}
+                </a>
+            </li>
             <li class="breadcrumb-item active">
-                Editer un groupe de questions
+                Créer une question
             </li>
         </ol>
     </nav>
@@ -29,21 +34,9 @@
     <form method="POST" action=".">
         {% csrf_token %}
         {{ form.as_p }}
-        <input class="btn btn-primary" type="submit" value="Mettre à jour"/>
+        <input class="btn btn-primary" type="submit" value="Créer"/>
     </form>
 
-    <hr/>
-    <div class="d-flex justify-content-end">
-        <form id="form-survey-delete-question-set" method="POST" action="{% url 'survey-editor-question-set-delete' question_set.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">
-                <svg class="bi " width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash"/>
-                </svg>
-			          Supprimer
-		        </button>
-        </form>
-    </div>
 
 
 </div>

@@ -5,7 +5,7 @@ from . import models
 
 @admin.register(models.Survey)
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ["qs_count"]
+    list_display = ["name", "qs_count"]
 
     @admin.display(description="Question Set count")
     def qs_count(self, obj):
