@@ -22,21 +22,39 @@
         </ol>
     </nav>
 
-    <div class="w-100">
-        <h2 class="mb-3 d-inline-block">
-            <svg class="bi" width="28" height="28" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
-            </svg>
-            {{ organization.name }}
-        </h2>
-        {% if user.is_staff %}
-        <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'addressbook-organization-contact-create' organization.id %}">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor"> 
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-plus"/>
-            </svg>
-            Ajouter
-        </a>
-        {% endif %}
+    <div class="row resource-details mb-3">
+        <div class="col-sm-12 col-lg-8 col-xl-9">
+            <h2 class="mb-3 d-inline-block">
+                <svg class="bi" width="28" height="28" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
+                </svg>
+                {{ organization.name }}
+            </h2>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
+            <!-- Edit -->
+            <div class="d-grid gap-2 mb-3">
+                <a class="btn btn-light btn-sm" href="{% url 'addressbook-organization-update' organization.id %}" role="button">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+                    </svg>
+                    &nbsp;
+                    Éditer cette organisation
+                </a>
+            </div>
+
+            <!-- Add contact -->
+            <div class="d-grid gap-2 mb-3">
+                <a class="btn btn-light btn-sm mb-1 d-inline-block"  href="{% url 'addressbook-organization-contact-create' organization.id %}">
+                    <svg class="bi me-1" width="16" height="16" fill="currentColor"> 
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-plus"/>
+                    </svg>
+                    Ajouter un contact
+                </a>
+            </div>
+        </div>
     </div>
 
     <table class="table">
@@ -59,6 +77,7 @@
             <th>
                 Courriel
             </th>
+            <th></th>
         </tr>
         {% for contact in organization.contacts.all %}
         <tr>
@@ -91,6 +110,15 @@
                 {% else %}
                 -
                 {% endif %}
+            </td>
+            <td>
+                <a class="btn btn-light btn-sm" href="{% url 'addressbook-organization-contact-update' contact.id %}">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+                    </svg>
+                    &nbsp;
+                    Éditer
+                </a>
             </td>
         </tr>
         {% endfor %}
