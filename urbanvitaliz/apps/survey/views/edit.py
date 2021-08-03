@@ -82,10 +82,12 @@ def question_set_create(request, survey_id=None):
 def question_set_delete(request, question_set_id=None):
     """Delete question_set (mark as deleted)"""
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
-    next_url = reverse("survey-editor-survey-details", args=[question_set.survey_id])
     if request.method == "POST":
         question_set.deleted = timezone.now()
         question_set.save()
+        next_url = reverse(
+            "survey-editor-survey-details", args=[question_set.survey_id]
+        )
         return redirect(next_url)
     return render(request, "survey/editor/question_set/delete.html", locals())
 
@@ -93,13 +95,6 @@ def question_set_delete(request, question_set_id=None):
 #######################################################################
 # question
 #######################################################################
-
-
-@login_required
-def question_details(request, question_id=None):
-    """Return the details of given question"""
-    question = get_object_or_404(models.Question, pk=question_id)
-    return render(request, "survey/editor/question/details.html", locals())
 
 
 @login_required
@@ -142,12 +137,12 @@ def question_create(request, question_set_id=None):
 def question_delete(request, question_id=None):
     """Delete question (mark as deleted)"""
     question = get_object_or_404(models.Question, pk=question_id)
-    next_url = reverse(
-        "survey-editor-question-set-details", args=[question.question_set.id]
-    )
     if request.method == "POST":
         question.deleted = timezone.now()
         question.save()
+        next_url = reverse(
+            "survey-editor-question-set-details", args=[question.question_set.id]
+        )
         return redirect(next_url)
     return render(request, "survey/editor/question/delete.html", locals())
 
@@ -199,12 +194,12 @@ def choice_create(request, question_id=None):
 def choice_delete(request, choice_id=None):
     """Delete choice (mark as deleted)"""
     choice = get_object_or_404(models.Choice, pk=choice_id)
-    next_url = reverse(
-        "survey-editor-question-set-details", choice.question_set.question_id
-    )
     if request.method == "POST":
         choice.deleted = timezone.now()
         choice.save()
+        next_url = reverse(
+            "survey-editor-question-set-details", args=[choice.question.question_set_id]
+        )
         return redirect(next_url)
     return render(request, "survey/editor/choice/delete.html", locals())
 

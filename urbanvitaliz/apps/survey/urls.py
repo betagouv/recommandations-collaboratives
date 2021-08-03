@@ -64,11 +64,6 @@ urlpatterns = [
         name="survey-editor-question-create",
     ),
     path(
-        r"survey/editor/question/<int:question_id>/",
-        edit.question_details,
-        name="survey-editor-question-details",
-    ),
-    path(
         r"survey/editor/question/<int:question_id>/update/",
         edit.question_update,
         name="survey-editor-question-update",
