@@ -54,6 +54,9 @@
                 Téléphone
             </th>
             <th>
+                GSM
+            </th>
+            <th>
                 Courriel
             </th>
         </tr>
@@ -66,11 +69,18 @@
                 {{ contact.last_name }}
             </td>
             <td>
-                {{ contact.service|default:"-" }}
+                {{ contact.division|default:"-" }}
             </td>
             <td>
                 {% if contact.phone_no %}
-                <a href="tel:{{contact.email}}">{{ contact.phone_no }}</a>
+                <a href="tel:{{contact.phone_no}}">{{ contact.phone_no }}</a>
+                {% else %}
+                -
+                {% endif %}
+            </td>
+            <td>
+                {% if contact.mobile_no %}
+                <a href="tel:{{contact.mobile_no}}">{{ contact.mobile_no }}</a>
                 {% else %}
                 -
                 {% endif %}
