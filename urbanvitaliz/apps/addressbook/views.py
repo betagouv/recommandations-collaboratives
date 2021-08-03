@@ -36,6 +36,23 @@ def organization_create(request):
 
 
 @login_required
+def organization_update(request, organization_id=None):
+    """Update an Organization"""
+    is_staff_or_403(request.user)
+
+    if request.method == "POST":
+        form = OrganizationForm(request.POST, intance=organization)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.save()
+            form.save_m2m()
+            return redirect(reverse("addressbook-organization-list"))
+    else:
+        form = OrganizationForm(intance=organization)
+    return render(request, "addressbook/organization_update.html", locals())
+
+
+@login_required
 def organization_list(request):
     """Return the Organization list"""
     is_staff_or_403(request.user)
