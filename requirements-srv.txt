@@ -3,6 +3,7 @@ ipython
 django-markdownx
 django-magicauth
 django_otp
+django-tagging
 # STATIC FILES
 django-sass-processor
 libsass

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "magicauth",
     "sass_processor",
     "markdownx",
+    "tagging",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",
