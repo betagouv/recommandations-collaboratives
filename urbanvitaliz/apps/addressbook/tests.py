@@ -56,6 +56,28 @@ def test_organization_list_available_for_staff_users(client):
     assert response.status_code == 200
 
 
+#
+# update
+
+@pytest.mark.django_db
+def test_update_organization_not_available_for_non_staff_users(client):
+    organization = Recipe(models.Organization).make()
+    url = reverse("addressbook-organization-update", args=[organization.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_update_organization_available_for_staff_users(client):
+    organization = Recipe(models.Organization).make()
+    url = reverse("addressbook-organization-update", args=[organization.id])
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+    assertContains(response, 'form id="form-organization-update"')
+
+
 @pytest.mark.django_db
 def test_organization_update_and_redirect(client):
     organization = Recipe(models.Organization).make()
@@ -117,6 +139,27 @@ def test_create_contact_available_for_staff_users(client):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-contact-create"')
+
+#
+# update
+
+@pytest.mark.django_db
+def test_update_contact_not_available_for_non_staff_users(client):
+    contact = Recipe(models.Contact).make()
+    url = reverse("addressbook-organization-contact-update", args=[contact.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_update_contact_available_for_staff_users(client):
+    contact = Recipe(models.Contact).make()
+    url = reverse("addressbook-organization-contact-update", args=[contact.id])
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+    assertContains(response, 'form id="form-contact-update"')
 
 
 @pytest.mark.django_db
