@@ -31,7 +31,7 @@
 
             <h2>
                 <svg class="bi" width="28" height="28" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#stack"/>
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ question_set.icon|default:'stack' }}"/>
                 </svg>&nbsp;
                 {{ question_set.heading }}
             </h2>
