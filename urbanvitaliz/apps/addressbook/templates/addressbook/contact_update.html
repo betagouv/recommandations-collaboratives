@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-lines-fill"/>
+                </svg>&nbsp;
+                <a href="{% url 'addressbook-organization-list' %}">Carnet d'adresses</a>
+            </li>
+            <li class="breadcrumb-item">
+                <span class="text-secondary">
+                    <a href="{% url "addressbook-organization-details" organization.id %}">
+                        {{ organization.name }}
+                    </a>
+                </span>
+            </li>
+            <li class="breadcrumb-item">
+                <span class="text-secondary">
+                    Editer un contact
+                </span>
+            </li>
+        </ol>
+    </nav>
+
+    <form id="form-contact-create" class="form" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input class="btn btn-primary" type="submit" value="Mettre à jour">
+    </form>
+
+</div>
+
+{% endblock %}
