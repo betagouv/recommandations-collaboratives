@@ -42,13 +42,14 @@ def organization_update(request, organization_id=None):
 
     organization = get_object_or_404(models.Organization, pk=organization_id)
     if request.method == "POST":
-        form = OrganizationForm(request.POST, intance=organization)
+        form = OrganizationForm(request.POST, instance=organization)
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            instance.save()
             form.save_m2m()
             return redirect(reverse("addressbook-organization-list"))
     else:
-        form = OrganizationForm(intance=organization)
+        form = OrganizationForm(instance=organization)
     return render(request, "addressbook/organization_update.html", locals())
 
 
@@ -117,13 +118,15 @@ def contact_update(request, contact_id=None):
 
     contact = get_object_or_404(models.Contact, pk=contact_id)
     if request.method == "POST":
-        form = ContactForm(request.POST, intance=contact)
+        form = ContactForm(request.POST, instance=contact)
         if form.is_valid():
             form.save()
-            form.save_m2m()
-            return redirect(reverse("addressbook-contact-list"))
+            next_url = reverse(
+                "addressbook-organization-details", args=[contact.organization_id]
+            )
+            return redirect(next_url)
     else:
-        form = ContactForm(intance=contact)
+        form = ContactForm(instance=contact)
     return render(request, "addressbook/contact_update.html", locals())
 
 
