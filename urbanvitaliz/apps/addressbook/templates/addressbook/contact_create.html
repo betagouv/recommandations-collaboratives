@@ -30,6 +30,8 @@
         </ol>
     </nav>
 
+    <h2>Ajouter un contact à {{ organization.name }}</h2>
+
     <form id="form-contact-create" class="form" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
