@@ -88,7 +88,7 @@
                     </svg>
                     Le site est situé à <a href="https://nominatim.openstreetmap.org/ui/search.html?q={{ project.location|urlencode }}" target="_new" >{{ project.location }}</a>
                     {% if project.commune %}
-                    ({{ project.commune.postal }} {{ project.commune }}, {{ project.commune.department }} - {{ project.commune.department.region }})
+                    ({{ project.commune.postal }}, {{ project.commune.department }} - {{ project.commune.department.region }})
                     {% endif %}
                     .
                 </p>

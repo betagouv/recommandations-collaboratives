@@ -17,23 +17,23 @@
             </li>
             <li class="breadcrumb-item">
                 <span class="text-secondary">
-                    <a href="{% url "addressbook-organization-list" %}">
-                        Organisations
+                    <a href="{% url "addressbook-organization-details" contact.organization_id %}">
+                        {{ contact.organization.name }}
                     </a>
                 </span>
             </li>
             <li class="breadcrumb-item">
                 <span class="text-secondary">
-                    Ajouter
+                    Editer un contact
                 </span>
             </li>
         </ol>
     </nav>
 
-    <form class="form" id="form-organization-create" method="POST">
+    <form id="form-contact-update" class="form" method="POST" action=".">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Créer" class="btn btn-primary">
+        <input class="btn btn-primary" type="submit" value="Mettre à jour">
     </form>
 
 </div>

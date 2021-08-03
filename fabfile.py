@@ -24,10 +24,10 @@ def upgrade(cnx):
     """Upgrade requirements to last version on server"""
     cnx.put(
         "./requirements-srv.txt",
-        remote="./urbanvitaliz-site/requirements.txt",
+        remote="./urbanvitaliz-production/requirements.txt",
     )
     cnx.run(
-        "cd urbanvitaliz-site "
+        "cd urbanvitaliz-production "
         "&& venv/bin/pip install --upgrade -r requirements.txt"
     )
 
@@ -38,10 +38,10 @@ def deploy(cnx):
     run_setup("setup.py", script_args=["sdist"])
     cnx.put(
         f"./dist/{PACKAGE}",
-        remote=f"./urbanvitaliz-site/dist/{PACKAGE}",
+        remote=f"./urbanvitaliz-production/dist/{PACKAGE}",
     )
     cnx.run(
-        "cd urbanvitaliz-site "
+        "cd urbanvitaliz-production "
         f"&& ./venv/bin/pip install ./dist/{PACKAGE}"
         "&& ./manage.py migrate"
         "&& ./manage.py compilescss"

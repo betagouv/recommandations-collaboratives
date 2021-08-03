@@ -17,7 +17,7 @@
             </li>
             <li class="breadcrumb-item">
                 <span class="text-secondary">
-                    <a href="{% url "addressbook-organization-list" %}">
+                    <a href="{% url "addressbook-organization-details" organization.id %}">
                         {{ organization.name }}
                     </a>
                 </span>
@@ -30,10 +30,12 @@
         </ol>
     </nav>
 
-    <form id="form-contact-create" method="POST">
+    <h2>Ajouter un contact à {{ organization.name }}</h2>
+
+    <form id="form-contact-create" class="form" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Créer">
+        <input class="btn btn-primary" type="submit" value="Créer">
     </form>
 
 </div>

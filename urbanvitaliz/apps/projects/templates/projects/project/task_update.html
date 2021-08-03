@@ -48,7 +48,19 @@
             {{ form.media }}
 	      </form>
 
-        
+        <hr/>
+        <div class="d-flex justify-content-end">
+            <form id="form-project-delete-task" method="POST" action="{% url 'projects-delete-task' task.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <svg class="bi " width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash"/>
+                    </svg>
+			              Supprimer
+		            </button>
+            </form>
+        </div>
+
 
     </section>
 

@@ -30,8 +30,18 @@ urlpatterns = [
         name="addressbook-organization-details",
     ),
     path(
+        r"addressbook/organization/<int:organization_id>/update/",
+        views.organization_update,
+        name="addressbook-organization-update",
+    ),
+    path(
         r"addressbook/organization/<int:organization_id>/create",
         views.contact_create,
         name="addressbook-organization-contact-create",
+    ),
+    path(
+        r"addressbook/contact/<int:contact_id>/update/",
+        views.contact_update,
+        name="addressbook-organization-contact-update",
     ),
 ]
