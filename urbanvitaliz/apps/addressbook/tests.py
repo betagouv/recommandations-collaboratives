@@ -56,8 +56,37 @@ def test_organization_list_available_for_staff_users(client):
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
+def test_organization_create_and_redirect(client):
+    url = reverse("addressbook-organization-create")
+
+    with login(client, is_staff=True):
+        data = {"name": "my organization"}
+        response = client.post(url, data=data)
+
+    organization = models.Organization.objects.all()[0]
+    assert organization.name == data["name"]
+
+    new_url = reverse("addressbook-organization-list")
+    assertRedirects(response, new_url)
+
+
+@pytest.mark.django_db
+def test_organization_create_error(client):
+    url = reverse("addressbook-organization-create")
+
+    data = {}
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    assert models.Organization.objects.count() == 0
+
+    assert response.status_code == 200
+
+
 #
 # update
+
 
 @pytest.mark.django_db
 def test_update_organization_not_available_for_non_staff_users(client):
@@ -140,8 +169,26 @@ def test_create_contact_available_for_staff_users(client):
     assert response.status_code == 200
     assertContains(response, 'form id="form-contact-create"')
 
+
+@pytest.mark.django_db
+def test_contact_create_and_redirect(client):
+    organization = Recipe(models.Organization).make()
+    url = reverse("addressbook-organization-contact-create", args=[organization.id])
+
+    with login(client, is_staff=True):
+        data = {"first_name": "my contact"}
+        response = client.post(url, data=data)
+
+    contact = models.Contact.objects.all()[0]
+    assert contact.first_name == data["first_name"]
+
+    new_url = reverse("addressbook-organization-details", args=[organization.id])
+    assertRedirects(response, new_url)
+
+
 #
 # update
+
 
 @pytest.mark.django_db
 def test_update_contact_not_available_for_non_staff_users(client):
