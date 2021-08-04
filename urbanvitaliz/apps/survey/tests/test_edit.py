@@ -184,7 +184,9 @@ def test_question_create_and_redirect(client):
     question = models.Question.objects.all()[0]
     assert question.text == data["text"]
 
-    new_url = reverse("survey-editor-question-set-details", args=[question.id])
+    new_url = reverse(
+        "survey-editor-question-set-details", args=[question.question_set_id]
+    )
     assertRedirects(response, new_url)
 
 
@@ -295,7 +297,9 @@ def test_choice_create_and_redirect(client):
     assert choice.text == data["text"]
     assert choice.value == data["value"]
 
-    new_url = reverse("survey-editor-question-set-details", args=[choice.id])
+    new_url = reverse(
+        "survey-editor-question-set-details", args=[question.question_set_id]
+    )
     assertRedirects(response, new_url)
 
 
