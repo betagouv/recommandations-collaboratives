@@ -7,14 +7,10 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-08-03 14:26:39 CEST
 """
 
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.shortcuts import render
-
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView
 
-from .. import models
-from .. import forms
+from .. import forms, models
 
 #####
 # Session

@@ -15,7 +15,7 @@ class QuestionSet(models.Model):
     )
 
     heading = models.CharField(max_length=255, verbose_name="En-tête")
-    icon = models.CharField(max_length=80, verbose_name="Icône")
+    icon = models.CharField(max_length=80, verbose_name="Icône", blank=True)
 
     subheading = models.TextField(verbose_name="Sous-titre")
 
@@ -56,7 +56,11 @@ class QuestionSet(models.Model):
 class Question(models.Model):
     """A question with mutliple choices"""
 
-    # tags_required =
+    precondition = TagField(
+        verbose_name="Pré-condition",
+        help_text="Affiche cette question si TOUS les signaux saisis sont émis",
+    )
+
     question_set = models.ForeignKey(
         QuestionSet, on_delete=models.CASCADE, related_name="questions"
     )
@@ -85,6 +89,10 @@ class Question(models.Model):
     def previous(self):
         """Return the previous question"""
         return self._following(order_by="-id")
+
+    def check_precondition(self):
+        """Return true if the precondition is met"""
+        return False
 
     def __str__(self):
         return self.text
@@ -155,6 +163,7 @@ class Answer(models.Model):
         Question, related_name="answers", on_delete=models.CASCADE
     )
     value = models.CharField(max_length=30)
+    signals = TagField(verbose_name="Signaux", blank=True, null=True)
     comment = models.TextField(blank=True)
 
-    # tags =
+tagging_register(Answer, tag_descriptor_attr="tags")
