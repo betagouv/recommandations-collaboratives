@@ -43,25 +43,40 @@ def test_session_next_question_succeed():
 
 
 @pytest.mark.django_db
-def test_question_precondition_succeeds():
-    session = Recipe(models.Session).make()
+def test_session_next_question_skips_answered_ones():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, text="Q1", question_set=qs).make()
+    q2 = Recipe(models.Question, text="Q2", question_set=qs).make()
+    q3 = Recipe(models.Question, text="Q3", question_set=qs).make()
 
-    signal = "gamma"
+    session = Recipe(models.Session, survey=survey).make()
 
-    Recipe(models.Answer, session=session, signals=signal).make()
+    # Answer Q2, meaning it should be skipped
+    Recipe(models.Answer, session=session, question=q2).make()
 
-    q = Recipe(models.Question, precondition=signal, text="Q-with-precondition").make()
+    assert session.next_question() == q1
+    Recipe(models.Answer, session=session, question=q1).make()
 
-    assert q.check_precondition(session) is True
+    assert session.next_question() == q3
 
 
 @pytest.mark.django_db
-def test_question_precondition_fails():
-    session = Recipe(models.Session).make()
+def test_session_next_question_skips_untriggered_question():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, text="Q1", question_set=qs).make()
+    q2 = Recipe(
+        models.Question, text="Q2", precondition="oscar-mike", question_set=qs
+    ).make()
+    q3 = Recipe(models.Question, text="Q3", question_set=qs).make()
 
-    q = Recipe(models.Question, precondition="gamma", text="Q-with-precondition").make()
+    session = Recipe(models.Session, survey=survey).make()
 
-    assert q.check_precondition(session) is False
+    assert session.next_question() == q1
+    Recipe(models.Answer, session=session, question=q1).make()
+
+    assert session.next_question() == q3
 
 
 @pytest.mark.django_db
@@ -216,3 +231,25 @@ def test_question_redirects_to_next_one(client):
 
     assert response.status_code == 302
     assert response.url == reverse("survey-question-details", args=(session.id, q2.id))
+
+
+@pytest.mark.django_db
+def test_question_precondition_succeeds():
+    session = Recipe(models.Session).make()
+
+    signal = "gamma"
+
+    Recipe(models.Answer, session=session, signals=signal).make()
+
+    q = Recipe(models.Question, precondition=signal, text="Q-with-precondition").make()
+
+    assert q.check_precondition(session) is True
+
+
+@pytest.mark.django_db
+def test_question_precondition_fails():
+    session = Recipe(models.Session).make()
+
+    q = Recipe(models.Question, precondition="gamma", text="Q-with-precondition").make()
+
+    assert q.check_precondition(session) is False
