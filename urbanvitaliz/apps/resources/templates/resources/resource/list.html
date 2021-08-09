@@ -14,6 +14,7 @@
 <script type="text/javascript">
  $(document).ready(function() {
      $(".filters-categories .form-check-input").click(function() { $(".quick-search form").submit(); });
+     $("#limit_area").change(function() { $(".quick-search form").submit(); });
  });
 </script>
 {% endblock %}
@@ -64,7 +65,7 @@
             <div class="input-group mb-3">
 
                 {% if limit_area != None and user.is_authenticated %}
-                <select name="limit_area" class="form-select" style="flex: 0 0 auto !important; min-width: 200px" aria-label="Limiter la zone géographique">
+                <select id="limit_area" name="limit_area" class="form-select" style="flex: 0 0 auto !important; min-width: 200px" aria-label="Limiter la zone géographique">
                     <option {% if not limit_area %}selected{% endif %} value="false">France entière</option>
                     <option {% if limit_area %}selected{% endif %} value="1">
                         {% for department in departments %}{{ department.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
