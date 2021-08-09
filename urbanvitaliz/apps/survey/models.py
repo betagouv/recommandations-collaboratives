@@ -145,15 +145,20 @@ class Session(models.Model):
         }
 
     def next_question(self):
-        """Return the first unanswered question"""
+        """
+        Return the next unanswered question.
+        It will trigger only the questions that passes their precondition.
+        This is the prefered interface to navigate questions
+        """
         answered_questions = Answer.objects.filter(session=self).values_list(
             "question__id", flat=True
         )
 
-        for qs in self.survey.question_sets.all():
-            for question in qs.questions.all():
+        for qs in self.survey.question_sets.order_by("id").all():
+            for question in qs.questions.order_by("id").all():
                 if question.id not in answered_questions:
-                    return question
+                    if question.check_precondition(self):
+                        return question
 
         return None
 
