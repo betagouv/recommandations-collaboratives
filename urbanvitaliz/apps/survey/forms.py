@@ -35,14 +35,23 @@ class AnswerForm(forms.Form):
     def update_session(self, session: models.Session):
         answer_value = self.cleaned_data.get("answer")
         comment = self.cleaned_data.get("comment", None)
+
+        # Get choice object
+        choice = models.Choice.objects.get(question=self.question, value=answer_value)
+
         answer, created = models.Answer.objects.get_or_create(
             session=session,
             question=self.question,
-            defaults={"value": answer_value, "comment": comment},
+            defaults={
+                "value": answer_value,
+                "comment": comment,
+                "signals": choice.signals,
+            },
         )
         if not created:
             answer.value = answer_value
             answer.comment = comment
+            answer.signals = choice.signals
             answer.save()
 
         return True
