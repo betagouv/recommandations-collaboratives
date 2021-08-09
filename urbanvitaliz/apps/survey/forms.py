@@ -36,7 +36,7 @@ class AnswerForm(forms.Form):
         answer_value = self.cleaned_data.get("answer")
         comment = self.cleaned_data.get("comment", None)
 
-        # Get choice object
+        # We need the Choice object for extra information (such as signals)
         choice = models.Choice.objects.get(question=self.question, value=answer_value)
 
         answer, created = models.Answer.objects.get_or_create(

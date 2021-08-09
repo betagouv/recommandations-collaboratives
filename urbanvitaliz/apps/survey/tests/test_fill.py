@@ -43,16 +43,40 @@ def test_session_next_question_succeed():
 
 
 @pytest.mark.django_db
-def test_question_precondition_succeed():
-    survey = Recipe(models.Survey).make()
-    qs = Recipe(models.QuestionSet, survey=survey).make()
-    q1 = Recipe(models.Question, text="Q1", question_set=qs).make()
-    q2 = Recipe(models.Question, text="Q2-with-precondition", question_set=qs).make()
+def test_question_precondition_succeeds():
+    session = Recipe(models.Session).make()
 
-    session = Recipe(models.Session, survey=survey).make()
-    next_q = session.next_question()
+    signal = "gamma"
 
-    assert next_q == q1
+    Recipe(models.Answer, session=session, signals=signal).make()
+
+    q = Recipe(models.Question, precondition=signal, text="Q-with-precondition").make()
+
+    assert q.check_precondition(session) is True
+
+
+@pytest.mark.django_db
+def test_question_precondition_fails():
+    session = Recipe(models.Session).make()
+
+    q = Recipe(models.Question, precondition="gamma", text="Q-with-precondition").make()
+
+    assert q.check_precondition(session) is False
+
+
+@pytest.mark.django_db
+def test_session_signals_union():
+    session = Recipe(models.Session).make()
+
+    signals = ["charlie-mike, pan, pan", "tango-yankee"]
+    answers = []
+    for signal in signals:
+        answers.append(Recipe(models.Answer, session=session, signals=signal).make())
+
+    # Check that each signal from the answers are found in the session
+    for answer in answers:
+        for tag in answer.tags:
+            assert tag.name in session.signals
 
 
 #####

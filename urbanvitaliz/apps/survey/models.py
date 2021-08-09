@@ -1,5 +1,6 @@
 from django.db import models
 from tagging.fields import TagField
+from tagging.models import Tag
 from tagging.registry import register as tagging_register
 
 
@@ -90,12 +91,20 @@ class Question(models.Model):
         """Return the previous question"""
         return self._following(order_by="-id")
 
-    def check_precondition(self):
+    def check_precondition(self, session: "Session"):
         """Return true if the precondition is met"""
-        return False
+        my_tags = set(self.precondition_tags.values_list("name", flat=True))
+        return my_tags.issubset(session.signals)
 
     def __str__(self):
         return self.text
+
+
+tagging_register(
+    Question,
+    tag_descriptor_attr="precondition_tags",
+    tagged_item_manager_attr="precondition_tagged",
+)
 
 
 class Choice(models.Model):
@@ -124,6 +133,16 @@ class Session(models.Model):
     survey = models.ForeignKey(
         Survey, related_name="sessions", on_delete=models.CASCADE
     )
+
+    @property
+    def signals(self):
+        """Return the union of signals from Answers of this Session"""
+        return {
+            tag.name
+            for tag in Tag.objects.usage_for_queryset(
+                Answer.objects.filter(session=self.pk)
+            )
+        }
 
     def next_question(self):
         """Return the first unanswered question"""
@@ -165,5 +184,6 @@ class Answer(models.Model):
     value = models.CharField(max_length=30)
     signals = TagField(verbose_name="Signaux", blank=True, null=True)
     comment = models.TextField(blank=True)
+
 
 tagging_register(Answer, tag_descriptor_attr="tags")

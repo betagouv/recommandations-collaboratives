@@ -7,13 +7,18 @@ import tagging.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('survey', '0011_alter_questionset_icon'),
+        ("survey", "0011_alter_questionset_icon"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='question',
-            name='precondition',
-            field=tagging.fields.TagField(blank=True, help_text='Affiche cette question si TOUS les signaux saisis sont émis', max_length=255, verbose_name='Pré-condition'),
+            model_name="question",
+            name="precondition",
+            field=tagging.fields.TagField(
+                blank=True,
+                help_text="Affiche cette question si TOUS les signaux saisis sont émis",
+                max_length=255,
+                verbose_name="Pré-condition",
+            ),
         ),
     ]
