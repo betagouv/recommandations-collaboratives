@@ -8,18 +8,12 @@ created: 2021-08-02 16:24:35 CEST
 """
 
 import pytest
-
 from django.urls import reverse
-
 from model_bakery.recipe import Recipe
-
-from pytest_django.asserts import assertContains
-from pytest_django.asserts import assertRedirects
-
+from pytest_django.asserts import assertContains, assertRedirects
 from urbanvitaliz.utils import login
 
 from .. import models
-
 
 ########################################################################
 # surveys
@@ -176,7 +170,7 @@ def test_question_set_detail_contains_question_links(client):
 def test_question_create_and_redirect(client):
     qs = Recipe(models.QuestionSet).make()
     url = reverse("survey-editor-question-create", args=[qs.id])
-    data = {"text": "the text of the question"}
+    data = {"text": "the text of the question", "priority": 1}
 
     with login(client, is_staff=True):
         response = client.post(url, data=data)
@@ -211,7 +205,7 @@ def test_question_create_error(client):
 def test_question_update_and_redirect(client):
     question = Recipe(models.Question).make()
     url = reverse("survey-editor-question-update", args=[question.id])
-    data = {"text": "the text of the question"}
+    data = {"text": "the text of the question", "priority": 0}
 
     with login(client, is_staff=True):
         response = client.post(url, data=data)

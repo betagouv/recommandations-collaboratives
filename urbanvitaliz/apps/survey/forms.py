@@ -73,7 +73,7 @@ class EditQuestionForm(forms.ModelForm):
 
     class Meta:
         model = models.Question
-        fields = ["text"]
+        fields = ["priority", "text"]
 
 
 class EditChoiceForm(forms.ModelForm):

@@ -62,6 +62,12 @@ class Question(models.Model):
         help_text="Affiche cette question si TOUS les signaux saisis sont émis",
     )
 
+    priority = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Priorité",
+        help_text="Priorité d'affichage. Le plus fort, le plus important.",
+    )
+
     question_set = models.ForeignKey(
         QuestionSet, on_delete=models.CASCADE, related_name="questions"
     )
@@ -69,11 +75,11 @@ class Question(models.Model):
 
     deleted = models.DateTimeField(null=True)
 
-    def _following(self, order_by):
+    def _following(self, order_by: list):
         """return the following question defined by the given order_by"""
         questions = self.question_set.questions
 
-        iterator = questions.order_by(order_by).iterator()
+        iterator = questions.order_by(*order_by).iterator()
         for question in iterator:
             if question == self:
                 try:
@@ -85,11 +91,11 @@ class Question(models.Model):
 
     def next(self):
         """Return the next question"""
-        return self._following(order_by="id")
+        return self._following(order_by=("-priority", "id"))
 
     def previous(self):
         """Return the previous question"""
-        return self._following(order_by="-id")
+        return self._following(order_by=("priority", "-id"))
 
     def check_precondition(self, session: "Session"):
         """Return true if the precondition is met"""
@@ -155,7 +161,7 @@ class Session(models.Model):
         )
 
         for qs in self.survey.question_sets.order_by("id").all():
-            for question in qs.questions.order_by("id").all():
+            for question in qs.questions.order_by("-priority", "id").all():
                 if question.id not in answered_questions:
                     if question.check_precondition(self):
                         return question
