@@ -22,6 +22,16 @@ urlpatterns = [
         name="survey-question-details",
     ),
     path(
+        "projects/survey/<int:session_id>/q-<int:question_id>/next/",
+        fill.survey_next_question,
+        name="survey-question-next",
+    ),
+    path(
+        "projects/survey/<int:session_id>/q-<int:question_id>/previous/",
+        fill.survey_previous_question,
+        name="survey-question-previous",
+    ),
+    path(
         "projects/survey/<int:session_id>/",
         fill.SessionDetailsView.as_view(),
         name="survey-session-details",

@@ -150,9 +150,9 @@ class Session(models.Model):
             )
         }
 
-    def next_question(self):
-        """
-        Return the next unanswered question.
+    def next_question(self, question=None):
+        """Return the next unanswered question or None.
+
         It will trigger only the questions that passes their precondition.
         This is the prefered interface to navigate questions
         """
@@ -160,18 +160,43 @@ class Session(models.Model):
             "question__id", flat=True
         )
 
-        for qs in self.survey.question_sets.order_by("id").all():
-            for question in qs.questions.order_by("-priority", "id").all():
-                if question.id not in answered_questions:
-                    if question.check_precondition(self):
-                        return question
+        if not question:
+            return self.first_question()
+
+        question = question.next()
+        while question:
+            if question.id not in answered_questions:
+                if question.check_precondition(self):
+                    return question
+            question = question.next()
+
+        return None
+
+    def previous_question(self, question=None):
+        """Return the previous unanswered question or None.
+
+        It will trigger only the questions that passes their precondition.
+        This is the prefered interface to navigate questions
+        """
+        answered_questions = Answer.objects.filter(session=self).values_list(
+            "question__id", flat=True
+        )
+        if not question:
+            return None
+
+        question = question.previous()
+        while question:
+            if question.id not in answered_questions:
+                if question.check_precondition(self):
+                    return question
+            question = question.previous()
 
         return None
 
     def first_question(self):
         """Return the first Question of the first Question Set"""
         for qs in self.survey.question_sets.all():
-            for question in qs.questions.all():
+            for question in qs.questions.all().order_by("-priority", "id"):
                 return question
 
         return None
