@@ -8,165 +8,20 @@ created: 2021-06-27 12:06:10 CEST
 """
 
 import pytest
+
 from django.urls import reverse
+
+from pytest_django.asserts import assertRedirects
+
 from model_bakery.recipe import Recipe
+
 from urbanvitaliz.utils import login
 
 from .. import models
 
 
-#####
-# Session
-#####
-@pytest.mark.django_db
-def test_session_next_question_if_none():
-    survey = Recipe(models.Survey).make()
-    Recipe(models.QuestionSet, survey=survey).make()
-    Recipe(models.QuestionSet, survey=survey).make()
-
-    session = Recipe(models.Session, survey=survey).make()
-
-    next_q = session.next_question()
-    assert next_q is None
-
-
-@pytest.mark.django_db
-def test_session_next_question_succeed():
-    survey = Recipe(models.Survey).make()
-    qs = Recipe(models.QuestionSet, survey=survey).make()
-    q1 = Recipe(models.Question, text="Q1", question_set=qs).make()
-
-    session = Recipe(models.Session, survey=survey).make()
-    next_q = session.next_question()
-
-    assert next_q == q1
-
-
-@pytest.mark.django_db
-def test_session_next_question_with_priority():
-    survey = Recipe(models.Survey).make()
-    qs = Recipe(models.QuestionSet, survey=survey).make()
-    Recipe(models.Question, priority=10, text="Q1", question_set=qs).make()
-    q2 = Recipe(models.Question, priority=100, text="Q2", question_set=qs).make()
-
-    session = Recipe(models.Session, survey=survey).make()
-    next_q = session.next_question()
-
-    assert next_q == q2
-
-
-@pytest.mark.django_db
-def test_session_next_question_skips_answered_ones():
-    survey = Recipe(models.Survey).make()
-    qs = Recipe(models.QuestionSet, survey=survey).make()
-    q1 = Recipe(models.Question, text="Q1", question_set=qs).make()
-    q2 = Recipe(models.Question, text="Q2", question_set=qs).make()
-    q3 = Recipe(models.Question, text="Q3", question_set=qs).make()
-
-    session = Recipe(models.Session, survey=survey).make()
-
-    # Answer Q2, meaning it should be skipped
-    Recipe(models.Answer, session=session, question=q2).make()
-
-    assert session.next_question() == q1
-    Recipe(models.Answer, session=session, question=q1).make()
-
-    assert session.next_question() == q3
-
-
-@pytest.mark.django_db
-def test_session_next_question_skips_untriggered_question():
-    survey = Recipe(models.Survey).make()
-    qs = Recipe(models.QuestionSet, survey=survey).make()
-    q1 = Recipe(models.Question, text="Q1", question_set=qs).make()
-    Recipe(
-        models.Question, text="Q2", precondition="oscar-mike", question_set=qs
-    ).make()
-    q3 = Recipe(models.Question, text="Q3", question_set=qs).make()
-
-    session = Recipe(models.Session, survey=survey).make()
-
-    assert session.next_question() == q1
-    Recipe(models.Answer, session=session, question=q1).make()
-
-    assert session.next_question() == q3
-
-
-@pytest.mark.django_db
-def test_session_signals_union():
-    session = Recipe(models.Session).make()
-
-    signals = ["charlie-mike, pan, pan", "tango-yankee"]
-    answers = []
-    for signal in signals:
-        answers.append(Recipe(models.Answer, session=session, signals=signal).make())
-
-    # Check that each signal from the answers are found in the session
-    for answer in answers:
-        for tag in answer.tags:
-            assert tag.name in session.signals
-
-
-#####
-# Question Sets
-#####
-@pytest.mark.django_db
-def test_question_set_next():
-    survey = Recipe(models.Survey).make()
-    qs1 = Recipe(models.QuestionSet, survey=survey).make()
-    qs2 = Recipe(models.QuestionSet, survey=survey).make()
-
-    assert qs2 == qs1.next()
-    assert qs2.next() is None
-
-
-@pytest.mark.django_db
-def test_question_set_previous():
-    survey = Recipe(models.Survey).make()
-    qs1 = Recipe(models.QuestionSet, survey=survey).make()
-    qs2 = Recipe(models.QuestionSet, survey=survey).make()
-
-    assert qs1 == qs2.previous()
-    assert qs1.previous() is None
-
-
-######
-# Questions
-#####
-
-
-@pytest.mark.django_db
-def test_question_next_question():
-    survey = Recipe(models.Survey).make()
-    qs = Recipe(models.QuestionSet, survey=survey).make()
-    q1 = Recipe(models.Question, priority=0, text="Q1", question_set=qs).make()
-    q2 = Recipe(models.Question, priority=0, text="Q2", question_set=qs).make()
-
-    assert q2 == q1.next()
-    assert q2.next() is None
-
-
-@pytest.mark.django_db
-def test_question_next_question_with_priority():
-    survey = Recipe(models.Survey).make()
-    qs = Recipe(models.QuestionSet, survey=survey).make()
-    q1 = Recipe(models.Question, text="Q1", priority=300, question_set=qs).make()
-    q2 = Recipe(models.Question, text="Q2", question_set=qs).make()
-    q3 = Recipe(models.Question, text="Q2", priority=200, question_set=qs).make()
-
-    assert q1.next() == q3
-    assert q3.next() == q2
-
-
-@pytest.mark.django_db
-def test_question_previous_question():
-    survey = Recipe(models.Survey).make()
-    qs = Recipe(models.QuestionSet, survey=survey).make()
-    q1 = Recipe(models.Question, priority=0, text="Q1", question_set=qs).make()
-    q2 = Recipe(models.Question, priority=0, text="Q2", question_set=qs).make()
-
-    assert q1 == q2.previous()
-    assert q1.previous() is None
+#
+# answering questions
 
 
 @pytest.mark.django_db
@@ -242,12 +97,11 @@ def test_answered_question_is_updated_to_session(client):
 
 
 @pytest.mark.django_db
-def test_question_redirects_to_next_one(client):
+def test_question_redirects_to_next_question(client):
     session = Recipe(models.Session).make()
     survey = Recipe(models.Survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
-    q2 = Recipe(models.Question, question_set=qs).make()
     choice = Recipe(models.Choice, question=q1, value="yep").make()
 
     url = reverse("survey-question-details", args=(session.id, q1.id))
@@ -255,26 +109,73 @@ def test_question_redirects_to_next_one(client):
         response = client.post(url, data={"answer": choice.value})
 
     assert response.status_code == 302
-    assert response.url == reverse("survey-question-details", args=(session.id, q2.id))
+    assert response.url == reverse("survey-question-next", args=(session.id, q1.id))
+
+
+#
+# navigating questions
 
 
 @pytest.mark.django_db
-def test_question_precondition_succeeds():
+def test_next_question_redirects_to_next_available_question(client):
     session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    q2 = Recipe(models.Question, question_set=qs).make()
 
-    signal = "gamma"
+    with login(client, is_staff=False):
+        url = reverse("survey-question-next", args=(session.id, q1.id))
+        response = client.get(url)
 
-    Recipe(models.Answer, session=session, signals=signal).make()
-
-    q = Recipe(models.Question, precondition=signal, text="Q-with-precondition").make()
-
-    assert q.check_precondition(session) is True
+    new_url = reverse("survey-question-details", args=(session.id, q2.id))
+    assertRedirects(response, new_url)
 
 
 @pytest.mark.django_db
-def test_question_precondition_fails():
+def test_next_question_redirects_to_done_when_not_more_questions(client):
     session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
 
-    q = Recipe(models.Question, precondition="gamma", text="Q-with-precondition").make()
+    with login(client, is_staff=False):
+        url = reverse("survey-question-next", args=(session.id, q1.id))
+        response = client.get(url)
 
-    assert q.check_precondition(session) is False
+    new_url = reverse("survey-session-done", args=(session.id,))
+    assertRedirects(response, new_url)
+
+
+@pytest.mark.django_db
+def test_previous_question_redirects_to_previous_available_question(client):
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    q2 = Recipe(models.Question, question_set=qs).make()
+
+    with login(client, is_staff=False):
+        url = reverse("survey-question-previous", args=(session.id, q2.id))
+        response = client.get(url)
+
+    new_url = reverse("survey-question-details", args=(session.id, q1.id))
+    assertRedirects(response, new_url)
+
+
+@pytest.mark.django_db
+def test_previous_question_redirects_to_survey_when_not_more_questions(client):
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+
+    with login(client, is_staff=False):
+        url = reverse("survey-question-previous", args=(session.id, q1.id))
+        response = client.get(url)
+
+    new_url = reverse("survey-session-details", args=(session.id,))
+    assertRedirects(response, new_url)
+
+
+# eof
