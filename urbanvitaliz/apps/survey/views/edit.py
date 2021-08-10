@@ -7,16 +7,12 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-08-03 14:26:39 CEST
 """
 
-from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
-from .. import models
-from .. import forms
-
+from .. import forms, models
 
 ########################################################################
 # survey
@@ -39,6 +35,7 @@ def survey_details(request, survey_id=None):
 def question_set_details(request, question_set_id=None):
     """Return the details of given question_set"""
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
+    questions = question_set.questions.order_by("-priority")
     return render(request, "survey/editor/question_set/details.html", locals())
 
 
