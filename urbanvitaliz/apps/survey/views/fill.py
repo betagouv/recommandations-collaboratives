@@ -57,12 +57,16 @@ def survey_question_details(request, session_id, question_id):
     return render(request, "survey/question_details.html", locals())
 
 
-def survey_next_question(request, session_id, question_id):
+def survey_next_question(request, session_id, question_id=None):
     """Redirect to next unanswered/answerable question from survey"""
     session = get_object_or_404(models.Session, pk=session_id)
-    question = get_object_or_404(models.Question, pk=question_id)
 
-    next_question = session.next_question(question)
+    if question_id is not None:
+        question = get_object_or_404(models.Question, pk=question_id)
+        next_question = session.next_question(question)
+    else:
+        next_question = session.next_question()
+
     if next_question:
         # redirect to question
         return redirect(
