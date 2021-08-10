@@ -68,10 +68,7 @@ def test_session_next_question_skips_answered_ones():
     # Answer Q2, meaning it should be skipped
     Recipe(models.Answer, session=session, question=q2).make()
 
-    assert session.next_question() == q1
-    Recipe(models.Answer, session=session, question=q1).make()
-
-    assert session.next_question() == q3
+    assert session.next_question(q1) == q3
 
 
 @pytest.mark.django_db
@@ -86,10 +83,7 @@ def test_session_next_question_skips_untriggered_question():
 
     session = Recipe(models.Session, survey=survey).make()
 
-    assert session.next_question() == q1
-    Recipe(models.Answer, session=session, question=q1).make()
-
-    assert session.next_question() == q3
+    assert session.next_question(q1) == q3
 
 
 @pytest.mark.django_db
@@ -242,12 +236,11 @@ def test_answered_question_is_updated_to_session(client):
 
 
 @pytest.mark.django_db
-def test_question_redirects_to_next_one(client):
+def test_question_redirects_to_next_question(client):
     session = Recipe(models.Session).make()
     survey = Recipe(models.Survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
-    q2 = Recipe(models.Question, question_set=qs).make()
     choice = Recipe(models.Choice, question=q1, value="yep").make()
 
     url = reverse("survey-question-details", args=(session.id, q1.id))
@@ -255,7 +248,7 @@ def test_question_redirects_to_next_one(client):
         response = client.post(url, data={"answer": choice.value})
 
     assert response.status_code == 302
-    assert response.url == reverse("survey-question-details", args=(session.id, q2.id))
+    assert response.url == reverse("survey-question-next", args=(session.id, q1.id))
 
 
 @pytest.mark.django_db
