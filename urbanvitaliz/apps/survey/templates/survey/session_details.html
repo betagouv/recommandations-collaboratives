@@ -4,23 +4,13 @@
 
 <div class="col-11 py-5 mx-auto">
 
-    <h1>Questions pour un·e Champion·ne</h1>
-
-    <p>
-        Ce qui vous attend :
-
-        <ul>
-            {% for qs in session.survey.question_sets.all %}
-            <li>{{ qs.questions.count }} question{{ qs.questions.count|pluralize }} dans la thématique  <strong>{{ qs.heading }}</strong></li>
-            {% endfor %}
-        </ul>
-    </p>
+    <h1>Questionnaire</h1>
 
     {% if session.answers.count %}
 
     {% if session.next_question %}
     <p>
-        Vous avez déjà commencé à répondre aux questions. <a href="{% url 'survey-question-details' session.id session.next_question.id %}">Continuer</a> ?
+        Vous avez déjà commencé à répondre aux questions. <a href="{% url 'survey-session-start' session.id  %}">Continuer</a> ?
     </p>
     {% else %}
     <p>
@@ -29,37 +19,32 @@
     {% endif %}
 
 
-    <h4>Vous avez déjà répondu à</h4>
-
-    <table class="table">
-        <tr>
-            <th>Section</th>
-            <th>Question</th>
-            <th>Réponse</th>
-            <th>Commentaire</th>
-        </tr>
-        {% for answer in session.answers.all %}
-        <tr>
-            <td>
-                {{ answer.question.question_set }}
-            </td>
-            <td>
-                <a href="{% url 'survey-question-details' session.id answer.question.id %}">{{ answer.question.text }}</a>
-            </td>
-            <td>
-                {{ answer.value }}
-            </td>
-            <td>
-                {{ answer.comment }}
-            </td>
-        </tr>
+    <div class="row row-cols-2 row-cols-md-3 g-4">
+        {% for question_set in session.survey.question_sets.all %}
+        <div class="col">
+            <div class="card text-white" style="background: #5DC2B0;">
+                <div class="card-body mt-2 mb-2 ms-2">
+                    <div style="border-left: 5px solid white; border-radius: 2px; padding-left: 20px;">
+                        <h5 class="card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set.heading }}</h5>
+                        <progress class="mb-0" max="100" value="33"></progress>
+                        <h6>33%</h6>
+                        <p class="card-text">
+                            <ul class="list-unstyled">
+                                {% for question in question_set.questions.all %}
+                                <li>{{ question.text }}</li>
+                                {% endfor %}
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </table>
-
+    </div>
 
     {% else %}
     C'est la première fois que vous venez ! 
-    <a href="{% url 'survey-question-details' session.id session.first_question.id %}">
+    <a href="{% url 'survey-session-start' session.id %}">
         Commençons !
     </a>
     {% endif %}

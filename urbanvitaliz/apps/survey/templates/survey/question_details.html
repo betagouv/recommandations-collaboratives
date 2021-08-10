@@ -91,13 +91,13 @@
 
 
                     <div class="btn-group me-2" role="group" aria-label="First group">
-                        <a class="btn btn-outline-warning" href="#">
+                        <a class="btn btn-outline-warning" href="{% url 'survey-session-details' question.question_set.survey.id %}">
                             <svg class="d-inline-block bi" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#cup-fill"/>
                             </svg>&nbsp;
                             Je Break !
                         </a>
-                        <a class="btn btn-outline-secondary" href="#">
+                        <a class="btn btn-outline-secondary" href="{% url 'survey-question-next' session.id question.id %}">
                             <svg class="d-inline-block bi" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#patch-question"/>
                             </svg>&nbsp;
@@ -133,19 +133,15 @@
                     {% lorem 1 %}
                 </p>
 
-                <p>
-                    {% include "resources/resource/widgets/card_horizontal.html" with resource=question %}
-                </p>
+                
             </div>
         </div>
     </div>
 
-    {% if question.previous %}
     <ul>
-        <li><a href="{% url 'survey-question-details' session.id question.previous.id %}">Revenir à la question précédente</a></li>
+        <li><a href="{% url 'survey-question-previous' session.id question.id %}">Revenir à la question précédente</a></li>
         <li>        <a href="{% url 'survey-session-details' session.id %}">Revenir au tableau de bord</a></li>
     </ul>
-    {% endif %}
 
 </div>
 
