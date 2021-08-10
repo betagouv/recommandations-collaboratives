@@ -62,13 +62,13 @@ def survey_next_question(request, session_id, question_id):
     session = get_object_or_404(models.Session, pk=session_id)
     question = get_object_or_404(models.Question, pk=question_id)
 
-    next_question = session.next(question)
+    next_question = session.next_question(question)
     if next_question:
         # redirect to question
         return redirect(
             "survey-question-details",
-            session_id=session.pk,
-            question_id=next_question.pk,
+            session_id=session.id,
+            question_id=next_question.id,
         )
     # we're done
     return redirect("survey-session-done", session_id=session.pk)
@@ -79,13 +79,13 @@ def survey_previous_question(request, session_id, question_id):
     session = get_object_or_404(models.Session, pk=session_id)
     question = get_object_or_404(models.Question, pk=question_id)
 
-    previous_question = session.previous(question)
+    previous_question = session.previous_question(question)
     if previous_question:
         # redirect to question
         return redirect(
             "survey-question-details",
-            session_id=session.pk,
-            question_id=previous_question.pk,
+            session_id=session.id,
+            question_id=previous_question.id,
         )
     # go back to survey
     return redirect("survey-session-details", session_id=session.pk)
