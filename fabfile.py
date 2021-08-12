@@ -18,30 +18,40 @@ import urbanvitaliz
 
 PACKAGE = f"urbanvitaliz-django-{urbanvitaliz.VERSION}.tar.gz"
 
+# TODO make target folder being
+# - prod if branch == main,
+# - develop if branch == develop, and
+# - error otherwise.
 
 @task
-def upgrade(cnx):
-    """Upgrade requirements to last version on server"""
+def upgrade(cnx, site=None):
+    """Upgrade requirements to last version on server for site"""
+    if site not in ["production", "development"]:
+        print("Usage: fab upgrade --site={production,development} --hosts=...")
+        return
     cnx.put(
         "./requirements-srv.txt",
-        remote="./urbanvitaliz-production/requirements.txt",
+        remote=f"./urbanvitaliz-{site}/requirements.txt",
     )
     cnx.run(
-        "cd urbanvitaliz-production "
+        f"cd urbanvitaliz-{site} "
         "&& venv/bin/pip install --upgrade -r requirements.txt"
     )
 
 
 @task
-def deploy(cnx):
-    """Deploy new version of project to server"""
+def deploy(cnx, site=None):
+    """Deploy new version of project to server for site"""
+    if site not in ["production", "development"]:
+        print("Usage: fab deploy --site={production,development} --hosts=...")
+        return
     run_setup("setup.py", script_args=["sdist"])
     cnx.put(
         f"./dist/{PACKAGE}",
-        remote=f"./urbanvitaliz-production/dist/{PACKAGE}",
+        remote=f"./urbanvitaliz-{site}/dist/{PACKAGE}",
     )
     cnx.run(
-        "cd urbanvitaliz-production "
+        f"cd urbanvitaliz-{site} "
         f"&& ./venv/bin/pip install ./dist/{PACKAGE}"
         "&& ./manage.py migrate"
         "&& ./manage.py compilescss"
