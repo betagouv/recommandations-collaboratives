@@ -46,7 +46,7 @@
         <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
             <!-- Preview -->
             <div class="d-grid gap-2 mb-3">
-                <a class="btn btn-primary btn-sm" href="{% url 'survey-question-details' 1 question_set.id %}" role="button">
+                <a class="btn btn-primary btn-sm" href="#" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightning"/>
                     </svg>
@@ -136,6 +136,7 @@
                 <div>{{ choice.text }} (<span class="fw-bold">{{ choice.value }}</span>)</div>
                 <a href="{% url 'survey-editor-choice-update' choice.pk %}">éditer</a>
             </div>
+            {% if choice.tags %}
             <div>
                 <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#tags"/>
@@ -144,6 +145,7 @@
                 <span class="badge bg-dark rounded-pill">{{ tag }}</span>
                 {% endfor %}
             </div>
+            {% endif %}
         </li>
         {% endfor %}
     </ul>

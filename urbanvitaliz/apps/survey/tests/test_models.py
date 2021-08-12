@@ -129,6 +129,7 @@ def test_session_previous_question_skips_untriggered_question():
 #
 # use of question signals
 
+
 @pytest.mark.django_db
 def test_session_signals_union():
     session = Recipe(models.Session).make()
