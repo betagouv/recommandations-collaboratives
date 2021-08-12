@@ -7,30 +7,19 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-06-16 10:59:08 CEST
 """
 
+from django import forms
 from django.contrib.auth.decorators import login_required
 from django.contrib.syndication.views import Feed
-
-from django import forms
-
-from django.utils import timezone
-
-from django.urls import reverse
-
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.shortcuts import render
-
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
-
+from django.urls import reverse
+from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
-
+from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import is_staff_or_403
 
-from urbanvitaliz.apps.projects import models as projects
-
 from . import models
-
 
 ########################################################################
 # Searching resources
@@ -159,7 +148,7 @@ def resource_create(request):
             next_url = reverse("resources-resource-detail", args=[resource.id])
             return redirect(next_url)
     else:
-        form = EditResourceForm()
+        form = EditResourceForm(initial={"public": True})
     return render(request, "resources/resource/create.html", locals())
 
 
@@ -186,12 +175,14 @@ class EditResourceForm(forms.ModelForm):
     subtitle = forms.CharField(
         label="Sous-Titre",
         widget=forms.TextInput(attrs={"class": "form-control"}),
+        required=False,
     )
     summary = forms.CharField(
         label="Résumé bref",
         widget=forms.Textarea(
             attrs={"class": "form-control", "rows": "3", "maxlength": 400}
         ),
+        required=False,
     )
     tags = forms.CharField(
         label="Mots-clés",
@@ -209,6 +200,7 @@ class EditResourceForm(forms.ModelForm):
             "departments",
             "content",
             "contacts",
+            "public",
         ]
 
 
