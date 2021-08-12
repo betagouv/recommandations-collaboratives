@@ -36,6 +36,15 @@
                 <a href="tel:{{contact.phone_no}}">{{ contact.phone_no }}</a>
             </div>
             {% endif %}
+            {% if contact.mobile_no %}
+            <div class="small text-secondary">
+                <svg class="bi" width="12" height="12" >
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#phone"/>
+                </svg>
+                &nbsp;
+                <a href="tel:{{contact.mobile_no}}">{{ contact.mobile_no }}</a>
+            </div>
+            {% endif %}
             {% if contact.email %}
             <div class="small text-secondary">
                 <svg class="bi" width="12" height="12" >
