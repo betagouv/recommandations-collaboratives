@@ -10,8 +10,7 @@ created : 2021-07-27 10:06:23 CEST
 
 from django.urls import path
 
-from .views import fill
-from .views import edit
+from .views import edit, fill
 
 urlpatterns = [
     #
@@ -35,6 +34,11 @@ urlpatterns = [
         "projects/survey/<int:session_id>/",
         fill.SessionDetailsView.as_view(),
         name="survey-session-details",
+    ),
+    path(
+        "projects/survey/<int:session_id>/start/",
+        fill.survey_next_question,
+        name="survey-session-start",
     ),
     path(
         "projects/survey/<int:session_id>/done",

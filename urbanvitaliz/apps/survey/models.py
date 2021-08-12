@@ -161,9 +161,10 @@ class Session(models.Model):
         )
 
         if not question:
-            return self.first_question()
+            question = self.first_question()
+        else:
+            question = question.next()
 
-        question = question.next()
         while question:
             if question.id not in answered_questions:
                 if question.check_precondition(self):
