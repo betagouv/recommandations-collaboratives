@@ -46,7 +46,7 @@
                 </a>
 
                 <div class="d-grid gap-2 mt-3">
-                    <a class="btn btn-primary btn-sm" href="mailto:contact@urbanvitaliz.fr?subject=UrbanVitaliz" role="button">
+                    <a class="btn btn-primary btn-sm" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=UrbanVitaliz" role="button">
                         <svg class="bi" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
                         </svg>
