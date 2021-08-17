@@ -9,6 +9,7 @@ created: 2021-08-03 14:26:39 CEST
 
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView
+from urbanvitaliz.apps.projects import models as projects_models
 
 from .. import forms, models
 
@@ -55,6 +56,19 @@ def survey_question_details(request, session_id, question_id):
         form = forms.AnswerForm(question, answer)
 
     return render(request, "survey/question_details.html", locals())
+
+
+def survey_create_session_for_project(request, project_id):
+    """Create a session for the given project if necessary. Redirects to
+    session."""
+    project = get_object_or_404(projects_models.Project, pk=project_id)
+    survey = get_object_or_404(models.Survey, pk=1)  # XXX Hardcoded survey ID
+
+    session, created = models.Session.objects.get_or_create(
+        project=project, survey=survey
+    )
+
+    return redirect("survey-session-start", session_id=session.id)
 
 
 def survey_next_question(request, session_id, question_id=None):
