@@ -73,6 +73,9 @@ class Question(models.Model):
     )
     text = models.CharField(max_length=255, verbose_name="Texte de la question")
 
+    how = models.TextField(default="", blank=True)
+    why = models.TextField(default="", blank=True)
+
     deleted = models.DateTimeField(null=True)
 
     def _following(self, order_by: list):
