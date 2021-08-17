@@ -233,7 +233,6 @@ class Session(models.Model):
         return (
             self.answers.select_related()
             .annotate(question_set=F("question__question_set__heading"))
-            .annotate(question_set_completion=Count("id"))
             .order_by("question__question_set")
         )
 

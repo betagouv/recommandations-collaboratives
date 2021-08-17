@@ -8,7 +8,7 @@ created: 2021-08-03 14:26:39 CEST
 """
 
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import DetailView
+from django.views.generic import DetailView, RedirectView
 from urbanvitaliz.apps.projects import models as projects_models
 
 from .. import forms, models
@@ -25,10 +25,15 @@ class SessionDetailsView(DetailView):
     template_name = "survey/session_details.html"
 
 
-class SessionDoneView(DetailView):
-    model = models.Session
-    pk_url_kwarg = "session_id"
-    template_name = "survey/session_done.html"
+class SessionDoneView(RedirectView):
+    permanent = False
+    query_string = True
+    pattern_name = "projects-project-detail"
+
+    def get_redirect_url(self, *args, **kwargs):
+        session = get_object_or_404(models.Session, pk=kwargs["session_id"])
+        project = get_object_or_404(projects_models.Project, pk=session.project.id)
+        return super().get_redirect_url(*args, project_id=project.id)
 
 
 #####
