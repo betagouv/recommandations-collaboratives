@@ -8,6 +8,7 @@ created : 2021-07-27 11:33:08 CEST
 """
 
 from django import forms
+from markdownx.fields import MarkdownxFormField
 
 from . import models
 
@@ -90,9 +91,12 @@ class EditQuestionSetForm(forms.ModelForm):
 class EditQuestionForm(forms.ModelForm):
     """Create and update form for questions"""
 
+    why = MarkdownxFormField(required=False)
+    how = MarkdownxFormField(required=False)
+
     class Meta:
         model = models.Question
-        fields = ["priority", "text", "precondition", "is_multiple"]
+        fields = ["priority", "is_multiple", "text", "precondition", "why", "how"]
 
 
 class EditChoiceForm(forms.ModelForm):

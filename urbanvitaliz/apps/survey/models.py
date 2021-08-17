@@ -1,8 +1,10 @@
 from django.db import models
-
+from django.db.models import Count, F
+from markdownx.utils import markdownify
 from tagging.fields import TagField
 from tagging.models import Tag
 from tagging.registry import register as tagging_register
+from urbanvitaliz.apps.projects import models as projects_models
 
 
 class Survey(models.Model):
@@ -74,11 +76,24 @@ class Question(models.Model):
     )
     text = models.CharField(max_length=255, verbose_name="Texte de la question")
 
-    how = models.TextField(default="", blank=True)
-    why = models.TextField(default="", blank=True)
+    how = models.TextField(default="", blank=True, verbose_name="Comment ?")
+
+    @property
+    def how_rendered(self):
+        """Return content as markdown"""
+        return markdownify(self.how)
+
+    why = models.TextField(default="", blank=True, verbose_name="Pourquoi ?")
+
+    @property
+    def why_rendered(self):
+        """Return content as markdown"""
+        return markdownify(self.why)
 
     # does this question expect a multiple choice or single choice answer
-    is_multiple = models.BooleanField(default=False, blank=True)
+    is_multiple = models.BooleanField(
+        default=False, blank=True, verbose_name="Est un QCM ?"
+    )
 
     deleted = models.DateTimeField(null=True)
 
@@ -147,6 +162,10 @@ class Session(models.Model):
         Survey, related_name="sessions", on_delete=models.CASCADE
     )
 
+    project = models.OneToOneField(
+        projects_models.Project, related_name="survey_session", on_delete=models.CASCADE
+    )
+
     @property
     def signals(self):
         """Return the union of signals from Answers of this Session"""
@@ -208,6 +227,14 @@ class Session(models.Model):
                 return question
 
         return None
+
+    def answers_by_questions_set(self):
+        return (
+            self.answers.select_related()
+            .annotate(question_set=F("question__question_set__heading"))
+            .annotate(question_set_completion=Count("id"))
+            .order_by("question__question_set")
+        )
 
     def __str__(self):
         return "Session #{0}".format(self.id)
