@@ -25,6 +25,13 @@ class SessionDetailsView(DetailView):
     template_name = "survey/session_details.html"
 
 
+class SessionResultsView(DetailView):
+    model = models.Session
+    pk_url_kwarg = "session_id"
+    context_object_name = "session"
+    template_name = "survey/session_results.html"
+
+
 class SessionDoneView(RedirectView):
     permanent = False
     query_string = True
