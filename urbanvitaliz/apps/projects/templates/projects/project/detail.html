@@ -140,19 +140,33 @@
                  </p>
 
                  <button type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#exampleModal">
-                 <svg class="bi" width="16" height="16" fill="currentColor">
-                 <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#telephone"/>
-                 </svg>
-                 Prendre rendez-vous
+                     <svg class="bi" width="16" height="16" fill="currentColor">
+                         <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#telephone"/>
+                     </svg>
+                     Prendre rendez-vous
                  </button>
 
                  ou <a href="#">poser une question</a>.
-                 </button>
+                        </button>
 
-            -->
+                        -->
 
         </div>
     </div>
+
+    {% if request.GET.first_time %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">
+            <svg class="bi align-middle" width="40" height="40" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
+            </svg>
+            Merci !
+        </h4>
+        <p class="mb-0"><strong>Nous avons bien reçu votre demande et allons vous contacter.</strong></p>
+        <p class="mb-0">Marquez cette page, elle vous permettra de suivre l'avancement de vos démarches et d'échanger avec l'équipe d'accompagnement.</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
 
     {% if not project.tasks.count %}
     <div class="border  p-5 align-items-center">
@@ -298,7 +312,7 @@
 
     {% endif %}
 
-    {% if project.tasks.count %}
+    {% if project.tasks.count or user.is_staff %}
     <!-- Actions -->
     <div class="w-100">
         <h2 class="mb-3 d-inline-block">
