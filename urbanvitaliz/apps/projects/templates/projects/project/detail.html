@@ -13,21 +13,21 @@
 
 {% block js %}
 <script type="text/javascript">
- function textFoldToggle(id) {
-     var excerpt = document.getElementById("excerpt-" + id);
-     var moreText = document.getElementById("more-" + id);
-     var btnText = document.getElementById("foldBtn-" + id);
+function textFoldToggle(id) {
+    var excerpt = document.getElementById("excerpt-" + id);
+    var moreText = document.getElementById("more-" + id);
+    var btnText = document.getElementById("foldBtn-" + id);
 
-     if (moreText.style.display === "inline") {
-         excerpt.style.display = "inline";
-         btnText.innerHTML = "[Lire tout]";
-         moreText.style.display = "none";
-     } else {
-         excerpt.style.display = "none";
-         btnText.innerHTML = "[Réduire]";
-         moreText.style.display = "inline";
-     }
- }
+    if (moreText.style.display === "inline") {
+        excerpt.style.display = "inline";
+        btnText.innerHTML = "[Lire tout]";
+        moreText.style.display = "none";
+    } else {
+        excerpt.style.display = "none";
+        btnText.innerHTML = "[Réduire]";
+        moreText.style.display = "inline";
+    }
+}
 </script>
 {% endblock %}
 
@@ -131,22 +131,22 @@
             {% endif %}
 
             <!--
-                 <p>
-                 <span class="align-items-center link-dark text-decoration-none">
-                 <img src="https://github.com/salomeDeschenes.png" alt="" width="32" height="32" class="rounded-circle me-2">
-                 <strong>Salomé D.</strong>
-                 </span> est votre <strong>accompagnatrice</strong> UrbanVitaliz sur ce projet. N'hésitez pas à <strong>prendre rendez-vous</strong> pour lui <strong>poser vos questions</strong> et faire avancer votre projet.
+            <p>
+                <span class="align-items-center link-dark text-decoration-none">
+                    <img src="https://github.com/salomeDeschenes.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <strong>Salomé D.</strong>
+                </span> est votre <strong>accompagnatrice</strong> UrbanVitaliz sur ce projet. N'hésitez pas à <strong>prendre rendez-vous</strong> pour lui <strong>poser vos questions</strong> et faire avancer votre projet.
 
-                 </p>
+            </p>
 
-                 <button type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#exampleModal">
-                     <svg class="bi" width="16" height="16" fill="currentColor">
-                         <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#telephone"/>
-                     </svg>
-                     Prendre rendez-vous
-                 </button>
+            <button type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#exampleModal">
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#telephone"/>
+                </svg>
+                Prendre rendez-vous
+            </button>
 
-                 ou <a href="#">poser une question</a>.
+            ou <a href="#">poser une question</a>.
                         </button>
 
                         -->
@@ -201,7 +201,7 @@
             </h4>
 
             <a href="{% url 'survey-project-session' project.id %}" class="text-white fw-bolder text-decoration-none stretched-link">
-                    <span class="align-middle">Démarrer</span><span class="fs-2 align-middle"> &#8594;</span>
+                <span class="align-middle">Démarrer</span><span class="fs-2 align-middle"> &#8594;</span>
             </a>
         </div>
         <div class="w-100">
@@ -266,34 +266,38 @@
     -->
 
     {% if project.survey_session or project.tasks.count %}
-         <h2 class="mt-5 mb-3">
-             <svg class="bi" width="28" height="28" fill="currentColor">
-                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
-             </svg>
-             Connaissances du site
-         </h2>
+    <h2 class="mt-5 mb-3">
+        <svg class="bi" width="28" height="28" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
+        </svg>
+        Connaissances du site
+    </h2>
 
 
-         <p class="text-secondary">
-             La <strong>pertinence de nos recommandations</strong> est liée à la connaissance que nous avons de votre site.
-             {% if project.survey_session %}
-             N'hésitez pas <a href="{% url 'survey-session-start' project.survey_session.id %}">à l'enrichir</a> !
-             {% endif %}
-         </p>
+    <p class="text-secondary">
+        La <strong>pertinence de nos recommandations</strong> est liée à la connaissance que nous avons de votre site.
+        {% if project.survey_session  %}
+        {% if project.survey_session.next_question %}
+        N'hésitez pas <a href="{% url 'survey-session-start' project.survey_session.id %}">à continuer le questionnaire</a> !
+        {% else %}
+        <strong>Merci</strong> d'avoir répondu à toutes les questions !
+        {% endif %}
+        {% endif %}
+    </p>
 
-         {% if project.survey_session %}
+    {% if project.survey_session and project.survey_session.answers.count > 0 %}
 
-         <div class="row row-cols-2 row-cols-md-3 g-4 mb-5">
-             {% regroup project.survey_session.answers_by_questions_set by question_set as answer_list %}
+    <div class="row row-cols-2 row-cols-md-3 g-4 mb-5">
+        {% regroup project.survey_session.answers_by_questions_set by question_set as answer_list %}
 
-             {% for question_set, answers in answer_list %}
-             <div class="col">
-                 {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set answers=answers %}
-             </div>
-             {% endfor %}
-         </div>
+        {% for question_set, answers in answer_list %}
+        <div class="col">
+            {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set answers=answers %}
+        </div>
+        {% endfor %}
+    </div>
 
-         {% else %}
+    {% else %}
 
     <div class="bd-callout bd-callout-warning text-white position-relative mb-5" style="border-radius: 10px; background: #5DC2B0;">
         <div class="d-flex justify-content-between w-100">
@@ -304,7 +308,7 @@
             </h4>
 
             <a href="{% url 'survey-project-session' project.id %}" class="text-white fw-bolder text-decoration-none stretched-link">
-                    <span class="align-middle">Répondre</span><span class="fs-2 align-middle"> &#8594;</span>
+                <span class="align-middle">Répondre</span><span class="fs-2 align-middle"> &#8594;</span>
             </a>
         </div>
     </div>
