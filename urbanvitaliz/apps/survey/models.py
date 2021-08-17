@@ -1,4 +1,7 @@
 from django.db import models
+
+from django.contrib.postgres import fields as pg
+
 from tagging.fields import TagField
 from tagging.models import Tag
 from tagging.registry import register as tagging_register
@@ -75,6 +78,9 @@ class Question(models.Model):
 
     how = models.TextField(default="", blank=True)
     why = models.TextField(default="", blank=True)
+
+    # does this question expect a multiple choice or single choice answer
+    is_multiple = models.BooleanField(default=False, blank=True)
 
     deleted = models.DateTimeField(null=True)
 
@@ -221,7 +227,8 @@ class Answer(models.Model):
     question = models.ForeignKey(
         Question, related_name="answers", on_delete=models.CASCADE
     )
-    value = models.CharField(max_length=30)
+    value = models.CharField(max_length=30)  # field to be  removed in future version
+    values = pg.ArrayField(models.CharField(max_length=32), default=list, blank=True)
     signals = TagField(verbose_name="Signaux", blank=True, null=True)
     comment = models.TextField(blank=True)
 
