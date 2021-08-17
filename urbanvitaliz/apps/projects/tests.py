@@ -7,30 +7,20 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
-import pytest
-
-from pytest_django.asserts import assertContains
-from pytest_django.asserts import assertNotContains
-from pytest_django.asserts import assertRedirects
-
-from django.urls import reverse
-
 import django.core.mail
-
+import pytest
 from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
-
+from django.urls import reverse
 from model_bakery.recipe import Recipe
-
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
+from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
 
-from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.apps.geomatics import models as geomatics
-
-from .templatetags import projects_extra
-
 from . import models
-
+from .templatetags import projects_extra
 
 # TODO when local authority can see & update her project
 # TODO check that project, note, and task belong to her
@@ -80,7 +70,7 @@ def test_performing_onboarding_create_a_new_project(client):
     note = models.Note.objects.all()[0]
     assert note.project == project
     assert note.content == f"# Demande initiale\n\n{project.impediments}"
-    assert response.status_code == 200
+    assert response.status_code == 302
 
 
 @pytest.mark.django_db
@@ -100,7 +90,7 @@ def test_performing_onboarding_sets_existing_postal_code(client):
                 "impediments": "some impediment",
             },
         )
-    assert response.status_code == 200
+    assert response.status_code == 302
     project = models.Project.fetch()[0]
     assert project.commune == commune
 
@@ -121,7 +111,7 @@ def test_performing_onboarding_discard_unknown_postal_code(client):
                 "impediments": "some impediment",
             },
         )
-    assert response.status_code == 200
+    assert response.status_code == 302
     project = models.Project.fetch()[0]
     assert project.commune is None
 
