@@ -3,9 +3,9 @@
 <div class="card text-white" style="background: #5DC2B0;">
     <div class="card-body mt-2 ms-2">
         <div style="border-left: 5px solid white; border-radius: 2px; padding-left: 20px;">
-            <h5 class="card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set }}</h5>
+            <h5 class="card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set.heading }}</h5>
             <progress class="mb-0" max="100" value="{% question_set_completion answers.0.session answers.0.question.question_set %}"></progress> 
-            <h6>{% question_set_completion answers.0.session answers.0.question.question_set %}%</h6>
+            <h6>{% question_set_completion answers.0.session question_set %}%</h6>
             <p class="card-text">
                 <ul class="list-unstyled">
                     {{ question_set_completion }}

@@ -228,14 +228,6 @@ class Session(models.Model):
 
         return None
 
-    def answers_by_questions_set(self):
-        """Return answers grouped by their question_set"""
-        return (
-            self.answers.select_related()
-            .annotate(question_set=F("question__question_set__heading"))
-            .order_by("question__question_set")
-        )
-
     def __str__(self):
         return "Session #{0}".format(self.id)
 

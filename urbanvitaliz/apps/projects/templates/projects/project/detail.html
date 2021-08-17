@@ -196,7 +196,7 @@ function textFoldToggle(id) {
     <div class="bd-callout bd-callout-warning text-white mb-5 position-relative" style="border-radius: 10px; background: #5DC2B0;">
         <div class="d-flex justify-content-between w-100">
             <h4 class="text-left flex-grow">
-                <img src="{% static 'projects/img/analyzing.gif' %}" width="50px">
+                <img src="{% static 'projects/img/analyzing.gif' %}" width="50px">&nbsp;
                 Accélérez votre diagnostique !
             </h4>
 
@@ -266,12 +266,23 @@ function textFoldToggle(id) {
     -->
 
     {% if project.survey_session or project.tasks.count %}
-    <h2 class="mt-5 mb-3">
+    <div class="w-100 mt-5">
+        <h2 class="mb-3 d-inline">
         <svg class="bi" width="28" height="28" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
         </svg>
         Connaissances du site
     </h2>
+    {% if user.is_staff and project.survey_session %}
+    <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'survey-session-results' project.survey_session.id %}">
+        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#receipt"/>
+        </svg>
+        Voir les réponses
+    </a>
+    {% endif %}
+    </div>
+
 
 
     <p class="text-secondary">
@@ -288,7 +299,7 @@ function textFoldToggle(id) {
     {% if project.survey_session and project.survey_session.answers.count > 0 %}
 
     <div class="row row-cols-2 row-cols-md-3 g-4 mb-5">
-        {% regroup project.survey_session.answers_by_questions_set by question_set as answer_list %}
+        {% regroup project.survey_session.answers.all by question.question_set as answer_list %}
 
         {% for question_set, answers in answer_list %}
         <div class="col">

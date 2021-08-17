@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load survey %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <h1>{{ session.project.name }}</h1>
+    {{ session.answers.count }} Réponses
+
+    <div class="row row-cols-2 row-cols-md-3 g-4">
+        {% regroup session.answers.all by question.question_set as answer_list %}
+        {% for question_set, answers in answer_list %}
+        <div class="col">
+            <div class="card text-white bg-primary fw-bold">
+                <div class="card-body mt-2 mb-2 ms-2">
+                    <div style="border-left: 5px solid white; border-radius: 2px; padding-left: 20px;">
+                        <h5 class="card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set.heading }}</h5>
+                        <p class="card-text">
+                            <ul class="list-unstyled">
+                                {% for answer in answers %}
+                                <li class="fw-normal mb-4">
+                                    <h6 class="m-0">{{ answer.question.text }}</h6>
+                                    {% lookup_choices_from_answer answer as choices %}
+                                    <ul>
+                                    {% for choice in choices %}
+                                        <li>{{ choice.text }}</li>
+                                        {% endfor %}
+                                    </ul>
+
+                                    {% if answer.tags %}
+                                    <div>
+                                        <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#tags"/>
+                                        </svg>
+                                        {% for tag in answer.tags %}
+                                        <span class="badge bg-dark rounded-pill">{{ tag }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+{% endblock %}
