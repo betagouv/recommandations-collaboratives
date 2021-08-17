@@ -7,14 +7,10 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-16 10:57:13 CEST
 """
 
-from markdownx.utils import markdownify
-
-from django.db import models
-
-from django.utils import timezone
-
 from django.contrib.auth import models as auth
-
+from django.db import models
+from django.utils import timezone
+from markdownx.utils import markdownify
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 
@@ -101,8 +97,8 @@ class Resource(models.Model):
     )
 
     title = models.CharField(max_length=256)
-    subtitle = models.CharField(max_length=512, default="")
-    summary = models.CharField(max_length=512, default="")
+    subtitle = models.CharField(max_length=512, default="", blank=True)
+    summary = models.CharField(max_length=512, default="", blank=True)
     content = models.TextField()
 
     contacts = models.ManyToManyField(

@@ -15,14 +15,15 @@ aaa
 
 ## ⚡ Passez à l'action !
 
-### →  Contact
+### Intégrer un Contact
 
-📧 Email : 
+Exemple d'intégration d'un contact : [Madame Friche](#contact-3)
 
-📞 Service opérationnel : 03 28 07 25 79  
-    Accueil : 03 28 07 25 00  
+Le "#contact-X" est à récupérer sur la carte contact en bas de page, à droite du nom.
   
-[Formulaire de contact](https://www.epf-npdc.fr/lepf-pratique/contact "Contact EPF Nord-Pas-de-Calais")
+### Un lien 
+  
+[Formulaire de contact](https://www.epf-npdc.fr/lepf-pratique/contact)
 
 ### →  Autres informations
 
