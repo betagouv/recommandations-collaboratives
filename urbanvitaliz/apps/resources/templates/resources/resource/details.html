@@ -37,7 +37,7 @@
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"key" }}"/>
                     </svg>
                 </span>
-                {{ resource.title|title }}
+                {{ resource.title|capfirst }}
 
                 <!-- Toggle Bookmarking -->
                 {% if user.is_authenticated %}
@@ -89,6 +89,17 @@
                 <span class="badge rounded-pill bg-light text-dark">#{{ tag }}</span>
                 {% endfor %}
             </div>
+
+            <!-- Show banner if draft -->
+            {% if user.is_staff %}
+            <div class="bd-callout bd-callout-warning">
+                <svg class="bi align-middle" width="24" height="24" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hammer"/>
+                </svg>&nbsp;
+                Cette fiche-ressource est en cours d'écriture. Pensez à la
+                <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <em>Public</em> si vous souhaitez que les visiteurs puissent la consulter !
+            </div>
+            {% endif %}
 
             {% if resource.subtitle %}
             <h3 class="subtitle text-secondary mt-3">{{ resource.subtitle }}</h3>
@@ -220,7 +231,7 @@
 
         <div class="row row-cols-1 row-cols-md-2">
             {% for contact in resource.contacts.all %}
-            <div class="col" id="contact-{{ contact.id }}">
+            <div class="col mb-3" id="contact-{{ contact.id }}">
                 {% include 'addressbook/widgets/card_contact_horizontal.html' with contact=contact show_id=True %}
             </div>
             {% endfor %}
