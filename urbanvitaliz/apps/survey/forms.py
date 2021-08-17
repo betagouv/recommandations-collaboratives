@@ -13,7 +13,6 @@ from . import models
 
 
 class AnswerForm(forms.Form):
-    answer = forms.ChoiceField(widget=forms.RadioSelect())
     comment = forms.CharField(widget=forms.Textarea, required=False)
 
     def __init__(
@@ -22,6 +21,12 @@ class AnswerForm(forms.Form):
         self.question = question
         super().__init__(*args, **kwargs)
 
+        self.fields["answer"] = (
+            forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple)
+            if question.is_multiple
+            else forms.ChoiceField(widget=forms.RadioSelect())
+        )
+
         choices = []
         for choice in question.choices.all():
             choices.append((choice.value, choice.text))
@@ -29,29 +34,43 @@ class AnswerForm(forms.Form):
 
         # If we already have an answer, prefill
         if answer:
-            self.fields["answer"].initial = answer.value
+            self.fields["answer"].initial = answer.values
             self.fields["comment"].initial = answer.comment
 
     def update_session(self, session: models.Session):
-        answer_value = self.cleaned_data.get("answer")
+        answer_values = self.cleaned_data.get("answer")
         comment = self.cleaned_data.get("comment", None)
 
-        # We need the Choice object for extra information (such as signals)
-        choice = models.Choice.objects.get(question=self.question, value=answer_value)
+        # compute the signals according to the kind of question
+        if isinstance(answer_values, list):
+            # multiple choices
+            choices = models.Choice.objects.filter(
+                question=self.question, value__in=answer_values
+            )
+            signals = []
+            for choice in choices:
+                signals.append(choice.signals)
+            signals = ", ".join(signals)
+        else:
+            # single choice
+            choice = models.Choice.objects.get(
+                question=self.question, value=answer_values
+            )
+            signals = choice.signals
 
         answer, created = models.Answer.objects.get_or_create(
             session=session,
             question=self.question,
             defaults={
-                "value": answer_value,
+                "values": answer_values,
                 "comment": comment,
-                "signals": choice.signals,
+                "signals": signals,
             },
         )
         if not created:
-            answer.value = answer_value
+            answer.values = answer_values
             answer.comment = comment
-            answer.signals = choice.signals
+            answer.signals = signals
             answer.save()
 
         return True
@@ -73,7 +92,7 @@ class EditQuestionForm(forms.ModelForm):
 
     class Meta:
         model = models.Question
-        fields = ["priority", "text", "precondition"]
+        fields = ["priority", "text", "precondition", "is_multiple"]
 
 
 class EditChoiceForm(forms.ModelForm):
