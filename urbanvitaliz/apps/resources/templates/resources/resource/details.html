@@ -144,7 +144,7 @@
 
             <!-- User actions -->
             <div class="d-grid gap-2 mt-3">
-                <a class="btn btn-primary btn-sm" href="mailto:contact@urbanvitaliz.fr?subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'" role="button">
+                <a class="btn btn-primary btn-sm" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource {{ resource.title|truncatewords:4 }}" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
                     </svg>
@@ -250,7 +250,7 @@
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle-fill"/>
         </svg>
         &nbsp;
-        Un problème sur cette ressource ? Un doute, des questions ? N'hésitez pas à <a href="mailto:contact@urbanvitaliz.fr?subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'"">nous interpeller</a>.
+        Un problème sur cette ressource ? Un doute, des questions ? N'hésitez pas à <a href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'"">nous interpeller</a>.
     </div>
 
 </div>
