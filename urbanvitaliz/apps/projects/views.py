@@ -315,7 +315,7 @@ def update_task(request, task_id=None):
 class CreateTaskForm(forms.ModelForm):
     """Form new project task creation"""
 
-    content = MarkdownxFormField()
+    content = MarkdownxFormField(required=False)
 
     notify_email = forms.BooleanField(initial=True, required=False)
 
@@ -337,7 +337,7 @@ class CreateTaskForm(forms.ModelForm):
 class UpdateTaskForm(forms.ModelForm):
     """Form for task update"""
 
-    content = MarkdownxFormField()
+    content = MarkdownxFormField(required=False)
 
     class Meta:
         model = models.Task

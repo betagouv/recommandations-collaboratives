@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="col-9 py-5 mx-auto">
+
+    <h2 class="mb-3">
+        <svg class="bi me-2" width="28" height="28">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+        </svg>
+        Contacter l'équipe UrbanVitaliz
+    </h2>
+
+    {% if user.is_authenticated %}
+
+    <p class="text-secondary">
+        Si vous ne souhaitez pas utiliser notre formulaire, vous pouvez
+        copier-coller notre adresse email :
+        <span class="fw-bold">friches@beta.gouv.fr</span>
+    </p>
+
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}"/>
+
+        <div class="form-floating mb-3">
+            <input type="text" id="{{ form.subject.id_for_label }}" class="form-control {% if form.subject.errors %}is-invalid{% endif %}" name="{{ form.subject.name }}" placeholder="Sujet" value="{{ request.GET.subject }}" required>
+            <label for="{{ form.subject.id_for_label }}">Sujet de votre message</label>
+
+            {% for error in form.subject.errors %}
+            <div class="text-danger text-end">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            <textarea class="form-control {% if form.content.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-content" name="{{ form.content.name }}" value="{{ form.content.value|default:'' }}" placeholder="Votre message..." required></textarea>
+            <label class="visually-hidden" for="input-project-content">{{ form.content.label }}</label>
+
+            {% for error in form.content.errors %}
+            <div class="text-danger text-end">{{ error }}</div>
+            {% endfor %}
+
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+			      Envoyer mon message
+		    </button>
+
+    </form>
+
+    {% if request.GET.next %}
+    <p class="small mt-3">
+        <a href="{{ request.GET.next }}" class="small">Annuler et revenir à la page précédente</a>
+    </p>
+    {% endif %}
+
+
+
+</div>
+
+{% endblock %}
