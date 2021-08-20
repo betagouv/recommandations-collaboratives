@@ -429,7 +429,7 @@ function textFoldToggle(id) {
                             <svg class="bi me-1" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
                             </svg>
-                            <a class="text-reset" href="mailto:contact@urbanvitaliz.fr?subject=[{{ project.name|truncatechars:10 }}] {{ task.intent|truncatewords:10 }}">J'ai une question/un problème</a>
+                            <a class="text-reset" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject={{ project.name|truncatechars:10 }} : Action '{{ task.intent|truncatewords:10 }}'">J'ai une question/un problème</a>
                         </div>
                     </div>
 

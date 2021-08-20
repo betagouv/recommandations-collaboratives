@@ -187,6 +187,7 @@ class EditResourceForm(forms.ModelForm):
     tags = forms.CharField(
         label="Mots-clés",
         widget=forms.TextInput(attrs={"class": "form-control"}),
+        required=False,
     )
 
     class Meta:

@@ -23,7 +23,7 @@
             <svg class="bi me-1" width="16" height="16">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#patch-exclamation"/>
             </svg>
-            Pour toute <strong>autre demande</strong> qu'une friche à réhabiliter, merci de <a href="mailto:friches@beta.gouv.fr">nous contacter par email</a>.
+            Pour toute <strong>autre demande</strong> qu'une friche à réhabiliter, merci de <a href="{% url 'home-contact' %}?next=/&subject=Prise de contact">nous contacter par email</a>.
         </p>
     </div>
 
