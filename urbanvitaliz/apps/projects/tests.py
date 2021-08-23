@@ -13,8 +13,7 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
