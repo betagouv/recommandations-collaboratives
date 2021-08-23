@@ -7,14 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0013_auto_20210720_1232'),
-        ('survey', '0017_session_project'),
+        ("projects", "0013_auto_20210720_1232"),
+        ("survey", "0017_session_project"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='session',
-            name='project',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='survey_session', to='projects.project'),
+            model_name="session",
+            name="project",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="survey_session",
+                to="projects.project",
+            ),
         ),
     ]
