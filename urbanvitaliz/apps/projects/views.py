@@ -7,28 +7,17 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
-from django.contrib.auth.decorators import login_required
-
 from django import forms
-
-from django.urls import reverse
-
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.syndication.views import Feed
-
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
-
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.shortcuts import render
-
 from markdownx.fields import MarkdownxFormField
-
-from urbanvitaliz.utils import is_staff_or_403
-from urbanvitaliz.utils import send_email
-
-from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models
 
@@ -80,7 +69,9 @@ def onboarding(request):
             models.Note(
                 project=project, content=f"# Demande initiale\n\n{project.impediments}"
             ).save()
-            return render(request, "projects/thanks.html", locals())
+            response = redirect("projects-project-detail", project_id=project.id)
+            response["Location"] += "?first_time=1"
+            return response
     else:
         form = OnboardingForm()
     return render(request, "projects/onboarding.html", locals())
@@ -324,7 +315,7 @@ def update_task(request, task_id=None):
 class CreateTaskForm(forms.ModelForm):
     """Form new project task creation"""
 
-    content = MarkdownxFormField()
+    content = MarkdownxFormField(required=False)
 
     notify_email = forms.BooleanField(initial=True, required=False)
 
@@ -346,7 +337,7 @@ class CreateTaskForm(forms.ModelForm):
 class UpdateTaskForm(forms.ModelForm):
     """Form for task update"""
 
-    content = MarkdownxFormField()
+    content = MarkdownxFormField(required=False)
 
     class Meta:
         model = models.Task

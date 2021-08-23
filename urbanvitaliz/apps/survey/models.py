@@ -1,7 +1,10 @@
 from django.db import models
+from django.db.models import Count, F
+from markdownx.utils import markdownify
 from tagging.fields import TagField
 from tagging.models import Tag
 from tagging.registry import register as tagging_register
+from urbanvitaliz.apps.projects import models as projects_models
 
 
 class Survey(models.Model):
@@ -73,6 +76,25 @@ class Question(models.Model):
     )
     text = models.CharField(max_length=255, verbose_name="Texte de la question")
 
+    how = models.TextField(default="", blank=True, verbose_name="Comment ?")
+
+    @property
+    def how_rendered(self):
+        """Return content as markdown"""
+        return markdownify(self.how)
+
+    why = models.TextField(default="", blank=True, verbose_name="Pourquoi ?")
+
+    @property
+    def why_rendered(self):
+        """Return content as markdown"""
+        return markdownify(self.why)
+
+    # does this question expect a multiple choice or single choice answer
+    is_multiple = models.BooleanField(
+        default=False, blank=True, verbose_name="Est un QCM ?"
+    )
+
     deleted = models.DateTimeField(null=True)
 
     def _following(self, order_by: list):
@@ -138,6 +160,10 @@ class Session(models.Model):
 
     survey = models.ForeignKey(
         Survey, related_name="sessions", on_delete=models.CASCADE
+    )
+
+    project = models.OneToOneField(
+        projects_models.Project, related_name="survey_session", on_delete=models.CASCADE
     )
 
     @property
@@ -206,6 +232,11 @@ class Session(models.Model):
         return "Session #{0}".format(self.id)
 
 
+def empty_answer():
+    """Return the empty answer for json values field"""
+    return list()
+
+
 class Answer(models.Model):
     """Actual answer to a question"""
 
@@ -218,7 +249,8 @@ class Answer(models.Model):
     question = models.ForeignKey(
         Question, related_name="answers", on_delete=models.CASCADE
     )
-    value = models.CharField(max_length=30)
+    value = models.CharField(max_length=30)  # field to be  removed in future version
+    values = models.JSONField(default=empty_answer, blank=True)
     signals = TagField(verbose_name="Signaux", blank=True, null=True)
     comment = models.TextField(blank=True)
 

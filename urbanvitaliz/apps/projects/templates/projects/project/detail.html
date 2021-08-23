@@ -13,21 +13,21 @@
 
 {% block js %}
 <script type="text/javascript">
- function textFoldToggle(id) {
-     var excerpt = document.getElementById("excerpt-" + id);
-     var moreText = document.getElementById("more-" + id);
-     var btnText = document.getElementById("foldBtn-" + id);
+function textFoldToggle(id) {
+    var excerpt = document.getElementById("excerpt-" + id);
+    var moreText = document.getElementById("more-" + id);
+    var btnText = document.getElementById("foldBtn-" + id);
 
-     if (moreText.style.display === "inline") {
-         excerpt.style.display = "inline";
-         btnText.innerHTML = "[Lire tout]";
-         moreText.style.display = "none";
-     } else {
-         excerpt.style.display = "none";
-         btnText.innerHTML = "[Réduire]";
-         moreText.style.display = "inline";
-     }
- }
+    if (moreText.style.display === "inline") {
+        excerpt.style.display = "inline";
+        btnText.innerHTML = "[Lire tout]";
+        moreText.style.display = "none";
+    } else {
+        excerpt.style.display = "none";
+        btnText.innerHTML = "[Réduire]";
+        moreText.style.display = "inline";
+    }
+}
 </script>
 {% endblock %}
 
@@ -131,28 +131,95 @@
             {% endif %}
 
             <!--
-                 <p>
-                 <span class="align-items-center link-dark text-decoration-none">
-                 <img src="https://github.com/salomeDeschenes.png" alt="" width="32" height="32" class="rounded-circle me-2">
-                 <strong>Salomé D.</strong>
-                 </span> est votre <strong>accompagnatrice</strong> UrbanVitaliz sur ce projet. N'hésitez pas à <strong>prendre rendez-vous</strong> pour lui <strong>poser vos questions</strong> et faire avancer votre projet.
+            <p>
+                <span class="align-items-center link-dark text-decoration-none">
+                    <img src="https://github.com/salomeDeschenes.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <strong>Salomé D.</strong>
+                </span> est votre <strong>accompagnatrice</strong> UrbanVitaliz sur ce projet. N'hésitez pas à <strong>prendre rendez-vous</strong> pour lui <strong>poser vos questions</strong> et faire avancer votre projet.
 
-                 </p>
+            </p>
 
-                 <button type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#exampleModal">
-                 <svg class="bi" width="16" height="16" fill="currentColor">
-                 <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#telephone"/>
-                 </svg>
-                 Prendre rendez-vous
-                 </button>
+            <button type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#exampleModal">
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#telephone"/>
+                </svg>
+                Prendre rendez-vous
+            </button>
 
-                 ou <a href="#">poser une question</a>.
-                 </button>
+            ou <a href="#">poser une question</a>.
+                        </button>
 
-            -->
+                        -->
 
         </div>
     </div>
+
+    {% if request.GET.first_time %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">
+            <svg class="bi align-middle" width="40" height="40" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
+            </svg>
+            Merci !
+        </h4>
+        <p class="mb-0"><strong>Nous avons bien reçu votre demande et allons vous contacter.</strong></p>
+        <p class="mb-0">Marquez cette page, elle vous permettra de suivre l'avancement de vos démarches et d'échanger avec l'équipe d'accompagnement.</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% if not project.tasks.count %}
+    <div class="border  p-5 align-items-center">
+        <div class="w-100">
+            <p class="text-center">
+                <img src="https://github.com/salomeDeschenes.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Salomé" alt="Salomé" width="32" height="32" class="rounded-circle me-2">
+                <svg class="bi align-middle" width="40" height="40" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eyeglasses"/>
+                </svg>
+                <img src="https://github.com/anoukjn.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Anouk" alt="Anouk" width="32" height="32" class="rounded-circle ms-2">
+                <br/>
+
+                <h4 class="mt-1 text-center">
+                    UrbanVitaliz diagnostique en ce moment votre dossier !
+                </h4>
+            </p>
+
+            <p class="text-center">
+                L'équipe d'aiguillage vous proposera des <strong><em>Actions</em></strong> à prendre dès l'étude terminée.
+
+                <br/><span class="text-secondary small">Vous serez alors prévenu.e par courriel.</span>
+            </p>
+        </div>
+    </div>
+
+    {% if not project.survey_session %}
+    <div class="bd-callout bd-callout-warning text-white mb-5 position-relative" style="border-radius: 10px; background: #5DC2B0;">
+        <div class="d-flex justify-content-between w-100">
+            <h4 class="text-left flex-grow">
+                <img src="{% static 'projects/img/analyzing.gif' %}" width="50px">&nbsp;
+                Accélérez votre diagnostique !
+            </h4>
+
+            <a href="{% url 'survey-project-session' project.id %}" class="text-white fw-bolder text-decoration-none stretched-link">
+                <span class="align-middle">Démarrer</span><span class="fs-2 align-middle"> &#8594;</span>
+            </a>
+        </div>
+        <div class="w-100">
+
+            <p class="text-left fw-normal fs-5 m-0 p-0">
+                Nos aiguilleuses ont des <span class="fw-bolder">questions pour vous</span>.
+                <br/>
+                <span class="small">
+                    En répondant à celles-ci, nous pourrons <span class="fw-bolder">mieux cibler votre besoin</span> dès le premier entretien.
+                </span>
+                <br/>
+            </p>
+            <div class="d-flex">
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
 
     <!--
          <iframe width="250"
@@ -164,41 +231,6 @@
          src="http://www.openstreetmap.org/export/embed.html?bbox=79.84942674636841%2C6.899900944350287%2C79.85650777816772%2C6.90436374803887&amp;layers=ND"
          style="border: 1px solid black">
          </iframe>
-    -->
-
-    <!-- 
-    <h2 class="mb-3">
-        <svg class="bi" width="28" height="28" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
-        </svg>
-        Connaissances du site</h2>
-
-
-    <p>
-        Voici la liste des faîts collectés sur votre projet. N'hésitez pas à <a href="#">répondre au questionnaire d'approfondissement</a> pour vous permettre de mieux cerner l'état actuel de votre projet.
-    </p>
-
-
-
-    <div class="accordion mb-5" id="knowledge">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    <svg class="bi align-middle" width="16" height="16">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-inbound"/>
-                    </svg>
-                    &nbsp;
-                    Demande initiale
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                    {{ project.impediments|linebreaks }}
-                </div>
-            </div>
-        </div>
-
-    </div>
     -->
 
     <!-- Devenir
@@ -233,6 +265,69 @@
          </div>
     -->
 
+    {% if project.survey_session or project.tasks.count %}
+    <div class="w-100 mt-5">
+        <h2 class="mb-3 d-inline">
+        <svg class="bi" width="28" height="28" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
+        </svg>
+        Connaissances du site
+    </h2>
+    {% if user.is_staff and project.survey_session %}
+    <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'survey-session-results' project.survey_session.id %}">
+        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#receipt"/>
+        </svg>
+        Voir les réponses
+    </a>
+    {% endif %}
+    </div>
+
+
+
+    <p class="text-secondary">
+        La <strong>pertinence de nos recommandations</strong> est liée à la connaissance que nous avons de votre site.
+        {% if project.survey_session  %}
+        {% if project.survey_session.next_question %}
+        N'hésitez pas <a href="{% url 'survey-session-start' project.survey_session.id %}">à continuer le questionnaire</a> !
+        {% else %}
+        <strong>Merci</strong> d'avoir répondu à toutes les questions !
+        {% endif %}
+        {% endif %}
+    </p>
+
+    {% if project.survey_session and project.survey_session.answers.count > 0 %}
+
+    <div class="row row-cols-2 row-cols-md-3 g-4 mb-5">
+        {% regroup project.survey_session.answers.all by question.question_set as answer_list %}
+
+        {% for question_set, answers in answer_list %}
+        <div class="col">
+            {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set answers=answers %}
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+
+    <div class="bd-callout bd-callout-warning text-white position-relative mb-5" style="border-radius: 10px; background: #5DC2B0;">
+        <div class="d-flex justify-content-between w-100">
+            <h4 class="text-left flex-grow m-0 p-0">
+                <img src="{% static 'projects/img/analyzing.gif' %}" width="50px">
+                &nbsp;
+                Nous avons des questions pour vous
+            </h4>
+
+            <a href="{% url 'survey-project-session' project.id %}" class="text-white fw-bolder text-decoration-none stretched-link">
+                <span class="align-middle">Répondre</span><span class="fs-2 align-middle"> &#8594;</span>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% endif %}
+
+    {% if project.tasks.count or user.is_staff %}
     <!-- Actions -->
     <div class="w-100">
         <h2 class="mb-3 d-inline-block">
@@ -251,38 +346,12 @@
         {% endif %}
     </div>
 
-    {% if not project.tasks.count %}
 
-    <p>
-        Les <strong><em>Actions</em></strong> vous aident à baliser votre parcours et à avancer méthodiquement.
+    <p class="mb-3 text-secondary">
+        Les <strong><em>Actions</em></strong> vous sont proposées par l'équipe d'accompagnement pour baliser votre parcours et avancer méthodiquement.
         <br/>
-        <span class="text-secondary">Par exemple, il peut s'agir d'une étape pour  <q><em> Identifier le propriétaire </em></q> ou encore <q><em> Vérifier la pollution des sols </em></q></span>.
+        <!-- <span class="text-secondary">Par exemple, il peut s'agir d'une étape pour  <q><em> Identifier le propriétaire </em></q> ou encore <q><em> Vérifier la pollution des sols </em></q></span>. -->
     </p>
-
-    <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
-        <div class="w-100">
-            <p class="text-center">
-                <img src="https://github.com/salomeDeschenes.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Salomé" alt="Salomé" width="32" height="32" class="rounded-circle me-2">
-                <svg class="bi align-middle" width="40" height="40" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eyeglasses"/>
-                </svg>
-                <img src="https://github.com/anoukjn.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Anouk" alt="Anouk" width="32" height="32" class="rounded-circle ms-2">
-                <br/>
-
-                <h4 class="mt-1 text-center">
-                    UrbanVitaliz diagnostique en ce moment votre dossier !
-                </h4>
-            </p>
-
-            <p class="text-center">
-                L'équipe d'aiguillage vous proposera des <strong><em>Actions</em></strong> à prendre dès l'étude terminée.
-
-                <br/><span class="text-secondary small">Vous serez alors prévenu.e par courriel.</span>
-            </p>
-        </div>
-    </div>
-    {% else %}
-    <!-- New one-->
 
     <ul class="list-group mb-3">
 			  {% for task in project.tasks.all %}
@@ -315,6 +384,13 @@
                     {% endif %}
                 </div>
                 <div class="d-flex flex-fill ms-2 justify-content-start flex-column" >
+                    <div class="w-100 relative">
+                        <svg class="bi me-2 align-baseline" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-right-quote"/>
+                        </svg><span class="d-inline text-secondary">UrbanVitaliz :</span>
+                        <span class="text-break d-inline text-secondary">{{ task.content_rendered|safe }}</span>
+                    </div>
+
                     {% if task.resource or task.contact %}
                     <div class="d-flex flex-row flex-grow-1 justify-content-between mb-3">
                         {% if task.resource %}
@@ -329,12 +405,6 @@
                         {% endif %}
                     </div>
                     {% endif %}
-                    <div class="w-100 relative">
-                        <svg class="bi me-2 align-baseline" width="18" height="18" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-right-quote"/>
-                        </svg>
-                        <span class="text-break text-secondary">{{ task.content_rendered|safe }}</span>
-                    </div>
                 </div>
 
                 <div class="d-flex ms-2 justify-content-between flex-column" style="flex-shrink: 0; width: 20%;">

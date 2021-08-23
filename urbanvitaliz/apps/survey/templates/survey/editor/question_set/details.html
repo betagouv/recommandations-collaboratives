@@ -116,8 +116,12 @@
         </div>
     </div>
 
+    <span class="text-secondary fw-bold d-inline-block">
+        {% if question.is_multiple %}Choix Multiples{%else%}Choix Unique{%endif%}
+    </span>
+    {% if question.is_multiple and question.precondition %} avec {% endif %}
     {% if question.precondition %}
-    <div class="text-secondary mt-2 mb-2">
+    <div class="text-secondary mt-2 mb-2 d-inline-block">
         <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alt"/>
         </svg>

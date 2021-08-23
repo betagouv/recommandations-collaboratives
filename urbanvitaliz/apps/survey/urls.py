@@ -36,9 +36,19 @@ urlpatterns = [
         name="survey-session-details",
     ),
     path(
+        "project/survey/<int:session_id>/results",
+        fill.SessionResultsView.as_view(),
+        name="survey-session-results",
+    ),
+    path(
         "projects/survey/<int:session_id>/start/",
         fill.survey_next_question,
         name="survey-session-start",
+    ),
+    path(
+        "project/<int:project_id>/survey/",
+        fill.survey_create_session_for_project,
+        name="survey-project-session",
     ),
     path(
         "projects/survey/<int:session_id>/done",
