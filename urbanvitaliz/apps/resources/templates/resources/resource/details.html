@@ -92,6 +92,7 @@
 
             <!-- Show banner if draft -->
             {% if user.is_staff %}
+            {% if not resource.public %}
             <div class="bd-callout bd-callout-warning">
                 <svg class="bi align-middle" width="24" height="24" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hammer"/>
@@ -99,6 +100,7 @@
                 Cette fiche-ressource est en cours d'écriture. Pensez à la
                 <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <em>Public</em> si vous souhaitez que les visiteurs puissent la consulter !
             </div>
+            {% endif %}
             {% endif %}
 
             {% if resource.subtitle %}

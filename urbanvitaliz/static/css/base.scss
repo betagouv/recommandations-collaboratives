@@ -34,6 +34,10 @@ main {
 	  border-left-color: #5bc0de;
 }
 
+.bd-callout-warning {
+	  border-left-color: orange;
+}
+
 
 .bd-placeholder-img {
     font-size: 1.125rem;
@@ -49,3 +53,25 @@ main {
     }
 }
 
+
+
+/* Arrow */
+.arrow {
+    position: absolute;
+    padding: 0.4em; /* Arrow size */
+    box-shadow: 1px -1px 0 1px white inset;
+    -webkit-box-shadow: 2px -2px white inset;
+    border: solid transparent;
+    border-width: 0 0 2rem 2rem;
+    transition: 0.2s;
+}
+
+.arrow:hover {
+    box-shadow: 2px -2px 0 2px #ddd inset;
+    -webkit-box-shadow: 4px -4px #ddd inset;
+}
+
+.arrow-up    { transform:rotate(135deg) }
+.arrow-right { transform:rotate(225deg) }
+.arrow-down  { transform:rotate(-45deg) }
+.arrow-left  { transform:rotate(45deg) }
