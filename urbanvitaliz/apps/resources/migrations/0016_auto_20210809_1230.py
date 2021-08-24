@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('resources', '0015_resource_contacts'),
+        ("resources", "0015_resource_contacts"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='resource',
-            name='subtitle',
-            field=models.CharField(blank=True, default='', max_length=512),
+            model_name="resource",
+            name="subtitle",
+            field=models.CharField(blank=True, default="", max_length=512),
         ),
         migrations.AlterField(
-            model_name='resource',
-            name='summary',
-            field=models.CharField(blank=True, default='', max_length=512),
+            model_name="resource",
+            name="summary",
+            field=models.CharField(blank=True, default="", max_length=512),
         ),
     ]
