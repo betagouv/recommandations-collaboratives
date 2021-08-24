@@ -35,6 +35,8 @@
         {% csrf_token %}
         {{ form.as_p }}
         <input class="btn btn-primary" type="submit" value="Créer"/>
+
+        {{ form.media }}
     </form>
 
 
