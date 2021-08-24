@@ -7,18 +7,20 @@ import urbanvitaliz.apps.survey.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('survey', '0015_auto_20210817_1008'),
+        ("survey", "0015_auto_20210817_1008"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='answer',
-            name='values',
-            field=models.JSONField(blank=True, default=urbanvitaliz.apps.survey.models.empty_answer),
+            model_name="answer",
+            name="values",
+            field=models.JSONField(
+                blank=True, default=urbanvitaliz.apps.survey.models.empty_answer
+            ),
         ),
         migrations.AddField(
-            model_name='question',
-            name='is_multiple',
+            model_name="question",
+            name="is_multiple",
             field=models.BooleanField(blank=True, default=False),
         ),
     ]
