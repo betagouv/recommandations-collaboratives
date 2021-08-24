@@ -48,6 +48,8 @@ def send_message_to_team(request, data):
     """Send message as email to the team"""
     subject = data.get("subject")
     content = data.get("content")
+    if request.user.is_authenticated:
+        content += f"\n\nfrom: {request.user.email}"
     return django.core.mail.send_mail(
         subject=subject,
         message=content,

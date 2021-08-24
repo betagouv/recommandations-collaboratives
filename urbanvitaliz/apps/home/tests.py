@@ -16,6 +16,7 @@ import django.core.mail
 
 from pytest_django.asserts import assertRedirects
 
+from urbanvitaliz.utils import login
 
 @pytest.mark.django_db
 def test_non_logged_user_can_send_message_to_team(mocker, client):
@@ -29,6 +30,29 @@ def test_non_logged_user_can_send_message_to_team(mocker, client):
     django.core.mail.send_mail.assert_called_once_with(
         subject=data["subject"],
         message=data["content"],
+        from_email=settings.EMAIL_FROM,
+        recipient_list=settings.TEAM_EMAILS,
+        fail_silently=True,
+    )
+
+    assertRedirects(response, "/")
+
+
+@pytest.mark.django_db
+def test_logged_user_can_send_message_to_team(mocker, client):
+
+    mocker.patch("django.core.mail.send_mail")
+
+    data = {"subject": "a subject", "content": "some content"}
+    url = reverse("home-contact") + "?next=/"
+    with login(client, is_staff=False) as user:
+        response = client.post(url, data=data)
+
+    content = data["content"] + f"\n\nfrom: {user.email}"
+
+    django.core.mail.send_mail.assert_called_once_with(
+        subject=data["subject"],
+        message=content,
         from_email=settings.EMAIL_FROM,
         recipient_list=settings.TEAM_EMAILS,
         fail_silently=True,
