@@ -18,6 +18,7 @@ from pytest_django.asserts import assertRedirects
 
 from urbanvitaliz.utils import login
 
+
 @pytest.mark.django_db
 def test_non_logged_user_can_send_message_to_team(mocker, client):
 
