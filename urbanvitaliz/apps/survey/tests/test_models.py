@@ -8,11 +8,9 @@ created: 2021-06-27 12:06:10 CEST
 """
 
 import pytest
-
 from model_bakery.recipe import Recipe
 
 from .. import models
-
 
 ########################################################################
 # Session
@@ -156,7 +154,7 @@ def test_question_set_next():
     qs1 = Recipe(models.QuestionSet, survey=survey).make()
     qs2 = Recipe(models.QuestionSet, survey=survey).make()
 
-    assert qs2 == qs1.next()
+    assert qs1.next() == qs2
     assert qs2.next() is None
 
 
@@ -166,8 +164,28 @@ def test_question_set_previous():
     qs1 = Recipe(models.QuestionSet, survey=survey).make()
     qs2 = Recipe(models.QuestionSet, survey=survey).make()
 
-    assert qs1 == qs2.previous()
+    assert qs2.previous() == qs1
     assert qs1.previous() is None
+
+
+@pytest.mark.django_db
+def test_question_set_first_question():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, text="Q1", question_set=qs).make()
+    q2 = Recipe(models.Question, text="Q2", question_set=qs).make()  # NOQA
+
+    assert qs.first_question() == q1
+
+
+@pytest.mark.django_db
+def test_question_set_last_question():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, text="Q1", question_set=qs).make()  # NOQA
+    q2 = Recipe(models.Question, text="Q2", question_set=qs).make()
+
+    assert qs.last_question() == q2
 
 
 ########################################################################
