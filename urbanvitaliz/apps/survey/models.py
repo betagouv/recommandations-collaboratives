@@ -53,6 +53,12 @@ class QuestionSet(models.Model):
 
         return None
 
+    def last_question(self):
+        for question in self.questions.all().order_by("-id"):
+            return question
+
+        return None
+
     def __str__(self):
         return self.heading
 
@@ -113,11 +119,29 @@ class Question(models.Model):
 
     def next(self):
         """Return the next question"""
-        return self._following(order_by=("-priority", "id"))
+        next_question = self._following(order_by=("-priority", "id"))
+        if next_question:
+            return next_question
+
+        # No next question in current question set, ask sibling
+        next_qs = self.question_set.next()
+        if next_qs:
+            return next_qs.first_question()
+
+        return None
 
     def previous(self):
         """Return the previous question"""
-        return self._following(order_by=("priority", "-id"))
+        previous_question = self._following(order_by=("priority", "-id"))
+        if previous_question:
+            return previous_question
+
+        # No previous question in current question set, ask sibling
+        previous_qs = self.question_set.previous()
+        if previous_qs:
+            return previous_qs.last_question()
+
+        return None
 
     def check_precondition(self, session: "Session"):
         """Return true if the precondition is met"""

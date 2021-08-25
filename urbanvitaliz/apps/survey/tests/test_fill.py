@@ -183,12 +183,48 @@ def test_next_question_redirects_to_done_when_no_more_questions(client):
 
 
 @pytest.mark.django_db
+def test_next_question_redirects_to_next_question_set(client):
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs1 = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs1).make()
+
+    qs2 = Recipe(models.QuestionSet, survey=survey).make()
+    q2 = Recipe(models.Question, question_set=qs2).make()
+
+    with login(client, is_staff=False):
+        url = reverse("survey-question-next", args=(session.id, q1.id))
+        response = client.get(url)
+
+    new_url = reverse("survey-question-details", args=(session.id, q2.id))
+    assertRedirects(response, new_url)
+
+
+@pytest.mark.django_db
 def test_previous_question_redirects_to_previous_available_question(client):
     session = Recipe(models.Session).make()
     survey = Recipe(models.Survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     q2 = Recipe(models.Question, question_set=qs).make()
+
+    with login(client, is_staff=False):
+        url = reverse("survey-question-previous", args=(session.id, q2.id))
+        response = client.get(url)
+
+    new_url = reverse("survey-question-details", args=(session.id, q1.id))
+    assertRedirects(response, new_url)
+
+
+@pytest.mark.django_db
+def test_previous_question_redirects_to_previous_question_set(client):
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs1 = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs1).make()
+
+    qs2 = Recipe(models.QuestionSet, survey=survey).make()
+    q2 = Recipe(models.Question, question_set=qs2).make()
 
     with login(client, is_staff=False):
         url = reverse("survey-question-previous", args=(session.id, q2.id))
