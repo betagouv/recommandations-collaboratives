@@ -26,7 +26,10 @@
         <link rel="icon" href="{% static 'img/favicons/favicon.ico' %}">
 
     </head>
-    <body>
+    <body class="bg-light">
+
+        <h1 class="visually-hidden">Urban Vitaliz</h1>
+        {% include "sidebar.html" %}
 
         <main>
             {% if messages %}
@@ -55,23 +58,18 @@
             </div>
             {% endif %}
 
-            <h1 class="visually-hidden">Urban Vitaliz</h1>
+            <!--             <div class="b-page-divider"></div> -->
 
-            {% include "sidebar.html" %}
-
-            <div class="b-page-divider"></div>
-
-            <div class="container-fluid">
+            <div class="container-fluid bg-white">
                 <div class="row">
                     {% block content %}
 			              {% endblock %}
                 </div>
 
-                <div class="row justify-content-md-center">
+                <div class="row justify-content-center">
                         {% include 'footer.html' %}
                 </div>
             </div>
-            <div class="b-page-divider"></div>
 
         </main>
 
