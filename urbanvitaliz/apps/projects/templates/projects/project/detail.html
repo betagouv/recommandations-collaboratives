@@ -116,6 +116,15 @@ function textFoldToggle(id) {
                     </a>
                 </span>
                 <span class="d-inline-block"> 
+                    <a href="{% url 'projects-access-update' project.id %}" class="btn btn-light w-100 btn-sm">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock"/>
+                        </svg>
+                        &nbsp;
+                        Gérer les accès
+                    </a>
+                </span>
+                <span class="d-inline-block"> 
                     <form method="POST" action="{% url 'projects-push-resource' project.id %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-light w-100 btn-sm" role="submit">

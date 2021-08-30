@@ -12,7 +12,6 @@ from django.urls import path
 
 from . import views
 
-
 urlpatterns = [
     path(r"onboarding/", views.onboarding, name="projects-onboarding"),
     # my projects for local authorities
@@ -79,6 +78,16 @@ urlpatterns = [
         r"project/<int:resource_id>/resource/action/",
         views.create_resource_action,
         name="projects-create-resource-action",
+    ),
+    path(
+        r"project/<int:project_id>/access/",
+        views.access_update,
+        name="projects-access-update",
+    ),
+    path(
+        r"project/<int:project_id>/access/<str:email>/delete",
+        views.access_delete,
+        name="projects-access-delete",
     ),
 ]
 

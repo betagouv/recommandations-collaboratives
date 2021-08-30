@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                </svg>&nbsp;
+                <a href="{% url 'projects-project-list' %}">Projets</a>
+            </li>
+            <li class="breadcrumb-item">
+                <span class="text-secondary">
+                    <a href="{% url 'projects-project-detail' project.pk %}">
+                        {{ project.name|capfirst }}
+                    </a>
+                </span>
+            </li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-3">
+        <svg class="bi" width="28" height="28" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock"/>
+        </svg>
+        <span class="align-middle">Gestion des accès</span>
+    </h2>
+
+    <section class="mt-5">
+        <div class="fs-5 mb-3">Usager principal : <strong>{{ project.email }}</strong> <em>(non révocable)</em></div>
+
+        <table class="table">
+            <h3>
+                <svg class="bi" width="24" height="24" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
+                </svg>
+                <span class="align-middle">Collaborateur·rice·s <em>(avec droit d'édition)</em></span>
+            </h3>
+            <tr>
+                <th>Courriel</th>
+                <th>Action</th>
+            </tr>
+            {% for email in project.emails %}
+            <tr>
+                <td>{{ email }}</td>
+                <td>
+                    <form id="form-projects-access-remove-user"
+				                  method="post"
+				                  action="{% url 'projects-access-delete' project.pk email %}"
+				                  class="form">
+                        {% csrf_token %}
+                        <button class="btn btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" class="text-center">
+                    Aucun·e collaborateur·rice pour le moment, seul l'usager principal peut éditer.
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </section>
+
+    <section class="mt-5">
+
+        <h3>
+            <svg class="bi" width="24" height="24" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+            </svg>&nbsp;
+            <span class="align-middle">Ajouter un·e collaborateur·rice</span>
+        </h3>
+
+	      <form id="form-projects-access-add-user"
+				      method="post"
+				      action="."
+				      class="form">
+
+		        {% csrf_token %}
+
+            {{ form.as_p }}
+
+		        <button type="submit" class="btn btn-primary">
+			          Ajouter
+		        </button>
+
+	      </form>
+
+        {{ form.media }}
+
+    </section>
+
+{% endblock %}
+
+
+
