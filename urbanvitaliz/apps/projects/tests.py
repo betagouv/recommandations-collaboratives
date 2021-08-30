@@ -131,7 +131,7 @@ def test_my_project_not_available_when_not_logged_in(client):
 def test_my_projects_are_displayed_on_page(client):
     url = reverse("projects-local-authority")
     with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, email=user.email).make()
+        project = Recipe(models.Project, emails=[user.email]).make()
         response = client.get(url)
     # template does a capfirst that capitalize the first word of title
     assertContains(response, project.name.capitalize()[:20])  # truncated name
@@ -142,7 +142,7 @@ def test_my_projects_are_displayed_on_page(client):
 def test_my_projects_are_stored_in_session(client):
     url = reverse("projects-local-authority")
     with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, email=user.email).make()
+        project = Recipe(models.Project, emails=[user.email]).make()
         client.get(url)
     assert len(client.session["projects"]) == 1
     session_project = client.session["projects"][0]
@@ -242,9 +242,9 @@ def test_project_detail_not_available_for_non_staff_users(client):
 @pytest.mark.django_db
 def test_project_detail_available_for_owner(client):
     # project email is same as test user to be logged in
-    project = Recipe(models.Project, email="test@example.com").make()
-    url = reverse("projects-project-detail", args=[project.id])
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        project = Recipe(models.Project, emails=[user.email]).make()
+        url = reverse("projects-project-detail", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
 
@@ -558,7 +558,7 @@ def test_create_new_note_for_project_and_redirect(client):
 def test_private_note_shown_only_to_staff(client):
     user_email = "not@admin.here"
     note_content = "this is a private note"
-    project = Recipe(models.Project, email=user_email).make()
+    project = Recipe(models.Project, emails=[user_email]).make()
     with login(client, is_staff=True):
         response = client.post(
             reverse("projects-create-note", args=[project.id]),

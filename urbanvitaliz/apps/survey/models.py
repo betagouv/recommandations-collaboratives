@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Count, F
 from markdownx.utils import markdownify
 from tagging.fields import TagField
 from tagging.models import Tag
