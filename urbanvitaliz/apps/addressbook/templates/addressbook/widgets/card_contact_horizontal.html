@@ -4,7 +4,7 @@
 <div class="card-resource card-resource-horizontal card h-100" style="min-height: 100px;">
     <!-- <hr class="middle-hr" /> -->
     <div class="card-body">
-        <div class="card-title mb-4">
+        <div class="card-title mb-3">
             <div class="row">
                 <!-- <div class="icon-placeholder  d-inline"> -->
                 <!--</div> -->
@@ -19,6 +19,9 @@
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
                     </svg>
                     {{ contact.full_name|title }} {% if show_id and user.is_staff %}
+                    {% if user.is_staff %}
+                    <span class="text-secondary">(<a href="{% url 'addressbook-organization-contact-update' contact.id %}">editer</a>)</span>
+                    {% endif %}
                     <span class="text-secondary">#contact-{{ contact.id }}</span>
                     {% endif %}
                 </div>
@@ -26,6 +29,12 @@
         </div>
 
         <div class="card-text">
+            {% if contact.division %}
+            <div class="mb-2">
+                {{ contact.division }}
+            </div>
+            {% endif %}
+
             <div class="small text-secondary subtitle">{{ contact.organization.name|truncatechars:120 }}</div>
             {% if contact.phone_no %}
             <div class="small text-secondary">

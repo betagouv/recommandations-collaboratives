@@ -37,6 +37,19 @@
         <input class="btn btn-primary" type="submit" value="Mettre à jour"/>
     </form>
 
+    <hr/>
+
+    <div class="d-flex justify-content-end">
+        <form id="form-survey-delete-choice" method="POST" action="{% url 'survey-editor-choice-delete' choice.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <svg class="bi " width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash"/>
+                </svg>
+			          Supprimer
+		        </button>
+        </form>
+    </div>
 
 
 </div>

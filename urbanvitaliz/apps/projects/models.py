@@ -9,12 +9,9 @@ created : 2021-05-26 13:33:11 CEST
 from datetime import date
 
 from django.db import models
-
-from django.utils import timezone
 from django.urls import reverse
-
+from django.utils import timezone
 from markdownx.utils import markdownify
-
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.resources import models as resources
@@ -24,6 +21,8 @@ class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
 
     email = models.CharField(max_length=128)
+    emails = models.JSONField(default=list)  # list of person having access to project
+
     last_name = models.CharField(
         max_length=128, default="", verbose_name="Nom du contact"
     )
@@ -84,7 +83,7 @@ class Project(models.Model):
     def fetch(cls, email=None):
         projects = cls.objects.filter(deleted=None)
         if email:
-            projects = projects.filter(email=email)
+            projects = projects.filter(emails__contains=email)
         return projects
 
     def notes(self):
@@ -98,10 +97,10 @@ class NoteManager(models.Manager):
     """Manager for active tasks"""
 
     def public(self):
-        return self.filter(private=False)
+        return self.filter(public=True)
 
     def private(self):
-        return self.filter(private=True)
+        return self.filter(public=False)
 
 
 class Note(models.Model):
@@ -109,7 +108,9 @@ class Note(models.Model):
 
     objects = NoteManager()
 
-    project = models.ForeignKey("Project", on_delete=models.CASCADE)
+    project = models.ForeignKey(
+        "Project", on_delete=models.CASCADE, related_name="notes"
+    )
     public = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"

@@ -31,6 +31,7 @@ def notify_action_created(request, project, task, resource=None):
     Notify the creation of an Action the user by sending an email and displaying
     a UI popup
     """
+    # TODO send to all project emails
     send_email(
         request,
         user_email=project.email,
@@ -137,7 +138,7 @@ def project_detail(request, project_id=None):
     """Return the details of given project for switchtender"""
     project = get_object_or_404(models.Project, pk=project_id)
     # if user is not the owner then check for admin rights
-    if project.email != request.user.email:
+    if request.user.email not in project.emails:
         is_staff_or_403(request.user)
     return render(request, "projects/project/detail.html", locals())
 
@@ -419,6 +420,61 @@ class ResourceTaskForm(forms.ModelForm):
     class Meta:
         model = models.Task
         fields = ["intent", "content", "contact", "notify_email"]
+
+
+########################################################################
+# Access
+########################################################################
+class AccessAddForm(forms.Form):
+    """A form to add an Access"""
+
+    email = forms.EmailField()
+
+
+@login_required
+def access_update(request, project_id):
+    """Handle ACL for a project"""
+    is_staff_or_403(request.user)
+    project = get_object_or_404(models.Project, pk=project_id)
+
+    if request.method == "POST":
+        form = AccessAddForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            if email not in project.emails:
+                project.emails.append(email)
+                project.save()
+                messages.success(
+                    request,
+                    "{0} a bien été ajouté à la liste des collaborateurs.".format(
+                        email
+                    ),
+                    extra_tags=["auth"],
+                )
+
+            return redirect(reverse("projects-project-detail", args=[project_id]))
+    else:
+        form = AccessAddForm()
+    return render(request, "projects/project/access_update.html", locals())
+
+
+@login_required
+def access_delete(request, project_id: int, email: str):
+    """Delete en email from the project ACL"""
+    is_staff_or_403(request.user)
+    project = get_object_or_404(models.Project, pk=project_id)
+
+    if request.method == "POST":
+        if email in project.emails:
+            project.emails.remove(email)
+            project.save()
+            messages.success(
+                request,
+                "{0} a bien été supprimé de la liste des collaborateurs.".format(email),
+                extra_tags=["auth"],
+            )
+
+    return redirect(reverse("projects-access-update", args=[project_id]))
 
 
 ########################################################################
