@@ -444,8 +444,15 @@ def access_update(request, project_id):
             if email not in project.emails:
                 project.emails.append(email)
                 project.save()
+                messages.success(
+                    request,
+                    "{0} a bien été ajouté à la liste des collaborateurs.".format(
+                        email
+                    ),
+                    extra_tags=["auth"],
+                )
 
-            return redirect(reverse("projects-access-update", args=[project_id]))
+            return redirect(reverse("projects-project-detail", args=[project_id]))
     else:
         form = AccessAddForm()
     return render(request, "projects/project/access_update.html", locals())
@@ -461,6 +468,11 @@ def access_delete(request, project_id: int, email: str):
         if email in project.emails:
             project.emails.remove(email)
             project.save()
+            messages.success(
+                request,
+                "{0} a bien été supprimé de la liste des collaborateurs.".format(email),
+                extra_tags=["auth"],
+            )
 
     return redirect(reverse("projects-access-update", args=[project_id]))
 
