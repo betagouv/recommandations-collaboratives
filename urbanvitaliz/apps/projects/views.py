@@ -14,9 +14,12 @@ from django.contrib.syndication.views import Feed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+
 from markdownx.fields import MarkdownxFormField
+
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
+
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models
@@ -31,6 +34,7 @@ def notify_action_created(request, project, task, resource=None):
     Notify the creation of an Action the user by sending an email and displaying
     a UI popup
     """
+    # TODO send to all project emails
     send_email(
         request,
         user_email=project.email,
@@ -137,7 +141,7 @@ def project_detail(request, project_id=None):
     """Return the details of given project for switchtender"""
     project = get_object_or_404(models.Project, pk=project_id)
     # if user is not the owner then check for admin rights
-    if project.email != request.user.email:
+    if request.user.email not in project.emails:
         is_staff_or_403(request.user)
     return render(request, "projects/project/detail.html", locals())
 

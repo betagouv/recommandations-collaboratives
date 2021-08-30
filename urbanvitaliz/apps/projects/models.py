@@ -24,6 +24,8 @@ class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
 
     email = models.CharField(max_length=128)
+    emails = models.JSONField(default=list)  # list of person having access to project
+
     last_name = models.CharField(
         max_length=128, default="", verbose_name="Nom du contact"
     )
@@ -84,7 +86,7 @@ class Project(models.Model):
     def fetch(cls, email=None):
         projects = cls.objects.filter(deleted=None)
         if email:
-            projects = projects.filter(email=email)
+            projects = projects.filter(emails__contains=email)
         return projects
 
     def notes(self):

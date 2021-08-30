@@ -115,7 +115,7 @@ def test_resource_list_contains_only_resource_with_area(client):
     url = f"{url}?limit_area=true&query=resource"
     with login(client) as user:
         Recipe(
-            projects.Project, email=user.email, commune__department=departments[1]
+            projects.Project, emails=[user.email], commune__department=departments[1]
         ).make()
         response = client.get(url)
     detail_url = reverse("resources-resource-detail", args=[resource1.id])
