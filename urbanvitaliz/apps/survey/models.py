@@ -21,6 +21,7 @@ class QuestionSet(models.Model):
     """A set of question (ex: same topic)"""
 
     objects = QuestionSetManager()
+    objects_deleted = models.Manager()
 
     survey = models.ForeignKey(
         Survey, related_name="question_sets", on_delete=models.CASCADE
@@ -82,6 +83,7 @@ class Question(models.Model):
     """A question with mutliple choices"""
 
     objects = QuestionManager()
+    objects_deleted = models.Manager()
 
     precondition = TagField(
         verbose_name="Pré-condition",
@@ -187,6 +189,7 @@ class Choice(models.Model):
     """A choice for a given Question"""
 
     objects = ChoiceManager()
+    objects_deleted = models.Manager()
 
     class Meta:
         unique_together = [["value", "question"]]
