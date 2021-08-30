@@ -131,7 +131,7 @@ def test_my_project_not_available_when_not_logged_in(client):
 def test_my_projects_are_displayed_on_page(client):
     url = reverse("projects-local-authority")
     with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, email=user.email).make()
+        project = Recipe(models.Project, emails=[user.email]).make()
         response = client.get(url)
     # template does a capfirst that capitalize the first word of title
     assertContains(response, project.name.capitalize()[:20])  # truncated name
@@ -142,7 +142,7 @@ def test_my_projects_are_displayed_on_page(client):
 def test_my_projects_are_stored_in_session(client):
     url = reverse("projects-local-authority")
     with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, email=user.email).make()
+        project = Recipe(models.Project, emails=[user.email]).make()
         client.get(url)
     assert len(client.session["projects"]) == 1
     session_project = client.session["projects"][0]
@@ -242,9 +242,9 @@ def test_project_detail_not_available_for_non_staff_users(client):
 @pytest.mark.django_db
 def test_project_detail_available_for_owner(client):
     # project email is same as test user to be logged in
-    project = Recipe(models.Project, email="test@example.com").make()
-    url = reverse("projects-project-detail", args=[project.id])
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        project = Recipe(models.Project, emails=[user.email]).make()
+        url = reverse("projects-project-detail", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
 
@@ -392,6 +392,65 @@ def test_delete_project_and_redirect(client):
 
     list_url = reverse("projects-project-list")
     assertRedirects(response, list_url)
+
+
+########################################################################
+# modify who can access the project
+########################################################################
+
+
+@pytest.mark.django_db
+def test_non_staff_cannot_add_email_to_project(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-access-update", args=[project.id])
+
+    with login(client, is_staff=False):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_staff_can_add_email_to_project(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-access-update", args=[project.id])
+    data = {"email": "test@example.com"}
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    project = models.Project.objects.get(id=project.id)
+    assert data["email"] in project.emails
+
+    # detail_url = reverse("projects-project-detail", args=[project.id])
+    # assertRedirects(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_non_staff_cannot_delete_email_from_project(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-access-delete", args=[project.id, "test@example.com"])
+
+    with login(client, is_staff=False):
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_staff_can_delete_email_from_project(client):
+    email = "test@example.com"
+    project = Recipe(models.Project, emails=[email]).make()
+    url = reverse("projects-access-delete", args=[project.id, email])
+
+    with login(client, is_staff=True):
+        response = client.post(url)
+
+    project = models.Project.objects.get(id=project.id)
+    assert email not in project.emails
+
+    update_url = reverse("projects-access-update", args=[project.id])
+    assertRedirects(response, update_url)
 
 
 ########################################################################
@@ -558,7 +617,7 @@ def test_create_new_note_for_project_and_redirect(client):
 def test_private_note_shown_only_to_staff(client):
     user_email = "not@admin.here"
     note_content = "this is a private note"
-    project = Recipe(models.Project, email=user_email).make()
+    project = Recipe(models.Project, emails=[user_email]).make()
     with login(client, is_staff=True):
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
@@ -569,6 +628,23 @@ def test_private_note_shown_only_to_staff(client):
         response = client.get(project.get_absolute_url())
 
     assertNotContains(response, note_content)
+
+
+@pytest.mark.django_db
+def test_public_note_available_to_readers(client):
+    user_email = "not@admin.here"
+    note_content = "this is a public note"
+    project = Recipe(models.Project, emails=[user_email]).make()
+    with login(client, is_staff=True):
+        response = client.post(
+            reverse("projects-create-note", args=[project.id]),
+            data={"content": note_content, "public": "True"},
+        )
+
+    with login(client, username="project_owner", email=user_email, is_staff=False):
+        response = client.get(project.get_absolute_url())
+
+    assertContains(response, note_content)
 
 
 #

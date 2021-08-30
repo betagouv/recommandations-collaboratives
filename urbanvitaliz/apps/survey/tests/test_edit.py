@@ -137,7 +137,7 @@ def test_question_set_delete_and_redirect(client):
     with login(client, is_staff=True):
         response = client.post(url)
 
-    qs = models.QuestionSet.objects.get(id=qs.id)
+    qs = models.QuestionSet.objects_deleted.get(id=qs.id)
     assert qs.deleted
 
     new_url = reverse("survey-editor-survey-details", args=[qs.survey_id])
@@ -246,7 +246,7 @@ def test_question_delete_and_redirect(client):
     with login(client, is_staff=True):
         response = client.post(url)
 
-    question = models.Question.objects.get(id=question.id)
+    question = models.Question.objects_deleted.get(id=question.id)
     assert question.deleted
 
     new_url = reverse(
@@ -360,7 +360,7 @@ def test_choice_delete_and_redirect(client):
     with login(client, is_staff=True):
         response = client.post(url)
 
-    choice = models.Choice.objects.get(id=choice.id)
+    choice = models.Choice.objects_deleted.get(id=choice.id)
     assert choice.deleted
 
     new_url = reverse(

@@ -42,7 +42,14 @@
                             <svg class="bi me-1" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
                             </svg>&nbsp;
-                            Courriel envoyé !
+                            <span class="align-middle">Courriel envoyé !</span>
+                        </strong>
+                        {% elif "auth" in message.tags %}
+                        <strong class="me-auto">
+                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock"/>
+                            </svg>&nbsp;
+                            <span class="align-middle">Gestion des droits</span>
                         </strong>
                         {% else %}
                         <strong class="me-auto">Notification</strong>
