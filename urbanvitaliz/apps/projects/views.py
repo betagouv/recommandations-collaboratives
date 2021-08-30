@@ -14,12 +14,9 @@ from django.contrib.syndication.views import Feed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-
 from markdownx.fields import MarkdownxFormField
-
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
-
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models
@@ -423,6 +420,49 @@ class ResourceTaskForm(forms.ModelForm):
     class Meta:
         model = models.Task
         fields = ["intent", "content", "contact", "notify_email"]
+
+
+########################################################################
+# Access
+########################################################################
+class AccessAddForm(forms.Form):
+    """A form to add an Access"""
+
+    email = forms.EmailField()
+
+
+@login_required
+def access_update(request, project_id):
+    """Handle ACL for a project"""
+    is_staff_or_403(request.user)
+    project = get_object_or_404(models.Project, pk=project_id)
+
+    if request.method == "POST":
+        form = AccessAddForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            if email not in project.emails:
+                project.emails.append(email)
+                project.save()
+
+            return redirect(reverse("projects-access-update", args=[project_id]))
+    else:
+        form = AccessAddForm()
+    return render(request, "projects/project/access_update.html", locals())
+
+
+@login_required
+def access_delete(request, project_id: int, email: str):
+    """Delete en email from the project ACL"""
+    is_staff_or_403(request.user)
+    project = get_object_or_404(models.Project, pk=project_id)
+
+    if request.method == "POST":
+        if email in project.emails:
+            project.emails.remove(email)
+            project.save()
+
+    return redirect(reverse("projects-access-update", args=[project_id]))
 
 
 ########################################################################
