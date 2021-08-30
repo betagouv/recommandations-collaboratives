@@ -13,7 +13,8 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -569,6 +570,23 @@ def test_private_note_shown_only_to_staff(client):
         response = client.get(project.get_absolute_url())
 
     assertNotContains(response, note_content)
+
+
+@pytest.mark.django_db
+def test_public_note_available_to_readers(client):
+    user_email = "not@admin.here"
+    note_content = "this is a public note"
+    project = Recipe(models.Project, emails=[user_email]).make()
+    with login(client, is_staff=True):
+        response = client.post(
+            reverse("projects-create-note", args=[project.id]),
+            data={"content": note_content, "public": "True"},
+        )
+
+    with login(client, username="project_owner", email=user_email, is_staff=False):
+        response = client.get(project.get_absolute_url())
+
+    assertContains(response, note_content)
 
 
 #
