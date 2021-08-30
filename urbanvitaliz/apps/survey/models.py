@@ -11,8 +11,17 @@ class Survey(models.Model):
     name = models.CharField(max_length=80)
 
 
+class QuestionSetManager(models.Manager):
+    """Manager for active Question Sets"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
 class QuestionSet(models.Model):
     """A set of question (ex: same topic)"""
+
+    objects = QuestionSetManager()
 
     survey = models.ForeignKey(
         Survey, related_name="question_sets", on_delete=models.CASCADE
@@ -63,8 +72,17 @@ class QuestionSet(models.Model):
         return self.heading
 
 
+class QuestionManager(models.Manager):
+    """Manager for active Questions"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
 class Question(models.Model):
     """A question with mutliple choices"""
+
+    objects = QuestionManager()
 
     precondition = TagField(
         verbose_name="Pré-condition",
@@ -159,8 +177,17 @@ tagging_register(
 )
 
 
+class ChoiceManager(models.Manager):
+    """Manager for active Choices"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
 class Choice(models.Model):
     """A choice for a given Question"""
+
+    objects = ChoiceManager()
 
     class Meta:
         unique_together = [["value", "question"]]
