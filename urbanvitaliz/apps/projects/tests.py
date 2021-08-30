@@ -13,8 +13,7 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -393,6 +392,65 @@ def test_delete_project_and_redirect(client):
 
     list_url = reverse("projects-project-list")
     assertRedirects(response, list_url)
+
+
+########################################################################
+# modify who can access the project
+########################################################################
+
+
+@pytest.mark.django_db
+def test_non_staff_cannot_add_email_to_project(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-access-update", args=[project.id])
+
+    with login(client, is_staff=False):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_staff_can_add_email_to_project(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-access-update", args=[project.id])
+    data = {"email": "test@example.com"}
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    project = models.Project.objects.get(id=project.id)
+    assert data["email"] in project.emails
+
+    # detail_url = reverse("projects-project-detail", args=[project.id])
+    # assertRedirects(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_non_staff_cannot_delete_email_from_project(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-access-delete", args=[project.id, "test@example.com"])
+
+    with login(client, is_staff=False):
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_staff_can_delete_email_from_project(client):
+    email = "test@example.com"
+    project = Recipe(models.Project, emails=[email]).make()
+    url = reverse("projects-access-delete", args=[project.id, email])
+
+    with login(client, is_staff=True):
+        response = client.post(url)
+
+    project = models.Project.objects.get(id=project.id)
+    assert email not in project.emails
+
+    update_url = reverse("projects-access-update", args=[project.id])
+    assertRedirects(response, update_url)
 
 
 ########################################################################
