@@ -35,7 +35,7 @@ class Contact(models.Model):
     phone_no = models.CharField(blank=True, max_length=20, verbose_name="Téléphone")
     mobile_no = models.CharField(blank=True, max_length=20, verbose_name="GSM")
     email = models.EmailField(blank=True, verbose_name="Courriel")
-    division = models.CharField(verbose_name="Service", max_length=100, blank=True)
+    division = models.CharField(verbose_name="Fonction", max_length=100, blank=True)
     organization = models.ForeignKey(
         Organization, related_name="contacts", on_delete=models.CASCADE
     )
