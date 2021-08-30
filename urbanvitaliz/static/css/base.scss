@@ -1,11 +1,24 @@
+/* variables */
+$blue: #335B7E;
+$dark-blue: #224A6D;
+$turquoise: #5DC2B0;
+
+
 /* Gloabal settings */
 body {
     min-height: 100vh;
     min-height: -webkit-fill-available;
+
+    padding-top: 56px;
+
 }
 
 html {
     height: -webkit-fill-available;
+}
+
+html, body {
+    overflow-x: hidden; /* Prevent scroll on narrow devices */
 }
 
 main {
@@ -75,3 +88,21 @@ main {
 .arrow-right { transform:rotate(225deg) }
 .arrow-down  { transform:rotate(-45deg) }
 .arrow-left  { transform:rotate(45deg) }
+
+
+a {
+    color: $blue;
+}
+a:hover {
+    color: $dark-blue !important;
+}
+
+.btn-primary {
+    background-color: $blue !important;
+    border-color: $dark-blue !important;
+    color: white !important;
+
+    &:hover {
+        color: white !important;
+    }
+}
