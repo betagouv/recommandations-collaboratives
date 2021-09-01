@@ -69,7 +69,9 @@ def onboarding(request):
             project.commune = geomatics.Commune.get_by_postal_code(postcode)
             project.save()
             models.Note(
-                project=project, content=f"# Demande initiale\n\n{project.impediments}"
+                project=project,
+                content=f"# Demande initiale\n\n{project.impediments}",
+                public=True,
             ).save()
             response = redirect("projects-project-detail", project_id=project.id)
             response["Location"] += "?first_time=1"

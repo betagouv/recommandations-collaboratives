@@ -67,6 +67,7 @@ def test_performing_onboarding_create_a_new_project(client):
     assert data["email"] in project.emails
     note = models.Note.objects.all()[0]
     assert note.project == project
+    assert note.public
     assert note.content == f"# Demande initiale\n\n{project.impediments}"
     assert response.status_code == 302
 
