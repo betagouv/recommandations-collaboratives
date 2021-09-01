@@ -50,22 +50,21 @@ def test_onboarding_page_is_reachable_without_login(client):
 
 @pytest.mark.django_db
 def test_performing_onboarding_create_a_new_project(client):
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "location": "some place",
+        "first_name": "john",
+        "last_name": "doe",
+        "description": "a project description",
+        "impediments": "some impediment",
+    }
     with login(client):
-        response = client.post(
-            reverse("projects-onboarding"),
-            data={
-                "name": "a project",
-                "email": "a@example.com",
-                "location": "some place",
-                "first_name": "john",
-                "last_name": "doe",
-                "description": "a project description",
-                "impediments": "some impediment",
-            },
-        )
+        response = client.post(reverse("projects-onboarding"), data=data)
     project = models.Project.fetch()[0]
     assert project.name == "a project"
     assert project.is_draft
+    assert data["email"] in project.emails
     note = models.Note.objects.all()[0]
     assert note.project == project
     assert note.content == f"# Demande initiale\n\n{project.impediments}"
