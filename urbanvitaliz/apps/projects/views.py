@@ -64,6 +64,7 @@ def onboarding(request):
         form = OnboardingForm(request.POST)
         if form.is_valid():
             project = form.save(commit=False)
+            project.emails.append(project.email)
             postcode = form.cleaned_data.get("postcode")
             project.commune = geomatics.Commune.get_by_postal_code(postcode)
             project.save()
