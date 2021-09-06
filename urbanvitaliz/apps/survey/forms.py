@@ -96,7 +96,15 @@ class EditQuestionForm(forms.ModelForm):
 
     class Meta:
         model = models.Question
-        fields = ["priority", "is_multiple", "text", "precondition", "why", "how"]
+        fields = [
+            "priority",
+            "is_multiple",
+            "text",
+            "precondition",
+            "why",
+            "how",
+            "comment_title",
+        ]
 
 
 class EditChoiceForm(forms.ModelForm):
