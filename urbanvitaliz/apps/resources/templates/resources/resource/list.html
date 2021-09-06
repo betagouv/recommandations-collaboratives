@@ -5,6 +5,12 @@
 
 {% load sass_tags %}
 
+{% block title %} | Toutes nos ressources{% endblock %}
+
+{% block og_title %} | Toutes nos ressources{% endblock %}
+
+
+
 {% block css %}
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
