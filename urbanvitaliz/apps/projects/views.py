@@ -140,6 +140,21 @@ def project_list(request):
 def project_detail(request, project_id=None):
     """Return the details of given project for switchtender"""
     project = get_object_or_404(models.Project, pk=project_id)
+
+    # XXX: We need this here too since onboarding now redirects to
+    # this page directly.
+    projects = models.Project.fetch(email=request.user.email)
+    # store my projects in the session
+    request.session["projects"] = list(
+        {
+            "name": p.name,
+            "id": p.id,
+            "location": p.location,
+            "actions_open": p.tasks.open().count(),
+        }
+        for p in projects
+    )
+
     # if user is not the owner then check for admin rights
     if request.user.email not in project.emails:
         is_staff_or_403(request.user)
