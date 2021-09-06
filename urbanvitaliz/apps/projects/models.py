@@ -160,7 +160,7 @@ class TaskManager(models.Manager):
     """Manager for active tasks"""
 
     def get_queryset(self):
-        return super().get_queryset().filter(deleted=None)
+        return super().get_queryset().order_by("-priority").filter(deleted=None)
 
     def done(self):
         return self.filter(done=True)
@@ -186,6 +186,12 @@ class Task(models.Model):
         "Project", on_delete=models.CASCADE, related_name="tasks"
     )
     public = models.BooleanField(default=False, blank=True)
+    priority = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Priorité",
+        help_text="Plus le chiffre est élevé, plus la recommandation s'affichera en haut.",
+    )
+
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )
