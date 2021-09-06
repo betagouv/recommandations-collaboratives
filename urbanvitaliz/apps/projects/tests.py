@@ -13,7 +13,8 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -503,7 +504,7 @@ def test_create_new_task_for_project_and_redirect(client):
             reverse("projects-create-task", args=[project.id]),
             data={"content": "this is some content"},
         )
-    task = models.Task.fetch()[0]
+    task = models.Task.objects.all()[0]
     assert task.project == project
     assert response.status_code == 302
 
