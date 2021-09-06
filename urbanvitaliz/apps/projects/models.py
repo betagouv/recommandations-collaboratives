@@ -188,6 +188,7 @@ class Task(models.Model):
     public = models.BooleanField(default=False, blank=True)
     priority = models.PositiveIntegerField(
         default=0,
+        blank=True,
         verbose_name="Priorité",
         help_text="Plus le chiffre est élevé, plus la recommandation s'affichera en haut.",
     )
