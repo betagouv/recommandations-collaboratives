@@ -76,7 +76,7 @@ def test_question_set_create_and_redirect(client):
 def test_question_set_create_error(client):
     survey = Recipe(models.Survey).make()
     url = reverse("survey-editor-question-set-create", args=[survey.id])
-    data = {"heading": "new heading"}
+    data = {}
 
     with login(client, is_staff=True):
         response = client.post(url, data=data)
@@ -114,13 +114,13 @@ def test_question_set_update_and_redirect(client):
 def test_question_set_update_error(client):
     qs = Recipe(models.QuestionSet).make()
     url = reverse("survey-editor-question-set-update", args=[qs.id])
-    data = {"heading": "new heading"}
+    data = {}
 
     with login(client, is_staff=True):
         response = client.post(url, data=data)
 
     qs = models.QuestionSet.objects.get(id=qs.id)
-    assert qs.heading != data["heading"]
+    assert qs.heading != ""
 
     assert response.status_code == 200
 
@@ -329,7 +329,7 @@ def test_choice_update_and_redirect(client):
 
     new_url = reverse(
         "survey-editor-question-set-details", args=[choice.question.question_set_id]
-    )
+    ) + "#q-{0}".format(choice.question.id)
     assertRedirects(response, new_url)
 
 
