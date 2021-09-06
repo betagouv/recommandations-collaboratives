@@ -148,6 +148,7 @@ MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à UrbanVitaliz ici"
 MAGICAUTH_EMAIL_FIELD = "email"
 MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "projects-local-authority"
 MAGICAUTH_EMAIL_UNKNOWN_CALLBACK = "urbanvitaliz.apps.home.utils.create_user"
+MAGICAUTH_TOKEN_DURATION_SECONDS = 60 * 30
 
 # Tagging
 FORCE_LOWERCASE_TAGS = True
