@@ -157,9 +157,12 @@ def choice_update(request, choice_id=None):
         form = forms.EditChoiceForm(request.POST, instance=choice)
         if form.is_valid():
             form.save()
-            next_url = reverse(
-                "survey-editor-question-set-details",
-                args=[choice.question.question_set.id],
+            next_url = (
+                reverse(
+                    "survey-editor-question-set-details",
+                    args=[choice.question.question_set.id],
+                )
+                + "#q-{0}".format(choice.question.id)
             )
             return redirect(next_url)
     else:
