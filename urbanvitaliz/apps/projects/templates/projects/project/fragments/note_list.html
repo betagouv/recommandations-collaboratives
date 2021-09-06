@@ -53,7 +53,10 @@
                 </span>
                 {% endif %}
                 &nbsp;
-                <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em> - <a href="{% url 'projects-update-note' note.id %}">éditer</a></span>
+                <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em>
+                {% if user.is_staff %}
+                    - <a href="{% url 'projects-update-note' note.id %}">éditer</a></span>
+                {% endif %}
             </div>
         </div>
     </div>
