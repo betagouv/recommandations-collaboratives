@@ -1,13 +1,21 @@
 {% load static %}
 {% load sass_tags %}
-
 <!doctype html>
 <html lang="fr">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <title>UrbanVitaliz, réhabilitez vos friches plus sereinement</title>
+
+
+        <title>UrbanVitaliz{% block title %}, réhabilitez vos friches plus sereinement{% endblock %}</title>
+        <meta name="description" content="{% block description %}Aiguiller les collectivités dans leurs projets de réhabilitation de friches et autres fonciers à l’abandon - un service gratuit du Cerema{% endblock %}">
+        <meta name="robots" content="index, archive" />
+
+        <meta property="og:title" content="UrbanVitaliz{% block og_title %}, réhabilitez vos friches plus sereinement{% endblock %}" />
+        <meta property="og:locale" content="fr" />
+        <meta property="og:site_name" content="UrbanVitaliz" />
+        <meta property="og:description" content="{% block og_description %}Aiguiller les collectivités dans leurs projets de réhabilitation de friches et autres fonciers à l’abandon - un service gratuit du Cerema{% endblock %}" />
+
 
         <!-- Bootstrap core CSS -->
 		    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">

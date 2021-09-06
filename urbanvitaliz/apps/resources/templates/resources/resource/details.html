@@ -5,6 +5,15 @@
 
 {% load sass_tags %}
 
+{% block title %} | {{ resource.title }}{% endblock %}
+
+{% block og_title %} | {{ resource.title }}{% endblock %}
+
+{% block description %}{{ resource.subtitle }}{% endblock %}
+
+{% block og_description %}{{ resource.subtitle }}{% endblock %}
+
+
 {% block css %}
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
 {% endblock %}
