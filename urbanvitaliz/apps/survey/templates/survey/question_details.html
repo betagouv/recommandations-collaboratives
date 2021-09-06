@@ -135,7 +135,7 @@
                 </ul>
 
                 <div class="mt-3 mb-3">
-                    <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-comments" name="{{ form.comments.name }}" value="{{ form.comments.value|default:'' }}" placeholder="Une précision ? Un commentaire ? Une remarque ?"></textarea>
+                    <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-comments" name="{{ form.comments.name }}" value="{{ form.comments.value|default:'' }}" placeholder="{{ question.comment_title }}"></textarea>
                     <label class="visually-hidden" for="input-project-comments">{{ form.comments.label }}</label>
 
                     {% for error in form.comments.errors %}

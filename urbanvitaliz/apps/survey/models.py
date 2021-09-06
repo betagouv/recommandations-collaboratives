@@ -125,6 +125,13 @@ class Question(models.Model):
 
     deleted = models.DateTimeField(null=True)
 
+    comment_title = models.CharField(
+        max_length=255,
+        default="Commentaire",
+        blank=True,
+        verbose_name="Titre du commentaire",
+    )
+
     def _following(self, order_by: list):
         """return the following question defined by the given order_by"""
         questions = self.question_set.questions
