@@ -336,7 +336,7 @@ class CreateTaskForm(forms.ModelForm):
 
     content = MarkdownxFormField(required=False)
 
-    notify_email = forms.BooleanField(initial=True, required=False)
+    notify_email = forms.BooleanField(initial=False, required=False)
 
     class Meta:
         model = models.Task
@@ -435,7 +435,7 @@ def create_resource_action(request, resource_id=None):
 class ResourceTaskForm(forms.ModelForm):
     """Create and task for push resource"""
 
-    notify_email = forms.BooleanField(initial=True, required=False)
+    notify_email = forms.BooleanField(initial=False, required=False)
 
     class Meta:
         model = models.Task
