@@ -9,6 +9,9 @@ from urbanvitaliz.apps.projects import models as projects_models
 class Survey(models.Model):
     name = models.CharField(max_length=80)
 
+    def __str__(self):
+        return "Survey: {0}".format(self.name)
+
 
 class QuestionSetManager(models.Manager):
     """Manager for active Question Sets"""
@@ -32,7 +35,7 @@ class QuestionSet(models.Model):
 
     subheading = models.TextField(verbose_name="Sous-titre")
 
-    deleted = models.DateTimeField(null=True)
+    deleted = models.DateTimeField(null=True, blank=True)
 
     def _following(self, order_by):
         """return the following question set defined by the given order_by"""

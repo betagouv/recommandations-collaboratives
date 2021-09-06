@@ -1,7 +1,58 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load sass_tags %}
 {% load humanize %}
+
+{% block js %}
+<script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+
+<script type="text/javascript">
+ var tour = introJs().setOptions({
+     tooltipClass: 'introjs-uv',
+     prevLabel: 'Précédent',
+     nextLabel: 'Suivant',
+     doneLabel: 'C\'est parti !',
+     steps: [
+         {
+             intro: "👋 Bienvenue dans le <strong>parcours d'exploration</strong> d'UrbanVitaliz<br/>Ce parcours vous aide à structurer votre connaissance de votre friche, à ne rien oublier d’important pour la suite du projet."
+         },
+         {
+             element: document.querySelector('#qs-heading'),
+             intro: "Le parcours est divisé en sections thématiques. Vous pouvez les enchaîner, ou y revenir plus tard : pas de pression 😉"
+         },
+         {
+             element: document.querySelector('#section-why'),
+             intro: "🌱 Certaines informations sont plus importantes qu’elles n’en ont l’air. Découvrez ici pourquoi."
+         },
+         {
+             element: document.querySelector('#section-how'),
+             intro: "🔍 Vous ne savez pas répondre à la question ? Cet encart vous indiquer où trouver l’information manquante."
+         },
+         /*
+            Ici, vous retrouverez le récapitulatif de vos réponses, et les questions que vous avez passées : vous pouvez y revenir une fois l’information trouvée.*/
+
+         {
+             element: document.querySelector('#button-skip'),
+             intro: "✨ Vous pouvez aussi enchaîner les questions, et laisser de côté celles où vous ne savez pas répondre.",
+         },
+         {
+             intro: "Bonne exploration de votre site 👋"
+     }]
+ });
+
+ {% if session.answers.count == 0 %}
+ tour.start()
+ {% endif %}
+
+</script>
+
+{% endblock %}
+
+{% block css %}
+<link href="https://unpkg.com/intro.js/minified/introjs.min.css" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'survey/css/introjs-uv.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
 
 {% block content %}
 
@@ -25,7 +76,7 @@
     </nav>
 
     <div class="row">
-        <div class="col">
+        <div class="col" id="qs-heading">
             <h2>
                 <svg class="bi" width="32" height="32" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ question.question_set.icon|default:'question' }}"/>
@@ -104,7 +155,7 @@
                              Je Break !
                              </a>
                         -->
-                        <a class="btn btn-outline-secondary" href="{% url 'survey-question-next' session.id question.id %}">
+                        <a id="button-skip" class="btn btn-outline-secondary" href="{% url 'survey-question-next' session.id question.id %}">
                             <svg class="d-inline-block bi" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#patch-question"/>
                             </svg>&nbsp;
@@ -124,7 +175,7 @@
         <div class="col col-lg-5">
 
             {% if question.why %}
-            <div class="mb-5">
+            <div id="section-why" class="mb-5">
                 <svg class="d-inline-block bi me-1" width="18" height="18" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle"/>
                 </svg>&nbsp;<h5 class="d-inline-block">Pourquoi c'est important</h5>
@@ -135,7 +186,7 @@
             {% endif %}
 
             {% if question.how %}
-            <div>
+            <div id="section-how">
                 <svg class="d-inline-block bi me-1" width="18" height="18" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#compass"/>
                 </svg>&nbsp;<h5 class="d-inline-block">Où chercher l'information</h5>

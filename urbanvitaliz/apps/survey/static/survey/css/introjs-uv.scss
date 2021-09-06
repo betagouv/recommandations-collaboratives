@@ -1,0 +1,27 @@
+$green: #5DC2B0;
+$blue: #335B7E;
+$dark-blue: #224A6D;
+
+
+.introjs-tooltip {
+    background-color: $green;
+    color: white;
+    font-size: 1.3em;
+
+    border: 1px solid white;
+
+    min-width: 40vw; // change to desired
+
+}
+
+.introjs-skipbutton {
+    color: white;
+}
+
+.introjs-button {
+    background-color: $blue;
+    border: 1px solid $dark-blue;
+    color: white;
+
+    text-shadow: none;
+}
