@@ -137,7 +137,15 @@
         {% for choice in question.choices.all %}
         <li class="list-group-item d-flex justify-content-between align-items-start">
             <div class="ms-2 me-auto">
-                <div>{{ choice.text }} (<span class="fw-bold">{{ choice.value }}</span>)</div>
+                <div>
+                    {{ choice.text }} (<span class="fw-bold">{{ choice.value }}</span>) 
+                    <span class="text-secondary small" style="font-size: 15px">
+                        &nbsp;<svg class="bi" width="15" height="15" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#sort-up"/>
+                        </svg>&nbsp;{{ choice.priority }}
+                    </span>
+
+                </div>
                 <a href="{% url 'survey-editor-choice-update' choice.pk %}">éditer</a>
             </div>
             {% if choice.tags %}
