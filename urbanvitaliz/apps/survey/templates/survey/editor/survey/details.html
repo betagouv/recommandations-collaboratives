@@ -50,12 +50,12 @@
         <li class="list-group-item d-flex justify-content-between align-items-start">
             <div class="ms-2 me-auto">
                 {% if question_set.icon %}
-                <svg class="bi me-1 d-inline" width="16" height="16" fill="currentColor">
+                <svg class="bi me-1 d-inline rounded-circle align-middle p-1" width="24" height="24" style="background-color: {{ question_set.color }}">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ question_set.icon }}"/>
                 </svg>
                 {% endif %}
-                <div class="d-inline fw-bold"><a href="{% url 'survey-editor-question-set-details' question_set.pk %}">{{ question_set.heading }}</a></div>
-                <span class="text-secondary">{{ question_set.subheading }}</span>
+                <div class="d-inline align-middle fw-bold"><a href="{% url 'survey-editor-question-set-details' question_set.pk %}">{{ question_set.heading }}</a></div>
+                <span class="align-middle text-secondary">{{ question_set.subheading }}</span>
             </div>
             {% if question_set.questions.count %}
             <span class="badge bg-primary rounded-pill">{{ question_set.questions.count }} question{{ question_set.questions.count|pluralize }}</span>

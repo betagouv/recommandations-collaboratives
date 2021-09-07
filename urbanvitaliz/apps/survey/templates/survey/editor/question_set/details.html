@@ -30,10 +30,10 @@
         <div class="col-sm-12 col-lg-8 col-xl-9">
 
             <h2>
-                <svg class="bi" width="28" height="28" fill="currentColor">
+                <svg class="bi rounded-circle p-2" width="40" height="40" style="background-color: {{ question_set.color }}">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ question_set.icon|default:'stack' }}"/>
                 </svg>&nbsp;
-                {{ question_set.heading }}
+                <span class="align-middle">{{ question_set.heading }}</span>
             </h2>
 
             <p>
@@ -89,7 +89,8 @@
             <svg class="bi" width="26" height="26" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-square"/>
             </svg>&nbsp;
-            {{ question.text }}
+            <span class="align-middle">{{ question.text }}</span>
+            
             <span class="text-secondary small" style="font-size: 15px">
             &nbsp;<svg class="bi" width="15" height="15" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#sort-up"/>

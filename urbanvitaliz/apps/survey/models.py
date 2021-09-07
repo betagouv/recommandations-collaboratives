@@ -32,6 +32,9 @@ class QuestionSet(models.Model):
 
     heading = models.CharField(max_length=255, verbose_name="En-tête")
     icon = models.CharField(max_length=80, verbose_name="Icône", blank=True)
+    color = models.CharField(
+        max_length=10, verbose_name="Couleur", blank=True, default="orange"
+    )
 
     subheading = models.TextField(
         verbose_name="Sous-titre", null=True, blank=True, default=""
