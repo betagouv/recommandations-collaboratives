@@ -1,3 +1,4 @@
+import math
 import statistics
 
 from django.db import models
@@ -318,7 +319,7 @@ class Session(models.Model):
         for qs in self.survey.question_sets.all():
             completions.append(utils.compute_qs_completion(self, qs))
 
-        return statistics.mean(completions)
+        return math.ceil(statistics.mean(completions))
 
 
 def empty_answer():

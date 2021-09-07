@@ -59,7 +59,7 @@
         <!-- Show QS with progress -->
         {% regroup session.answers.all by question.question_set as answer_list %}
         {% for question_set, answers in answer_list %}
-        <div class="col">
+        <div class="col mb-3">
             {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set answers=answers show_conclusion=1 show_comment=1 %}
         </div>
         {% endfor %}
@@ -69,7 +69,7 @@
 
         {% question_set_completion session question_set as qs_completion %}
         {% if qs_completion == 0 %}
-        <div class="col">
+        <div class="col mb-3">
             {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set %}
         </div>
         {% endif %}
