@@ -38,28 +38,44 @@
     </div>
     {% else %}
 
-    {% regroup session.answers.all by question.question_set as answer_list %}
-    {% for question_set, answers in answer_list %}
     <p class="text-secondary">
         {% if project.survey_session  %}
+
         {% if project.survey_session.next_question %}
-        <p>
         La <strong>pertinence de nos recommandations</strong> est liée à la connaissance que nous avons de votre site.
-        </p>
 
         N'hésitez pas <a href="{% url 'survey-session-start' project.survey_session.id %}">à continuer le questionnaire</a> !
         {% else %}
-        <strong>Merci</strong> d'avoir répondu à toutes les questions ! Ceci nous aide à <strong>mieux cibler vos besoins</strong>.
+
+        🎉 <strong>Merci</strong> d'avoir répondu à toutes les questions ! Ceci nous aide à <strong>mieux cibler vos besoins</strong>.
         {% endif %}
         {% endif %}
     </p>
-    <div class="row row-cols-1 row-cols-md-2">
-        <div class="col">
-            {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set answers=answers %}
-        </div>
-    </div>
 
-    {% endfor %}
+
+
+
+    <div class="row row-cols-1 row-cols-md-2">
+        <!-- Show QS with progress -->
+        {% regroup session.answers.all by question.question_set as answer_list %}
+        {% for question_set, answers in answer_list %}
+        <div class="col">
+            {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set answers=answers show_conclusion=1 show_comment=1 %}
+        </div>
+        {% endfor %}
+
+        <!-- Show other QS not yet started -->
+        {%  for question_set in session.survey.question_sets.all %}
+
+        {% question_set_completion session question_set as qs_completion %}
+        {% if qs_completion == 0 %}
+        <div class="col">
+            {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set %}
+        </div>
+        {% endif %}
+        {% endfor %}
+
+    </div>
     {% endif %}
 </div>
 {% endblock %}

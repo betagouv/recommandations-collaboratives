@@ -217,6 +217,8 @@ class Choice(models.Model):
     signals = TagField(verbose_name="Signaux")
     text = models.CharField(max_length=255)
 
+    conclusion = models.CharField(max_length=100, blank=True, null=True)
+
     priority = models.PositiveIntegerField(
         default=0,
         verbose_name="Priorité",
