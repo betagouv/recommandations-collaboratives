@@ -1,9 +1,13 @@
+import statistics
+
 from django.db import models
 from markdownx.utils import markdownify
 from tagging.fields import TagField
 from tagging.models import Tag
 from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.projects import models as projects_models
+
+from . import utils
 
 
 class Survey(models.Model):
@@ -305,6 +309,14 @@ class Session(models.Model):
 
     def __str__(self):
         return "Session #{0}".format(self.id)
+
+    @property
+    def completion(self):
+        completions = []
+        for qs in self.survey.question_sets.all():
+            completions.append(utils.compute_qs_completion(self, qs))
+
+        return statistics.mean(completions)
 
 
 def empty_answer():

@@ -1,23 +1,14 @@
-import math
-
 from django import template
 
-from ..models import Answer, Choice, Question
+from .. import utils
+from ..models import Choice
 
 register = template.Library()
 
 
 @register.simple_tag
 def question_set_completion(session, question_set):
-    """Return an optimistic percentage of completion for a question_set"""
-    answer_count = Answer.objects.filter(
-        session=session, question__question_set=question_set
-    ).count()
-    question_count = Question.objects.filter(
-        question_set=question_set, precondition=""
-    ).count()
-
-    return min(math.ceil(answer_count / question_count * 100), 100)
+    return utils.compute_qs_completion(session, question_set)
 
 
 @register.simple_tag

@@ -1,16 +1,64 @@
 {% load survey %}
+{% load static %}
 
-<div class="card text-white" style="background: #5DC2B0;">
+<div class="card text-white" style="background: {{ question_set.color|default:'grey' }};">
     <div class="card-body mt-2 ms-2">
         <div style="border-left: 5px solid white; border-radius: 2px; padding-left: 20px;">
-            <h5 class="card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set.heading }}</h5>
+            <div>
+                {% if question_set.icon %}
+                <svg class="bi d-inline me-1" width="16" height="16">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ question_set.icon }}"/>
+                </svg>
+                {% endif %}
+                <h5 class="align-middle d-inline card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set.heading }}</h5>
+            </div>
             <progress class="mb-0" max="100" value="{% question_set_completion answers.0.session answers.0.question.question_set %}"></progress> 
             <h6>{% question_set_completion answers.0.session question_set %}%</h6>
             <p class="card-text">
                 <ul class="list-unstyled">
                     {{ question_set_completion }}
+
                     {% for answer in answers %}
-                    <li><del>{{ answer.question.text }}</del></li>
+                    <li class="mb-2">
+                        {% if show_question %}
+                        <div>
+                            <h6 class="m-0 d-inline">{{ answer.question.text }}</h6>
+                            (<a class="text-white d-inline" href="{% url 'survey-question-details' session.id answer.question.id %}">changer</a>)
+                        </div>
+                        {% endif %}
+
+
+                        {% if show_answers %}
+                        {% lookup_choices_from_answer answer as choices %}
+                        <ul>
+                            {% for choice in choices %}
+                            <li>{{ choice.text }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+
+
+                    {% if show_comment and answer.comment %}
+                    <div>
+                        <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
+                        </svg>
+                        <span class="align-middle">"<em>{{ answer.comment }}</em>"</span>
+                    </div>
+                    {% endif %}
+
+                    {% if show_tags and answer.tags %}
+                    <div>
+                        <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#tags"/>
+                        </svg>
+                        {% for tag in answer.tags %}
+                        <span class="badge bg-dark rounded-pill">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    </li>
                     {% endfor %}
                 </ul>
             </p>
