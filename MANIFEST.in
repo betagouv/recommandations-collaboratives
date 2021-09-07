@@ -3,5 +3,6 @@ recursive-include urbanvitaliz/apps/home/static *.*
 recursive-include urbanvitaliz/apps/projects *.txt
 recursive-include urbanvitaliz/apps/projects/static *.*
 recursive-include urbanvitaliz/apps/resources/static *.*
+recursive-include urbanvitaliz/apps/survey/static *.*
 recursive-include urbanvitaliz/apps/resources *.md
 recursive-include urbanvitaliz *.html
