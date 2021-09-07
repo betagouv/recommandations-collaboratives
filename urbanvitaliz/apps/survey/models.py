@@ -194,7 +194,7 @@ class ChoiceManager(models.Manager):
     """Manager for active Choices"""
 
     def get_queryset(self):
-        return super().get_queryset().filter(deleted=None)
+        return super().get_queryset().filter(deleted=None).order_by("-priority")
 
 
 class Choice(models.Model):
@@ -209,6 +209,13 @@ class Choice(models.Model):
     value = models.CharField(max_length=30)
     signals = TagField(verbose_name="Signaux")
     text = models.CharField(max_length=255)
+
+    priority = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Priorité",
+        help_text="Priorité d'affichage. Le plus fort, le plus important.",
+        blank=True,
+    )
 
     deleted = models.DateTimeField(null=True)
 

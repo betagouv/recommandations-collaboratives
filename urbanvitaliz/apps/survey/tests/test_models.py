@@ -247,3 +247,19 @@ def test_question_precondition_fails():
     q = Recipe(models.Question, precondition="gamma", text="Q-with-precondition").make()
 
     assert q.check_precondition(session) is False
+
+
+########################################################################
+# Choices
+########################################################################
+
+
+@pytest.mark.django_db
+def test_question_previous_question():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q = Recipe(models.Question, priority=0, text="Q", question_set=qs).make()
+    c1 = Recipe(models.Choice, priority=0, text="C1", question=q).make()
+    c2 = Recipe(models.Choice, priority=10, text="C2", question=q).make()
+
+    assert c2 == q.choices.all()[0]
