@@ -20,6 +20,24 @@ from .. import models
 
 
 @pytest.mark.django_db
+def test_answered_question_with_comment_only_is_saved_to_session(client):
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    Recipe(models.Question, question_set=qs).make()
+
+    my_comment = "this is a comment"
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+    with login(client, is_staff=False):
+        client.post(url, data={"comment": my_comment})
+
+    # Fetch persisted answer
+    answer = models.Answer.objects.get(session=session, question=q1)
+    assert answer.comment == my_comment
+
+
+@pytest.mark.django_db
 def test_answered_question_with_single_choice_is_saved_to_session(client):
     session = Recipe(models.Session).make()
     survey = Recipe(models.Survey).make()
@@ -58,6 +76,22 @@ def test_answered_question_with_multiple_choice_is_saved_to_session(client):
     answer = models.Answer.objects.get(session=session, question=q1)
     assert answer.values == [choice.value]
     assert answer.comment == my_comment
+
+
+@pytest.mark.django_db
+def test_question_with_comment_only_make_comment_field_mandatory(client):
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    Recipe(models.Question, question_set=qs).make()
+
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+    with login(client, is_staff=False):
+        client.post(url, data={})
+
+    with pytest.raises(models.Answer.DoesNotExist):
+        models.Answer.objects.get(session=session, question=q1)
 
 
 @pytest.mark.django_db

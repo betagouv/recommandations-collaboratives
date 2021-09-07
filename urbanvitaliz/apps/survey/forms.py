@@ -22,25 +22,31 @@ class AnswerForm(forms.Form):
         self.question = question
         super().__init__(*args, **kwargs)
 
-        self.fields["answer"] = (
-            forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple)
-            if question.is_multiple
-            else forms.ChoiceField(widget=forms.RadioSelect())
-        )
+        choices = [(choice.value, choice.text) for choice in question.choices.all()]
 
-        choices = []
-        for choice in question.choices.all():
-            choices.append((choice.value, choice.text))
-        self.fields["answer"].choices = choices
+        if choices:
+            self.fields["answer"] = (
+                forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple)
+                if question.is_multiple
+                else forms.ChoiceField(widget=forms.RadioSelect())
+            )
+
+            self.fields["answer"].choices = choices
+        else:
+            # No choices, force comment to be mandatory since this is our expected answer
+            self.fields["comment"].required = True
 
         # If we already have an answer, prefill
         if answer:
-            self.fields["answer"].initial = answer.values
+            if "answer" in self.fields:
+                self.fields["answer"].initial = answer.values
             self.fields["comment"].initial = answer.comment
 
     def update_session(self, session: models.Session):
-        answer_values = self.cleaned_data.get("answer")
+        answer_values = self.cleaned_data.get("answer", "")
         comment = self.cleaned_data.get("comment", None)
+
+        signals = ""
 
         # compute the signals according to the kind of question
         if isinstance(answer_values, list):
@@ -54,10 +60,15 @@ class AnswerForm(forms.Form):
             signals = ", ".join(signals)
         else:
             # single choice
-            choice = models.Choice.objects.get(
-                question=self.question, value=answer_values
-            )
-            signals = choice.signals
+            try:
+                choice = models.Choice.objects.get(
+                    question=self.question, value=answer_values
+                )
+                signals = choice.signals
+
+            except models.Choice.DoesNotExist:
+                # Comment question only, we're fine
+                pass
 
         answer, created = models.Answer.objects.get_or_create(
             session=session,
