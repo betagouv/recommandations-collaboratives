@@ -14,54 +14,7 @@
         {% regroup session.answers.all by question.question_set as answer_list %}
         {% for question_set, answers in answer_list %}
         <div class="col">
-            <div class="card text-white bg-primary fw-bold">
-                <div class="card-body mt-2 mb-2 ms-2">
-                    <div style="border-left: 5px solid white; border-radius: 2px; padding-left: 20px;">
-                        <h5 class="card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set.heading }}</h5>
-                        <p class="card-text">
-                            <ul class="list-unstyled">
-                                {% for answer in answers %}
-                                <li class="fw-normal mb-4">
-                                    <div>
-                                        <h6 class="m-0 d-inline">{{ answer.question.text }}</h6>
-                                        (<a class="text-white d-inline" href="{% url 'survey-question-details' session.id answer.question.id %}">changer</a>)
-                                    </div>
-                                    {% lookup_choices_from_answer answer as choices %}
-                                    <ul>
-                                    {% for choice in choices %}
-                                        <li>{{ choice.text }}</li>
-                                        {% endfor %}
-                                    </ul>
 
-                                    {% if answer.comment %}
-                                    <div>
-                                        <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
-                                        </svg>
-                                        <span class="align-middle">"<em>{{ answer.comment }}</em>"</span>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if answer.tags %}
-                                    <div>
-                                        <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#tags"/>
-                                        </svg>
-                                        {% for tag in answer.tags %}
-                                        <span class="badge bg-dark rounded-pill">{{ tag }}</span>
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-
-   
-                                    
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </p>
-                    </div>
-                </div>
-            </div>
         </div>
         {% endfor %}
     </div>
