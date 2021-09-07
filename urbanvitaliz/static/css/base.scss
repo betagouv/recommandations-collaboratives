@@ -106,3 +106,28 @@ a:hover {
         color: white !important;
     }
 }
+
+progress {
+    border: 0;
+    height: 6px;
+    border-radius: 20px;
+    background-color: white;
+}
+progress::-webkit-progress-bar {
+    border: 0;
+    height: 6px;
+    border-radius: 20px;
+    background-color: white;
+}
+progress::-webkit-progress-value {
+    border: 0;
+    height: 6px;
+    border-radius: 20px;
+    background-color: white;
+}
+progress::-moz-progress-bar {
+    border: 0;
+    height: 6px;
+    border-radius: 20px;
+    background-color: white;
+}

@@ -4,7 +4,7 @@
 <div class="card text-white" style="background: {{ question_set.color|default:'grey' }};">
     <div class="card-body mt-2 ms-2">
         <div style="border-left: 5px solid white; border-radius: 2px; padding-left: 20px;">
-            <div>
+            <div class="mb-0">
                 {% if question_set.icon %}
                 <svg class="bi d-inline me-1" width="16" height="16">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ question_set.icon }}"/>
@@ -12,8 +12,12 @@
                 {% endif %}
                 <h5 class="align-middle d-inline card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set.heading }}</h5>
             </div>
-            <progress class="mb-0" max="100" value="{% question_set_completion answers.0.session answers.0.question.question_set %}"></progress> 
+            {% if answers %}
+            <progress class="mb-0" max="100" value="{% question_set_completion answers.0.session answers.0.question.question_set %}"></progress>
             <h6>{% question_set_completion answers.0.session question_set %}%</h6>
+            {% else %}
+            <h6 class="mt-2">{{ question_set.questions.count }} question{{ question_set.questions.count|pluralize }}</h6>
+            {% endif %}
             <p class="card-text">
                 <ul class="list-unstyled">
                     {{ question_set_completion }}
@@ -28,12 +32,23 @@
                         {% endif %}
 
 
-                        {% if show_answers %}
+                        {% if show_answers or show_conclusion %}
                         {% lookup_choices_from_answer answer as choices %}
-                        <ul>
+                        <ul class="list-unstyled">
+                            {% if not show_question %}
+                            <a class="text-white" href="{% url 'survey-question-details' session.id answer.question.id %}">
+                                {% endif %}
                             {% for choice in choices %}
+                            {% if show_answers %}
                             <li>{{ choice.text }}</li>
+                            {% endif %}
+                            {% if show_conclusion  %}
+                            <li class="">{{ choice.conclusion|default:choice.text }}</li>
+                            {% endif %}
                             {% endfor %}
+                            {% if not show_question %}
+                            </a>
+                            {% endif %}
                         </ul>
                         {% endif %}
 

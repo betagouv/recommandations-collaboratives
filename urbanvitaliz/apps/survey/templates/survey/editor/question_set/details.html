@@ -90,7 +90,7 @@
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-square"/>
             </svg>&nbsp;
             <span class="align-middle">{{ question.text }}</span>
-            
+
             <span class="text-secondary small" style="font-size: 15px">
             &nbsp;<svg class="bi" width="15" height="15" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#sort-up"/>
@@ -118,7 +118,11 @@
     </div>
 
     <span class="text-secondary fw-bold d-inline-block">
+        {% if question.choices.count %}
         {% if question.is_multiple %}Choix Multiples{%else%}Choix Unique{%endif%}
+        {% else %}
+        Question Ouverte
+        {% endif %}
     </span>
     {% if question.is_multiple and question.precondition %} avec {% endif %}
     {% if question.precondition %}
@@ -139,7 +143,7 @@
         <li class="list-group-item d-flex justify-content-between align-items-start">
             <div class="ms-2 me-auto">
                 <div>
-                    {{ choice.text }} (<span class="fw-bold">{{ choice.value }}</span>) 
+                    {{ choice.text }} {% if choice.conclusion %}(<span class="fw-bold">{{ choice.conclusion }}</span>){% endif %}
                     <span class="text-secondary small" style="font-size: 15px">
                         &nbsp;<svg class="bi" width="15" height="15" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#sort-up"/>

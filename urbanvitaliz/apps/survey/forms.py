@@ -123,4 +123,4 @@ class EditChoiceForm(forms.ModelForm):
 
     class Meta:
         model = models.Choice
-        fields = ["text", "value", "signals", "priority"]
+        fields = ["text", "value", "conclusion", "signals", "priority"]

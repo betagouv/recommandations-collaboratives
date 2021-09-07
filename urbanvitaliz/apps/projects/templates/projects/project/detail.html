@@ -324,7 +324,7 @@
                      </div>
                 -->
 
-                {% if project.survey_session or project.tasks.count %}
+                {% if project.survey_session.answers.count > 0  or project.tasks.count %}
                 <div class="bd-callout bd-callout-info position-relative mb-5">
                     <h4 class="mb-3">👋 Rebonjour !</h4>
                     {% if project.survey_session and project.survey_session.completion != 100 %}
@@ -340,6 +340,7 @@
                     {% endif %}
 
                 </div>
+                {% endif %}
 
                 {% if project.survey_session and project.survey_session.answers.count == 0 %}
 
@@ -358,7 +359,6 @@
                 </div>
                 {% endif %}
 
-                {% endif %}
 
                 <!-- Notes de suivi -->
                 <div class="w-100">
