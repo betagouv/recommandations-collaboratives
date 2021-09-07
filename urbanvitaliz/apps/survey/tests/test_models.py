@@ -255,7 +255,7 @@ def test_question_precondition_fails():
 
 
 @pytest.mark.django_db
-def test_question_previous_question():
+def test_choice_order_follows_priority():
     survey = Recipe(models.Survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q = Recipe(models.Question, priority=0, text="Q", question_set=qs).make()

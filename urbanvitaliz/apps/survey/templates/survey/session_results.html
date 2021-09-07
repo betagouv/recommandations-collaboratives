@@ -22,13 +22,25 @@
                             <ul class="list-unstyled">
                                 {% for answer in answers %}
                                 <li class="fw-normal mb-4">
-                                    <h6 class="m-0">{{ answer.question.text }}</h6>
+                                    <div>
+                                        <h6 class="m-0 d-inline">{{ answer.question.text }}</h6>
+                                        (<a class="text-white d-inline" href="{% url 'survey-question-details' session.id answer.question.id %}">changer</a>)
+                                    </div>
                                     {% lookup_choices_from_answer answer as choices %}
                                     <ul>
                                     {% for choice in choices %}
                                         <li>{{ choice.text }}</li>
                                         {% endfor %}
                                     </ul>
+
+                                    {% if answer.comment %}
+                                    <div>
+                                        <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
+                                        </svg>
+                                        <span class="align-middle"><em>{{ answer.comment }}</em>"</span>
+                                    </div>
+                                    {% endif %}
 
                                     {% if answer.tags %}
                                     <div>
@@ -40,6 +52,9 @@
                                         {% endfor %}
                                     </div>
                                     {% endif %}
+
+   
+                                    
                                 </li>
                                 {% endfor %}
                             </ul>
