@@ -12,4 +12,7 @@ def compute_qs_completion(session, question_set):
         question_set=question_set, precondition=""
     ).count()
 
+    if question_count == 0:
+        return 0
+
     return min(math.ceil(answer_count / question_count * 100), 100)
