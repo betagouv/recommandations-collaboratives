@@ -123,7 +123,7 @@
                     {% for choice in form.fields.answer.choices %}
                     <li class="list-group-item py-3">
                         {% if question.is_multiple %}
-                        <input class="form-check-input" type="checkbox" name="answer" value="{{ choice.0 }}" id="form_answer-{{ forloop.counter }}">
+                        <input class="form-check-input" type="checkbox" name="answer" value="{{ choice.0 }}" id="form_answer-{{ forloop.counter }}" {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
                         {% else %}
                         <input class="form-check-input" type="radio" name="answer" value="{{ choice.0 }}" id="form_answer-{{ forloop.counter }}" {% ifequal form.fields.answer.initial choice.0 %}checked{% endifequal %}>
                         {{ form.fields.answer.selected }}
