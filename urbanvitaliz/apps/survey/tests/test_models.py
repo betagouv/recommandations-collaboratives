@@ -259,7 +259,7 @@ def test_choice_order_follows_priority():
     survey = Recipe(models.Survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q = Recipe(models.Question, priority=0, text="Q", question_set=qs).make()
-    c1 = Recipe(models.Choice, priority=0, text="C1", question=q).make()
+    Recipe(models.Choice, priority=0, text="C1", question=q).make()
     c2 = Recipe(models.Choice, priority=10, text="C2", question=q).make()
 
     assert c2 == q.choices.all()[0]
@@ -306,7 +306,7 @@ def test_compute_qs_partially_answered():
     session = Recipe(models.Session).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, priority=0, text="Q", question_set=qs).make()
-    q2 = Recipe(models.Question, priority=0, text="Q2", question_set=qs).make()
+    Recipe(models.Question, priority=0, text="Q2", question_set=qs).make()
     Recipe(models.Answer, session=session, question=q1).make()
 
     assert utils.compute_qs_completion(session, qs) == 50

@@ -104,17 +104,8 @@
                 Fiche crée <em>{{ project.created_on|naturalday }}</em> et modifiée <em>{{ project.updated_on|naturaltime }}</em>.
             </p>
 
-            {% if user.is_staff %}
             <div class="d-grid gap-2 mt-3">
-                <span class="d-inline-block"> 
-                    <a href="{% url 'projects-project-update' project.id %}" class="btn btn-light w-100 btn-sm">
-                        <svg class="bi" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
-                        </svg>
-                        &nbsp;
-                        Éditer
-                    </a>
-                </span>
+                {% if user.is_staff or can_administrate %}
                 <span class="d-inline-block"> 
                     <a href="{% url 'projects-access-update' project.id %}" class="btn btn-light w-100 btn-sm">
                         <svg class="bi" width="16" height="16" fill="currentColor">
@@ -122,6 +113,17 @@
                         </svg>
                         &nbsp;
                         Gérer les accès
+                    </a>
+                </span>
+                {% endif %}
+                {% if user.is_staff %}
+                <span class="d-inline-block"> 
+                    <a href="{% url 'projects-project-update' project.id %}" class="btn btn-light w-100 btn-sm">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
+                        </svg>
+                        &nbsp;
+                        Éditer
                     </a>
                 </span>
                 <span class="d-inline-block"> 
@@ -136,8 +138,9 @@
                         </button>
                     </form>
                 </span>
+                {% endif %}
             </div>
-            {% endif %}
+
 
             <!--
                  <p>

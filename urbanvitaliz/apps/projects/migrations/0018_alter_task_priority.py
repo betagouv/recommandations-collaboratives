@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             field=models.PositiveIntegerField(
                 blank=True,
                 default=0,
-                help_text="Plus le chiffre est élevé, plus la recommandation s'affichera en haut.",
+                help_text="Plus le chiffre est élevé, plus la recommandation s'affichera en haut.",  # noqa
                 verbose_name="Priorité",
             ),
         ),
