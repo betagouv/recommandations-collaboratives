@@ -1,0 +1,11 @@
+.link-edit {
+    svg {
+        visibility: hidden;
+    }
+
+    &:hover {
+        svg {
+            visibility: visible;
+        }
+    }
+}
