@@ -18,6 +18,8 @@ pytest-coverage
 pytest-django
 pytest-mock
 pytest-xdist
+pytest-sugar
+pytest-icdiff
 pytz
 semgrep
 
