@@ -10,7 +10,7 @@ created: 2021-06-27 12:06:10 CEST
 import pytest
 from model_bakery.recipe import Recipe
 
-from .. import models
+from .. import models, utils
 
 ########################################################################
 # Session
@@ -263,3 +263,50 @@ def test_choice_order_follows_priority():
     c2 = Recipe(models.Choice, priority=10, text="C2", question=q).make()
 
     assert c2 == q.choices.all()[0]
+
+
+########################################################################
+# Utils
+########################################################################
+
+
+@pytest.mark.django_db
+def test_compute_qs_with_empty_question_set():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    session = Recipe(models.Session).make()
+
+    assert utils.compute_qs_completion(session, qs) == 0
+
+
+@pytest.mark.django_db
+def test_compute_qs_with_no_answer():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    Recipe(models.Question, priority=0, text="Q", question_set=qs).make()
+    session = Recipe(models.Session).make()
+
+    assert utils.compute_qs_completion(session, qs) == 0
+
+
+@pytest.mark.django_db
+def test_compute_qs_fully_answered():
+    survey = Recipe(models.Survey).make()
+    session = Recipe(models.Session).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q = Recipe(models.Question, priority=0, text="Q", question_set=qs).make()
+    Recipe(models.Answer, session=session, question=q).make()
+
+    assert utils.compute_qs_completion(session, qs) == 100
+
+
+@pytest.mark.django_db
+def test_compute_qs_partially_answered():
+    survey = Recipe(models.Survey).make()
+    session = Recipe(models.Session).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, priority=0, text="Q", question_set=qs).make()
+    q2 = Recipe(models.Question, priority=0, text="Q2", question_set=qs).make()
+    Recipe(models.Answer, session=session, question=q1).make()
+
+    assert utils.compute_qs_completion(session, qs) == 50
