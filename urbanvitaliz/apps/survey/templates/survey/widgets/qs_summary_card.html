@@ -1,5 +1,12 @@
 {% load survey %}
 {% load static %}
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'survey/css/survey.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+
 
 <div class="card text-white" style="background: {{ question_set.color|default:'grey' }};">
     <div class="card-body mt-2 ms-2">
@@ -24,26 +31,44 @@
 
                     {% for answer in answers %}
                     <li class="mb-2">
-                        {% if show_question %}
+                        {% lookup_choices_from_answer answer as choices %}
+
+                        {% if show_question or not choices %}
                         <div>
-                            <h6 class="m-0 d-inline">{{ answer.question.text }}</h6>
-                            (<a class="text-white d-inline" href="{% url 'survey-question-details' session.id answer.question.id %}">changer</a>)
+                            <a class="text-white text-decoration-none link-edit" href="{% url 'survey-question-details' session.id answer.question.id %}">
+                                <h6 class="m-0 d-inline align-middle">{{ answer.question.text }}</h6>
+                                &nbsp;
+                                <svg class="bi me-1 d-inline align-middle" width="12" height="12" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
+                                </svg>
+                            </a>
                         </div>
                         {% endif %}
 
 
                         {% if show_answers or show_conclusion %}
-                        {% lookup_choices_from_answer answer as choices %}
                         <ul class="list-unstyled">
                             {% if not show_question %}
-                            <a class="text-white" href="{% url 'survey-question-details' session.id answer.question.id %}">
+                            <a class="link-edit text-white text-decoration-none" href="{% url 'survey-question-details' session.id answer.question.id %}">
                                 {% endif %}
                             {% for choice in choices %}
                             {% if show_answers %}
-                            <li>{{ choice.text }}</li>
+                                <li>
+                                    {{ choice.text }}
+                                    &nbsp;
+                                    <svg class="bi me-1 d-inline align-middle" width="12" height="12" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
+                                    </svg>
+                                </li>
                             {% endif %}
                             {% if show_conclusion  %}
-                            <li class="">{{ choice.conclusion|default:choice.text }}</li>
+                                <li class="">
+                                    {{ choice.conclusion|default:choice.text }}
+                                    &nbsp;
+                                    <svg class="bi me-1 d-inline align-middle" width="12" height="12" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
+                                    </svg>
+                                </li>
                             {% endif %}
                             {% endfor %}
                             {% if not show_question %}
@@ -53,7 +78,7 @@
                         {% endif %}
 
 
-                    {% if show_comment and answer.comment %}
+                    {% if show_comment and answer.comment or not choices %}
                     <div>
                         <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
