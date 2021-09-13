@@ -1,0 +1,111 @@
+{% load static %}
+{% load humanize %}
+<div class="row">
+    <div class="col col-7">
+
+        <!-- Actions
+        <div class="w-100">
+            <h2 class="mb-3 d-inline-block">
+                <svg class="bi align-middle me-1" width="28" height="28" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
+                </svg>
+                <span class="align-middle">Actions en cours</span>
+            </h2>
+            {% if user.is_staff %}
+            <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-task' project.id %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+                </svg>
+                Ajouter une action
+            </a>
+            {% endif %}
+        </div>
+
+        <p class="mb-3 text-secondary">
+            Les <strong><em>Actions</em></strong> vous sont proposées par l'équipe d'accompagnement pour baliser votre parcours et avancer méthodiquement.
+            <br/>
+        </p>
+
+        -->
+
+
+
+        <h2 class="mt-1 mb-3 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
+            <span class="align-middle">Actions en cours</span>
+            &nbsp;
+            <span class="align-middle badge rounded-pill bg-secondary">X</span>
+        </h2>
+
+        <div class="accordion" id="task-list">
+            <div class="accordion-item">
+                <div class="accordion-header border border-1 d-flex justify-content-between p-3">
+                    <span class="text-uppercase">Financer le projet</span>
+                    <div>
+                        <span class="align-middle badge rounded-pill bg-primary me-2">
+                            <svg class="align-middle bi me-1" width="14" height="14" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
+                            </svg>
+                            <span class="align-middle small">X</span>
+                        </span>
+                        <span class="align-middle badge rounded-pill bg-primary">
+                            <svg class="align-middle bi" width="14" height="14" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
+                            </svg>
+                            <span class="align-middle small">Y</span>
+                        </span>
+                    </div>
+                </div>
+		        {% for task in project.tasks.all %}
+            <div class="accordion-item">
+                <div id="action-{{ task.id }}-header" class="accordion-header" data-bs-toggle="collapse" data-bs-target="#action-{{ task.id }}-content" aria-expanded="false" aria-controls="action-{{ task.id }}-content">
+                    <button class="accordion-button collapsed">{{ task.intent|capfirst|default:"Action" }}</button>
+                </div>
+                <div id="action-{{ task.id }}-content" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        {{ task.content }}
+
+                        <div class="d-flex flex-fill ms-2 justify-content-start flex-column" >
+
+                            {% if task.resource or task.contact %}
+                            <div class="d-flex flex-row flex-grow-1 justify-content-between mb-3">
+                                {% if task.resource %}
+                                <div class="relative" style="width: 50%;">
+                                    {% include "resources/resource/widgets/card_horizontal.html" with resource=task.resource %}
+                                </div>
+                                {% endif %}
+                                {% if task.contact %}
+                                <div class="relative  {% if task.resource %}ms-2{% endif %}" style="width: 50%;">
+                                    {% include "addressbook/widgets/card_contact_horizontal.html" with contact=task.contact %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                    <div class="d-flex align-self-end">
+                        {% if user.is_staff %}
+                        <div class="btn-group mb-1" role="group" aria-label="Admin action">
+                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'projects-update-task' task.id %}">
+                                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
+                                </svg>
+                                Éditer
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+		        {% endfor %}
+        </div>
+        </div>
+
+        <h2 class="mt-4 mb-3 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
+            <span class="align-middle">Actions recommandées</span>
+            &nbsp;
+            <span class="align-middle badge rounded-pill bg-secondary">X</span>
+        </h2>
+
+    </div>
