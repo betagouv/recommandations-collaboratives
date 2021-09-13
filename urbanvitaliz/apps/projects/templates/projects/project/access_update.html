@@ -50,6 +50,7 @@
             <tr>
                 <td>{{ email }}</td>
                 <td>
+                    {% if email != project.email %}
                     <form id="form-projects-access-remove-user"
 				                  method="post"
 				                  action="{% url 'projects-access-delete' project.pk email %}"
@@ -57,6 +58,10 @@
                         {% csrf_token %}
                         <button class="btn btn-danger">Supprimer</button>
                     </form>
+                    {% else %}
+                    <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Vous ne pouvez pas retirer le propriétaire de son propre projet">
+                        <button type="button" class="btn btn-danger disabled" >Supprimer</button>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}

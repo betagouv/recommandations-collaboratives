@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('survey', '0024_questionset_color'),
+        ("survey", "0024_questionset_color"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='choice',
-            name='conclusion',
+            model_name="choice",
+            name="conclusion",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
     ]

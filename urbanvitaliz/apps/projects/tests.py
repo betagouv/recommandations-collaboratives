@@ -13,7 +13,8 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -417,7 +418,7 @@ def test_staff_can_add_email_to_project(client):
     data = {"email": "test@example.com"}
 
     with login(client, is_staff=True):
-        response = client.post(url, data=data)
+        client.post(url, data=data)
 
     project = models.Project.objects.get(id=project.id)
     assert data["email"] in project.emails
@@ -427,11 +428,72 @@ def test_staff_can_add_email_to_project(client):
 
 
 @pytest.mark.django_db
+def test_owner_can_add_email_to_project_if_not_draft(client):
+    email = "owner@example.com"
+    project = Recipe(models.Project, email=email, is_draft=False).make()
+    url = reverse("projects-access-update", args=[project.id])
+    data = {"email": "collaborator@example.com"}
+
+    with login(client, email=email, is_staff=False):
+        client.post(url, data=data)
+
+    project = models.Project.objects.get(id=project.id)
+    assert data["email"] in project.emails
+
+
+@pytest.mark.django_db
+def test_owner_cannot_add_email_to_project_if_draft(client):
+    email = "owner@example.com"
+    project = Recipe(models.Project, email=email, is_draft=True).make()
+    url = reverse("projects-access-update", args=[project.id])
+    data = {"email": "collaborator@example.com"}
+
+    with login(client, email=email, is_staff=False):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
 def test_non_staff_cannot_delete_email_from_project(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-access-delete", args=[project.id, "test@example.com"])
 
     with login(client, is_staff=False):
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_owner_can_remove_email_from_project_if_not_draft(client):
+    email = "owner@example.com"
+    colab_email = "collaborator@example.com"
+    project = Recipe(
+        models.Project, email=email, emails=[email, colab_email], is_draft=False
+    ).make()
+    url = reverse(
+        "projects-access-delete",
+        args=[project.id, colab_email],
+    )
+
+    with login(client, email=email, is_staff=False):
+        client.post(url)
+
+    project = models.Project.objects.get(id=project.id)
+    assert colab_email not in project.emails
+
+
+@pytest.mark.django_db
+def test_owner_cannot_remove_email_from_project_if_draft(client):
+    email = "owner@example.com"
+    colab_email = "collaborator@example.com"
+    project = Recipe(
+        models.Project, email=email, emails=[email, colab_email], is_draft=True
+    ).make()
+    url = reverse("projects-access-delete", args=[project.id, colab_email])
+
+    with login(client, email=email, is_staff=False):
         response = client.post(url)
 
     assert response.status_code == 403
@@ -448,6 +510,22 @@ def test_staff_can_delete_email_from_project(client):
 
     project = models.Project.objects.get(id=project.id)
     assert email not in project.emails
+
+    update_url = reverse("projects-access-update", args=[project.id])
+    assertRedirects(response, update_url)
+
+
+@pytest.mark.django_db
+def test_owner_cannot_be_removed_from_project_acl(client):
+    email = "test@example.com"
+    project = Recipe(models.Project, email=email, emails=[email]).make()
+    url = reverse("projects-access-delete", args=[project.id, email])
+
+    with login(client, is_staff=True):
+        response = client.post(url)
+
+    project = models.Project.objects.get(id=project.id)
+    assert email in project.emails
 
     update_url = reverse("projects-access-update", args=[project.id])
     assertRedirects(response, update_url)

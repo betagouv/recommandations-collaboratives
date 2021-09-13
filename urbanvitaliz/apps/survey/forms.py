@@ -33,7 +33,8 @@ class AnswerForm(forms.Form):
 
             self.fields["answer"].choices = choices
         else:
-            # No choices, force comment to be mandatory since this is our expected answer
+            # No choices, force comment to be mandatory since this is our
+            # expected answer
             self.fields["comment"].required = True
 
         # If we already have an answer, prefill

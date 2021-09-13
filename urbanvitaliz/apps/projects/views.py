@@ -20,6 +20,7 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models
+from .utils import can_administrate_or_403
 
 ########################################################################
 # notifications
@@ -158,6 +159,11 @@ def project_detail(request, project_id=None):
     # if user is not the owner then check for admin rights
     if request.user.email not in project.emails:
         is_staff_or_403(request.user)
+
+    can_administrate = (  # noqa: F841
+        request.user.email == project.email
+    ) and project.is_draft is False
+
     return render(request, "projects/project/detail.html", locals())
 
 
@@ -454,8 +460,9 @@ class AccessAddForm(forms.Form):
 @login_required
 def access_update(request, project_id):
     """Handle ACL for a project"""
-    is_staff_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
+
+    can_administrate_or_403(project, request.user)
 
     if request.method == "POST":
         form = AccessAddForm(request.POST)
@@ -481,11 +488,21 @@ def access_update(request, project_id):
 @login_required
 def access_delete(request, project_id: int, email: str):
     """Delete en email from the project ACL"""
-    is_staff_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
 
+    can_administrate_or_403(project, request.user)
+
     if request.method == "POST":
-        if email in project.emails:
+        if email == project.email:
+            messages.error(
+                request,
+                "Vous ne pouvez pas retirer le propriétaire de son propre projet.".format(
+                    email
+                ),
+                extra_tags=["auth"],
+            )
+
+        elif email in project.emails:
             project.emails.remove(email)
             project.save()
             messages.success(
