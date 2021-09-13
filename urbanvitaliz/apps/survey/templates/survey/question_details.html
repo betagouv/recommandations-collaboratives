@@ -136,8 +136,9 @@
                 </ul>
 
                 <div class="mt-3 mb-3">
+                    <label class="mb-1" for="input-project-comment">{{ question_comment_title|default:'Commentaire' }}</label>
                     <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-comment" name="{{ form.comment.name }}" placeholder="{{ question.comment_title }}">{{ form.comment.value|default:'' }}</textarea>
-                    <label class="visually-hidden" for="input-project-comment">{{ form.comment.label }}</label>
+
 
                     {% for error in form.comment.errors %}
                     <div class="text-danger text-end">{{ error }}</div>
