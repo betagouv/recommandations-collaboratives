@@ -259,10 +259,10 @@ def test_choice_order_follows_priority():
     survey = Recipe(models.Survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q = Recipe(models.Question, priority=0, text="Q", question_set=qs).make()
-    Recipe(models.Choice, priority=0, text="C1", question=q).make()
+    c1 = Recipe(models.Choice, priority=0, text="C1", question=q).make()
     c2 = Recipe(models.Choice, priority=10, text="C2", question=q).make()
 
-    assert c2 == q.choices.all()[0]
+    assert list(q.choices.all()) == [c2, c1]
 
 
 ########################################################################
