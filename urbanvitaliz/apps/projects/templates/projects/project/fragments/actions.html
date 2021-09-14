@@ -1,7 +1,9 @@
 {% load static %}
 {% load humanize %}
+{% load gravatar %}
+
 <div class="row">
-    <div class="col col-7">
+    <div class="col col-8">
 
         <!-- Actions
         <div class="w-100">
@@ -9,7 +11,7 @@
                 <svg class="bi align-middle me-1" width="28" height="28" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
                 </svg>
-                <span class="align-middle">Actions en cours</span>
+                <span class="align-middle">Actions à mener</span>
             </h2>
             {% if user.is_staff %}
             <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-task' project.id %}">
@@ -33,79 +35,189 @@
         <h2 class="mt-1 mb-3 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
             <span class="align-middle">Actions en cours</span>
             &nbsp;
-            <span class="align-middle badge rounded-pill bg-secondary">X</span>
+            <span class="align-middle badge rounded-pill bg-secondary">{{ project.tasks.open.count }}</span>
+        </h2>
+
+        {% if project.tasks.open.count %}
+
+        <div class="accordion" id="task-list">
+            <div class="accordion-item">
+                <div class="accordion-header border border-1 d-flex justify-content-start p-3">
+                    <span class="text-uppercase fw-bolder small">Toutes les actions</span>
+                    <div>
+
+                    </div>
+                </div>
+		            {% for task in project.tasks.open %}
+                {% include 'projects/project/fragments/action_list_item.html' %}
+		            {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <!-- Empty -->
+        <div class="bg-light p-4 rounded-2">
+            <h3 class="fw-light">Vous n'avez pas d'actions en cours</h3>
+            {% if project.tasks.proposed.count == 0 %}
+            <p class="fst-italic fw-light">
+                Des actions vous seront proposées par notre équipe dès que possible.
+            </p>
+            <p class="fst-italic fw-light">
+                Vous pouvez accélerer les recommandations <span class="fw-bolder">en complétant le questionnaire d'exploration</span>.
+            </p>
+            <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary">Compléter le questionnaire d'exploration</a>
+            {% else %}
+            <p class="fst-italic fw-light">
+                Nos aiguilleuses vous <span class="fw-bolder">recommandent des actions</span>, n'hésitez pas à les consulter et vous les approprier !
+            </p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+
+        {% if project.tasks.done.count %}
+
+        <h2 class="mt-5 mb-3 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
+            <span class="align-middle">Actions terminées</span>
+            &nbsp;
+            <span class="align-middle badge rounded-pill bg-secondary">{{ project.tasks.done.count }}</span>
         </h2>
 
         <div class="accordion" id="task-list">
             <div class="accordion-item">
-                <div class="accordion-header border border-1 d-flex justify-content-between p-3">
-                    <span class="text-uppercase">Financer le projet</span>
+                <div class="accordion-header border border-1 d-flex justify-content-start p-3">
+                    <span class="text-uppercase fw-bolder small">Actions terminées</span>
                     <div>
-                        <span class="align-middle badge rounded-pill bg-primary me-2">
-                            <svg class="align-middle bi me-1" width="14" height="14" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
-                            </svg>
-                            <span class="align-middle small">X</span>
-                        </span>
-                        <span class="align-middle badge rounded-pill bg-primary">
-                            <svg class="align-middle bi" width="14" height="14" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
-                            </svg>
-                            <span class="align-middle small">Y</span>
-                        </span>
-                    </div>
-                </div>
-		        {% for task in project.tasks.all %}
-            <div class="accordion-item">
-                <div id="action-{{ task.id }}-header" class="accordion-header" data-bs-toggle="collapse" data-bs-target="#action-{{ task.id }}-content" aria-expanded="false" aria-controls="action-{{ task.id }}-content">
-                    <button class="accordion-button collapsed">{{ task.intent|capfirst|default:"Action" }}</button>
-                </div>
-                <div id="action-{{ task.id }}-content" class="accordion-collapse collapse">
-                    <div class="accordion-body">
-                        {{ task.content }}
-
-                        <div class="d-flex flex-fill ms-2 justify-content-start flex-column" >
-
-                            {% if task.resource or task.contact %}
-                            <div class="d-flex flex-row flex-grow-1 justify-content-between mb-3">
-                                {% if task.resource %}
-                                <div class="relative" style="width: 50%;">
-                                    {% include "resources/resource/widgets/card_horizontal.html" with resource=task.resource %}
-                                </div>
-                                {% endif %}
-                                {% if task.contact %}
-                                <div class="relative  {% if task.resource %}ms-2{% endif %}" style="width: 50%;">
-                                    {% include "addressbook/widgets/card_contact_horizontal.html" with contact=task.contact %}
-                                </div>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-                        </div>
 
                     </div>
-                    <div class="d-flex align-self-end">
-                        {% if user.is_staff %}
-                        <div class="btn-group mb-1" role="group" aria-label="Admin action">
-                            <a class="btn btn-outline-secondary btn-sm" href="{% url 'projects-update-task' task.id %}">
-                                <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
-                                </svg>
-                                Éditer
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
-
                 </div>
+		            {% for task in project.tasks.done %}
+                {% include 'projects/project/fragments/action_list_item.html' %}
+		            {% endfor %}
             </div>
-		        {% endfor %}
         </div>
-        </div>
+        {% endif %}
+    </div>
 
-        <h2 class="mt-4 mb-3 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
+    <div class="col col-4">
+        <h2 class="mb-3 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
             <span class="align-middle">Actions recommandées</span>
             &nbsp;
-            <span class="align-middle badge rounded-pill bg-secondary">X</span>
+            <span class="align-middle badge rounded-pill bg-secondary">{{ project.tasks.proposed.count }}</span>
         </h2>
 
+        {% for task in project.tasks.proposed %}
+        <div class="d-flex mb-4">
+            <!-- Image -->
+            <img
+                src="{% gravatar_url task.created_by.email 40 %}"
+                alt="{{ task.created_by.get_full_name }}"
+                class="me-3 rounded-circle"
+                style="width: 40px; height: 40px;"
+            />
+            <div class="w-100">
+                <h5 class="fw-bold">
+                    {{ task.created_by.get_full_name }}
+                    <small class="text-muted">{{ task.created_on|naturalday }}</small>
+                    {% if user.is_staff %}
+                    (<a class="" href="{% url 'projects-update-task' task.id %}">éditer</a>)
+                    {% endif %}
+                </h5>
+                <p>
+                    {{ task.content }}
+                </p>
+                <div class="d-flex mt-4">
+                    {% if task.resource %}
+                    {% include "resources/resource/widgets/card_horizontal.html" with resource=task.resource with_category=1 %}
+                    {% else %}
+                        {% if not task.resource %}
+                        <h5>{{ task.intent }}</h5>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div class="mt-2 mb-2 d-flex btn-toolbar justify-content-end">
+                    <div class=" btn-group">
+                        <form method="POST" action="{% url 'projects-accept-task' task.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">
+                                <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
+                                </svg>
+                                <span class="align-middle">Ajouter aux actions</span>
+                            </button>
+                        </form>
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modal-action-{{ task.id }}">
+                        <span data-bs-toggle="tooltip" title="Rejeter cette recommandation">
+                            <svg class="bi me-1 align-middle" width="12" height="12" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-lg"/>
+                            </svg>
+                        </span>
+                    </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 
+             <div class="card text-left">
+             <div class="card-body d-flex flex-column">
+             <div class="card-title d-flex justify-content-between">
+             <span class="align-middle text-uppercase fw-bolder small">Financer le projet</span>
+             {% if can_administrate %}
+             <a  href="#" class="align-middle text-secondary" data-bs-toggle="modal" data-bs-target="#modal-action-{{ task.id }}">
+             <svg class="bi me-1 align-middle" width="24" height="24" fill="currentColor">
+             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x"/>
+             </svg>  
+             </a>
+             {% endif %}
+             </div>
+
+             <div class="d-flex flex-row justify-content-between">
+             <div class="left col card-text">
+             <p class="mb-1">{{ task.intent }}</p>
+             <p class="small">{{ task.content }}</p>
+             </div>
+             <div class="right col col-3 d-flex align-items-center">
+             {% if can_administrate %}
+             <button class="btn btn-primary">Ajouter aux actions</button>
+             {% endif %}
+             </div>
+             </div>
+             </div>
+             <div class="card-footer text-muted">
+             <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
+             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
+             </svg>
+             <span class="fst-italic align-middle">{{ task.comment }}</span>
+             </div>
+             </div>
+        -->
+        <div id="modal-action-{{ task.id }}" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content text-center">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Vous ne verrez plus cette recommandation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Pourriez-vous nous dire pourquoi vous ne souhaitez pas ajouter cette action ?</p>
+                        <p>
+                            <q>Ne jamais confondre mouvement et action.</q> -- Hemingway
+                        </p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Je l'ai déjà fait</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Ce n'est pas pertinent</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% empty %}
+        <span class="fst-italic fw-light">Aucune action recommandée pour le moment !</span>
+        {% endfor %}
+
+
+
+
     </div>
+</div>

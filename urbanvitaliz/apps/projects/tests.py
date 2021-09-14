@@ -13,8 +13,7 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -576,13 +575,53 @@ def test_create_task_available_for_staff_users(client):
 @pytest.mark.django_db
 def test_create_new_task_for_project_and_redirect(client):
     project = Recipe(models.Project).make()
-    with login(client, is_staff=True):
+    username = "bob"
+    with login(client, username=username, is_staff=True):
         response = client.post(
             reverse("projects-create-task", args=[project.id]),
             data={"content": "this is some content"},
         )
     task = models.Task.objects.all()[0]
     assert task.project == project
+    assert task.created_by.username == username
+    assert response.status_code == 302
+
+
+#
+# accept
+
+
+@pytest.mark.django_db
+def test_accept_task_for_project_and_redirect_for_project_owner(client):
+    owner_email = "owner@univer.se"
+    project = Recipe(
+        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+    ).make()
+    task = Recipe(models.Task, project=project, accepted=False).make()
+    with login(client, email=owner_email):
+        response = client.post(
+            reverse("projects-accept-task", args=[task.id]),
+        )
+    task = models.Task.objects.all()[0]
+    assert task.accepted is True
+    assert response.status_code == 302
+
+
+#
+# mark as done
+@pytest.mark.django_db
+def test_task_mark_as_done_for_project_and_redirect_for_project_owner(client):
+    owner_email = "owner@univer.se"
+    project = Recipe(
+        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+    ).make()
+    task = Recipe(models.Task, project=project, accepted=True, done=False).make()
+    with login(client, email=owner_email):
+        response = client.post(
+            reverse("projects-mark-done-task", args=[task.id]),
+        )
+    task = models.Task.objects.all()[0]
+    assert task.done is True
     assert response.status_code == 302
 
 

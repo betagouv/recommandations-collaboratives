@@ -8,6 +8,7 @@ created : 2021-05-26 13:33:11 CEST
 """
 from datetime import date
 
+from django.contrib.auth import models as auth_models
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -162,11 +163,17 @@ class TaskManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().order_by("-priority").filter(deleted=None)
 
+    def accepted(self):
+        return self.filter(accepted=True)
+
+    def proposed(self):
+        return self.filter(accepted=False)
+
     def done(self):
-        return self.filter(done=True)
+        return self.filter(accepted=True, done=True)
 
     def open(self):
-        return self.filter(done=False)
+        return self.filter(accepted=True, done=False)
 
 
 class DeletedTaskManager(models.Manager):
@@ -191,6 +198,10 @@ class Task(models.Model):
         blank=True,
         verbose_name="Priorité",
         help_text="Plus le chiffre est élevé, plus la recommandation s'affichera en haut.",
+    )
+
+    created_by = models.ForeignKey(
+        auth_models.User, on_delete=models.CASCADE, related_name="tasks_created"
     )
 
     created_on = models.DateTimeField(
@@ -239,6 +250,7 @@ class Task(models.Model):
     def is_deadline_past_due(self):
         return date.today() > self.deadline if self.deadline else False
 
+    accepted = models.BooleanField(default=False, blank=True)
     done = models.BooleanField(default=False, blank=True)
 
     deleted = models.DateTimeField(null=True, blank=True)
