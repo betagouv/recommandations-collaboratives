@@ -138,6 +138,14 @@
                         </button>
                     </form>
                 </span>
+                <span class="d-inline-block">
+                    <a class="btn btn-light w-100 btn-sm"  href="{% url 'projects-create-task' project.id %}">
+                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
+                        </svg>
+                        Ajouter une action
+                    </a>
+                </span>
                 {% endif %}
             </div>
 
@@ -198,11 +206,22 @@
             <!-- actions -->
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="actions-tab" data-bs-toggle="tab" data-bs-target="#actions" type="button" role="tab" aria-controls="actions" aria-selected="false">
-                    <svg class="bi align-middle me-1" width="16" height="16">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
-                    </svg>
-                    <span class="align-middle">Actions</span>
-                    <span class="badge rounded-pill bg-primary text-white">{{ project.tasks.open.count }}</span>
+                    <span class="position-relative">
+                        <svg class="bi align-middle me-1" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
+                        </svg>
+                        {% if project.tasks.proposed.count %}
+                        <span class="position-absolute top-0 start-50 p-1 bg-danger  rounded-circle">
+                            <span class="visually-hidden">Nouvelles recommandations</span>
+                        </span>
+                        {% endif %}
+                    </span>
+                    <span class="align-middle position-relative">
+                        Actions
+                        {% if project.tasks.open.count > 0 %}
+                        <span class="badge rounded-pill bg-primary text-white">{{ project.tasks.open.count }}</span>
+                        {% endif %}
+                    </span>
                 </button>
             </li>
         </ul>

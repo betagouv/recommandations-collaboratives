@@ -160,9 +160,10 @@ def project_detail(request, project_id=None):
     if request.user.email not in project.emails:
         is_staff_or_403(request.user)
 
-    can_administrate = (  # noqa: F841
-        request.user.email == project.email
-    ) and project.is_draft is False
+    can_administrate = (
+        (request.user.email == project.email)  # noqa: F841
+        and project.is_draft is False
+    ) or request.user.is_staff
 
     return render(request, "projects/project/detail.html", locals())
 
@@ -305,6 +306,7 @@ def create_task(request, project_id=None):
         form = CreateTaskForm(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
+            instance.created_by = request.user
             instance.project = project
             instance.save()
 
@@ -316,6 +318,36 @@ def create_task(request, project_id=None):
     else:
         form = CreateTaskForm()
     return render(request, "projects/project/task_create.html", locals())
+
+
+@login_required
+def accept_task(request, task_id):
+    """Accept task for a project"""
+    task = get_object_or_404(models.Task, pk=task_id)
+    can_administrate_or_403(task.project, request.user)
+
+    if request.method == "POST":
+        task.accepted = True
+        task.save()
+
+        messages.success(
+            request,
+            '"{0}" a bien été ajouté à votre liste d\'actions.'.format(task.intent),
+        )
+
+    return redirect(reverse("projects-project-detail", args=[task.project_id]))
+
+
+def mark_done_task(request, task_id):
+    """Mark task as done for a project"""
+    task = get_object_or_404(models.Task, pk=task_id)
+    can_administrate_or_403(task.project, request.user)
+
+    if request.method == "POST":
+        task.done = True
+        task.save()
+
+    return redirect(reverse("projects-project-detail", args=[task.project_id]))
 
 
 @login_required
@@ -496,9 +528,7 @@ def access_delete(request, project_id: int, email: str):
         if email == project.email:
             messages.error(
                 request,
-                "Vous ne pouvez pas retirer le propriétaire de son propre projet.".format(
-                    email
-                ),
+                "Vous ne pouvez pas retirer le propriétaire de son propre projet.",
                 extra_tags=["auth"],
             )
 

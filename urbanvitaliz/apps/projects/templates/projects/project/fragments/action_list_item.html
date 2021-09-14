@@ -1,0 +1,94 @@
+{% load static %}
+{% load gravatar %}
+{% load humanize %}
+
+<div class="accordion-item pt-2 pb-2">
+    <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
+        {% if task.done %}
+        <form>
+            {% else %}
+        <form method="POST" action="{% url 'projects-mark-done-task' task.id %}">
+                {% endif %}
+                {% csrf_token %}
+        <button type="submit" class="ms-2 btn btn-text align-middle" style="color: #ccc">
+            <svg class="align-middle bi" width="28" height="28" fill="currentColor">
+                {% if task.done %}
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-square"/>
+                {% else %}
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#square"/>
+                {% endif %}
+            </svg>
+        </button>
+            </form>
+        <div class="d-flex justify-content-between w-100">
+            <div class="align-middle flex-grow-1">
+                <button class="align-middle justify-content-left d-flex text-left btn btn-text collapsed fs-5 w-100" data-bs-toggle="collapse" data-bs-target="#action-{{ task.id }}-content" aria-expanded="false" aria-controls="action-{{ task.id }}-content">
+                    {% if task.resource %}
+                    <!-- Icon -->
+                    <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }}" style="width:30px; height: 30px;" >
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ task.resource.category.icon|default:"key" }}"/>
+                    </svg>
+                    <span>
+                        {{ task.resource.title|capfirst }}
+                    </span>
+                    {% else %}
+                    {{ task.intent|capfirst }}
+                    {% endif %}
+                </button>
+            </div>
+
+            <div class="align-middle align-items-center d-flex justify-self-end me-3">
+                <span class="align-self-center badge rounded-pill bg-info">
+                    <svg class="align-middle bi me-1" width="14" height="14" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
+                    </svg>
+                    <span class="align-middle small">1</span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div id="action-{{ task.id }}-content" class="accordion-collapse collapse">
+        <div class="accordion-body">
+            {% if user.is_staff %}
+            <p>
+                (<a class="" href="{% url 'projects-update-task' task.id %}">éditer</a>)
+            </p>
+            {% endif %}
+
+            {% if task.resource %}
+            {{ task.resource.summary }} [<a href="{% url 'resources-resource-detail' task.resource.id %}">Lire la ressource</a>]
+            {% endif %}
+            <div class="d-flex mb-2 mt-2">
+                <!-- Image -->
+                <img
+                    src="{% gravatar_url task.created_by.email 40 %}"
+                    alt="{{ task.created_by.get_full_name }}"
+                    class="me-3 rounded-circle"
+                    style="width: 40px; height: 40px;"
+                />
+                <div class="w-100">
+                    <h5 class="fw-bold">
+                        {{ task.created_by.get_full_name }}
+                        <small class="text-muted">{{ task.created_on|naturalday }}</small>
+                    </h5>
+                    <p>
+                        {{ task.content }}
+                    </p>
+                </div>
+            </div>
+
+            {% if task.contact %}
+            <div class="d-flex w-100 mb-3">
+                {% include "addressbook/widgets/card_contact_horizontal.html" with contact=task.contact %}
+            </div>
+            {% endif %}
+
+            <div class="text-secondary small mt-1">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+                </svg>
+                <a class="text-reset" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject={{ project.name|truncatechars:10 }} : Action '{{ task.intent|truncatewords:10 }}'">J'ai une question/un problème sur cette action</a>
+            </div>
+        </div>
+    </div>
+</div>
