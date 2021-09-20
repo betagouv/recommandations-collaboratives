@@ -29,6 +29,20 @@
      }
  }
 </script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    var url = document.location.toString();
+    if (url.match('#')) {
+        activateTab(url.split('#')[1]);
+    }
+});
+
+function activateTab(tab){
+    $('#' + tab + '-tab').get(0).click();
+};
+
+</script>
 {% endblock %}
 
 
