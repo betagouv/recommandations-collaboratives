@@ -123,17 +123,20 @@
                     {% endif %}
                 </h5>
                 <p>
-                    {{ task.content }}
+                    {{ task.content_rendered|safe }}
                 </p>
                 <div class="d-flex mt-4">
                     {% if task.resource %}
                     {% include "resources/resource/widgets/card_horizontal.html" with resource=task.resource with_category=1 %}
                     {% else %}
-                        {% if not task.resource %}
-                    <h5>{{ task.intent }}</h5>
-                    {% endif %}
+                    <h5 class="w-100">{{ task.intent }}</h5>
                     {% endif %}
                 </div>
+                {% if task.contact and not task.resource %}
+                <div class="d-flex mt-4">
+                    {% include "addressbook/widgets/card_contact_horizontal.html" with contact=task.contact %}
+                </div>
+                {% endif %}
                 {% if can_administrate %}
                 <div class="mt-2 mb-2 d-flex btn-toolbar justify-content-end">
                     <div class=" btn-group">
