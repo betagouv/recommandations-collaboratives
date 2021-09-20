@@ -340,13 +340,13 @@ def accept_task(request, task_id):
     )
 
 
-def mark_done_task(request, task_id):
+def toggle_done_task(request, task_id):
     """Mark task as done for a project"""
     task = get_object_or_404(models.Task, pk=task_id)
     can_administrate_or_403(task.project, request.user)
 
     if request.method == "POST":
-        task.done = True
+        task.done = not task.done
         task.save()
 
     return redirect(

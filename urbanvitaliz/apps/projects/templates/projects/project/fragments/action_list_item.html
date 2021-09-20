@@ -4,22 +4,23 @@
 
 <div class="accordion-item pt-2 pb-2">
     <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
-        {% if task.done %}
-        <form>
+        <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}">
+            {% csrf_token %}
+            {% if task.done %}
+            <button title="Remettre l'action en cours" data-bs-toggle="tooltip" type="submit" class="ms-2 btn btn-text align-middle" style="color: #ccc">
+                <svg class="align-middle bi" width="28" height="28" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-square"/>
+                </svg>
+            </button>
             {% else %}
-        <form method="POST" action="{% url 'projects-mark-done-task' task.id %}">
-                {% endif %}
-                {% csrf_token %}
-        <button type="submit" class="ms-2 btn btn-text align-middle" style="color: #ccc">
-            <svg class="align-middle bi" width="28" height="28" fill="currentColor">
-                {% if task.done %}
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-square"/>
-                {% else %}
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#square"/>
-                {% endif %}
-            </svg>
-        </button>
-            </form>
+            <button title="Marquer l'action comme terminée" data-bs-toggle="tooltip" type="submit" class="ms-2 btn btn-text align-middle" style="color: #ccc">
+                <svg class="align-middle bi" width="28" height="28" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#square"/>
+                </svg>
+            </button>
+            {% endif %}
+
+        </form>
         <div class="d-flex justify-content-between w-100">
             <div class="align-middle flex-grow-1">
                 <button class="align-middle justify-content-left d-flex text-left btn btn-text collapsed fs-5 w-100" data-bs-toggle="collapse" data-bs-target="#action-{{ task.id }}-content" aria-expanded="false" aria-controls="action-{{ task.id }}-content">
