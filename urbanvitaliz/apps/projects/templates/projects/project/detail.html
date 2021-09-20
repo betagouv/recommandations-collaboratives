@@ -8,7 +8,7 @@
 {% block css %}
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
-
+<link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block js %}
@@ -40,6 +40,7 @@ $(document).ready(function(){
 
 // Change hash for page-reload
 $('.nav-tabs button').on('shown.bs.tab', function (e) {
+
     window.location.hash = $(e.target).data("bs-target");
     window.scrollBy(0, 0);
 })

@@ -2,7 +2,9 @@
 {% load gravatar %}
 {% load humanize %}
 
-<div class="accordion-item pt-2 pb-2">
+
+
+<div class="action-list-item accordion-item pt-2 pb-2">
     <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
         <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}">
             {% csrf_token %}
@@ -17,21 +19,30 @@
                 <svg class="align-middle bi" width="28" height="28" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#square"/>
                 </svg>
+
             </button>
             {% endif %}
 
         </form>
+
         <div class="d-flex justify-content-between w-100">
             <div class="align-middle flex-grow-1">
-                <button class="align-middle justify-content-left d-flex text-left btn btn-text collapsed fs-5 w-100" data-bs-toggle="collapse" data-bs-target="#action-{{ task.id }}-content" aria-expanded="false" aria-controls="action-{{ task.id }}-content">
+                <button class="align-middle justify-content-between d-flex text-left btn btn-text collapsed fs-5 w-100" data-bs-toggle="collapse" data-bs-target="#action-{{ task.id }}-content" aria-expanded="false" aria-controls="action-{{ task.id }}-content">
                     {% if task.resource %}
                     <!-- Icon -->
                     <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }}" style="width:30px; height: 30px;" >
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ task.resource.category.icon|default:"key" }}"/>
                     </svg>
-                    <span>
-                        {{ task.resource.title|capfirst }}
-                    </span>
+                    <div class="flex-grow-1 d-flex justify-content-between align-middle">
+                        <span>
+                            {{ task.resource.title|capfirst }}
+                        </span>
+                        <span class="toggle align-middle">
+                            <svg class="bi" width="24px" height="24px">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down"/>
+                            </svg>
+                        </span>
+                    </div>
                     {% else %}
                     {{ task.intent|capfirst }}
                     {% endif %}
