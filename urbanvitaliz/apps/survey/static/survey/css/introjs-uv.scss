@@ -24,4 +24,15 @@ $dark-blue: #224A6D;
     color: white;
 
     text-shadow: none;
+
+    &:hover, &:focus {
+        background-color: $blue;
+        color: white !important;
+    }
+    
+}
+
+.introjs-prevbutton {
+    background-color: white;
+    color: black;
 }
