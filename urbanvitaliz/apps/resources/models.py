@@ -9,6 +9,7 @@ created: 2021-06-16 10:57:13 CEST
 
 from django.contrib.auth import models as auth
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils import timezone
 from markdownx.utils import markdownify
 from urbanvitaliz.apps.addressbook import models as addressbook_models
@@ -52,6 +53,9 @@ class Category(models.Model):
 
 class ResourceQuerySet(models.QuerySet):
     """Specific filters for resources"""
+
+    def get_queryset(self):
+        return super().get_queryset().order_by(Lower("title"))
 
     def limit_area(self, communes):
         """Limit resources that match at least one department of communes"""
