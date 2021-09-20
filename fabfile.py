@@ -30,7 +30,7 @@ def upgrade(cnx, site=None):
         print("Usage: fab upgrade --site={production,development} --hosts=...")
         return
     cnx.put(
-        "./requirements-srv.txt",
+        "./requirements.txt",
         remote=f"./urbanvitaliz-{site}/requirements.txt",
     )
     cnx.run(

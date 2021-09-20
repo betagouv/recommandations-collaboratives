@@ -1,11 +1,11 @@
-Django
+django
 ipython
 django-markdownx
 django-magicauth
 django_otp
 django-tagging
-psycopg2-binary
 django-gravatar2
+psycopg2-binary
 # STATIC FILES
 django-sass-processor
 libsass
