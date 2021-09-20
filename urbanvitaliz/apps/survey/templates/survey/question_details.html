@@ -37,8 +37,10 @@
              intro: "✨ Vous pouvez aussi enchaîner les questions, et laisser de côté celles où vous ne savez pas répondre.",
          },
          {
-             intro: "Bonne exploration de votre site 👋"
-     }]
+             element: document.querySelector('#project-link'),
+             intro: "Ici, vous retrouverez le récapitulatif de vos réponses, et les questions que vous avez laissées vides : vous pouvez y revenir une fois l’information trouvée. <br/>Bonne exploration de votre site 👋"
+         }
+     ]
  });
 
  {% if session.answers.count == 0 %}
@@ -202,7 +204,7 @@
 
     <ul class="mt-3">
         <li><a href="javascript:history.go(-1);">Revenir à la question précédente</a></li>
-        <li><a href="{% url 'projects-project-detail' session.project.id %}">Revenir sur la fiche du projet</a></li>
+        <li id="project-link"><a href="{% url 'projects-project-detail' session.project.id %}#exploration">Revenir sur la fiche du projet</a></li>
     </ul>
 
 </div>
