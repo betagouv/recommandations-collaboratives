@@ -1,0 +1,12 @@
+.action-list-item {
+    .collapsed {
+        .toggle {
+            transform: rotate(0deg);
+        }
+    }
+
+    .toggle {
+        transform: rotate(180deg);
+    }
+
+}
