@@ -335,7 +335,9 @@ def accept_task(request, task_id):
             '"{0}" a bien été ajouté à votre liste d\'actions.'.format(task.intent),
         )
 
-    return redirect(reverse("projects-project-detail", args=[task.project_id]))
+    return redirect(
+        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+    )
 
 
 def mark_done_task(request, task_id):
@@ -347,7 +349,9 @@ def mark_done_task(request, task_id):
         task.done = True
         task.save()
 
-    return redirect(reverse("projects-project-detail", args=[task.project_id]))
+    return redirect(
+        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+    )
 
 
 @login_required
