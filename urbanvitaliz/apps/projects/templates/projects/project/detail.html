@@ -32,10 +32,11 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
-    var url = document.location.toString();
-    if (url.match('#')) {
-        activateTab(url.split('#')[1]);
-    }
+    activateTab();
+
+    window.addEventListener('hashchange', function() {
+        activateTab()
+    });
 });
 
 // Change hash for page-reload
@@ -45,8 +46,12 @@ $('.nav-tabs button').on('shown.bs.tab', function (e) {
     window.scrollBy(0, 0);
 })
 
-function activateTab(tab){
-    $('#' + tab + "-tab").get(0).click();
+function activateTab(){
+    var url = document.location.toString();
+    if (url.match('#')) {
+        let hash = url.split('#')[1]
+        $('#' + hash + "-tab").get(0).click();
+    }
 };
 
 </script>
@@ -217,9 +222,7 @@ function activateTab(tab){
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
                     </svg>
                     <span class="align-middle">Exploration</span>
-                    {% if project.survey_session %}
-                    <span class="badge rounded-pill bg-primary text-white">{{ project.survey_session.completion }}%</span>
-                    {% endif %}
+                    <span class="badge rounded-pill bg-primary text-white">{{ project.survey_session.completion|default:"0" }}%</span>
                 </button>
             </li>
 
