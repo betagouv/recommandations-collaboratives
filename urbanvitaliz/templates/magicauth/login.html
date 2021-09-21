@@ -30,7 +30,7 @@
         {% csrf_token %}
 
         <div class="form-floating mb-3">
-            <input type="email" class="form-control {% if form.errors %}state-invalid {% endif %}" id="{{ form.email.id_for_label }}" name="{{ form.email.name }}" placeholder="nom@exemple.fr" value="{{ form.email.value|default:'' }}">
+            <input type="email" class="form-control {% if form.errors %}state-invalid {% endif %}" id="{{ form.email.id_for_label }}" name="{{ form.email.name }}" placeholder="nom@exemple.fr" value="{% if request.GET.email %}{{request.GET.email}}{% else %}{{ form.email.value|default:'' }}{%endif%}">
             <div class="form-text">Votre courriel ne sera jamais partagé en dehors de notre équipe.</div>
             <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
 
