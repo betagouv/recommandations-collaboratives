@@ -98,6 +98,17 @@
                     </div>
                     {% endif %}
 
+                    {% if answer.attachment %}
+                    <div>
+                        <svg class="align-middle bi" width="16px" height="16px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-richtext"/>
+                        </svg>
+                        <span class="align-middle">
+                            <a target="_new" href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
+                        </span>
+                    </div>
+                    {% endif %}
+
                     </li>
                     {% endfor %}
                 </ul>
