@@ -346,6 +346,7 @@ def toggle_done_task(request, task_id):
     can_administrate_or_403(task.project, request.user)
 
     if request.method == "POST":
+        task.accepted = True
         task.done = not task.done
         task.save()
 

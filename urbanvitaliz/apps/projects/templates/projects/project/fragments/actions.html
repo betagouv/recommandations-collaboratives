@@ -33,7 +33,7 @@
 
 
         <h2 class="mt-1 mb-3 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
-            <span class="align-middle">Actions en cours</span>
+            <span class="align-middle">Mes actions en cours</span>
             &nbsp;
             <span class="align-middle badge rounded-pill bg-secondary">{{ project.tasks.open.count }}</span>
         </h2>
@@ -67,7 +67,7 @@
             <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary">Compléter le questionnaire d'exploration</a>
             {% else %}
             <p class="fst-italic fw-light">
-                Nos aiguilleuses vous <span class="fw-bolder">recommandent des actions</span>, n'hésitez pas à les consulter et vous les approprier !
+                Nos aiguilleuses vous <span class="fw-bolder">recommandent des actions</span>, n'hésitez pas à les consulter et vous les approprier ! Toutes les propositions d'actions se trouvent sur <strong>la colonne de droite</strong>.
             </p>
             {% endif %}
         </div>
@@ -146,7 +146,7 @@
                                 <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
                                 </svg>
-                                <span class="align-middle">Ajouter aux actions</span>
+                                <span class="align-middle">Ajouter à ma liste</span>
                             </button>
                         </form>
                     <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modal-action-{{ task.id }}">
@@ -205,13 +205,26 @@
                     </div>
                     <div class="modal-body">
                         <p>Pourriez-vous nous dire pourquoi vous ne souhaitez pas ajouter cette action ?</p>
-                        <p>
-                            <q>Ne jamais confondre mouvement et action.</q> -- Hemingway
-                        </p>
                     </div>
                     <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Je l'ai déjà fait</button>
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Ce n'est pas pertinent</button>
+                        <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">
+                                <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
+                                </svg>
+                                <span class="align-middle">Je l'ai déjà fait</span>
+                            </button>
+                        </form>
+                        <form method="POST" action="/">
+                            <button type="submit" class="btn btn-primary">
+                                <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x"/>
+                                </svg>
+                                <span class="align-middle">Ce n'est pas pertinent</span>
+                            </button>
+                        </form>
+                        
                     </div>
                 </div>
             </div>

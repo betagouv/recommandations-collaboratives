@@ -161,7 +161,12 @@ class TaskManager(models.Manager):
     """Manager for active tasks"""
 
     def get_queryset(self):
-        return super().get_queryset().order_by("-priority").filter(deleted=None)
+        return (
+            super()
+            .get_queryset()
+            .order_by("-priority", "-updated_on")
+            .filter(deleted=None)
+        )
 
     def accepted(self):
         return self.filter(accepted=True)
@@ -251,6 +256,7 @@ class Task(models.Model):
         return date.today() > self.deadline if self.deadline else False
 
     accepted = models.BooleanField(default=False, blank=True)
+    refused = models.BooleanField(default=False, blank=True)
     done = models.BooleanField(default=False, blank=True)
 
     deleted = models.DateTimeField(null=True, blank=True)
