@@ -33,9 +33,18 @@
                     <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }}" style="width:30px; height: 30px;" >
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ task.resource.category.icon|default:"key" }}"/>
                     </svg>
+                    {% elif task.contact %}
+                    <svg class="align-middle bi me-2 rounded-circle" width="30px" height="30px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
+                    </svg>
+                    {% endif %}
                     <div class="flex-grow-1 d-flex justify-content-between align-middle">
                         <span>
+                            {% if task.resource %}
                             {{ task.resource.title|capfirst }}
+                            {% else %}
+                            {{ task.intent|capfirst }}
+                            {% endif %}
                         </span>
                         <span class="toggle align-middle">
                             <svg class="bi" width="24px" height="24px">
@@ -43,9 +52,6 @@
                             </svg>
                         </span>
                     </div>
-                    {% else %}
-                    {{ task.intent|capfirst }}
-                    {% endif %}
                 </button>
             </div>
 
@@ -84,7 +90,7 @@
                         <small class="text-muted">{{ task.created_on|naturalday }}</small>
                     </h5>
                     <p>
-                        {{ task.content }}
+                        {{ task.content_rendered|safe }}
                     </p>
                 </div>
             </div>

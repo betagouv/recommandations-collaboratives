@@ -96,6 +96,30 @@
             </div>
         </div>
         {% endif %}
+
+        {% if project.tasks.refused.count %}
+
+        <h2 class="mt-5 mb-3 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
+            <span class="align-middle">Actions refusées</span>
+            &nbsp;
+            <span class="align-middle badge rounded-pill bg-secondary">{{ project.tasks.refused.count }}</span>
+        </h2>
+
+        <div class="accordion" id="task-list">
+            <div class="accordion-item">
+                <div class="accordion-header border border-1 d-flex justify-content-start p-3">
+                    <span class="text-uppercase fw-bolder small">Actions refusées</span>
+                    <div>
+
+                    </div>
+                </div>
+		            {% for task in project.tasks.refused %}
+                {% include 'projects/project/fragments/action_list_item.html' %}
+		            {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
     </div>
 
     <div class="col col-4">
@@ -216,7 +240,8 @@
                                 <span class="align-middle">Je l'ai déjà fait</span>
                             </button>
                         </form>
-                        <form method="POST" action="/">
+                        <form method="POST" action="{% url 'projects-refuse-task' task.id %}">
+                            {% csrf_token %}
                             <button type="submit" class="btn btn-primary">
                                 <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x"/>

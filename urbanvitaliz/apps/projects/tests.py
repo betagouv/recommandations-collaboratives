@@ -13,7 +13,8 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -638,6 +639,22 @@ def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(client
         )
     task = models.Task.objects.all()[0]
     assert task.done is False
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_refuse_task_for_project_and_redirect_for_project_owner(client):
+    owner_email = "owner@univer.se"
+    project = Recipe(
+        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+    ).make()
+    task = Recipe(models.Task, project=project, accepted=False, done=False).make()
+    with login(client, email=owner_email):
+        response = client.post(
+            reverse("projects-refuse-task", args=[task.id]),
+        )
+    task = models.Task.objects.all()[0]
+    assert task.refused is True
     assert response.status_code == 302
 
 

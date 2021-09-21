@@ -60,6 +60,11 @@ urlpatterns = [
         name="projects-toggle-done-task",
     ),
     path(
+        r"task/<int:task_id>/refuse/",
+        views.refuse_task,
+        name="projects-refuse-task",
+    ),
+    path(
         r"task/<int:task_id>/delete/",
         views.delete_task,
         name="projects-delete-task",

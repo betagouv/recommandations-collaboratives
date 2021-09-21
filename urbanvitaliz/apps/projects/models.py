@@ -169,16 +169,19 @@ class TaskManager(models.Manager):
         )
 
     def accepted(self):
-        return self.filter(accepted=True)
+        return self.filter(accepted=True, refused=False)
 
     def proposed(self):
-        return self.filter(accepted=False)
+        return self.filter(accepted=False, refused=False)
+
+    def refused(self):
+        return self.filter(refused=True)
 
     def done(self):
-        return self.filter(accepted=True, done=True)
+        return self.filter(accepted=True, done=True, refused=False)
 
     def open(self):
-        return self.filter(accepted=True, done=False)
+        return self.filter(accepted=True, done=False, refused=False)
 
 
 class DeletedTaskManager(models.Manager):

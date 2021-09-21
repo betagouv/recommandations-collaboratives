@@ -346,8 +346,23 @@ def toggle_done_task(request, task_id):
     can_administrate_or_403(task.project, request.user)
 
     if request.method == "POST":
+        task.refused = False
         task.accepted = True
         task.done = not task.done
+        task.save()
+
+    return redirect(
+        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+    )
+
+
+def refuse_task(request, task_id):
+    """Mark task refused for a project"""
+    task = get_object_or_404(models.Task, pk=task_id)
+    can_administrate_or_403(task.project, request.user)
+
+    if request.method == "POST":
+        task.refused = True
         task.save()
 
     return redirect(
