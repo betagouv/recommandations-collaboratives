@@ -8,6 +8,7 @@ created: 2021-06-27 12:06:10 CEST
 """
 
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
@@ -35,6 +36,24 @@ def test_answered_question_with_comment_only_is_saved_to_session(client):
     # Fetch persisted answer
     answer = models.Answer.objects.get(session=session, question=q1)
     assert answer.comment == my_comment
+
+
+@pytest.mark.django_db
+def test_answered_question_with_upload_has_attachment_saved(client):
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    the_file = SimpleUploadedFile("test.pdf", b"Some content.")
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs, upload_title="The upload").make()
+    Recipe(models.Question, question_set=qs).make()
+
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+    with login(client, is_staff=False):
+        client.post(url, data={"comment": "blah", "attachment": the_file})
+
+    # Fetch persisted answer
+    answer = models.Answer.objects.get(session=session, question=q1)
+    assert answer.attachment.size > 0
 
 
 @pytest.mark.django_db
