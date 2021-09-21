@@ -1,0 +1,22 @@
+Bonjour,
+
+<p>
+    Vous êtes invité·e à collaborer sur le projet <strong>{{ project.name }}</strong> !
+</p>
+
+<p>
+    Pour ce faire, cliquez ou copiez ce lien dans votre navigateur :
+    <br/>
+
+    {{ request.scheme }}://{{ site.domain }}{{ project.get_absolute_url }}?email={{email}}
+</p>
+
+<p>
+    Prenez note qu'il sera nécessaire de valider votre adresse email avant de pouvoir y accéder.
+</p>
+
+Bonne journée,
+<br/>
+
+L'équipe UrbanVitaliz
+
