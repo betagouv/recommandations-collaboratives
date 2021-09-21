@@ -525,10 +525,19 @@ def access_update(request, project_id):
                 project.save()
                 messages.success(
                     request,
-                    "{0} a bien été ajouté à la liste des collaborateurs.".format(
+                    "Un courriel d'invitation à rejoindre le projet bien été envoyé à {0}.".format(
                         email
                     ),
-                    extra_tags=["auth"],
+                    extra_tags=["email"],
+                )
+                send_email(
+                    request,
+                    user_email=email,
+                    email_subject="[UrbanVitaliz] Vous êtes invité·e à collaborer sur {0}".format(
+                        project.name
+                    ),
+                    template_base_name="projects/notifications/acl_new_collaborator",
+                    extra_context={"project": project, "email": email},
                 )
 
             return redirect(reverse("projects-project-detail", args=[project_id]))
