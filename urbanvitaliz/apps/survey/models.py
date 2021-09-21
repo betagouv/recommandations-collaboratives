@@ -135,6 +135,14 @@ class Question(models.Model):
 
     deleted = models.DateTimeField(null=True)
 
+    upload_title = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Titre du Téléversement",
+        help_text="Si rempli, il sera possible de téléverser un fichier",
+    )
+
     comment_title = models.CharField(
         max_length=255,
         default="Commentaire",
@@ -327,6 +335,10 @@ def empty_answer():
     return list()
 
 
+def survey_private_file_path(instance, filename):
+    return "survey/session/{0}/{1}".format(instance.session.id, filename)
+
+
 class Answer(models.Model):
     """Actual answer to a question"""
 
@@ -343,6 +355,9 @@ class Answer(models.Model):
     values = models.JSONField(default=empty_answer, blank=True)
     signals = TagField(verbose_name="Signaux", blank=True, null=True)
     comment = models.TextField(blank=True)
+    attachment = models.FileField(
+        blank=True, null=True, upload_to=survey_private_file_path
+    )
 
 
 tagging_register(Answer, tag_descriptor_attr="tags")

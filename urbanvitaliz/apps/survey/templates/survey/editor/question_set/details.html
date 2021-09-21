@@ -124,6 +124,9 @@
         {% else %}
         Question Ouverte
         {% endif %}
+        {% if question.upload_title %}
+        avec fichier
+        {% endif %}
     </span>
     {% if question.is_multiple and question.precondition %} avec {% endif %}
     {% if question.precondition %}

@@ -58,7 +58,7 @@ def survey_question_details(request, session_id, question_id):
         answer = None
 
     if request.method == "POST":
-        form = forms.AnswerForm(question, answer, request.POST)
+        form = forms.AnswerForm(question, answer, request.POST, request.FILES)
         if form.is_valid():
             form.update_session(session)
             return redirect(

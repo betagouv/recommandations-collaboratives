@@ -37,15 +37,21 @@ class AnswerForm(forms.Form):
             # expected answer
             self.fields["comment"].required = True
 
+        if question.upload_title:
+            self.fields["attachment"] = forms.FileField(required=False)
+
         # If we already have an answer, prefill
         if answer:
             if "answer" in self.fields:
                 self.fields["answer"].initial = answer.values
             self.fields["comment"].initial = answer.comment
+            if "attachment" in self.fields:
+                self.fields["attachment"].initial = answer.attachment
 
     def update_session(self, session: models.Session):
         answer_values = self.cleaned_data.get("answer", "")
         comment = self.cleaned_data.get("comment", None)
+        attachment = self.cleaned_data.get("attachment", None)
 
         signals = ""
 
@@ -78,12 +84,14 @@ class AnswerForm(forms.Form):
                 "values": answer_values,
                 "comment": comment,
                 "signals": signals,
+                "attachment": attachment,
             },
         )
         if not created:
             answer.values = answer_values
             answer.comment = comment
             answer.signals = signals
+            answer.attachment = attachment
             answer.save()
 
         return True
@@ -115,6 +123,7 @@ class EditQuestionForm(forms.ModelForm):
             "precondition",
             "why",
             "how",
+            "upload_title",
             "comment_title",
         ]
 
