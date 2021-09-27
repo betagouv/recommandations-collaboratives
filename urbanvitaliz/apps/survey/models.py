@@ -329,6 +329,10 @@ class Session(models.Model):
 
         return math.ceil(statistics.mean(completions))
 
+    @property
+    def the_answers(self):
+        return self.answer_set.order_by("question__question_set", "question")
+
 
 def empty_answer():
     """Return the empty answer for json values field"""
