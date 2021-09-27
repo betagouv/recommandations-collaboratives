@@ -6,7 +6,6 @@ Models for project
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
-import uuid
 from datetime import date
 
 from django.contrib.auth import models as auth_models
@@ -17,6 +16,8 @@ from markdownx.utils import markdownify
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.resources import models as resources
+
+from .utils import generate_ro_key
 
 
 class Project(models.Model):
@@ -29,7 +30,7 @@ class Project(models.Model):
         max_length=32,
         editable=False,
         verbose_name="Clé d'accès lecture seule",
-        default=lambda: uuid.uuid4().hex,
+        default=generate_ro_key,
     )
 
     last_name = models.CharField(
