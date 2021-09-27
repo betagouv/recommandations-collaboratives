@@ -6,6 +6,7 @@ Models for project
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
+import uuid
 from datetime import date
 
 from django.contrib.auth import models as auth_models
@@ -23,6 +24,13 @@ class Project(models.Model):
 
     email = models.CharField(max_length=128)
     emails = models.JSONField(default=list)  # list of person having access to project
+
+    ro_key = models.CharField(
+        max_length=32,
+        editable=False,
+        verbose_name="Clé d'accès lecture seule",
+        default=lambda: uuid.uuid4().hex,
+    )
 
     last_name = models.CharField(
         max_length=128, default="", verbose_name="Nom du contact"
