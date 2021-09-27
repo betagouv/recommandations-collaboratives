@@ -13,7 +13,8 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -64,6 +65,7 @@ def test_performing_onboarding_create_a_new_project(client):
     project = models.Project.fetch()[0]
     assert project.name == "a project"
     assert project.is_draft
+    assert len(project.ro_key) == 32
     assert data["email"] in project.emails
     note = models.Note.objects.all()[0]
     assert note.project == project
@@ -166,6 +168,21 @@ def test_other_projects_are_not_stored_in_session(client):
     with login(client, is_staff=False):
         client.get(url)
     assert {"name": project.name, "id": project.id} not in client.session["projects"]
+
+
+######
+# Sharing link
+######
+
+
+@pytest.mark.django_db
+def test_project_sharing_link(client):
+    project = Recipe(models.Project).make()
+    url = reverse(
+        "projects-project-sharing-link", kwargs={"project_ro_key": project.ro_key}
+    )
+    response = client.get(url)
+    assert response.status_code == 200
 
 
 ########################################################################
