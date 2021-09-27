@@ -12,3 +12,4 @@ __pycache__
 .coverage
 development.py
 htmlcov
+media

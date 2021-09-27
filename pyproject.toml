@@ -1,0 +1,5 @@
+[tool.djlint]
+# ignore = "W013"
+extension = "html"
+indent = "\t" # change indentation level
+exclude = ".venv,venv,.eggs" # override the default set of excluded paths
