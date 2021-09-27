@@ -3,17 +3,23 @@
 from django.db import migrations, models
 import uuid
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0021_task_refused'),
+        ("projects", "0021_task_refused"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='ro_key',
-            field=models.CharField(default=uuid.uuid4().hex, editable=False, max_length=32, verbose_name="Clé d'accès lecture seule"),
+            model_name="project",
+            name="ro_key",
+            field=models.CharField(
+                default=uuid.uuid4().hex,
+                editable=False,
+                max_length=32,
+                verbose_name="Clé d'accès lecture seule",
+            ),
             preserve_default=False,
         ),
     ]
