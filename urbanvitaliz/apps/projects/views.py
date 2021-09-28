@@ -17,12 +17,13 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
-from urbanvitaliz.apps.reminders import api
 
 from . import models
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -466,9 +467,11 @@ def remind_task(request, task_id=None):
     subject = f"[UrbanVitaliz] Rappel action sur {task.project.name}"
     template = "projects/notifications/task_remind_email"
     api.create_reminder_email(
-        request, recipient, subject, template, extra_context={"task": task}
+        request, recipient, subject, template, extra_context={"task": task, "delay": 15}
     )
-    return redirect(reverse("projects-project-detail", args=[task.project_id]))
+    return redirect(
+        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+    )
 
 
 ########################################################################

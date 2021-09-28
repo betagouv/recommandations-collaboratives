@@ -2,9 +2,13 @@ Bonjour,
 
 Vous nous avez demandé de vous rappeler il y a {{ delay }} jours de l'action suivante :
 
-{{ task.intent|default:task.resource.title }}
+{% if task.resource %}
+    {{ task.resource.title }}
+{% else %}
+    {{ task.intent }}
+{% endif %}
 
-Cette action va vous permettre d'avancer sur votre {{ task.project.title }}.
+Cette action va vous permettre d'avancer sur votre projet {{ task.project.name }}.
 
 Vous pouvez retrouver cette action en cliquant ou en copiant le lien ci dessous :
 
