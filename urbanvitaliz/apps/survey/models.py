@@ -331,7 +331,7 @@ class Session(models.Model):
 
     @property
     def the_answers(self):
-        return self.answer_set.order_by("question__question_set", "question")
+        return self.answers.order_by("question__question_set__id", "question__id")
 
 
 def empty_answer():
