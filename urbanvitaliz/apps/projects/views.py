@@ -11,6 +11,7 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.syndication.views import Feed
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -20,7 +21,8 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import can_administrate_or_403
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -66,6 +68,7 @@ def onboarding(request):
         if form.is_valid():
             project = form.save(commit=False)
             project.emails.append(project.email)
+            project.ro_key = generate_ro_key()
             postcode = form.cleaned_data.get("postcode")
             project.commune = geomatics.Commune.get_by_postal_code(postcode)
             project.save()
@@ -76,7 +79,7 @@ def onboarding(request):
             ).save()
 
             signals.project_submitted.send(
-                sender=models.Project, project=project, user=reuqest.user
+                sender=models.Project, project=project, user=request.user
             )
 
             response = redirect("projects-project-detail", project_id=project.id)
@@ -165,12 +168,21 @@ def project_detail(request, project_id=None):
     if request.user.email not in project.emails:
         is_staff_or_403(request.user)
 
-    can_administrate = (
-        (request.user.email == project.email)  # noqa: F841
-        and project.is_draft is False
-    ) or request.user.is_staff
+    can_administrate = can_administrate_project(project, request.user)
 
     return render(request, "projects/project/detail.html", locals())
+
+
+def project_detail_from_sharing_link(request, project_ro_key):
+    """Return a special view of the project using the sharing link"""
+    try:
+        project = models.Project.objects.filter(ro_key=project_ro_key)[0]
+    except:
+        raise Http404
+
+    can_administrate = can_administrate_project(project, request.user)
+
+    return render(request, "projects/project/detail-ro.html", locals())
 
 
 @login_required
