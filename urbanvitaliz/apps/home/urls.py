@@ -12,9 +12,11 @@ from django.urls import path
 
 from . import views
 
-
 urlpatterns = [
     path(r"", views.HomePageView.as_view(), name="home"),
+    path(
+        r"staff/dashboard", views.StaffDashboardView.as_view(), name="staff-dashboard"
+    ),
     path(r"contact/", views.contact, name="home-contact"),
 ]
 
