@@ -10,19 +10,21 @@ created : 2021-09-28 12:40:54 CEST
 
 from django.db import models
 
+from django.utils import timezone
+
 
 class MailManager(models.Manager):
     """Manager for mails to send"""
 
     def get_queryset(self):
-        return super().get_queryset().filter(sent=None)
+        return super().get_queryset().filter(sent_on=None)
 
 
 class SentMailManager(models.Manager):
     """Manager for sent mails"""
 
     def get_queryset(self):
-        return super().get_queryset().exclude(sent=None)
+        return super().get_queryset().exclude(sent_on=None)
 
 
 class Mail(models.Model):
@@ -37,7 +39,7 @@ class Mail(models.Model):
     html = models.TextField(default="")
     deadline = models.DateField()
 
-    sent = models.DateTimeField(null=True, blank=True)
+    sent_on = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = "mail"
@@ -45,6 +47,10 @@ class Mail(models.Model):
 
     def __str__(self):
         return f"{self.recipient} {self.deadline}"
+
+    def mark_as_sent(self):
+        self.sent_on = timezone.now()
+        self.save()
 
 
 # eof

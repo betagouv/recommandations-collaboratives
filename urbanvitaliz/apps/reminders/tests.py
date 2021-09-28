@@ -11,8 +11,11 @@ import datetime
 import pytest
 
 from django.test.client import RequestFactory
+from django.conf import settings
+from django.core.management import call_command
+import django.core.mail
 
-# from model_bakery.recipe import Recipe
+from model_bakery import baker
 
 from . import api
 from . import models
@@ -40,6 +43,80 @@ def test_create_mail_reminder_using_provided_information():
     assert url in reminder.text
 
     assert reminder.deadline == datetime.date.today() + datetime.timedelta(days=delay)
+
+
+@pytest.mark.django_db
+def test_command_send_pending_reminder_with_reached_deadline(mocker):
+    today = datetime.date.today()
+    reminder = baker.make(
+        models.Mail,
+        recipient="test@example.org",
+        subject="[uv] test",
+        text="body as text",
+        html="<p>body as html</p>",
+        deadline=today,
+    )
+
+    mocker.patch("django.core.mail.send_mail")
+
+    call_command("sendreminders")
+
+    assert models.Mail.to_send.count() == 0
+    updated = models.Mail.sent.all()[0]
+    assert updated.id == reminder.id
+
+    django.core.mail.send_mail.assert_called_once_with(
+        subject=reminder.subject,
+        message=reminder.text,
+        html_message=reminder.html,
+        from_email=settings.EMAIL_FROM,
+        recipient_list=[reminder.recipient],
+        fail_silently=False,
+    )
+
+
+@pytest.mark.django_db
+def test_command_send_pending_reminder_with_past_deadline(mocker):
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    baker.make(
+        models.Mail,
+        recipient="test@example.org",
+        subject="[uv] test",
+        text="body as text",
+        html="<p>body as html</p>",
+        deadline=yesterday,
+    )
+
+    mocker.patch("django.core.mail.send_mail")
+
+    call_command("sendreminders")
+
+    assert models.Mail.to_send.count() == 0
+    assert models.Mail.sent.count() == 1
+
+    django.core.mail.send_mail.assert_called_once()
+
+
+@pytest.mark.django_db
+def test_command_do_not_send_pending_reminder_with_future_deadline(mocker):
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    baker.make(
+        models.Mail,
+        recipient="test@example.org",
+        subject="[uv] test",
+        text="body as text",
+        html="<p>body as html</p>",
+        deadline=tomorrow,
+    )
+
+    mocker.patch("django.core.mail.send_mail")
+
+    call_command("sendreminders")
+
+    assert models.Mail.to_send.count() == 1
+    assert models.Mail.sent.count() == 0
+
+    django.core.mail.send_mail.assert_not_called()
 
 
 # eof
