@@ -6,9 +6,7 @@
 {% load humanize %}
 
 {% block content %}
-
-<div class="col-10 py-3 g-0 mx-auto">
-
+<div class="col-10 py-5 mx-auto">
     <h3>Activité sur les projets</h3>
     {% activity_stream "model_actions" project_model  %}
     <ul class="list-group">

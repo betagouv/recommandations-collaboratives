@@ -1,0 +1,79 @@
+{% load static %}
+{% load humanize %}
+<div id="project-sidebar" class="col-md-3 border-start h-100">
+    <p class="small text-secondary d-inline">
+        <svg class="bi" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-history"/>
+        </svg>
+        &nbsp;
+        Fiche crée <em>{{ project.created_on|naturalday }}</em> et modifiée <em>{{ project.updated_on|naturaltime }}</em>.
+    </p>
+
+    <div class="d-grid gap-2 mt-3">
+        {% if user.is_staff or can_administrate %}
+        <span class="d-inline-block"> 
+            <a href="{% url 'projects-access-update' project.id %}" class="btn btn-light w-100 btn-sm">
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock"/>
+                </svg>
+                &nbsp;
+                Partager
+            </a>
+        </span>
+        {% endif %}
+        {% if user.is_staff %}
+        <span class="d-inline-block"> 
+            <a href="{% url 'projects-project-update' project.id %}" class="btn btn-light w-100 btn-sm">
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
+                </svg>
+                &nbsp;
+                Éditer
+            </a>
+        </span>
+        <span class="d-inline-block"> 
+            <form method="POST" action="{% url 'projects-push-resource' project.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-light w-100 btn-sm" role="submit">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
+                    </svg>
+                    &nbsp;
+                    Pousser une ressource
+                </button>
+            </form>
+        </span>
+        <span class="d-inline-block">
+            <a class="btn btn-light w-100 btn-sm"  href="{% url 'projects-create-task' project.id %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
+                </svg>
+                Ajouter une action
+            </a>
+        </span>
+        {% endif %}
+    </div>
+
+
+    <!--
+         <p>
+         <span class="align-items-center link-dark text-decoration-none">
+         <img src="https://github.com/salomeDeschenes.png" alt="" width="32" height="32" class="rounded-circle me-2">
+         <strong>Salomé D.</strong>
+         </span> est votre <strong>accompagnatrice</strong> UrbanVitaliz sur ce projet. N'hésitez pas à <strong>prendre rendez-vous</strong> pour lui <strong>poser vos questions</strong> et faire avancer votre projet.
+
+         </p>
+
+         <button type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#exampleModal">
+         <svg class="bi" width="16" height="16" fill="currentColor">
+         <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#telephone"/>
+         </svg>
+         Prendre rendez-vous
+         </button>
+
+         ou <a href="#">poser une question</a>.
+         </button>
+
+    -->
+
+</div>
