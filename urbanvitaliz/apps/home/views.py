@@ -13,7 +13,7 @@ import urbanvitaliz.apps.projects.models as project_models
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect, render
 from django.views.generic.base import TemplateView
 
@@ -77,8 +77,11 @@ def notify_user_of_sending(request, status):
 ######
 
 
-class StaffDashboardView(LoginRequiredMixin, TemplateView):
+class StaffDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = "staff/dashboard.html"
+
+    def test_func(self):
+        return self.request.user.is_staff
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
