@@ -5,11 +5,15 @@ Bonjour,<br>
 </p>
 
 <p>
-    {{ task.intent|default:task.resource.title }}
+    {% if task.resource %}
+    {{ task.resource.title }}
+    {% else %}
+    {{ task.intent }}
+    {% endif %}
 </p>
 
 <p>
-    Cette action va vous permettre d'avancer sur votre {{ project.title }}.
+    Cette action va vous permettre d'avancer sur votre projet {{ task.project.name }}.
 </p>
 
 <p>
