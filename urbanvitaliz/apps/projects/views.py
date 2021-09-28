@@ -19,7 +19,7 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
-from . import models
+from . import models, signals
 from .utils import can_administrate_or_403
 
 ########################################################################
@@ -74,6 +74,11 @@ def onboarding(request):
                 content=f"# Demande initiale\n\n{project.impediments}",
                 public=True,
             ).save()
+
+            signals.project_submitted.send(
+                sender=models.Project, project=project, user=reuqest.user
+            )
+
             response = redirect("projects-project-detail", project_id=project.id)
             response["Location"] += "?first_time=1"
             return response
@@ -335,6 +340,10 @@ def accept_task(request, task_id):
             '"{0}" a bien été ajouté à votre liste d\'actions.'.format(task.intent),
         )
 
+        signals.action_accepted.send(
+            sender=accept_task, task=task, project=task.project, user=request.user
+        )
+
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"
     )
@@ -349,6 +358,20 @@ def toggle_done_task(request, task_id):
         task.refused = False
         task.accepted = True
         task.done = not task.done
+        if task.done:
+            signals.action_done.send(
+                sender=toggle_done_task,
+                task=task,
+                project=task.project,
+                user=request.user,
+            )
+        else:
+            signals.action_undone.send(
+                sender=toggle_done_task,
+                task=task,
+                project=task.project,
+                user=request.user,
+            )
         task.save()
 
     return redirect(
@@ -364,6 +387,9 @@ def refuse_task(request, task_id):
     if request.method == "POST":
         task.refused = True
         task.save()
+        signals.action_refused.send(
+            sender=refuse_task, task=task, project=task.project, user=request.user
+        )
 
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"

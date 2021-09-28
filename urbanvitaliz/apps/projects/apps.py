@@ -6,7 +6,8 @@ class ProjectConfig(AppConfig):
     name = "urbanvitaliz.apps.projects"
 
     def ready(self):
-        from actstream import registry
+        import urbanvitaliz.apps.projects.signals  # noqa
+        from actstream import registry  # noqa
 
         registry.register(self.get_model("Project"))
         registry.register(self.get_model("Task"))
