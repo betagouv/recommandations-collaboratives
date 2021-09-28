@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load activity_tags %}
+{% load humanize %}
+{% load gravatar %}
+
+{% block content %}
+<div class="col-10 py-5 mx-auto">
+
+    <span class="fs-3">
+        <img
+            src="{% gravatar_url user.email 40 %}"
+            alt="{{ user.get_full_name }}"
+            class="me-2 rounded-circle align-middle"
+            style="width: 40px; height: 40px;"
+        />
+        <span class="align-middle">Salut, {{ request.user.first_name|default:request.user.username }} !</span>
+    </span>
+
+    {% if projects_waiting %}
+    <div class="bd-callout bd-callout-info">
+        <svg class="align-middle bi me-2" width="20px" height="20px" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#box-seam"/>
+        </svg>
+        <span class="align-middle">
+            Il y a <a href="{% url 'projects-project-list' %}">{{ projects_waiting }} projet{{ projects_waiting|pluralize }}</a> en attendant de validation.
+        </span>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-8">
+            <h3 class="mt-3">
+                <svg class="bi align-middle" width="24" height="24">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightning-fill"/>
+                </svg>
+                <span class="align-middle">Activité sur les projets</span>
+            </h3>
+            {% activity_stream "model_actions" project_model %}
+            <ul class="list-group">
+                {% for action in stream %}
+                <li class="list-group-item">
+
+                    {% if action.target %}
+                    {{ action.timestamp|naturalday|capfirst }} - {{ action.actor|capfirst }} {{ action.verb }} {{ action.action_object }} (sur <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>)
+                    {% else %}
+                    {{ action.timestamp|naturalday|capfirst }} - {{ action.actor|capfirst }} {{ action.verb }} <a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
+                    {% endif %}
+
+                </li>
+                {% empty %}
+                -- Pas encore d'activité, revenez plus tard ! --
+                {% endfor %}
+            </ul>
+
+            <h3 class="mt-3">
+                <svg class="bi align-middle" width="24" height="24">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
+                </svg>
+                <span class="align-middle">Connexions</span>
+            </h3>
+            {% activity_stream "model_actions" user_model %}
+            <ul class="list-group">
+                {% for action in stream %}
+                {% if action.verb == "s'est connecté" %}
+                <li class="list-group-item">
+                    {{ action.timestamp|naturalday|capfirst }} - {{ action.actor|capfirst }} {{ action.verb }}
+                </li>
+                {% endif %}
+                {% empty %}
+                -- Pas encore d'activité, revenez plus tard ! --
+                {% endfor %}
+            </ul>
+
+        </div>
+        <div class="col-4">
+            <h3 class="mt-3">
+                <svg class="bi align-middle" width="24" height="24">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                </svg>
+                <span class="align-middle">Mes projets aiguillés</span>
+            </h3>
+
+            {% regroup request.user.tasks_created.all by project as project_list %}
+            <ul class="list-group">
+                {% for project in project_list %}
+                <li class="list-group-item"><a href="{{project.grouper.get_absolute_url }}">{{ project.grouper }}</a></li>
+                {% endfor %}
+            </ul>
+
+
+            <h3 class="mt-3">
+                <svg class="bi align-middle" width="24" height="24">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-check"/>
+                </svg>
+                <span class="align-middle">Mes dernières actions</span>
+            </h3>
+            <ul>
+                {% for task in request.user.tasks_created.all %}
+                <li>{{ task }} ({{ task.project }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -21,9 +21,8 @@ from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
-from . import models
-from .utils import (can_administrate_or_403, can_administrate_project,
-                    generate_ro_key)
+from . import models, signals
+from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
 
 ########################################################################
 # notifications
@@ -78,6 +77,11 @@ def onboarding(request):
                 content=f"# Demande initiale\n\n{project.impediments}",
                 public=True,
             ).save()
+
+            signals.project_submitted.send(
+                sender=models.Project, project=project, user=request.user
+            )
+
             response = redirect("projects-project-detail", project_id=project.id)
             response["Location"] += "?first_time=1"
             return response
@@ -173,7 +177,7 @@ def project_detail_from_sharing_link(request, project_ro_key):
     """Return a special view of the project using the sharing link"""
     try:
         project = models.Project.objects.filter(ro_key=project_ro_key)[0]
-    except:
+    except Exception:
         raise Http404
 
     can_administrate = can_administrate_project(project, request.user)
@@ -348,6 +352,10 @@ def accept_task(request, task_id):
             '"{0}" a bien été ajouté à votre liste d\'actions.'.format(task.intent),
         )
 
+        signals.action_accepted.send(
+            sender=accept_task, task=task, project=task.project, user=request.user
+        )
+
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"
     )
@@ -363,6 +371,20 @@ def toggle_done_task(request, task_id):
         task.refused = False
         task.accepted = True
         task.done = not task.done
+        if task.done:
+            signals.action_done.send(
+                sender=toggle_done_task,
+                task=task,
+                project=task.project,
+                user=request.user,
+            )
+        else:
+            signals.action_undone.send(
+                sender=toggle_done_task,
+                task=task,
+                project=task.project,
+                user=request.user,
+            )
         task.save()
 
     return redirect(
@@ -379,6 +401,9 @@ def refuse_task(request, task_id):
     if request.method == "POST":
         task.refused = True
         task.save()
+        signals.action_rejected.send(
+            sender=refuse_task, task=task, project=task.project, user=request.user
+        )
 
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"

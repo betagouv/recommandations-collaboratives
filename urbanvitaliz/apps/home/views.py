@@ -7,16 +7,14 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
+import django.contrib.auth.models as auth_models
+import django.core.mail
+import urbanvitaliz.apps.projects.models as project_models
 from django import forms
-
 from django.conf import settings
 from django.contrib import messages
-
-import django.core.mail
-
-from django.shortcuts import redirect
-from django.shortcuts import render
-
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import redirect, render
 from django.views.generic.base import TemplateView
 
 
@@ -72,6 +70,27 @@ def notify_user_of_sending(request, status):
             "Vous pouvez réessayer "
             "ou utiliser l'adresse depuis votre logiciel de messagerie",
         )
+
+
+######
+# ADMIN VIEWS
+######
+
+
+class StaffDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = "staff/dashboard.html"
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["projects_waiting"] = project_models.Project.objects.filter(
+            is_draft=True
+        ).count()
+        context["project_model"] = project_models.Project
+        context["user_model"] = auth_models.User
+        return context
 
 
 # eof
