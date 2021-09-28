@@ -75,6 +75,11 @@ urlpatterns = [
         name="projects-delete-task",
     ),
     path(
+        r"task/<int:task_id>/remind/",
+        views.remind_task,
+        name="projects-remind-task",
+    ),
+    path(
         r"project/<int:project_id>/note/",
         views.create_note,
         name="projects-create-note",
