@@ -16,6 +16,7 @@ from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.utils import login
 
 from . import models
@@ -736,6 +737,21 @@ def test_delete_task_from_project_and_redirect(client):
     task = models.Task.deleted_objects.get(id=task.id)
     assert task.deleted
     assert response.status_code == 302
+
+
+#
+# reminder
+
+
+@pytest.mark.django_db
+def test_create_reminder_for_task(client):
+    task = Recipe(models.Task).make()
+    url = reverse("projects-remind-task", args=[task.id])
+    with login(client) as user:
+        response = client.get(url)
+    assert response.status_code == 302
+    reminder = reminders.Mail.to_send.all()[0]
+    assert reminder.recipient == user.email
 
 
 ########################################################################
