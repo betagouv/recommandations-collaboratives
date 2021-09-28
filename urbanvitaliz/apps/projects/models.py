@@ -270,7 +270,10 @@ class Task(models.Model):
         verbose_name_plural = "actions"
 
     def __str__(self):
-        return "Task".format()
+        return "Task:{0}".format(self.intent or self.id)
+
+    def get_absolute_url(self):
+        return reverse("projects-project-detail", args=[self.project.id]) + "#actions"
 
     @classmethod
     def fetch(cls):

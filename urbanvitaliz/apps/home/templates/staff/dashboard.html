@@ -2,11 +2,20 @@
 
 {% load sass_tags %}
 {% load static %}
+{% load activity_tags %}
+{% load humanize %}
 
 {% block content %}
 
 <div class="col-10 py-3 g-0 mx-auto">
-XX
+
+    <h3>Activité sur les projets</h3>
+    {% activity_stream "model_actions" project_model  %}
+    <ul class="list-group">
+        {% for action in stream %}
+        <li class="list-group-item">{{ action.timestamp|naturalday|capfirst }} - {{ action.actor|capfirst }} {{ action.verb }} {{ action.action_object }} (sur <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>)</li>
+        {% endfor %}
+    </ul>
 
 </div>
 

@@ -8,6 +8,7 @@ created: 2021-08-16 15:40:08 CEST
 """
 
 import django.core.mail
+import urbanvitaliz.apps.projects.models as project_models
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -77,6 +78,11 @@ def notify_user_of_sending(request, status):
 
 class StaffDashboardView(LoginRequiredMixin, TemplateView):
     template_name = "staff/dashboard.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["project_model"] = project_models.Project
+        return context
 
 
 # eof
