@@ -7,16 +7,12 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
+import django.core.mail
 from django import forms
-
 from django.conf import settings
 from django.contrib import messages
-
-import django.core.mail
-
-from django.shortcuts import redirect
-from django.shortcuts import render
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect, render
 from django.views.generic.base import TemplateView
 
 
@@ -72,6 +68,15 @@ def notify_user_of_sending(request, status):
             "Vous pouvez réessayer "
             "ou utiliser l'adresse depuis votre logiciel de messagerie",
         )
+
+
+######
+# ADMIN VIEWS
+######
+
+
+class StaffDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = "staff/dashboard.html"
 
 
 # eof

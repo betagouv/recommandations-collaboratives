@@ -5,4 +5,5 @@ from django.dispatch import receiver
 
 @receiver(user_logged_in)
 def post_login(sender, user, request, **kwargs):
-    action.send(user, verb="s'est connecté")
+    if not user.is_staff:
+        action.send(user, verb="s'est connecté")
