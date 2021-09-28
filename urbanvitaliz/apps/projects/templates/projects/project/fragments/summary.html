@@ -1,0 +1,48 @@
+{% load static %}
+<span class="align-items-center link-dark text-decoration-none">
+    <svg class="bi" width="16" height="16" fill="currentColor">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill"/>
+    </svg>
+
+    <strong>Référent&middot;e : {{ project.first_name }} {{ project.last_name }}</strong>
+    {% if project.org_name %}
+    <span class="text-secondary">({{ project.org_name|title }})</span>
+    {% endif %}
+</span>
+<div>
+    <!-- Email -->
+    <svg class="bi" width="16" height="16" fill="currentColor">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+    </svg>
+    <a class="d-inline" href="mailto:{{ project.email }}"  data-bs-toggle="tooltip" title="Envoyer un courriel">{{ project.email }}</a>
+
+    <!-- Phone -->
+    {% if project.phone %}
+    &nbsp;&nbsp;
+    <svg class="bi" width="16" height="16" fill="currentColor">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone"/>
+    </svg>
+    <a class="d-inline" href="tel:{{ project.phone }}"  data-bs-toggle="tooltip" title="Appeler">
+        {{ project.phone }}
+        <span class="visually-hidden">Téléphoner</span>
+    </a>
+    {% endif %}
+</div>
+
+
+<div class="col-lg-10 py-3 px-0">
+    <p class="lead">{{ project.description|linebreaks|default:'Aucune description.' }}</p>
+
+    <!--<p>Le site est situé sur la commune d'<a href="#">Attignéville (88015), rue des Viviers</a>. Il concerne la parcelle cadastrale numéro <a href="#">A59</a>.</p> -->
+
+    <p>
+        <svg class="bi" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#geo-alt"/>
+        </svg>
+        Le site est situé à <a href="https://nominatim.openstreetmap.org/ui/search.html?q={{ project.location|urlencode }}" target="_new" >{{ project.location }}</a>
+        {% if project.commune %}
+        ({{ project.commune.postal }}, {{ project.commune.department }} - {{ project.commune.department.region }})
+        {% endif %}
+        .
+    </p>
+</div>
