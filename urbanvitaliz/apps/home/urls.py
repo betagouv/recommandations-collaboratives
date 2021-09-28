@@ -15,6 +15,9 @@ from . import views
 
 urlpatterns = [
     path(r"", views.HomePageView.as_view(), name="home"),
+    path(
+        r"+", views.HomePageView.as_view(), name="home"
+    ),  # dirty to fix bad external reference
     path(r"contact/", views.contact, name="home-contact"),
 ]
 
