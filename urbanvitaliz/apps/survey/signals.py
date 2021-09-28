@@ -1,6 +1,5 @@
 import django.dispatch
 from actstream import action
-from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 
 survey_started = django.dispatch.Signal()

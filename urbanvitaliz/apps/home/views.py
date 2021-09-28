@@ -7,6 +7,7 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
+import django.contrib.auth.models as auth_models
 import django.core.mail
 import urbanvitaliz.apps.projects.models as project_models
 from django import forms
@@ -81,7 +82,11 @@ class StaffDashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        context["projects_waiting"] = project_models.Project.objects.filter(
+            is_draft=True
+        ).count()
         context["project_model"] = project_models.Project
+        context["user_model"] = auth_models.User
         return context
 
 
