@@ -17,12 +17,21 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.resources import models as resources
 
+from .utils import generate_ro_key
+
 
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
 
     email = models.CharField(max_length=128)
     emails = models.JSONField(default=list)  # list of person having access to project
+
+    ro_key = models.CharField(
+        max_length=32,
+        editable=False,
+        verbose_name="Clé d'accès lecture seule",
+        default=generate_ro_key,
+    )
 
     last_name = models.CharField(
         max_length=128, default="", verbose_name="Nom du contact"

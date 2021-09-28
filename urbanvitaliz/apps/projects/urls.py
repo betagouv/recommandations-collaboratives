@@ -30,6 +30,11 @@ urlpatterns = [
         name="projects-project-update",
     ),
     path(
+        r"project/partage/<str:project_ro_key>/",
+        views.project_detail_from_sharing_link,
+        name="projects-project-sharing-link",
+    ),
+    path(
         r"project/<int:project_id>/accept/",
         views.project_accept,
         name="projects-project-accept",
