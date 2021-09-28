@@ -21,8 +21,7 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import (can_administrate_or_403, can_administrate_project,
-                    generate_ro_key)
+from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
 
 ########################################################################
 # notifications
@@ -177,7 +176,7 @@ def project_detail_from_sharing_link(request, project_ro_key):
     """Return a special view of the project using the sharing link"""
     try:
         project = models.Project.objects.filter(ro_key=project_ro_key)[0]
-    except:
+    except Exception:
         raise Http404
 
     can_administrate = can_administrate_project(project, request.user)
@@ -399,7 +398,7 @@ def refuse_task(request, task_id):
     if request.method == "POST":
         task.refused = True
         task.save()
-        signals.action_refused.send(
+        signals.action_rejected.send(
             sender=refuse_task, task=task, project=task.project, user=request.user
         )
 
