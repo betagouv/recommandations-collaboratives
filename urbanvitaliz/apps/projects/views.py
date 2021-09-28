@@ -19,6 +19,7 @@ from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
+from urbanvitaliz.apps.reminders import api
 
 from . import models
 from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
@@ -351,6 +352,7 @@ def accept_task(request, task_id):
     )
 
 
+@login_required
 def toggle_done_task(request, task_id):
     """Mark task as done for a project"""
     task = get_object_or_404(models.Task, pk=task_id)
@@ -367,6 +369,7 @@ def toggle_done_task(request, task_id):
     )
 
 
+@login_required
 def refuse_task(request, task_id):
     """Mark task refused for a project"""
     task = get_object_or_404(models.Task, pk=task_id)
@@ -453,6 +456,19 @@ def delete_task(request, task_id=None):
         task.save()
     next_url = reverse("projects-project-detail", args=[task.project_id])
     return redirect(next_url)
+
+
+@login_required
+def remind_task(request, task_id=None):
+    """Set a reminder for a task"""
+    task = get_object_or_404(models.Task, pk=task_id)
+    recipient = request.user.email
+    subject = f"[UrbanVitaliz] Rappel action sur {task.project.name}"
+    template = "projects/notifications/task_remind_email"
+    api.create_reminder_email(
+        request, recipient, subject, template, extra_context={"task": task}
+    )
+    return redirect(reverse("projects-project-detail", args=[task.project_id]))
 
 
 ########################################################################
