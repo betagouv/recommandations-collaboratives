@@ -35,6 +35,9 @@
     <section class="mt-5">
         <div class="fs-5 mb-3">Usager principal : <strong>{{ project.email }}</strong> <em>(non révocable)</em></div>
 
+
+        <div class="fs-5 mb-3">Lien de partage de votre projet (consultation uniquement) : <a target="_new" href="{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}"><strong>{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}</strong></a></div>
+
         <table class="table">
             <h3>
                 <svg class="bi" width="24" height="24" fill="currentColor">

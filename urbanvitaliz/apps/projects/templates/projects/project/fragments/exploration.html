@@ -38,6 +38,7 @@
     </div>
     {% else %}
 
+    {% if can_administrate %}
     <p class="text-secondary">
         {% if project.survey_session  %}
 
@@ -51,7 +52,7 @@
         {% endif %}
         {% endif %}
     </p>
-
+    {% endif %}
 
 
 
