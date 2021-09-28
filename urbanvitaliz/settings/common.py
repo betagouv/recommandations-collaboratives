@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.geomatics",
     "urbanvitaliz.apps.addressbook",
     "urbanvitaliz.apps.survey",
-    "urbanvitaliz.apps.notifications",
+    "urbanvitaliz.apps.reminders",
     "django_gravatar",
 ]
 
