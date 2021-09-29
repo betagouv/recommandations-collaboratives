@@ -46,7 +46,11 @@
                     {% if action.target %}
                     {{ action.timestamp|naturalday|capfirst }} - {{ action.actor|capfirst }} {{ action.verb }} {{ action.action_object }} (sur <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>)
                     {% else %}
+                    {% if action.action_object %}
                     {{ action.timestamp|naturalday|capfirst }} - {{ action.actor|capfirst }} {{ action.verb }} <a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
+                    {% else %}
+                    {{ action.timestamp|naturalday|capfirst }} - <a href="{{ action.actor.get_absolute_url }}">{{ action.actor|capfirst }}</a> {{ action.verb }}
+                    {% endif %}
                     {% endif %}
 
                 </li>
