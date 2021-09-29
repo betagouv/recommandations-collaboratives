@@ -13,10 +13,11 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.reminders import models as reminders
+from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
 
 from . import models
@@ -60,8 +61,7 @@ def test_performing_onboarding_create_a_new_project(client):
         "description": "a project description",
         "impediments": "some impediment",
     }
-    with login(client):
-        response = client.post(reverse("projects-onboarding"), data=data)
+    response = client.post(reverse("projects-onboarding"), data=data)
     project = models.Project.fetch()[0]
     assert project.name == "a project"
     assert project.is_draft
