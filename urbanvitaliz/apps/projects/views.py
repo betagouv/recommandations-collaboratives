@@ -22,7 +22,8 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -78,9 +79,7 @@ def onboarding(request):
                 public=True,
             ).save()
 
-            signals.project_submitted.send(
-                sender=models.Project, project=project, user=request.user
-            )
+            signals.project_submitted.send(sender=models.Project, project=project)
 
             response = redirect("projects-project-detail", project_id=project.id)
             response["Location"] += "?first_time=1"

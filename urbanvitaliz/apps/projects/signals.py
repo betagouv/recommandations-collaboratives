@@ -9,8 +9,8 @@ project_submitted = django.dispatch.Signal()
 
 
 @receiver(project_submitted)
-def log_project_submitted(sender, project, user, **kwargs):
-    action.send(user, verb="a déposé le projet", action_object=project)
+def log_project_submitted(sender, project, **kwargs):
+    action.send(project, verb="a été déposé")
 
 
 ######
