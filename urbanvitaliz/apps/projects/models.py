@@ -31,6 +31,7 @@ class Project(models.Model):
         editable=False,
         verbose_name="Clé d'accès lecture seule",
         default=generate_ro_key,
+        unique=True,
     )
 
     last_name = models.CharField(
