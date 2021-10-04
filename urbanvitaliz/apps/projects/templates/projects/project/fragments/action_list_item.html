@@ -106,7 +106,7 @@
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
                 </svg>
                 <a class="text-reset" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject={{ project.name|truncatechars:10 }} : Action '{{ task.intent|truncatewords:10 }}'">J'ai une question/un problème sur cette action</a> |
-                <a class="text-reset" href="{% url 'projects-remind-task' task.pk %}">M'alerter par e-mail de cette action dans 15 jours</a>
+                <button type="button" class="btn btn-text" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">Programmer une rappel par e-mail</button>
             </div>
         </div>
     </div>

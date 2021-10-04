@@ -22,7 +22,8 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -482,6 +483,12 @@ def delete_task(request, task_id=None):
     return redirect(next_url)
 
 
+class RemindTaskForm(forms.Form):
+    """Remind task after X days"""
+
+    days = forms.IntegerField(min_value=0, required=True)
+
+
 @login_required
 def remind_task(request, task_id=None):
     """Set a reminder for a task"""
@@ -489,9 +496,27 @@ def remind_task(request, task_id=None):
     recipient = request.user.email
     subject = f"[UrbanVitaliz] Rappel action sur {task.project.name}"
     template = "projects/notifications/task_remind_email"
-    api.create_reminder_email(
-        request, recipient, subject, template, extra_context={"task": task, "delay": 15}
-    )
+
+    if request.method == "POST":
+        form = RemindTaskForm(request.POST)
+        if form.is_valid():
+            days = form.cleaned_data["days"]
+
+            api.create_reminder_email(
+                request,
+                recipient,
+                subject,
+                template,
+                delay=days,
+                extra_context={"task": task, "delay": days},
+            )
+
+            messages.success(
+                request, "Une alarme a bien été programmée dans {0} jours.".format(days)
+            )
+        else:
+            messages.error(request, "Impossible de programmer l'alarme.")
+
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"
     )

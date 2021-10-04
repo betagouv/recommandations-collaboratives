@@ -6,6 +6,7 @@ Tests for project application
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
+import datetime
 
 import django.core.mail
 import pytest
@@ -13,7 +14,8 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -746,11 +748,24 @@ def test_delete_task_from_project_and_redirect(client):
 def test_create_reminder_for_task(client):
     task = Recipe(models.Task).make()
     url = reverse("projects-remind-task", args=[task.id])
+    data = {"days": 5}
     with login(client) as user:
-        response = client.get(url)
+        response = client.post(url, data=data)
     assert response.status_code == 302
     reminder = reminders.Mail.to_send.all()[0]
     assert reminder.recipient == user.email
+    in_fifteen_days = datetime.date.today() + datetime.timedelta(days=data["days"])
+    assert reminder.deadline == in_fifteen_days
+
+
+@pytest.mark.django_db
+def test_create_reminder_without_delay_for_task(client):
+    task = Recipe(models.Task).make()
+    url = reverse("projects-remind-task", args=[task.id])
+    with login(client) as user:
+        response = client.post(url)
+    assert response.status_code == 302
+    assert reminders.Mail.to_send.count() == 0
 
 
 ########################################################################
