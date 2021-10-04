@@ -34,7 +34,8 @@ function activateTab(){
         let hash = url.split('#')[1]
         $('#' + hash + "-tab").get(0).click();
     }
-};
+ };
+
 
 </script>
 {% endblock %}
@@ -295,7 +296,7 @@ function activateTab(){
 
             <!-- TAB: actions -->
             <div class="tab-pane pt-4" id="actions" role="tabpanel" aria-labelledby="actions">
-
+                {% include "projects/project/fragments/reminder_modal.html" %}
                 {% include "projects/project/fragments/actions.html" %}
 
                 <!-- 
