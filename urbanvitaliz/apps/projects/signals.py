@@ -13,6 +13,19 @@ def log_project_submitted(sender, project, **kwargs):
     action.send(project, verb="a été déposé")
 
 
+#####
+# Reminders
+#####
+reminder_created = django.dispatch.Signal()
+
+
+@receiver(reminder_created)
+def log_reminder_created(sender, task, project, user, **kwargs):
+    action.send(
+        user, verb="a créé un rappel sur l'action", action_object=task, target=project
+    )
+
+
 ######
 # Actions
 #####

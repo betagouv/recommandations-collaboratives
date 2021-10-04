@@ -511,6 +511,13 @@ def remind_task(request, task_id=None):
                 extra_context={"task": task, "delay": days},
             )
 
+            signals.reminder_created.send(
+                sender=models.Project,
+                task=task,
+                project=task.project,
+                user=request.user,
+            )
+
             messages.success(
                 request, "Une alarme a bien été programmée dans {0} jours.".format(days)
             )
