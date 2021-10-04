@@ -40,7 +40,7 @@
             </h3>
             {% activity_stream "model_actions" project_model %}
             <ul class="list-group">
-                {% for action in stream %}
+                {% for action in stream|slice:":20" %}
                 <li class="list-group-item">
 
                     {% if action.target %}
@@ -67,7 +67,7 @@
             </h3>
             {% activity_stream "model_actions" user_model %}
             <ul class="list-group">
-                {% for action in stream %}
+                {% for action in stream|slice:":10" %}
                 {% if action.verb == "s'est connecté" %}
                 <li class="list-group-item">
                     {{ action.timestamp|naturalday|capfirst }} - {{ action.actor|capfirst }} {{ action.verb }}
