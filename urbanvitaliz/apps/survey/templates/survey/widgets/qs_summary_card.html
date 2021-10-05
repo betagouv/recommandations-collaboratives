@@ -8,35 +8,54 @@
 
 
 
-<div class="card text-white" style="background: {{ question_set.color|default:'grey' }};">
-    <div class="card-body mt-2 ms-2">
-        <div style="border-left: 5px solid white; border-radius: 2px; padding-left: 20px;">
-            <div class="mb-0">
+<div class="survey-card card text-black rounded-3">
+    <div class="card-body m-1">
+        <div>
+            <div class="mb-0 mb-2">
                 {% if question_set.icon %}
-                <svg class="bi d-inline me-1" width="16" height="16">
+                <svg class="bi d-inline align-middle me-1" width="18px" height="18px">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ question_set.icon }}"/>
                 </svg>
                 {% endif %}
-                <h5 class="align-middle d-inline card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set.heading }}</h5>
+                <h5 class="fw-bolder align-middle d-inline card-title text-transform-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set.heading }}</h5>
             </div>
-            {% if answers %}
-            <progress class="mb-0" max="100" value="{% question_set_completion answers.0.session answers.0.question.question_set %}"></progress>
-            <h6>{% question_set_completion answers.0.session question_set %}%</h6>
-            {% else %}
-            <h6 class="mt-2">{{ question_set.questions.count }} question{{ question_set.questions.count|pluralize }}</h6>
-            {% endif %}
+
+            <div class="q-progress d-flex justify-content-between w-75 mb-1">
+                {% for q in question_set.questions.all %}
+                {% if forloop.counter <= answers|length %}
+                <span class="rounded-3 mx-1 done flex-grow-1" style="background-color: {{ question_set.color|default:'black' }} !important;">&nbsp;</span>
+                {% else %}
+                <span class="rounded-3 mx-1 todo flex-grow-1">&nbsp;</span>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+
+
+            <h6 style="color: {{ question_set.color|default:'black' }};" class="text-uppercase fw-bolder small">
+                {% if answers %}
+                {% with answers|length as answers_count %}
+                {{ answers_count }} question{{ answers_count|pluralize }}
+                {% endwith %}
+                {% else %}
+                0 question
+                {% endif %}
+                sur {{ question_set.questions.count }}
+            </h6>
+
             <p class="card-text">
                 <ul class="list-unstyled">
                     {{ question_set_completion }}
 
                     {% for answer in answers %}
-                    <li class="mb-2">
+                    <li class="mb-2 d-flex justify-content-between">
+                        <div class="flex-grow-1">
                         {% lookup_choices_from_answer answer as choices %}
 
                         {% if show_question or not choices %}
                         <div>
-                            <a class="text-white text-decoration-none link-edit" href="{% url 'survey-question-details' session.id answer.question.id %}">
-                                <h6 class="m-0 d-inline align-middle">{{ answer.question.text }}</h6>
+                            <a class="text-decoration-none link-edit" href="{% url 'survey-question-details' session.id answer.question.id %}">
+                                <h6 class="m-0 d-inline align-middle text-uppercase">{{ answer.question.text }}</h6>
                                 &nbsp;
                                 <svg class="bi me-1 d-inline align-middle" width="12" height="12" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
@@ -49,7 +68,7 @@
                         {% if show_answers or show_conclusion %}
                         <ul class="list-unstyled">
                             {% if not show_question %}
-                            <a class="link-edit text-white text-decoration-none" href="{% url 'survey-question-details' session.id answer.question.id %}">
+                            <a class="link-edit text-decoration-none" href="{% url 'survey-question-details' session.id answer.question.id %}">
                                 {% endif %}
                             {% for choice in choices %}
                             {% if show_answers %}
@@ -99,20 +118,25 @@
                     {% endif %}
 
                     {% if answer.attachment %}
-                    <div>
-                        <svg class="align-middle bi" width="16px" height="16px" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-richtext"/>
-                        </svg>
+                    <div
                         <span class="align-middle">
-                            <a target="_new" href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
+                            <a style="color: {{ question_set.color|default:'black' }} !important;" target="_new" href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
+                            <!-- <span class="text-secondary">{{ answer.attachment.size }} Ko</span> -->
                         </span>
                     </div>
                     {% endif %}
-
+                        </div>
+                        <div class="flex-shrink-1">
+                            <svg class="align-middle bi" width="26px" height="26px" fill="currentColor" style="color: {{ question_set.color|default:'black' }} !important;">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-right-short"/>
+                            </svg>
+                        </div>
                     </li>
                     {% endfor %}
                 </ul>
             </p>
         </div>
+
+        <button class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2" style="background-color: {{ question_set.color|default:'black' }} !important;">Compléter cette section</button>
     </div>
 </div>
