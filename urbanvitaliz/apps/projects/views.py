@@ -337,23 +337,21 @@ def create_task(request, project_id=None):
 
 
 @login_required
-def accept_task(request, task_id):
-    """Accept task for a project"""
+def visit_task(request, task_id):
+    """Visit the content of a task"""
     task = get_object_or_404(models.Task, pk=task_id)
     can_administrate_or_403(task.project, request.user)
 
-    if request.method == "POST":
-        task.accepted = True
+    if not task.visited:
+        task.visited = True
         task.save()
 
-        messages.success(
-            request,
-            '"{0}" a bien été ajouté à votre liste d\'actions.'.format(task.intent),
+        signals.action_accepted.send(
+            sender=visit_task, task=task, project=task.project, user=request.user
         )
 
-        signals.action_accepted.send(
-            sender=accept_task, task=task, project=task.project, user=request.user
-        )
+    if task.resource:
+        return redirect(reverse("resources-resource-detail", args=[task.resource.pk]))
 
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"
