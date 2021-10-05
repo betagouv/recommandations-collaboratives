@@ -17,9 +17,6 @@ urlpatterns = [
     path(
         r"staff/dashboard", views.StaffDashboardView.as_view(), name="staff-dashboard"
     ),
-    path(
-        r"+", views.HomePageView.as_view(), name="home"
-    ),  # dirty to fix bad external reference
     path(r"contact/", views.contact, name="home-contact"),
 ]
 
