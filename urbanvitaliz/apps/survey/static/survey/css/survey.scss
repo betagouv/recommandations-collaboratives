@@ -1,16 +1,18 @@
 .link-edit {
     color: black;
+}
 
-    svg {
-        visibility: hidden;
-    }
 
-    &:hover {
-        svg {
-            visibility: visible;
-        }
+.next-arrow {
+    transition-property: transform;
+    transition-duration: 0.3s;
+}
+.answer:hover {
+    .next-arrow {
+        transform: translateX(5px);
     }
 }
+
 
 .survey-card {
     .q-progress {
@@ -30,6 +32,6 @@
     }
 
     h6 {
-        letter-spacing: 0.2em !important;
+        letter-spacing: 0.1em !important;
     }
 }
