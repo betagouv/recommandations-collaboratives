@@ -105,8 +105,12 @@
                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
                 </svg>
-                <a class="text-reset" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject={{ project.name|truncatechars:10 }} : Action '{{ task.intent|truncatewords:10 }}'">J'ai une question/un problème sur cette action</a> |
-                <button type="button" class="btn btn-text" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">Programmer une rappel par e-mail</button>
+                <a class="align-middle text-reset" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject={{ project.name|truncatechars:10 }} : Action '{{ task.intent|truncatewords:10 }}'">J'ai une question/un problème sur cette action</a>
+                <span class="align-middle mx-1">|</span>
+                <svg class="align-middle bi" width="16px" height="16px" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
+                </svg>
+                <button type="button" class="align-middle text-decoration-underline btn btn-text btn-sm p-0 m-0 text-secondary" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">Programmer un rappel par e-mail</button>
             </div>
         </div>
     </div>
