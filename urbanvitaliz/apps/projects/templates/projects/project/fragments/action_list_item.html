@@ -2,32 +2,48 @@
 {% load gravatar %}
 {% load humanize %}
 
+<div id="modal-action-{{ task.id }}" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+            <div class="modal-header">
+                <h5 class="modal-title">Vous ne verrez plus cette recommandation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Pourriez-vous nous dire pourquoi vous ne souhaitez pas ajouter cette action ?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
+                        </svg>
+                        <span class="align-middle">Je l'ai déjà fait</span>
+                    </button>
+                </form>
+                <form method="POST" action="{% url 'projects-refuse-task' task.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x"/>
+                        </svg>
+                        <span class="align-middle">Ce n'est pas pertinent</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
+<div class="accordion border border-1 rounded-3 mb-4 position-relative">
 
-<div class="action-list-item accordion-item pt-2 pb-2">
-    <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
-        <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}">
-            {% csrf_token %}
-            {% if task.done %}
-            <button title="Remettre l'action en cours" data-bs-toggle="tooltip" type="submit" class="ms-2 btn btn-text align-middle" style="color: #ccc">
-                <svg class="align-middle bi" width="28" height="28" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-square"/>
-                </svg>
-            </button>
-            {% else %}
-            <button title="Marquer l'action comme terminée" data-bs-toggle="tooltip" type="submit" class="ms-2 btn btn-text align-middle" style="color: #ccc">
-                <svg class="align-middle bi" width="28" height="28" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#square"/>
-                </svg>
+    <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary" style="margin-left: 60px" >NOUVEAU</span>
 
-            </button>
-            {% endif %}
-
-        </form>
-
-        <div class="d-flex justify-content-between w-100">
-            <div class="align-middle flex-grow-1">
-                <button class="align-middle justify-content-between d-flex text-left btn btn-text collapsed fs-5 w-100" data-bs-toggle="collapse" data-bs-target="#action-{{ task.id }}-content" aria-expanded="false" aria-controls="action-{{ task.id }}-content">
+    <div class="accordion-header d-flex justify-content-between border-bottom">
+        <div class="task-opening d-flex ps-4 pt-4 justify-content-between flew-grow-1 w-100 position-relative pb-4">
+            <div class="d-flex flex-column flex-grow-1">
+                <div class="d-flex fw-bold fs-5 task-title mb-2 {% if task.done %}text-decoration-line-through{% endif %}">
                     {% if task.resource %}
                     <!-- Icon -->
                     <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }}" style="width:30px; height: 30px;" >
@@ -38,79 +54,123 @@
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
                     </svg>
                     {% endif %}
-                    <div class="flex-grow-1 d-flex justify-content-between align-middle">
-                        <span>
-                            {% if task.resource %}
-                            {{ task.resource.title|capfirst }}
-                            {% else %}
-                            {{ task.intent|capfirst }}
-                            {% endif %}
-                        </span>
-                        <span class="toggle align-middle">
-                            <svg class="bi" width="24px" height="24px">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down"/>
-                            </svg>
-                        </span>
+                    <div class="flex-grow-1 align-middle">
+                        {% if task.resource %}
+                        {{ task.resource.title|capfirst }}
+                        {% else %}
+                        {{ task.intent|capfirst }}
+                        {% endif %}
                     </div>
-                </button>
+                </div>
+                {% if not hide_details %}
+                <div class="task-summary">
+                    {% if task.resource %}
+                    {{ task.resource.summary }}
+                    {% elif task.contact %}
+                    <div class="d-flex mx-4">
+                        {% include "addressbook/widgets/card_contact_horizontal.html" with contact=task.contact %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
-
-            <div class="align-middle align-items-center d-flex justify-self-end me-3">
-                <span class="align-self-center badge rounded-pill bg-info">
-                    <svg class="align-middle bi me-1" width="14" height="14" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
+            {% if task.resource %}
+            <a class="stretched-link" href="{% url 'resources-resource-detail' task.resource.id %}">
+                <div class="flex-shrink-1 px-3 arrow-link text-primary align-items-center">
+                    <svg class="align-middle bi" width="26px" height="26px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-right-short"/>
                     </svg>
-                    <span class="align-middle small">1</span>
+                </div>
+            </a>
+            {% endif %}
+        </div>
+        {% if can_administrate %}
+        <div class="toolbar d-flex border-start flex-column justify-content-between">
+            {% if not task.done %}
+            <button class="p-4 btn btn-text m-0 border-bottom flex-grow-1" data-bs-toggle="modal" data-bs-target="#modal-action-{{ task.id }}">
+                <span data-bs-toggle="tooltip" title="Rejeter cette recommandation">
+                    <svg class="bi me-1 align-middle text-danger" width="16px" height="16px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-lg"/>
+                    </svg>
                 </span>
+            </button>
+            {% endif %}
+
+            <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}" class="flex-grow-1">
+                {% csrf_token %}
+                {% if task.done %}
+                <button title="Remettre l'action en cours" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
+                    <svg class="bi align-middle" width="24" height="24" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-counterclockwise"/>
+                    </svg>
+
+                </button>
+                {% else %}
+                <button title="Marquer l'action comme terminée" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
+                    <svg class="bi align-middle text-success" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-lg"/>
+                    </svg>
+
+                </button>
+                {% endif %}
+            </form>
+
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="action-list-item accordion-item pt-2 pb-2 border-0">
+        <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
+
+            <div class="d-flex justify-content-between w-100 px-4">
+                <div class="align-middle flex-grow-1">
+                    <button class="align-middle justify-content-start m-0 px-0 d-flex text-left btn btn-text collapsed text-primary w-100" data-bs-toggle="collapse" data-bs-target="#action-{{ task.id }}-content" aria-expanded="false" aria-controls="action-{{ task.id }}-content">
+                        Lire les commentaires
+                    </button>
+                </div>
+                {% if user.is_staff %}
+                <span class="align-middle p-2 small">
+                    <a class="" href="{% url 'projects-update-task' task.id %}">Éditer</a>
+                </span>
+                {% endif %}
+
+                {% if not hide_details %}
+                <button type="button" class="align-middle text-decoration-underline btn btn-text btn-sm p-0 m-0 text-primary" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">
+                    Programmer un rappel
+                </button>
+                {% endif %}
+
             </div>
         </div>
-    </div>
-    <div id="action-{{ task.id }}-content" class="accordion-collapse collapse">
-        <div class="accordion-body">
-            {% if user.is_staff %}
-            <p>
-                (<a class="" href="{% url 'projects-update-task' task.id %}">éditer</a>)
-            </p>
-            {% endif %}
+        <div id="action-{{ task.id }}-content" class="accordion-collapse collapse">
+            <div class="accordion-body">
 
-            {% if task.resource %}
-            {{ task.resource.summary }} [<a href="{% url 'resources-resource-detail' task.resource.id %}">Lire la ressource</a>]
-            {% endif %}
-            <div class="d-flex mb-2 mt-2">
-                <!-- Image -->
-                <img
-                    src="{% gravatar_url task.created_by.email 40 %}"
-                    alt="{{ task.created_by.get_full_name }}"
-                    class="me-3 rounded-circle"
-                    style="width: 40px; height: 40px;"
-                />
-                <div class="w-100">
-                    <h5 class="fw-bold">
-                        {{ task.created_by.get_full_name }}
-                        <small class="text-muted">{{ task.created_on|naturalday }}</small>
-                    </h5>
-                    <p>
+                <div class="d-flex flex-column m-2 bg-light p-4 comment">
+                    <p class="m-0 p-0">
                         {{ task.content_rendered|safe }}
                     </p>
+
+                    <div>
+                        <!-- Image -->
+                        <img
+                            src="{% gravatar_url task.created_by.email 16 %}"
+                            alt="{{ task.created_by.get_full_name }}"
+                            class="me-1 rounded-circle align-middle"
+                            height="18px" width="18px"
+                        />
+                        <span class="align-middle">
+                            {{ task.created_by.get_full_name }}
+                            <small class="text-muted">{{ task.created_on|naturalday }}</small>
+                        </span>
+                    </div>
                 </div>
-            </div>
 
-            {% if task.contact %}
-            <div class="d-flex w-100 mb-3">
-                {% include "addressbook/widgets/card_contact_horizontal.html" with contact=task.contact %}
-            </div>
-            {% endif %}
-
-            <div class="text-secondary small mt-1">
-                <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
-                </svg>
-                <a class="align-middle text-reset" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject={{ project.name|truncatechars:10 }} : Action '{{ task.intent|truncatewords:10 }}'">J'ai une question/un problème sur cette action</a>
-                <span class="align-middle mx-1">|</span>
-                <svg class="align-middle bi" width="16px" height="16px" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
-                </svg>
-                <button type="button" class="align-middle text-decoration-underline btn btn-text btn-sm p-0 m-0 text-secondary" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">Programmer un rappel par e-mail</button>
+                <div class="text-secondary small mt-1">
+                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+                    </svg>
+                    <a class="align-middle text-reset" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject={{ project.name|truncatechars:10 }} : Action '{{ task.intent|truncatewords:10 }}'">J'ai une question/un problème sur cette action</a>
+                </div>
             </div>
         </div>
     </div>
