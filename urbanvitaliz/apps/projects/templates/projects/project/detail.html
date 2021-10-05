@@ -45,11 +45,13 @@ function activateTab(){
 
 <div class="col-11 py-5 mx-auto">
 
-    <h1 class=" align-items-center">
-        <svg class="bi" width="40" height="40" fill="currentColor">
+    <h1 class="fw-bold">
+        <svg class="bi align-middle" width="40" height="40" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
         </svg>
-        {{ project.name|title }}
+        <span class="align-middle">
+            {{ project.name|title }}
+        </span>
     </h1>
 
     <div class="row">
@@ -58,7 +60,7 @@ function activateTab(){
         </div>
         {% include "projects/project/fragments/sidebar.html" %}
     </div>
-    
+
     <div id="project-sections" class="row">
         <ul class="nav nav-tabs" id="project-tabs" role="tablist">
             <!-- main sheet -->
