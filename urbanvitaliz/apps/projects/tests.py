@@ -606,22 +606,41 @@ def test_create_new_task_for_project_and_redirect(client):
 
 
 #
-# accept
+# Visit
 
 
 @pytest.mark.django_db
-def test_accept_task_for_project_and_redirect_for_project_owner(client):
+def test_visit_task_for_project_and_redirect_for_project_owner(client):
     owner_email = "owner@univer.se"
     project = Recipe(
         models.Project, is_draft=False, email=owner_email, emails=[owner_email]
     ).make()
-    task = Recipe(models.Task, project=project, accepted=False).make()
+    task = Recipe(models.Task, project=project, visited=False, resource=None).make()
     with login(client, email=owner_email):
-        response = client.post(
-            reverse("projects-accept-task", args=[task.id]),
+        response = client.get(
+            reverse("projects-visit-task", args=[task.id]),
         )
     task = models.Task.objects.all()[0]
-    assert task.accepted is True
+    assert task.visited is True
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(client):
+    owner_email = "owner@univer.se"
+    resource = resources.Resource()
+    resource.save()
+
+    project = Recipe(
+        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+    ).make()
+    task = Recipe(models.Task, project=project, visited=False, resource=resource).make()
+    with login(client, email=owner_email):
+        response = client.get(
+            reverse("projects-visit-task", args=[task.id]),
+        )
+    task = models.Task.objects.all()[0]
+    assert task.visited is True
     assert response.status_code == 302
 
 
@@ -633,7 +652,7 @@ def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(client)
     project = Recipe(
         models.Project, is_draft=False, email=owner_email, emails=[owner_email]
     ).make()
-    task = Recipe(models.Task, project=project, accepted=True, done=False).make()
+    task = Recipe(models.Task, project=project, visited=True, done=False).make()
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-toggle-done-task", args=[task.id]),
@@ -649,7 +668,7 @@ def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(client
     project = Recipe(
         models.Project, is_draft=False, email=owner_email, emails=[owner_email]
     ).make()
-    task = Recipe(models.Task, project=project, accepted=True, done=True).make()
+    task = Recipe(models.Task, project=project, visited=True, done=True).make()
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-toggle-done-task", args=[task.id]),
@@ -665,7 +684,7 @@ def test_refuse_task_for_project_and_redirect_for_project_owner(client):
     project = Recipe(
         models.Project, is_draft=False, email=owner_email, emails=[owner_email]
     ).make()
-    task = Recipe(models.Task, project=project, accepted=False, done=False).make()
+    task = Recipe(models.Task, project=project, visited=False, done=False).make()
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-refuse-task", args=[task.id]),
@@ -762,7 +781,7 @@ def test_create_reminder_for_task(client):
 def test_create_reminder_without_delay_for_task(client):
     task = Recipe(models.Task).make()
     url = reverse("projects-remind-task", args=[task.id])
-    with login(client) as user:
+    with login(client):
         response = client.post(url)
     assert response.status_code == 302
     assert reminders.Mail.to_send.count() == 0

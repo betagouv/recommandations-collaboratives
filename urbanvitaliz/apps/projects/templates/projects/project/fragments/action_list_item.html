@@ -38,7 +38,9 @@
 
 <div class="accordion border border-1 rounded-3 mb-4 position-relative">
 
+    {% if not task.visited %}
     <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary" style="margin-left: 60px" >NOUVEAU</span>
+    {% endif %}
 
     <div class="accordion-header d-flex justify-content-between border-bottom">
         <div class="task-opening d-flex ps-4 pt-4 justify-content-between flew-grow-1 w-100 position-relative pb-4">
@@ -75,7 +77,7 @@
                 {% endif %}
             </div>
             {% if task.resource %}
-            <a class="stretched-link" href="{% url 'resources-resource-detail' task.resource.id %}">
+            <a class="stretched-link" href="{% url 'projects-visit-task' task.id %}">
                 <div class="flex-shrink-1 px-3 arrow-link text-primary align-items-center">
                     <svg class="align-middle bi" width="26px" height="26px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-right-short"/>
