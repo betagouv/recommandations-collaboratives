@@ -43,13 +43,14 @@
                 {% for action in stream|slice:":20" %}
                 <li class="list-group-item">
 
+                    <span class="text-secondary">{{ action.timestamp|naturalday|capfirst }}</span> -
                     {% if action.target %}
-                    {{ action.timestamp|naturalday|capfirst }} - {{ action.actor|capfirst }} {{ action.verb }} {{ action.action_object }} (sur <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>)
+                    {{ action.actor|capfirst }} <strong>{{ action.verb }}</strong> {{ action.action_object }} (sur <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>)
                     {% else %}
                     {% if action.action_object %}
-                    {{ action.timestamp|naturalday|capfirst }} - {{ action.actor|capfirst }} {{ action.verb }} <a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
+                    {{ action.actor|capfirst }} <strong>{{ action.verb }}</strong> <a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
                     {% else %}
-                    {{ action.timestamp|naturalday|capfirst }} - <a href="{{ action.actor.get_absolute_url }}">{{ action.actor|capfirst }}</a> {{ action.verb }}
+                    <a href="{{ action.actor.get_absolute_url }}">{{ action.actor|capfirst }}</a> <strong>{{ action.verb }}</strong>
                     {% endif %}
                     {% endif %}
 
@@ -103,7 +104,7 @@
             </h3>
             <ul>
                 {% for task in request.user.tasks_created.all %}
-                <li>{{ task }} ({{ task.project }})</li>
+                <li><a href="{{ task.get_absolute_url }}">{{ task }}</a> ({{ task.project }})</li>
                 {% endfor %}
             </ul>
         </div>
