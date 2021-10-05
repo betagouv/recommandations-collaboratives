@@ -125,6 +125,6 @@
             </p>
         </div>
 
-        <button class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2" style="background-color: {{ question_set.color|default:'black' }} !important;">Compléter cette section</button>
+        <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}" class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2" style="background-color: {{ question_set.color|default:'black' }} !important;">Compléter cette section</a>
     </div>
 </div>
