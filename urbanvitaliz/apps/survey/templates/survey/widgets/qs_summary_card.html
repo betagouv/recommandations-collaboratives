@@ -45,7 +45,6 @@
 
             <p class="card-text">
                 <ul class="list-unstyled">
-                    {{ question_set_completion }}
 
                     {% for answer in answers %}
                     <li class="answer mb-2 mt-4 d-flex justify-content-between position-relative">
@@ -53,17 +52,21 @@
                         {% lookup_choices_from_answer answer as choices %}
 
                         {% if show_question or not choices %}
-                        <div>
-                            <a class="text-decoration-none stretched-link link-edit" href="{% url 'survey-question-details' session.id answer.question.id %}">
-                                <h6 class="m-0 d-inline align-middle text-uppercase">{{ answer.question.text }}</h6>
-                            </a>
+                            <div>
+                                {% if can_administrate %}
+                                <a class="text-decoration-none stretched-link link-edit" href="{% url 'survey-question-details' session.id answer.question.id %}">
+                                    {% endif %}
+                                    <h6 class="m-0 d-inline align-middle text-uppercase">{{ answer.question.text }}</h6>
+                                    {% if can_administrate %}
+                                </a>
+                                {% endif %}
                         </div>
                         {% endif %}
 
 
                         {% if show_answers or show_conclusion %}
                         <ul class="list-unstyled">
-                            {% if not show_question %}
+                            {% if can_administrate and not show_question %}
                             <a class="link-edit stretched-link text-decoration-none" href="{% url 'survey-question-details' session.id answer.question.id %}">
                                 {% endif %}
                             {% for choice in choices %}
@@ -78,7 +81,7 @@
                                 </li>
                             {% endif %}
                             {% endfor %}
-                            {% if not show_question %}
+                            {% if can_administrate and not show_question %}
                             </a>
                             {% endif %}
                         </ul>
@@ -108,23 +111,28 @@
                     {% if answer.attachment %}
                     <div
                         <span class="align-middle">
-                            <a style="color: {{ question_set.color|default:'black' }} !important;" target="_new" href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
+                            <a style="position: relative; z-index:2; color: {{ question_set.color|default:'black' }} !important;" target="_new" href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
                             <!-- <span class="text-secondary">{{ answer.attachment.size }} Ko</span> -->
                         </span>
                     </div>
                     {% endif %}
                         </div>
+                        {% if can_administrate %}
                         <div class="flex-shrink-1 next-arrow">
                             <svg class="align-middle bi" width="26px" height="26px" fill="currentColor" style="color: {{ question_set.color|default:'black' }} !important;">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-right-short"/>
                             </svg>
                         </div>
+                        {% endif %}
                     </li>
                     {% endfor %}
                 </ul>
             </p>
         </div>
+        {% question_set_completion session.pk question_set as completion %}
 
+        {% if can_administrate and completion < 100 %}
         <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}" class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2" style="background-color: {{ question_set.color|default:'black' }} !important;">Compléter cette section</a>
+        {% endif %}
     </div>
 </div>
