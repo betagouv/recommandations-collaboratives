@@ -98,7 +98,7 @@
             </button>
             {% endif %}
 
-            <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}" class="flex-grow-1">
+            <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}" class="flex-grow-1 d-flex">
                 {% csrf_token %}
                 {% if task.done %}
                 <button title="Remettre l'action en cours" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
