@@ -9,7 +9,6 @@
     {% if not session %}
     <p class="mb-3 text-secondary">
         L' <strong><em>Exploration</em></strong> permet de regrouper les informations nécessaires à l'étude de votre dossier.
-        <!-- <span class="text-secondary">Par exemple, il peut s'agir d'une étape pour  <q><em> Identifier le propriétaire </em></q> ou encore <q><em> Vérifier la pollution des sols </em></q></span>. -->
     </p>
 
 
@@ -28,22 +27,19 @@
     {% else %}
 
     {% if can_administrate %}
-    <p class="text-secondary bd-callout">
-        {% if project.survey_session  %}
+    {% if project.survey_session and project.survey_session.next_question %}
+    <div class="box-heading d-flex justify-content-between mb-4 mt-4">
+        <div class="flex-grow-1">
+            <h3>Complétez votre parcours d'exploration !</h3>
 
-        {% if project.survey_session.next_question %}
-        La <strong>pertinence de nos recommandations</strong> est liée à la connaissance que nous avons de votre site.
-
-        N'hésitez pas <a href="{% url 'survey-session-start' project.survey_session.id %}">à continuer le questionnaire</a> !
-        {% else %}
-
-        🎉 <strong>Merci</strong> d'avoir répondu à toutes les questions ! Ceci nous aide à <strong>mieux cibler vos besoins</strong>.
-        {% endif %}
-        {% endif %}
-    </p>
+            La <strong>pertinence de nos recommandations</strong> est liée à la connaissance que nous avons de votre site.
+        </div>
+        <div class="flex-shrink-1">
+            <a href="{% url 'survey-session-start' project.survey_session.id %}" class="btn btn-primary fw-bold p-2 m-4">Continuer le questionnaire</a>
+        </div>
+    </div>
     {% endif %}
-
-
+    {% endif %}
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3">
         <!-- Show QS with progress -->
