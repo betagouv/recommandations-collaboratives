@@ -193,6 +193,9 @@ class TaskManager(models.Manager):
     def done(self):
         return self.filter(visited=True, done=True, refused=False)
 
+    def done_or_already_done(self):
+        return self.filter(done=True)
+
     def open(self):
         return self.filter(done=False, refused=False)
 

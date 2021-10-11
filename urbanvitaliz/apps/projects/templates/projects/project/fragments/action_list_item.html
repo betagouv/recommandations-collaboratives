@@ -13,7 +13,7 @@
                 <p>Pourriez-vous nous dire pourquoi vous ne souhaitez pas ajouter cette action ?</p>
             </div>
             <div class="modal-footer justify-content-center">
-                <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}">
+                <form method="POST" action="{% url 'projects-already-done-task' task.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">
                         <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
@@ -88,7 +88,7 @@
         </div>
         {% if can_administrate %}
         <div class="toolbar d-flex border-start flex-column justify-content-between">
-            {% if not task.done %}
+            {% if not task.done and not task.refused %}
             <button class="p-4 btn btn-text m-0 border-bottom flex-grow-1" data-bs-toggle="modal" data-bs-target="#modal-action-{{ task.id }}">
                 <span data-bs-toggle="tooltip" title="Rejeter cette recommandation">
                     <svg class="bi me-1 align-middle text-danger" width="16px" height="16px" fill="currentColor">
@@ -100,7 +100,7 @@
 
             <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}" class="flex-grow-1 d-flex">
                 {% csrf_token %}
-                {% if task.done %}
+                {% if task.done or task.refused %}
                 <button title="Remettre l'action en cours" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
                     <svg class="bi align-middle" width="24" height="24" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-counterclockwise"/>
