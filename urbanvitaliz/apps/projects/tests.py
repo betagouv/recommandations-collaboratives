@@ -89,7 +89,9 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(client):
     project = models.Project.fetch()[0]
     user = auth.User.objects.get(username=project.email)
     assert user.is_authenticated
-    assert response.url == f"/project/{project.id}/survey/?first_time=1"
+    url = reverse("survey-project-session", args=[project.id])
+    assert response.status_code == 302
+    assert response.url == (url + "?first_time=1")
 
 
 @pytest.mark.django_db
