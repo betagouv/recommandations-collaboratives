@@ -120,6 +120,7 @@ class EditQuestionForm(forms.ModelForm):
             "priority",
             "is_multiple",
             "text",
+            "text_short",
             "precondition",
             "why",
             "how",
