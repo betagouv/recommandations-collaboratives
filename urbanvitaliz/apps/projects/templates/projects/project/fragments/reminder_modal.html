@@ -1,0 +1,79 @@
+{% load static %}
+
+<div class="modal fade" id="reminder-modal" tabindex="-1" aria-labelledby="reminder-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reminder-modal-label">
+                    <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
+                    </svg>
+                    <span class="align-middle">
+                        Programmer une alerte
+                    </span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                En validant cette alerte, vous recevrez un courriel pour vous remémorer de prendre
+                une action sur cette recommandation.
+                <form method="POST" data-action-pattern="{% url 'projects-remind-task' 0 %}">
+                    {% csrf_token %}
+                    <input name="days" type="hidden" class="form-control" id="reminder-days">
+                    <div class="btn-group w-100 mt-4 mb-2" role="group" aria-label="Shortcuts">
+                        <a href="javascript:setReminderDate(15);" class="btn btn-outline-secondary">Dans 15 jours</a>
+                        <a href="javascript:setReminderDate(30);" class="btn btn-outline-secondary">Dans 1 mois</a>
+                        <a href="javascript:setReminderDate(30*6);" class="btn btn-outline-secondary">Dans 6 mois</a>
+                    </div>
+                    <div class="input-group mt-2 mb-3">
+                        <span class="input-group-text" id="date-input">Date : </span>
+                        <input required aria-describedby="date-input" name="date" id="reminder-date" class="form-control" size="16" type="date">
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" type="submit" class="btn btn-primary">Programmer</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+ var reminderModal = document.getElementById('reminder-modal')
+ reminderModal.addEventListener('show.bs.modal', function (event) {
+     // Button that triggered the modal
+     var button = event.relatedTarget
+     // Extract info from data-bs-* attributes
+     var task_id = button.getAttribute('data-bs-task-id')
+
+     // Change action to match Task ID
+     var form = reminderModal.querySelector('.modal-body form')
+     var action_pattern = form.getAttribute('data-action-pattern')
+     form.action = action_pattern.replace('/0/', '/' + task_id + '/')
+
+     // Set 15 days by default
+     var date_input = reminderModal.querySelector('.modal-body form #reminder-date')
+     date_input.valueAsDate = new Date((new Date()).getTime() + (15 * 86400000 /* seconds in a day */))
+ });
+
+ submit_button = reminderModal.querySelector(".btn-primary");
+ submit_button.onclick = function(){
+     var date_input = reminderModal.querySelector('.modal-body form #reminder-date')
+     var days_input = reminderModal.querySelector('.modal-body form #reminder-days')
+     days_input.value = Math.ceil((new Date(date_input.value) - new Date())  / 86400000)
+
+     var form = reminderModal.querySelector('.modal-body form')
+     form.submit();
+ };
+
+
+ function setReminderDate(days) {
+     var date_input = reminderModal.querySelector('.modal-body form #reminder-date')
+     date_input.valueAsDate = new Date((new Date()).getTime() + (days * 86400000 /* seconds in a day */))
+ }
+
+</script>

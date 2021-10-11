@@ -31,6 +31,7 @@ class Project(models.Model):
         editable=False,
         verbose_name="Clé d'accès lecture seule",
         default=generate_ro_key,
+        unique=True,
     )
 
     last_name = models.CharField(
@@ -177,20 +178,20 @@ class TaskManager(models.Manager):
             .filter(deleted=None)
         )
 
-    def accepted(self):
-        return self.filter(accepted=True, refused=False)
+    def visited(self):
+        return self.filter(visited=True, refused=False)
 
     def proposed(self):
-        return self.filter(accepted=False, refused=False)
+        return self.filter(visited=False, refused=False)
 
     def refused(self):
         return self.filter(refused=True)
 
     def done(self):
-        return self.filter(accepted=True, done=True, refused=False)
+        return self.filter(visited=True, done=True, refused=False)
 
     def open(self):
-        return self.filter(accepted=True, done=False, refused=False)
+        return self.filter(done=False, refused=False)
 
 
 class DeletedTaskManager(models.Manager):
@@ -267,7 +268,7 @@ class Task(models.Model):
     def is_deadline_past_due(self):
         return date.today() > self.deadline if self.deadline else False
 
-    accepted = models.BooleanField(default=False, blank=True)
+    visited = models.BooleanField(default=False, blank=True)
     refused = models.BooleanField(default=False, blank=True)
     done = models.BooleanField(default=False, blank=True)
 
@@ -279,7 +280,10 @@ class Task(models.Model):
         verbose_name_plural = "actions"
 
     def __str__(self):
-        return "Task".format()
+        return "Task:{0}".format(self.intent or self.id)
+
+    def get_absolute_url(self):
+        return reverse("projects-project-detail", args=[self.project.id]) + "#actions"
 
     @classmethod
     def fetch(cls):

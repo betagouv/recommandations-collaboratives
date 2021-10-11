@@ -17,11 +17,13 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
-from . import models
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from . import models, signals
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -76,6 +78,9 @@ def onboarding(request):
                 content=f"# Demande initiale\n\n{project.impediments}",
                 public=True,
             ).save()
+
+            signals.project_submitted.send(sender=models.Project, project=project)
+
             response = redirect("projects-project-detail", project_id=project.id)
             response["Location"] += "?first_time=1"
             return response
@@ -171,7 +176,7 @@ def project_detail_from_sharing_link(request, project_ro_key):
     """Return a special view of the project using the sharing link"""
     try:
         project = models.Project.objects.filter(ro_key=project_ro_key)[0]
-    except:
+    except Exception:
         raise Http404
 
     can_administrate = can_administrate_project(project, request.user)
@@ -332,25 +337,28 @@ def create_task(request, project_id=None):
 
 
 @login_required
-def accept_task(request, task_id):
-    """Accept task for a project"""
+def visit_task(request, task_id):
+    """Visit the content of a task"""
     task = get_object_or_404(models.Task, pk=task_id)
     can_administrate_or_403(task.project, request.user)
 
-    if request.method == "POST":
-        task.accepted = True
+    if not task.visited:
+        task.visited = True
         task.save()
 
-        messages.success(
-            request,
-            '"{0}" a bien été ajouté à votre liste d\'actions.'.format(task.intent),
+        signals.action_accepted.send(
+            sender=visit_task, task=task, project=task.project, user=request.user
         )
+
+    if task.resource:
+        return redirect(reverse("resources-resource-detail", args=[task.resource.pk]))
 
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"
     )
 
 
+@login_required
 def toggle_done_task(request, task_id):
     """Mark task as done for a project"""
     task = get_object_or_404(models.Task, pk=task_id)
@@ -360,6 +368,20 @@ def toggle_done_task(request, task_id):
         task.refused = False
         task.accepted = True
         task.done = not task.done
+        if task.done:
+            signals.action_done.send(
+                sender=toggle_done_task,
+                task=task,
+                project=task.project,
+                user=request.user,
+            )
+        else:
+            signals.action_undone.send(
+                sender=toggle_done_task,
+                task=task,
+                project=task.project,
+                user=request.user,
+            )
         task.save()
 
     return redirect(
@@ -367,6 +389,7 @@ def toggle_done_task(request, task_id):
     )
 
 
+@login_required
 def refuse_task(request, task_id):
     """Mark task refused for a project"""
     task = get_object_or_404(models.Task, pk=task_id)
@@ -375,6 +398,9 @@ def refuse_task(request, task_id):
     if request.method == "POST":
         task.refused = True
         task.save()
+        signals.action_rejected.send(
+            sender=refuse_task, task=task, project=task.project, user=request.user
+        )
 
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"
@@ -453,6 +479,52 @@ def delete_task(request, task_id=None):
         task.save()
     next_url = reverse("projects-project-detail", args=[task.project_id])
     return redirect(next_url)
+
+
+class RemindTaskForm(forms.Form):
+    """Remind task after X days"""
+
+    days = forms.IntegerField(min_value=0, required=True)
+
+
+@login_required
+def remind_task(request, task_id=None):
+    """Set a reminder for a task"""
+    task = get_object_or_404(models.Task, pk=task_id)
+    recipient = request.user.email
+    subject = f"[UrbanVitaliz] Rappel action sur {task.project.name}"
+    template = "projects/notifications/task_remind_email"
+
+    if request.method == "POST":
+        form = RemindTaskForm(request.POST)
+        if form.is_valid():
+            days = form.cleaned_data["days"]
+
+            api.create_reminder_email(
+                request,
+                recipient,
+                subject,
+                template,
+                delay=days,
+                extra_context={"task": task, "delay": days},
+            )
+
+            signals.reminder_created.send(
+                sender=models.Project,
+                task=task,
+                project=task.project,
+                user=request.user,
+            )
+
+            messages.success(
+                request, "Une alarme a bien été programmée dans {0} jours.".format(days)
+            )
+        else:
+            messages.error(request, "Impossible de programmer l'alarme.")
+
+    return redirect(
+        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+    )
 
 
 ########################################################################

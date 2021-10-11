@@ -151,7 +151,7 @@ def test_question_with_single_multiple_signals_are_copied_over_answer(client):
 
     # Fetch persisted answer
     answer = models.Answer.objects.get(session=session, question=q1)
-    assert answer.signals == f"{c1.signals}, {c2.signals}"
+    assert set(answer.signals) == set(f"{c1.signals}, {c2.signals}")
 
 
 @pytest.mark.django_db

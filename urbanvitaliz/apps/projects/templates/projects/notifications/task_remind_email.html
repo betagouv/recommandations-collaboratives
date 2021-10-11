@@ -1,0 +1,27 @@
+Bonjour,<br>
+
+<p>
+    Vous nous avez demandé de vous rappeler il y a {{ delay }} jours de l'action suivante :
+</p>
+
+<p>
+    {% if task.resource %}
+    {{ task.resource.title }}
+    {% else %}
+    {{ task.intent }}
+    {% endif %}
+</p>
+
+<p>
+    Cette action va vous permettre d'avancer sur votre projet {{ task.project.name }}.
+</p>
+
+<p>
+    Vous pouvez retrouver cette action en cliquant ou en copiant le lien ci dessous :<br>
+    {{ request.scheme }}://{{ site.domain }}{{ task.project.get_absolute_url }}#action-{{ task.pk }}
+</p>
+
+Bonne journée,<br>
+
+L'équipe UrbanVitaliz
+

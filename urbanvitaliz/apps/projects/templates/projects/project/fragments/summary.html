@@ -4,7 +4,7 @@
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill"/>
     </svg>
 
-    <strong>Référent&middot;e : {{ project.first_name }} {{ project.last_name }}</strong>
+    Référent&middot;e : {{ project.first_name }} {{ project.last_name }}
     {% if project.org_name %}
     <span class="text-secondary">({{ project.org_name|title }})</span>
     {% endif %}
@@ -39,7 +39,7 @@
         <svg class="bi" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#geo-alt"/>
         </svg>
-        Le site est situé à <a href="https://nominatim.openstreetmap.org/ui/search.html?q={{ project.location|urlencode }}" target="_new" >{{ project.location }}</a>
+        <a href="https://nominatim.openstreetmap.org/ui/search.html?q={{ project.location|urlencode }}" target="_new" >{{ project.location }}</a>
         {% if project.commune %}
         ({{ project.commune.postal }}, {{ project.commune.department }} - {{ project.commune.department.region }})
         {% endif %}
