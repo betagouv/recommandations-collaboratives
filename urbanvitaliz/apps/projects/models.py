@@ -185,7 +185,10 @@ class TaskManager(models.Manager):
         return self.filter(visited=False, refused=False)
 
     def refused(self):
-        return self.filter(refused=True)
+        return self.filter(refused=True, done=False)
+
+    def already_done(self):
+        return self.filter(refused=True, done=True)
 
     def done(self):
         return self.filter(visited=True, done=True, refused=False)

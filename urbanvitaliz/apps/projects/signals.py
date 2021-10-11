@@ -35,6 +35,7 @@ def log_reminder_created(sender, task, project, user, **kwargs):
 #####
 action_accepted = django.dispatch.Signal()
 action_rejected = django.dispatch.Signal()
+action_already_done = django.dispatch.Signal()
 action_done = django.dispatch.Signal()
 action_undone = django.dispatch.Signal()
 
@@ -49,6 +50,14 @@ def log_action_accepted(sender, task, project, user, **kwargs):
 def log_action_rejected(sender, task, project, user, **kwargs):
     if not user.is_staff:
         action.send(user, verb="a refusé l'action", action_object=task, target=project)
+
+
+@receiver(action_already_done)
+def log_action_already_done(sender, task, project, user, **kwargs):
+    if not user.is_staff:
+        action.send(
+            user, verb="a déjà fait l'action", action_object=task, target=project
+        )
 
 
 @receiver(action_done)
