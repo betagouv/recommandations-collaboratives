@@ -56,7 +56,7 @@
                                 {% if can_administrate %}
                                 <a class="text-decoration-none stretched-link link-edit" href="{% url 'survey-question-details' session.id answer.question.id %}">
                                     {% endif %}
-                                    <h6 class="m-0 d-inline align-middle text-uppercase">{{ answer.question.text }}</h6>
+                                    <h6 class="m-0 d-inline align-middle text-uppercase">{{ answer.question.text_short|default:answer.question.text }}</h6>
                                     {% if can_administrate %}
                                 </a>
                                 {% endif %}
