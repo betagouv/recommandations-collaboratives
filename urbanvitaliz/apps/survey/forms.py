@@ -105,7 +105,7 @@ class EditQuestionSetForm(forms.ModelForm):
 
     class Meta:
         model = models.QuestionSet
-        fields = ["heading", "icon", "color", "subheading"]
+        fields = ["priority", "heading", "icon", "color", "subheading"]
 
 
 class EditQuestionForm(forms.ModelForm):
@@ -120,6 +120,7 @@ class EditQuestionForm(forms.ModelForm):
             "priority",
             "is_multiple",
             "text",
+            "text_short",
             "precondition",
             "why",
             "how",

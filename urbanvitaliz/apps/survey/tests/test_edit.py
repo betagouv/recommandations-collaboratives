@@ -56,6 +56,7 @@ def test_question_set_create_and_redirect(client):
     survey = Recipe(models.Survey).make()
     url = reverse("survey-editor-question-set-create", args=[survey.id])
     data = {
+        "priority": 10,
         "heading": "new heading",
         "subheading": "new sub heading",
         "icon": "an-icon",
@@ -94,6 +95,7 @@ def test_question_set_update_and_redirect(client):
     qs = Recipe(models.QuestionSet).make()
     url = reverse("survey-editor-question-set-update", args=[qs.id])
     data = {
+        "priority": 10,
         "heading": "new heading",
         "subheading": "new sub heading",
         "icon": "an-icon",
@@ -170,7 +172,11 @@ def test_question_set_detail_contains_question_links(client):
 def test_question_create_and_redirect(client):
     qs = Recipe(models.QuestionSet).make()
     url = reverse("survey-editor-question-create", args=[qs.id])
-    data = {"text": "the text of the question", "priority": 1}
+    data = {
+        "text_short": "short version",
+        "text": "the text of the question",
+        "priority": 1,
+    }
 
     with login(client, is_staff=True):
         response = client.post(url, data=data)
@@ -205,7 +211,11 @@ def test_question_create_error(client):
 def test_question_update_and_redirect(client):
     question = Recipe(models.Question).make()
     url = reverse("survey-editor-question-update", args=[question.id])
-    data = {"text": "the text of the question", "priority": 0}
+    data = {
+        "text_short": "short version",
+        "text": "the text of the question",
+        "priority": 0,
+    }
 
     with login(client, is_staff=True):
         response = client.post(url, data=data)
