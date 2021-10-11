@@ -22,7 +22,8 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -341,7 +342,7 @@ def visit_task(request, task_id):
     task = get_object_or_404(models.Task, pk=task_id)
     can_administrate_or_403(task.project, request.user)
 
-    if not task.visited:
+    if not task.visited and not request.user.is_staff:
         task.visited = True
         task.save()
 
