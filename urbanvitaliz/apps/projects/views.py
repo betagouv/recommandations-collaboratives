@@ -74,6 +74,9 @@ def onboarding(request):
             project.ro_key = generate_ro_key()
             postcode = form.cleaned_data.get("postcode")
             project.commune = geomatics.Commune.get_by_postal_code(postcode)
+            # concatener les impediment_kinds et la rajouter en debut d'impediment
+            impediment_kinds = form.cleaned_data.get("impediment_kinds", [])
+            project.impediments = "\n".join(impediment_kinds) + project.impediments
             project.save()
             models.Note(
                 project=project,
@@ -105,6 +108,19 @@ class OnboardingForm(forms.ModelForm):
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
 
+    impediment_kinds = forms.MultipleChoiceField(
+        choices=[
+            ("Financements", "Financements"),
+            ("Retours d'expériences", "Retours d'expériences"),
+            ("Ingénierie", "Ingénierie"),
+            ("Méthodologie", "Méthodologie"),
+            ("La propriété", "La propriété"),
+            ("Autre", "Autre (précisez en commentaire)"),
+        ],
+        required=True,
+        label="Quels sont les besoins et points de blocage?",
+    )
+
     class Meta:
         model = models.Project
         fields = [
@@ -115,7 +131,7 @@ class OnboardingForm(forms.ModelForm):
             "org_name",
             "name",
             "location",
-            "description",
+            # "description",
             "impediments",
         ]
 
