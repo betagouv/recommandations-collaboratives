@@ -9,9 +9,9 @@ created : 2021-05-26 15:56:20 CEST
 
 from django import forms
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import models as auth
 from django.contrib.auth import login as log_user
+from django.contrib.auth import models as auth
+from django.contrib.auth.decorators import login_required
 from django.contrib.syndication.views import Feed
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -24,8 +24,7 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import (can_administrate_or_403, can_administrate_project,
-                    generate_ro_key)
+from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
 
 ########################################################################
 # notifications
@@ -76,7 +75,12 @@ def onboarding(request):
             project.commune = geomatics.Commune.get_by_postal_code(postcode)
             # concatener les impediment_kinds et la rajouter en debut d'impediment
             impediment_kinds = form.cleaned_data.get("impediment_kinds", [])
-            project.impediments = "\n".join(impediment_kinds) + project.impediments
+            project.impediments = (
+                "#### Besoins : "
+                + ", ".join(impediment_kinds)
+                + "\n\n"
+                + project.impediments
+            )
             project.save()
             models.Note(
                 project=project,
