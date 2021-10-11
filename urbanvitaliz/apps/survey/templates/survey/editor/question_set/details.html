@@ -90,7 +90,7 @@
             <svg class="bi" width="26" height="26" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-square"/>
             </svg>&nbsp;
-            <span class="align-middle">{{ question.text }}</span>
+            <span class="align-middle">{{ question.text }} {% if question.text_short %}<span class="text-secondary small">({{ question.text_short }}){% endif %}</span></span>
 
             <span class="text-secondary small" style="font-size: 15px">
             &nbsp;<svg class="bi" width="15" height="15" fill="currentColor">
