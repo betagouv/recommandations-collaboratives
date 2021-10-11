@@ -7,7 +7,7 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-08-03 14:26:39 CEST
 """
 
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import DetailView, RedirectView
 from urbanvitaliz.apps.projects import models as projects_models
 
@@ -84,7 +84,11 @@ def survey_create_session_for_project(request, project_id):
         sender=None, survey=survey, project=project, request=request
     )
 
-    return redirect("survey-session-start", session_id=session.id)
+    url = reverse("survey-session-start", args=(session.id,))
+    if "first_time" in request.GET:
+        url += "?first_time=1"
+
+    return redirect(url)
 
 
 def survey_next_question(request, session_id, question_id=None):
@@ -99,11 +103,12 @@ def survey_next_question(request, session_id, question_id=None):
 
     if next_question:
         # redirect to question
-        return redirect(
-            "survey-question-details",
-            session_id=session.id,
-            question_id=next_question.id,
-        )
+        url = reverse("survey-question-details", args=(session.id, next_question.id))
+        if "first_time" in request.GET:
+            url += "?first_time=1"
+
+        return redirect(url)
+
     # we're done
     return redirect("survey-session-done", session_id=session.pk)
 
