@@ -365,7 +365,6 @@ def toggle_done_task(request, task_id):
 
     if request.method == "POST":
         task.refused = False
-        task.accepted = True
         task.done = not task.done
         if task.done:
             signals.action_done.send(
@@ -395,10 +394,30 @@ def refuse_task(request, task_id):
     can_administrate_or_403(task.project, request.user)
 
     if request.method == "POST":
+        task.done = False
         task.refused = True
         task.save()
         signals.action_rejected.send(
             sender=refuse_task, task=task, project=task.project, user=request.user
+        )
+
+    return redirect(
+        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+    )
+
+
+@login_required
+def already_done_task(request, task_id):
+    """Mark task refused for a project"""
+    task = get_object_or_404(models.Task, pk=task_id)
+    can_administrate_or_403(task.project, request.user)
+
+    if request.method == "POST":
+        task.done = True
+        task.refused = True
+        task.save()
+        signals.action_already_done.send(
+            sender=already_done_task, task=task, project=task.project, user=request.user
         )
 
     return redirect(

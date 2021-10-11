@@ -690,6 +690,24 @@ def test_refuse_task_for_project_and_redirect_for_project_owner(client):
         )
     task = models.Task.objects.all()[0]
     assert task.refused is True
+    assert task.done is False
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_already_done_task_for_project_and_redirect_for_project_owner(client):
+    owner_email = "owner@univer.se"
+    project = Recipe(
+        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+    ).make()
+    task = Recipe(models.Task, project=project, visited=False, done=False).make()
+    with login(client, email=owner_email):
+        response = client.post(
+            reverse("projects-already-done-task", args=[task.id]),
+        )
+    task = models.Task.objects.all()[0]
+    assert task.refused is True
+    assert task.done is True
     assert response.status_code == 302
 
 
