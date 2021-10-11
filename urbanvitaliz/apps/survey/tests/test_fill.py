@@ -243,7 +243,7 @@ def test_next_question_redirects_to_next_question_set(client):
     q1 = Recipe(models.Question, question_set=qs1).make()
 
     qs2 = Recipe(models.QuestionSet, survey=survey, priority=10).make()
-    q2 = Recipe(models.Question, question_set=qs2).make()
+    Recipe(models.Question, question_set=qs2).make()
 
     qs3 = Recipe(models.QuestionSet, survey=survey, priority=20).make()
     q3 = Recipe(models.Question, question_set=qs3).make()
