@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.humanize",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     "django.contrib.admin",
     "magicauth",
     "sass_processor",
@@ -44,8 +45,12 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.geomatics",
     "urbanvitaliz.apps.addressbook",
     "urbanvitaliz.apps.survey",
+    "urbanvitaliz.apps.reminders",
     "django_gravatar",
+    "actstream",
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

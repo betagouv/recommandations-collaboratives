@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView, RedirectView
 from urbanvitaliz.apps.projects import models as projects_models
 
-from .. import forms, models
+from .. import forms, models, signals
 
 #####
 # Session
@@ -78,6 +78,10 @@ def survey_create_session_for_project(request, project_id):
 
     session, created = models.Session.objects.get_or_create(
         project=project, survey=survey
+    )
+
+    signals.survey_started.send(
+        sender=None, survey=survey, project=project, request=request
     )
 
     return redirect("survey-session-start", session_id=session.id)

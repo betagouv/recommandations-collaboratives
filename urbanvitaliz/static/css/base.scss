@@ -66,7 +66,14 @@ main {
     }
 }
 
-
+/* Heading Infobox */
+.box-heading {
+    background-color: #fafafa;
+    border-radius: 10px;
+    padding: 20px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
 
 /* Arrow */
 .arrow {
@@ -111,23 +118,23 @@ progress {
     border: 0;
     height: 6px;
     border-radius: 20px;
-    background-color: white;
+    background-color: black;
 }
 progress::-webkit-progress-bar {
     border: 0;
     height: 6px;
     border-radius: 20px;
-    background-color: white;
+    background-color: black;
 }
 progress::-webkit-progress-value {
     border: 0;
     height: 6px;
     border-radius: 20px;
-    background-color: white;
+    background-color: black;
 }
 progress::-moz-progress-bar {
     border: 0;
     height: 6px;
     border-radius: 20px;
-    background-color: white;
+    background-color: black;
 }

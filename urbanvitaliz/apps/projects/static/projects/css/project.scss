@@ -1,12 +1,12 @@
-.action-list-item {
-    .collapsed {
-        .toggle {
-            transform: rotate(0deg);
-        }
-    }
-
-    .toggle {
-        transform: rotate(180deg);
-    }
-
+.arrow-link {
+    transition-property: transform;
+    transition-duration: 0.3s;
 }
+
+.task-opening:hover {
+    .arrow-link {
+        transform: translateX(5px);
+    }
+}
+
+

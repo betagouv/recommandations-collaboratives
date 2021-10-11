@@ -1,11 +1,37 @@
 .link-edit {
-    svg {
-        visibility: hidden;
+    color: black;
+}
+
+
+.next-arrow {
+    transition-property: transform;
+    transition-duration: 0.3s;
+}
+.answer:hover {
+    .next-arrow {
+        transform: translateX(5px);
+    }
+}
+
+
+.survey-card {
+    .q-progress {
+        height: 5px;
+
+        span:first-of-type {
+            margin-left: 0 !important;
+        }
+
+        .done {
+
+        }
+
+        .todo {
+            background-color: #eee;
+        }
     }
 
-    &:hover {
-        svg {
-            visibility: visible;
-        }
+    h6 {
+        letter-spacing: 0.1em !important;
     }
 }

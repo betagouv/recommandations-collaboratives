@@ -55,9 +55,9 @@ urlpatterns = [
         name="projects-update-task",
     ),
     path(
-        r"task/<int:task_id>/accept/",
-        views.accept_task,
-        name="projects-accept-task",
+        r"task/<int:task_id>/visit/",
+        views.visit_task,
+        name="projects-visit-task",
     ),
     path(
         r"task/<int:task_id>/toggle-done/",
@@ -73,6 +73,11 @@ urlpatterns = [
         r"task/<int:task_id>/delete/",
         views.delete_task,
         name="projects-delete-task",
+    ),
+    path(
+        r"task/<int:task_id>/remind/",
+        views.remind_task,
+        name="projects-remind-task",
     ),
     path(
         r"project/<int:project_id>/note/",

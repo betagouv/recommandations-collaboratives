@@ -6,6 +6,7 @@ django_otp
 django-tagging
 django-gravatar2
 psycopg2-binary
+django-activity-stream
 # STATIC FILES
 django-sass-processor
 libsass

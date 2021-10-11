@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load gravatar %}
 
 {% load projects_extra %}
 
@@ -169,9 +169,13 @@ s                                    <a class="stretched-link text-reset text-de
 
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
-                        <svg class="bi me-2 rounded-circle" width="32" height="32">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle"/>
-                        </svg>
+                        <img
+                            src="{% gravatar_url user.email 32 %}"
+                            alt="{{ user.get_full_name }}"
+                            class="me-2 rounded-circle"
+                            style="width: 32px; height: 32px;"
+                        />
+
                         <strong>{{ user.get_full_name|default:user.email|truncatechars:13 }}</strong>
 
                     </a>
@@ -184,6 +188,7 @@ s                                    <a class="stretched-link text-reset text-de
                         <li><a class="dropdown-item" href="{% url 'logout' %}">Déconnexion</a></li>
                         {% if user.is_staff %}
                         <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'staff-dashboard' %}">Tableau de Bord</a></li>
                         <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>
                         {% endif %}
                     </ul>
