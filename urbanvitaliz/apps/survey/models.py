@@ -45,6 +45,12 @@ class QuestionSet(models.Model):
         verbose_name="Sous-titre", null=True, blank=True, default=""
     )
 
+    priority = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Priorité",
+        help_text="Priorité d'affichage. Le plus fort, le plus important.",
+    )
+
     deleted = models.DateTimeField(null=True, blank=True)
 
     def _following(self, order_by):
@@ -113,6 +119,10 @@ class Question(models.Model):
         QuestionSet, on_delete=models.CASCADE, related_name="questions"
     )
     text = models.CharField(max_length=255, verbose_name="Texte de la question")
+
+    text_short = models.CharField(
+        max_length=32, verbose_name="Texte court de la question", default=""
+    )
 
     how = models.TextField(default="", blank=True, verbose_name="Comment ?")
 
