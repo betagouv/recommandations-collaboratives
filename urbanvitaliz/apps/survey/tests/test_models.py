@@ -151,8 +151,8 @@ def test_session_signals_union():
 @pytest.mark.django_db
 def test_question_set_next():
     survey = Recipe(models.Survey).make()
-    qs1 = Recipe(models.QuestionSet, survey=survey).make()
-    qs2 = Recipe(models.QuestionSet, survey=survey).make()
+    qs1 = Recipe(models.QuestionSet, survey=survey, priority=20).make()
+    qs2 = Recipe(models.QuestionSet, survey=survey, priority=10).make()
 
     assert qs1.next() == qs2
     assert qs2.next() is None
@@ -161,8 +161,8 @@ def test_question_set_next():
 @pytest.mark.django_db
 def test_question_set_previous():
     survey = Recipe(models.Survey).make()
-    qs1 = Recipe(models.QuestionSet, survey=survey).make()
-    qs2 = Recipe(models.QuestionSet, survey=survey).make()
+    qs1 = Recipe(models.QuestionSet, survey=survey, priority=20).make()
+    qs2 = Recipe(models.QuestionSet, survey=survey, priority=10).make()
 
     assert qs2.previous() == qs1
     assert qs1.previous() is None

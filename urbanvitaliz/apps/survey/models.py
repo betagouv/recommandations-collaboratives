@@ -54,10 +54,10 @@ class QuestionSet(models.Model):
     deleted = models.DateTimeField(null=True, blank=True)
 
     def _following(self, order_by):
-        """return the following question set defined by the given order_by"""
+        """return the following question set defined by the given order_byi sequence"""
         question_sets = self.survey.question_sets
 
-        iterator = question_sets.order_by(order_by).iterator()
+        iterator = question_sets.order_by(*order_by).iterator()
         for question_set in iterator:
             if question_set == self:
                 try:
@@ -69,11 +69,11 @@ class QuestionSet(models.Model):
 
     def next(self):
         """Return the next question set"""
-        return self._following(order_by="id")
+        return self._following(order_by=["-priority", "id"])
 
     def previous(self):
         """Return the previous question set"""
-        return self._following(order_by="-id")
+        return self._following(order_by=["priority", "-id"])
 
     def first_question(self):
         for question in self.questions.all():
