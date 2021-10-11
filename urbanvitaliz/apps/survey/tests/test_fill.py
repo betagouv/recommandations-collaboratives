@@ -239,17 +239,20 @@ def test_next_question_redirects_to_done_when_no_more_questions(client):
 def test_next_question_redirects_to_next_question_set(client):
     session = Recipe(models.Session).make()
     survey = Recipe(models.Survey).make()
-    qs1 = Recipe(models.QuestionSet, survey=survey).make()
+    qs1 = Recipe(models.QuestionSet, survey=survey, priority=30).make()
     q1 = Recipe(models.Question, question_set=qs1).make()
 
-    qs2 = Recipe(models.QuestionSet, survey=survey).make()
+    qs2 = Recipe(models.QuestionSet, survey=survey, priority=10).make()
     q2 = Recipe(models.Question, question_set=qs2).make()
+
+    qs3 = Recipe(models.QuestionSet, survey=survey, priority=20).make()
+    q3 = Recipe(models.Question, question_set=qs3).make()
 
     with login(client, is_staff=False):
         url = reverse("survey-question-next", args=(session.id, q1.id))
         response = client.get(url)
 
-    new_url = reverse("survey-question-details", args=(session.id, q2.id))
+    new_url = reverse("survey-question-details", args=(session.id, q3.id))
     assertRedirects(response, new_url)
 
 
