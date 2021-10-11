@@ -75,6 +75,24 @@ def test_performing_onboarding_create_a_new_project(client):
 
 
 @pytest.mark.django_db
+def test_performing_onboarding_create_a_new_user_and_logs_in(client):
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "location": "some place",
+        "first_name": "john",
+        "last_name": "doe",
+        "description": "a project description",
+        "impediments": "some impediment",
+    }
+    response = client.post(reverse("projects-onboarding"), data=data)
+    project = models.Project.fetch()[0]
+    user = auth.User.objects.get(username=project.email)
+    assert user.is_authenticated
+
+
+
+@pytest.mark.django_db
 def test_performing_onboarding_sets_existing_postal_code(client):
     commune = Recipe(geomatics.Commune, postal="12345").make()
     with login(client):
