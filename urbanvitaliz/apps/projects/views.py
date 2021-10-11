@@ -10,6 +10,8 @@ created : 2021-05-26 15:56:20 CEST
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import models as auth
+from django.contrib.auth import login as log_user
 from django.contrib.syndication.views import Feed
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -81,7 +83,16 @@ def onboarding(request):
 
             signals.project_submitted.send(sender=models.Project, project=project)
 
-            response = redirect("projects-project-detail", project_id=project.id)
+            # TODO get or create user and log her in the application
+            user, _ = auth.User.objects.get_or_create(
+                username=project.email,
+                defaults={
+                    "email": project.email,
+                },
+            )
+            log_user(request, user)
+
+            response = redirect("survey-project-session", project_id=project.id)
             response["Location"] += "?first_time=1"
             return response
     else:
