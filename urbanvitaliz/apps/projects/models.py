@@ -63,7 +63,7 @@ class Project(models.Model):
     phone = models.CharField(
         max_length=16, default="", blank=True, verbose_name="Téléphone"
     )
-    description = models.TextField(verbose_name="Description")
+    description = models.TextField(verbose_name="Description", default="", blank=True)
     location = models.CharField(max_length=256, verbose_name="Localisation")
     commune = models.ForeignKey(
         geomatics_models.Commune,
