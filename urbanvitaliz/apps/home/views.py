@@ -9,16 +9,15 @@ created: 2021-08-16 15:40:08 CEST
 
 import datetime
 
-from django.db.models import Count, F
 import django.core.mail
-from django.contrib.auth import models as auth
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import models as auth
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import Count, F
 from django.shortcuts import redirect, render
 from django.views.generic.base import TemplateView
-
 from urbanvitaliz.apps.projects import models as projects
 
 
@@ -53,10 +52,10 @@ class StatisticsView(TemplateView):
 
         context["new_col_per_month"] = [
             (f"{p['month']}/{p['year']}", p["total"])
-            for p in the_projects.order_by("created_on")
+            for p in the_projects.order_by("created_on__year", "created_on__month")
             .values(year=F("created_on__year"), month=F("created_on__month"))
             .annotate(total=Count("id"))
-        ]
+        ][:10]
 
         context["collectivity_geo"] = (
             (p["latitude"], p["longitude"])
