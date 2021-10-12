@@ -55,7 +55,7 @@ class StatisticsView(TemplateView):
             for p in the_projects.order_by("created_on__year", "created_on__month")
             .values(year=F("created_on__year"), month=F("created_on__month"))
             .annotate(total=Count("id"))
-        ][:10]
+        ][-10:]
 
         context["collectivity_geo"] = (
             (p["latitude"], p["longitude"])
