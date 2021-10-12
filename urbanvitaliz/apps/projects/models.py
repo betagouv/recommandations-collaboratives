@@ -87,7 +87,7 @@ class Project(models.Model):
         verbose_name = "project"
         verbose_name_plural = "projects"
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return f"{self.name} {self.location}"
 
     @classmethod
@@ -159,8 +159,8 @@ class Note(models.Model):
         verbose_name = "note"
         verbose_name_plural = "notes"
 
-    def __str__(self):
-        return "Note".format()
+    def __str__(self):  # pragma: nocover
+        return f"Note: #{self.id}"
 
     @classmethod
     def fetch(cls):
@@ -221,7 +221,9 @@ class Task(models.Model):
         default=0,
         blank=True,
         verbose_name="Priorité",
-        help_text="Plus le chiffre est élevé, plus la recommandation s'affichera en haut.",
+        help_text=(
+            "Plus le chiffre est élevé, plus la recommandation s'affichera en haut."
+        ),
     )
 
     created_by = models.ForeignKey(
@@ -285,7 +287,7 @@ class Task(models.Model):
         verbose_name = "action"
         verbose_name_plural = "actions"
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return "Task:{0}".format(self.intent or self.id)
 
     def get_absolute_url(self):
@@ -316,8 +318,8 @@ class Document(models.Model):
         verbose_name = "document"
         verbose_name_plural = "documents"
 
-    def __str__(self):
-        return "Document".format()
+    def __str__(self):  # pragma: nocover
+        return f"Document {self.id}"
 
     @classmethod
     def fetch(cls):

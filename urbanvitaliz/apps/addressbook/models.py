@@ -19,7 +19,7 @@ class Organization(models.Model):
         verbose_name="Départements concernés",
     )
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return "Organization: {0}".format(self.name)
 
 
@@ -48,7 +48,7 @@ class Contact(models.Model):
         Organization, related_name="contacts", on_delete=models.CASCADE
     )
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return "{0} {1}".format(self.last_name, self.first_name)
 
 

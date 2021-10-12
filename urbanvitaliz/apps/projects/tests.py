@@ -21,6 +21,8 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
 
 from . import models
+from . import views
+
 from .templatetags import projects_extra
 
 # TODO when local authority can see & update her project
@@ -196,13 +198,21 @@ def test_other_projects_are_not_stored_in_session(client):
 
 
 @pytest.mark.django_db
-def test_project_sharing_link(client):
+def test_project_access_proper_sharing_link(client):
     project = Recipe(models.Project).make()
     url = reverse(
         "projects-project-sharing-link", kwargs={"project_ro_key": project.ro_key}
     )
     response = client.get(url)
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_fails_unknown_sharing_link(client):
+    Recipe(models.Project).make()
+    url = reverse("projects-project-sharing-link", kwargs={"project_ro_key": "unkown"})
+    response = client.get(url)
+    assert response.status_code == 404
 
 
 ########################################################################
@@ -610,6 +620,19 @@ def test_create_task_available_for_staff_users(client):
 
 
 @pytest.mark.django_db
+def test_create_new_task_for_project_notify_user(mocker, client):
+    project = Recipe(models.Project).make()
+    mocker.patch("urbanvitaliz.apps.projects.views.notify_action_created")
+    with login(client, is_staff=True):
+        client.post(
+            reverse("projects-create-task", args=[project.id]),
+            data={"content": "this is some content", "notify_email": True},
+        )
+
+    views.notify_action_created.assert_called_once()
+
+
+@pytest.mark.django_db
 def test_create_new_task_for_project_and_redirect(client):
     project = Recipe(models.Project).make()
     username = "bob"
@@ -958,6 +981,17 @@ def test_delete_note_for_project_and_redirect(client):
 ########################################################################
 # pushing a resource to a project's owner
 ########################################################################
+
+
+@pytest.mark.django_db
+def test_staff_push_resource_fails_on_get(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-push-resource", args=[project.id])
+    with login(client, is_staff=True):
+        response = client.get(url)
+
+    newurl = reverse("projects-project-detail", args=[project.id])
+    assertRedirects(response, newurl)
 
 
 @pytest.mark.django_db
