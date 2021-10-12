@@ -97,7 +97,7 @@
                     <ul class="text-start">
                         <li>Total depuis lancement du service : {{collectivity_supported}}</li>
                         <li>Qui ont déjà reçu au moins une recommandation : {{collectivity_with_reco}}</li>
-                        <li>Nombre moyen de recommandations fournies par collectivité : {{collectivity_avg_reco}}</li>
+                        <li>Nombre moyen de recommandations fournies par collectivité : {{collectivity_avg_reco|floatformat:1}}</li>
                     </ul>
                 </p>
                 {% leaflet_map "friches" callback="window.map_init" %}
