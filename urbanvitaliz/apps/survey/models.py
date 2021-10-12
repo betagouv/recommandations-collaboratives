@@ -14,8 +14,8 @@ from . import utils
 class Survey(models.Model):
     name = models.CharField(max_length=80)
 
-    def __str__(self):
-        return "Survey: {0}".format(self.name)
+    def __str__(self):  # pragma: nocover
+        return f"Survey: {self.name}"
 
 
 class QuestionSetManager(models.Manager):
@@ -87,7 +87,7 @@ class QuestionSet(models.Model):
 
         return None
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return self.heading
 
 
@@ -205,7 +205,7 @@ class Question(models.Model):
         my_tags = set(self.precondition_tags.values_list("name", flat=True))
         return my_tags.issubset(session.signals)
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return self.text
 
 
@@ -328,8 +328,8 @@ class Session(models.Model):
 
         return None
 
-    def __str__(self):
-        return "Session #{0}".format(self.id)
+    def __str__(self):  # pragma: nocover
+        return f"Session #{self.id}"
 
     @property
     def completion(self):

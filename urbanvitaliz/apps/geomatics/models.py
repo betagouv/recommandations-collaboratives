@@ -21,7 +21,7 @@ class Region(models.Model):
         verbose_name = "région"
         verbose_name_plural = "régions"
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return self.name
 
 
@@ -37,7 +37,7 @@ class Department(models.Model):
         verbose_name = "département"
         verbose_name_plural = "départements"
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return self.name
 
 
@@ -57,7 +57,7 @@ class Commune(models.Model):
         verbose_name = "commune"
         verbose_name_plural = "communes"
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return self.name
 
     @classmethod

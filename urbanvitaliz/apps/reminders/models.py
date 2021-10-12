@@ -45,7 +45,7 @@ class Mail(models.Model):
         verbose_name = "mail"
         verbose_name_plural = "mails"
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return f"{self.recipient} {self.deadline}"
 
     def mark_as_sent(self):

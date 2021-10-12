@@ -20,7 +20,7 @@ def current_project(session):
     try:
         project_id = session.get("project_id")
         return models.Project.fetch().get(id=project_id)
-    except:  # noqa
+    except Exception:  # pragma: nocover noqa
         pass
 
 

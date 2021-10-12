@@ -7,12 +7,59 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-08-17 12:33:33 CEST
 """
 
-import django.core.mail
 import pytest
+
+from model_bakery import baker
+
+import django.core.mail
+from django import forms
 from django.conf import settings
 from django.urls import reverse
+from django.contrib.auth import models as auth
+from django.db.utils import IntegrityError
 from pytest_django.asserts import assertRedirects
+
 from urbanvitaliz.utils import login
+
+from . import utils
+
+#
+# create new user hook for magicauth
+
+
+@pytest.mark.django_db
+def test_create_user_with_proper_email():
+    email = "new.user@example.com"
+    user = utils.create_user(email)
+    assert user.email == email
+    assert user.username == email
+
+
+@pytest.mark.django_db
+def test_create_user_fails_with_missing_email():
+    email = None
+    with pytest.raises(forms.ValidationError):
+        utils.create_user(email)
+
+
+@pytest.mark.django_db
+def test_create_user_fails_for_known_email():
+    email = "known.user@example.com"
+    baker.make(auth.User, username=email)
+    with pytest.raises(IntegrityError):
+        utils.create_user(email)
+
+
+#
+# seding message to team
+
+
+def test_user_can_access_contact_form(client):
+
+    url = reverse("home-contact") + "?next=/"
+    response = client.get(url)
+
+    assert b"<form " in response.content
 
 
 @pytest.mark.django_db

@@ -39,7 +39,7 @@ class Category(models.Model):
         verbose_name = "catégorie"
         verbose_name_plural = "catégories"
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return self.name
 
     @property
@@ -125,7 +125,7 @@ class Resource(models.Model):
         verbose_name = "ressource"
         verbose_name_plural = "ressources"
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return self.title
 
     @classmethod
@@ -189,12 +189,7 @@ class Bookmark(models.Model):
         verbose_name = "bookmark"
         verbose_name_plural = "bookmarks"
 
-    def __str__(self):
+    def __str__(self):  # pragma: nocover
         return f"{self.resource.title}"
-
-    @classmethod
-    def fetch(cls):
-        return cls.objects.filter(deleted=None)
-
 
 # eof
