@@ -50,8 +50,8 @@ class Mail(models.Model):
     html = models.TextField(default="")
     deadline = models.DateField()
 
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.PositiveIntegerField(default=0)
     related = GenericForeignKey("content_type", "object_id")
 
     origin = models.IntegerField(choices=ORIGIN_CHOICES, default=0)

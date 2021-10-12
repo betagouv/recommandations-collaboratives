@@ -7,15 +7,19 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
-import django.contrib.auth.models as auth_models
+import datetime
+
+from django.db.models import Count, F
 import django.core.mail
-import urbanvitaliz.apps.projects.models as project_models
+from django.contrib.auth import models as auth
 from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect, render
 from django.views.generic.base import TemplateView
+
+from urbanvitaliz.apps.projects import models as projects
 
 
 class HomePageView(TemplateView):
@@ -26,19 +30,41 @@ class StatisticsView(TemplateView):
     template_name = "home/statistics.html"
 
     def get_context_data(self, **kwargs):
+        staff_emails = [user.email for user in auth.User.objects.filter(is_staff=True)]
+        the_projects = projects.Project.objects.exclude(email__in=staff_emails)
         context = super().get_context_data(**kwargs)
         context["reco_following_pc"] = 90
-        context["collectivity_supported"] = 63
-        context["collectivity_with_reco"] = 43
-        context["collectivity_avg_reco"] = 5
-        context["created_on"] = "Octobre 2011"
-        context["updated_on"] = "05/10/2021"
-        context["new_col_per_month"] = (
-            ("Septembre", 12),
-            ("Octobre", 48),
+        context["collectivity_supported"] = projects.count()
+        context["collectivity_with_reco"] = (
+            projects.Task.objects.filter(refused=False)
+            .exclude(email__in=staff_emails)
+            .order_by("project_id")
+            .values("project_id")
+            .distinct("project_id")
+            .count()
+        )
+        numbers = [
+            p.number_tasks
+            for p in the_projects.all().annotate(number_tasks=Count("task"))
+        ]
+        context["collectivity_avg_reco"] = sum(numbers) / len(numbers) if numbers else 0
+        context["created_on"] = "Octobre 2020"
+        context["updated_on"] = datetime.date.today().strftime("%d/%m/%Y")
+
+        context["new_col_per_month"] = [
+            (f"{p['month']}/{p['year']}", p["total"])
+            for p in the_projects.order_by("created_on")
+            .values(year=F("created_on__year"), month=F("created_on__month"))
+            .annotate(total=Count("id"))
+        ]
+
+        context["collectivity_geo"] = (
+            (p["latitude"], p["longitude"])
+            for p in the_projects.exclude(commune=None).values(
+                latitude=F("commune__latitude"), longitude=F("commune__longitude")
+            )
         )
 
-        context["collectivity_geo"] = (("50.3", "3.0"), ("50.3", "5.0"))
         return context
 
 
@@ -105,11 +131,11 @@ class StaffDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["projects_waiting"] = project_models.Project.objects.filter(
+        context["projects_waiting"] = projects.Project.objects.filter(
             is_draft=True
         ).count()
-        context["project_model"] = project_models.Project
-        context["user_model"] = auth_models.User
+        context["project_model"] = projects.Project
+        context["user_model"] = auth.User
         return context
 
 
