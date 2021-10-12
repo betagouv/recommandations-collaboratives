@@ -34,10 +34,10 @@ class StatisticsView(TemplateView):
         the_projects = projects.Project.objects.exclude(email__in=staff_emails)
         context = super().get_context_data(**kwargs)
         context["reco_following_pc"] = 90
-        context["collectivity_supported"] = projects.count()
+        context["collectivity_supported"] = the_projects.count()
         context["collectivity_with_reco"] = (
             projects.Task.objects.filter(refused=False)
-            .exclude(email__in=staff_emails)
+            .exclude(project__email__in=staff_emails)
             .order_by("project_id")
             .values("project_id")
             .distinct("project_id")
@@ -45,7 +45,7 @@ class StatisticsView(TemplateView):
         )
         numbers = [
             p.number_tasks
-            for p in the_projects.all().annotate(number_tasks=Count("task"))
+            for p in the_projects.all().annotate(number_tasks=Count("tasks"))
         ]
         context["collectivity_avg_reco"] = sum(numbers) / len(numbers) if numbers else 0
         context["created_on"] = "Octobre 2020"
