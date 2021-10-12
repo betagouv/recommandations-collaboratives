@@ -63,4 +63,20 @@ def create_reminder_email(
     ).save()
 
 
+def remove_reminder_email(related, recipient=None, origin=0):
+    """Remove reminder if one exist for this object [w/ given recipient, origin]"""
+    if not related:
+        return
+    content_type = ContentType.objects.get_for_model(related)
+    reminders = models.Mail.to_send.filter(
+        content_type=content_type,
+        object_id=related.id,
+    )
+    if recipient:
+        reminders = reminders.filter(recipient=recipient)
+    if origin:
+        reminders = reminders.filter(origin=origin)
+    reminders.delete()
+
+
 # eof

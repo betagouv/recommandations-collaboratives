@@ -400,6 +400,10 @@ def toggle_done_task(request, task_id):
         task.refused = False
         task.done = not task.done
         if task.done:
+            # NOTE should we remove all the reminders?
+            api.remove_reminder_email(
+                task, recipient=request.user.email, origin=api.models.Mail.STAFF
+            )
             signals.action_done.send(
                 sender=toggle_done_task,
                 task=task,
@@ -430,6 +434,7 @@ def refuse_task(request, task_id):
         task.done = False
         task.refused = True
         task.save()
+        api.remove_reminder_email(task)
         signals.action_rejected.send(
             sender=refuse_task, task=task, project=task.project, user=request.user
         )
@@ -449,6 +454,9 @@ def already_done_task(request, task_id):
         task.done = True
         task.refused = True
         task.save()
+        api.remove_reminder_email(
+            task, recipient=request.user.email, origin=api.models.Mail.STAFF
+        )
         signals.action_already_done.send(
             sender=already_done_task, task=task, project=task.project, user=request.user
         )
@@ -471,6 +479,9 @@ def update_task(request, task_id=None):
             instance.save()
             instance.project.updated_on = instance.updated_on
             instance.project.save()
+            api.remove_reminder_email(
+                task, recipient=request.user.email,  origin=api.models.Mail.STAFF
+            )
             return redirect(reverse("projects-project-detail", args=[task.project_id]))
     else:
         form = UpdateTaskForm(instance=task)
@@ -528,6 +539,7 @@ def delete_task(request, task_id=None):
     if request.method == "POST":
         task.deleted = timezone.now()
         task.save()
+        api.remove_reminder_email(task)
     next_url = reverse("projects-project-detail", args=[task.project_id])
     return redirect(next_url)
 
@@ -550,6 +562,9 @@ def remind_task(request, task_id=None):
         form = RemindTaskForm(request.POST)
         if form.is_valid():
             days = form.cleaned_data["days"]
+
+            # TODO mutualise code with create_resource_action using:
+            # create_reminder(task, recipient, origin=api.models.Mail.SELF)
 
             api.create_reminder_email(
                 request,
@@ -612,6 +627,8 @@ def create_resource_action(request, resource_id=None):
             task.resource = resource
             task.created_by = request.user
             task.save()
+            # TODO assign reminder in six weeks -- mutualise code w/ remind_task
+            # create_reminder(task, recipient, origin=api.models.Mail.STAFF)
             # cleanup the session
             del request.session["project_id"]
 
