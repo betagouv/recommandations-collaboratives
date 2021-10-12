@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load leaflet_tags %}
+{% load l10n %}
 {% load static %}
 
 {% block js %}
@@ -13,7 +14,7 @@
 <script type="text/javascript">
  function map_init (map, options) {
      {% for point in collectivity_geo %}
-     L.marker([{{point.0}}, {{point.1}}]).addTo(map);
+     L.marker([{{point.0|unlocalize}}, {{point.1|unlocalize}}]).addTo(map);
      {% endfor %}
      map.setView(new L.LatLng(47, 2.5), 5);
  }
@@ -51,7 +52,7 @@
     {% for month in new_col_per_month %}
     { 
                      "label" : "{{ month.0 }}",
-                     "value" : {{ month.1 }}
+                     "value" : {{ month.1|unlocalize }}
     } ,
     {% endfor %}
               ]
