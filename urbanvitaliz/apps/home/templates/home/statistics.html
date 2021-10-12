@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% load leaflet_tags %}
+{% load static %}
+
+{% block js %}
+{% leaflet_js %}
+
+<script src="{% static "/js/d3.min.js" %}"></script>
+<script src="{% static "/js/nv.d3.min.js" %}"></script>
+
+<!-- Leaflet -->
+<script type="text/javascript">
+ function map_init (map, options) {
+     {% for point in collectivity_geo %}
+     L.marker([{{point.0}}, {{point.1}}]).addTo(map);
+     {% endfor %}
+     map.setView(new L.LatLng(47, 2.5), 5);
+ }
+
+</script>
+
+<!-- Charts -->
+<script type="text/javascript">
+
+    nv.addGraph(function() {
+    var chart = nv.models.discreteBarChart()
+    .x(function(d) { return d.label })    //Specify the data accessors.
+    .y(function(d) { return d.value })
+    .staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
+    .tooltips(false)        //Don't show tooltips
+    .showValues(true)       //...instead, show the bar value right on top of each bar.
+    .transitionDuration(350)
+    ;
+
+    d3.select('#chart-new svg')
+    .datum(newFrichesData())
+    .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+    });
+
+    //Each bar represents a single discrete quantity.
+    function newFrichesData() {
+    return  [ 
+    {
+    key: "Nouvelles Friches",
+    values: [
+    {% for month in new_col_per_month %}
+    { 
+                     "label" : "{{ month.0 }}",
+                     "value" : {{ month.1 }}
+    } ,
+    {% endfor %}
+              ]
+         }
+     ]
+
+ }
+ </script>
+
+{% endblock %}
+
+ {% block title %}
+  | Statistiques d'impact
+ {% endblock %}
+
+{% block css %}
+{% leaflet_css %}
+{% endblock %}
+
+{% block content %}
+<div class="col-9 py-5 mx-auto">
+
+    <h2>Quel est l'impact d'UrbanVitaliz ?</h2>
+
+    <p>
+        Depuis {{ created_on }}. Mise à jour le {{ updated_on }}
+    </p>
+
+    <div class="border border-1 p-4 rounded-4 text-center text-white mb-4" style="background-color: #04466c">
+        <h2 class="mb-2">
+            <strong>{{ reco_following_pc}}%</strong><br/>des collectivités utilisatrices du service déclarent recevoir des recommandations qui les aident à avancer
+        </h2>
+        <p>
+            Notre impact est atteint lorsqu'une collectivité entreprend une action suite à l'une de nos recommandations. Les collectivités actionnent ces recommandations sous quelques semaines à quelques mois, selon leur disponibilité et leur agenda politique.
+        </p>
+    </div>
+
+    <div class="row row-cols-xl-2 row-cols-1">
+        <div class="col">
+            <div class="rounded-4 border border-1 p-4 mb-4 me-1 text-center">
+                <h4 class="fw-bold mb-2">Collectivités accompagnées</h4>
+                <p class="text-start">
+                    <ul class="text-start">
+                        <li>Total depuis lancement du service : {{collectivity_supported}}</li>
+                        <li>Qui ont déjà reçu au moins une recommandation : {{collectivity_with_reco}}</li>
+                        <li>Nombre moyen de recommandations fournies par collectivité : {{collectivity_avg_reco}}</li>
+                    </ul>
+                </p>
+                {% leaflet_map "friches" callback="window.map_init" %}
+            </div>
+        </div>
+        <div class="col h-100">
+            <div class="rounded-4 border border-1 p-4 mb-4 ms-1 text-center h-100">
+                <h4 class="fw-bold mb-2">Sollicitations de nouvelles friches</h4>
+                <div id="chart-new">
+                    <svg class="w-100"  style="min-height: 300px;">> </svg>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="rounded-4 border border-1 p-4 mb-4 me-1 text-center">
+                <h4 class="fw-bold mb-2">Exemples de blocages levés</h4>
+                <div class="row">
+                    <div class="col-6">
+                        <img src="{% static "/img/statistics/handshake.jpg" %}" alt="handshake"/>
+                        <p>
+                            Qui peut m'aider pour rédiger ou relire un dossier d'appel à projet ?
+                        </p>
+                    </div>
+                    <div class="col-6">
+                        <img src="{% static "/img/statistics/question.jpg" %}" alt="questions"/>
+                        <p>
+                            Le site de la friche a été construit illégalement. Que faire ?
+                        </p>
+                    </div>
+                    <div class="col-6">
+                        <img src="{% static "/img/statistics/support.jpg" %}" alt="support"/>
+                        <p>
+                            Je ne savais pas que cet acteur pouvait m'aider. Qui contacter ?
+                        </p>
+                    </div>
+                    <div class="col-6">
+                        <img src="{% static "/img/statistics/puzzle.jpg" %}" alt="puzzle"/>
+                        <p>
+                            Le propriétaire du site ne répond pas. Quelle stratégie adopter ?
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="rounded-4 border border-1 p-4 mb-4 ms-1 text-center">
+                <h4 class="fw-bold mb-2">Quel impact potentiel ?</h4>
+                <p class="text-start">
+                    <h5 class="fw-bolder text-start">Combien de friches en France ?</h5>
+                    <p class="text-start">
+                        Officiellement, <strong>257.000 anciens sites industriels</strong> et activités de service pouvant être à l'origine de pollution des sols.
+                        <em>(Source: BASIAS)</em>
+                    </p>
+                    <p class="text-start">
+                        Et les sites non pollués ? Les zones commerciales en déprise, les bâtiments tertiaires ou résidentiels à l'abandon, les anciennes gares... ? <strong>Au moins autant</strong>, bien qu'aucun recensement exhaustif n'existe.
+                    </p>
+                    
+                    <h5 class="fw-bolder text-start">Combien de friches réellement recyclables ?</h5>
+                    <p class="text-start">
+                        A l'instant T en métropole, nous estimons <strong class="text-decoration-underline" >à 6.500 le nombre de friches bénéficiant d'une réelle volonté politique de
+                        réhabilitation</strong>.
+                        <em>(Source : recoupage entre l'Observatoire de l'EPF Bretagne et des ratios nationaux, et les candidatures à l'AAP Recyclage foncier du Plan de Relance)</em>
+                    </p>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{% endblock %}
