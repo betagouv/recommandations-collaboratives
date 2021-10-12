@@ -32,7 +32,7 @@
     .showValues(true)       //...instead, show the bar value right on top of each bar.
     .transitionDuration(350)
     ;
-    
+
     d3.select('#chart-new svg')
     .datum(newFrichesData())
     .call(chart);
@@ -50,7 +50,7 @@
     values: [
     {% for month in new_col_per_month %}
     { 
-                     "label" : "{{ month.0 }}" , 
+                     "label" : "{{ month.0 }}",
                      "value" : {{ month.1 }}
     } ,
     {% endfor %}
@@ -63,6 +63,10 @@
 
 {% endblock %}
 
+ {% block title %}
+  | Statistiques d'impact
+ {% endblock %}
+
 {% block css %}
 {% leaflet_css %}
 {% endblock %}
@@ -73,7 +77,7 @@
     <h2>Quel est l'impact d'UrbanVitaliz ?</h2>
 
     <p>
-        Depuis Octobre 2021. Mise à jour le XX/YY/ZZZZ
+        Depuis {{ created_on }}. Mise à jour le {{ updated_on }}
     </p>
 
     <div class="border border-1 p-4 rounded-4 text-center text-white mb-4" style="background-color: #04466c">
@@ -88,7 +92,7 @@
     <div class="row row-cols-xl-2 row-cols-1">
         <div class="col">
             <div class="rounded-4 border border-1 p-4 mb-4 me-1 text-center">
-                <h4>Collectivités accompagnées</h4>
+                <h4 class="fw-bold mb-2">Collectivités accompagnées</h4>
                 <p class="text-start">
                     <ul class="text-start">
                         <li>Total depuis lancement du service : {{collectivity_supported}}</li>
@@ -101,7 +105,7 @@
         </div>
         <div class="col h-100">
             <div class="rounded-4 border border-1 p-4 mb-4 ms-1 text-center h-100">
-                <h4>Sollicitations de nouvelles friches</h4>
+                <h4 class="fw-bold mb-2">Sollicitations de nouvelles friches</h4>
                 <div id="chart-new">
                     <svg class="w-100"  style="min-height: 300px;">> </svg>
                 </div>
@@ -109,41 +113,53 @@
         </div>
         <div class="col">
             <div class="rounded-4 border border-1 p-4 mb-4 me-1 text-center">
-                <h4>Exemples de blocages levés</h4>
+                <h4 class="fw-bold mb-2">Exemples de blocages levés</h4>
                 <div class="row">
                     <div class="col-6">
-                        A
+                        <img src="{% static "/img/statistics/handshake.jpg" %}" alt="handshake"/>
+                        <p>
+                            Qui peut m'aider pour rédiger ou relire un dossier d'appel à projet ?
+                        </p>
                     </div>
                     <div class="col-6">
-                        B
+                        <img src="{% static "/img/statistics/question.jpg" %}" alt="questions"/>
+                        <p>
+                            Le site de la friche a été construit illégalement. Que faire ?
+                        </p>
                     </div>
                     <div class="col-6">
-                        C
+                        <img src="{% static "/img/statistics/support.jpg" %}" alt="support"/>
+                        <p>
+                            Je ne savais pas que cet acteur pouvait m'aider. Qui contacter ?
+                        </p>
                     </div>
                     <div class="col-6">
-                        D
+                        <img src="{% static "/img/statistics/puzzle.jpg" %}" alt="puzzle"/>
+                        <p>
+                            Le propriétaire du site ne répond pas. Quelle stratégie adopter ?
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col">
             <div class="rounded-4 border border-1 p-4 mb-4 ms-1 text-center">
-                <h4>Quel impact potentiel ?</h4>
+                <h4 class="fw-bold mb-2">Quel impact potentiel ?</h4>
                 <p class="text-start">
-                    <h5 class="text-start">Combien de friches en France ?</h5>
+                    <h5 class="fw-bolder text-start">Combien de friches en France ?</h5>
                     <p class="text-start">
-                    Officiellement, 257.000 anciens sites industriels et activités de service pouvant être à l'origine de pollution des sols.
-                        (Source: BASIAS)
+                        Officiellement, <strong>257.000 anciens sites industriels</strong> et activités de service pouvant être à l'origine de pollution des sols.
+                        <em>(Source: BASIAS)</em>
                     </p>
                     <p class="text-start">
-                        Et les sites non pollués ? Les zones commerciales en déprise, les bâtiments tertiaires ou résidentiels à l'abandon, les anciennes gares... ? Au moins autant, bien qu'aucun recensement exhaustif n'existe.
+                        Et les sites non pollués ? Les zones commerciales en déprise, les bâtiments tertiaires ou résidentiels à l'abandon, les anciennes gares... ? <strong>Au moins autant</strong>, bien qu'aucun recensement exhaustif n'existe.
                     </p>
                     
-                    <h5 class="text-start">Combien de friches réellement recyclables ?</h5>
+                    <h5 class="fw-bolder text-start">Combien de friches réellement recyclables ?</h5>
                     <p class="text-start">
-                        A l'instant T en métropole, nous estimons à 6.500 le nombre de friches bénéficiant d'une réelle volonté politique de
-                    réhabilitation.
-                        (Source : recoupage entre l'Observatoire de l'EPF Bretagne et des ratios nationaux, et les candidatures à l'AAP Recyclage foncier du Plan de Relance)
+                        A l'instant T en métropole, nous estimons <strong class="text-decoration-underline" >à 6.500 le nombre de friches bénéficiant d'une réelle volonté politique de
+                        réhabilitation</strong>.
+                        <em>(Source : recoupage entre l'Observatoire de l'EPF Bretagne et des ratios nationaux, et les candidatures à l'AAP Recyclage foncier du Plan de Relance)</em>
                     </p>
                 </p>
             </div>
