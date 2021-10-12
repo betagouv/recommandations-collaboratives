@@ -24,8 +24,7 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import (can_administrate_or_403, can_administrate_project,
-                    generate_ro_key)
+from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
 
 ########################################################################
 # notifications
@@ -557,6 +556,8 @@ def remind_task(request, task_id=None):
                 recipient,
                 subject,
                 template,
+                related=task,
+                origin=api.models.Mail.SELF,
                 delay=days,
                 extra_context={"task": task, "delay": days},
             )

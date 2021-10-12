@@ -17,8 +17,15 @@ import django.core.mail
 
 from model_bakery import baker
 
+from urbanvitaliz.apps.projects import models as projects
+
 from . import api
 from . import models
+
+
+########################################################################
+# Create reminders
+########################################################################
 
 
 @pytest.mark.django_db
@@ -28,11 +35,18 @@ def test_create_mail_reminder_using_provided_information():
     recipient = "test@example.com"
     subject = "[UV] action reminder"
     template = "reminders/test"
+    related = baker.make(projects.Task)
     delay = 14
     extra = {"notes": "some notes."}
 
     api.create_reminder_email(
-        request, recipient, subject, template, delay=delay, extra_context=extra
+        request,
+        recipient,
+        subject,
+        template,
+        related=related,
+        delay=delay,
+        extra_context=extra,
     )
 
     reminder = models.Mail.to_send.all()[0]
@@ -43,6 +57,47 @@ def test_create_mail_reminder_using_provided_information():
     assert url in reminder.text
 
     assert reminder.deadline == datetime.date.today() + datetime.timedelta(days=delay)
+
+
+@pytest.mark.django_db
+def test_create_mail_reminder_replace_existing_ones():
+    task = baker.make(projects.Task)
+    recipient = "test@example.com"
+    url = "/project/action/0/"
+    request = RequestFactory().get(url)
+    subject = "[UV] action reminder"
+    template = "reminders/test"
+    related = task
+    delay = 14
+    extra = {"notes": "some notes."}
+
+    baker.make(models.Mail, related=task, recipient=recipient)
+
+    api.create_reminder_email(
+        request,
+        recipient,
+        subject,
+        template,
+        related=related,
+        delay=delay,
+        extra_context=extra,
+    )
+
+    assert models.Mail.to_send.count() == 1
+
+    reminder = models.Mail.to_send.all()[0]
+
+    assert reminder.recipient == recipient
+    assert reminder.subject == subject
+    assert extra["notes"] in reminder.text
+    assert url in reminder.text
+
+    assert reminder.deadline == datetime.date.today() + datetime.timedelta(days=delay)
+
+
+########################################################################
+# Sending reminders
+########################################################################
 
 
 @pytest.mark.django_db

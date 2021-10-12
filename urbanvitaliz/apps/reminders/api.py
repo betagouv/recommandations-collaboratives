@@ -11,15 +11,35 @@ import datetime
 
 from django.template import loader
 
+from django.contrib.contenttypes.models import ContentType
+
 from django.contrib.sites.shortcuts import get_current_site
 
 from . import models
 
 
 def create_reminder_email(
-    request, recipient, subject, template_base_name, delay=15, extra_context=None
+    request,
+    recipient,
+    subject,
+    template_base_name,
+    related,
+    origin=0,
+    delay=15,
+    extra_context=None,
 ):
     """Prepare an email raw or html to be sent in delay days, inspired by magicauth"""
+
+    # remove existing reminders for this recipient / related
+    # NOTE should we only delete objects farther than the new deadline ?
+    # NOTE discuss about only removing reminders from the same origin
+    if not related:
+        return
+    content_type = ContentType.objects.get_for_model(related)
+    models.Mail.to_send.filter(
+        content_type=content_type, object_id=related.id, recipient=recipient
+    ).delete()
+
     html_template = template_base_name + ".html"
     text_template = template_base_name + ".txt"
 
@@ -38,6 +58,8 @@ def create_reminder_email(
         text=text_message,
         html=html_message,
         deadline=deadline,
+        related=related,
+        origin=origin,
     ).save()
 
 

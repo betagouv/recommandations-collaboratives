@@ -354,7 +354,7 @@ def test_update_project_available_for_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_update_project_and_redirect(client):
+def test_update_project_wo_commune_and_redirect(client):
     project = Recipe(models.Project).make()
     updated_on_before = project.updated_on
     url = reverse("projects-project-update", args=[project.id])
@@ -377,6 +377,19 @@ def test_update_project_and_redirect(client):
 
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertRedirects(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_update_project_with_commune(client):
+    commune = Recipe(geomatics.Commune, postal="12345").make()
+    project = Recipe(models.Project, commune=commune).make()
+    url = reverse("projects-project-update", args=[project.id])
+
+    with login(client, is_staff=True):
+        response = client.get(url)
+
+    assertContains(response, "<form")
+    assertContains(response, commune.postal)
 
 
 ########################################################################

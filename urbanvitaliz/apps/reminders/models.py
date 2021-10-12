@@ -10,6 +10,9 @@ created : 2021-09-28 12:40:54 CEST
 
 from django.db import models
 
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
 from django.utils import timezone
 
 
@@ -30,6 +33,14 @@ class SentMailManager(models.Manager):
 class Mail(models.Model):
     """Represents a mail to be sent on a given date"""
 
+    SELF = 1
+    STAFF = 2
+
+    ORIGIN_CHOICES = (
+        (SELF, "Personal"),
+        (STAFF, "Assigned"),
+    )
+
     to_send = MailManager()
     sent = SentMailManager()
 
@@ -38,6 +49,12 @@ class Mail(models.Model):
     text = models.TextField(default="")
     html = models.TextField(default="")
     deadline = models.DateField()
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    related = GenericForeignKey("content_type", "object_id")
+
+    origin = models.IntegerField(choices=ORIGIN_CHOICES, default=0)
 
     sent_on = models.DateTimeField(null=True, blank=True)
 

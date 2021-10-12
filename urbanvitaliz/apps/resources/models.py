@@ -192,4 +192,5 @@ class Bookmark(models.Model):
     def __str__(self):  # pragma: nocover
         return f"{self.resource.title}"
 
+
 # eof

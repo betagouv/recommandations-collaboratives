@@ -6,10 +6,9 @@ Models for project
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
-from datetime import date
 
-from django.contrib.auth import models as auth_models
 from django.db import models
+from django.contrib.auth import models as auth_models
 from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
@@ -97,21 +96,12 @@ class Project(models.Model):
             projects = projects.filter(emails__contains=email)
         return projects
 
-    def notes(self):
-        return Note.fetch().filter(project=self).order_by("created_on")
-
-    def tasks(self):
-        return Task.fetch().filter(project=self).order_by("deadline", "created_on")
-
 
 class NoteManager(models.Manager):
     """Manager for active tasks"""
 
     def public(self):
         return self.filter(public=True)
-
-    def private(self):
-        return self.filter(public=False)
 
 
 class Note(models.Model):
@@ -178,8 +168,8 @@ class TaskManager(models.Manager):
             .filter(deleted=None)
         )
 
-    def visited(self):
-        return self.filter(visited=True, refused=False)
+    #     def visited(self):
+    #         return self.filter(visited=True, refused=False)
 
     def proposed(self):
         return self.filter(visited=False, refused=False)
@@ -187,11 +177,11 @@ class TaskManager(models.Manager):
     def refused(self):
         return self.filter(refused=True, done=False)
 
-    def already_done(self):
-        return self.filter(refused=True, done=True)
-
-    def done(self):
-        return self.filter(visited=True, done=True, refused=False)
+    #     def already_done(self):
+    #         return self.filter(refused=True, done=True)
+    #
+    #     def done(self):
+    #         return self.filter(visited=True, done=True, refused=False)
 
     def done_or_already_done(self):
         return self.filter(done=True)
@@ -238,19 +228,19 @@ class Task(models.Model):
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
-    def tags_as_list(self):
-        """
-        Needed since django doesn't provide a split template tag
-        """
-        tags = []
-
-        words = self.tags.split(" ")
-        for word in words:
-            tag = word.strip(" ")
-            if tag != "":
-                tags.append(tag)
-
-        return tags
+    #     def tags_as_list(self):
+    #         """
+    #         Needed since django doesn't provide a split template tag
+    #         """
+    #         tags = []
+    #
+    #         words = self.tags.split(" ")
+    #         for word in words:
+    #             tag = word.strip(" ")
+    #             if tag != "":
+    #                 tags.append(tag)
+    #
+    #         return tags
 
     intent = models.CharField(
         max_length=256, blank=True, default="", verbose_name="Intention"
@@ -272,9 +262,9 @@ class Task(models.Model):
         addressbook_models.Contact, on_delete=models.CASCADE, null=True, blank=True
     )
 
-    @property
-    def is_deadline_past_due(self):
-        return date.today() > self.deadline if self.deadline else False
+    #     @property
+    #     def is_deadline_past_due(self):
+    #         return date.today() > self.deadline if self.deadline else False
 
     visited = models.BooleanField(default=False, blank=True)
     refused = models.BooleanField(default=False, blank=True)
@@ -292,10 +282,6 @@ class Task(models.Model):
 
     def get_absolute_url(self):
         return reverse("projects-project-detail", args=[self.project.id]) + "#actions"
-
-    @classmethod
-    def fetch(cls):
-        return cls.objects.filter(deleted=None)
 
 
 class Document(models.Model):
@@ -320,10 +306,6 @@ class Document(models.Model):
 
     def __str__(self):  # pragma: nocover
         return f"Document {self.id}"
-
-    @classmethod
-    def fetch(cls):
-        return cls.objects.filter(deleted=None)
 
 
 # eof
