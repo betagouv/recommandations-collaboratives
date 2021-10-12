@@ -14,6 +14,7 @@ from . import views
 
 urlpatterns = [
     path(r"", views.HomePageView.as_view(), name="home"),
+    path(r"statistiques", views.StatisticsView.as_view(), name="statistics"),
     path(
         r"staff/dashboard", views.StaffDashboardView.as_view(), name="staff-dashboard"
     ),
