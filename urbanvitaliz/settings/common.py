@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "sass_processor",
     "markdownx",
     "tagging",
+    "leaflet",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",

@@ -22,6 +22,26 @@ class HomePageView(TemplateView):
     template_name = "home/home.html"
 
 
+class StatisticsView(TemplateView):
+    template_name = "home/statistics.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["reco_following_pc"] = 90
+        context["collectivity_supported"] = 63
+        context["collectivity_with_reco"] = 43
+        context["collectivity_avg_reco"] = 5
+        context["created_on"] = "Octobre 2011"
+        context["updated_on"] = "05/10/2021"
+        context["new_col_per_month"] = (
+            ("Septembre", 12),
+            ("Octobre", 48),
+        )
+
+        context["collectivity_geo"] = (("50.3", "3.0"), ("50.3", "5.0"))
+        return context
+
+
 def contact(request):
     """Sends an email to the team with contact info from user"""
     next_url = request.GET.get("next", "/")
