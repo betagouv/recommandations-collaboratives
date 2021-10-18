@@ -1,6 +1,7 @@
 django
 ipython
 django-markdownx
+markdown-link-attr-modifier
 django-magicauth
 django_otp
 django-tagging
