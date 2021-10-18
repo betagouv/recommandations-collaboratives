@@ -19,6 +19,8 @@
         <span class="align-middle">Mis à jour de votre avancement sur le projet {{ task.project.name }}</span>
     </h2>
 
+    <form class="form" method="POST" action=".">
+        {% csrf_token %}
     <div class="d-flex flex-column p-4 bg-light rounded rounded-4 mb-4">
         <div class="d-flex justify-content-between">
             <span class="fs-3 flex-grow-1">
@@ -33,15 +35,15 @@
             {% elif status == 4 %}vous ne trouvez plus cette action pertinente{% endif %}</span>.
                 </span>
             </span>
-        <button type="submit" class="btn btn-primary btn-lg">Confirmer</button>
+        <button type="submit" class="ms-2 btn btn-primary btn-lg">Confirmer</button>
         </div>
 
         <span class="text-secondary">Souhaitez-vous laisser un commentaire de suivi ?</span>
-        <form class="form" method="POST" action=".">
-            <textarea name="comment" style="min-height: 100px; border-color: #ccc;" class="w-100 p-2 rounded rounded-4 my-1 border" placeholder="Cette note est privée et ne sera consultée que par votre équipe et UrbanVitaliz"></textarea>
-            
-        </form>
+
+        <textarea name="comment" style="min-height: 100px; border-color: #ccc;" class="w-100 p-2 rounded rounded-4 my-1 border" placeholder="Cette note est privée et ne sera consultée que par votre équipe et UrbanVitaliz"></textarea>
+        
     </div>
+    </form>
     {% include 'projects/project/fragments/action_list_item.html' with task=task show_comments=True%}
 
 </div>

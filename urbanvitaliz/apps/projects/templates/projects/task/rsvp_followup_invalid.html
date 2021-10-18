@@ -1,0 +1,33 @@
+
+{% extends "base.html" %}
+
+{% load humanize %}
+{% load static %}
+
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+    <h2 class="mb-4">
+        <span class="align-middle">Mis à jour de votre avancement</span>
+    </h2>
+
+    <div class="d-flex flex-column p-4 bg-light rounded rounded-4 mb-4">
+        <p class="fs-3 ">
+        Désolé, mais vous avez soit déjà utilisé ce lien pour nous faire part de votre avancement
+            ou celui-ci n'est pas valide.
+        </p>
+        <p>
+            Vous pouvez nous <a class=" text-reset" href="{% url 'home-contact' %}?next=/&subject=Problème de lien">contacter en cas de problème</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
