@@ -64,6 +64,7 @@
                         {% endif %}
                     </div>
                 </div>
+
                 {% if not hide_details %}
                 <div class="task-summary">
                     {% if task.resource %}
@@ -165,6 +166,15 @@
                             <small class="text-muted">{{ task.created_on|naturalday }}</small>
                         </span>
                     </div>
+                </div>
+
+                <div class="m-2 comment mt-4">
+                    <span class="">Répondre</span>
+                    <form class="mt-2 form d-flex flex-column align-items-end" method="POST" action="{% url 'projects-followup-task' task.id %}">
+                        {% csrf_token %}
+                        <textarea name="comment" style="min-height: 100px; border-color: #ccc;" class="w-100 p-2 rounded rounded-4 my-1 border" placeholder="Votre message..."></textarea>
+                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                    </form>
                 </div>
 
                 <div class="text-secondary small mt-1">
