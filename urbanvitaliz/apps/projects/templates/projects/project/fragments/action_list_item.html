@@ -137,7 +137,7 @@
                 </span>
                 {% endif %}
 
-                {% if not hide_details %}
+                {% if not hide_details and can_administrate %}
                 <button type="button" class="align-middle text-decoration-underline btn btn-text btn-sm p-0 m-0 text-primary" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">
                     Programmer un rappel
                 </button>
@@ -145,7 +145,7 @@
 
             </div>
         </div>
-        <div id="action-{{ task.id }}-content" class="accordion-collapse {% if task.visited %}collapse{% endif %}">
+        <div id="action-{{ task.id }}-content" class="accordion-collapse {% if task.visited and not show_comments %}collapse{% endif %}">
             <div class="accordion-body">
 
                 <div class="d-flex flex-column m-2 bg-light p-4 comment">
@@ -168,6 +168,7 @@
                     </div>
                 </div>
 
+                {% if can_administrate %}
                 <div class="m-2 comment mt-4">
                     <span class="">Répondre</span>
                     <form class="mt-2 form d-flex flex-column align-items-end" method="POST" action="{% url 'projects-followup-task' task.id %}">
@@ -183,6 +184,7 @@
                     </svg>
                     <a class="align-middle text-reset" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject={{ project.name|truncatechars:10 }} : Action '{{ task.intent|truncatewords:10 }}'">J'ai une question/un problème sur cette action</a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

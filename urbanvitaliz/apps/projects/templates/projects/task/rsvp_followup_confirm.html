@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+{% load static %}
+
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <h2 class="mb-4">
+        <span class="align-middle">Mis à jour de votre avancement sur le projet {{ task.project.name }}</span>
+    </h2>
+
+    <div class="d-flex flex-column p-4 bg-light rounded rounded-4 mb-4">
+        <div class="d-flex justify-content-between">
+            <span class="fs-3 flex-grow-1">
+                <svg class="align-middle bi" width="24px" height="24px" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-right-dots-fill"/>
+                </svg>
+                <span class="align-middle">
+            Vous souhaitez nous indiquer que <span class="text-decoration-underline">
+            {% if status == 1 %}vous êtes en cours de travail sur cette action
+            {% elif status == 2 %}vous êtes bloqué·e sur cette action
+            {% elif status == 3 %}vous avez terminé cette action
+            {% elif status == 4 %}vous ne trouvez plus cette action pertinente{% endif %}</span>.
+                </span>
+            </span>
+        <button type="submit" class="btn btn-primary btn-lg">Confirmer</button>
+        </div>
+
+        <span class="text-secondary">Souhaitez-vous laisser un commentaire de suivi ?</span>
+        <form class="form" method="POST" action=".">
+            <textarea name="comment" style="min-height: 100px; border-color: #ccc;" class="w-100 p-2 rounded rounded-4 my-1 border" placeholder="Cette note est privée et ne sera consultée que par votre équipe et UrbanVitaliz"></textarea>
+            
+        </form>
+    </div>
+    {% include 'projects/project/fragments/action_list_item.html' with task=task show_comments=True%}
+
+</div>
+
+{% endblock %}

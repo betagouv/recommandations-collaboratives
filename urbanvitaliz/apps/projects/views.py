@@ -24,7 +24,8 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -647,7 +648,7 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
 
 class RsvpTaskFollowupForm(forms.Form):
 
-    comment = forms.CharField(required=False)
+    comment = forms.CharField(widget=forms.Textarea, required=False)
 
 
 ########################################################################
