@@ -90,7 +90,7 @@ urlpatterns = [
         name="projects-followup-task",
     ),
     path(
-        r"task/rsvp/<uuid:rsvp_id>/<str:action>/",
+        r"task/rsvp/<uuid:rsvp_id>/<int:status>/",
         views.rsvp_followup_task,
         name="projects-rsvp-followup-task",
     ),
