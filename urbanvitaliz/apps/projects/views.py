@@ -21,6 +21,7 @@ from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
@@ -198,6 +199,14 @@ def project_detail(request, project_id=None):
     # if user is not the owner then check for admin rights
     if request.user.email not in project.emails:
         is_staff_or_403(request.user)
+
+    try:
+        survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
+        session, created = survey_models.Session.objects.get_or_create(
+            project=project, survey=survey
+        )
+    except survey_models.Survey.DoesNotExist:
+        session = None
 
     can_administrate = can_administrate_project(project, request.user)
 
