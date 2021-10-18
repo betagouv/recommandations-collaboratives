@@ -8,7 +8,9 @@ Bonjour,
     Pour ce faire, cliquez ou copiez ce lien dans votre navigateur :
     <br/>
 
-    {{ request.scheme }}://{{ site.domain }}{% url 'magicauth-login' %}?next={{ project.get_absolute_url }}&email={{email}}
+    <a href="{{ request.scheme }}://{{ site.domain }}{% url 'magicauth-login' %}?next={{ project.get_absolute_url }}&email={{email}}">
+        {{ request.scheme }}://{{ site.domain }}{% url 'magicauth-login' %}?next={{ project.get_absolute_url }}&email={{email}}
+    </a>
 </p>
 
 <p>
