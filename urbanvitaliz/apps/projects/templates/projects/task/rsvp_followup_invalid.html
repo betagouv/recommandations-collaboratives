@@ -16,13 +16,18 @@
 
 <div class="col-11 py-5 mx-auto">
     <h2 class="mb-4">
-        <span class="align-middle">Mis à jour de votre avancement</span>
+        <span class="align-middle">Mise à jour de votre avancement</span>
     </h2>
 
     <div class="d-flex flex-column p-4 bg-light rounded rounded-4 mb-4">
         <p class="fs-3 ">
-        Désolé, mais vous avez soit déjà utilisé ce lien pour nous faire part de votre avancement
-            ou celui-ci n'est pas valide.
+            <svg class="align-middle bi" width="24px" height="24px" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#exclamation-diamond"/>
+            </svg>
+            <span class="align-middle">
+            Désolé, mais vous avez soit déjà utilisé ce lien pour nous faire part de votre avancement
+                ou celui-ci n'est pas valide.
+            </span>
         </p>
         <p>
             Vous pouvez nous <a class=" text-reset" href="{% url 'home-contact' %}?next=/&subject=Problème de lien">contacter en cas de problème</a>
