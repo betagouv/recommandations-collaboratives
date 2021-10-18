@@ -595,6 +595,22 @@ def remind_task(request, task_id=None):
     )
 
 
+@login_required
+def followup_task(request, task_id=None):
+    """Create a new followup for task"""
+    project = None
+    can_administrate_or_403(project)
+    pass
+
+
+def rsvp_followup_task(request, rsvp_id=None, action=None):
+    """Manage the user task followup from her rsvp email."""
+    rsvp = get_object_or_404(models.TaskFollowupRsvp, pk=rsvp_id)
+    if action not in []:
+        raise Http404()
+    pass
+
+
 ########################################################################
 # push resource to project
 ########################################################################

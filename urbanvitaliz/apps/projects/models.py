@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
 
+import uuid
 from django.db import models
 from django.contrib.auth import models as auth_models
 from django.urls import reverse
@@ -313,6 +314,23 @@ class TaskFollowup(models.Model):
 
     def __str__(self):  # pragma: nocover
         return f"TaskFollowup{self.id}"
+
+
+class TaskFollowupRsvp(models.Model):
+    """Task followup request sent to project owner."""
+
+    uuid = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    task = models.ForeignKey(
+        "Task", on_delete=models.CASCADE, related_name="rsvp_followups"
+    )
+    created_on = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "rsvp suivi action"
+        verbose_name_plural = "rsvp suivis actions"
+
+    def __str__(self):  # pragma: nocover
+        return f"TaskFollowupRsvp{self.uuid}"
 
 
 class Document(models.Model):
