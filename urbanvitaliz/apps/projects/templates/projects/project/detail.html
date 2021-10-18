@@ -23,7 +23,9 @@ $(document).ready(function(){
          activateTab()
          window.dispatchEvent(new Event('resize'));
      });
-});
+
+     window.dispatchEvent(new Event('resize'));
+ });
 
 // Change hash for page-reload
 $('.nav-tabs button').on('shown.bs.tab', function (e) {
@@ -85,7 +87,7 @@ function activateTab(){
                     <svg class="bi align-middle me-1" width="16" height="16">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
                     </svg>
-                    <span class="align-middle">Exploration</span>
+                    <span class="align-middle">Connaissance du site</span>
                     <span class="badge rounded-pill bg-primary text-white">{{ project.survey_session.completion|default:"0" }}%</span>
                 </button>
             </li>
