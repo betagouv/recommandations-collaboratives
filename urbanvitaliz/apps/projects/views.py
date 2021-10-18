@@ -208,7 +208,7 @@ def project_detail_from_sharing_link(request, project_ro_key):
     try:
         project = models.Project.objects.filter(ro_key=project_ro_key)[0]
     except Exception:
-        raise Http404
+        raise Http404()
 
     can_administrate = can_administrate_project(project, request.user)
 
@@ -598,17 +598,56 @@ def remind_task(request, task_id=None):
 @login_required
 def followup_task(request, task_id=None):
     """Create a new followup for task"""
-    project = None
-    can_administrate_or_403(project)
-    pass
+    task = get_object_or_404(models.Task, pk=task_id)
+    can_administrate_or_403(task.project)
+    if request.method == "POST":
+        form = TaskFollowupForm(request.POST)
+        if form.is_valid():
+            followup = form.save(commit=False)
+            # followup.status = task.status
+            followup.save()
+            signals.action_commented.send(
+                followup_task, task, task.project, request.user
+            )
+    next_url = reverse("projects-project-detail", args=[task.project.id])
+    return redirect(next_url)
 
 
-def rsvp_followup_task(request, rsvp_id=None, action=None):
+class TaskFollowupForm(forms.ModelForm):
+    """Create a new followup for a task"""
+
+    class Meta:
+        model = models.TaskFollowup
+        fields = ["comment"]
+
+
+def rsvp_followup_task(request, rsvp_id=None, status=None):
     """Manage the user task followup from her rsvp email."""
-    rsvp = get_object_or_404(models.TaskFollowupRsvp, pk=rsvp_id)
-    if action not in []:
+    try:
+        rsvp = models.TaskFollowupRsvp.objects.get(uuid=rsvp_id)
+    except models.TaskFollowupRsvp.DoesNotExist:
+        return render(request, "projects/task/rsvp_followup_invalid.html", locals())
+    task = rsvp.task
+    if status not in [1, 2, 3, 4]:
         raise Http404()
-    pass
+    if request.method == "POST":
+        form = RsvpTaskFollowupForm(request.POST)
+        if form.is_valid():
+            comment = form.cleaned_data.get("comment", "")
+            models.TaskFollowup(status=status, comment=comment)
+            rsvp.delete()  # we are done with this use only once object
+            # TODO
+            # task.status = status
+            # task.save()
+            return render(request, "projects/task/rsvp_followup_thanks.html", locals())
+    else:
+        form = RsvpTaskFollowupForm()
+    return render(request, "projects/task/rsvp_followup_confirm.html", locals())
+
+
+class RsvpTaskFollowupForm(forms.Form):
+
+    comment = forms.CharField(required=False)
 
 
 ########################################################################
@@ -694,7 +733,7 @@ def access_update(request, project_id):
                 project.save()
                 messages.success(
                     request,
-                    "Un courriel d'invitation à rejoindre le projet bien été envoyé à {0}.".format(
+                    "Un courriel d'invitation à rejoindre le projet a été envoyé à {0}.".format(
                         email
                     ),
                     extra_tags=["email"],

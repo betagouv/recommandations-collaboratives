@@ -38,6 +38,9 @@ action_rejected = django.dispatch.Signal()
 action_already_done = django.dispatch.Signal()
 action_done = django.dispatch.Signal()
 action_undone = django.dispatch.Signal()
+action_commented = django.dispatch.Signal()
+
+# TODO refactor arguements as project is know to task -> f(sender, task , user, **kwargs)
 
 
 @receiver(action_accepted)
@@ -72,3 +75,14 @@ def log_action_undone(sender, task, project, user, **kwargs):
         action.send(
             user, verb="a redémarré l'action", action_object=task, target=project
         )
+
+
+@receiver(action_commented)
+def log_action_commented(sender, task, project, user, **kwargs):
+    if not user.is_staff:
+        action.send(
+            user, verb="a commenté l'action", action_object=task, target=project
+        )
+
+
+# eof
