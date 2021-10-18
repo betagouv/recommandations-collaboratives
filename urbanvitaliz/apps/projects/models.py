@@ -203,6 +203,18 @@ class Task(models.Model):
     objects = TaskManager()
     deleted_objects = DeletedTaskManager()
 
+    INPROGRESS = 1
+    BLOCKED = 2
+    DONE = 3
+    REFUSED = 4
+
+    STATUS_CHOICES = (
+        (INPROGRESS, "en cours"),
+        (BLOCKED, "blocage"),
+        (DONE, "terminé"),
+        (REFUSED, "refusé"),
+    )
+
     project = models.ForeignKey(
         "Project", on_delete=models.CASCADE, related_name="tasks"
     )
@@ -282,6 +294,25 @@ class Task(models.Model):
 
     def get_absolute_url(self):
         return reverse("projects-project-detail", args=[self.project.id]) + "#actions"
+
+
+class TaskFollowup(models.Model):
+    """An followup on the task -- achievements and comments"""
+
+    task = models.ForeignKey("Task", on_delete=models.CASCADE, related_name="followups")
+    who = models.ForeignKey(
+        auth_models.User, on_delete=models.CASCADE, related_name="task_followups"
+    )
+    status = models.IntegerField(choices=Task.STATUS_CHOICES)
+    timestamp = models.DateTimeField(default=timezone.now)
+    comment = models.TextField(default="", blank=True)
+
+    class Meta:
+        verbose_name = "suivi action"
+        verbose_name_plural = "suivis actions"
+
+    def __str__(self):  # pragma: nocover
+        return f"TaskFollowup{self.id}"
 
 
 class Document(models.Model):

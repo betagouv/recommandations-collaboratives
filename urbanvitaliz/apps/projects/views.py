@@ -480,7 +480,7 @@ def update_task(request, task_id=None):
             instance.project.updated_on = instance.updated_on
             instance.project.save()
             api.remove_reminder_email(
-                task, recipient=request.user.email,  origin=api.models.Mail.STAFF
+                task, recipient=request.user.email, origin=api.models.Mail.STAFF
             )
             return redirect(reverse("projects-project-detail", args=[task.project_id]))
     else:
