@@ -25,12 +25,12 @@
                 {% if forloop.counter <= answers|length %}
                 <span class="rounded-3 ms-1 done flex-grow-1" style="background-color: {{ question_set.color|default:'black' }} !important;">&nbsp;</span>
                 {% else %}
+                {% if completion < 100 %}
                 <span class="rounded-3 ms-1 todo flex-grow-1">&nbsp;</span>
+                {% endif %}
                 {% endif %}
                 {% endfor %}
             </div>
-
-
 
             <h6 style="color: {{ question_set.color|default:'black' }};" class="text-uppercase fw-bolder small">
                 {% if answers %}
@@ -40,7 +40,11 @@
                 {% else %}
                 0 question
                 {% endif %}
+                {% if completion < 100 %}
                 sur {{ question_set.questions.count }}
+                {% else %}
+                sur {{ answers|length }}
+                {% endif %}
             </h6>
 
             <p class="card-text">
