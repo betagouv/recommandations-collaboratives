@@ -144,7 +144,7 @@
 
             </div>
         </div>
-        <div id="action-{{ task.id }}-content" class="accordion-collapse collapse">
+        <div id="action-{{ task.id }}-content" class="accordion-collapse {% if task.visited %}collapse{% endif %}">
             <div class="accordion-body">
 
                 <div class="d-flex flex-column m-2 bg-light p-4 comment">
