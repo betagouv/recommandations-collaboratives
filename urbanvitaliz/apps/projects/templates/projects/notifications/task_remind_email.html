@@ -1,7 +1,8 @@
 Bonjour,<br>
 
 <p>
-    Vous nous avez demandé de vous rappeler il y a {{ delay }} jours de l'action suivante :
+    {{ task.created_by.get_full_name }} vous a recommandé cette action il y a {{ delay }} jours
+    dans le cadre de votre projet "{{ task.project.name }}" :
 </p>
 
 <p>
@@ -13,15 +14,31 @@ Bonjour,<br>
 </p>
 
 <p>
-    Cette action va vous permettre d'avancer sur votre projet {{ task.project.name }}.
+    Où en êtes-vous depuis que vous avez pris connaissance de cette proposition d'action ?
+</p>
+
+<p>
+    <ul>
+        <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 1 %}">C'est fait !</a></li>
+        <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 2 %}">C'est en cours</a></li>
+        <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 3 %}">Je rencontre un blocage sur cette action</a></li>
+        <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 4 %}">Me le rappeler plus tard</a></li>
+        <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 5 %}">Finalement, ça ne m'intéresse pas</a></li>
+    </ul>
 </p>
 
 <p>
     Vous pouvez retrouver cette action en cliquant ou en copiant le lien ci dessous :<br>
-    {{ request.scheme }}://{{ site.domain }}{{ task.project.get_absolute_url }}#action-{{ task.pk }}
+    <a href="{{ request.scheme }}://{{ site.domain }}{{ task.project.get_absolute_url }}#action-{{ task.pk }}">
+        {{ request.scheme }}://{{ site.domain }}{{ task.project.get_absolute_url }}#action-{{ task.pk }}
+    </a>
 </p>
 
-Bonne journée,<br>
+<p>
+    Envie de nous reparler ? Demandez-le nous via <a href="{{ request.scheme }}://{{ site.domain }}{% url 'home-contact' %}">notre page contact</a>
+</p>
+
+A bientôt,<br>
 
 L'équipe UrbanVitaliz
 
