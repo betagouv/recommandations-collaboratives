@@ -10,12 +10,14 @@ created : 2021-05-26 13:33:11 CEST
 import uuid
 
 from django.contrib.auth import models as auth_models
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
+from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 
 from .utils import generate_ro_key
@@ -291,6 +293,8 @@ class Task(models.Model):
     done = models.BooleanField(default=False, blank=True)
 
     deleted = models.DateTimeField(null=True, blank=True)
+
+    reminders = GenericRelation(reminders_models.Mail, related_query_name="tasks")
 
     class Meta:
         ordering = []
