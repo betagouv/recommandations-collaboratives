@@ -557,7 +557,7 @@ def delete_task(request, task_id=None):
 class RemindTaskForm(forms.Form):
     """Remind task after X days"""
 
-    days = forms.IntegerField(min_value=0, required=True)
+    days = forms.IntegerField(min_value=0, required=False, initial=42)
 
 
 @login_required
@@ -565,16 +565,22 @@ def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, pk=task_id)
     recipient = request.user.email
-    subject = f"[UrbanVitaliz] Rappel action sur {task.project.name}"
+    subject = f'[UrbanVitaliz] Où en êtes vous suite à nos recommandations pour le site "{task.project.name}"'
     template = "projects/notifications/task_remind_email"
 
     if request.method == "POST":
         form = RemindTaskForm(request.POST)
         if form.is_valid():
-            days = form.cleaned_data["days"]
+            days = form.cleaned_data.get("days")
+            days = days or 6 * 7  # 6 weeks is default
 
             # TODO mutualise code with create_resource_action using:
             # create_reminder(task, recipient, origin=api.models.Mail.SELF)
+
+            rsvp, created = models.TaskFollowupRsvp.objects.get_or_create(task=task)
+            if not created:
+                rsvp.created_on = timezone.now()
+                rsvp.save()
 
             api.create_reminder_email(
                 request,
@@ -584,7 +590,7 @@ def remind_task(request, task_id=None):
                 related=task,
                 origin=api.models.Mail.SELF,
                 delay=days,
-                extra_context={"task": task, "delay": days},
+                extra_context={"task": task, "delay": days, "rsvp": rsvp},
             )
 
             signals.reminder_created.send(
