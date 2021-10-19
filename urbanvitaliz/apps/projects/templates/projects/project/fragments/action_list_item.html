@@ -153,6 +153,7 @@
         <div id="action-{{ task.id }}-content" class="accordion-collapse {% if task.visited and not show_comments %}collapse{% endif %}">
             <div class="accordion-body">
 
+                <!-- Comments -->
                 <div class="d-flex flex-column m-2 bg-light p-4 comment">
                     <p class="m-0 p-0">
                         {{ task.content_rendered|safe }}
@@ -172,6 +173,26 @@
                         </span>
                     </div>
                 </div>
+
+                <!-- Followups -->
+                {% for followup in task.followups.all %}
+                <div class="d-flex flex-column m-2 p-2 comment small"> 
+                    <span class="align-middle" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ followup.who.get_full_name|default:followup.who.email }}">
+                        <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left-right"/>
+                        </svg>
+                        &nbsp;
+                            <span class="align-middle text-secondary">
+                                Action indiquée comme <strong>{{ followup.status_txt }}</strong>
+                            </span>
+                            <span class="align-middle">&#8212;&nbsp;</span>
+                            <small class="align-middle text-muted">{{ followup.timestamp|naturalday }}</small>
+                        </span>
+                        <p class="m-0 p-0">
+                            <q>&nbsp;{{ followup.comment|safe }}&nbsp;</q>
+                        </p>
+                </div>
+                {% endfor %}
 
                 {% if can_administrate %}
                 <div class="m-2 comment mt-4">
