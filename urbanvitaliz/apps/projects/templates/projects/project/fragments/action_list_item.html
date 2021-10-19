@@ -142,11 +142,11 @@
                     <svg class="align-middle bi" width="14px" height="14px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
                     </svg>
-                    {% if task.has_reminder %}
-                    <span class="text-secondary align-middle small">Rappel le X/Y/Z</span>
+                    {% if task.reminders.count %}
+                    <span class="text-secondary align-middle small">Rappel le {{ task.reminders.all.0.deadline }}</span>
                     {% endif %}
                     <a href="javascript:null;" class="align-middle text-decoration-underline small btn btn-text btn-sm p-0 m-0 text-primary" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">
-                        {% if not task.has_reminder %}
+                        {% if not task.reminders.count %}
                         Programmer un rappel
                         {% else %}
                         Changer
