@@ -8,8 +8,9 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import uuid
-from django.db import models
+
 from django.contrib.auth import models as auth_models
+from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
@@ -305,6 +306,16 @@ class TaskFollowup(models.Model):
         auth_models.User, on_delete=models.CASCADE, related_name="task_followups"
     )
     status = models.IntegerField(choices=Task.STATUS_CHOICES)
+
+    @property
+    def status_txt(self):
+        return {
+            Task.INPROGRESS: "en cours",
+            Task.BLOCKED: "bloquée",
+            Task.DONE: "terminée",
+            Task.REFUSED: "rejetée",
+        }[self.status]
+
     timestamp = models.DateTimeField(default=timezone.now)
     comment = models.TextField(default="", blank=True)
 
