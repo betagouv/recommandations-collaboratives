@@ -46,6 +46,12 @@ class Project(models.Model):
     def full_name(self):
         return " ".join([self.first_name, self.last_name])
 
+    @property
+    def has_blocked_action(self):
+        # return self.tasks.filter(status=Task.BLOCKED).count() > 0
+        # XXX Uncomment me once status is written
+        return False
+
     is_draft = models.BooleanField(default=True, blank=True)
 
     org_name = models.CharField(
