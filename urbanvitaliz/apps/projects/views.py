@@ -21,10 +21,12 @@ from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -197,6 +199,14 @@ def project_detail(request, project_id=None):
     # if user is not the owner then check for admin rights
     if request.user.email not in project.emails:
         is_staff_or_403(request.user)
+
+    try:
+        survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
+        session, created = survey_models.Session.objects.get_or_create(
+            project=project, survey=survey
+        )
+    except survey_models.Survey.DoesNotExist:
+        session = None
 
     can_administrate = can_administrate_project(project, request.user)
 
@@ -547,7 +557,7 @@ def delete_task(request, task_id=None):
 class RemindTaskForm(forms.Form):
     """Remind task after X days"""
 
-    days = forms.IntegerField(min_value=0, required=True)
+    days = forms.IntegerField(min_value=0, required=False, initial=42)
 
 
 @login_required
@@ -559,7 +569,8 @@ def remind_task(request, task_id=None):
     if request.method == "POST":
         form = RemindTaskForm(request.POST)
         if form.is_valid():
-            days = form.cleaned_data["days"]
+            days = form.cleaned_data.get("days")
+            days = days or 6 * 7  # 6 weeks is default
 
             create_reminder(request, days, task, recipient, origin=api.models.Mail.SELF)
 
@@ -575,8 +586,12 @@ def remind_task(request, task_id=None):
 
 
 def create_reminder(request, days, task, recipient, origin):
-    subject = f"[UrbanVitaliz] Rappel action sur {task.project.name}"
+    subject = f'[UrbanVitaliz] Où en êtes vous suite à nos recommandations pour le site "{task.project.name}"'
     template = "projects/notifications/task_remind_email"
+    rsvp, created = models.TaskFollowupRsvp.objects.get_or_create(task=task)
+    if not created:
+        rsvp.created_on = timezone.now()
+        rsvp.save()
     api.create_reminder_email(
         request,
         recipient,
@@ -585,7 +600,7 @@ def create_reminder(request, days, task, recipient, origin):
         related=task,
         origin=origin,
         delay=days,
-        extra_context={"task": task, "delay": days},
+        extra_context={"task": task, "delay": days, "rsvp": rsvp},
     )
     signals.reminder_created.send(
         sender=models.Project, task=task, project=task.project, user=request.user
@@ -644,7 +659,7 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
 
 class RsvpTaskFollowupForm(forms.Form):
 
-    comment = forms.CharField(required=False)
+    comment = forms.CharField(widget=forms.Textarea, required=False)
 
 
 ########################################################################

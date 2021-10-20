@@ -14,15 +14,14 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
 
-from . import models
-from . import views
-
+from . import models, views
 from .templatetags import projects_extra
 
 # TODO when local authority can see & update her project
@@ -845,6 +844,7 @@ def test_create_reminder_for_task(client):
         response = client.post(url, data=data)
     assert response.status_code == 302
     reminder = reminders.Mail.to_send.all()[0]
+    assert models.TaskFollowupRsvp.objects.count() == 1
     assert reminder.recipient == user.email
     in_fifteen_days = datetime.date.today() + datetime.timedelta(days=data["days"])
     assert reminder.deadline == in_fifteen_days
@@ -857,7 +857,25 @@ def test_create_reminder_without_delay_for_task(client):
     with login(client):
         response = client.post(url)
     assert response.status_code == 302
-    assert reminders.Mail.to_send.count() == 0
+    assert reminders.Mail.to_send.count() == 1
+    assert models.TaskFollowupRsvp.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_recreate_reminder_for_same_task(client):
+    task = Recipe(models.Task).make()
+    url = reverse("projects-remind-task", args=[task.id])
+    data = {"days": 5}
+    data2 = {"days": 10}
+    with login(client):
+        response = client.post(url, data=data)
+        response = client.post(url, data=data2)
+
+    assert response.status_code == 302
+    reminder = reminders.Mail.to_send.all()[0]
+    in_ten_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
+    assert reminder.deadline == in_ten_days
+    assert models.TaskFollowupRsvp.objects.count() == 1
 
 
 ########################################################################

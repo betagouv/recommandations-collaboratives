@@ -40,6 +40,16 @@ class TaskAdmin(admin.ModelAdmin):
         return o.project.name
 
 
+@admin.register(models.TaskFollowup)
+class TaskFollowupAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.TaskFollowupRsvp)
+class TaskFollowupRsvpAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(models.Document)
 class DocumentAdmin(admin.ModelAdmin):
     search_fields = ["description", "the_file"]
