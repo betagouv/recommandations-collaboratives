@@ -555,34 +555,13 @@ def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, pk=task_id)
     recipient = request.user.email
-    subject = f"[UrbanVitaliz] Rappel action sur {task.project.name}"
-    template = "projects/notifications/task_remind_email"
 
     if request.method == "POST":
         form = RemindTaskForm(request.POST)
         if form.is_valid():
             days = form.cleaned_data["days"]
 
-            # TODO mutualise code with create_resource_action using:
-            # create_reminder(task, recipient, origin=api.models.Mail.SELF)
-
-            api.create_reminder_email(
-                request,
-                recipient,
-                subject,
-                template,
-                related=task,
-                origin=api.models.Mail.SELF,
-                delay=days,
-                extra_context={"task": task, "delay": days},
-            )
-
-            signals.reminder_created.send(
-                sender=models.Project,
-                task=task,
-                project=task.project,
-                user=request.user,
-            )
+            create_reminder(request, days, task, recipient, origin=api.models.Mail.SELF)
 
             messages.success(
                 request, "Une alarme a bien été programmée dans {0} jours.".format(days)
@@ -592,6 +571,24 @@ def remind_task(request, task_id=None):
 
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+    )
+
+
+def create_reminder(request, days, task, recipient, origin):
+    subject = f"[UrbanVitaliz] Rappel action sur {task.project.name}"
+    template = "projects/notifications/task_remind_email"
+    api.create_reminder_email(
+        request,
+        recipient,
+        subject,
+        template,
+        related=task,
+        origin=origin,
+        delay=days,
+        extra_context={"task": task, "delay": days},
+    )
+    signals.reminder_created.send(
+        sender=models.Project, task=task, project=task.project, user=request.user
     )
 
 
@@ -682,8 +679,10 @@ def create_resource_action(request, resource_id=None):
             task.resource = resource
             task.created_by = request.user
             task.save()
-            # TODO assign reminder in six weeks -- mutualise code w/ remind_task
-            # create_reminder(task, recipient, origin=api.models.Mail.STAFF)
+            # assign reminder in six weeks
+            create_reminder(
+                request, 42, task, project.email, origin=api.models.Mail.STAFF
+            )
             # cleanup the session
             del request.session["project_id"]
 
