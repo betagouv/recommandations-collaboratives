@@ -6,26 +6,6 @@
 <div class="row">
 
 
-    {% if not session %}
-    <p class="mb-3 text-secondary">
-        L' <strong><em>Exploration</em></strong> permet de regrouper les informations nécessaires à l'étude de votre dossier.
-    </p>
-
-
-    <div class="bd-callout bd-callout-warning text-white position-relative" style="border-radius: 10px; background: #5DC2B0;">
-                    <div class="d-flex justify-content-between w-100">
-                        <h4 class="text-left flex-grow">
-                            <img src="{% static 'projects/img/analyzing.gif' %}" width="50px">&nbsp;
-                            Démarrer l'exploration !
-                        </h4>
-
-                        <a href="{% url 'survey-project-session' project.id %}" class="text-white fw-bolder text-decoration-none stretched-link">
-                            <span class="align-middle">Démarrer</span><span class="fs-2 align-middle"> &#8594;</span>
-                        </a>
-                    </div>
-    </div>
-    {% else %}
-
     {% if can_administrate %}
     {% if project.survey_session and project.survey_session.next_question %}
     <div class="box-heading d-flex justify-content-between mb-4 mt-4">
@@ -35,7 +15,15 @@
             La <strong>pertinence de nos recommandations</strong> est liée à la connaissance que nous avons de votre site.
         </div>
         <div class="flex-shrink-1">
-            <a href="{% url 'survey-session-start' project.survey_session.id %}" class="btn btn-primary fw-bold p-2 m-4">Continuer le questionnaire</a>
+            {% if project.survey_session.completion > 0 %}
+            <a href="{% url 'survey-session-start' project.survey_session.id %}" class="btn btn-primary fw-bold p-2 m-4">
+                <span class="align-middle">Continuer le questionnaire</span><span class="align-middle"> &#8594;</span>
+            </a>
+            {% else %}
+            <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary fw-bold p-2 m-4">
+                <span class="align-middle">Démarrer le questionnaire</span><span class="align-middle"> &#8594;</span>
+            </a>
+            {% endif %}
         </div>
     </div>
     {% endif %}
@@ -62,6 +50,6 @@
         {% endfor %}
 
     </div>
-    {% endif %}
+
 </div>
 {% endblock %}

@@ -58,7 +58,11 @@
                         {% if project.is_draft %}
                         Nouveau
                         {% else %}
+                        {% if project.has_blocked_action %}
+                        <span class="text-danger">Bloqué</span>
+                        {% else %}
                         Validé
+                        {% endif %}
                         {% endif %}
                     </td>
                     <td>

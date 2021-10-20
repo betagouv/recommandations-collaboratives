@@ -163,6 +163,20 @@ MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "projects-local-authority"
 MAGICAUTH_EMAIL_UNKNOWN_CALLBACK = "urbanvitaliz.apps.home.utils.create_user"
 MAGICAUTH_TOKEN_DURATION_SECONDS = 60 * 30
 
+# MARKDOWNX
+MARKDOWNX_MARKDOWN_EXTENSIONS = [
+    "markdown.extensions.extra",
+    "markdown_link_attr_modifier",
+]
+
+MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
+    "markdown_link_attr_modifier": {
+        "new_tab": "on",
+        "no_referrer": "external_only",
+        "auto_title": "on",
+    },
+}
+
 # Tagging
 FORCE_LOWERCASE_TAGS = True
 

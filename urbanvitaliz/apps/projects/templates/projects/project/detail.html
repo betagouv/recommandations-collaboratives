@@ -23,7 +23,9 @@ $(document).ready(function(){
          activateTab()
          window.dispatchEvent(new Event('resize'));
      });
-});
+
+     window.dispatchEvent(new Event('resize'));
+ });
 
 // Change hash for page-reload
 $('.nav-tabs button').on('shown.bs.tab', function (e) {
@@ -85,7 +87,7 @@ function activateTab(){
                     <svg class="bi align-middle me-1" width="16" height="16">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
                     </svg>
-                    <span class="align-middle">Exploration</span>
+                    <span class="align-middle">Connaissance du site</span>
                     <span class="badge rounded-pill bg-primary text-white">{{ project.survey_session.completion|default:"0" }}%</span>
                 </button>
             </li>
@@ -187,59 +189,12 @@ function activateTab(){
                 {% endif %}
                 {% endif %}
 
-
-                
-
-                <!--
-                     <iframe width="250"
-                     height="250"
-                     frameborder="0"
-                     scrolling="no"
-                     marginheight="0"
-                     marginwidth="0"
-                     src="http://www.openstreetmap.org/export/embed.html?bbox=79.84942674636841%2C6.899900944350287%2C79.85650777816772%2C6.90436374803887&amp;layers=ND"
-                     style="border: 1px solid black">
-                     </iframe>
-                -->
-
-                <!-- Devenir
-                     <h2 class="py-3">
-                     <svg class="bi" width="32" height="32" fill="currentColor">
-                     <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#lightbulb"/>
-                     </svg>
-
-                     Devenir du site
-                     </h2>
-
-                     <p>Besoin d'inspiration ?</p>
-
-                     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                     <div class="modal-dialog modal-dialog-centered" role="document">
-                     <div class="modal-content">
-                     <div class="modal-header">
-                     <h5 class="modal-title" id="exampleModalLabel">Success!</h5>
-                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                     <span aria-hidden="true">&times;</span>
-                     </button>
-                     </div>
-                     <div class="modal-body">
-                     If you're seeing this modal after clicking the button on the page, Bootstrap's CSS and JS are both working properly.
-                     </div>
-                     <div class="modal-footer">
-                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                     <button type="button" class="btn btn-primary">Save changes</button>
-                     </div>
-                     </div>
-                     </div>
-                     </div>
-                -->
-
                 {% if project.survey_session.answers.count > 0  or project.tasks.count %}
                 <div class="bd-callout bd-callout-info position-relative mb-5">
                     <h4 class="mb-3">👋 Rebonjour !</h4>
                     {% if project.survey_session and project.survey_session.completion != 100 %}
                     <p>
-                        N'hésitez pas à continuer l'<strong>exploration de votre site</strong> en cliquant sur l'onglet "<strong>Exploration</strong>".
+                        N'hésitez pas à continuer l'<strong>exploration de votre site</strong> en cliquant sur l'onglet "<strong>Connaissance du site</strong>".
                     </p>
                     {% endif %}
 

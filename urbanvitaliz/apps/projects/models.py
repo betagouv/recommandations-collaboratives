@@ -8,13 +8,16 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import uuid
-from django.db import models
+
 from django.contrib.auth import models as auth_models
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
+from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 
 from .utils import generate_ro_key
@@ -44,6 +47,12 @@ class Project(models.Model):
     @property
     def full_name(self):
         return " ".join([self.first_name, self.last_name])
+
+    @property
+    def has_blocked_action(self):
+        # return self.tasks.filter(status=Task.BLOCKED).count() > 0
+        # XXX Uncomment me once status is written
+        return False
 
     is_draft = models.BooleanField(default=True, blank=True)
 
@@ -285,6 +294,8 @@ class Task(models.Model):
 
     deleted = models.DateTimeField(null=True, blank=True)
 
+    reminders = GenericRelation(reminders_models.Mail, related_query_name="tasks")
+
     class Meta:
         ordering = []
         verbose_name = "action"
@@ -305,6 +316,16 @@ class TaskFollowup(models.Model):
         auth_models.User, on_delete=models.CASCADE, related_name="task_followups"
     )
     status = models.IntegerField(choices=Task.STATUS_CHOICES)
+
+    @property
+    def status_txt(self):
+        return {
+            Task.INPROGRESS: "en cours",
+            Task.BLOCKED: "bloquée",
+            Task.DONE: "terminée",
+            Task.REFUSED: "rejetée",
+        }[self.status]
+
     timestamp = models.DateTimeField(default=timezone.now)
     comment = models.TextField(default="", blank=True)
 

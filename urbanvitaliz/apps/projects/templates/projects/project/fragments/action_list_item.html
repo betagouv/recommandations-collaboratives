@@ -137,17 +137,30 @@
                 </span>
                 {% endif %}
 
-                {% if not hide_details %}
-                <button type="button" class="align-middle text-decoration-underline btn btn-text btn-sm p-0 m-0 text-primary" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">
-                    Programmer un rappel
-                </button>
+                {% if not hide_details and can_administrate %}
+                <span class="align-middle p-1">
+                    <svg class="align-middle bi" width="14px" height="14px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
+                    </svg>
+                    {% if task.reminders.count %}
+                    <span class="text-secondary align-middle small">Rappel le {{ task.reminders.all.0.deadline }}</span>
+                    {% endif %}
+                    <a href="javascript:null;" class="align-middle text-decoration-underline small btn btn-text btn-sm p-0 m-0 text-primary" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">
+                        {% if not task.reminders.count %}
+                        Programmer un rappel
+                        {% else %}
+                        Changer
+                        {% endif %}
+                    </a>
+                </span>
                 {% endif %}
 
             </div>
         </div>
-        <div id="action-{{ task.id }}-content" class="accordion-collapse {% if task.visited %}collapse{% endif %}">
+        <div id="action-{{ task.id }}-content" class="accordion-collapse {% if task.visited and not show_comments %}collapse{% endif %}">
             <div class="accordion-body">
 
+                <!-- Comments -->
                 <div class="d-flex flex-column m-2 bg-light p-4 comment">
                     <p class="m-0 p-0">
                         {{ task.content_rendered|safe }}
@@ -168,6 +181,27 @@
                     </div>
                 </div>
 
+                <!-- Followups -->
+                {% for followup in task.followups.all %}
+                <div class="d-flex flex-column m-2 p-2 comment small"> 
+                    <span class="align-middle" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ followup.who.get_full_name|default:followup.who.email }}">
+                        <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left-right"/>
+                        </svg>
+                        &nbsp;
+                            <span class="align-middle text-secondary">
+                                Action indiquée comme <strong>{{ followup.status_txt }}</strong>
+                            </span>
+                            <span class="align-middle">&#8212;&nbsp;</span>
+                            <small class="align-middle text-muted">{{ followup.timestamp|naturalday }}</small>
+                        </span>
+                        <p class="m-0 p-0">
+                            <q>&nbsp;{{ followup.comment|safe }}&nbsp;</q>
+                        </p>
+                </div>
+                {% endfor %}
+
+                {% if can_administrate %}
                 <div class="m-2 comment mt-4">
                     <span class="">Répondre</span>
                     <form class="mt-2 form d-flex flex-column align-items-end" method="POST" action="{% url 'projects-followup-task' task.id %}">
@@ -183,6 +217,7 @@
                     </svg>
                     <a class="align-middle text-reset" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject={{ project.name|truncatechars:10 }} : Action '{{ task.intent|truncatewords:10 }}'">J'ai une question/un problème sur cette action</a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
