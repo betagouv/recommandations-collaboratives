@@ -610,7 +610,7 @@ def create_reminder(request, days, task, recipient, origin):
 def followup_task(request, task_id=None):
     """Create a new followup for task"""
     task = get_object_or_404(models.Task, pk=task_id)
-    can_administrate_or_403(task.project)
+    can_administrate_or_403(task.project, request.user)
     if request.method == "POST":
         form = TaskFollowupForm(request.POST)
         if form.is_valid():
