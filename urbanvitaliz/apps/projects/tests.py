@@ -6,6 +6,8 @@ Tests for project application
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
+
+import uuid
 import datetime
 
 import django.core.mail
@@ -882,6 +884,9 @@ def test_recreate_reminder_for_same_task(client):
 # task followup
 ########################################################################
 
+#
+# simple followup
+
 
 @pytest.mark.django_db
 def test_user_cannot_followup_on_non_existant_task(client):
@@ -924,6 +929,62 @@ def test_user_is_redirected_after_followup_on_task(client):
         response = client.post(url)
     assert response.status_code == 302
     assert response.url == reverse("projects-project-detail", args=[task.project.id])
+
+
+#
+# rsvp followup
+
+
+@pytest.mark.django_db
+def test_user_cannot_followup_on_non_existant_rsvp(client):
+    bad_uuid = uuid.uuid4()
+    url = reverse(
+        "projects-rsvp-followup-task", args=[bad_uuid, models.Task.INPROGRESS]
+    )
+    with login(client):
+        response = client.post(url)
+    assert response.status_code == 200
+    assertContains(response, "pas valide")
+
+
+@pytest.mark.django_db
+def test_user_cannot_followup_on_rsvp_with_bad_status(client):
+    rsvp = baker.make(models.TaskFollowupRsvp)
+    with login(client):
+        url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, 0])
+        response = client.post(url)
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_user_can_followup_on_rsvp_using_mail_link(client):
+    status = models.Task.INPROGRESS
+    with login(client) as user:
+        project = baker.make(models.Project, is_draft=False, email=user.email)
+        task = baker.make(models.Task, project=project)
+        rsvp = baker.make(models.TaskFollowupRsvp, task=task)
+        url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
+        response = client.get(url)
+    assert response.status_code == 200
+    assertContains(response, '<form id="form-rsvp-followup-confirm"')
+
+
+@pytest.mark.django_db
+def test_user_can_followup_on_rsvp(client):
+    data = dict(comment="some comment")
+    status = models.Task.INPROGRESS
+    with login(client) as user:
+        project = baker.make(models.Project, is_draft=False, email=user.email)
+        task = baker.make(models.Task, project=project)
+        rsvp = baker.make(models.TaskFollowupRsvp, task=task)
+        url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
+        response = client.post(url, data=data)
+    assert models.TaskFollowupRsvp.objects.filter(uuid=rsvp.uuid).count() == 0
+    followup = models.TaskFollowup.objects.all()[0]
+    assert followup.task == task
+    assert followup.status == status
+    assert followup.comment == data["comment"]
+    assert followup.who == user
 
 
 ########################################################################
