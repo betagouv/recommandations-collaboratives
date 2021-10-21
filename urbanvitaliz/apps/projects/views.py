@@ -616,6 +616,7 @@ def followup_task(request, task_id=None):
         if form.is_valid():
             followup = form.save(commit=False)
             # followup.status = task.status
+            followup.status = 0
             followup.save()
             signals.action_commented.send(
                 followup_task, task, task.project, request.user
