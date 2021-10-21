@@ -14,6 +14,7 @@ from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery.recipe import Recipe
+from model_bakery import baker
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
@@ -875,6 +876,54 @@ def test_recreate_reminder_for_same_task(client):
     in_ten_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
     assert reminder.deadline == in_ten_days
     assert models.TaskFollowupRsvp.objects.count() == 1
+
+
+########################################################################
+# task followup
+########################################################################
+
+
+@pytest.mark.django_db
+def test_user_cannot_followup_on_non_existant_task(client):
+    url = reverse("projects-followup-task", args=[0])
+    with login(client):
+        response = client.post(url)
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_user_cannot_followup_on_someone_else_task(client):
+    task = baker.make(models.Task)
+    with login(client):
+        url = reverse("projects-followup-task", args=[task.id])
+        response = client.post(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_user_can_followup_on_personal_task(client):
+    data = dict(comment="some comment")
+    with login(client) as user:
+        project = baker.make(models.Project, is_draft=False, email=user.email)
+        task = baker.make(models.Task, project=project)
+        url = reverse("projects-followup-task", args=[task.id])
+        response = client.post(url, data=data)
+    followup = models.TaskFollowup.objects.all()[0]
+    assert followup.task == task
+    assert followup.status == 0  # to be replaced by task status
+    assert followup.comment == data["comment"]
+    assert followup.who == user
+
+
+@pytest.mark.django_db
+def test_user_is_redirected_after_followup_on_task(client):
+    with login(client) as user:
+        project = baker.make(models.Project, is_draft=False, email=user.email)
+        task = baker.make(models.Task, project=project)
+        url = reverse("projects-followup-task", args=[task.id])
+        response = client.post(url)
+    assert response.status_code == 302
+    assert response.url == reverse("projects-project-detail", args=[task.project.id])
 
 
 ########################################################################
