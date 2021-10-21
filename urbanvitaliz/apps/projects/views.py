@@ -615,11 +615,13 @@ def followup_task(request, task_id=None):
         form = TaskFollowupForm(request.POST)
         if form.is_valid():
             followup = form.save(commit=False)
+            followup.task = task
+            followup.who = request.user
             # followup.status = task.status
             followup.status = 0
             followup.save()
             signals.action_commented.send(
-                followup_task, task, task.project, request.user
+                sender=followup_task, task=task, project=task.project, user=request.user
             )
     next_url = reverse("projects-project-detail", args=[task.project.id])
     return redirect(next_url)
