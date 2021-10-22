@@ -324,7 +324,7 @@ class TaskFollowup(models.Model):
             Task.BLOCKED: "bloquée",
             Task.DONE: "terminée",
             Task.REFUSED: "rejetée",
-        }[self.status]
+        }.get(self.status, "?")
 
     timestamp = models.DateTimeField(default=timezone.now)
     comment = models.TextField(default="", blank=True)
