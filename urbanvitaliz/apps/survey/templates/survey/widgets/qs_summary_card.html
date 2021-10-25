@@ -37,12 +37,10 @@
 
                 {% if answers %}
                 {% with answers|length as answers_count %}
-                {{ answers_count }} question{{ answers_count|pluralize }}
+                {{ answers_count }} question{{ answers_count|pluralize }} sur {{ question_set.questions.count }}
                 {% endwith %}
-                {% elif answers_count == 0 %} 0 question
-                {% if completion < 100 %}
-                sur {{ question_set.questions.count }}
-                {% endif %}
+                {% elif answers_count == 0 %}
+                0 question sur {{ question_set.questions.count }}
                 {% else %}
                 {{ question_set.questions.count }} question{{ question_set.questions.count|pluralize }}
                 {% endif %}
