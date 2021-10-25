@@ -30,7 +30,9 @@ class StatisticsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         staff_emails = [user.email for user in auth.User.objects.filter(is_staff=True)]
-        the_projects = projects.Project.objects.exclude(email__in=staff_emails)
+        the_projects = projects.Project.objects.exclude(
+            email__in=staff_emails, is_draft=True, exclude_stats=True
+        )
         context = super().get_context_data(**kwargs)
         context["reco_following_pc"] = 90
         context["collectivity_supported"] = the_projects.count()

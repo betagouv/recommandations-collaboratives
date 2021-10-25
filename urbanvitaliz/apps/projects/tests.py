@@ -7,17 +7,18 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
-import uuid
 import datetime
+import uuid
 
 import django.core.mail
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.messages import get_messages
 from django.urls import reverse
-from model_bakery.recipe import Recipe
 from model_bakery import baker
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from model_bakery.recipe import Recipe
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -447,7 +448,7 @@ def test_delete_project_and_redirect(client):
     with login(client, is_staff=True):
         response = client.post(url)
 
-    project = models.Project.objects.get(id=project.id)
+    project = models.Project.objects_deleted.get(id=project.id)
     assert project.deleted
     assert project.updated_on > updated_on_before
 
