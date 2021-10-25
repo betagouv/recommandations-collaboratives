@@ -9,6 +9,7 @@
 
 <script src="{% static "/js/d3.min.js" %}"></script>
 <script src="{% static "/js/nv.d3.min.js" %}"></script>
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
 
 <!-- Leaflet -->
 <script type="text/javascript">
@@ -16,7 +17,13 @@
      {% for point in collectivity_geo %}
      L.marker([{{point.0|unlocalize}}, {{point.1|unlocalize}}]).addTo(map);
      {% endfor %}
-     map.setView(new L.LatLng(47, 2.5), 5);
+
+     var zoom = 5;
+     map.setView(new L.LatLng(47, 2.5), zoom);
+     map.setMinZoom(zoom - 2);
+     map.setMaxZoom(zoom + 4);
+
+     map.addControl(new L.Control.Fullscreen());
  }
 
 </script>
@@ -24,52 +31,53 @@
 <!-- Charts -->
 <script type="text/javascript">
 
-    nv.addGraph(function() {
-    var chart = nv.models.discreteBarChart()
-    .x(function(d) { return d.label })    //Specify the data accessors.
-    .y(function(d) { return d.value })
-    .staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
-    .tooltips(false)        //Don't show tooltips
-    .showValues(true)       //...instead, show the bar value right on top of each bar.
-    .transitionDuration(350)
-    ;
+ nv.addGraph(function() {
+     var chart = nv.models.discreteBarChart()
+                   .x(function(d) { return d.label })    //Specify the data accessors.
+                   .y(function(d) { return d.value })
+                   .staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
+                   .tooltips(false)        //Don't show tooltips
+                   .showValues(true)       //...instead, show the bar value right on top of each bar.
+                   .transitionDuration(350)
+     ;
 
-    d3.select('#chart-new svg')
-    .datum(newFrichesData())
-    .call(chart);
+     d3.select('#chart-new svg')
+       .datum(newFrichesData())
+       .call(chart);
 
-    nv.utils.windowResize(chart.update);
+     nv.utils.windowResize(chart.update);
 
-    return chart;
-    });
+     return chart;
+ });
 
-    //Each bar represents a single discrete quantity.
-    function newFrichesData() {
-    return  [ 
-    {
-    key: "Nouvelles Friches",
-    values: [
-    {% for month in new_col_per_month %}
-    { 
+ //Each bar represents a single discrete quantity.
+ function newFrichesData() {
+     return  [ 
+         {
+             key: "Nouvelles Friches",
+             values: [
+                 {% for month in new_col_per_month %}
+                 { 
                      "label" : "{{ month.0 }}",
                      "value" : {{ month.1|unlocalize }}
-    } ,
-    {% endfor %}
-              ]
+                 } ,
+                 {% endfor %}
+             ]
          }
      ]
 
  }
- </script>
+</script>
 
 {% endblock %}
 
- {% block title %}
-  | Statistiques d'impact
- {% endblock %}
+{% block title %}
+| Statistiques d'impact
+{% endblock %}
 
 {% block css %}
 {% leaflet_css %}
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
 {% endblock %}
 
 {% block content %}
