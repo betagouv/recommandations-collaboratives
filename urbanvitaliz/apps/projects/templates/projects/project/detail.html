@@ -16,7 +16,7 @@
 
 
 <script type="text/javascript">
-$(document).ready(function(){
+ $(document).ready(function(){
      activateTab();
 
      window.addEventListener('hashchange', function() {
@@ -27,19 +27,19 @@ $(document).ready(function(){
      window.dispatchEvent(new Event('resize'));
  });
 
-// Change hash for page-reload
-$('.nav-tabs button').on('shown.bs.tab', function (e) {
+ // Change hash for page-reload
+ $('.nav-tabs button').on('shown.bs.tab', function (e) {
 
-    window.location.hash = $(e.target).data("bs-target");
-    window.scrollBy(0, 0);
-})
+     window.location.hash = $(e.target).data("bs-target");
+     window.scrollBy(0, 0);
+ })
 
-function activateTab(){
-    var url = document.location.toString();
-    if (url.match('#')) {
-        let hash = url.split('#')[1]
-        $('#' + hash + "-tab").get(0).click();
-    }
+ function activateTab(){
+     var url = document.location.toString();
+     if (url.match('#')) {
+         let hash = url.split('#')[1]
+         $('#' + hash + "-tab").get(0).click();
+     }
  };
 
 
@@ -135,8 +135,24 @@ function activateTab(){
                 </div>
                 {% endif %}
 
+                {% if project.is_draft %}
+                <div class="border  p-4 align-items-center">
+                    <div class="w-100">
+                        <p class="text-center d-flex justify-content-center flex-column">
+                            <span class="mb-2">
+                            <svg class="align-middle bi" width="28px" height="28px" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hourglass-split"/>
+                            </svg>
+                            </span>
 
-                {% if not project.tasks.count %}
+                            <span class="align-middle fs-4">Votre projet est actuellement en cours de modération par l'équipe UrbanVitaliz</span>
+                            <br/>
+                            <span class="align-middle text-secondary">Ceci signifie que certains fonctionnalités ne sont pas disponibles, tel que l'accès aux commentaires.</span>
+
+                        </p>
+                    </div>
+                </div>
+                {% elif not project.tasks.count %}
                 <div class="border  p-5 align-items-center">
                     <div class="w-100">
                         <p class="text-center">
