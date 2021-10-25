@@ -23,8 +23,25 @@ from urbanvitaliz.apps.resources import models as resources
 from .utils import generate_ro_key
 
 
+class ProjectManager(models.Manager):
+    """Manager for active projects"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
+class DeletedProjectManager(models.Manager):
+    """Manager for deleted projects"""
+
+    def get_queryset(self):
+        return super().get_queryset().exclude(deleted=None)
+
+
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
+
+    objects = ProjectManager()
+    objects_deleted = DeletedProjectManager()
 
     email = models.CharField(max_length=128)
     emails = models.JSONField(default=list)  # list of person having access to project
@@ -55,6 +72,8 @@ class Project(models.Model):
         return False
 
     is_draft = models.BooleanField(default=True, blank=True)
+
+    exclude_stats = models.BooleanField(default=False)
 
     org_name = models.CharField(
         max_length=256, blank=True, default="", verbose_name="Nom de votre structure"
