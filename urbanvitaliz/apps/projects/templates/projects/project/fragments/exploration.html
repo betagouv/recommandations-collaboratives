@@ -44,7 +44,6 @@
         {% question_set_completion session question_set as qs_completion %}
         {% if qs_completion == 0 %}
         <div class="col-12 col-xl-4 col-md-6 mb-3 p-2">
-            {{ can_administrate_draft }}
             {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set can_administrate=can_administrate_draft %}
         </div>
         {% endif %}
