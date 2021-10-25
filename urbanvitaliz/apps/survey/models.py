@@ -95,7 +95,7 @@ class QuestionManager(models.Manager):
     """Manager for active Questions"""
 
     def get_queryset(self):
-        return super().get_queryset().filter(deleted=None)
+        return super().get_queryset().order_by("-priority").filter(deleted=None)
 
 
 class Question(models.Model):
