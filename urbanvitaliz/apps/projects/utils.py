@@ -13,22 +13,20 @@ import uuid
 from django.core.exceptions import PermissionDenied
 
 
-def can_administrate_project(project, user):
+def can_administrate_project(project, user, allow_draft=False):
     """Check if user is allowed to administrate this project"""
     if user.is_anonymous:
         return False
 
     return (
-        (user.email == project.email) and project.is_draft is False  # noqa: F841
+        (user.email == project.email)
+        and ((not project.is_draft) or allow_draft)  # noqa: F841
     ) or user.is_staff
 
 
-def can_administrate_or_403(project, user):
+def can_administrate_or_403(project, user, allow_draft=False):
     """Raise a 403 error is user is not a owner or admin"""
-    if user.is_staff:
-        return True
-
-    if not project.is_draft and (user.email == project.email):
+    if can_administrate_project(project, user, allow_draft=allow_draft):
         return True
 
     raise PermissionDenied("L'information demandée n'est pas disponible")

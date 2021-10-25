@@ -25,7 +25,8 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -208,6 +209,9 @@ def project_detail(request, project_id=None):
         session = None
 
     can_administrate = can_administrate_project(project, request.user)
+    can_administrate_draft = can_administrate_project(
+        project, request.user, allow_draft=True
+    )
 
     return render(request, "projects/project/detail.html", locals())
 
@@ -381,7 +385,7 @@ def create_task(request, project_id=None):
 def visit_task(request, task_id):
     """Visit the content of a task"""
     task = get_object_or_404(models.Task, pk=task_id)
-    can_administrate_or_403(task.project, request.user)
+    can_administrate_or_403(task.project, request.user, allow_draft=True)
 
     if not task.visited and not request.user.is_staff:
         task.visited = True
