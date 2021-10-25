@@ -6,7 +6,7 @@
 <link href="{% sass_src 'survey/css/survey.scss' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
-
+{% question_set_completion session.pk question_set as completion %}
 
 <div class="survey-card card text-black rounded-3">
     <div class="card-body m-1">
@@ -33,18 +33,24 @@
             </div>
 
             <h6 style="color: {{ question_set.color|default:'black' }};" class="text-uppercase fw-bolder small">
+                {% if completion < 100 %}
+
                 {% if answers %}
                 {% with answers|length as answers_count %}
                 {{ answers_count }} question{{ answers_count|pluralize }}
                 {% endwith %}
-                {% else %}
-                0 question
-                {% endif %}
+                {% elif answers_count == 0 %} 0 question
                 {% if completion < 100 %}
                 sur {{ question_set.questions.count }}
-                {% else %}
-                sur {{ answers|length }}
                 {% endif %}
+                {% else %}
+                {{ question_set.questions.count }} question{{ question_set.questions.count|pluralize }}
+                {% endif %}
+
+                {% else %}
+                terminé
+                {% endif %}
+
             </h6>
 
             <p class="card-text">
@@ -133,7 +139,6 @@
                 </ul>
             </p>
         </div>
-        {% question_set_completion session.pk question_set as completion %}
 
         {% if can_administrate and completion < 100 %}
         <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}" class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2" style="background-color: {{ question_set.color|default:'black' }} !important;">Compléter cette section</a>
