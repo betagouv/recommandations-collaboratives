@@ -14,8 +14,10 @@
 <!-- Leaflet -->
 <script type="text/javascript">
  function map_init (map, options) {
+     var icon = L.icon({iconUrl: '{% static "img/statistics/marker.png" %}', iconSize: [18, 18]});
+
      {% for point in collectivity_geo %}
-     L.marker([{{point.0|unlocalize}}, {{point.1|unlocalize}}]).addTo(map);
+     L.marker([{{point.0|unlocalize}}, {{point.1|unlocalize}}], {icon: icon}).addTo(map);
      {% endfor %}
 
      var zoom = 5;
