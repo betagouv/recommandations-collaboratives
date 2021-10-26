@@ -114,6 +114,16 @@
                     </span>
                 </button>
             </li>
+
+            <!-- Activity -->
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab" aria-controls="activity" aria-selected="false">
+                    <svg class="bi align-middle me-1" width="16" height="16">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bar-chart-line-fill"/>
+                    </svg>
+                    <span class="align-middle">Activité</span>
+                </button>
+            </li>
         </ul>
 
 
@@ -300,6 +310,13 @@
                      </div>
                 -->
             </div>
+
+            <!-- TAB: activit -->
+            {% if user.is_staff %}
+            <div class="tab-pane pt-4" id="activity" role="tabpanel" aria-labelledby="activity">
+                {% include "projects/project/fragments/activity.html"  %}
+            </div>
+            {% endif %}
 
         </div>
     </div>
