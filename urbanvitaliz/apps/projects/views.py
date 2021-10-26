@@ -391,7 +391,7 @@ def visit_task(request, task_id):
         task.visited = True
         task.save()
 
-        signals.action_accepted.send(
+        signals.action_visited.send(
             sender=visit_task, task=task, project=task.project, user=request.user
         )
 
