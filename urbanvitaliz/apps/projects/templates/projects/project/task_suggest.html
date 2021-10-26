@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+    <h2>{{ project.name }}</h2>
+    <p class="text-secondary mb-4">Nb de recos : {{ tasks|length }}</p>
+    {% for task in tasks %}
+    <p class="mb-4">{{ task.intent }}</p>
+    {% include 'projects/project/fragments/action_list_item.html' with hide_comments=True %}
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+

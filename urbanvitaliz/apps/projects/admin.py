@@ -50,6 +50,11 @@ class TaskFollowupRsvpAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(models.TaskRecommandation)
+class TaskRecommandationAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(models.Document)
 class DocumentAdmin(admin.ModelAdmin):
     search_fields = ["description", "the_file"]

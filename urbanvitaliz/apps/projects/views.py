@@ -501,6 +501,39 @@ def update_task(request, task_id=None):
     return render(request, "projects/project/task_update.html", locals())
 
 
+@login_required
+def presuggest_task(request, project_id):
+    """Suggest tasks"""
+    is_staff_or_403(request.user)
+
+    project = get_object_or_404(models.Project, pk=project_id)
+
+    try:
+        survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
+        session, created = survey_models.Session.objects.get_or_create(
+            project=project, survey=survey
+        )
+    except survey_models.Survey.DoesNotExist:
+        session = None
+
+    session_signals = session.signals
+
+    tasks = []
+    for recommandation in models.TaskRecommandation.objects.all():
+        reco_tags = set(recommandation.condition_tags.values_list("name", flat=True))
+        if reco_tags.issubset(session_signals):
+            tasks.append(
+                models.Task(
+                    id=0,
+                    project=project,
+                    resource=recommandation.resource,
+                    intent=recommandation.text,
+                )
+            )
+
+    return render(request, "projects/project/task_suggest.html", locals())
+
+
 class CreateTaskForm(forms.ModelForm):
     """Form new project task creation"""
 
