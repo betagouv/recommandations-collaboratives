@@ -30,8 +30,8 @@ class StatisticsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         staff_emails = [user.email for user in auth.User.objects.filter(is_staff=True)]
-        the_projects = projects.Project.objects.exclude(
-            email__in=staff_emails, is_draft=True, exclude_stats=True
+        the_projects = projects.Project.objects.exclude(email__in=staff_emails).exclude(
+            is_draft=True, exclude_stats=True
         )
         context = super().get_context_data(**kwargs)
         context["reco_following_pc"] = 90
@@ -39,6 +39,10 @@ class StatisticsView(TemplateView):
         context["collectivity_with_reco"] = (
             projects.Task.objects.filter(refused=False)
             .exclude(project__email__in=staff_emails)
+            .exclude(
+                project__is_draft=True,
+                project__exclude_stats=True,
+            )
             .order_by("project_id")
             .values("project_id")
             .distinct("project_id")
