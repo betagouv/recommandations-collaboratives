@@ -4,6 +4,11 @@
 
 <div class="row">
     <div class="col col-xl-8 col-lg-10">
+        {% if user.is_staff %}
+        <p>
+            <span class="badge bg-warning">Beta feature</span> <a href="{% url 'projects-project-tasks-suggest' project.pk %}">Accès aux suggestions de Recommandations</a>
+        </p>
+        {% endif %}
 
         <!-- Actions
              <div class="w-100">

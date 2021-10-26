@@ -15,6 +15,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
+from tagging.fields import TagField
+from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
@@ -371,6 +373,20 @@ class TaskFollowupRsvp(models.Model):
 
     def __str__(self):  # pragma: nocover
         return f"TaskFollowupRsvp{self.uuid}"
+
+
+class TaskRecommandation(models.Model):
+    """Recommandation mechanisms for Tasks"""
+
+    condition = TagField(verbose_name="Condition", blank=True, null=True)
+    resource = models.ForeignKey(resources.Resource, on_delete=models.CASCADE)
+    text = models.TextField()
+
+    def __str__(self):
+        return f"{self.resource.title} - {self.text}"
+
+
+tagging_register(TaskRecommandation, tag_descriptor_attr="condition_tags")
 
 
 class Document(models.Model):
