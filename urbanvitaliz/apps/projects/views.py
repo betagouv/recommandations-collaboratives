@@ -79,7 +79,7 @@ def onboarding(request):
             impediment_kinds = form.cleaned_data.get("impediment_kinds", [])
             project.impediments = (
                 "#### Besoins : "
-                + ", ".join(impediment_kinds)
+                + " ; ".join(impediment_kinds)
                 + "\n\n"
                 + project.impediments
             )
@@ -116,11 +116,24 @@ class OnboardingForm(forms.ModelForm):
 
     impediment_kinds = forms.MultipleChoiceField(
         choices=[
-            ("Financements", "Financements"),
-            ("Retours d'expériences", "Retours d'expériences"),
-            ("Ingénierie", "Ingénierie"),
-            ("Méthodologie", "Méthodologie"),
-            ("La propriété", "La propriété"),
+            (
+                "Méthode à suivre, guidage sur les prochaines étapes et questions à se poser",
+                "Méthode à suivre, guidage sur les prochaines étapes et questions à se poser",
+            ),
+            (
+                "Définition du projet de réhabilitation",
+                "Définition du projet de réhabilitation",
+            ),
+            (
+                "Accompagnement, conseil et compétences techniques avant travaux",
+                "Accompagnement, conseil et compétences techniques avant travaux",
+            ),
+            ("Financement pour des études", "Financement pour des études"),
+            ("Financement des travaux", "Financement des travaux"),
+            (
+                "Propriété de la friche, acquisition, contact avec le propriétaire",
+                "Propriété de la friche, acquisition, contact avec le propriétaire",
+            ),
             ("Autre", "Autre (précisez en commentaire)"),
         ],
         required=True,
