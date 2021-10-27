@@ -15,7 +15,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import models as auth
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.db.models import Count, F
+from django.db.models import Count, F, Q
 from django.shortcuts import redirect, render
 from django.views.generic.base import TemplateView
 from urbanvitaliz.apps.projects import models as projects
@@ -30,18 +30,18 @@ class StatisticsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         staff_emails = [user.email for user in auth.User.objects.filter(is_staff=True)]
-        the_projects = projects.Project.objects.exclude(email__in=staff_emails).exclude(
-            is_draft=True, exclude_stats=True
+        the_projects = projects.Project.objects.exclude(
+            Q(email__in=staff_emails) | Q(is_draft=True) | Q(exclude_stats=True)
         )
         context = super().get_context_data(**kwargs)
         context["reco_following_pc"] = 90
         context["collectivity_supported"] = the_projects.count()
         context["collectivity_with_reco"] = (
             projects.Task.objects.filter(refused=False)
-            .exclude(project__email__in=staff_emails)
             .exclude(
-                project__is_draft=True,
-                project__exclude_stats=True,
+                Q(project__email__in=staff_emails)
+                | Q(project__is_draft=True)
+                | Q(project__exclude_stats=True)
             )
             .order_by("project_id")
             .values("project_id")
