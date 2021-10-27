@@ -88,7 +88,7 @@
     <h2>Quel est l'impact d'UrbanVitaliz ?</h2>
 
     <p>
-        Depuis {{ created_on }}. Mise à jour le {{ updated_on }}
+        Mis à jour en continu
     </p>
 
     <div class="border border-1 p-4 rounded-4 text-center text-white mb-4" style="background-color: #04466c">
@@ -103,12 +103,13 @@
     <div class="row row-cols-xl-2 row-cols-1">
         <div class="col">
             <div class="rounded-4 border border-1 p-4 mb-4 me-1 text-center">
-                <h4 class="fw-bold mb-2">Collectivités accompagnées</h4>
+                <h4 class="fw-bold mb-2">Sites accompagnés et actions recommandées</h4>
                 <p class="text-start">
                     <ul class="text-start">
-                        <li>Total depuis lancement du service : {{collectivity_supported}}</li>
+                        <li>Nombre de sites accompagnés : {{collectivity_supported}}</li>
                         <li>Qui ont déjà reçu au moins une recommandation : {{collectivity_with_reco}}</li>
-                        <li>Nombre moyen de recommandations fournies par collectivité : {{collectivity_avg_reco|floatformat:1}}</li>
+                        <li>Nombre moyen de recommandations par site : {{collectivity_avg_reco|floatformat:1}}</li>
+                        <li>Collectivités qui agissent dans les 3 mois : 65%</li>
                     </ul>
                 </p>
                 {% leaflet_map "friches" callback="window.map_init" %}
