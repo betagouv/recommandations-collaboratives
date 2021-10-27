@@ -62,7 +62,7 @@ def test_performing_onboarding_create_a_new_project(client):
         "location": "some place",
         "first_name": "john",
         "last_name": "doe",
-        "impediment_kinds": ["Financements", "Autre"],
+        "impediment_kinds": ["Autre"],
         "impediments": "some impediment",
     }
     response = client.post(reverse("projects-onboarding"), data=data)
@@ -86,7 +86,7 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(client):
         "location": "some place",
         "first_name": "john",
         "last_name": "doe",
-        "impediment_kinds": ["Financements", "Autre"],
+        "impediment_kinds": ["Autre"],
         "impediments": "some impediment",
     }
     response = client.post(reverse("projects-onboarding"), data=data)
@@ -111,7 +111,7 @@ def test_performing_onboarding_sets_existing_postal_code(client):
                 "first_name": "john",
                 "last_name": "doe",
                 "postcode": commune.postal,
-                "impediment_kinds": ["Financements", "Autre"],
+                "impediment_kinds": ["Autre"],
                 "impediments": "some impediment",
             },
         )
@@ -132,7 +132,7 @@ def test_performing_onboarding_discard_unknown_postal_code(client):
                 "first_name": "john",
                 "last_name": "doe",
                 "postcode": "12345",
-                "impediment_kinds": ["Financements", "Autre"],
+                "impediment_kinds": ["Autre"],
                 "impediments": "some impediment",
             },
         )
