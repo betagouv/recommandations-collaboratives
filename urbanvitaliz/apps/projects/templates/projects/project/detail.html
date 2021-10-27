@@ -116,6 +116,7 @@
             </li>
 
             <!-- Activity -->
+            {% if user.is_staff %}
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab" aria-controls="activity" aria-selected="false">
                     <svg class="bi align-middle me-1" width="16" height="16">
@@ -124,6 +125,7 @@
                     <span class="align-middle">Activité</span>
                 </button>
             </li>
+            {% endif %}
         </ul>
 
 
