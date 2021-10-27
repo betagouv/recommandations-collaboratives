@@ -53,8 +53,6 @@ class StatisticsView(TemplateView):
             for p in the_projects.all().annotate(number_tasks=Count("tasks"))
         ]
         context["collectivity_avg_reco"] = sum(numbers) / len(numbers) if numbers else 0
-        context["created_on"] = "Octobre 2020"
-        context["updated_on"] = datetime.date.today().strftime("%d/%m/%Y")
 
         context["new_col_per_month"] = [
             (f"{p['month']}/{p['year']}", p["total"])
