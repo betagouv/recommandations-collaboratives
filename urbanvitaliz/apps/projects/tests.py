@@ -17,8 +17,7 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -913,7 +912,7 @@ def test_user_can_followup_on_personal_task(client):
         project = baker.make(models.Project, is_draft=False, email=user.email)
         task = baker.make(models.Task, project=project)
         url = reverse("projects-followup-task", args=[task.id])
-        response = client.post(url, data=data)
+        client.post(url, data=data)
     followup = models.TaskFollowup.objects.all()[0]
     assert followup.task == task
     assert followup.status == 0  # to be replaced by task status
@@ -979,7 +978,7 @@ def test_user_can_followup_on_rsvp(client):
         task = baker.make(models.Task, project=project)
         rsvp = baker.make(models.TaskFollowupRsvp, task=task)
         url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
-        response = client.post(url, data=data)
+        client.post(url, data=data)
     assert models.TaskFollowupRsvp.objects.filter(uuid=rsvp.uuid).count() == 0
     followup = models.TaskFollowup.objects.all()[0]
     assert followup.task == task
