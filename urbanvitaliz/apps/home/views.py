@@ -7,8 +7,6 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
-import datetime
-
 import django.core.mail
 from django import forms
 from django.conf import settings
