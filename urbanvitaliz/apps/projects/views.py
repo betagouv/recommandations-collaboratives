@@ -535,9 +535,7 @@ def task_recommendation_create(request):
     if request.method == "POST":
         form = TaskRecommendationForm(request.POST)
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-
+            form.save()
             return redirect(reverse("projects-task-recommendation-list"))
     else:
         form = TaskRecommendationForm()
@@ -547,18 +545,19 @@ def task_recommendation_create(request):
 @login_required
 def task_recommendation_update(request, recommendation_id):
     """Update a task recommendation"""
-    recommendation = get_object_or_404(models.Project, pk=recommendation_id)
-
     is_staff_or_403(request.user)
 
+    recommendation = get_object_or_404(models.TaskRecommendation, pk=recommendation_id)
+
     if request.method == "POST":
-        form = TaskRecommendationForm(request.POST)
+        form = TaskRecommendationForm(request.POST, instance=recommendation)
         if form.is_valid():
             form.save()
             return redirect(reverse("projects-task-recommendation-list"))
     else:
-        form = TaskRecommendationForm()
-    return render(request, "projects/task/recommendation_update.html", locals())
+        form = TaskRecommendationForm(instance=recommendation)
+
+    return render(request, "projects/tasks/recommendation_update.html", locals())
 
 
 @login_required

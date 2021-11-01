@@ -127,7 +127,7 @@ s                                    <a class="stretched-link text-reset text-de
                             <span class="visually-hidden">Toggle Dropdown</span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li class="dropdown-item border-0 d-inline-block">
+                            <li class="dropdown-item border-0 d-inline-block position-relative">
                                 <svg class="bi me-2 d-inline" width="16" height="16">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus"/>
                                 </svg>
@@ -135,12 +135,20 @@ s                                    <a class="stretched-link text-reset text-de
                             </li>
 
                             {% if user.is_staff %}
-                            <li class="dropdown-item border-0 d-inline-block">
+                            <li class="dropdown-item border-0 d-inline-block position-relative">
                                 <svg class="bi me-2 d-inline" width="16" height="16">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-fill"/>
                                 </svg>
                                 <a class="stretched-link d-inline text-secondary" href="{% url 'projects-task-recommendation-list' %}">Pré-fléchage</a>
                             </li>
+
+                            <li class="dropdown-item border-0 d-inline-block position-relative">
+                                <svg class="bi me-2 d-inline" width="16" height="16">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle"/>
+                                </svg>
+                                <a class="stretched-link d-inline text-secondary" href="{% url 'survey-editor-survey-details' 1 %}">Questionnaire</a>
+                            </li>
+
                             {% endif %}
                         </ul>
                     </div>
@@ -156,17 +164,6 @@ s                                    <a class="stretched-link text-reset text-de
                         <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
                     </a>
                 </li>
-
-                <!-- Address Book -->
-                <li class="nav-item nav-item-admin">
-                    <a href="{% url 'survey-editor-survey-details' 1 %}" class="nav-link link-dark">
-                        <svg class="bi align-middle" width="16" height="16">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle"/>
-                        </svg>
-                        <span class="ms-1 me-2 align-middle">Questionnaire</span>
-                    </a>
-                </li>
-
 
                 {% endif %}
 
