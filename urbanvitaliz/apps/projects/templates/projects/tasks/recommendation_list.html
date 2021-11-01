@@ -17,6 +17,8 @@
                 <span class="align-middle">Configuration du Pré-fléchage</span>
             </h2>
 
+            <span class="text-secondary">Vous pouvez configurer ici les ressources qui seront pré-fléchées à partir des signaux collectés par les réponses aux questions de l'exploration.</span>
+
         </div>
 
         <!-- Sidebar -->
@@ -47,6 +49,13 @@
 
                     </div>
                 </div>
+                <span class="text-secondary fw-bold d-block">
+                    {% if recommendation.departments.all.count > 0 %}
+                    Limité à : {% for department in recommendation.departments.all %}{{ department.name }}{% if not forloop.last %}, {%endif%}{% endfor %}
+                    {% else %}
+                    Toute la France
+                    {% endif %}
+                </span>
                 <div class="text-secondary mt-2 mb-2 d-inline-block">
                     <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alt"/>
@@ -60,11 +69,16 @@
                 <div class="text-secondary my-2">
                     {{ recommendation.text }}
                 </div>
-                <div class="small">
+                <div class="small bd-callout">
+                    <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#info-circle"/>
+                    </svg>
                     Déclenchable par :
                     <ul>
                         {% for choice in recommendation.trigged_by %}
                         <li>{{ choice.conclusion|default:choice.text }}</li>
+                        {% empty %}
+                        <li class="text-danger">---Non déclencheable--</li>
                         {% endfor %}
                     </ul>
 

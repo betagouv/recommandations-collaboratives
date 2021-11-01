@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+    <h2>Mise à jour d'un pré-fléchage</h2>
+    <p>
+        {{ recommendation.ressource.title }} / {{ recommendation.text }}
+    </p>
+    <form class="form" method="POST" action="{% url 'projects-task-recommendation-update' recommendation.pk %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">Mettre à jour</button>
+    </form>
+</div>
+
+{% endblock %}
