@@ -8,6 +8,7 @@ created: 2021-06-27 12:06:10 CEST
 """
 
 import pytest
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery.recipe import Recipe
@@ -73,7 +74,7 @@ def test_answered_question_with_single_choice_is_saved_to_session(client):
 
     # Fetch persisted answer
     answer = models.Answer.objects.get(session=session, question=q1)
-    assert answer.values == choice.value
+    assert answer.values == [choice.value]
     assert answer.comment == my_comment
 
 
@@ -180,7 +181,7 @@ def test_answered_question_is_updated_to_session(client):
     assert models.Answer.objects.filter(session=session, question=q1).count() == 1
 
     answer = models.Answer.objects.get(session=session, question=q1)
-    assert answer.values == choice2.value
+    assert answer.values == [choice2.value]
     assert answer.comment == my_comment
     assert answer.signals == my_signals
 
@@ -303,6 +304,49 @@ def test_previous_question_redirects_to_survey_when_not_more_questions(client):
 
     new_url = reverse("survey-session-details", args=(session.id,))
     assertRedirects(response, new_url)
+
+
+####
+# Signals refresh
+####
+@pytest.mark.django_db
+def test_refresh_signals_only_for_staff(client):
+    session = Recipe(models.Session).make()
+    url = reverse("survey-session-refresh-signals", args=(session.id,))
+    with login(client, is_staff=False):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_refresh_signals(client):
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    Recipe(models.Question, question_set=qs).make()
+    choice = Recipe(
+        models.Choice, question=q1, value="yep", signals="lima-charlie, bravo-zulu"
+    ).make()
+
+    # Answer question first
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+    with login(client, is_staff=False, username="nonstaff"):
+        client.post(url, data={"answer": choice.value})
+
+    # Update choice signal and refresh
+    new_signal = "new-signal"
+    choice.signals = new_signal
+    choice.save()
+
+    url = reverse("survey-session-refresh-signals", args=(session.id,))
+    with login(client, is_staff=True, username="staff"):
+        response = client.get(url)
+
+    # Fetch persisted answer
+    answer = models.Answer.objects.get(session=session, question=q1)
+    assert answer.signals == "new-signal"
 
 
 # eof

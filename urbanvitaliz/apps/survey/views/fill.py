@@ -7,9 +7,12 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-08-03 14:26:39 CEST
 """
 
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import DetailView, RedirectView
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.utils import is_staff_or_403
 
 from .. import forms, models, signals
 
@@ -128,6 +131,38 @@ def survey_previous_question(request, session_id, question_id):
         )
     # go back to survey
     return redirect("survey-session-details", session_id=session.pk)
+
+
+### Admin Tasks
+@login_required
+def survey_signals_refresh(request, session_id):
+    """Refresh a given session with new signals, on request"""
+
+    is_staff_or_403(request.user)
+    session = get_object_or_404(models.Session, pk=session_id)
+
+    update_count = 0
+    for answer in session.answers.all():
+        if not answer.choices:
+            continue
+
+        choice_signals = []
+        for choice in answer.choices.all():
+            choice_signals.append(choice.signals)
+
+        answer.signals = ", ".join(choice_signals)
+        answer.save()
+
+        update_count += 1
+
+    messages.success(
+        request, "{0} réponse(s) ont bien été mises à jour.".format(update_count)
+    )
+
+    # go back to survey
+    return redirect(
+        reverse("projects-project-detail", args=(session.project.pk,)) + "#exploration"
+    )
 
 
 # eof
