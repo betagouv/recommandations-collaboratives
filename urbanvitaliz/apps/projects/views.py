@@ -25,7 +25,8 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -513,6 +514,63 @@ def update_task(request, task_id=None):
     return render(request, "projects/project/task_update.html", locals())
 
 
+########
+# Task Recommendation
+########
+
+
+class TaskRecommendationForm(forms.ModelForm):
+    """Form new task recommendation creation"""
+
+    class Meta:
+        model = models.TaskRecommendation
+        fields = ["condition", "resource", "text", "departments"]
+
+
+@login_required
+def task_recommendation_create(request):
+    """Create a new task recommendation for a project"""
+    is_staff_or_403(request.user)
+
+    if request.method == "POST":
+        form = TaskRecommendationForm(request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.save()
+
+            return redirect(reverse("projects-task-recommendation-list"))
+    else:
+        form = TaskRecommendationForm()
+    return render(request, "projects/tasks/recommendation_create.html", locals())
+
+
+@login_required
+def task_recommendation_update(request, recommendation_id):
+    """Update a task recommendation"""
+    recommendation = get_object_or_404(models.Project, pk=recommendation_id)
+
+    is_staff_or_403(request.user)
+
+    if request.method == "POST":
+        form = TaskRecommendationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse("projects-task-recommendation-list"))
+    else:
+        form = TaskRecommendationForm()
+    return render(request, "projects/task/recommendation_update.html", locals())
+
+
+@login_required
+def task_recommendation_list(request):
+    """List task recommendations for a project"""
+    is_staff_or_403(request.user)
+
+    recommendations = models.TaskRecommendation.objects.all()
+
+    return render(request, "projects/tasks/recommendation_list.html", locals())
+
+
 @login_required
 def presuggest_task(request, project_id):
     """Suggest tasks"""
@@ -531,7 +589,17 @@ def presuggest_task(request, project_id):
     session_signals = session.signals
 
     tasks = []
-    for recommandation in models.TaskRecommandation.objects.all():
+    for recommandation in models.TaskRecommendation.objects.all():
+        if not project.commune:
+            continue
+
+        if recommandation.departments:
+            if not (
+                project.commune.department.code
+                in recommandation.departments.values_list("code", flat=True)
+            ):
+                continue
+
         reco_tags = set(recommandation.condition_tags.values_list("name", flat=True))
         if reco_tags.issubset(session_signals):
             tasks.append(

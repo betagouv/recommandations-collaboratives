@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from tagging.fields import TagField
+from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
@@ -375,18 +376,35 @@ class TaskFollowupRsvp(models.Model):
         return f"TaskFollowupRsvp{self.uuid}"
 
 
-class TaskRecommandation(models.Model):
-    """Recommandation mechanisms for Tasks"""
+class TaskRecommendationManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by("resource__title")
+
+
+class TaskRecommendation(models.Model):
+    """Recommendation mechanisms for Tasks"""
+
+    objects = TaskRecommendationManager()
 
     condition = TagField(verbose_name="Condition", blank=True, null=True)
     resource = models.ForeignKey(resources.Resource, on_delete=models.CASCADE)
     text = models.TextField()
+    departments = models.ManyToManyField(
+        geomatics_models.Department,
+        blank=True,
+        verbose_name="Départements concernés",
+    )
+
+    def trigged_by(self):
+        from urbanvitaliz.apps.survey import models as survey_models
+
+        return TaggedItem.objects.get_by_model(survey_models.Choice, self.condition)
 
     def __str__(self):
         return f"{self.resource.title} - {self.text}"
 
 
-tagging_register(TaskRecommandation, tag_descriptor_attr="condition_tags")
+tagging_register(TaskRecommendation, tag_descriptor_attr="condition_tags")
 
 
 class Document(models.Model):

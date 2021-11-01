@@ -50,8 +50,8 @@ class TaskFollowupRsvpAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(models.TaskRecommandation)
-class TaskRecommandationAdmin(admin.ModelAdmin):
+@admin.register(models.TaskRecommendation)
+class TaskRecommendationAdmin(admin.ModelAdmin):
     pass
 
 

@@ -133,6 +133,15 @@ s                                    <a class="stretched-link text-reset text-de
                                 </svg>
                                 <a class="stretched-link d-inline text-secondary" href="{% url 'projects-onboarding' %}">Créer</a>
                             </li>
+
+                            {% if user.is_staff %}
+                            <li class="dropdown-item border-0 d-inline-block">
+                                <svg class="bi me-2 d-inline" width="16" height="16">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-fill"/>
+                                </svg>
+                                <a class="stretched-link d-inline text-secondary" href="{% url 'projects-task-recommendation-list' %}">Pré-fléchage</a>
+                            </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </li>
