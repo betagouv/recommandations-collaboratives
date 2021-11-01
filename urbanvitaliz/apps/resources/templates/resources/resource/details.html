@@ -89,6 +89,18 @@
             </div>
             {% endif %}
 
+            <!-- Show banner if expired -->
+            {% if not resource.expired %}
+            <div class="bd-callout bd-callout-warning">
+                <svg class="bi align-middle text-danger" width="24" height="24" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#exclamation-octagon-fill"/>
+                </svg>&nbsp;
+                <span class="align-middle">
+                    Cette fiche-ressource a expiré, les informations ne sont probablement plus à jour  !
+                </span>
+            </div>
+            {% endif %}
+
             {% if resource.departments.count and resource.tags %}
             &nbsp;-&nbsp;
             {% endif %}
