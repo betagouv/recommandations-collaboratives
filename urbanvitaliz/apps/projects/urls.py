@@ -134,6 +134,22 @@ urlpatterns = [
         views.access_delete,
         name="projects-access-delete",
     ),
+    # Recommendations
+    path(
+        r"projects/task-recommendation",
+        views.task_recommendation_list,
+        name="projects-task-recommendation-list",
+    ),
+    path(
+        r"projects/task-recommendation/create",
+        views.task_recommendation_create,
+        name="projects-task-recommendation-create",
+    ),
+    path(
+        r"projects/task-recommendation/<int:recommendation_id>/update",
+        views.task_recommendation_update,
+        name="projects-task-recommendation-update",
+    ),
 ]
 
 # eof

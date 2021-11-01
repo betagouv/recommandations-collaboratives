@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+
+    <div class="row recommendation-list mb-3">
+        <div class="col-sm-12 col-lg-8 col-xl-9">
+
+            <h2>
+                <svg class="bi rounded-circle p-2" width="40" height="40">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-fill"/>
+                </svg>&nbsp;
+                <span class="align-middle">Configuration du Pré-fléchage</span>
+            </h2>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
+        </div>
+
+        <!-- main content -->
+        <div>
+            {% for recommendation in recommendations %}
+            <div>
+                <div class="w-100 mt-5" id="q-{{ recommendation.id }}">
+                    <h3 class="mt-3 d-inline-block">
+                        <svg class="bi" width="26" height="26" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost"/>
+                        </svg>&nbsp;
+                        <span class="align-middle">{{ recommendation.resource.title|truncatechars:50 }}</span></span>
+                    </h3>
+
+
+                    <div class="btn-group ms-5 align-middle" role="group" aria-label="actions">
+
+                        <a class="btn btn-light mb-1 d-inline-block btn-outline-primary btn-sm"  href="{% url 'projects-task-recommendation-update' recommendation.pk %}">
+                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+                            </svg>
+                            Éditer
+                        </a>
+
+                    </div>
+                </div>
+                <div class="text-secondary mt-2 mb-2 d-inline-block">
+                    <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alt"/>
+                    </svg>
+                    Condition :
+                    {% for tag in recommendation.condition_tags %}
+                    <span class="badge bg-dark rounded-pill">{{ tag }}</span>
+                    {% if not forloop.last %}+{% endif %}
+                    {% endfor %}
+                </div>
+                <div class="text-secondary my-2">
+                    {{ recommendation.text }}
+                </div>
+                <div class="small">
+                    Déclenchable par :
+                    <ul>
+                        {% for choice in recommendation.trigged_by %}
+                        <li>{{ choice.conclusion|default:choice.text }}</li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+            </div>
+            {% empty %}
+            <div class="bd-callout bd-callout-info">
+                Il n'y a pas de pré-fléchage pour l'instant.
+                <a href="{% url 'projects-task-recommendation-create' %}">Créez-en un</a>.
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
