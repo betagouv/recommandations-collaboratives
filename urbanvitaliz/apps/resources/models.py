@@ -6,6 +6,7 @@ Models for resources application
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-16 10:57:13 CEST
 """
+import datetime
 
 from django.contrib.auth import models as auth
 from django.db import models
@@ -79,6 +80,14 @@ class Resource(models.Model):
     updated_on = models.DateTimeField(
         default=timezone.now, verbose_name="dernière modification"
     )
+    expires_on = models.DateField(
+        blank=True, null=True, verbose_name="date d'expiration"
+    )
+
+    @property
+    def expired(self):
+        return self.expires_on > datetime.date.today()
+
     tags = models.CharField(max_length=256, blank=True, default="")
 
     def tags_as_list(self):

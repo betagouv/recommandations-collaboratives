@@ -202,6 +202,7 @@ class EditResourceForm(forms.ModelForm):
             "content",
             "contacts",
             "public",
+            "expires_on",
         ]
 
 
