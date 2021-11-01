@@ -592,7 +592,7 @@ def presuggest_task(request, project_id):
         if not project.commune:
             continue
 
-        if recommandation.departments:
+        if recommandation.departments.all().count() > 0:
             if not (
                 project.commune.department.code
                 in recommandation.departments.values_list("code", flat=True)

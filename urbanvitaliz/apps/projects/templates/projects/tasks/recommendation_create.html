@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+    <h2>Ajouter un pré-fléchage</h2>
+
+    <form class="form" method="POST" action="{% url 'projects-task-recommendation-create' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">Ajouter</button>
+    </form>
+</div>
+
+{% endblock %}

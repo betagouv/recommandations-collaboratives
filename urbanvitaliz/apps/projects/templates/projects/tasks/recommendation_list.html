@@ -23,6 +23,16 @@
 
         <!-- Sidebar -->
         <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
+            <!-- Ajouter -->
+            <div class="d-grid gap-2">
+                <a class="btn btn-light btn-sm" href="{% url 'projects-task-recommendation-create' %}" role="button">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+                    </svg>
+                    &nbsp;
+                    Ajouter un pré-fléchage
+                </a>
+            </div>
         </div>
 
         <!-- main content -->
