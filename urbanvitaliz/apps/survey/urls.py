@@ -56,6 +56,13 @@ urlpatterns = [
         name="survey-session-done",
     ),
     #
+    # staff
+    path(
+        "projects/survey/<int:session_id>/refresh",
+        fill.survey_signals_refresh,
+        name="survey-session-refresh-signals",
+    ),
+    #
     # editing surveys
     path(
         r"survey/editor/survey/<int:survey_id>/",

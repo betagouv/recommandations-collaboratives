@@ -112,6 +112,17 @@
                         Éditer
                     </a>
                 </span>
+
+                <span class="d-inline-block">
+                    <a href="{% url 'survey-session-refresh-signals' session.pk %}" class="btn btn-light w-100 btn-sm">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#braces"/>
+                        </svg>
+                        &nbsp;
+                        Rafraîchir les signaux
+                    </a>
+                </span>
+
             </div>
         </div>
         {% endif %}

@@ -365,6 +365,7 @@ class Answer(models.Model):
     question = models.ForeignKey(
         Question, related_name="answers", on_delete=models.CASCADE
     )
+    choices = models.ManyToManyField(Choice, related_name="answers")
     value = models.CharField(max_length=30)  # field to be  removed in future version
     values = models.JSONField(default=empty_answer, blank=True)
     signals = TagField(verbose_name="Signaux", blank=True, null=True)

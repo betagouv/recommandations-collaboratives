@@ -43,7 +43,15 @@ class AnswerForm(forms.Form):
         # If we already have an answer, prefill
         if answer:
             if "answer" in self.fields:
-                self.fields["answer"].initial = answer.values
+                if not question.is_multiple:
+                    if isinstance(answer.values, list):
+                        initial_value = answer.values[0]
+                    else:
+                        # Compatibility with old way of storing
+                        initial_value = answer.values
+                else:
+                    initial_value = answer.values
+                self.fields["answer"].initial = initial_value
             self.fields["comment"].initial = answer.comment
             if "attachment" in self.fields:
                 self.fields["attachment"].initial = answer.attachment
@@ -53,29 +61,19 @@ class AnswerForm(forms.Form):
         comment = self.cleaned_data.get("comment", None)
         attachment = self.cleaned_data.get("attachment", None)
 
-        signals = ""
-
         # compute the signals according to the kind of question
-        if isinstance(answer_values, list):
-            # multiple choices
-            choices = models.Choice.objects.filter(
-                question=self.question, value__in=answer_values
-            )
-            signals = []
-            for choice in choices:
-                signals.append(choice.signals)
-            signals = ", ".join(signals)
-        else:
-            # single choice
-            try:
-                choice = models.Choice.objects.get(
-                    question=self.question, value=answer_values
-                )
-                signals = choice.signals
+        if not isinstance(answer_values, list):
+            answer_values = (answer_values,)
 
-            except models.Choice.DoesNotExist:
-                # Comment question only, we're fine
-                pass
+        # multiple choices
+        choices = models.Choice.objects.filter(
+            question=self.question, value__in=answer_values
+        )
+        signals = ""
+        choice_signals = []
+        for choice in choices:
+            choice_signals.append(choice.signals)
+        signals = ", ".join(choice_signals)
 
         answer, created = models.Answer.objects.get_or_create(
             session=session,
@@ -93,6 +91,8 @@ class AnswerForm(forms.Form):
             answer.signals = signals
             answer.attachment = attachment
             answer.save()
+
+        answer.choices.set(choices)
 
         return True
 
