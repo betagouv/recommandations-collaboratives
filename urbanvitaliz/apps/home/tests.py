@@ -7,18 +7,15 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-08-17 12:33:33 CEST
 """
 
-import pytest
-
-from model_bakery import baker
-
 import django.core.mail
+import pytest
 from django import forms
 from django.conf import settings
-from django.urls import reverse
 from django.contrib.auth import models as auth
 from django.db.utils import IntegrityError
+from django.urls import reverse
+from model_bakery import baker
 from pytest_django.asserts import assertRedirects
-
 from urbanvitaliz.utils import login
 
 from . import utils
@@ -123,6 +120,18 @@ def test_dashboard_available_for_staff_users(client):
     url = reverse("staff-dashboard")
     with login(client, is_staff=True):
         response = client.get(url)
+    assert response.status_code == 200
+
+
+########################################################################
+# Statistics
+########################################################################
+
+
+@pytest.mark.django_db
+def test_user_can_access_stats(client):
+    url = reverse("statistics")
+    response = client.get(url)
     assert response.status_code == 200
 
 
