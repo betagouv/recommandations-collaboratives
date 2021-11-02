@@ -152,6 +152,7 @@ class OnboardingForm(forms.ModelForm):
             "location",
             # "description",
             "impediments",
+            "publish_to_cartofriches",
         ]
 
 
@@ -291,6 +292,9 @@ class ProjectForm(forms.ModelForm):
     """Form for updating the base information of a project"""
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
+    publish_to_cartofriches = forms.BooleanField(
+        label="Publication sur cartofriches", disabled=True, required=False
+    )
 
     class Meta:
         model = models.Project
@@ -304,6 +308,7 @@ class ProjectForm(forms.ModelForm):
             "postcode",
             "location",
             "description",
+            "publish_to_cartofriches",
         ]
 
 

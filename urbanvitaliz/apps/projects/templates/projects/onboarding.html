@@ -148,7 +148,7 @@
                         <input type="text" class="form-control {% if form.location.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.location.name }}" placeholder="Adresse" value="{{ form.location.value|default:'' }}" required>
                         <label for="input-project-address">{{ form.location.label }}</label>
                         <div id="input-email-help" class="form-text">Si la friche n'a pas d'adresse exacte, utilisez uniquement le nom de la commune.</div>
-                        
+
                         {% for error in form.location.errors %}
                         <div class="text-danger text-end">{{ error }}</div>
                         {% endfor %}
@@ -181,6 +181,12 @@
                 {% for error in form.impediments.errors %}
                 <div class="text-danger text-end">{{ error }}</div>
                 {% endfor %}
+
+                <!-- Cartofriches -->
+                <div class="mt-2">
+                    <input class="form-check-input" type="checkbox" name="publish_to_cartofriches" id="input-project-publish-cartofriches" checked>
+                    <label for="input-project-publish-cartofriches">Je souhaite ajouter cette friche à la cartographie publique des friches - ce qui me permet de faire connaître ce site à des porteurs de projet potentiels !</label>
+                </div>
 
             </div>
 
