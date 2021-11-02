@@ -585,30 +585,34 @@ def presuggest_task(request, project_id):
     except survey_models.Survey.DoesNotExist:
         session = None
 
-    session_signals = session.signals
-
     tasks = []
-    for recommandation in models.TaskRecommendation.objects.all():
-        if not project.commune:
-            continue
 
-        if recommandation.departments.all().count() > 0:
-            if not (
-                project.commune.department.code
-                in recommandation.departments.values_list("code", flat=True)
-            ):
+    if session:
+        session_signals = session.signals
+
+        for recommandation in models.TaskRecommendation.objects.all():
+            if not project.commune:
                 continue
 
-        reco_tags = set(recommandation.condition_tags.values_list("name", flat=True))
-        if reco_tags.issubset(session_signals):
-            tasks.append(
-                models.Task(
-                    id=0,
-                    project=project,
-                    resource=recommandation.resource,
-                    intent=recommandation.text,
-                )
+            if recommandation.departments.all().count() > 0:
+                if not (
+                    project.commune.department.code
+                    in recommandation.departments.values_list("code", flat=True)
+                ):
+                    continue
+
+            reco_tags = set(
+                recommandation.condition_tags.values_list("name", flat=True)
             )
+            if reco_tags.issubset(session_signals):
+                tasks.append(
+                    models.Task(
+                        id=0,
+                        project=project,
+                        resource=recommandation.resource,
+                        intent=recommandation.text,
+                    )
+                )
 
     return render(request, "projects/project/task_suggest.html", locals())
 
