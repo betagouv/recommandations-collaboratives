@@ -38,7 +38,7 @@
 
 <div class="accordion border border-1 rounded-3 mb-4 position-relative">
 
-    {% if not task.visited %}
+    {% if task.visited == False %}
     <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary" style="margin-left: 60px" >NOUVEAU</span>
     {% endif %}
 
@@ -78,7 +78,11 @@
                 {% endif %}
             </div>
             {% if task.resource %}
+            {% if disable_tracking %}
+            <a class="stretched-link" href="{% url 'resources-resource-detail' task.resource.id %}">
+            {% else %}
             <a class="stretched-link" href="{% url 'projects-visit-task' task.id %}">
+            {% endif %}
                 <div class="flex-shrink-1 px-3 arrow-link text-primary align-items-center">
                     <svg class="align-middle bi" width="26px" height="26px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-right-short"/>
@@ -133,7 +137,7 @@
                     </button>
                 </div>
                 {% endif %}
-                {% if user.is_staff %}
+                {% if user.is_staff and not disable_edit %}
                 <span class="align-middle p-2 small">
                     <a class="" href="{% url 'projects-update-task' task.id %}">Éditer</a>
                 </span>
