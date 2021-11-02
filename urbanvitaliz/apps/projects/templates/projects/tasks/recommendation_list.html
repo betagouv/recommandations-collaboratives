@@ -98,7 +98,7 @@
                             {% for choice in recommendation.trigged_by %}
                             <li>{{ choice.conclusion|default:choice.text }}</li>
                             {% empty %}
-                            <li class="text-danger">---Non déclencheable--</li>
+                            <li class="text-danger">---Non déclenchable--</li>
                             {% endfor %}
                         </ul>
 
