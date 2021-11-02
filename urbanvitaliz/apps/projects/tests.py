@@ -17,10 +17,12 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import login
 
 from . import models, views
@@ -1187,7 +1189,7 @@ def test_staff_create_action_for_resource_push(client):
         data = {"intent": "read this", "content": "some nice content"}
         response = client.post(url, data=data)
 
-    # a new Recommmendation is created
+    # a new Task is created
     task = models.Task.objects.all()[0]
     assert task.project == project
     assert task.resource == resource
@@ -1233,6 +1235,155 @@ def test_staff_create_action_for_resource_push_with_notification(client):
     assertRedirects(response, newurl)
     # sessions is cleaned up
     assert "project_id" not in client.session
+
+
+########################################################################
+# Task Recommendation
+########################################################################
+@pytest.mark.django_db
+def test_task_recommendation_list_not_available_for_non_staff_users(client):
+    url = reverse("projects-task-recommendation-list")
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_task_recommendation_list_available_for_staff_users(client):
+    url = reverse("projects-task-recommendation-list")
+    with login(client, is_staff=True):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_task_recommendation_create_not_available_for_non_staff_users(client):
+    url = reverse("projects-task-recommendation-create")
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_task_recommendation_create_available_staff_users(client):
+    url = reverse("projects-task-recommendation-create")
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_task_recommendation_is_created(client):
+    url = reverse("projects-task-recommendation-create")
+    resource = Recipe(resources.Resource).make()
+
+    data = {"text": "mew", "resource": resource.pk}
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    assert models.TaskRecommendation.objects.count() == 1
+
+    assert response.status_code == 302
+    newurl = reverse("projects-task-recommendation-list")
+    assertRedirects(response, newurl)
+
+
+@pytest.mark.django_db
+def test_task_recommendation_update_not_available_for_non_staff_users(client):
+    recommendation = Recipe(models.TaskRecommendation).make()
+    url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_task_recommendation_update_available_staff_users(client):
+    recommendation = Recipe(models.TaskRecommendation).make()
+    url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_task_recommendation_is_updated(client):
+    recommendation = Recipe(models.TaskRecommendation).make()
+
+    url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
+
+    data = {"text": "new-text", "resource": recommendation.resource.pk}
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+    newurl = reverse("projects-task-recommendation-list")
+    assertRedirects(response, newurl)
+
+    assert models.TaskRecommendation.objects.count() == 1
+    updated_recommendation = models.TaskRecommendation.objects.all()[0]
+    assert updated_recommendation.text == data["text"]
+
+
+@pytest.mark.django_db
+def test_task_suggestion_not_available_for_non_staff_users(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-tasks-suggest", args=(project.pk,))
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_task_suggestion_when_no_survey(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-tasks-suggest", args=(project.pk,))
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_task_suggestion_available_with_bare_project(client):
+    Recipe(survey_models.Survey, pk=1).make()
+    Recipe(models.TaskRecommendation, condition="").make()
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-tasks-suggest", args=(project.pk,))
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_task_suggestion_available_with_filled_project(client):
+    Recipe(survey_models.Survey, pk=1).make()
+    commune = Recipe(geomatics.Commune).make()
+    Recipe(models.TaskRecommendation, condition="").make()
+    project = Recipe(models.Project, commune=commune).make()
+    url = reverse("projects-project-tasks-suggest", args=(project.pk,))
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_task_suggestion_available_with_localized_reco(client):
+    Recipe(survey_models.Survey, pk=1).make()
+    commune = Recipe(geomatics.Commune).make()
+    dept = Recipe(geomatics.Department).make()
+    Recipe(
+        models.TaskRecommendation,
+        condition="",
+        departments=[
+            dept,
+        ],
+    ).make()
+    project = Recipe(models.Project, commune=commune).make()
+    url = reverse("projects-project-tasks-suggest", args=(project.pk,))
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
 
 
 ########################################################################
