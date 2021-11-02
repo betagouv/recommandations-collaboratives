@@ -64,6 +64,10 @@ class Project(models.Model):
         max_length=128, default="", verbose_name="Prénom du contact"
     )
 
+    publish_to_cartofriches = models.BooleanField(
+        verbose_name="Publier sur cartofriches", default=False
+    )
+
     @property
     def full_name(self):
         return " ".join([self.first_name, self.last_name])
