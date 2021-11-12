@@ -17,7 +17,8 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -942,7 +943,10 @@ def test_user_is_redirected_after_followup_on_task(client):
         url = reverse("projects-followup-task", args=[task.id])
         response = client.post(url)
     assert response.status_code == 302
-    assert response.url == reverse("projects-project-detail", args=[task.project.id])
+    assert (
+        response.url
+        == reverse("projects-project-detail", args=[task.project.id]) + "#actions"
+    )
 
 
 #

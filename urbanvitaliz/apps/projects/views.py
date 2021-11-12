@@ -25,7 +25,8 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -748,7 +749,7 @@ def followup_task(request, task_id=None):
                 sender=followup_task, task=task, project=task.project, user=request.user
             )
     next_url = reverse("projects-project-detail", args=[task.project.id])
-    return redirect(next_url)
+    return redirect(next_url + "#actions")
 
 
 class TaskFollowupForm(forms.ModelForm):
