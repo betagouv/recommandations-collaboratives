@@ -206,7 +206,9 @@
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle"/>
                 </svg>&nbsp;<h5 class="d-inline-block">Pourquoi c'est important</h5>
                 <p class="text-secondary">
-                    <span id="excerpt-why">{{ question.why_rendered|safe|truncatechars_html:150  }}</span>
+                    <div id="excerpt-why" style="display: inline;">
+                       {{ question.why_rendered|safe|truncatechars_html:150  }}
+                    </div>
                     {% if question.why_rendered|safe|truncatechars_html:151|length > 150 %}
                     <span id="more-why" style="display: none;">{{ question.why_rendered|safe }}</span>
                     <a class="" href="javascript:void(0);" onclick="textFoldToggle('why')" id="foldBtn-why">[Lire tout]</a>
@@ -221,7 +223,7 @@
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#compass"/>
                 </svg>&nbsp;<h5 class="d-inline-block">Où chercher l'information</h5>
                 <p class="text-secondary">
-                    <span id="excerpt-how">{{ question.how_rendered|safe|truncatechars_html:500  }}</span>
+                    <div id="excerpt-how">{{ question.how_rendered|safe|truncatechars_html:500  }}</div>
                     {% if question.how_rendered|safe|truncatechars_html:501|length > 500 %}
                     <span id="more-how" style="display: none;">{{ question.how_rendered|safe }}</span>
                     <a class="" href="javascript:void(0);" onclick="textFoldToggle('how')" id="foldBtn-how">[Lire tout]</a>
