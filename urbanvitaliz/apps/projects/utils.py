@@ -19,7 +19,7 @@ def can_administrate_project(project, user, allow_draft=False):
         return False
 
     return (
-        (user.email == project.email)
+        ((user.email == project.email) or (user.email in project.emails))
         and ((not project.is_draft) or allow_draft)  # noqa: F841
     ) or user.is_staff
 

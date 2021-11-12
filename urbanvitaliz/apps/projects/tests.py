@@ -25,7 +25,7 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import login
 
-from . import models, views
+from . import models, utils, views
 from .templatetags import projects_extra
 
 # TODO when local authority can see & update her project
@@ -198,8 +198,6 @@ def test_other_projects_are_not_stored_in_session(client):
 ######
 # Sharing link
 ######
-
-
 @pytest.mark.django_db
 def test_project_access_proper_sharing_link(client):
     project = Recipe(models.Project).make()
@@ -460,6 +458,21 @@ def test_delete_project_and_redirect(client):
 ########################################################################
 # modify who can access the project
 ########################################################################
+@pytest.mark.django_db
+def test_contributor_has_the_same_rights_as_the_owner(client):
+    owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
+    contributor = Recipe(
+        auth.User, username="contributor", email="contributor@example.com"
+    ).make()
+    project = Recipe(
+        models.Project,
+        email=owner.email,
+        emails=[owner.email, contributor.email],
+        is_draft=False,
+    ).make()
+
+    assert utils.can_administrate_project(project, owner)
+    assert utils.can_administrate_project(project, contributor)
 
 
 @pytest.mark.django_db
