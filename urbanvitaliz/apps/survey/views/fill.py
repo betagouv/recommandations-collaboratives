@@ -133,7 +133,7 @@ def survey_previous_question(request, session_id, question_id):
     return redirect("survey-session-details", session_id=session.pk)
 
 
-### Admin Tasks
+# Admin Tasks
 @login_required
 def survey_signals_refresh(request, session_id):
     """Refresh a given session with new signals, on request"""

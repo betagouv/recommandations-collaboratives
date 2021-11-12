@@ -8,7 +8,6 @@ created: 2021-06-27 12:06:10 CEST
 """
 
 import pytest
-from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery.recipe import Recipe
@@ -342,7 +341,7 @@ def test_refresh_signals(client):
 
     url = reverse("survey-session-refresh-signals", args=(session.id,))
     with login(client, is_staff=True, username="staff"):
-        response = client.get(url)
+        client.get(url)
 
     # Fetch persisted answer
     answer = models.Answer.objects.get(session=session, question=q1)
