@@ -67,23 +67,32 @@
         {% include "projects/project/fragments/sidebar.html" %}
     </div>
 
+    <div class="row">
+        {% if project.is_draft %}
+        <div class="border mb-4 p-4 align-items-center">
+            <div class="w-100">
+                <p class="text-center d-flex justify-content-center flex-column">
+                    <span class="mb-2">
+                        <svg class="align-middle bi" width="28px" height="28px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hourglass-split"/>
+                        </svg>
+                    </span>
+
+                    <span class="align-middle fs-4">Un peu de patience, on vérifie que vous n'êtes pas un pirate du web ;)</span>
+                    <br/>
+                    <span class="align-middle text-secondary">Dès que l'équipe UrbanVitaliz aura validé votre dossier, vous pourrez faire plus de choses sur votre dossier ! Par exemple, le partager à des collaborateur·rice·s.</span>
+
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
     <div id="project-sections" class="row">
         <ul class="nav nav-tabs" id="project-tabs" role="tablist">
-            <!-- main sheet -->
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="sheet-tab" data-bs-toggle="tab" data-bs-target="#sheet" type="button" role="tab" aria-controls="sheet" aria-selected="true">
-                    <svg class="bi align-middle me-1" width="16" height="16">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder"/>
-                    </svg>
-                    <span class="align-middle">
-                        Dossier
-                    </span>
-                </button>
-            </li>
-
             <!-- exploration/survey -->
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="exploration-tab" data-bs-toggle="tab" data-bs-target="#exploration" type="button" role="tab" aria-controls="exploration" aria-selected="false">
+                <button class="nav-link active" id="exploration-tab" data-bs-toggle="tab" data-bs-target="#exploration" type="button" role="tab" aria-controls="exploration" aria-selected="true">
                     <svg class="bi align-middle me-1" width="16" height="16">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
                     </svg>
@@ -115,6 +124,19 @@
                 </button>
             </li>
 
+            <!-- main sheet -->
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sheet-tab" data-bs-toggle="tab" data-bs-target="#sheet" type="button" role="tab" aria-controls="sheet" aria-selected="false">
+                    <svg class="bi align-middle me-1" width="16" height="16">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder"/>
+                    </svg>
+                    <span class="align-middle">
+                        Suivi
+                    </span>
+                </button>
+            </li>
+
+
             <!-- Activity -->
             {% if user.is_staff %}
             <li class="nav-item" role="presentation">
@@ -130,156 +152,8 @@
 
 
         <div class="tab-content" id="project-tabs-content">
-            <div class="tab-pane  show active pt-4" id="sheet" role="tabpanel" aria-labelledby="sheet">
-
-                {% if request.GET.first_time %}
-
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <h4 class="alert-heading">
-                        <svg class="bi align-middle" width="40" height="40" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
-                        </svg>
-                        Merci !
-                    </h4>
-                    <p class="mb-0"><strong>Nous avons bien reçu votre demande et allons vous contacter.</strong></p>
-                    <p class="mb-0">Marquez cette page, elle vous permettra de suivre l'avancement de vos démarches et d'échanger avec l'équipe d'accompagnement.</p>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endif %}
-
-                {% if project.is_draft %}
-                <div class="border  p-4 align-items-center">
-                    <div class="w-100">
-                        <p class="text-center d-flex justify-content-center flex-column">
-                            <span class="mb-2">
-                            <svg class="align-middle bi" width="28px" height="28px" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hourglass-split"/>
-                            </svg>
-                            </span>
-
-                            <span class="align-middle fs-4">Un peu de patience, on vérifie que vous n'êtes pas un pirate du web ;)</span>
-                            <br/>
-                            <span class="align-middle text-secondary">Dès que l'équipe UrbanVitaliz aura validé votre dossier, vous pourrez faire plus de choses sur votre dossier ! Par exemple, le partager à des collaborateur·rice·s.</span>
-
-                        </p>
-                    </div>
-                </div>
-                {% elif not project.tasks.count %}
-                <div class="border  p-5 align-items-center">
-                    <div class="w-100">
-                        <p class="text-center">
-                            <img src="https://github.com/salomeDeschenes.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Salomé" alt="Salomé" width="32" height="32" class="rounded-circle me-2">
-                            <svg class="bi align-middle" width="40" height="40" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eyeglasses"/>
-                            </svg>
-                            <img src="https://github.com/anoukjn.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Anouk" alt="Anouk" width="32" height="32" class="rounded-circle ms-2">
-                            <br/>
-
-                            <h4 class="mt-1 text-center">
-                                UrbanVitaliz diagnostique en ce moment votre dossier !
-                            </h4>
-                        </p>
-
-                        <p class="text-center">
-                            L'équipe d'aiguillage vous proposera des <strong><em>Actions</em></strong> à prendre dès l'étude terminée.
-
-                            <br/><span class="text-secondary small">Vous serez alors prévenu.e par courriel.</span>
-                        </p>
-                    </div>
-                </div>
-
-                {% if not project.survey_session %}
-                <div class="bd-callout bd-callout-warning text-white mb-5 position-relative" style="border-radius: 10px; background: #5DC2B0;">
-                    <div class="d-flex justify-content-between w-100">
-                        <h4 class="text-left flex-grow">
-                            <img src="{% static 'projects/img/analyzing.gif' %}" width="50px">&nbsp;
-                            Accélérez votre diagnostic !
-                        </h4>
-
-                        <a href="{% url 'survey-project-session' project.id %}" class="text-white fw-bolder text-decoration-none stretched-link">
-                            <span class="align-middle">Démarrer</span><span class="fs-2 align-middle"> &#8594;</span>
-                        </a>
-                    </div>
-                    <div class="w-100">
-
-                        <p class="text-left fw-normal fs-5 m-0 p-0">
-                            Nos aiguilleuses ont des <span class="fw-bolder">questions pour vous</span>.
-                            <br/>
-                            <span class="small">
-                                En répondant à celles-ci, nous pourrons <span class="fw-bolder">mieux cibler votre besoin</span> dès le premier entretien.
-                            </span>
-                            <br/>
-                        </p>
-                        <div class="d-flex">
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                {% endif %}
-
-                {% if project.survey_session.answers.count > 0  or project.tasks.count %}
-                <div class="bd-callout bd-callout-info position-relative mb-5">
-                    <h4 class="mb-3">👋 Rebonjour !</h4>
-                    {% if project.survey_session and project.survey_session.completion != 100 %}
-                    <p>
-                        N'hésitez pas à continuer l'<strong>exploration de votre site</strong> en cliquant sur l'onglet "<strong>Connaissance du site</strong>".
-                    </p>
-                    {% endif %}
-
-                    {% if project.tasks.open.count %}
-                    <p>
-                        Des <strong>recommandations d'actions</strong> de nos aiguilleuses vous attendent ! Cliquez sur l'onglet "<strong>Actions</strong>" pour y accéder.
-                    </p>
-                    {% endif %}
-
-                </div>
-                {% endif %}
-
-                {% if project.survey_session and project.survey_session.answers.count == 0 %}
-
-                <div class="bd-callout bd-callout-warning text-white position-relative mb-5" style="border-radius: 10px; background: #5DC2B0;">
-                    <div class="d-flex justify-content-between w-100">
-                        <h4 class="text-left flex-grow m-0 p-0">
-                            <img src="{% static 'projects/img/analyzing.gif' %}" width="50px">
-                            &nbsp;
-                            Nous avons des questions pour vous
-                        </h4>
-
-                        <a href="{% url 'survey-project-session' project.id %}" class="text-white fw-bolder text-decoration-none stretched-link">
-                            <span class="align-middle">Répondre</span><span class="fs-2 align-middle"> &#8594;</span>
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
-
-
-                <!-- Notes de suivi -->
-                <div class="w-100">
-                    <h2 class="mb-3 d-inline-block">
-                        <svg class="bi" width="28" height="28" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
-                        </svg>
-                        Notes de suivi
-                    </h2>
-                    {% if user.is_staff %}
-                    <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-note' project.id %}">
-                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
-                        </svg>
-                        Ajouter une note
-                    </a>
-                    {% endif %}
-                </div>
-
-                {% if user.is_staff %}
-                {% include "projects/project/fragments/note_list.html" with notes=project.notes.all %}
-                {% else %}
-                {% include "projects/project/fragments/note_list.html" with notes=project.notes.public %}
-                {% endif %}
-
-            </div>
             <!-- TAB: exploration -->
-            <div class="tab-pane pt-4" id="exploration" role="tabpanel" aria-labelledby="exploration">
+            <div class="tab-pane show active pt-4" id="exploration" role="tabpanel" aria-labelledby="exploration">
                 {% include "projects/project/fragments/exploration.html" with session=project.survey_session %}
             </div>
 
@@ -312,6 +186,147 @@
                      </div>
                 -->
             </div>
+
+            <div class="tab-pane pt-4" id="sheet" role="tabpanel" aria-labelledby="sheet">
+
+                <!-- 
+                     {% if request.GET.first_time %}
+
+                     <div class="alert alert-success alert-dismissible fade show" role="alert">
+                     <h4 class="alert-heading">
+                     <svg class="bi align-middle" width="40" height="40" fill="currentColor">
+                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
+                     </svg>
+                     Merci !
+                     </h4>
+                     <p class="mb-0"><strong>Nous avons bien reçu votre demande et allons vous contacter.</strong></p>
+                     <p class="mb-0">Marquez cette page, elle vous permettra de suivre l'avancement de vos démarches et d'échanger avec l'équipe d'accompagnement.</p>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                     </div>
+                     {% endif %}
+                -->
+
+                <!-- 
+                     {% if not project.tasks.count %}
+                     <div class="border  p-5 align-items-center">
+                     <div class="w-100">
+                     <p class="text-center">
+                     <img src="https://github.com/salomeDeschenes.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Salomé" alt="Salomé" width="32" height="32" class="rounded-circle me-2">
+                     <svg class="bi align-middle" width="40" height="40" fill="currentColor">
+                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eyeglasses"/>
+                     </svg>
+                     <img src="https://github.com/anoukjn.png" data-bs-toggle="tooltip" data-bs-placement="top" title="Anouk" alt="Anouk" width="32" height="32" class="rounded-circle ms-2">
+                     <br/>
+
+                     <h4 class="mt-1 text-center">
+                     UrbanVitaliz diagnostique en ce moment votre dossier !
+                     </h4>
+                     </p>
+
+                     <p class="text-center">
+                     L'équipe d'aiguillage vous proposera des <strong><em>Actions</em></strong> à prendre dès l'étude terminée.
+
+                     <br/><span class="text-secondary small">Vous serez alors prévenu.e par courriel.</span>
+                     </p>
+                     </div>
+                     </div>
+
+                     {% if not project.survey_session %}
+                     <div class="bd-callout bd-callout-warning text-white mb-5 position-relative" style="border-radius: 10px; background: #5DC2B0;">
+                     <div class="d-flex justify-content-between w-100">
+                     <h4 class="text-left flex-grow">
+                     <img src="{% static 'projects/img/analyzing.gif' %}" width="50px">&nbsp;
+                     Accélérez votre diagnostic !
+                     </h4>
+
+                     <a href="{% url 'survey-project-session' project.id %}" class="text-white fw-bolder text-decoration-none stretched-link">
+                     <span class="align-middle">Démarrer</span><span class="fs-2 align-middle"> &#8594;</span>
+                     </a>
+                     </div>
+                     <div class="w-100">
+
+                     <p class="text-left fw-normal fs-5 m-0 p-0">
+                     Nos aiguilleuses ont des <span class="fw-bolder">questions pour vous</span>.
+                     <br/>
+                     <span class="small">
+                     En répondant à celles-ci, nous pourrons <span class="fw-bolder">mieux cibler votre besoin</span> dès le premier entretien.
+                     </span>
+                     <br/>
+                     </p>
+                     <div class="d-flex">
+                     </div>
+                     </div>
+                     </div>
+                     {% endif %}
+                     {% endif %}
+
+                -->
+
+                {% if project.survey_session.answers.count > 0  or project.tasks.count %}
+                <div class="bd-callout bd-callout-info position-relative mb-5">
+                    <h4 class="mb-3">👋 Rebonjour !</h4>
+                    {% if project.survey_session and project.survey_session.completion != 100 %}
+                    <p>
+                        N'hésitez pas à continuer l'<strong>exploration de votre site</strong> en cliquant sur l'onglet "<strong>Connaissance du site</strong>".
+                    </p>
+                    {% endif %}
+
+                    {% if project.tasks.open.count %}
+                    <p>
+                        Des <strong>recommandations d'actions</strong> de nos aiguilleuses vous attendent ! Cliquez sur l'onglet "<strong>Actions</strong>" pour y accéder.
+                    </p>
+                    {% endif %}
+
+                </div>
+                {% endif %}
+
+                <!-- XXX Remove?
+                     {% if project.survey_session and project.survey_session.answers.count == 0 %}
+
+                     <div class="bd-callout bd-callout-warning text-white position-relative mb-5" style="border-radius: 10px; background: #5DC2B0;">
+                     <div class="d-flex justify-content-between w-100">
+                     <h4 class="text-left flex-grow m-0 p-0">
+                     <img src="{% static 'projects/img/analyzing.gif' %}" width="50px">
+                     &nbsp;
+                     Nous avons des questions pour vous
+                     </h4>
+
+                     <a href="{% url 'survey-project-session' project.id %}" class="text-white fw-bolder text-decoration-none stretched-link">
+                     <span class="align-middle">Répondre</span><span class="fs-2 align-middle"> &#8594;</span>
+                     </a>
+                     </div>
+                     </div>
+                     {% endif %}
+                -->
+
+                <!-- Notes de suivi -->
+                <div class="w-100">
+                    <!-- 
+                         <h2 class="mb-3 d-inline-block">
+                         <svg class="bi" width="28" height="28" fill="currentColor">
+                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+                         </svg>
+                         Notes de suivi
+                         </h2>
+                    -->
+                    {% if user.is_staff %}
+                    <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-note' project.id %}">
+                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+                        </svg>
+                        Ajouter une note
+                    </a>
+                    {% endif %}
+                </div>
+
+                {% if user.is_staff %}
+                {% include "projects/project/fragments/note_list.html" with notes=project.notes.all %}
+                {% else %}
+                {% include "projects/project/fragments/note_list.html" with notes=project.notes.public %}
+                {% endif %}
+
+            </div>
+
 
             <!-- TAB: activit -->
             {% if user.is_staff %}
