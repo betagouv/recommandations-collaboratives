@@ -150,7 +150,7 @@ class OnboardingForm(forms.ModelForm):
             "org_name",
             "name",
             "location",
-            # "description",
+            "description",
             "impediments",
             "publish_to_cartofriches",
         ]

@@ -19,16 +19,13 @@
 
 
     <div class="bd-callout bd-callout-info mb-5">
-        <strong>Comment ceci fonctionne ?</strong>
-
-        <p>
-        Une fois ces quelques informations remplies, un <strong>membre de l'équipe</strong> prendra contact rapidement pour <strong>organiser un échange de vive voix</strong> (visio <em>ou</em> téléphone) afin de mieux <strong>saisir vos enjeux</strong> et <strong>démarrer votre accompagnement</strong>.
-        </p>
         <p class="mt-3">
             <svg class="bi me-1" width="16" height="16">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#patch-exclamation"/>
             </svg>
-            Pour toute <strong>autre demande</strong> qu'une friche à réhabiliter, merci de <a href="{% url 'home-contact' %}?next=/&subject=Prise de contact">nous contacter par email</a>.
+            <span class=" align-middle">
+                Pour toute <strong>autre demande</strong> qu'une friche à réhabiliter, merci de <a href="{% url 'home-contact' %}?next=/&subject=Prise de contact">nous contacter par email</a>.
+            </span>
         </p>
     </div>
 
@@ -120,7 +117,7 @@
                 <svg class="bi me-2" width="28" height="28">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#cone-striped"/>
                 </svg>
-                Identité de la Friche
+                De quelle friche parle-t-on ?
             </h3>
 
             <div class="form-floating mb-3">
@@ -132,19 +129,19 @@
                 {% endfor %}
             </div>
 
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col-3">
-                    <div class="form-floating mb-5">
+                    <div class="form-floating mb-3">
                         <input type="text" class="form-control {% if form.postcode.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.postcode.name }}" placeholder="Code Postal" value="{{ form.postcode.value|default:'' }}" required>
                         <label for="input-project-address">{{ form.postcode.label }}</label>
-                        
+
                         {% for error in form.postcode.errors %}
                         <div class="text-danger text-end">{{ error }}</div>
                         {% endfor %}
-                    </div> 
+                    </div>
                 </div>
                 <div class="col">
-                    <div class="form-floating mb-5">
+                    <div class="form-floating mb-3">
                         <input type="text" class="form-control {% if form.location.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.location.name }}" placeholder="Adresse" value="{{ form.location.value|default:'' }}" required>
                         <label for="input-project-address">{{ form.location.label }}</label>
                         <div id="input-email-help" class="form-text">Si la friche n'a pas d'adresse exacte, utilisez uniquement le nom de la commune.</div>
@@ -153,10 +150,22 @@
                         <div class="text-danger text-end">{{ error }}</div>
                         {% endfor %}
                     </div>
+
                 </div>
+
             </div>
 
-            <h3 class="mb-3">
+            <div class="form-floating mb-3">
+                <textarea maxlength="500" class="form-control {% if form.description.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-description" name="{{ form.description.name }}" placeholder="">{{ form.description.value|default:'' }}</textarea>
+                <label class="mb-2" for="input-project-description">Dites-nous quelques mots sur le contexte si vous le souhaitez...</label>
+                <div id="input-description-help" class="form-text">Limité à 500 caractères, vous pourrez nous en dire beaucoup plus par la suite !</div>
+
+                {% for error in form.description.errors %}
+                <div class="text-danger text-end">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <h3 class="mb-3 mt-5">
                 <svg class="bi me-2" width="28" height="28">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#life-preserver"/>
                 </svg>
@@ -175,6 +184,7 @@
                     {% endfor %}
                 </ul>
 
+                <!-- Impediments -->
                 <textarea class="form-control {% if form.impediments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-impediments" name="{{ form.impediments.name }}" value="{{ form.impediments.value|default:'' }}" placeholder="N'hésitez pas à préciser votre demande en quelques mots"></textarea>
                 <label class="visually-hidden" for="input-project-impediments">{{ form.impediments.label }}</label>
 
@@ -185,7 +195,7 @@
                 <!-- Cartofriches -->
                 <div class="mt-2">
                     <input class="form-check-input" type="checkbox" name="publish_to_cartofriches" id="input-project-publish-cartofriches" checked>
-                    <label for="input-project-publish-cartofriches">Je souhaite ajouter cette friche à la cartographie publique des friches - ce qui me permet de faire connaître ce site à des porteurs de projet potentiels !</label>
+                    <label for="input-project-publish-cartofriches">Je souhaite ajouter cette friche à la <a href="https://cartofriches.cerema.fr" target="_new">cartographie publique des friches</a> - ce qui me permet de faire connaître ce site à des porteurs de projet potentiels !</label>
                 </div>
 
             </div>
