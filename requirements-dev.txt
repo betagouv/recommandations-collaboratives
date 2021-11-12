@@ -2,6 +2,7 @@ bandit
 black
 coverage
 django-debug-toolbar
+django_coverage_plugin
 fabric
 ipython
 model_bakery
