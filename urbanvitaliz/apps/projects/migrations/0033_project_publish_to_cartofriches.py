@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0032_rename_taskrecommandation_taskrecommendation'),
+        ("projects", "0032_rename_taskrecommandation_taskrecommendation"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='project',
-            name='publish_to_cartofriches',
-            field=models.BooleanField(default=False, verbose_name='Publier sur cartofriches'),
+            model_name="project",
+            name="publish_to_cartofriches",
+            field=models.BooleanField(
+                default=False, verbose_name="Publier sur cartofriches"
+            ),
         ),
     ]
