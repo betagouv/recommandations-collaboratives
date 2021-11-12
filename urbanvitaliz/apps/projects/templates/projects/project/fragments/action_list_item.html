@@ -168,28 +168,11 @@
             <div class="accordion-body">
 
                 <!-- Comments -->
-                <div class="d-flex flex-column m-2 bg-light p-4 comment">
-                    <p class="m-0 p-0">
-                        {{ task.content_rendered|safe }}
-                    </p>
-
-                    <div>
-                        <!-- Image -->
-                        <img
-                            src="{% gravatar_url task.created_by.email 16 %}"
-                            alt="{{ task.created_by.get_full_name }}"
-                            class="me-1 rounded-circle align-middle"
-                            height="18px" width="18px"
-                        />
-                        <span class="align-middle">
-                            {{ task.created_by.get_full_name }}
-                            <small class="text-muted">{{ task.created_on|naturalday }}</small>
-                        </span>
-                    </div>
-                </div>
+                {% include "projects/project/fragments/action_comment.html" with comment=task.content_rendered author=task.created_by date=task.created_on %}
 
                 <!-- Followups -->
                 {% for followup in task.followups.all %}
+                {% if followup.status %}
                 <div class="d-flex flex-column m-2 p-2 comment small"> 
                     <span class="align-middle" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ followup.who.get_full_name|default:followup.who.email }}">
                         <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
@@ -206,6 +189,9 @@
                             <q>&nbsp;{{ followup.comment|safe }}&nbsp;</q>
                         </p>
                 </div>
+                {% else %}
+                {% include "projects/project/fragments/action_comment.html" with comment=followup.comment author=followup.who date=followup.timestamp %}
+                {% endif %}
                 {% endfor %}
 
                 {% if can_administrate %}

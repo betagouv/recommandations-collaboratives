@@ -1,0 +1,21 @@
+{% load gravatar %}
+{% load humanize %}
+<div class="d-flex flex-column m-2 bg-light p-4 comment">
+    <p class="m-0 p-0">
+        {{ comment|safe }}
+    </p>
+
+    <div>
+        <!-- Image -->
+        <img
+            src="{% gravatar_url author.email 16 %}"
+            alt="{{ author.get_full_name }}"
+            class="me-1 rounded-circle align-middle"
+            height="18px" width="18px"
+        />
+        <span class="align-middle">
+            {{ author.get_full_name }}
+            <small class="text-muted">{{ date|naturalday }}</small>
+        </span>
+    </div>
+</div>
