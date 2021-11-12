@@ -14,13 +14,8 @@
      nextLabel: 'Suivant',
      doneLabel: 'C\'est parti !',
      steps: [
-         {% if "first_time" in request.GET %}
          {
-             intro: "Pour vous conseiller au mieux, l'équipe UrbanVitaliz a besoin d'un certain nombre d'informations sur votre site. Les prochains écrans vont vous poser des questions dessus. Prévoyez environ 20 min pour y répondre. <strong>Vous pouvez quitter et reprendre le questionnaire où vous l'avez laissé à tout moment.</strong>"
-         },
-         {% endif %}
-         {
-             intro: "👋 Bienvenue dans le <strong>parcours d'exploration</strong> d'UrbanVitaliz<br/>Ce parcours vous aide à structurer votre connaissance de votre friche, à ne rien oublier d’important pour la suite du projet."
+             intro: "Obtenez des recommandations plus efficaces en répondant à quelques questions ! <br/>Ce parcours vous guide pour structurer votre connaissance de la friche.<br/>Vous pouvez quitter et reprendre le questionnaire à tout moment, et inviter des collaborateurs pour le remplir."
          },
          {
              element: document.querySelector('#qs-heading'),
