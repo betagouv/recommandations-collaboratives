@@ -149,13 +149,26 @@
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
                     </svg>
                     {% if task.reminders.count %}
-                    <span class="text-secondary align-middle small">Rappel le {{ task.reminders.all.0.deadline }}</span>
+                    {% with reminder=task.reminders.all.0 %}
+                    {% if reminder.origin == 1 %} {# Set by user #}
+                    <span class="text-secondary align-middle small">Rappel pour <strong>{{ project.email }}</strong> le {{ task.reminders.all.0.deadline }}</span>
+                    {% elif user.is_staff %}
+                    <span class="text-secondary align-middle small">Rappel <strong>auto</strong> le {{ task.reminders.all.0.deadline }}</span>
                     {% endif %}
+                    {% endwith %}
+                    {% endif %}
+
                     <a href="javascript:null;" class="align-middle text-decoration-underline small btn btn-text btn-sm p-0 m-0 text-primary" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">
                         {% if not task.reminders.count %}
                         Programmer un rappel
                         {% else %}
+                        {% with reminder=task.reminders.all.0 %}
+                        {% if reminder.origin == 2 %} {# Set by staff #}
+                        Programmer un rappel
+                        {% else %}
                         Changer
+                        {% endif %}
+                        {% endwith %}
                         {% endif %}
                     </a>
                 </span>
