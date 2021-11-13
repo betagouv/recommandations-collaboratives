@@ -17,7 +17,8 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -1052,6 +1053,16 @@ def test_create_note_available_for_staff_users(client):
 
 
 @pytest.mark.django_db
+def test_create_note_available_for_project_collaborators(client):
+    with login(client) as user:
+        project = Recipe(models.Project, email=user.email).make()
+        url = reverse("projects-create-note", args=[project.id])
+        response = client.get(url)
+    assert response.status_code == 200
+    assertContains(response, 'form id="form-projects-add-note"')
+
+
+@pytest.mark.django_db
 def test_create_new_note_for_project_and_redirect(client):
     project = Recipe(models.Project).make()
     with login(client, is_staff=True):
@@ -1061,6 +1072,34 @@ def test_create_new_note_for_project_and_redirect(client):
         )
     note = models.Note.fetch()[0]
     assert note.project == project
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_create_public_note_for_project_collaborator_and_redirect(client):
+    with login(client) as user:
+        project = Recipe(models.Project, email=user.email).make()
+        response = client.post(
+            reverse("projects-create-note", args=[project.id]),
+            data={"content": "this is some content"},
+        )
+    note = models.Note.fetch()[0]
+    assert note.project == project
+    assert note.public == True
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_create_private_note_not_available_for_project_collaborator(client):
+    with login(client) as user:
+        project = Recipe(models.Project, email=user.email).make()
+        response = client.post(
+            reverse("projects-create-note", args=[project.id]),
+            data={"content": "this is some content", "public": False},
+        )
+    note = models.Note.fetch()[0]
+    assert note.project == project
+    assert note.public == True
     assert response.status_code == 302
 
 
@@ -1120,6 +1159,32 @@ def test_update_note_available_for_staff_users(client):
     assert response.status_code == 200
     # FIXME rename add-note to edit-note ?
     assertContains(response, 'form id="form-projects-add-note"')
+
+
+@pytest.mark.django_db
+def test_update_public_note_for_project_collaborator_and_redirect(client):
+    with login(client) as user:
+        project = Recipe(models.Project, email=user.email).make()
+        note = Recipe(models.Note, project=project, public=True).make()
+        response = client.post(
+            reverse("projects-update-note", args=[note.id]),
+            data={"content": "this is some content", "tags": "blah"},
+        )
+    note = models.Note.fetch()[0]
+    assert note.project == project
+    assert note.public == True
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_update_private_note_for_project_collaborator(client):
+    with login(client) as user:
+        project = Recipe(models.Project, email=user.email).make()
+        note = Recipe(models.Note, project=project, public=False).make()
+        url = reverse("projects-update-note", args=[note.id])
+        response = client.get(url)
+
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db

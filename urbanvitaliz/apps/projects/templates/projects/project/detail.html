@@ -263,7 +263,7 @@
                 -->
 
                 {% if project.survey_session.answers.count > 0  or project.tasks.count %}
-                <div class="bd-callout bd-callout-info position-relative mb-5">
+                <div class="bd-callout bd-callout-info position-relative mb-2">
                     <h4 class="mb-3">👋 Rebonjour !</h4>
                     {% if project.survey_session and project.survey_session.completion != 100 %}
                     <p>
@@ -300,7 +300,7 @@
                 -->
 
                 <!-- Notes de suivi -->
-                <div class="w-100">
+                <div class="w-100 d-flex justify-content-end">
                     <!-- 
                          <h2 class="mb-3 d-inline-block">
                          <svg class="bi" width="28" height="28" fill="currentColor">
@@ -309,8 +309,8 @@
                          Notes de suivi
                          </h2>
                     -->
-                    {% if user.is_staff %}
-                    <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-note' project.id %}">
+                    {% if can_administrate %}
+                    <a class="btn btn-light mb-2"  href="{% url 'projects-create-note' project.id %}">
                         <svg class="bi me-1" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
                         </svg>
@@ -319,11 +319,13 @@
                     {% endif %}
                 </div>
 
+                <div>
                 {% if user.is_staff %}
                 {% include "projects/project/fragments/note_list.html" with notes=project.notes.all %}
                 {% else %}
                 {% include "projects/project/fragments/note_list.html" with notes=project.notes.public %}
-                {% endif %}
+                    {% endif %}
+                </div>
 
             </div>
 

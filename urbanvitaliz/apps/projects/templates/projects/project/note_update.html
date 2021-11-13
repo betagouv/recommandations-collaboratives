@@ -64,6 +64,7 @@
 
 	      </form>
 
+        {% if user.is_staff %}
         <hr/>
         <div class="d-flex justify-content-end">
             <form id="form-projects-delete-note" method="POST" action="{% url 'projects-delete-note' note.id %}">
@@ -76,6 +77,7 @@
 		            </button>
             </form>
         </div>
+        {% endif %}
 
         {{ form.media }}
 
