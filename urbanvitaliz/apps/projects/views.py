@@ -25,7 +25,8 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -314,38 +315,63 @@ class ProjectForm(forms.ModelForm):
 @login_required
 def create_note(request, project_id=None):
     """Create a new note for a project"""
-    is_staff_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
+    can_administrate_or_403(project, request.user, allow_draft=True)
+    is_staff = request.user.is_staff
+
     if request.method == "POST":
-        form = NoteForm(request.POST)
+        if is_staff:
+            form = StaffNoteForm(request.POST)
+        else:
+            form = NoteForm(request.POST)
+
         if form.is_valid():
             instance = form.save(commit=False)
             instance.project = project
+            if not is_staff:
+                instance.public = True
             instance.save()
-            return redirect(reverse("projects-project-detail", args=[project_id]))
+            return redirect(
+                reverse("projects-project-detail", args=[project_id]) + "#sheet"
+            )
     else:
-        form = NoteForm()
+        if is_staff:
+            form = StaffNoteForm()
+        else:
+            form = NoteForm()
     return render(request, "projects/project/note_create.html", locals())
 
 
 @login_required
 def update_note(request, note_id=None):
     """Update an existing note for a project"""
-    is_staff_or_403(request.user)
     note = get_object_or_404(models.Note, pk=note_id)
     project = note.project  # For template consistency
+    can_administrate_or_403(project, request.user)
+    is_staff = request.user.is_staff
+
+    if not note.public:
+        is_staff_or_403(request.user)
 
     if request.method == "POST":
-        form = NoteForm(request.POST, instance=note)
+        if is_staff:
+            form = StaffNoteForm(request.POST, instance=note)
+        else:
+            form = NoteForm(request.POST, instance=note)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.updated_on = timezone.now()
             instance.save()
             instance.project.updated_on = instance.updated_on
             instance.project.save()
-            return redirect(reverse("projects-project-detail", args=[note.project_id]))
+            return redirect(
+                reverse("projects-project-detail", args=[note.project_id]) + "#sheet"
+            )
     else:
-        form = NoteForm(instance=note)
+        if is_staff:
+            form = StaffNoteForm(instance=note)
+        else:
+            form = NoteForm(instance=note)
     return render(request, "projects/project/note_update.html", locals())
 
 
@@ -370,9 +396,15 @@ class NoteForm(forms.ModelForm):
 
     class Meta:
         model = models.Note
-        fields = ["content", "tags", "public"]
+        fields = ["content", "tags"]
 
     content = MarkdownxFormField()
+
+
+class StaffNoteForm(NoteForm):
+    class Meta:
+        model = models.Note
+        fields = ["content", "tags", "public"]
 
 
 @login_required

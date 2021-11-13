@@ -20,7 +20,7 @@
 <div class="row row-cols-1 row-cols-md-2">
 
     {% for note in notes %}
-    <div class="col">
+    <div class="col mb-4">
         <div class="card h-100">
             <div class="card-body">
                 <div class="card-subtitle mb-2 text-muted">
@@ -54,7 +54,7 @@
                 {% endif %}
                 &nbsp;
                 <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em>
-                {% if user.is_staff %}
+                {% if can_administrate %}
                     - <a href="{% url 'projects-update-note' note.id %}">éditer</a></span>
                 {% endif %}
             </div>
