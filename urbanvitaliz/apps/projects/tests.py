@@ -17,8 +17,7 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -854,7 +853,8 @@ def test_delete_task_from_project_and_redirect(client):
 
 @pytest.mark.django_db
 def test_create_reminder_for_task(client):
-    task = Recipe(models.Task).make()
+    project = Recipe(models.Project, email="owner@example.com").make()
+    task = Recipe(models.Task, project=project).make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
     with login(client) as user:
@@ -862,7 +862,7 @@ def test_create_reminder_for_task(client):
     assert response.status_code == 302
     reminder = reminders.Mail.to_send.all()[0]
     assert models.TaskFollowupRsvp.objects.count() == 1
-    assert reminder.recipient == user.email
+    assert reminder.recipient == project.email
     in_fifteen_days = datetime.date.today() + datetime.timedelta(days=data["days"])
     assert reminder.deadline == in_fifteen_days
 
@@ -879,7 +879,7 @@ def test_create_reminder_without_delay_for_task(client):
 
 
 @pytest.mark.django_db
-def test_recreate_reminder_for_same_task(client):
+def test_recreate_reminder_after_for_same_task(client):
     task = Recipe(models.Task).make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
@@ -890,8 +890,27 @@ def test_recreate_reminder_for_same_task(client):
 
     assert response.status_code == 302
     reminder = reminders.Mail.to_send.all()[0]
+    assert reminders.Mail.to_send.count() == 1
     in_ten_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
     assert reminder.deadline == in_ten_days
+    assert models.TaskFollowupRsvp.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_recreate_reminder_before_for_same_task(client):
+    task = Recipe(models.Task).make()
+    url = reverse("projects-remind-task", args=[task.id])
+    data = {"days": 5}
+    data2 = {"days": 2}
+    with login(client):
+        response = client.post(url, data=data)
+        response = client.post(url, data=data2)
+
+    assert response.status_code == 302
+    assert reminders.Mail.to_send.count() == 1
+    reminder = reminders.Mail.to_send.all()[0]
+    in_two_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
+    assert reminder.deadline == in_two_days
     assert models.TaskFollowupRsvp.objects.count() == 1
 
 

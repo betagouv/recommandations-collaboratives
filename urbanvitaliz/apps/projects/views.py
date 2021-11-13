@@ -25,8 +25,7 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import is_staff_or_403, send_email
 
 from . import models, signals
-from .utils import (can_administrate_or_403, can_administrate_project,
-                    generate_ro_key)
+from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
 
 ########################################################################
 # notifications
@@ -688,7 +687,7 @@ class RemindTaskForm(forms.Form):
 def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, pk=task_id)
-    recipient = request.user.email
+    recipient = task.project.email
 
     if request.method == "POST":
         form = RemindTaskForm(request.POST)

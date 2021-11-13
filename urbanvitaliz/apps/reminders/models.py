@@ -8,11 +8,9 @@ created : 2021-09-28 12:40:54 CEST
 """
 
 
-from django.db import models
-
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-
+from django.db import models
 from django.utils import timezone
 
 
