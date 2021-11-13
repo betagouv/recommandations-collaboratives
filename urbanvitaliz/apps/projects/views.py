@@ -347,7 +347,7 @@ def update_note(request, note_id=None):
     """Update an existing note for a project"""
     note = get_object_or_404(models.Note, pk=note_id)
     project = note.project  # For template consistency
-    can_administrate_or_403(project, request.user)
+    can_administrate_or_403(project, request.user, allow_draft=True)
     is_staff = request.user.is_staff
 
     if not note.public:

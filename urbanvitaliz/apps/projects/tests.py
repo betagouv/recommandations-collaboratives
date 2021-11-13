@@ -1168,7 +1168,7 @@ def test_update_public_note_for_project_collaborator_and_redirect(client):
         note = Recipe(models.Note, project=project, public=True).make()
         response = client.post(
             reverse("projects-update-note", args=[note.id]),
-            data={"content": "this is some content", "tags": "blah"},
+            data={"content": "this is some content"},
         )
     note = models.Note.fetch()[0]
     assert note.project == project
