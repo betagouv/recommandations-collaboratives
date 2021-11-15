@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="col col-xl-8 col-lg-10">
-        {% if user.is_staff %}
+        {% if is_switchtender %}
         <p>
             <span class="badge bg-warning">Beta feature</span> <a href="{% url 'projects-project-tasks-suggest' project.pk %}">Accès aux suggestions de Recommandations</a>
         </p>
@@ -18,7 +18,7 @@
              </svg>
              <span class="align-middle">Actions à mener</span>
              </h2>
-             {% if user.is_staff %}
+             {% if is_switchtender %}
              <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-task' project.id %}">
              <svg class="bi me-1" width="16" height="16" fill="currentColor">
              <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>

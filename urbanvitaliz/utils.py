@@ -30,6 +30,17 @@ def is_staff_or_403(user):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
+def is_switchtender_or_403(user):
+    """Raise a 403 error is user is not a switchtender"""
+    if not user or not check_if_switchtender(user):
+        raise PermissionDenied("L'information demandée n'est pas disponible")
+
+
+def check_if_switchtender(user):
+    """Return true if user is a switchtender"""
+    return auth.User.objects.filter(pk=user.id, groups__name="switchtender").exists()
+
+
 def send_email(
     request, user_email, email_subject, template_base_name, extra_context=None
 ):
@@ -61,11 +72,17 @@ def send_email(
 
 
 @contextmanager
-def login(client, is_staff=False, username="test", email="test@example.com"):
+def login(
+    client, is_staff=False, groups=None, username="test", email="test@example.com"
+):
     """Create a user and sign her into the application"""
+    groups = groups or []
     user = auth.User.objects.create_user(
         username=username, email=email, is_staff=is_staff
     )
+    for name in groups:
+        group = auth.Group.objects.get(name=name)
+        group.user_set.add(user)
     client.force_login(user)
     yield user
 

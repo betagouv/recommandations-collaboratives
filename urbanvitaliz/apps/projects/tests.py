@@ -17,8 +17,7 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -256,7 +255,7 @@ def test_project_list_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_project_list_available_for_staff_users(client):
+def test_project_list_available_for_staff_user(client):
     url = reverse("projects-project-list")
     with login(client, is_staff=True):
         response = client.get(url)
@@ -279,7 +278,7 @@ def test_project_list_contains_project_name_and_link(client):
 
 
 @pytest.mark.django_db
-def test_project_detail_not_available_for_non_staff_users(client):
+def test_project_detail_not_available_for_non_switchtender(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-project-detail", args=[project.id])
     with login(client):
@@ -291,17 +290,17 @@ def test_project_detail_not_available_for_non_staff_users(client):
 def test_project_detail_available_for_owner(client):
     # project email is same as test user to be logged in
     with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, emails=[user.email]).make()
+        project = Recipe(models.Project, email=user.email).make()
         url = reverse("projects-project-detail", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_project_detail_available_for_staff_users(client):
+def test_project_detail_available_for_switchtender(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-project-detail", args=[project.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -312,7 +311,7 @@ def test_project_detail_contains_informations(client):
     task = Recipe(models.Task, project=project).make()
     note = Recipe(models.Note, project=project).make()
     url = reverse("projects-project-detail", args=[project.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assertContains(response, project.description)
     assertContains(response, task.content)
@@ -323,7 +322,7 @@ def test_project_detail_contains_informations(client):
 def test_project_detail_contains_actions(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-project-detail", args=[project.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     add_task_url = reverse("projects-create-task", args=[project.id])
     assertContains(response, add_task_url)
@@ -346,10 +345,10 @@ def test_update_project_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_update_project_available_for_staff_users(client):
+def test_update_project_available_for_switchtender(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-project-update", args=[project.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -369,7 +368,7 @@ def test_update_project_wo_commune_and_redirect(client):
         "impediment": "some impediment",
     }
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url, data=data)
 
     project = models.Project.objects.get(id=project.id)
@@ -386,7 +385,7 @@ def test_update_project_with_commune(client):
     project = Recipe(models.Project, commune=commune).make()
     url = reverse("projects-project-update", args=[project.id])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
 
     assertContains(response, "<form")
@@ -413,7 +412,7 @@ def test_accept_project_and_redirect(client):
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url)
 
     project = models.Project.objects.get(id=project.id)
@@ -458,6 +457,8 @@ def test_delete_project_and_redirect(client):
 ########################################################################
 # modify who can access the project
 ########################################################################
+
+
 @pytest.mark.django_db
 def test_contributor_has_the_same_rights_as_the_owner(client):
     owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
@@ -476,6 +477,24 @@ def test_contributor_has_the_same_rights_as_the_owner(client):
 
 
 @pytest.mark.django_db
+def test_switchtender_can_administrate_project(client):
+    switchtender = Recipe(auth.User).make()
+    group = auth.Group.objects.get(name="switchtender")
+    switchtender.groups.add(group)
+    project = Recipe(models.Project, is_draft=False).make()
+
+    assert utils.can_administrate_project(project, switchtender)
+
+
+@pytest.mark.django_db
+def test_non_switchtender_cannot_administrate_project(client):
+    someone = Recipe(auth.User).make()
+    project = Recipe(models.Project, is_draft=False).make()
+
+    assert not utils.can_administrate_project(project, someone)
+
+
+@pytest.mark.django_db
 def test_non_staff_cannot_add_email_to_project(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-access-update", args=[project.id])
@@ -487,12 +506,12 @@ def test_non_staff_cannot_add_email_to_project(client):
 
 
 @pytest.mark.django_db
-def test_staff_can_add_email_to_project(client):
+def test_switchtender_can_add_email_to_project(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "test@example.com"}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         client.post(url, data=data)
 
     project = models.Project.objects.get(id=project.id)
@@ -575,12 +594,12 @@ def test_owner_cannot_remove_email_from_project_if_draft(client):
 
 
 @pytest.mark.django_db
-def test_staff_can_delete_email_from_project(client):
+def test_switchtender_can_delete_email_from_project(client):
     email = "test@example.com"
     project = Recipe(models.Project, emails=[email]).make()
     url = reverse("projects-access-delete", args=[project.id, email])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url)
 
     project = models.Project.objects.get(id=project.id)
@@ -596,7 +615,7 @@ def test_owner_cannot_be_removed_from_project_acl(client):
     project = Recipe(models.Project, email=email, emails=[email]).make()
     url = reverse("projects-access-delete", args=[project.id, email])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url)
 
     project = models.Project.objects.get(id=project.id)
@@ -639,10 +658,10 @@ def test_create_task_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_create_task_available_for_staff_users(client):
+def test_create_task_available_for_switchtender(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-create-task", args=[project.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-projects-add-task"')
@@ -652,7 +671,7 @@ def test_create_task_available_for_staff_users(client):
 def test_create_new_task_for_project_notify_user(mocker, client):
     project = Recipe(models.Project).make()
     mocker.patch("urbanvitaliz.apps.projects.views.notify_action_created")
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         client.post(
             reverse("projects-create-task", args=[project.id]),
             data={"content": "this is some content", "notify_email": True},
@@ -665,7 +684,7 @@ def test_create_new_task_for_project_notify_user(mocker, client):
 def test_create_new_task_for_project_and_redirect(client):
     project = Recipe(models.Project).make()
     username = "bob"
-    with login(client, username=username, is_staff=True):
+    with login(client, username=username, groups=["switchtender"]):
         response = client.post(
             reverse("projects-create-task", args=[project.id]),
             data={"content": "this is some content"},
@@ -797,10 +816,10 @@ def test_update_task_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_update_task_available_for_staff_users(client):
+def test_update_task_available_for_switchtender(client):
     task = Recipe(models.Task).make()
     url = reverse("projects-update-task", args=[task.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
     # FIXME rename add-task to edit-task ?
@@ -814,7 +833,7 @@ def test_update_task_for_project_and_redirect(client):
     url = reverse("projects-update-task", args=[task.id])
     data = {"content": "this is some content"}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url, data=data)
 
     task = models.Task.objects.get(id=task.id)
@@ -841,7 +860,7 @@ def test_delete_task_not_available_for_non_staff_users(client):
 @pytest.mark.django_db
 def test_delete_task_from_project_and_redirect(client):
     task = Recipe(models.Task).make()
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(reverse("projects-delete-task", args=[task.id]))
     task = models.Task.deleted_objects.get(id=task.id)
     assert task.deleted
@@ -858,7 +877,7 @@ def test_create_reminder_for_task(client):
     task = Recipe(models.Task, project=project).make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
-    with login(client) as user:
+    with login(client):
         response = client.post(url, data=data)
     assert response.status_code == 302
     reminder = reminders.Mail.to_send.all()[0]
@@ -1043,10 +1062,10 @@ def test_create_note_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_create_note_available_for_staff_users(client):
+def test_create_note_available_for_switchtender(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-create-note", args=[project.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-projects-add-note"')
@@ -1065,7 +1084,7 @@ def test_create_note_available_for_project_collaborators(client):
 @pytest.mark.django_db
 def test_create_new_note_for_project_and_redirect(client):
     project = Recipe(models.Project).make()
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
             data={"content": "this is some content"},
@@ -1085,7 +1104,7 @@ def test_create_public_note_for_project_collaborator_and_redirect(client):
         )
     note = models.Note.fetch()[0]
     assert note.project == project
-    assert note.public == True
+    assert note.public is True
     assert response.status_code == 302
 
 
@@ -1099,33 +1118,29 @@ def test_create_private_note_not_available_for_project_collaborator(client):
         )
     note = models.Note.fetch()[0]
     assert note.project == project
-    assert note.public == True
+    assert note.public is True
     assert response.status_code == 302
 
 
 @pytest.mark.django_db
-def test_private_note_shown_only_to_staff(client):
+def test_private_note_hidden_from_project_members(client):
     user_email = "not@admin.here"
-    note_content = "this is a private note"
-    project = Recipe(models.Project, emails=[user_email]).make()
-    with login(client, is_staff=True):
-        response = client.post(
-            reverse("projects-create-note", args=[project.id]),
-            data={"content": note_content},
-        )
+    project = Recipe(models.Project, is_draft=False, emails=[user_email]).make()
+
+    note = Recipe(models.Note, content="short note", public=False).make()
 
     with login(client, username="project_owner", email=user_email, is_staff=False):
         response = client.get(project.get_absolute_url())
 
-    assertNotContains(response, note_content)
+    assertNotContains(response, note.content)
 
 
 @pytest.mark.django_db
 def test_public_note_available_to_readers(client):
     user_email = "not@admin.here"
     note_content = "this is a public note"
-    project = Recipe(models.Project, emails=[user_email]).make()
-    with login(client, is_staff=True):
+    project = Recipe(models.Project, emails=[user_email], is_draft=False).make()
+    with login(client, groups=["switchtender"]):
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
             data={"content": note_content, "public": "True"},
@@ -1151,10 +1166,10 @@ def test_update_note_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_update_note_available_for_staff_users(client):
+def test_update_note_available_for_switchtender(client):
     note = Recipe(models.Note).make()
     url = reverse("projects-update-note", args=[note.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
     # FIXME rename add-note to edit-note ?
@@ -1172,7 +1187,7 @@ def test_update_public_note_for_project_collaborator_and_redirect(client):
         )
     note = models.Note.fetch()[0]
     assert note.project == project
-    assert note.public == True
+    assert note.public is True
     assert response.status_code == 302
 
 
@@ -1194,7 +1209,7 @@ def test_update_note_for_project_and_redirect(client):
     url = reverse("projects-update-note", args=[note.id])
     data = {"content": "this is some content"}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url, data=data)
 
     note = models.Note.objects.get(id=note.id)
@@ -1211,7 +1226,7 @@ def test_delete_note_for_project_and_redirect(client):
     note = Recipe(models.Note, project=project).make()
     url = reverse("projects-delete-note", args=[note.id])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url)
 
     note = models.Note.objects.get(id=note.id)
@@ -1226,10 +1241,10 @@ def test_delete_note_for_project_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_staff_push_resource_fails_on_get(client):
+def test_switchtender_push_resource_fails_on_get(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-push-resource", args=[project.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
 
     newurl = reverse("projects-project-detail", args=[project.id])
@@ -1237,10 +1252,10 @@ def test_staff_push_resource_fails_on_get(client):
 
 
 @pytest.mark.django_db
-def test_staff_push_resource_to_project(client):
+def test_switchtender_push_resource_to_project(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-push-resource", args=[project.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url)
     # project is stored in session and user redirected to resource app.
     assert client.session["project_id"] == project.id
@@ -1250,12 +1265,12 @@ def test_staff_push_resource_to_project(client):
 
 
 @pytest.mark.django_db
-def test_staff_push_resource_to_project_needs_project_id(client):
+def test_switchtender_push_resource_to_project_needs_project_id(client):
     project = Recipe(models.Project).make()
     resource = Recipe(resources.Resource, public=True).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         session = client.session
         session["project_id"] = project.id
         session.save()
@@ -1265,23 +1280,23 @@ def test_staff_push_resource_to_project_needs_project_id(client):
 
 
 @pytest.mark.django_db
-def test_staff_push_resource_to_project_fails_if_no_project_in_session(client):
+def test_switchtender_push_resource_to_project_fails_if_no_project_in_session(client):
     resource = Recipe(resources.Resource, public=True).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
 
     assert response.status_code == 404
 
 
 @pytest.mark.django_db
-def test_staff_create_action_for_resource_push(client):
+def test_switchtender_create_action_for_resource_push(client):
     project = Recipe(models.Project).make()
     resource = Recipe(resources.Resource, public=True).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         # project_id should be in session
         session = client.session
         session["project_id"] = project.id
@@ -1303,12 +1318,12 @@ def test_staff_create_action_for_resource_push(client):
 
 
 @pytest.mark.django_db
-def test_staff_create_action_for_resource_push_with_notification(client):
+def test_switchtender_create_action_for_resource_push_with_notification(client):
     project = Recipe(models.Project).make()
     resource = Recipe(resources.Resource, public=True).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         # project_id should be in session
         session = client.session
         session["project_id"] = project.id
@@ -1340,8 +1355,10 @@ def test_staff_create_action_for_resource_push_with_notification(client):
 ########################################################################
 # Task Recommendation
 ########################################################################
+
+
 @pytest.mark.django_db
-def test_task_recommendation_list_not_available_for_non_staff_users(client):
+def test_task_recommendation_list_not_available_for_non_switchtender(client):
     url = reverse("projects-task-recommendation-list")
     with login(client):
         response = client.get(url)
@@ -1349,16 +1366,16 @@ def test_task_recommendation_list_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_list_available_for_staff_users(client):
+def test_task_recommendation_list_available_for_switchtender(client):
     url = reverse("projects-task-recommendation-list")
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
 
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_task_recommendation_create_not_available_for_non_staff_users(client):
+def test_task_recommendation_create_not_available_for_non_switchtender(client):
     url = reverse("projects-task-recommendation-create")
     with login(client):
         response = client.get(url)
@@ -1366,9 +1383,9 @@ def test_task_recommendation_create_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_create_available_staff_users(client):
+def test_create_task_recommendation_available_for_switchtender(client):
     url = reverse("projects-task-recommendation-create")
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -1379,7 +1396,7 @@ def test_task_recommendation_is_created(client):
     resource = Recipe(resources.Resource).make()
 
     data = {"text": "mew", "resource": resource.pk}
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url, data=data)
 
     assert models.TaskRecommendation.objects.count() == 1
@@ -1390,7 +1407,7 @@ def test_task_recommendation_is_created(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_update_not_available_for_non_staff_users(client):
+def test_task_recommendation_update_not_available_for_non_switchtender(client):
     recommendation = Recipe(models.TaskRecommendation).make()
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
     with login(client):
@@ -1399,10 +1416,10 @@ def test_task_recommendation_update_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_update_available_staff_users(client):
+def test_task_recommendation_update_available_for_switchtender(client):
     recommendation = Recipe(models.TaskRecommendation).make()
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -1414,7 +1431,7 @@ def test_task_recommendation_is_updated(client):
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
 
     data = {"text": "new-text", "resource": recommendation.resource.pk}
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -1427,7 +1444,7 @@ def test_task_recommendation_is_updated(client):
 
 
 @pytest.mark.django_db
-def test_task_suggestion_not_available_for_non_staff_users(client):
+def test_task_suggestion_not_available_for_non_switchtender(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client):
@@ -1439,7 +1456,7 @@ def test_task_suggestion_not_available_for_non_staff_users(client):
 def test_task_suggestion_when_no_survey(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -1450,7 +1467,7 @@ def test_task_suggestion_available_with_bare_project(client):
     Recipe(models.TaskRecommendation, condition="").make()
     project = Recipe(models.Project).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -1462,7 +1479,7 @@ def test_task_suggestion_available_with_filled_project(client):
     Recipe(models.TaskRecommendation, condition="").make()
     project = Recipe(models.Project, commune=commune).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -1481,7 +1498,7 @@ def test_task_suggestion_available_with_localized_reco(client):
     ).make()
     project = Recipe(models.Project, commune=commune).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
