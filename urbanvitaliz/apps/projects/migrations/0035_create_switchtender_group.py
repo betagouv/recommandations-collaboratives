@@ -8,8 +8,6 @@ from django.contrib.auth import models as auth
 def create_switchtender_group(apps, schema_editor):
     """Create the switchtender group for their permissions"""
     g, _ = auth.Group.objects.get_or_create(name="switchtender")
-    p = auth.Permission.objects.get(codename="can_administrate_project")
-    g.permissions.add(p)
 
 
 def delete_switchtender_group(apps, schema_editor):
