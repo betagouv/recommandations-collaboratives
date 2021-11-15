@@ -118,9 +118,11 @@ class Project(models.Model):
         return reverse("projects-project-detail", kwargs={"project_id": self.pk})
 
     class Meta:
-        ordering = []
         verbose_name = "project"
         verbose_name_plural = "projects"
+        permissions = (
+            ("can_administrate_project", ("Aiguilleuse > Peut administrer un projet")),
+        )
 
     def __str__(self):  # pragma: nocover
         return f"{self.name} {self.location}"

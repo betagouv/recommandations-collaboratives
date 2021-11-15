@@ -21,7 +21,7 @@ def can_administrate_project(project, user, allow_draft=False):
     return (
         ((user.email == project.email) or (user.email in project.emails))
         and ((not project.is_draft) or allow_draft)  # noqa: F841
-    ) or user.is_staff
+    ) or user.has_perm("projects.can_administrate_project")
 
 
 def can_administrate_or_403(project, user, allow_draft=False):

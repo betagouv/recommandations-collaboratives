@@ -138,7 +138,7 @@
 
 
             <!-- Activity -->
-            {% if user.is_staff %}
+            {% if is_switchtender %}
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab" aria-controls="activity" aria-selected="false">
                     <svg class="bi align-middle me-1" width="16" height="16">
@@ -162,7 +162,7 @@
                 {% include "projects/project/fragments/reminder_modal.html" %}
                 {% include "projects/project/fragments/actions.html" %}
 
-                <!-- 
+                <!--
                      <h4>Ressources connexes</h4>
                      <div class="text-secondary">
                      {% for bookmark in project.bookmarks.all %}
@@ -189,7 +189,7 @@
 
             <div class="tab-pane pt-4" id="sheet" role="tabpanel" aria-labelledby="sheet">
 
-                <!-- 
+                <!--
                      {% if request.GET.first_time %}
 
                      <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -206,7 +206,7 @@
                      {% endif %}
                 -->
 
-                <!-- 
+                <!--
                      {% if not project.tasks.count %}
                      <div class="border  p-5 align-items-center">
                      <div class="w-100">
@@ -301,7 +301,7 @@
 
                 <!-- Notes de suivi -->
                 <div class="w-100 d-flex justify-content-end">
-                    <!-- 
+                    <!--
                          <h2 class="mb-3 d-inline-block">
                          <svg class="bi" width="28" height="28" fill="currentColor">
                          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
@@ -320,7 +320,7 @@
                 </div>
 
                 <div>
-                {% if user.is_staff %}
+                {% if is_switchtender %}
                 {% include "projects/project/fragments/note_list.html" with notes=project.notes.all %}
                 {% else %}
                 {% include "projects/project/fragments/note_list.html" with notes=project.notes.public %}
@@ -331,7 +331,7 @@
 
 
             <!-- TAB: activit -->
-            {% if user.is_staff %}
+            {% if is_switchtender %}
             <div class="tab-pane pt-4" id="activity" role="tabpanel" aria-labelledby="activity">
                 {% include "projects/project/fragments/activity.html"  %}
             </div>

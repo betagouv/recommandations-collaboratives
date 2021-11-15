@@ -22,11 +22,20 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import is_staff_or_403, send_email
+
+from urbanvitaliz.utils import (
+    check_if_switchtender,
+    is_switchtender_or_403,
+    is_staff_or_403,
+    send_email,
+)
 
 from . import models, signals
-from .utils import (can_administrate_or_403, can_administrate_project,
-                    generate_ro_key)
+from .utils import (
+    can_administrate_or_403,
+    can_administrate_project,
+    generate_ro_key,
+)
 
 ########################################################################
 # notifications
@@ -196,9 +205,16 @@ def project_detail(request, project_id=None):
     """Return the details of given project for switchtender"""
     project = get_object_or_404(models.Project, pk=project_id)
 
+    # check user can administrate projet (member or switchtender)
+    if request.user.email != project.email:
+        can_administrate_or_403(project, request.user)
+
+    is_switchtender = check_if_switchtender(request.user)
+
     # XXX: We need this here too since onboarding now redirects to
     # this page directly.
     projects = models.Project.fetch(email=request.user.email)
+
     # store my projects in the session
     request.session["projects"] = list(
         {
@@ -209,10 +225,6 @@ def project_detail(request, project_id=None):
         }
         for p in projects
     )
-
-    # if user is not the owner then check for admin rights
-    if request.user.email not in project.emails:
-        is_staff_or_403(request.user)
 
     try:
         survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
@@ -245,7 +257,7 @@ def project_detail_from_sharing_link(request, project_ro_key):
 @login_required
 def project_update(request, project_id=None):
     """Update the base information of a project"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
         form = ProjectForm(request.POST, instance=project)
@@ -268,7 +280,7 @@ def project_update(request, project_id=None):
 @login_required
 def project_accept(request, project_id=None):
     """Update project as accepted for processing"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
         project.is_draft = False
@@ -317,10 +329,10 @@ def create_note(request, project_id=None):
     """Create a new note for a project"""
     project = get_object_or_404(models.Project, pk=project_id)
     can_administrate_or_403(project, request.user, allow_draft=True)
-    is_staff = request.user.is_staff
+    is_switchtender = check_if_switchtender(request.user)
 
     if request.method == "POST":
-        if is_staff:
+        if is_switchtender:
             form = StaffNoteForm(request.POST)
         else:
             form = NoteForm(request.POST)
@@ -328,14 +340,14 @@ def create_note(request, project_id=None):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.project = project
-            if not is_staff:
+            if not is_switchtender:
                 instance.public = True
             instance.save()
             return redirect(
                 reverse("projects-project-detail", args=[project_id]) + "#sheet"
             )
     else:
-        if is_staff:
+        if is_switchtender:
             form = StaffNoteForm()
         else:
             form = NoteForm()
@@ -348,13 +360,13 @@ def update_note(request, note_id=None):
     note = get_object_or_404(models.Note, pk=note_id)
     project = note.project  # For template consistency
     can_administrate_or_403(project, request.user, allow_draft=True)
-    is_staff = request.user.is_staff
+    is_switchtender = check_if_switchtender(request.user)
 
     if not note.public:
-        is_staff_or_403(request.user)
+        is_switchtender_or_403(request.user)
 
     if request.method == "POST":
-        if is_staff:
+        if is_switchtender:
             form = StaffNoteForm(request.POST, instance=note)
         else:
             form = NoteForm(request.POST, instance=note)
@@ -368,7 +380,7 @@ def update_note(request, note_id=None):
                 reverse("projects-project-detail", args=[note.project_id]) + "#sheet"
             )
     else:
-        if is_staff:
+        if is_switchtender:
             form = StaffNoteForm(instance=note)
         else:
             form = NoteForm(instance=note)
@@ -378,7 +390,7 @@ def update_note(request, note_id=None):
 @login_required
 def delete_note(request, note_id=None):
     """Delete existing note for a project"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
     note = get_object_or_404(models.Note, pk=note_id)
 
     if request.method == "POST":
@@ -410,7 +422,7 @@ class StaffNoteForm(NoteForm):
 @login_required
 def create_task(request, project_id=None):
     """Create a new task for a project"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
         form = CreateTaskForm(request.POST)
@@ -435,8 +447,9 @@ def visit_task(request, task_id):
     """Visit the content of a task"""
     task = get_object_or_404(models.Task, pk=task_id)
     can_administrate_or_403(task.project, request.user, allow_draft=True)
+    is_switchtender = check_if_switchtender(request.user)
 
-    if not task.visited and not request.user.is_staff:
+    if not task.visited and not is_switchtender:
         task.visited = True
         task.save()
 
@@ -531,7 +544,7 @@ def already_done_task(request, task_id):
 @login_required
 def update_task(request, task_id=None):
     """Update an existing task for a project"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
     task = get_object_or_404(models.Task, pk=task_id)
     if request.method == "POST":
         form = UpdateTaskForm(request.POST, instance=task)
@@ -566,7 +579,7 @@ class TaskRecommendationForm(forms.ModelForm):
 @login_required
 def task_recommendation_create(request):
     """Create a new task recommendation for a project"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
 
     if request.method == "POST":
         form = TaskRecommendationForm(request.POST)
@@ -581,7 +594,7 @@ def task_recommendation_create(request):
 @login_required
 def task_recommendation_update(request, recommendation_id):
     """Update a task recommendation"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
 
     recommendation = get_object_or_404(models.TaskRecommendation, pk=recommendation_id)
 
@@ -599,7 +612,7 @@ def task_recommendation_update(request, recommendation_id):
 @login_required
 def task_recommendation_list(request):
     """List task recommendations for a project"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
 
     recommendations = models.TaskRecommendation.objects.all()
 
@@ -609,7 +622,7 @@ def task_recommendation_list(request):
 @login_required
 def presuggest_task(request, project_id):
     """Suggest tasks"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
 
     project = get_object_or_404(models.Project, pk=project_id)
 
@@ -699,7 +712,7 @@ class UpdateTaskForm(forms.ModelForm):
 @login_required
 def delete_task(request, task_id=None):
     """Delete a task from a project"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
     task = get_object_or_404(models.Task, pk=task_id)
     if request.method == "POST":
         task.deleted = timezone.now()
@@ -830,7 +843,7 @@ class RsvpTaskFollowupForm(forms.Form):
 @login_required
 def push_resource(request, project_id=None):
     """Start the process of pushing a resource to given project"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
         request.session["project_id"] = project.id
@@ -841,7 +854,7 @@ def push_resource(request, project_id=None):
 @login_required
 def create_resource_action(request, resource_id=None):
     """Create action for given resource to project stored in session"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
     project_id = request.session.get("project_id")
     resource = get_object_or_404(resources.Resource, pk=resource_id)
     project = get_object_or_404(models.Project, pk=project_id)
