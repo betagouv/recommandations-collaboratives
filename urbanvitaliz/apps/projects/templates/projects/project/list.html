@@ -79,6 +79,7 @@
                             </form>
                             {% endif %}
 
+                            {% if user.is_staff %}
                             <form method="POST" action="{% url "projects-project-delete" project.id %}">
                                 {% csrf_token %}
                                 <button class="btn btn-secondary btn-sm">
@@ -88,6 +89,7 @@
                                     Supprimer
                                 </button>
                             </form>
+                            {% endif %}
                         </div>
                     </td>
 			          </tr>
