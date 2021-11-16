@@ -26,11 +26,19 @@ from urbanvitaliz.apps.resources import models as resources
 from .utils import generate_ro_key
 
 
-class ProjectManager(models.Manager):
-    """Manager for active projects"""
+class ProjectQuerySet(models.QuerySet):
+    """QuerySet for active projects"""
 
-    def get_queryset(self):
-        return super().get_queryset().filter(deleted=None)
+    def email(self, mail):
+        """Return projects accessible to given email"""
+        return self.filter(emails__contains=mail, deleted=None)
+
+    def in_departments(self, departments):
+        """Return only project with commune in department scope (empty=full)"""
+        result = self.filter(deleted=None)
+        if departments:
+            result = result.filter(commune__department__in=departments)
+        return result
 
 
 class DeletedProjectManager(models.Manager):
@@ -43,7 +51,7 @@ class DeletedProjectManager(models.Manager):
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
 
-    objects = ProjectManager()
+    objects = ProjectQuerySet.as_manager()
     objects_deleted = DeletedProjectManager()
 
     email = models.CharField(max_length=128)
