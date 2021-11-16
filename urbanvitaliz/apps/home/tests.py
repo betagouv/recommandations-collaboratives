@@ -109,17 +109,17 @@ def test_logged_user_can_send_message_to_team(mocker, client):
 
 
 @pytest.mark.django_db
-def test_dashboard_not_available_for_non_staff_users(client):
-    url = reverse("staff-dashboard")
+def test_dashboard_not_available_for_non_switchtender_users(client):
+    url = reverse("switchtender-dashboard")
     with login(client):
         response = client.get(url)
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_dashboard_available_for_staff_users(client):
-    url = reverse("staff-dashboard")
-    with login(client, is_staff=True):
+def test_dashboard_available_for_switchtender_users(client):
+    url = reverse("switchtender-dashboard")
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 

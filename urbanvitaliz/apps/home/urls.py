@@ -16,7 +16,9 @@ urlpatterns = [
     path(r"", views.HomePageView.as_view(), name="home"),
     path(r"stats", views.StatisticsView.as_view(), name="statistics"),
     path(
-        r"staff/dashboard", views.StaffDashboardView.as_view(), name="staff-dashboard"
+        r"staff/dashboard",
+        views.SwitchtenderDashboardView.as_view(),
+        name="switchtender-dashboard",
     ),
     path(r"contact/", views.contact, name="home-contact"),
 ]

@@ -112,7 +112,7 @@ s                                    <a class="stretched-link text-reset text-de
                     </a>
                 </li>
 
-                {% if is_switchtender %}
+                {% if is_switchtender  %}
                 <!-- Project List -->
                 <li class="nav-item dropdown nav-item-admin me-2">
                     <div class="btn-group">
@@ -133,8 +133,31 @@ s                                    <a class="stretched-link text-reset text-de
                                 </svg>
                                 <a class="stretched-link d-inline text-secondary" href="{% url 'projects-onboarding' %}">Créer</a>
                             </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Address Book -->
+                <li class="nav-item nav-item-admin">
+                    <a href="{% url 'addressbook-organization-list' %}" class="nav-link link-dark">
+                        <svg class="bi align-middle" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-lines-fill"/>
+                        </svg>
+                        <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
+                    </a>
+                </li>
+                {% endif %}
 
-                            {% if user.is_staff %}
+                <!-- Staff tools -->
+                {% if user.is_staff  %}
+                <!-- Project List -->
+                <li class="nav-item dropdown nav-item-admin me-2">
+                        <button type="button" class="border-0 p-0 nav-link pt-2 d-inline-block btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                            <svg class="bi d-inline align-middle" width="16" height="16">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#sliders"/>
+                            </svg>
+                            <span class="text-secondary d-inline align-middle pe-1">Configuration</span>
+                        </button>
+                        <ul class="dropdown-menu">
                             <li class="dropdown-item border-0 d-inline-block position-relative">
                                 <svg class="bi me-2 d-inline" width="16" height="16">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-fill"/>
@@ -148,23 +171,8 @@ s                                    <a class="stretched-link text-reset text-de
                                 </svg>
                                 <a class="stretched-link d-inline text-secondary" href="{% url 'survey-editor-survey-details' 1 %}">Questionnaire</a>
                             </li>
-
-                            {% endif %}
                         </ul>
-                    </div>
                 </li>
-
-
-                <!-- Address Book -->
-                <li class="nav-item nav-item-admin">
-                    <a href="{% url 'addressbook-organization-list' %}" class="nav-link link-dark">
-                        <svg class="bi align-middle" width="16" height="16">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-lines-fill"/>
-                        </svg>
-                        <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
-                    </a>
-                </li>
-
                 {% endif %}
 
             </ul>
@@ -195,7 +203,7 @@ s                                    <a class="stretched-link text-reset text-de
                         {% if is_switchtender or user.is_staff %}
                         <li><hr class="dropdown-divider"></li>
                         {% if is_switchtender %}
-                        <li><a class="dropdown-item" href="{% url 'staff-dashboard' %}">Tableau de Bord</a></li>
+                        <li><a class="dropdown-item" href="{% url 'switchtender-dashboard' %}">Tableau de Bord</a></li>
                         {% endif %}
                         {% if user.is_staff %}
                         <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>

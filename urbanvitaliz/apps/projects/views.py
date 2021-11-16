@@ -22,15 +22,12 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-    send_email,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403, send_email)
 
 from . import models, signals
-from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key)
 
 ########################################################################
 # notifications
@@ -572,7 +569,7 @@ class TaskRecommendationForm(forms.ModelForm):
 @login_required
 def task_recommendation_create(request):
     """Create a new task recommendation for a project"""
-    is_switchtender_or_403(request.user)
+    is_staff_or_403(request.user)
 
     if request.method == "POST":
         form = TaskRecommendationForm(request.POST)
@@ -587,7 +584,7 @@ def task_recommendation_create(request):
 @login_required
 def task_recommendation_update(request, recommendation_id):
     """Update a task recommendation"""
-    is_switchtender_or_403(request.user)
+    is_staff_or_403(request.user)
 
     recommendation = get_object_or_404(models.TaskRecommendation, pk=recommendation_id)
 
@@ -605,7 +602,7 @@ def task_recommendation_update(request, recommendation_id):
 @login_required
 def task_recommendation_list(request):
     """List task recommendations for a project"""
-    is_switchtender_or_403(request.user)
+    is_staff_or_403(request.user)
 
     recommendations = models.TaskRecommendation.objects.all()
 

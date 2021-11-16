@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from urbanvitaliz.utils import is_staff_or_403
 
 from .. import forms, models
 
@@ -34,6 +35,8 @@ def survey_details(request, survey_id=None):
 @login_required
 def question_set_details(request, question_set_id=None):
     """Return the details of given question_set"""
+    is_staff_or_403(request.user)
+
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
     questions = question_set.questions.order_by("-priority")
     return render(request, "survey/editor/question_set/details.html", locals())
@@ -42,7 +45,10 @@ def question_set_details(request, question_set_id=None):
 @login_required
 def question_set_update(request, question_set_id=None):
     """Update informations for question_set"""
+    is_staff_or_403(request.user)
+
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
+
     if request.method == "POST":
         form = forms.EditQuestionSetForm(request.POST, instance=question_set)
         if form.is_valid():
@@ -59,7 +65,10 @@ def question_set_update(request, question_set_id=None):
 @login_required
 def question_set_create(request, survey_id=None):
     """Create new question_set"""
+    is_staff_or_403(request.user)
+
     survey = get_object_or_404(models.Survey, pk=survey_id)
+
     if request.method == "POST":
         form = forms.EditQuestionSetForm(request.POST)
         if form.is_valid():
@@ -78,6 +87,8 @@ def question_set_create(request, survey_id=None):
 @login_required
 def question_set_delete(request, question_set_id=None):
     """Delete question_set (mark as deleted)"""
+    is_staff_or_403(request.user)
+
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
     if request.method == "POST":
         question_set.deleted = timezone.now()
@@ -97,6 +108,8 @@ def question_set_delete(request, question_set_id=None):
 @login_required
 def question_update(request, question_id=None):
     """Update informations for question"""
+    is_staff_or_403(request.user)
+
     question = get_object_or_404(models.Question, pk=question_id)
     if request.method == "POST":
         form = forms.EditQuestionForm(request.POST, instance=question)
@@ -114,6 +127,8 @@ def question_update(request, question_id=None):
 @login_required
 def question_create(request, question_set_id=None):
     """Create new question"""
+    is_staff_or_403(request.user)
+
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
     if request.method == "POST":
         form = forms.EditQuestionForm(request.POST)
@@ -133,6 +148,8 @@ def question_create(request, question_set_id=None):
 @login_required
 def question_delete(request, question_id=None):
     """Delete question (mark as deleted)"""
+    is_staff_or_403(request.user)
+
     question = get_object_or_404(models.Question, pk=question_id)
     if request.method == "POST":
         question.deleted = timezone.now()
@@ -152,6 +169,8 @@ def question_delete(request, question_id=None):
 @login_required
 def choice_update(request, choice_id=None):
     """Update informations for choice"""
+    is_staff_or_403(request.user)
+
     choice = get_object_or_404(models.Choice, pk=choice_id)
     if request.method == "POST":
         form = forms.EditChoiceForm(request.POST, instance=choice)
@@ -173,6 +192,8 @@ def choice_update(request, choice_id=None):
 @login_required
 def choice_create(request, question_id=None):
     """Create new choice"""
+    is_staff_or_403(request.user)
+
     question = get_object_or_404(models.Question, pk=question_id)
     if request.method == "POST":
         form = forms.EditChoiceForm(request.POST)
@@ -193,6 +214,8 @@ def choice_create(request, question_id=None):
 @login_required
 def choice_delete(request, choice_id=None):
     """Delete choice (mark as deleted)"""
+    is_staff_or_403(request.user)
+
     choice = get_object_or_404(models.Choice, pk=choice_id)
     if request.method == "POST":
         choice.deleted = timezone.now()
