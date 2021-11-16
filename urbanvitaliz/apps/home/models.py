@@ -11,7 +11,6 @@ from django.contrib.auth import models as auth
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 from urbanvitaliz.apps.geomatics import models as geomatics
 
 
@@ -40,7 +39,7 @@ class UserProfile(models.Model):
     )
 
     departments = models.ManyToManyField(
-        geomatics.Department, related_name="user_profiles"
+        geomatics.Department, related_name="user_profiles", blank=True
     )
 
     deleted = models.DateTimeField(null=True, blank=True)
