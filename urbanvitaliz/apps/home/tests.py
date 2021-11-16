@@ -136,4 +136,27 @@ def test_user_can_access_stats(client):
     assert response.status_code == 200
 
 
+#######################################################################
+# Static pages
+#######################################################################
+
+
+def test_user_can_access_methodology(client):
+    url = reverse("methodology")
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+def test_user_can_access_whoweare(client):
+    url = reverse("whoweare")
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+def test_user_can_access_followus(client):
+    url = reverse("followus")
+    response = client.get(url)
+    assert response.status_code == 200
+
+
 # eof
