@@ -17,7 +17,7 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import is_staff_or_403, is_switchtender_or_403
+from urbanvitaliz.utils import is_switchtender_or_403
 
 from . import models
 
