@@ -7,8 +7,6 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2021-11-15 18:57:48 CET
 """
 
-import datetime
-
 from django.core.management.base import BaseCommand
 
 from django.contrib.auth import models as auth

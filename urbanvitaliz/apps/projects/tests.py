@@ -306,6 +306,17 @@ def test_project_detail_available_for_switchtender(client):
 
 
 @pytest.mark.django_db
+def test_project_detail_not_available_for_restricted_switchtender(client):
+    other = Recipe(geomatics.Department, code="02").make()
+    project = Recipe(models.Project, commune__departments__code="01").make()
+    url = reverse("projects-project-detail", args=[project.id])
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.departments.add(other)
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
 def test_project_detail_contains_informations(client):
     project = Recipe(models.Project).make()
     task = Recipe(models.Task, project=project).make()

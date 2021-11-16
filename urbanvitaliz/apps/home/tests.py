@@ -30,6 +30,7 @@ def test_create_user_with_proper_email():
     user = utils.create_user(email)
     assert user.email == email
     assert user.username == email
+    assert user.profile
 
 
 @pytest.mark.django_db
