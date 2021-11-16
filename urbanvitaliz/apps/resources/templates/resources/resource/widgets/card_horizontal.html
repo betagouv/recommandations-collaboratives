@@ -32,7 +32,7 @@
     <div class="card-footer" style="z-index: 10;">
         <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group" role="group" aria-label="Etat">
-                {% if user.is_staff %}
+                {% if is_switchtender %}
                 {% if resource.public %}
                 <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="Publiée">
                     <svg class="bi" width="16" height="16" fill="currentColor">
@@ -70,7 +70,7 @@
                 {% endif %}
 
                 <!-- Admin Actions -->
-                {% if user.is_staff %}
+                {% if is_switchtender %}
 
                 <!-- Push -->
                 {% if "project_id" in request.session %}

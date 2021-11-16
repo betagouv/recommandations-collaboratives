@@ -10,24 +10,16 @@ created: 2021-06-16 17:56:10 CEST
 from datetime import datetime
 
 import pytest
-
-from pytest_django.asserts import assertContains
-from pytest_django.asserts import assertNotContains
-from pytest_django.asserts import assertRedirects
-
-from django.urls import reverse
-
 from django.template import defaultfilters
-
+from django.urls import reverse
 from model_bakery.recipe import Recipe
-
-from urbanvitaliz.utils import login
-
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
+from urbanvitaliz.utils import login
 
 from . import models
-
 
 ########################################################################
 # resources
@@ -158,17 +150,17 @@ def test_resource_detail_contains_informations(client):
 
 
 @pytest.mark.django_db
-def test_resource_detail_contains_update_for_staff(client):
+def test_resource_detail_contains_update_for_switchtender(client):
     resource = Recipe(models.Resource).make()
     url = reverse("resources-resource-detail", args=[resource.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     update_url = reverse("resources-resource-update", args=[resource.id])
     assertContains(response, update_url)
 
 
 @pytest.mark.django_db
-def test_resource_detail_does_not_contain_update_for_non_staff(client):
+def test_resource_detail_does_not_contain_update_for_non_switchtender(client):
     resource = Recipe(models.Resource).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client):
@@ -182,7 +174,7 @@ def test_resource_detail_does_not_contain_update_for_non_staff(client):
 
 
 @pytest.mark.django_db
-def test_create_resource_not_available_for_non_staff_users(client):
+def test_create_resource_not_available_for_non_switchtender_users(client):
     url = reverse("resources-resource-create")
     with login(client):
         response = client.get(url)
@@ -190,9 +182,9 @@ def test_create_resource_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_create_resource_available_for_staff_users(client):
+def test_create_resource_available_for_switchtender_users(client):
     url = reverse("resources-resource-create")
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-create"')
@@ -207,7 +199,7 @@ def test_create_new_resource_and_redirect(client):
         "tags": "#tag",
         "content": "this is some content",
     }
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(reverse("resources-resource-create"), data=data)
     resource = models.Resource.fetch()[0]
     assert resource.content == data["content"]
@@ -219,7 +211,7 @@ def test_create_new_resource_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_update_resource_not_available_for_non_staff_users(client):
+def test_update_resource_not_available_for_non_switchtenders(client):
     resource = Recipe(models.Resource).make()
     url = reverse("resources-resource-update", args=[resource.id])
     with login(client):
@@ -228,10 +220,10 @@ def test_update_resource_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_update_resource_available_for_staff_users(client):
+def test_update_resource_available_for_switchtenders(client):
     resource = Recipe(models.Resource).make()
     url = reverse("resources-resource-update", args=[resource.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-update"')
@@ -249,7 +241,7 @@ def test_update_resource_and_redirect(client):
         "content": "this is some content",
     }
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url, data=data)
 
     resource = models.Resource.objects.get(id=resource.id)
