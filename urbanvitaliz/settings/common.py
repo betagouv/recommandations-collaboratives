@@ -77,6 +77,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.template.context_processors.media",
                 "django.contrib.messages.context_processors.messages",
+                "urbanvitaliz.apps.projects.context_processors.is_switchtender_processor",
             ],
         },
     },

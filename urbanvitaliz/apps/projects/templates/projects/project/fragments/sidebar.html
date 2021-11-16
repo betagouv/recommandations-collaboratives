@@ -10,7 +10,7 @@
     </p>
 
     <div class="d-grid gap-2 mt-3">
-        {% if user.is_staff or can_administrate %}
+        {% if can_administrate %}
         <span class="d-inline-block"> 
             <a href="{% url 'projects-access-update' project.id %}" class="btn btn-light w-100 btn-sm">
                 <svg class="bi" width="16" height="16" fill="currentColor">
@@ -21,7 +21,7 @@
             </a>
         </span>
         {% endif %}
-        {% if user.is_staff %}
+        {% if is_switchtender %}
         <span class="d-inline-block"> 
             <a href="{% url 'projects-project-update' project.id %}" class="btn btn-light w-100 btn-sm">
                 <svg class="bi" width="16" height="16" fill="currentColor">

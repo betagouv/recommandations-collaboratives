@@ -22,20 +22,15 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-
 from urbanvitaliz.utils import (
     check_if_switchtender,
-    is_switchtender_or_403,
     is_staff_or_403,
+    is_switchtender_or_403,
     send_email,
 )
 
 from . import models, signals
-from .utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    generate_ro_key,
-)
+from .utils import can_administrate_or_403, can_administrate_project, generate_ro_key
 
 ########################################################################
 # notifications
@@ -208,8 +203,6 @@ def project_detail(request, project_id=None):
     # check user can administrate projet (member or switchtender)
     if request.user.email != project.email:
         can_administrate_or_403(project, request.user)
-
-    is_switchtender = check_if_switchtender(request.user)
 
     # XXX: We need this here too since onboarding now redirects to
     # this page directly.

@@ -86,7 +86,7 @@ s                                    <a class="stretched-link text-reset text-de
                             </svg>
                             <span class="ms-1 align-middle">Ressources</span>
                         </a>
-                        {% if user.is_staff %}
+                        {% if is_switchtender %}
                         <button type="button" class="ps-0 btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                             <span class="visually-hidden">Toggle Dropdown</span>
                         </button>
@@ -112,7 +112,7 @@ s                                    <a class="stretched-link text-reset text-de
                     </a>
                 </li>
 
-                {% if user.is_staff %}
+                {% if is_switchtender %}
                 <!-- Project List -->
                 <li class="nav-item dropdown nav-item-admin me-2">
                     <div class="btn-group">
@@ -192,10 +192,14 @@ s                                    <a class="stretched-link text-reset text-de
                              <li><hr class="dropdown-divider"></li>
                         -->
                         <li><a class="dropdown-item" href="{% url 'logout' %}">Déconnexion</a></li>
-                        {% if user.is_staff %}
+                        {% if is_switchtender or user.is_staff %}
                         <li><hr class="dropdown-divider"></li>
+                        {% if is_switchtender %}
                         <li><a class="dropdown-item" href="{% url 'staff-dashboard' %}">Tableau de Bord</a></li>
+                        {% endif %}
+                        {% if user.is_staff %}
                         <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>
+                        {% endif %}
                         {% endif %}
                     </ul>
                 </div>
