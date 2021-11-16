@@ -18,10 +18,30 @@ def can_administrate_project(project, user, allow_draft=False):
     if user.is_anonymous:
         return False
 
-    return (
-        ((user.email == project.email) or (user.email in project.emails))
-        and ((not project.is_draft) or allow_draft)  # noqa: F841
-    ) or user.has_perm("projects.can_administrate_project")
+    if is_member(user, project, allow_draft):
+        return True
+
+    if user.has_perm("projects.can_administrate_project") and in_allowed_departments(
+        user, project
+    ):
+        return True
+
+    return False
+
+
+def is_member(user, project, allow_draft):
+    """return true if user is member of the project"""
+    return ((user.email == project.email) or (user.email in project.emails)) and (
+        (not project.is_draft) or allow_draft
+    )  # noqa: F841
+
+
+def in_allowed_departments(user, project):
+    """return true if project is in allowed departments for user"""
+    allowed = user.profile.departments.values_list("code", flat=True)
+    if not allowed:  # empty list means full access
+        return True
+    return project.commune and (project.commune.department_id in allowed)
 
 
 def can_administrate_or_403(project, user, allow_draft=False):
