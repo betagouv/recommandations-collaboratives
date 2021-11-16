@@ -190,8 +190,10 @@ def local_authority(request):
 @login_required
 def project_list(request):
     """Return the projects for the switchtender"""
-    is_staff_or_403(request.user)
-    projects = models.Project.fetch().order_by("-created_on")
+    is_switchtender_or_403(request.user)
+    projects = models.Project.objects.in_departments(
+        request.user.profile.departments.all()
+    ).order_by("-created_on")
     return render(request, "projects/project/list.html", locals())
 
 
