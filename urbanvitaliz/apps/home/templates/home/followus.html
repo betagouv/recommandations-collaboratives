@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+
+{% block css %}
+<link href="{% sass_src 'css/home/home.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<div class="col-8 py-3 g-0 mx-auto">
+
+    <h2>Suivre le projet</h2>
+
+    <p>
+        Le projet UrbanVitaliz fonctionne par sprints et propose une démo chaque mois ouverte à toutes les parties intéressées. Il s'agit d'une réunion d'équipe qui permet de retracer les travaux réalisés pendant le sprint et de discuter des points de blocage et idées pour nourrir la prochaine planification d'actions. Attention cet été, pas de rétro ! La prochaine aura lieu le 2 septembre à 15h.
+    </p>
+
+    <h4>Comment ça se passe ?</h4>
+
+    <p>
+        <strong>Le 1er jeudi du mois à 15h.</strong>
+    </p>
+
+    <p>
+        Pour y participer la première fois, envoie un mail à <a href="friches@beta.gouv.fr">friches@beta.gouv.fr</a> et connecte-toi à <a href="https://us02web.zoom.us/j/82589512780" target="_new">cette url</a>.
+        Tu peux venir ou ne pas venir, sans prévenir. On commence à l'heure la démo dans tous les cas.
+        Le contenu des démos des sprints précédents peut être retrouvé <a href="https://pad.incubateur.net/PZenp7o6Sx-OVBqSHsSKWQ#" target="_new">dans cette présentation</a> que l'équipe met à jour avant chaque démo.
+    </p>
+    <p>
+        Lors de la démo, on présente les travaux de l'équipe, comment le produit a évolué et les échanges avec les utilisateurs, etc. Puis on a un temps d'échange.
+        Ça dure 30 à 60 min selon les échanges, et tu peux évidemment arriver en retard ou partir plus tôt.
+    </p>
+
+    <p>
+        Accédez ici aux éléments sous le format <a href="https://pad.incubateur.net/PZenp7o6Sx-OVBqSHsSKWQ?edit" target="_new">Journal de bord</a>. Accédez ici aux <a href="https://pad.incubateur.net/-fMhnZPmQKKp-o7q45E1Iw?edit#" target="_new">éléments d'octobre 2020 à septembre 2021</a>.
+    </p>
+
+</div>
+
+{% endblock %}

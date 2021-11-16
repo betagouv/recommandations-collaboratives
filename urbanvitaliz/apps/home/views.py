@@ -24,6 +24,18 @@ class HomePageView(TemplateView):
     template_name = "home/home.html"
 
 
+class MethodologyPageView(TemplateView):
+    template_name = "home/methodology.html"
+
+
+class WhoWeArePageView(TemplateView):
+    template_name = "home/whoweare.html"
+
+
+class FollowUsPageView(TemplateView):
+    template_name = "home/followus.html"
+
+
 class StatisticsView(TemplateView):
     template_name = "home/statistics.html"
 

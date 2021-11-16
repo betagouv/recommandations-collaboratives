@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+
+{% block css %}
+<link href="{% sass_src 'css/home/home.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<div class="col-8 py-3 g-0 mx-auto">
+    <h2>Quelle étape vous intéresse ?</h2>
+
+    <p>Pour mener votre projet de revitalisation de friche, nous vous proposons d'explorer cette approche en 4 étapes </p>
+
+    <div style="width: 100%;"><div style="position: relative; padding-bottom: 56.25%; padding-top: 0; height: 0;"><iframe frameborder="0" width="1200" height="675" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://view.genial.ly/60e8451c062c5d0dc40864c0" type="text/html" allowscriptaccess="always" allowfullscreen="true" scrolling="yes" allownetworking="all"></iframe> </div> </div>
+
+    <p>A noter : Cette proposition de méthode est destinée à évoluer selon les retours. N'hésitez pas à proposer une relecture en nous contactant : friches@beta.gouv.fr</p>
+
+    <p>
+        Partenaires/relecteurs/sources :
+        <ul>
+            <li>EPF Lorraine</li>
+            <li>EPF Nord Pas-de-Calais</li>
+            <li>Région Occitanie</li>
+            <li>OTEIS</li>
+            <li>Cerf - IDFriches</li>
+            <li>Ad'Occ</li>
+        </ul>
+    </p>
+
+</div>
+
+{% endblock %}
