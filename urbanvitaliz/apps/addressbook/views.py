@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render, reverse
-from urbanvitaliz.utils import is_staff_or_403
+from urbanvitaliz.utils import is_switchtender_or_403
 
 from . import models
 
@@ -21,7 +21,7 @@ class OrganizationForm(forms.ModelForm):
 @login_required
 def organization_create(request):
     """Create a new Organization"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
 
     if request.method == "POST":
         form = OrganizationForm(request.POST)
@@ -38,7 +38,7 @@ def organization_create(request):
 @login_required
 def organization_update(request, organization_id=None):
     """Update an Organization"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
 
     organization = get_object_or_404(models.Organization, pk=organization_id)
     if request.method == "POST":
@@ -56,7 +56,7 @@ def organization_update(request, organization_id=None):
 @login_required
 def organization_list(request):
     """Return the Organization list"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
     organizations = models.Organization.objects.order_by("name")
     return render(request, "addressbook/organization_list.html", locals())
 
@@ -64,7 +64,7 @@ def organization_list(request):
 @login_required
 def organization_details(request, organization_id):
     """Return the details for a given Organization"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
 
     organization = get_object_or_404(models.Organization, pk=organization_id)
     return render(request, "addressbook/organization_details.html", locals())
@@ -93,7 +93,7 @@ class ContactForm(forms.ModelForm):
 @login_required
 def contact_create(request, organization_id: int):
     """Create a new Contact"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
 
     organization = get_object_or_404(models.Organization, pk=organization_id)
 
@@ -114,7 +114,7 @@ def contact_create(request, organization_id: int):
 @login_required
 def contact_update(request, contact_id=None):
     """Update a Contact"""
-    is_staff_or_403(request.user)
+    is_switchtender_or_403(request.user)
 
     contact = get_object_or_404(models.Contact, pk=contact_id)
     if request.method == "POST":

@@ -1,16 +1,10 @@
 import pytest
-
-from pytest_django.asserts import assertContains
-from pytest_django.asserts import assertRedirects
-
-from model_bakery.recipe import Recipe
-
 from django.urls import reverse
-
+from model_bakery.recipe import Recipe
+from pytest_django.asserts import assertContains, assertRedirects
 from urbanvitaliz.utils import login
 
 from . import models
-
 
 ########################################################################################
 # Organization
@@ -20,7 +14,7 @@ from . import models
 
 
 @pytest.mark.django_db
-def test_create_organization_not_available_for_non_staff_users(client):
+def test_create_organization_not_available_for_non_switchtender_users(client):
     Recipe(models.Organization).make()
     url = reverse("addressbook-organization-create")
     with login(client):
@@ -29,10 +23,10 @@ def test_create_organization_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_create_organization_available_for_staff_users(client):
+def test_create_organization_available_for_switchtender(client):
     Recipe(models.Organization).make()
     url = reverse("addressbook-organization-create")
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -41,7 +35,7 @@ def test_create_organization_available_for_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_organization_list_not_available_for_non_staff_users(client):
+def test_organization_list_not_available_for_non_switchtender(client):
     url = reverse("addressbook-organization-list")
     with login(client):
         response = client.get(url)
@@ -49,9 +43,9 @@ def test_organization_list_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_organization_list_available_for_staff_users(client):
+def test_organization_list_available_for_switchtender(client):
     url = reverse("addressbook-organization-list")
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -60,7 +54,7 @@ def test_organization_list_available_for_staff_users(client):
 def test_organization_create_and_redirect(client):
     url = reverse("addressbook-organization-create")
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         data = {"name": "my organization"}
         response = client.post(url, data=data)
 
@@ -76,7 +70,7 @@ def test_organization_create_error(client):
     url = reverse("addressbook-organization-create")
 
     data = {}
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url, data=data)
 
     assert models.Organization.objects.count() == 0
@@ -89,7 +83,7 @@ def test_organization_create_error(client):
 
 
 @pytest.mark.django_db
-def test_update_organization_not_available_for_non_staff_users(client):
+def test_update_organization_not_available_for_non_switchtender_users(client):
     organization = Recipe(models.Organization).make()
     url = reverse("addressbook-organization-update", args=[organization.id])
     with login(client):
@@ -98,10 +92,10 @@ def test_update_organization_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_update_organization_available_for_staff_users(client):
+def test_update_organization_available_for_switchtender(client):
     organization = Recipe(models.Organization).make()
     url = reverse("addressbook-organization-update", args=[organization.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-organization-update"')
@@ -112,7 +106,7 @@ def test_organization_update_and_redirect(client):
     organization = Recipe(models.Organization).make()
     url = reverse("addressbook-organization-update", args=[organization.id])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         data = {"name": "new name", "departments": []}
         response = client.post(url, data=data)
 
@@ -129,7 +123,7 @@ def test_organization_update_error(client):
     url = reverse("addressbook-organization-update", args=[organization.id])
 
     data = {}
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.post(url, data=data)
 
     updated_organization = models.Organization.objects.get(id=organization.id)
@@ -146,7 +140,7 @@ def test_organization_update_error(client):
 
 
 @pytest.mark.django_db
-def test_create_contact_not_available_for_non_staff_users(client):
+def test_create_contact_not_available_for_non_switchtender(client):
     organization = Recipe(models.Organization).make()
     url = reverse(
         "addressbook-organization-contact-create",
@@ -158,13 +152,13 @@ def test_create_contact_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_create_contact_available_for_staff_users(client):
+def test_create_contact_available_for_switchtender(client):
     organization = Recipe(models.Organization).make()
     url = reverse(
         "addressbook-organization-contact-create",
         args=[organization.id],
     )
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-contact-create"')
@@ -175,7 +169,7 @@ def test_contact_create_and_redirect(client):
     organization = Recipe(models.Organization).make()
     url = reverse("addressbook-organization-contact-create", args=[organization.id])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         data = {"first_name": "my contact"}
         response = client.post(url, data=data)
 
@@ -191,7 +185,7 @@ def test_contact_create_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_update_contact_not_available_for_non_staff_users(client):
+def test_update_contact_not_available_for_non_switchtender(client):
     contact = Recipe(models.Contact).make()
     url = reverse("addressbook-organization-contact-update", args=[contact.id])
     with login(client):
@@ -200,10 +194,10 @@ def test_update_contact_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_update_contact_available_for_staff_users(client):
+def test_update_contact_available_for_switchtender(client):
     contact = Recipe(models.Contact).make()
     url = reverse("addressbook-organization-contact-update", args=[contact.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-contact-update"')
@@ -214,7 +208,7 @@ def test_contact_update_and_redirect(client):
     contact = Recipe(models.Contact).make()
     url = reverse("addressbook-organization-contact-update", args=[contact.id])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         data = {
             "first_name": "first_name",
             "last_name": "last_name",
