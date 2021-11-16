@@ -255,21 +255,44 @@ def test_project_list_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_project_list_available_for_staff_user(client):
+def test_project_list_available_for_switchtender_user(client):
     url = reverse("projects-project-list")
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_project_list_contains_project_name_and_link(client):
+def test_project_list_includes_project_for_global_switchtender(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-project-list")
-    with login(client, is_staff=True):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertContains(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_project_list_includes_project_in_switchtender_departments(client):
+    project = Recipe(models.Project, commune__department__code="01").make()
+    url = reverse("projects-project-list")
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.departments.add(project.commune.department)
+        response = client.get(url)
+    detail_url = reverse("projects-project-detail", args=[project.id])
+    assertContains(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_project_list_excludes_project_not_in_switchtender_departments(client):
+    department = Recipe(geomatics.Department, code="00").make()
+    project = Recipe(models.Project, commune__department__code="01").make()
+    url = reverse("projects-project-list")
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.departments.add(department)
+        response = client.get(url)
+    detail_url = reverse("projects-project-detail", args=[project.id])
+    assertNotContains(response, detail_url)
 
 
 ########################################################################
@@ -454,7 +477,8 @@ def test_delete_project_and_redirect(client):
     updated_on_before = project.updated_on
     url = reverse("projects-project-delete", args=[project.id])
 
-    with login(client, is_staff=True):
+    # delete needs staff, list projects needs switchtender
+    with login(client, groups=["switchtender"], is_staff=True):
         response = client.post(url)
 
     project = models.Project.objects_deleted.get(id=project.id)
