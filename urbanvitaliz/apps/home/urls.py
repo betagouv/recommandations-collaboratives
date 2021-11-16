@@ -15,6 +15,9 @@ from . import views
 urlpatterns = [
     path(r"", views.HomePageView.as_view(), name="home"),
     path(r"stats", views.StatisticsView.as_view(), name="statistics"),
+    path(r"methodologie", views.MethodologyPageView.as_view(), name="methodology"),
+    path(r"qui-sommes-nous", views.WhoWeArePageView.as_view(), name="whoweare"),
+    path(r"nous-suivre", views.FollowUsPageView.as_view(), name="followus"),
     path(
         r"staff/dashboard",
         views.SwitchtenderDashboardView.as_view(),
