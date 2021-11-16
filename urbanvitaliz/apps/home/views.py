@@ -17,6 +17,7 @@ from django.db.models import Count, F, Q
 from django.shortcuts import redirect, render
 from django.views.generic.base import TemplateView
 from urbanvitaliz.apps.projects import models as projects
+from urbanvitaliz.utils import check_if_switchtender
 
 
 class HomePageView(TemplateView):
@@ -124,11 +125,11 @@ def notify_user_of_sending(request, status):
 ######
 
 
-class StaffDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class SwitchtenderDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = "staff/dashboard.html"
 
     def test_func(self):
-        return self.request.user.is_staff
+        return check_if_switchtender(self.request.user)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

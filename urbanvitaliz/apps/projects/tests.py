@@ -17,7 +17,8 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -1369,7 +1370,7 @@ def test_switchtender_create_action_for_resource_push_with_notification(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_list_not_available_for_non_switchtender(client):
+def test_task_recommendation_list_not_available_for_non_staff(client):
     url = reverse("projects-task-recommendation-list")
     with login(client):
         response = client.get(url)
@@ -1377,16 +1378,16 @@ def test_task_recommendation_list_not_available_for_non_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_list_available_for_switchtender(client):
+def test_task_recommendation_list_available_for_staff(client):
     url = reverse("projects-task-recommendation-list")
-    with login(client, groups=["switchtender"]):
+    with login(client, is_staff=True):
         response = client.get(url)
 
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_task_recommendation_create_not_available_for_non_switchtender(client):
+def test_task_recommendation_create_not_available_for_non_staff(client):
     url = reverse("projects-task-recommendation-create")
     with login(client):
         response = client.get(url)
@@ -1394,9 +1395,9 @@ def test_task_recommendation_create_not_available_for_non_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_create_task_recommendation_available_for_switchtender(client):
+def test_create_task_recommendation_available_for_staff(client):
     url = reverse("projects-task-recommendation-create")
-    with login(client, groups=["switchtender"]):
+    with login(client, is_staff=True):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -1407,7 +1408,7 @@ def test_task_recommendation_is_created(client):
     resource = Recipe(resources.Resource).make()
 
     data = {"text": "mew", "resource": resource.pk}
-    with login(client, groups=["switchtender"]):
+    with login(client, is_staff=True):
         response = client.post(url, data=data)
 
     assert models.TaskRecommendation.objects.count() == 1
@@ -1418,7 +1419,7 @@ def test_task_recommendation_is_created(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_update_not_available_for_non_switchtender(client):
+def test_task_recommendation_update_not_available_for_non_staff(client):
     recommendation = Recipe(models.TaskRecommendation).make()
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
     with login(client):
@@ -1427,10 +1428,10 @@ def test_task_recommendation_update_not_available_for_non_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_update_available_for_switchtender(client):
+def test_task_recommendation_update_available_for_staff(client):
     recommendation = Recipe(models.TaskRecommendation).make()
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
-    with login(client, groups=["switchtender"]):
+    with login(client, is_staff=True):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -1442,7 +1443,7 @@ def test_task_recommendation_is_updated(client):
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
 
     data = {"text": "new-text", "resource": recommendation.resource.pk}
-    with login(client, groups=["switchtender"]):
+    with login(client, is_staff=True):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
