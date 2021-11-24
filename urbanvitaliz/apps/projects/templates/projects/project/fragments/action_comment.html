@@ -14,7 +14,7 @@
             height="18px" width="18px"
         />
         <span class="align-middle">
-            {{ author.get_full_name }}
+            {{ author.get_full_name|default:author.email }}
             <small class="text-muted">{{ date|naturalday }}</small>
         </span>
     </div>
