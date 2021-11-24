@@ -122,6 +122,25 @@
                 <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <em>Public</em> si vous souhaitez que les visiteurs puissent la consulter !
             </div>
             {% endif %}
+
+            {% if projects_used_by %}
+            <div class="bd-callout bd-callout-info">
+                <svg class="align-middle bi" width="24px" height="24px" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-2"/>
+                </svg>
+                &nbsp;
+                <span class="align-middle fs-5">
+                    Cette ressource a été recommandée sur les projets suivants :
+                </span>
+                <ul class="mt-3">
+                    {% for project in projects_used_by %}
+                    <li><a href="{% url 'projects-project-detail' project.pk %}">{{ project.name }}</a></li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+            {% endif %}
+
             {% endif %}
 
             {% if resource.subtitle %}
