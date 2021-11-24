@@ -74,8 +74,7 @@ def survey_question_details(request, session_id, question_id):
 
 
 def survey_create_session_for_project(request, project_id):
-    """Create a session for the given project if necessary. Redirects to
-    session."""
+    """Create a session for the given project if necessary. Redirects to session."""
     project = get_object_or_404(projects_models.Project, pk=project_id)
     survey = get_object_or_404(models.Survey, pk=1)  # XXX Hardcoded survey ID
 

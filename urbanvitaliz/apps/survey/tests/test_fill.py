@@ -14,10 +14,56 @@ from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
 from urbanvitaliz.utils import login
 
+from urbanvitaliz.apps.projects import models as projects
 from .. import models
 
-#
+
+########################################################################
+# creating sessions
+########################################################################
+
+
+@pytest.mark.django_db
+def test_new_survey_session_is_created(client):
+    project = Recipe(projects.Project).make()
+    survey = Recipe(models.Survey, id=1).make()  # hard coded
+
+    url = reverse("survey-project-session", args=(project.id,))
+    with login(client, is_staff=False):
+        response = client.get(url)
+
+    new_session = models.Session.objects.get(survey=survey, project=project)
+
+    assert response.status_code == 302
+    assert response.url == reverse("survey-session-start", args=(new_session.id, ))
+
+
+@pytest.mark.django_db
+def test_existing_survey_session_is_reused(client):
+    project = Recipe(projects.Project).make()
+    survey = Recipe(models.Survey, id=1).make()  # hard coded
+    session = Recipe(models.Session, project=project, survey=survey).make()
+
+    url = reverse("survey-project-session", args=(project.id,))
+    with login(client, is_staff=False):
+        response = client.get(url)
+
+    new_session = models.Session.objects.get(survey=survey, project=project)
+
+    assert new_session == session
+    assert response.status_code == 302
+    assert response.url == reverse("survey-session-start", args=(new_session.id, ))
+
+
+@pytest.mark.skip(reason="to be written")
+@pytest.mark.django_db
+def test_on_survey_creation_signal_is_sent(client):
+    pass
+
+
+########################################################################
 # answering questions
+########################################################################
 
 
 @pytest.mark.django_db
@@ -201,8 +247,9 @@ def test_question_redirects_to_next_question(client):
     assert response.url == reverse("survey-question-next", args=(session.id, q1.id))
 
 
-#
+########################################################################
 # navigating questions
+########################################################################
 
 
 @pytest.mark.django_db
@@ -305,9 +352,11 @@ def test_previous_question_redirects_to_survey_when_not_more_questions(client):
     assertRedirects(response, new_url)
 
 
-####
+########################################################################
 # Signals refresh
-####
+########################################################################
+
+
 @pytest.mark.django_db
 def test_refresh_signals_only_for_staff(client):
     session = Recipe(models.Session).make()
