@@ -93,15 +93,26 @@
                         <svg class="bi me-1 align-middle" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#info-circle"/>
                         </svg>
-                        Déclenchable par :
+                        <span class="align-middle">Déclencheurs</span>
                         <ul>
-                            {% for choice in recommendation.trigged_by %}
-                            <li>{{ choice.conclusion|default:choice.text }}</li>
-                            {% empty %}
-                            <li class="text-danger">---Non déclenchable--</li>
+                            {% for trigger, choices in recommendation.trigged_by.items %}
+                            <li>
+                        {{ trigger }}
+
+                                <ul>
+                                    {% for choice in choices %}
+                                    <li>
+                                        <a href="{% url 'survey-editor-question-set-details' choice.question.question_set.pk %}#q-{{ choice.question.pk }}">
+                                            {{ choice.conclusion|default:choice.text }}
+                                        </a>
+                                    </li>
+                                    {% empty %}
+                                    <li class="text-danger">---Non déclenchable--</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
                             {% endfor %}
                         </ul>
-
                     </div>
                 </div>
             </div>
