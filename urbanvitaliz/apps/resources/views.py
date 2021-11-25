@@ -17,7 +17,7 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import is_switchtender_or_403
+from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
 
 from . import models
 
@@ -112,6 +112,13 @@ def resource_detail(request, resource_id=None):
         ).first()
     else:
         bookmark = None
+
+    if check_if_switchtender(request.user):
+        projects_used_by = (
+            projects.Project.objects.filter(tasks__resource_id=resource.pk)
+            .order_by("name")
+            .distinct()
+        )
 
     return render(request, "resources/resource/details.html", locals())
 

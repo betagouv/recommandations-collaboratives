@@ -146,6 +146,14 @@ class Project(models.Model):
 class NoteManager(models.Manager):
     """Manager for active tasks"""
 
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .order_by("-created_on", "-updated_on")
+            .filter(deleted=None)
+        )
+
     def public(self):
         return self.filter(public=True)
 
