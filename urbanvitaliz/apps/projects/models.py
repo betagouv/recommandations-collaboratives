@@ -420,7 +420,11 @@ class TaskRecommendation(models.Model):
     def trigged_by(self):
         from urbanvitaliz.apps.survey import models as survey_models
 
-        return TaggedItem.objects.get_by_model(survey_models.Choice, self.condition)
+        triggers = {}
+        for tag in self.condition_tags:
+            triggers[tag] = TaggedItem.objects.get_by_model(survey_models.Choice, tag)
+
+        return triggers
 
     def __str__(self):
         return f"{self.resource.title} - {self.text}"
