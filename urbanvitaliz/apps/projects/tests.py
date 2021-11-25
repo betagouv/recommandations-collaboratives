@@ -17,7 +17,8 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -1264,8 +1265,7 @@ def test_delete_note_for_project_and_redirect(client):
     with login(client, groups=["switchtender"]):
         response = client.post(url)
 
-    note = models.Note.objects.get(id=note.id)
-    assert note.deleted is not None
+    assert models.Note.objects.count() == 0
 
     assert response.status_code == 302
 
