@@ -20,152 +20,217 @@
 
 {% block content %}
 
-<div class="col-11 py-5 mx-auto">
-
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
-                </svg>&nbsp;
-                <a href="{% url 'resources-resource-search' %}">Ressources</a>
-            </li>
-            <li class="breadcrumb-item active">{{ resource.title|title|truncatechars:20 }}
-                <span class="badge bg-light text-dark align-middle">{{ resource.category.name|default:"Ressource" }}</span>
-            </li>
-        </ol>
-    </nav>
-
-    <div class="row resource-details mb-3">
-        <div class="col-sm-12 col-lg-8 col-xl-9">
-
-            <h1 class="mb-3 text-break">
-                <span data-bs-toggle="tooltip" data-bs-placement="left" title="{{ resource.category.name|default:"Ressource" }}">
-                    <svg class="bi me-2 rounded-circle align-middle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"key" }}"/>
-                    </svg>
-                </span>
-                {{ resource.title|capfirst }}
-
-                <!-- Toggle Bookmarking -->
-                {% if user.is_authenticated %}
-                {% if resource.id in user.bookmarks.as_list %}
-                <form class="d-inline align-middle" method="POST" action="{% url "resources-bookmark-delete" resource.id %}">
-                    {% csrf_token %}
-                    <button class="d-inline-block btn btn-text"  data-bs-toggle="tooltip" data-bs-placement="right" title="Retirer de vos favoris">
-                        <svg class="bi align-baseline text-warning" width="24" height="24">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill"/>
-                        </svg>
-                    </button>
-                </form>
-
-                {% else %}
-
-                <form class="d-inline align-middle" method="GET" action="{% url "resources-bookmark-create" resource.id %}">
-                    <button class="d-inline-block btn btn-text"  data-bs-toggle="tooltip" data-bs-placement="right" title="Ajouter à vos favoris">
-                        <svg class="bi align-baseline text-warning" width="24" height="24">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
-                        </svg>
-                    </button>
-                </form>
-
-                {% endif %}
-                {% endif %}
-            </h1>
-
-            <!-- Area -->
-            {% if resource.departments.count %}
-            <div class="d-inline text-secondary">
-                <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#globe"/>
-                </svg>&nbsp;
-                <span class="small">
-                    {% for department in resource.departments.all %}
-                    {{ department.name }}
-                    {% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </span>
-            </div>
-            {% endif %}
-
-            <!-- Show banner if expired -->
-            {% if not resource.expired %}
-            <div class="bd-callout bd-callout-warning">
-                <svg class="bi align-middle text-danger" width="24" height="24" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#exclamation-octagon-fill"/>
-                </svg>&nbsp;
-                <span class="align-middle">
-                    Cette fiche-ressource a expiré, les informations ne sont probablement plus à jour  !
-                </span>
-            </div>
-            {% endif %}
-
-            {% if resource.departments.count and resource.tags %}
-            &nbsp;-&nbsp;
-            {% endif %}
-
-            <div class="mb-2 d-inline">
-                {% for tag in resource.tags_as_list  %}
-                <span class="badge rounded-pill bg-light text-dark">#{{ tag }}</span>
+<!-- 
+<div class="row">
+    <div class="col-3 py-5 offset-1">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
+                    </svg>&nbsp;
+                    <a href="{% url 'resources-resource-search' %}">Ressources</a>
+                </li>
+                <li class="breadcrumb-item active">{{ resource.title|title|truncatechars:20 }}
+                    <span class="badge bg-light text-dark align-middle">{{ resource.category.name|default:"Ressource" }}</span>
+                </li>
+            </ol>
+        </nav>
+    </div>
+</div>
+-->
+<div class="row py-5">
+    <div class="col-2 mx-auto">
+        {% if projects_used_by %}
+        <div class="">
+            <svg class="align-middle bi" width="24px" height="24px" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-2"/>
+            </svg>
+            &nbsp;
+            <span class="align-middle fs-5">
+                Cette ressource a été recommandée sur les projets suivants :
+            </span>
+            <ul class="mt-3">
+                {% for project in projects_used_by %}
+                <li><a href="{% url 'projects-project-detail' project.pk %}">{{ project.name }}</a></li>
                 {% endfor %}
-            </div>
+            </ul>
 
-            <!-- Show banner if draft -->
-            {% if is_switchtender %}
-            {% if not resource.public %}
-            <div class="bd-callout bd-callout-warning">
-                <svg class="bi align-middle" width="24" height="24" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hammer"/>
-                </svg>&nbsp;
-                Cette fiche-ressource est en cours d'écriture. Pensez à la
-                <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <em>Public</em> si vous souhaitez que les visiteurs puissent la consulter !
-            </div>
-            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 
-            {% if projects_used_by %}
-            <div class="bd-callout bd-callout-info">
-                <svg class="align-middle bi" width="24px" height="24px" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-2"/>
-                </svg>
-                &nbsp;
-                <span class="align-middle fs-5">
-                    Cette ressource a été recommandée sur les projets suivants :
-                </span>
-                <ul class="mt-3">
-                    {% for project in projects_used_by %}
-                    <li><a href="{% url 'projects-project-detail' project.pk %}">{{ project.name }}</a></li>
+    <div class="col-7 px-5 mx-auto">
+
+        <div class="row resource-details mb-3">
+            <div class="col-sm-12 col-lg-8 col-xl-9">
+
+                <h1 class="mb-3 text-break">
+                    <span data-bs-toggle="tooltip" data-bs-placement="left" title="{{ resource.category.name|default:"Ressource" }}">
+                        <svg class="bi me-2 rounded-circle align-middle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"key" }}"/>
+                        </svg>
+                    </span>
+                    {{ resource.title|capfirst }}
+
+                    <!-- Toggle Bookmarking -->
+                    {% if user.is_authenticated %}
+                    {% if resource.id in user.bookmarks.as_list %}
+                    <form class="d-inline align-middle" method="POST" action="{% url "resources-bookmark-delete" resource.id %}">
+                        {% csrf_token %}
+                        <button class="d-inline-block btn btn-text"  data-bs-toggle="tooltip" data-bs-placement="right" title="Retirer de vos favoris">
+                            <svg class="bi align-baseline text-warning" width="24" height="24">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill"/>
+                            </svg>
+                        </button>
+                    </form>
+
+                    {% else %}
+
+                    <form class="d-inline align-middle" method="GET" action="{% url "resources-bookmark-create" resource.id %}">
+                        <button class="d-inline-block btn btn-text"  data-bs-toggle="tooltip" data-bs-placement="right" title="Ajouter à vos favoris">
+                            <svg class="bi align-baseline text-warning" width="24" height="24">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
+                            </svg>
+                        </button>
+                    </form>
+
+                    {% endif %}
+                    {% endif %}
+                </h1>
+
+                <!-- Area -->
+                {% if resource.departments.count %}
+                <div class="d-inline text-secondary">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#globe"/>
+                    </svg>&nbsp;
+                    <span class="small">
+                        {% for department in resource.departments.all %}
+                        {{ department.name }}
+                        {% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+                {% endif %}
+
+                <!-- Show banner if expired -->
+                {% if not resource.expired %}
+                <div class="bd-callout bd-callout-warning">
+                    <svg class="bi align-middle text-danger" width="24" height="24" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#exclamation-octagon-fill"/>
+                    </svg>&nbsp;
+                    <span class="align-middle">
+                        Cette fiche-ressource a expiré, les informations ne sont probablement plus à jour  !
+                    </span>
+                </div>
+                {% endif %}
+
+                {% if resource.departments.count and resource.tags %}
+                &nbsp;-&nbsp;
+                {% endif %}
+
+                <div class="mb-2 d-inline">
+                    {% for tag in resource.tags_as_list  %}
+                    <span class="badge rounded-pill bg-light text-dark">#{{ tag }}</span>
                     {% endfor %}
-                </ul>
+                </div>
+
+                <!-- Show banner if draft -->
+                {% if is_switchtender %}
+                {% if not resource.public %}
+                <div class="bd-callout bd-callout-warning">
+                    <svg class="bi align-middle" width="24" height="24" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hammer"/>
+                    </svg>&nbsp;
+                    Cette fiche-ressource est en cours d'écriture. Pensez à la
+                    <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <em>Public</em> si vous souhaitez que les visiteurs puissent la consulter !
+                </div>
+                {% endif %}
+
+
+                {% endif %}
+
+                {% if resource.subtitle %}
+                <h3 class="subtitle text-secondary mt-3">{{ resource.subtitle }}</h3>
+                {% endif %}
+
+                {% if bookmark and bookmark.comments %}
+                <div class="text-secondary mt-2 p-1">
+                    <svg class="bi align-baseline" width="12" height="12" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+                    </svg>
+                    <span class="small">Note personnelle</span>
+                    <br/>
+                    <q> {{ bookmark.comments }} </q>
+                    -
+                    <a href="{% url "resources-bookmark-create" bookmark.resource.id %}" class="small">éditer</a>
+
+                </div>
+                {% endif %}
 
             </div>
-            {% endif %}
 
-            {% endif %}
-
-            {% if resource.subtitle %}
-            <h3 class="subtitle text-secondary mt-3">{{ resource.subtitle }}</h3>
-            {% endif %}
-
-            {% if bookmark and bookmark.comments %}
-            <div class="text-secondary mt-2 p-1">
-                <svg class="bi align-baseline" width="12" height="12" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
-                </svg>
-                <span class="small">Note personnelle</span>
-                <br/>
-                <q> {{ bookmark.comments }} </q>
-                -
-                <a href="{% url "resources-bookmark-create" bookmark.resource.id %}" class="small">éditer</a>
-
-            </div>
-            {% endif %}
 
         </div>
 
+        {% if resource.summary %}
+        <div class="bd-callout text-secondary">
+            <svg class="bi me-2 align-middle" width="16" height="16">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-right-quote"/>
+            </svg>
+            &nbsp; 
+            {{ resource.summary }}
+        </div>
+        {% endif %}
 
+        <div class="text-justified">
+            {{ resource.content_rendered|safe }}
+        </div>
+
+        {% if resource.contacts.count %}
+        <div class="contact-list mt-5 mb-5">
+            <h3 class="mb-3">
+                <svg class="bi me-2 align-middle" width="24" height="24">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
+                </svg>
+                Contact{{ resource.contacts.count|pluralize }}
+            </h3>
+            {% if user.is_anonymous %}
+            {% for contact in resource.contacts.all %}
+            <span id="contact-{{ contact.id}}"></span>
+            {% endfor %}
+
+            Nous avons {{ resource.contacts.count }} contact{{ resource.contacts.count|pluralize }} associé{{ resource.contacts.count|pluralize }}
+            à cette fiche. Si vous souhaitez y accéder, veuillez <a href="{% url 'magicauth-login' %}">vous identifier</a>.
+            {% else %}
+
+            <div class="row row-cols-1 row-cols-md-2">
+                {% for contact in resource.contacts.all %}
+                <div class="col mb-3" id="contact-{{ contact.id }}">
+                    {% include 'addressbook/widgets/card_contact_horizontal.html' with contact=contact show_id=True %}
+                </div>
+                {% endfor %}
+            </div>
+
+            {% endif %}
+        </div>
+
+        {% endif %}
+
+        <div class="bd-callout mt-6">
+            <svg class="bi me-2 align-middle" width="24" height="24">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle-fill"/>
+            </svg>
+            &nbsp;
+            Un problème sur cette ressource ? Un doute, des questions ? N'hésitez pas à <a href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'"">nous interpeller</a>.
+        </div>
+
+    </div>
+
+    <div class="col-2 mx-auto">
         <!-- Sidebar -->
-        <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
+        <div class="admin-sidebar">
             <p class="small text-secondary">
                 <a href="#" class="d-flex align-items-center link-dark text-decoration-none" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
                     <span class="align-items-center link-dark text-decoration-none">
@@ -173,7 +238,8 @@
                     </span>
                     &nbsp;
                     <strong>Rédigé par <strong>UrbanVitaliz</strong></strong>
-            </a>
+                </a>
+            </p>
 
             <p class="small text-secondary">
                 <svg class="bi" width="20" height="16" fill="currentColor">
@@ -237,62 +303,7 @@
 
 
         </div>
-
     </div>
-
-    {% if resource.summary %}
-    <div class="bd-callout text-secondary">
-        <svg class="bi me-2 align-middle" width="16" height="16">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-right-quote"/>
-        </svg>
-        &nbsp; 
-        {{ resource.summary }}
-    </div>
-    {% endif %}
-
-    <div class="text-justified">
-        {{ resource.content_rendered|safe }}
-    </div>
-
-    {% if resource.contacts.count %}
-    <div class="contact-list mt-5 mb-5">
-        <h3 class="mb-3">
-            <svg class="bi me-2 align-middle" width="24" height="24">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
-            </svg>
-            Contact{{ resource.contacts.count|pluralize }}
-        </h3>
-        {% if user.is_anonymous %}
-        {% for contact in resource.contacts.all %}
-        <span id="contact-{{ contact.id}}"></span>
-        {% endfor %}
-
-        Nous avons {{ resource.contacts.count }} contact{{ resource.contacts.count|pluralize }} associé{{ resource.contacts.count|pluralize }}
-        à cette fiche. Si vous souhaitez y accéder, veuillez <a href="{% url 'magicauth-login' %}">vous identifier</a>.
-        {% else %}
-
-        <div class="row row-cols-1 row-cols-md-2">
-            {% for contact in resource.contacts.all %}
-            <div class="col mb-3" id="contact-{{ contact.id }}">
-                {% include 'addressbook/widgets/card_contact_horizontal.html' with contact=contact show_id=True %}
-            </div>
-            {% endfor %}
-        </div>
-
-        {% endif %}
-    </div>
-
-    {% endif %}
-
-    <li class="list-group-item border-0 p-0 mb-3">
-    <div class="bd-callout mt-6">
-        <svg class="bi me-2 align-middle" width="24" height="24">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle-fill"/>
-        </svg>
-        &nbsp;
-        Un problème sur cette ressource ? Un doute, des questions ? N'hésitez pas à <a href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'"">nous interpeller</a>.
-    </div>
-
 </div>
 
 {% endblock %}
