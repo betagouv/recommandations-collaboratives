@@ -35,7 +35,7 @@ def test_new_survey_session_is_created(client):
     new_session = models.Session.objects.get(survey=survey, project=project)
 
     assert response.status_code == 302
-    assert response.url == reverse("survey-session-start", args=(new_session.id, ))
+    assert response.url == reverse("survey-session-start", args=(new_session.id,))
 
 
 @pytest.mark.django_db
@@ -52,7 +52,7 @@ def test_existing_survey_session_is_reused(client):
 
     assert new_session == session
     assert response.status_code == 302
-    assert response.url == reverse("survey-session-start", args=(new_session.id, ))
+    assert response.url == reverse("survey-session-start", args=(new_session.id,))
 
 
 @pytest.mark.skip(reason="to be written")

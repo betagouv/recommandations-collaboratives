@@ -150,7 +150,7 @@ def test_performing_onboarding_discard_unknown_postal_code(client):
 @pytest.mark.django_db
 def test_my_projects_are_stored_in_session_on_login(client):
     project = Recipe(models.Project, email="my@example.com").make()
-    with login(client, is_staff=False, email="my@example.com") as user:
+    with login(client, is_staff=False, email="my@example.com"):
         pass
 
     assert len(client.session["projects"]) == 1
