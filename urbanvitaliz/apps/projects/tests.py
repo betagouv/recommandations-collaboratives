@@ -148,50 +148,21 @@ def test_performing_onboarding_discard_unknown_postal_code(client):
 
 
 @pytest.mark.django_db
-def test_my_project_not_available_when_not_logged_in(client):
-    url = reverse("projects-local-authority")
-    response = client.get(url)
-    assert response.status_code == 302  # redirects to login
+def test_my_projects_are_stored_in_session_on_login(client):
+    project = Recipe(models.Project, email="my@example.com").make()
+    with login(client, is_staff=False, email="my@example.com") as user:
+        pass
 
-
-@pytest.mark.django_db
-def test_my_projects_are_displayed_on_page(client):
-    url = reverse("projects-local-authority")
-    with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, emails=[user.email]).make()
-        response = client.get(url)
-    # template does a capfirst that capitalize the first word of title
-    assertContains(response, project.name.capitalize()[:20])  # truncated name
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_my_projects_are_stored_in_session(client):
-    url = reverse("projects-local-authority")
-    with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, emails=[user.email]).make()
-        client.get(url)
     assert len(client.session["projects"]) == 1
     session_project = client.session["projects"][0]
     assert session_project["id"] == project.id
 
 
 @pytest.mark.django_db
-def test_other_projects_are_not_displayed_on_page(client):
-    project = Recipe(models.Project, email="other@example.com").make()
-    url = reverse("projects-local-authority")
-    with login(client, is_staff=False):
-        response = client.get(url)
-    assertNotContains(response, project.name)
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
 def test_other_projects_are_not_stored_in_session(client):
     project = Recipe(models.Project, email="other@exmaple.com").make()
-    url = reverse("projects-local-authority")
     with login(client, is_staff=False):
-        client.get(url)
+        pass
     assert {"name": project.name, "id": project.id} not in client.session["projects"]
 
 

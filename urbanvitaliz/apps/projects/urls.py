@@ -14,8 +14,11 @@ from . import views
 
 urlpatterns = [
     path(r"onboarding/", views.onboarding, name="projects-onboarding"),
-    # my projects for local authorities
-    path(r"ma-collectivite/", views.local_authority, name="projects-local-authority"),
+    path(
+        r"login_redirect/",
+        views.redirect_user_to_project,
+        name="projects-redirect-user-to-project",
+    ),
     # projects for switchtenders
     path(r"projects/", views.project_list, name="projects-project-list"),
     path("projects/feed/", views.LatestProjectsFeed(), name="projects-feed"),

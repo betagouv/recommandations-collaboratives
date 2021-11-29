@@ -20,7 +20,7 @@
         <!-- Bootstrap core CSS -->
 		    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
         <link href="{% sass_src 'css/base.scss' %}" rel="stylesheet" type="text/css">
-        <link href="{% sass_src 'css/sidebars.scss' %}" rel="stylesheet" type="text/css">
+        <link href="{% sass_src 'css/menu-top.scss' %}" rel="stylesheet" type="text/css">
         <link href="{% sass_src 'css/markdownx.scss' %}" rel="stylesheet" type="text/css">
 
         <!-- Extra CSS -->
@@ -36,8 +36,8 @@
     </head>
     <body class="bg-light">
 
-        <h1 class="visually-hidden">Urban Vitaliz</h1>
-        {% include "sidebar.html" %}
+        <h1 class="visually-hidden">UrbanVitaliz</h1>
+        {% include "menu-top.html" %}
 
         <main>
             {% if messages %}

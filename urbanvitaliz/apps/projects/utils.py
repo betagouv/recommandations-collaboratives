@@ -12,6 +12,8 @@ import uuid
 
 from django.core.exceptions import PermissionDenied
 
+from . import models
+
 
 def can_administrate_project(project, user, allow_draft=False):
     """Check if user is allowed to administrate this project"""
@@ -55,3 +57,27 @@ def can_administrate_or_403(project, user, allow_draft=False):
 def generate_ro_key():
     """Generate the ReadOnly key for sharing"""
     return uuid.uuid4().hex
+
+
+def get_active_project_id(request):
+    """Return the active project ID for a given user"""
+    return request.session.get("active_project", None)
+
+
+def get_active_project(request):
+    """Return the active project for a given user"""
+    project_id = get_active_project_id(request)
+    project = None
+
+    if project_id:
+        try:
+            project = models.Project.objects.get(id=project_id)
+        except models.Project.DoesNotExist:
+            pass
+
+    return project
+
+
+def set_active_project_id(request, project_id: int):
+    """Set the current project in a session cookie"""
+    request.session["active_project"] = project_id

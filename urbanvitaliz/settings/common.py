@@ -78,6 +78,7 @@ TEMPLATES = [
                 "django.template.context_processors.media",
                 "django.contrib.messages.context_processors.messages",
                 "urbanvitaliz.apps.projects.context_processors.is_switchtender_processor",
+                "urbanvitaliz.apps.projects.context_processors.active_project_processor",
             ],
         },
     },
@@ -160,7 +161,7 @@ LOGOUT_REDIRECT_URL = "/"
 MAGICAUTH_FROM_EMAIL = EMAIL_FROM
 MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à UrbanVitaliz ici"
 MAGICAUTH_EMAIL_FIELD = "email"
-MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "projects-local-authority"
+MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "projects-redirect-user-to-project"
 MAGICAUTH_EMAIL_UNKNOWN_CALLBACK = "urbanvitaliz.apps.home.utils.create_user"
 MAGICAUTH_TOKEN_DURATION_SECONDS = 60 * 30
 
