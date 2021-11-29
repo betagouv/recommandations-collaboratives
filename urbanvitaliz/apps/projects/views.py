@@ -12,7 +12,9 @@ from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.signals import user_logged_in
 from django.contrib.syndication.views import Feed
+from django.dispatch import receiver
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -27,7 +29,7 @@ from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
 
 from . import models, signals
 from .utils import (can_administrate_or_403, can_administrate_project,
-                    generate_ro_key)
+                    generate_ro_key, get_active_project, set_active_project_id)
 
 ########################################################################
 # notifications
@@ -158,28 +160,6 @@ class OnboardingForm(forms.ModelForm):
 
 
 ########################################################################
-# Local authorities
-########################################################################
-
-
-@login_required
-def local_authority(request):
-    """Return the projects followup for logged in local authority"""
-    projects = models.Project.fetch(email=request.user.email)
-    # store my projects in the session
-    request.session["projects"] = list(
-        {
-            "name": p.name,
-            "id": p.id,
-            "location": p.location,
-            "actions_open": p.tasks.open().count(),
-        }
-        for p in projects
-    )
-    return render(request, "projects/local_authority.html", locals())
-
-
-########################################################################
 # Switchtender
 ########################################################################
 
@@ -217,6 +197,9 @@ def project_detail(request, project_id=None):
         }
         for p in projects
     )
+
+    # Set this project as active
+    set_active_project_id(request, project.pk)
 
     try:
         survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
@@ -958,6 +941,46 @@ def access_delete(request, project_id: int, email: str):
             )
 
     return redirect(reverse("projects-access-update", args=[project_id]))
+
+
+########################################################################
+# Login methods and signals
+########################################################################
+@receiver(user_logged_in)
+def post_login_set_active_project(sender, user, request, **kwargs):
+    # store my projects in the session
+    projects = models.Project.objects.filter(email=user.email)
+
+    request.session["projects"] = list(
+        {
+            "name": p.name,
+            "id": p.id,
+            "location": p.location,
+            "actions_open": p.tasks.open().count(),
+        }
+        for p in projects
+    )
+
+    print(projects)
+
+    active_project = get_active_project(request)
+
+    if not active_project:
+        # Try to fetch a project
+        active_project = models.Project.objects.filter(email=user.email).first()
+        if active_project:
+            set_active_project_id(request, active_project.id)
+
+
+@login_required
+def redirect_user_to_project(request):
+    """Redirect user to project page given her context"""
+    active_project = get_active_project(request)
+
+    if active_project:
+        return redirect(reverse("projects-project-detail", args=[active_project.id]))
+    else:
+        return redirect(reverse("home"))
 
 
 ########################################################################
