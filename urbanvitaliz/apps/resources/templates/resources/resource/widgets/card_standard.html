@@ -82,7 +82,7 @@
                 {% if is_switchtender %}
 
                 <!-- Push -->
-                {% if "project_id" in request.session %}
+                {% if active_project %}
                 <a class="text-reset text-decoration-none align-baseline" href="{% url "projects-create-resource-action" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Pousser cette ressource">
                     <svg class="bi text-success align-baseline" width="14" height="14" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>

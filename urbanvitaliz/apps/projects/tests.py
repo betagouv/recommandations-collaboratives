@@ -1247,30 +1247,6 @@ def test_delete_note_for_project_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_switchtender_push_resource_fails_on_get(client):
-    project = Recipe(models.Project).make()
-    url = reverse("projects-push-resource", args=[project.id])
-    with login(client, groups=["switchtender"]):
-        response = client.get(url)
-
-    newurl = reverse("projects-project-detail", args=[project.id])
-    assertRedirects(response, newurl)
-
-
-@pytest.mark.django_db
-def test_switchtender_push_resource_to_project(client):
-    project = Recipe(models.Project).make()
-    url = reverse("projects-push-resource", args=[project.id])
-    with login(client, groups=["switchtender"]):
-        response = client.post(url)
-    # project is stored in session and user redirected to resource app.
-    assert client.session["project_id"] == project.id
-
-    newurl = reverse("resources-resource-search")
-    assertRedirects(response, newurl)
-
-
-@pytest.mark.django_db
 def test_switchtender_push_resource_to_project_needs_project_id(client):
     project = Recipe(models.Project).make()
     resource = Recipe(resources.Resource, public=True).make()
@@ -1278,7 +1254,7 @@ def test_switchtender_push_resource_to_project_needs_project_id(client):
     url = reverse("projects-create-resource-action", args=[resource.id])
     with login(client, groups=["switchtender"]):
         session = client.session
-        session["project_id"] = project.id
+        session["active_project"] = project.id
         session.save()
         response = client.get(url)
 
@@ -1303,10 +1279,10 @@ def test_switchtender_create_action_for_resource_push(client):
 
     url = reverse("projects-create-resource-action", args=[resource.id])
     with login(client, groups=["switchtender"]):
-        # project_id should be in session
         session = client.session
-        session["project_id"] = project.id
+        session["active_project"] = project.id
         session.save()
+
         data = {"intent": "read this", "content": "some nice content"}
         response = client.post(url, data=data)
 
@@ -1332,8 +1308,9 @@ def test_switchtender_create_action_for_resource_push_with_notification(client):
     with login(client, groups=["switchtender"]):
         # project_id should be in session
         session = client.session
-        session["project_id"] = project.id
+        session["active_project"] = project.id
         session.save()
+
         data = {
             "intent": "read this",
             "content": "some nice content",

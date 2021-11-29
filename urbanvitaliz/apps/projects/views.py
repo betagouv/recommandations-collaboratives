@@ -24,22 +24,13 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-    send_email,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403, send_email)
 
 from . import models, signals
-from .utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    generate_ro_key,
-    get_active_project,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key, get_active_project, get_active_project_id,
+                    refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # notifications
@@ -811,21 +802,10 @@ class RsvpTaskFollowupForm(forms.Form):
 
 
 @login_required
-def push_resource(request, project_id=None):
-    """Start the process of pushing a resource to given project"""
-    is_switchtender_or_403(request.user)
-    project = get_object_or_404(models.Project, pk=project_id)
-    if request.method == "POST":
-        request.session["project_id"] = project.id
-        return redirect(reverse("resources-resource-search"))
-    return redirect(reverse("projects-project-detail", args=[project_id]))
-
-
-@login_required
 def create_resource_action(request, resource_id=None):
     """Create action for given resource to project stored in session"""
     is_switchtender_or_403(request.user)
-    project_id = request.session.get("project_id")
+    project_id = get_active_project_id(request)
     resource = get_object_or_404(resources.Resource, pk=resource_id)
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
@@ -839,10 +819,8 @@ def create_resource_action(request, resource_id=None):
             task.save()
             # assign reminder in six weeks
             create_reminder(
-                request, 42, task, project.email, origin=api.models.Mail.STAFF
+                request, 6 * 7, task, project.email, origin=api.models.Mail.STAFF
             )
-            # cleanup the session
-            del request.session["project_id"]
 
             # Send notifications
             if form.cleaned_data["notify_email"]:

@@ -118,11 +118,6 @@ urlpatterns = [
         name="projects-update-note",
     ),
     path(
-        r"project/<int:project_id>/push/",
-        views.push_resource,
-        name="projects-push-resource",
-    ),
-    path(
         r"project/<int:resource_id>/resource/action/",
         views.create_resource_action,
         name="projects-create-resource-action",
