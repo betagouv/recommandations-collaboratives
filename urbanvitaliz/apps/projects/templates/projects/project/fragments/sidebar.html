@@ -31,18 +31,6 @@
                 Éditer
             </a>
         </span>
-        <span class="d-inline-block"> 
-            <form method="POST" action="{% url 'projects-push-resource' project.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-light w-100 btn-sm" role="submit">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
-                    </svg>
-                    &nbsp;
-                    Pousser une ressource
-                </button>
-            </form>
-        </span>
         <span class="d-inline-block">
             <a class="btn btn-light w-100 btn-sm"  href="{% url 'projects-create-task' project.id %}">
                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
