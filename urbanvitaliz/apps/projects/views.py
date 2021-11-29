@@ -24,12 +24,22 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
-                                is_switchtender_or_403, send_email)
+from urbanvitaliz.utils import (
+    check_if_switchtender,
+    is_staff_or_403,
+    is_switchtender_or_403,
+    send_email,
+)
 
 from . import models, signals
-from .utils import (can_administrate_or_403, can_administrate_project,
-                    generate_ro_key, get_active_project, set_active_project_id)
+from .utils import (
+    can_administrate_or_403,
+    can_administrate_project,
+    generate_ro_key,
+    get_active_project,
+    refresh_user_projects_in_session,
+    set_active_project_id,
+)
 
 ########################################################################
 # notifications
@@ -182,21 +192,6 @@ def project_detail(request, project_id=None):
     # check user can administrate projet (member or switchtender)
     if request.user.email != project.email:
         can_administrate_or_403(project, request.user)
-
-    # XXX: We need this here too since onboarding now redirects to
-    # this page directly.
-    projects = models.Project.fetch(email=request.user.email)
-
-    # store my projects in the session
-    request.session["projects"] = list(
-        {
-            "name": p.name,
-            "id": p.id,
-            "location": p.location,
-            "actions_open": p.tasks.open().count(),
-        }
-        for p in projects
-    )
 
     # Set this project as active
     set_active_project_id(request, project.pk)
@@ -949,19 +944,7 @@ def access_delete(request, project_id: int, email: str):
 @receiver(user_logged_in)
 def post_login_set_active_project(sender, user, request, **kwargs):
     # store my projects in the session
-    projects = models.Project.objects.filter(email=user.email)
-
-    request.session["projects"] = list(
-        {
-            "name": p.name,
-            "id": p.id,
-            "location": p.location,
-            "actions_open": p.tasks.open().count(),
-        }
-        for p in projects
-    )
-
-    print(projects)
+    refresh_user_projects_in_session(request, user)
 
     active_project = get_active_project(request)
 

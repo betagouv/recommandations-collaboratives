@@ -81,3 +81,18 @@ def get_active_project(request):
 def set_active_project_id(request, project_id: int):
     """Set the current project in a session cookie"""
     request.session["active_project"] = project_id
+
+
+def refresh_user_projects_in_session(request, user):
+    """store the user projects in the session"""
+    projects = models.Project.objects.filter(email=user.email)
+
+    request.session["projects"] = list(
+        {
+            "name": p.name,
+            "id": p.id,
+            "location": p.location,
+            "actions_open": p.tasks.open().count(),
+        }
+        for p in projects
+    )
