@@ -218,6 +218,15 @@
 
         {% endif %}
 
+        {% if active_project_actions %}
+        <div class="py-3">
+            <h2 class="mb-4">Actions associées</h2>
+            {% for action in active_project_actions %}
+            {% include 'projects/project/fragments/action_list_item.html' with task=action disable_tracking=True can_administrate=True hide_details=True %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
         <div class="bd-callout mt-6">
             <svg class="bi me-2 align-middle" width="24" height="24">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle-fill"/>
