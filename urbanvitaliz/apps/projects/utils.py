@@ -11,6 +11,7 @@ created: <2021-09-13 lun. 15:38>
 import uuid
 
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 
 from . import models
 
@@ -66,12 +67,23 @@ def get_active_project_id(request):
 
 def get_active_project(request):
     """Return the active project for a given user"""
+    if not request.user.is_authenticated:
+        return None
+
     project_id = get_active_project_id(request)
     project = None
 
     if project_id:
         try:
             project = models.Project.objects.get(id=project_id)
+        except models.Project.DoesNotExist:
+            pass
+    else:
+        try:
+            project = models.Project.objects.filter(
+                Q(email=request.user.email)
+                | Q(is_draft=False, emails__contains=request.user.email)
+            ).first()
         except models.Project.DoesNotExist:
             pass
 
@@ -85,7 +97,9 @@ def set_active_project_id(request, project_id: int):
 
 def refresh_user_projects_in_session(request, user):
     """store the user projects in the session"""
-    projects = models.Project.objects.filter(email=user.email)
+    projects = models.Project.objects.filter(
+        Q(email=user.email) | Q(is_draft=False, emails__contains=user.email)
+    )
 
     request.session["projects"] = list(
         {
