@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load humanize %}
+{% load gravatar %}
 
 {% load sass_tags %}
 
@@ -241,13 +242,22 @@
         <!-- Sidebar -->
         <div class="admin-sidebar">
             <p class="small text-secondary">
-                <a href="#" class="d-flex align-items-center link-dark text-decoration-none" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
                     <span class="align-items-center link-dark text-decoration-none">
-                        <img src="https://github.com/salomeDeschenes.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                        {% if resource.created_by %}
+                        <img
+                            src="{% gravatar_url resource.created_by.email 32 %}"
+                            alt="{{ resource.created_by.get_full_name }}"
+                            class="me-2 rounded-circle"
+                            style="width: 32px; height: 32px;"
+                        />
+                        {% else %}
+                        <img src="{% static 'img/logo-small.png' %}" alt="" width="32" height="32" class="rounded-circle me-2">
+                        {% endif %}
                     </span>
                     &nbsp;
-                    <strong>Rédigé par <strong>UrbanVitaliz</strong></strong>
-                </a>
+                    <span class="align-middle">
+                        Rédigé par <strong>{{ resource.created_by.get_full_name|default:"UrbanVitaliz" }}</strong>
+                    </span>
             </p>
 
             <p class="small text-secondary">
