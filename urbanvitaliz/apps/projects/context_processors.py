@@ -1,6 +1,5 @@
 from urbanvitaliz.utils import check_if_switchtender
 
-from .models import Project
 from .utils import get_active_project
 
 
