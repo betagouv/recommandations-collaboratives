@@ -118,7 +118,7 @@
 
                 <div class="btn-group">
                     <a href="{% url 'projects-project-detail' active_project.pk %}" class="nav-link link-dark project-name-box">
-                        <span class="fw-bold">{{ active_project.name }}</span>
+                        <span class="fw-bold">{{ active_project.name|truncatechars:30 }}</span>
                         <br/>
                         <span class="text-primary small">Aller à la page du projet&nbsp;&rarr;</span>
                     </a>
