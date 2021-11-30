@@ -283,7 +283,7 @@
 
             <!-- Push Resource -->
             <div class="d-grid gap-2 mt-3">
-                {% if "project_id" in request.session %}
+                {% if active_project %}
                 <form action="{% url "projects-create-resource-action" resource.id %}" method="GET">
                     <button type="submit" class="btn btn-success w-100 btn-sm" role="submit">
                         <svg class="bi" width="16" height="16" fill="currentColor">
