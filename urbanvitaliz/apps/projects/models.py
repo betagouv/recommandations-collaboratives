@@ -116,6 +116,15 @@ class Project(models.Model):
     )
     impediments = models.TextField(default="", blank=True, verbose_name="Difficultés")
 
+    switchtender = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.SET_NULL,
+        related_name="projects_managed",
+        null=True,
+        blank=True,
+        verbose_name="Aiguilleu·r·se",
+    )
+
     @property
     def resources(self):
         return self.tasks.exclude(resource=None)

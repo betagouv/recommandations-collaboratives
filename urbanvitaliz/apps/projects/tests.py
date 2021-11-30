@@ -669,8 +669,23 @@ def test_create_task_available_for_switchtender(client):
     url = reverse("projects-create-task", args=[project.id])
     with login(client, groups=["switchtender"]):
         response = client.get(url)
+
     assert response.status_code == 200
     assertContains(response, 'form id="form-projects-add-task"')
+
+
+@pytest.mark.django_db
+def test_create_task_assigns_new_switchtender(client):
+    project = Recipe(models.Project, switchtender=None).make()
+    url = reverse("projects-create-task", args=[project.id])
+    with login(client, groups=["switchtender"]):
+        client.post(
+            url,
+            data={"content": "this is some content", "notify_email": False},
+        )
+
+    project = models.Project.objects.all()[0]
+    assert project.switchtender is not None
 
 
 @pytest.mark.django_db
@@ -1269,6 +1284,23 @@ def test_switchtender_push_resource_to_project_fails_if_no_project_in_session(cl
         response = client.get(url)
 
     assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_switchtender_push_resource_assigns_switchtender_to_project(client):
+    project = Recipe(models.Project, switchtender=None).make()
+    resource = Recipe(resources.Resource, public=True).make()
+
+    url = reverse("projects-create-resource-action", args=[resource.id])
+    with login(client, groups=["switchtender"]):
+        session = client.session
+        session["active_project"] = project.id
+        session.save()
+        data = {"intent": "read this", "content": "some nice content"}
+        client.post(url, data=data)
+
+    project = models.Project.objects.get(pk=project.id)
+    assert project.switchtender is not None
 
 
 @pytest.mark.django_db
