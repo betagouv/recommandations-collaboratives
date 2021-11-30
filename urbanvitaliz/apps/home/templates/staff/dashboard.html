@@ -5,6 +5,47 @@
 {% load activity_tags %}
 {% load humanize %}
 {% load gravatar %}
+{% load leaflet_tags %}
+{% load l10n %}
+
+{% block js %}
+{% leaflet_js %}
+
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+
+<!-- Leaflet -->
+<script type="text/javascript">
+ function map_init (map, options) {
+     var icon = L.icon({iconUrl: '{% static "img/statistics/marker.png" %}', iconSize: [18, 18]});
+
+     {% regroup request.user.tasks_created.all by project as project_list %}
+     {% for project in project_list %}
+     {% if project.0.commune %}
+     L.marker([{{project.0.commune.latitude|unlocalize}}, {{project.0.commune.longitude|unlocalize}}], {icon: icon}).addTo(map);
+     {% endif %}
+     {% endfor %}
+
+     var zoom = 5;
+     map.setView(new L.LatLng(47, 2.5), zoom);
+     map.setMinZoom(zoom - 2);
+     map.setMaxZoom(zoom + 4);
+
+     map.addControl(new L.Control.Fullscreen());
+ }
+
+</script>
+{% endblock %}
+
+{% block title %}
+| Tableau de bord
+{% endblock %}
+
+{% block css %}
+{% leaflet_css %}
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+{% endblock %}
+
+
 
 {% block content %}
 <div class="col-10 py-5 mx-auto">
@@ -87,6 +128,10 @@
                 </svg>
                 <span class="align-middle">Mes projets aiguillés</span>
             </h3>
+
+            <div class="border-top border-left border-right">
+                {% leaflet_map "friches" callback="window.map_init" %}
+            </div>
 
             {% regroup request.user.tasks_created.all by project as project_list %}
             <ul class="list-group">
