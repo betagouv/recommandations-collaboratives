@@ -1,0 +1,206 @@
+{% load static %}
+{% load gravatar %}
+
+{% load projects_extra %}
+
+<nav
+    class="navbar navbar-expand-lg fixed-top navbar-light bg-white shadow-sm"
+    aria-label="Main navigation"
+    style="padding:0;"
+>
+    <div class="container-fluid me-2">
+        <a href="{% url 'home' %}" class="d-flex me-5 align-middle pt-2 pb-2">
+            <img src="{% static 'img/logo-uv.png' %}" width="180" alt="Logo UrbanVitaliz"/>
+        </a>
+        <button
+            class="navbar-toggler p-0 border-0"
+            type="button"
+            data-bs-toggle="offcanvas"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div
+            class="navbar-collapse offcanvas-collapse bg-white"
+        >
+
+            <ul class="main-menu navbar-nav me-auto">
+                {% if not active_project %}
+                <li class="nav-item fw-bold me-2">
+                    <a href="{% url 'projects-onboarding' %}" class="nav-link text-primary ">
+                        <svg class="bi align-middle" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus"/>
+                        </svg>
+                        <span class="align-middle">Déposer un projet</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Ressources -->
+                <li class="nav-item dropdown me-2">
+                    <div class="btn-group">
+                        <a href="{% url 'resources-resource-search' %}" class="nav-link link-dark">
+                            <svg class="bi align-middle" width="16" height="16">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
+                            </svg>
+                            <span class="ms-1 align-middle">Ressources</span>
+                        </a>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'methodology' %}" class="nav-link link-dark">
+                        <svg class="bi align-middle" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#grid"/>
+                        </svg>
+                        <span class="me-2 ms-1 align-middle">Méthodologie</span>
+                    </a>
+                </li>
+
+                {% if is_switchtender  %}
+                <!-- Address Book -->
+                <li class="nav-item nav-item-admin">
+                    <a href="{% url 'addressbook-organization-list' %}" class="nav-link link-dark">
+                        <svg class="bi align-middle" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-lines-fill"/>
+                        </svg>
+                        <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
+                    </a>
+                </li>
+                <!-- Project List -->
+                <li class="nav-item dropdown nav-item-admin me-2">
+                    <div class="btn-group">
+                        <a href="{% url 'projects-project-list' %}" class="nav-link link-dark">
+                            <svg class="bi align-middle" width="16" height="16">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                            </svg>
+                            <span class="ms-1 align-middle">Projets</span>
+                        </a>
+                    </div>
+                </li>
+
+                {% endif %}
+
+                <!-- Staff tools -->
+                {% if user.is_staff  %}
+                <!-- Project List -->
+                <li class="nav-item dropdown nav-item-admin me-2">
+                    <button type="button" class="border-0 p-0 nav-link pt-2 d-inline-block btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                        <svg class="bi d-inline align-middle" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#sliders"/>
+                        </svg>
+                        <span class="text-secondary d-inline align-middle pe-1">Configuration</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item border-0 d-inline-block position-relative">
+                            <svg class="bi me-2 d-inline" width="16" height="16">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-fill"/>
+                            </svg>
+                            <a class="stretched-link d-inline text-secondary" href="{% url 'projects-task-recommendation-list' %}">Pré-fléchage</a>
+                        </li>
+
+                        <li class="dropdown-item border-0 d-inline-block position-relative">
+                            <svg class="bi me-2 d-inline" width="16" height="16">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle"/>
+                            </svg>
+                            <a class="stretched-link d-inline text-secondary" href="{% url 'survey-editor-survey-details' 1 %}">Questionnaire</a>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+
+            </ul>
+
+            <!-- Project selector -->
+            {% if user.is_authenticated and active_project %}
+            <div id="project-selector" class="nav-item border-start border-end ps-2 pe-2">
+
+                <div class="btn-group">
+                    <a href="{% url 'projects-project-detail' active_project.pk %}" class="nav-link link-dark project-name-box">
+                        <span class="fw-bold">{{ active_project.name }}</span>
+                        <br/>
+                        <span class="text-primary small">Aller à la page du projet&nbsp;&rarr;</span>
+                    </a>
+
+                    {% if request.session.projects|length > 1 %}
+                    <button type="button" class="border-0 p-1 ps-4 pe-4 btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+
+                    <ul class="dropdown-menu" style="width: 20vw">
+                        {% for project in request.session.projects %}
+                        <li class="list-group-item list-group-item-action dropdown-item border-0 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-break text-truncate">
+                                    <a class="stretched-link text-reset text-decoration-none" href="{% url "projects-project-detail" project.id %}">{{ project.name|truncatechars:12|capfirst }}</a>
+                                </span>
+                                {% if project.actions_open > 0 %}
+                                <div>
+                                    <span class="align-middle badge bg-primary rounded-pill">
+                                        {{ project.actions_open }}
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <span class="text-secondary small text-break text-truncate">{{ project.location|truncatechars:20|capfirst }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% else %}
+                {% endif %}
+            </div>
+
+            <!-- User -->
+            <div id="user-info" class="pe-2 ps-2 ms-2">
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img
+                            src="{% gravatar_url user.email 32 %}"
+                            alt="{{ user.get_full_name }}"
+                            class="me-2 rounded-circle"
+                            style="width: 32px; height: 32px;"
+                        />
+
+                        <strong class="d-none d-lg-none d-xl-block">{{ user.get_full_name|default:user.email }}</strong>
+
+                    </a>
+                    <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+                        <!-- 
+                             <li><a class="dropdown-item" href="#">Nouveau Projet...</a></li>
+                             <li><a class="dropdown-item" href="#">Profil</a></li>
+                             <li><hr class="dropdown-divider"></li>
+                        -->
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">Déconnexion</a></li>
+                        {% if is_switchtender or user.is_staff %}
+                        <li><hr class="dropdown-divider"></li>
+                        {% if is_switchtender %}
+                        <li><a class="dropdown-item" href="{% url 'switchtender-dashboard' %}">Tableau de Bord</a></li>
+                        {% endif %}
+                        {% if user.is_staff %}
+                        <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>
+                        {% endif %}
+                        {% endif %}
+                    </ul>
+                </div>
+
+                {% else %}
+                <a href="{% url 'magicauth-login' %}" class="btn">
+                    <svg class="bi me-2 align-middle" width="16" height="16">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle"/>
+                    </svg>
+                    <span class="align-middle">Se connecter</span>
+                </a>
+
+                {% endif %}
+            </div>
+
+
+
+        </div>
+    </div>
+</nav>
+
