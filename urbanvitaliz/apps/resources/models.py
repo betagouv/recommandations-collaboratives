@@ -83,6 +83,12 @@ class Resource(models.Model):
     expires_on = models.DateField(
         blank=True, null=True, verbose_name="date d'expiration"
     )
+    created_by = models.ForeignKey(
+        auth.User,
+        on_delete=models.CASCADE,
+        related_name="authored_resources",
+        null=True,
+    )
 
     @property
     def expired(self):

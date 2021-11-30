@@ -164,7 +164,9 @@ def resource_create(request):
     if request.method == "POST":
         form = EditResourceForm(request.POST)
         if form.is_valid():
-            resource = form.save()
+            resource = form.save(commit=False)
+            resource.created_by = request.user
+            resource.save()
             next_url = reverse("resources-resource-detail", args=[resource.id])
             return redirect(next_url)
     else:
