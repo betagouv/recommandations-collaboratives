@@ -47,7 +47,7 @@
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-2"/>
             </svg>
             &nbsp;
-            <span class="align-middle fs-5">
+            <span class="align-middle fs-6">
                 Cette ressource a été recommandée sur les projets suivants :
             </span>
             <ul class="mt-3">
@@ -67,11 +67,11 @@
 
                 <h1 class="mb-3 text-break">
                     <span data-bs-toggle="tooltip" data-bs-placement="left" title="{{ resource.category.name|default:"Ressource" }}">
-                        <svg class="bi me-2 rounded-circle align-middle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}">
+                        <svg class="bi me-1 rounded-circle align-middle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"key" }}"/>
                         </svg>
                     </span>
-                    {{ resource.title|capfirst }}
+                    <span class="align-middle">{{ resource.title|capfirst }}</span>
 
                     <!-- Toggle Bookmarking -->
                     {% if user.is_authenticated %}
@@ -219,8 +219,8 @@
         {% endif %}
 
         {% if active_project_actions %}
-        <div class="py-3">
-            <h2 class="mb-4">Actions associées</h2>
+        <div class="py-1">
+            <h2 class="my-5">Actions associées</h2>
             {% for action in active_project_actions %}
             {% include 'projects/project/fragments/action_list_item.html' with task=action disable_tracking=True can_administrate=True hide_details=True %}
             {% endfor %}
