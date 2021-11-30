@@ -291,6 +291,7 @@ class ProjectForm(forms.ModelForm):
             "postcode",
             "location",
             "description",
+            "switchtender",
             "publish_to_cartofriches",
         ]
 
@@ -402,6 +403,10 @@ def create_task(request, project_id=None):
             instance.created_by = request.user
             instance.project = project
             instance.save()
+
+            if not project.switchtender:
+                project.switchtender = request.user
+                project.save()
 
             # Send notifications
             if form.cleaned_data["notify_email"]:
@@ -827,6 +832,12 @@ def create_resource_action(request, resource_id=None):
             task.resource = resource
             task.created_by = request.user
             task.save()
+
+            # Assign switchtender if none yet
+            if not project.switchtender:
+                project.switchtender = request.user
+                project.save()
+
             # assign reminder in six weeks
             create_reminder(
                 request, 6 * 7, task, project.email, origin=api.models.Mail.STAFF
