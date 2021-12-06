@@ -29,8 +29,9 @@ from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
 
 from . import models, signals
 from .utils import (can_administrate_or_403, can_administrate_project,
-                    generate_ro_key, get_active_project, get_active_project_id,
-                    refresh_user_projects_in_session, set_active_project_id)
+                    create_reminder, generate_ro_key, get_active_project,
+                    get_active_project_id, refresh_user_projects_in_session,
+                    set_active_project_id)
 
 ########################################################################
 # notifications
@@ -706,38 +707,25 @@ def remind_task(request, task_id=None):
             days = form.cleaned_data.get("days")
             days = days or 6 * 7  # 6 weeks is default
 
-            create_reminder(request, days, task, recipient, origin=api.models.Mail.SELF)
-
-            messages.success(
-                request, "Une alarme a bien été programmée dans {0} jours.".format(days)
-            )
+            if create_reminder(
+                request, days, task, recipient, origin=api.models.Mail.SELF
+            ):
+                messages.success(
+                    request,
+                    "Une alarme a bien été programmée dans {0} jours.".format(days),
+                )
+            else:
+                messages.error(
+                    request,
+                    "Impossible de programmer l'alarme : cet utilisateur n'existe pas.",
+                )
         else:
-            messages.error(request, "Impossible de programmer l'alarme.")
+            messages.error(
+                request, "Impossible de programmer l'alarme : données invalides."
+            )
 
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"
-    )
-
-
-def create_reminder(request, days, task, recipient, origin):
-    subject = f'[UrbanVitaliz] Où en êtes vous suite à nos recommandations pour le site "{task.project.name}"'
-    template = "projects/notifications/task_remind_email"
-    rsvp, created = models.TaskFollowupRsvp.objects.get_or_create(task=task)
-    if not created:
-        rsvp.created_on = timezone.now()
-        rsvp.save()
-    api.create_reminder_email(
-        request,
-        recipient,
-        subject,
-        template,
-        related=task,
-        origin=origin,
-        delay=days,
-        extra_context={"task": task, "delay": days, "rsvp": rsvp},
-    )
-    signals.reminder_created.send(
-        sender=models.Project, task=task, project=task.project, user=request.user
     )
 
 
@@ -771,7 +759,9 @@ class TaskFollowupForm(forms.ModelForm):
 
 
 def rsvp_followup_task(request, rsvp_id=None, status=None):
-    """Manage the user task followup from her rsvp email."""
+    """Manage the user task followup from her rsvp email.
+    Triggered when a user clicks on a rsvp link
+    """
     try:
         rsvp = models.TaskFollowupRsvp.objects.get(uuid=rsvp_id)
     except models.TaskFollowupRsvp.DoesNotExist:
@@ -784,7 +774,7 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
         if form.is_valid():
             comment = form.cleaned_data.get("comment", "")
             models.TaskFollowup(
-                status=status, comment=comment, task=task, who=request.user
+                status=status, comment=comment, task=task, who=rsvp.user
             ).save()
             rsvp.delete()  # we are done with this use only once object
             # TODO

@@ -17,7 +17,8 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -898,7 +899,7 @@ def test_create_reminder_for_task(client):
     task = Recipe(models.Task, project=project).make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
-    with login(client):
+    with login(client, email=project.email):
         response = client.post(url, data=data)
     assert response.status_code == 302
     reminder = reminders.Mail.to_send.all()[0]
@@ -910,9 +911,9 @@ def test_create_reminder_for_task(client):
 
 @pytest.mark.django_db
 def test_create_reminder_without_delay_for_task(client):
-    task = Recipe(models.Task).make()
+    task = Recipe(models.Task, project__email="owner@example.com").make()
     url = reverse("projects-remind-task", args=[task.id])
-    with login(client):
+    with login(client, email=task.project.email):
         response = client.post(url)
     assert response.status_code == 302
     assert reminders.Mail.to_send.count() == 1
@@ -921,11 +922,11 @@ def test_create_reminder_without_delay_for_task(client):
 
 @pytest.mark.django_db
 def test_recreate_reminder_after_for_same_task(client):
-    task = Recipe(models.Task).make()
+    task = Recipe(models.Task, project__email="owner@example.com").make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
     data2 = {"days": 10}
-    with login(client):
+    with login(client, email=task.project.email):
         response = client.post(url, data=data)
         response = client.post(url, data=data2)
 
@@ -939,11 +940,11 @@ def test_recreate_reminder_after_for_same_task(client):
 
 @pytest.mark.django_db
 def test_recreate_reminder_before_for_same_task(client):
-    task = Recipe(models.Task).make()
+    task = Recipe(models.Task, project__email="owner@example.com").make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
     data2 = {"days": 2}
-    with login(client):
+    with login(client, email=task.project.email):
         response = client.post(url, data=data)
         response = client.post(url, data=data2)
 
@@ -1037,12 +1038,15 @@ def test_user_cannot_followup_on_rsvp_with_bad_status(client):
 @pytest.mark.django_db
 def test_user_can_followup_on_rsvp_using_mail_link(client):
     status = models.Task.INPROGRESS
-    with login(client) as user:
-        project = baker.make(models.Project, is_draft=False, email=user.email)
-        task = baker.make(models.Task, project=project)
-        rsvp = baker.make(models.TaskFollowupRsvp, task=task)
-        url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
-        response = client.get(url)
+
+    user = baker.make(auth.User, email="owner@example.com")
+    project = baker.make(models.Project, is_draft=False, email=user.email)
+    task = baker.make(models.Task, project=project)
+    rsvp = baker.make(models.TaskFollowupRsvp, task=task)
+    url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
+
+    response = client.get(url)
+
     assert response.status_code == 200
     assertContains(response, '<form id="form-rsvp-followup-confirm"')
 
@@ -1051,12 +1055,14 @@ def test_user_can_followup_on_rsvp_using_mail_link(client):
 def test_user_can_followup_on_rsvp(client):
     data = dict(comment="some comment")
     status = models.Task.INPROGRESS
-    with login(client) as user:
-        project = baker.make(models.Project, is_draft=False, email=user.email)
-        task = baker.make(models.Task, project=project)
-        rsvp = baker.make(models.TaskFollowupRsvp, task=task)
-        url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
-        client.post(url, data=data)
+
+    user = baker.make(auth.User, email="owner@example.com")
+    project = baker.make(models.Project, is_draft=False, email=user.email)
+    task = baker.make(models.Task, project=project)
+    rsvp = baker.make(models.TaskFollowupRsvp, task=task, user=user)
+    url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
+    client.post(url, data=data)
+
     assert models.TaskFollowupRsvp.objects.filter(uuid=rsvp.uuid).count() == 0
     followup = models.TaskFollowup.objects.all()[0]
     assert followup.task == task

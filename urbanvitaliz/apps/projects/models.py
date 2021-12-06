@@ -397,6 +397,9 @@ class TaskFollowupRsvp(models.Model):
     task = models.ForeignKey(
         "Task", on_delete=models.CASCADE, related_name="rsvp_followups"
     )
+    user = models.ForeignKey(
+        auth_models.User, on_delete=models.CASCADE, related_name="rsvp_followups"
+    )
     created_on = models.DateTimeField(default=timezone.now)
 
     class Meta:
