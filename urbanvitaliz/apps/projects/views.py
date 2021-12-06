@@ -24,23 +24,13 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-    send_email,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403, send_email)
 
 from . import models, signals
-from .utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    generate_ro_key,
-    get_active_project,
-    get_active_project_id,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    generate_ro_key, get_active_project, get_active_project_id,
+                    refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # notifications
@@ -944,6 +934,9 @@ def access_delete(request, project_id: int, email: str):
 def post_login_set_active_project(sender, user, request, **kwargs):
     # store my projects in the session
     refresh_user_projects_in_session(request, user)
+
+    # Needed since get_active_project expects a user attribute
+    request.user = user
 
     active_project = get_active_project(request)
 
