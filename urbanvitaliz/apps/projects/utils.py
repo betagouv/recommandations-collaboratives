@@ -10,10 +10,13 @@ created: <2021-09-13 lun. 15:38>
 
 import uuid
 
+from django.contrib.auth import models as auth_models
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
+from django.utils import timezone
+from urbanvitaliz.apps.reminders import api
 
-from . import models
+from . import models, signals
 
 
 def can_administrate_project(project, user, allow_draft=False):
@@ -114,3 +117,41 @@ def refresh_user_projects_in_session(request, user):
         }
         for p in projects
     )
+
+
+def create_reminder(request, days, task, recipient, origin):
+    """
+    Create a reminder using the reminder API and schedule a RSVP to send to the target user
+    """
+    subject = f'[UrbanVitaliz] Où en êtes vous suite à nos recommandations pour le site "{task.project.name}"'
+    template = "projects/notifications/task_remind_email"
+
+    target_user = None
+    try:
+        target_user = auth_models.User.objects.get(email=recipient)
+    except auth_models.User.DoesNotExist:
+        return False
+
+    rsvp, created = models.TaskFollowupRsvp.objects.get_or_create(
+        task=task, user=target_user
+    )
+    if not created:
+        rsvp.created_on = timezone.now()
+        rsvp.save()
+
+    api.create_reminder_email(
+        request,
+        recipient,
+        subject,
+        template,
+        related=task,
+        origin=origin,
+        delay=days,
+        extra_context={"task": task, "delay": days, "rsvp": rsvp},
+    )
+
+    signals.reminder_created.send(
+        sender=models.Project, task=task, project=task.project, user=request.user
+    )
+
+    return True
