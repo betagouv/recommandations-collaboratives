@@ -80,10 +80,14 @@ def get_active_project(request):
             pass
     else:
         try:
-            project = models.Project.objects.filter(
-                Q(email=request.user.email)
-                | Q(is_draft=False, emails__contains=request.user.email)
-            ).first()
+            project = (
+                models.Project.objects.filter(deleted=None)
+                .filter(
+                    Q(email=request.user.email)
+                    | Q(is_draft=False, emails__contains=request.user.email)
+                )
+                .first()
+            )
         except models.Project.DoesNotExist:
             pass
 
@@ -97,7 +101,7 @@ def set_active_project_id(request, project_id: int):
 
 def refresh_user_projects_in_session(request, user):
     """store the user projects in the session"""
-    projects = models.Project.objects.filter(
+    projects = models.Project.objects.filter(deleted=None).filter(
         Q(email=user.email) | Q(is_draft=False, emails__contains=user.email)
     )
 
