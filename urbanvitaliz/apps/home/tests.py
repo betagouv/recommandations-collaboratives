@@ -74,7 +74,7 @@ def test_non_logged_user_can_send_message_to_team(mocker, client):
     url = reverse("home-contact") + "?next=/"
     response = client.post(url, data=data)
 
-    content = data["content"] + "\n\nfrom: john jdoe@example.com"
+    content = data["content"] + "\n\nfrom: john jdoe@example.com\nsource: "
 
     django.core.mail.send_mail.assert_called_once_with(
         subject=data["subject"],
@@ -97,7 +97,7 @@ def test_logged_user_can_send_message_to_team(mocker, client):
     with login(client, is_staff=False) as user:
         response = client.post(url, data=data)
 
-    content = data["content"] + f"\n\nfrom: {user.email}"
+    content = data["content"] + f"\n\nfrom: {user.email}\nsource: "
 
     django.core.mail.send_mail.assert_called_once_with(
         subject=data["subject"],
