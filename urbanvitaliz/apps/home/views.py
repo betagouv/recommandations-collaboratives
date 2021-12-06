@@ -120,6 +120,7 @@ def send_message_to_team(request, data):
         name = data.get("name")
         email = data.get("email")
         content += f"\n\nfrom: {name} {email}"
+    content += "\nsource: " + request.META.get("HTTP_REFERER", "")
     return django.core.mail.send_mail(
         subject=subject,
         message=content,
