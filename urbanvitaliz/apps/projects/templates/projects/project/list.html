@@ -11,7 +11,6 @@
 {% endblock %}
 
 {% block css %}
-
 <style>
  [x-cloak] {
 		 display: none;
@@ -34,7 +33,9 @@
                     </svg>
 
                     <span class="align-middle">
+                        {% if draft_projects.count %}
                         <a href="#draft-projects">{{ draft_projects.count }} projet{{ draft_projects|pluralize }}</a> en attente d'acceptation
+                        {% endif %}
                     </span>
             </span>
 
@@ -50,6 +51,7 @@
 
 				        <!-- Main Page -->
 					      <div class="flex-grow-1">
+
 						        <!-- Kanban column -->
 						        <div class="py-4 md-py-8">
 							          <div class="d-flex overflow-auto pb-2">
