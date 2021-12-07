@@ -86,13 +86,13 @@ def contact(request):
     """Sends an email to the team with contact info from user"""
     next_url = request.GET.get("next", "/")
     if request.method == "POST":
-        form = ContactForm(request.POST)
+        form = ContactForm(request.user, request.POST)
         if form.is_valid():
             status = send_message_to_team(request, form.cleaned_data)
             notify_user_of_sending(request, status)
             return redirect(next_url)
     else:
-        form = ContactForm()
+        form = ContactForm(request.user)
     return render(request, "home/contact.html", locals())
 
 
@@ -100,6 +100,14 @@ class ContactForm(forms.Form):
 
     subject = forms.CharField(max_length=256)
     content = forms.CharField(max_length=2048, widget=forms.Textarea)
+    name = forms.CharField(max_length=128)
+    email = forms.CharField(max_length=128)
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user.is_authenticated:
+            del self.fields["name"]
+            del self.fields["email"]
 
 
 def send_message_to_team(request, data):
@@ -108,6 +116,11 @@ def send_message_to_team(request, data):
     content = data.get("content")
     if request.user.is_authenticated:
         content += f"\n\nfrom: {request.user.email}"
+    else:
+        name = data.get("name")
+        email = data.get("email")
+        content += f"\n\nfrom: {name} {email}"
+    content += "\nsource: " + request.META.get("HTTP_REFERER", "")
     return django.core.mail.send_mail(
         subject=subject,
         message=content,
