@@ -68,7 +68,7 @@
     </div>
 
     <div class="row">
-        {% if project.is_draft %}
+        {% if project.status == "DRAFT" %}
         <div class="border mb-4 p-4 align-items-center">
             <div class="w-100">
                 <p class="text-center d-flex justify-content-center flex-column">

@@ -20,6 +20,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
+from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
@@ -28,6 +29,7 @@ from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
                                 is_switchtender_or_403, send_email)
 
 from . import models, signals
+from .serializers import ProjectSerializer
 from .utils import (can_administrate_or_403, can_administrate_project,
                     create_reminder, generate_ro_key, get_active_project,
                     get_active_project_id, refresh_user_projects_in_session,
@@ -170,9 +172,11 @@ class OnboardingForm(forms.ModelForm):
 def project_list(request):
     """Return the projects for the switchtender"""
     is_switchtender_or_403(request.user)
-    projects = models.Project.objects.in_departments(
-        request.user.profile.departments.all()
-    ).order_by("-created_on")
+    draft_projects = (
+        models.Project.objects.in_departments(request.user.profile.departments.all())
+        .filter(status="DRAFT")
+        .order_by("-created_on")
+    )
     return render(request, "projects/project/list.html", locals())
 
 
@@ -972,6 +976,23 @@ class LatestProjectsFeed(Feed):
 
     def item_pubdate(self, item):
         return item.created_on
+
+
+########################################################################
+# REST API
+########################################################################
+class ProjectViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+
+    def get_queryset(self):
+        return models.Project.objects.in_departments(
+            self.request.user.profile.departments.all()
+        ).order_by("-updated_on")
+
+    serializer_class = ProjectSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 # eof

@@ -13,14 +13,22 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from magicauth.urls import urlpatterns as magicauth_urls
+from rest_framework import routers
 
 from urbanvitaliz.apps.addressbook.urls import urlpatterns as addressbook_urls
 from urbanvitaliz.apps.home.urls import urlpatterns as home_urls
+from urbanvitaliz.apps.projects import views as projects_views
 from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
 from urbanvitaliz.apps.resources.urls import urlpatterns as resources_urls
 from urbanvitaliz.apps.survey.urls import urlpatterns as survey_urls
 
+## Rest
+router = routers.DefaultRouter()
+router.register(r"projects", projects_views.ProjectViewSet, basename="projects")
+
+
 urlpatterns = [
+    path("api/", include(router.urls)),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
     path("nimda/", admin.site.urls),

@@ -3,104 +3,182 @@
 {% load static %}
 {% load humanize %}
 
+{% block js %}
+<script src="{% static 'projects/js/kanban.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.3.5/dist/alpine.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
+
+{% endblock %}
+
+{% block css %}
+
+<style>
+ [x-cloak] {
+		 display: none;
+ }
+</style>
+
+{% endblock %}
+
+
 {% block content %}
 
 <div class="col-11 py-5 mx-auto">
-	  <h2>Liste des projets</h2>
 
-    <!-- Staff actions -->
-    <a class="btn btn-secondary btn-sm" href="{% url 'projects-onboarding' %}" role="button">
-        <svg class="bi" width="16" height="16" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
-        </svg>
-        &nbsp;
-        Ajouter un projet
-    </a>
+    <div class="row">
+	      <div x-data="kanban_app()" x-init="getTasks()" x-cloak class="d-flex flex-column border p-0 m-0">
+            <div class="topbar d-flex justify-content-between bg-light border-bottom p-2">
+            <span class="fs-5 flex-grow-1">
+                    <svg class="align-middle bi" width="24px" height="24px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#binoculars"/>
+                    </svg>
+
+                    <span class="align-middle">
+                        <a href="#draft-projects">{{ draft_projects.count }} projet{{ draft_projects|pluralize }}</a> en attente d'acceptation
+                    </span>
+            </span>
+
+            <a class="btn btn-secondary btn-sm" href="{% url 'projects-onboarding' %}" role="button">
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+                </svg>
+                &nbsp;
+                Ajouter un projet
+            </a>
+            </div>
+		        <div class="d-flex">
+
+				        <!-- Main Page -->
+					      <div class="flex-grow-1">
+						        <!-- Kanban column -->
+						        <div class="py-4 md-py-8">
+							          <div class="d-flex overflow-auto pb-2">
+
+								            <template x-for="board in boards" :key="board.code">
+									              <div class="px-4 flex-shrink-0">
+										                <div class="bg-light pb-4 rounded shadow overflow-y-auto overflow-x-hidden border-top border-4" :class="board.color_class"
+											                   style="min-height: 100px">
+											                  <div class="d-flex justify-content-between justify-items-center px-4 py-2 bg-light sticky top-0">
+												                    <h5 x-text="board.title" class="font-medium text-gray-800"></h3>
+											                  </div>
+
+											                  <div class="px-3">
+												                    <div
+													                      @dragover="onDragOver(event)"
+													                                 @drop="onDrop(event, board.code)"
+													                                 @dragenter="onDragEnter(event)"
+													                                 @dragleave="onDragLeave(event)"
+													                      class="pt-2 pb-4 rounded"
+												                    >
+                                                <!-- Task Template -->
+													                      <template x-for="(t, taskIndex) in tasks.filter(t => t.boardCode === board.code)" :key="taskIndex">
+														                        <div :id="t.uuid">
+
+															                          <div>
+																                            <div
+																	                              class="bg-white rounded shadow mb-3 p-2"
+																	                                     draggable="true"
+																	                                     @dragstart="onDragStart(event, t.uuid)"
+																                            >
+																	                              <div x-text="t.name" class="fw-semibold text-nowrap text-truncate"></div>
+																	                              <div x-text="t.organization" class="text-secondary small"></div>
+																                            </div>
+															                          </div>
+
+														                        </div>
+
+													                      </template>
+												                    </div>
+											                  </div>
+										                </div>
+									              </div>
+								            </template>
+
+							          </div>
+						            <!-- /Kanban Board -->
+					          </div>
+				            <!-- /Main Page -->
+
+			          </div>
+
+		        </div>
+	      </div>
+
+        <!-- Draft Projects -->
+        <div class="row mx-auto mt-4">
+            <div class="col-12 mx-auto">
+	              <h3 id="draft-projects">Projets attente d'acceptation</h3>
+
+	              <table class="table table-striped">
+		                <thead>
+			                  <tr>
+				                    <th>Date de création</th>
+				                    <th>Nom</th>
+                            <th>Actions</th>
+			                  </tr>
+		                </thead>
+		                <tbody>
+			                  {% for project in draft_projects %}
+			                  <tr>
+				                    <td>
+                                {{ project.created_on }}
+                                <br/>
+                                <span class="text-secondary small">({{ project.created_on|naturaltime }})</span>
+                            </td>
+				                    <td>
+					                      <a href="{% url 'projects-project-detail' project.id %}">
+						                        {{ project.name|capfirst }}
+					                      </a>
+                                <br/>
+                                <span class="text-secondary">{{ project.location }}</span>
+                                {% if project.commune %}
+                                <br/>
+                                <span class="text-secondary small">{{ project.commune.postal }}, {{ project.commune.name }}</span>
+                                <br/>
+                                <span class="text-secondary small">INSEE: {{ project.commune.insee }}</span>
+                                {% endif %}
+				                    </td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="actions">
+                                    <form method="POST" action="{% url "projects-project-accept" project.id %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-primary btn-sm">
+                                            <svg class="bi" width="16" height="16" fill="currentColor">
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check2-circle"/>
+                                            </svg>
+                                            Accepter
+                                        </button>
+                                    </form>
+
+                                    {% if user.is_staff %}
+                                    &nbsp;
+                                    <form method="POST" action="{% url "projects-project-delete" project.id %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-secondary btn-sm">
+                                            <svg class="bi" width="16" height="16" fill="currentColor">
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-circle"/>
+                                            </svg>
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+			                  </tr>
+			                  {% empty %}
+			                  <tr>
+				                    <td colspan="5">Rien à faire ici.</td>
+			                  </tr>
+			                  {% endfor %}
+		                </tbody>
+	              </table>
+
+            </div>
+        </div>
+    </div>
 
 
-    <section>
 
-	      <table class="table table-striped">
-		        <thead>
-			          <tr>
-				            <th>Date de création</th>
-				            <th>Nom</th>
-				            <th>Actions</th>
-				            <th>Notes</th>
-                    <th>Etat</th>
-                    <th>Actions</th>
-			          </tr>
-		        </thead>
-		        <tbody>
-			          {% for project in projects %}
-			          <tr>
-				            <td>
-                        {{ project.created_on }}
-                        <br/>
-                        <span class="text-secondary small">({{ project.created_on|naturaltime }})</span>
-                    </td>
-				            <td>
-					              <a href="{% url 'projects-project-detail' project.id %}">
-						                {{ project.name|capfirst }}
-					              </a>
-                        <br/>
-                        <span class="text-secondary">{{ project.location }}</span>
-                        {% if project.commune %}
-                        <br/>
-                        <span class="text-secondary small">{{ project.commune.postal }}, {{ project.commune.name }}</span>
-                        <br/>
-                        <span class="text-secondary small">INSEE: {{ project.commune.insee }}</span>
-                        {% endif %}
-				            </td>
-				            <td>{{ project.tasks.count }}</td>
-				            <td>{{ project.notes.count }}</td>
-                    <td>
-                        {% if project.is_draft %}
-                        Nouveau
-                        {% else %}
-                        {% if project.has_blocked_action %}
-                        <span class="text-danger">Bloqué</span>
-                        {% else %}
-                        Validé
-                        {% endif %}
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div class="btn-group" role="group" aria-label="actions">
-                            {% if project.is_draft %}
-                            <form method="POST" action="{% url "projects-project-accept" project.id %}">
-                                {% csrf_token %}
-                                <button class="btn btn-primary btn-sm">
-                                    <svg class="bi" width="16" height="16" fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check2-circle"/>
-                                    </svg>
-                                    Accepter
-                                </button>
-                            </form>
-                            {% endif %}
 
-                            {% if user.is_staff %}
-                            <form method="POST" action="{% url "projects-project-delete" project.id %}">
-                                {% csrf_token %}
-                                <button class="btn btn-secondary btn-sm">
-                                    <svg class="bi" width="16" height="16" fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-circle"/>
-                                    </svg>
-                                    Supprimer
-                                </button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    </td>
-			          </tr>
-			          {% empty %}
-			          <tr>
-				            <td colspan="5">Rien à faire ici.</td>
-			          </tr>
-			          {% endfor %}
-		        </tbody>
-	      </table>
-
-    </section>
 </div>
 {% endblock %}
