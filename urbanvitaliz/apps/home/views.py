@@ -42,7 +42,7 @@ class StatisticsView(TemplateView):
     def get_context_data(self, **kwargs):
         staff_emails = [user.email for user in auth.User.objects.filter(is_staff=True)]
         the_projects = projects.Project.objects.exclude(
-            Q(email__in=staff_emails) | Q(is_draft=True) | Q(exclude_stats=True)
+            Q(email__in=staff_emails) | Q(status="DRAFT") | Q(exclude_stats=True)
         )
         context = super().get_context_data(**kwargs)
         context["reco_following_pc"] = 90
@@ -51,7 +51,7 @@ class StatisticsView(TemplateView):
             projects.Task.objects.filter(refused=False)
             .exclude(
                 Q(project__email__in=staff_emails)
-                | Q(project__is_draft=True)
+                | Q(project__status="DRAFT")
                 | Q(project__exclude_stats=True)
             )
             .order_by("project_id")
@@ -159,7 +159,7 @@ class SwitchtenderDashboardView(LoginRequiredMixin, UserPassesTestMixin, Templat
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["projects_waiting"] = projects.Project.objects.filter(
-            is_draft=True
+            status="DRAFT"
         ).count()
         context["project_model"] = projects.Project
         context["user_model"] = auth.User

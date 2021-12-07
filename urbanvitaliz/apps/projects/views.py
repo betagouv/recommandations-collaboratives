@@ -24,24 +24,14 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-    send_email,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403, send_email)
 
 from . import models, signals
-from .utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    create_reminder,
-    generate_ro_key,
-    get_active_project,
-    get_active_project_id,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from .utils import (can_administrate_or_403, can_administrate_project,
+                    create_reminder, generate_ro_key, get_active_project,
+                    get_active_project_id, refresh_user_projects_in_session,
+                    set_active_project_id)
 
 ########################################################################
 # notifications
@@ -255,7 +245,7 @@ def project_accept(request, project_id=None):
     is_switchtender_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
-        project.is_draft = False
+        project.status = "TO_PROCESS"
         project.updated_on = timezone.now()
         project.save()
     return redirect(reverse("projects-project-detail", args=[project_id]))

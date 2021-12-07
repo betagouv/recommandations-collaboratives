@@ -17,7 +17,7 @@ from . import models
 @admin.register(models.Project)
 class ProjectAdmin(admin.ModelAdmin):
     search_fields = ["name"]
-    list_filter = ["created_on", "exclude_stats", "publish_to_cartofriches"]
+    list_filter = ["created_on", "exclude_stats", "publish_to_cartofriches", "status"]
     list_display = ["created_on", "name", "location"]
     actions = [csvexport]
 

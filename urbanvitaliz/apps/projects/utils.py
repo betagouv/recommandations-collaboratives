@@ -38,7 +38,7 @@ def can_administrate_project(project, user, allow_draft=False):
 def is_member(user, project, allow_draft):
     """return true if user is member of the project"""
     return ((user.email == project.email) or (user.email in project.emails)) and (
-        (not project.is_draft) or allow_draft
+        (project.status != "DRAFT") or allow_draft
     )  # noqa: F841
 
 
@@ -87,7 +87,7 @@ def get_active_project(request):
                 models.Project.objects.filter(deleted=None)
                 .filter(
                     Q(email=request.user.email)
-                    | Q(is_draft=False, emails__contains=request.user.email)
+                    | Q(~Q(status="DRAFT"), emails__contains=request.user.email)
                 )
                 .first()
             )
@@ -105,7 +105,7 @@ def set_active_project_id(request, project_id: int):
 def refresh_user_projects_in_session(request, user):
     """store the user projects in the session"""
     projects = models.Project.objects.filter(deleted=None).filter(
-        Q(email=user.email) | Q(is_draft=False, emails__contains=user.email)
+        Q(email=user.email) | Q(~Q(status="DRAFT"), emails__contains=user.email)
     )
 
     request.session["projects"] = list(

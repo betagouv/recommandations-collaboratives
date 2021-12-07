@@ -51,8 +51,22 @@ class DeletedProjectManager(models.Manager):
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
 
+    PROJECT_STATES = (
+        ("DRAFT", "Brouillon"),
+        ("TO_PROCESS", "A traiter"),
+        ("QUESTIONS", "En attente de retour de la collectivité"),
+        ("READY", "Prêt à aiguiller"),
+        ("IN_PROGRESS", "Recommandations en cours"),
+        ("REVIEW_REQUEST", "Demande de relecture"),
+        ("DONE", "Appui réalisé"),
+        ("STUCK", "En attente/bloqué"),
+        ("REJECTED", "Rejeté"),
+    )
+
     objects = ProjectQuerySet.as_manager()
     objects_deleted = DeletedProjectManager()
+
+    status = models.CharField(max_length=20, choices=PROJECT_STATES, default="DRAFT")
 
     email = models.CharField(max_length=128)
     emails = models.JSONField(default=list)  # list of person having access to project
@@ -85,8 +99,6 @@ class Project(models.Model):
         # return self.tasks.filter(status=Task.BLOCKED).count() > 0
         # XXX Uncomment me once status is written
         return False
-
-    is_draft = models.BooleanField(default=True, blank=True)
 
     exclude_stats = models.BooleanField(default=False)
 

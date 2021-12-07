@@ -17,7 +17,8 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -68,7 +69,7 @@ def test_performing_onboarding_create_a_new_project(client):
     response = client.post(reverse("projects-onboarding"), data=data)
     project = models.Project.fetch()[0]
     assert project.name == "a project"
-    assert project.is_draft
+    assert project.status == "DRAFT"
     assert len(project.ro_key) == 32
     assert data["email"] in project.emails
     note = models.Note.objects.all()[0]
@@ -421,7 +422,7 @@ def test_accept_project_and_redirect(client):
         response = client.post(url)
 
     project = models.Project.objects.get(id=project.id)
-    assert not project.is_draft
+    assert project.status == "TO_PROCESS"
     assert project.updated_on > updated_on_before
 
     detail_url = reverse("projects-project-detail", args=[project.id])
@@ -475,7 +476,7 @@ def test_contributor_has_the_same_rights_as_the_owner(client):
         models.Project,
         email=owner.email,
         emails=[owner.email, contributor.email],
-        is_draft=False,
+        status="READY",
     ).make()
 
     assert utils.can_administrate_project(project, owner)
@@ -487,7 +488,7 @@ def test_switchtender_can_administrate_project(client):
     switchtender = Recipe(auth.User).make()
     group = auth.Group.objects.get(name="switchtender")
     switchtender.groups.add(group)
-    project = Recipe(models.Project, is_draft=False).make()
+    project = Recipe(models.Project, status="READY").make()
 
     assert utils.can_administrate_project(project, switchtender)
 
@@ -495,7 +496,7 @@ def test_switchtender_can_administrate_project(client):
 @pytest.mark.django_db
 def test_non_switchtender_cannot_administrate_project(client):
     someone = Recipe(auth.User).make()
-    project = Recipe(models.Project, is_draft=False).make()
+    project = Recipe(models.Project, status="READY").make()
 
     assert not utils.can_administrate_project(project, someone)
 
@@ -530,7 +531,7 @@ def test_switchtender_can_add_email_to_project(client):
 @pytest.mark.django_db
 def test_owner_can_add_email_to_project_if_not_draft(client):
     email = "owner@example.com"
-    project = Recipe(models.Project, email=email, is_draft=False).make()
+    project = Recipe(models.Project, email=email, status="READY").make()
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "collaborator@example.com"}
 
@@ -544,7 +545,7 @@ def test_owner_can_add_email_to_project_if_not_draft(client):
 @pytest.mark.django_db
 def test_owner_cannot_add_email_to_project_if_draft(client):
     email = "owner@example.com"
-    project = Recipe(models.Project, email=email, is_draft=True).make()
+    project = Recipe(models.Project, email=email, status="DRAFT").make()
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "collaborator@example.com"}
 
@@ -570,7 +571,7 @@ def test_owner_can_remove_email_from_project_if_not_draft(client):
     email = "owner@example.com"
     colab_email = "collaborator@example.com"
     project = Recipe(
-        models.Project, email=email, emails=[email, colab_email], is_draft=False
+        models.Project, email=email, emails=[email, colab_email], status="READY"
     ).make()
     url = reverse(
         "projects-access-delete",
@@ -589,7 +590,7 @@ def test_owner_cannot_remove_email_from_project_if_draft(client):
     email = "owner@example.com"
     colab_email = "collaborator@example.com"
     project = Recipe(
-        models.Project, email=email, emails=[email, colab_email], is_draft=True
+        models.Project, email=email, emails=[email, colab_email], status="DRAFT"
     ).make()
     url = reverse("projects-access-delete", args=[project.id, colab_email])
 
@@ -724,7 +725,7 @@ def test_create_new_task_for_project_and_redirect(client):
 def test_visit_task_for_project_and_redirect_for_project_owner(client):
     owner_email = "owner@univer.se"
     project = Recipe(
-        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+        models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
     task = Recipe(models.Task, project=project, visited=False, resource=None).make()
     with login(client, email=owner_email):
@@ -743,7 +744,7 @@ def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(clien
     resource.save()
 
     project = Recipe(
-        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+        models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
     task = Recipe(models.Task, project=project, visited=False, resource=resource).make()
     with login(client, email=owner_email):
@@ -761,7 +762,7 @@ def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(clien
 def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(client):
     owner_email = "owner@univer.se"
     project = Recipe(
-        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+        models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
     task = Recipe(models.Task, project=project, visited=True, done=False).make()
     with login(client, email=owner_email):
@@ -777,7 +778,7 @@ def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(client)
 def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(client):
     owner_email = "owner@univer.se"
     project = Recipe(
-        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+        models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
     task = Recipe(models.Task, project=project, visited=True, done=True).make()
     with login(client, email=owner_email):
@@ -793,7 +794,7 @@ def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(client
 def test_refuse_task_for_project_and_redirect_for_project_owner(client):
     owner_email = "owner@univer.se"
     project = Recipe(
-        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+        models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
     task = Recipe(models.Task, project=project, visited=False, done=False).make()
     with login(client, email=owner_email):
@@ -810,7 +811,7 @@ def test_refuse_task_for_project_and_redirect_for_project_owner(client):
 def test_already_done_task_for_project_and_redirect_for_project_owner(client):
     owner_email = "owner@univer.se"
     project = Recipe(
-        models.Project, is_draft=False, email=owner_email, emails=[owner_email]
+        models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
     task = Recipe(models.Task, project=project, visited=False, done=False).make()
     with login(client, email=owner_email):
@@ -984,7 +985,7 @@ def test_user_cannot_followup_on_someone_else_task(client):
 def test_user_can_followup_on_personal_task(client):
     data = dict(comment="some comment")
     with login(client) as user:
-        project = baker.make(models.Project, is_draft=False, email=user.email)
+        project = baker.make(models.Project, status="READY", email=user.email)
         task = baker.make(models.Task, project=project)
         url = reverse("projects-followup-task", args=[task.id])
         client.post(url, data=data)
@@ -998,7 +999,7 @@ def test_user_can_followup_on_personal_task(client):
 @pytest.mark.django_db
 def test_user_is_redirected_after_followup_on_task(client):
     with login(client) as user:
-        project = baker.make(models.Project, is_draft=False, email=user.email)
+        project = baker.make(models.Project, status="READY", email=user.email)
         task = baker.make(models.Task, project=project)
         url = reverse("projects-followup-task", args=[task.id])
         response = client.post(url)
@@ -1039,7 +1040,7 @@ def test_user_can_followup_on_rsvp_using_mail_link(client):
     status = models.Task.INPROGRESS
 
     user = baker.make(auth.User, email="owner@example.com")
-    project = baker.make(models.Project, is_draft=False, email=user.email)
+    project = baker.make(models.Project, status="READY", email=user.email)
     task = baker.make(models.Task, project=project)
     rsvp = baker.make(models.TaskFollowupRsvp, task=task)
     url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
@@ -1056,7 +1057,7 @@ def test_user_can_followup_on_rsvp(client):
     status = models.Task.INPROGRESS
 
     user = baker.make(auth.User, email="owner@example.com")
-    project = baker.make(models.Project, is_draft=False, email=user.email)
+    project = baker.make(models.Project, status="READY", email=user.email)
     task = baker.make(models.Task, project=project)
     rsvp = baker.make(models.TaskFollowupRsvp, task=task, user=user)
     url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
@@ -1151,7 +1152,7 @@ def test_create_private_note_not_available_for_project_collaborator(client):
 @pytest.mark.django_db
 def test_private_note_hidden_from_project_members(client):
     user_email = "not@admin.here"
-    project = Recipe(models.Project, is_draft=False, emails=[user_email]).make()
+    project = Recipe(models.Project, status="READY", emails=[user_email]).make()
 
     note = Recipe(models.Note, content="short note", public=False).make()
 
@@ -1165,7 +1166,7 @@ def test_private_note_hidden_from_project_members(client):
 def test_public_note_available_to_readers(client):
     user_email = "not@admin.here"
     note_content = "this is a public note"
-    project = Recipe(models.Project, emails=[user_email], is_draft=False).make()
+    project = Recipe(models.Project, emails=[user_email], status="READY").make()
     with login(client, groups=["switchtender"]):
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
