@@ -59,9 +59,10 @@ function kanban_app() {
 								    id: t.id,
 								    name: this.truncate(t.name),
 								    status: t.status,
+                    switchtender: t.switchtender,
 								    boardCode: t.status,
 								    date: t.created_on,
-                    organization: t.org_name
+                    organization: this.truncate(t.org_name)
 							  }
 						});
 				},
