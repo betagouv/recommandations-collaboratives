@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.reminders",
     "django_gravatar",
     "actstream",
+    "csvexport",
 ]
 
 SITE_ID = 1
