@@ -26,6 +26,30 @@
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.GET.next }}"/>
 
+        {% if form.name %}
+        <div class="form-floating mb-3">
+            <input type="text" id="{{ form.name.id_for_label }}" class="form-control {% if form.name.errors %}is-invalid{% endif %}" name="{{ form.name.name }}" placeholder="Sujet" value="{{ request.GET.name }}" required>
+            <label for="{{ form.name.id_for_label }}">Votre nom</label>
+
+            {% for error in form.name.errors %}
+            <div class="text-danger text-end">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        {% endif %}
+
+        {% if form.email %}
+        <div class="form-floating mb-3">
+            <input type="text" id="{{ form.email.id_for_label }}" class="form-control {% if form.email.errors %}is-invalid{% endif %}" name="{{ form.email.name }}" placeholder="Sujet" value="{{ request.GET.email }}" required>
+            <label for="{{ form.email.id_for_label }}">Votre addresse courriel</label>
+
+            {% for error in form.email.errors %}
+            <div class="text-danger text-end">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        {% endif %}
+
         <div class="form-floating mb-3">
             <input type="text" id="{{ form.subject.id_for_label }}" class="form-control {% if form.subject.errors %}is-invalid{% endif %}" name="{{ form.subject.name }}" placeholder="Sujet" value="{{ request.GET.subject }}" required>
             <label for="{{ form.subject.id_for_label }}">Sujet de votre message</label>
