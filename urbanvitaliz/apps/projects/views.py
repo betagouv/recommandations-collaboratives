@@ -19,6 +19,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.csrf import ensure_csrf_cookie
 from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.geomatics import models as geomatics
@@ -169,6 +170,7 @@ class OnboardingForm(forms.ModelForm):
 
 
 @login_required
+@ensure_csrf_cookie
 def project_list(request):
     """Return the projects for the switchtender"""
     is_switchtender_or_403(request.user)
