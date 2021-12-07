@@ -59,9 +59,14 @@
                 {% if resource.task_recommendations.count %}
                 <span class="ms-1 align-middle" data-bs-toggle="tooltip" data-bs-placement="top" title="Voir les préfléchages">
                     <a class="ms-1 text-reset text-decoration-none" href="{% url "projects-task-recommendation-list" %}">
+                        {% if request.user.email == "anouk.jeanneau@beta.gouv.fr" %}
+                        {# Easter egg for Anouk, the only true artist! #}
+                        <img class="align-middle" src="{% static 'resources/img/preflechage_anouk.png' %}" height="16px"/>
+                        {% else %}
                         <svg class="bi text-" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-fill"/>
                         </svg>
+                        {% endif %}
                     </a>
                 </span>
                 {% endif %}
