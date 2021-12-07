@@ -5,8 +5,21 @@
 
 {% block js %}
 <script src="{% static 'projects/js/kanban.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.3.5/dist/alpine.min.js" defer></script>
+<script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script type="text/javascript">
+ const project_url_tmpl = "{% url 'projects-project-detail' 0 %}";
+ function goToProject(id) {
+     window.location.href = project_url_tmpl.replace('0', id);
+ }
+
+ function gravatar_url(email, size=50) {
+     hash = md5(email)
+     return `https://www.gravatar.com/avatar/${hash}?s=${size}`
+ }
+</script>
 
 {% endblock %}
 
@@ -82,8 +95,15 @@
 																	                                     draggable="true"
 																	                                     @dragstart="onDragStart(event, t.uuid)"
 																                            >
-																	                              <div x-text="t.name" class="fw-semibold text-nowrap text-truncate"></div>
+																	                              <div class="fw-semibold">
+                                                                    <a href="javascript:;" @click="goToProject(t.id)" x-text="t.name"></a>
+                                                                </div>
 																	                              <div x-text="t.organization" class="text-secondary small"></div>
+                                                                <template x-if="t.switchtender">
+                                                                    <div class="d-flex flex-row-reverse">
+                                                                        <img class="align-middle  rounded-circle d-inline-block" width="25px" :src="gravatar_url(t.switchtender.email, 25)" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${t.switchtender.first_name} ${t.switchtender.last_name}`" style="z-index: 1000;" tabindex="0">
+                                                                    </div>
+                                                                </template>
 																                            </div>
 															                          </div>
 
