@@ -1535,4 +1535,22 @@ def test_current_project_tag():
     assert projects_extra.current_project(session) == project
 
 
+########################################################################
+# API
+########################################################################
+@pytest.mark.django_db
+def test_anonymous_cannot_use_project_api(client):
+    url = reverse("projects-list")
+    response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_loggied_in_user_can_use_project_api(client):
+    url = reverse("projects-list")
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
 # eof

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.reminders",
     "django_gravatar",
     "actstream",
+    "rest_framework",
     "csvexport",
 ]
 
@@ -87,7 +88,6 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = "urbanvitaliz.wsgi.application"
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
