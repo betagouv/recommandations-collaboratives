@@ -421,7 +421,11 @@ class TaskRecommendation(models.Model):
     objects = TaskRecommendationManager()
 
     condition = TagField(verbose_name="Condition", blank=True, null=True)
-    resource = models.ForeignKey(resources.Resource, on_delete=models.CASCADE)
+    resource = models.ForeignKey(
+        resources.Resource,
+        on_delete=models.CASCADE,
+        related_name="task_recommendations",
+    )
     text = models.TextField()
     departments = models.ManyToManyField(
         geomatics_models.Department,

@@ -40,21 +40,32 @@
     </div>
     <div class="card-footer" style="z-index: 10;">
         <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
-            <div class="btn-group" role="group" aria-label="Etat">
+            <div class="btn-group align-middle" role="group" aria-label="Etat">
                 {% if is_switchtender %}
                 {% if resource.public %}
-                <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="Publiée">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
+                <span class="align-middle" data-bs-toggle="tooltip" data-bs-placement="top" title="Publiée">
+                    <svg class="bi align-middle" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
                     </svg>
                 </span>
                 {% else %}
-                <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="En travaux, non publiée">
+                <span class="align-middle" data-bs-toggle="tooltip" data-bs-placement="top" title="En travaux, non publiée">
                     <svg class="bi" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hammer"/>
                     </svg>
                 </span>
                 {% endif %}
+
+                {% if resource.task_recommendations.count %}
+                <span class="ms-1 align-middle" data-bs-toggle="tooltip" data-bs-placement="top" title="Voir les préfléchages">
+                    <a class="ms-1 text-reset text-decoration-none" href="{% url "projects-task-recommendation-list" %}">
+                        <svg class="bi text-" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-fill"/>
+                        </svg>
+                    </a>
+                </span>
+                {% endif %}
+
                 {% endif %}
             </div>
 
