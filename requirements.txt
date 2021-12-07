@@ -1,4 +1,4 @@
-django
+django==3.2.10
 ipython
 django-markdownx
 markdown-link-attr-modifier
@@ -10,6 +10,7 @@ psycopg2-binary
 django-activity-stream
 django-leaflet
 django-admin-csvexport
+djangorestframework
 # STATIC FILES
 django-sass-processor
 libsass
