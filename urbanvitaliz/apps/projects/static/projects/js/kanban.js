@@ -7,9 +7,9 @@ function kanban_app() {
             {code: 'QUESTIONS', title: 'En attente', color_class: 'border-warning'},
             {code: 'READY', title: 'Prêt à aiguiller', color_class: 'border-info'},
             {code: "IN_PROGRESS", title: "Recommandations en cours", color_class: 'border-primary'},
-            // {code: "REVIEW_REQUEST", title: "Demande de relecture", color_class: 'border-success'},
+            {code: "REVIEW_REQUEST", title: "Demande de relecture", color_class: 'border-warning'},
             {code: "DONE", title: "Aiguillage terminé", color_class: 'border-success'},
-            // {code: "STUCK", title: "En Attente/Bloqué", color_class: 'border-error'},
+            {code: "STUCK", title: "En Attente/Bloqué", color_class: 'border-dark'},
 
 				],
 
