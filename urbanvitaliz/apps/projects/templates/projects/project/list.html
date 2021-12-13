@@ -5,19 +5,26 @@
 
 {% block js %}
 <script src="{% static 'projects/js/kanban.js' %}"></script>
+<!-- Polyfill for older browsers -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=queueMicrotask"></script>
+
 <script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
 
 <script type="text/javascript">
  const project_url_tmpl = "{% url 'projects-project-detail' 0 %}";
- function goToProject(id) {
-     window.location.href = project_url_tmpl.replace('0', id);
+ function makeProjectURL(id) {
+     return project_url_tmpl.replace('0', id);
  }
 
- function gravatar_url(email, size=50) {
-     hash = md5(email)
-     return `https://www.gravatar.com/avatar/${hash}?s=${size}`
+ function gravatar_url(email, size=50, name="Inconnu") {
+     if (name.trim() == '') name = "Inconnu";
+
+     hash = md5(email);
+     encoded_fallback_uri = encodeURIComponent(`https://ui-avatars.com/api/${name}/${size}`);
+
+     return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=${encoded_fallback_uri}`
  }
 </script>
 
@@ -40,7 +47,7 @@
     <div class="row">
 	      <div x-data="kanban_app()" x-init="getTasks()" x-cloak class="d-flex flex-column border p-0 m-0">
             <div class="topbar d-flex justify-content-between bg-light border-bottom p-2">
-            <span class="fs-5 flex-grow-1">
+                <span class="fs-5 flex-grow-1">
                     <svg class="align-middle bi" width="24px" height="24px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#binoculars"/>
                     </svg>
@@ -50,28 +57,28 @@
                         <a href="#draft-projects">{{ draft_projects.count }} projet{{ draft_projects|pluralize }}</a> en attente d'acceptation
                         {% endif %}
                     </span>
-            </span>
+                </span>
 
-            <a class="btn btn-secondary btn-sm" href="{% url 'projects-onboarding' %}" role="button">
-                <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
-                </svg>
-                &nbsp;
-                Ajouter un projet
-            </a>
+                <a class="btn btn-secondary btn-sm" href="{% url 'projects-onboarding' %}" role="button">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+                    </svg>
+                    &nbsp;
+                    Ajouter un projet
+                </a>
             </div>
 		        <div class="d-flex">
 
 				        <!-- Main Page -->
-					      <div class="flex-grow-1">
+					      <div class="flex-grow-1 overflow-auto">
 
 						        <!-- Kanban column -->
 						        <div class="py-4 md-py-8">
-							          <div class="d-flex overflow-auto pb-2">
+							          <div class="d-flex pb-2">
 
 								            <template x-for="board in boards" :key="board.code">
 									              <div class="px-4 flex-shrink-0">
-										                <div class="bg-light pb-4 rounded shadow overflow-y-auto overflow-x-hidden border-top border-4" :class="board.color_class"
+										                <div class="bg-light pb-4 rounded shadow border-top border-4" :class="board.color_class"
 											                   style="min-height: 100px">
 											                  <div class="d-flex justify-content-between justify-items-center px-4 py-2 bg-light sticky top-0">
 												                    <h5 x-text="board.title" class="font-medium text-gray-800"></h3>
@@ -80,30 +87,44 @@
 											                  <div class="px-3">
 												                    <div
 													                      @dragover="onDragOver(event)"
-													                                 @drop="onDrop(event, board.code)"
-													                                 @dragenter="onDragEnter(event)"
-													                                 @dragleave="onDragLeave(event)"
+													                      @drop="onDrop(event, board.code)"
+													                      @dragenter="onDragEnter(event)"
+													                      @dragleave="onDragLeave(event)"
 													                      class="pt-2 pb-4 rounded"
 												                    >
                                                 <!-- Task Template -->
 													                      <template x-for="(t, taskIndex) in tasks.filter(t => t.boardCode === board.code)" :key="taskIndex">
-														                        <div :id="t.uuid">
+														                        <div :id="t.uuid" style="min-width: 15vw;">
 
 															                          <div>
 																                            <div
 																	                              class="bg-white rounded shadow mb-3 p-2"
-																	                                     draggable="true"
-																	                                     @dragstart="onDragStart(event, t.uuid)"
+																	                              draggable="true"
+																	                              @dragstart="onDragStart(event, t.uuid)"
 																                            >
 																	                              <div class="fw-semibold">
-                                                                    <a href="javascript:;" @click="goToProject(t.id)" x-text="t.name"></a>
+                                                                    <a :href="makeProjectURL(t.id)" x-text="t.name"></a>
                                                                 </div>
 																	                              <div x-text="t.organization" class="text-secondary small"></div>
-                                                                <template x-if="t.switchtender">
-                                                                    <div class="d-flex flex-row-reverse">
-                                                                        <img class="align-middle  rounded-circle d-inline-block" width="25px" :src="gravatar_url(t.switchtender.email, 25)" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${t.switchtender.first_name} ${t.switchtender.last_name}`" style="z-index: 1000;" tabindex="0">
+                                                                <template x-if="t.commune">
+                                                                    <div class="text-secondary small">
+                                                                        <span x-text="t.commune.name"></span>
+                                                                        <span x-text="`(${t.commune.postal})`"></span>
                                                                     </div>
                                                                 </template>
+                                                                <div class="d-flex flex-row justify-content-between">
+                                                                    <div class="small">
+                                                                        <span x-text="`Déposé le ${t.created_on.toLocaleDateString('fr-FR')}`" class="align-middle">
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <template x-if="t.switchtender">
+                                                                        <div>
+                                                                            <img class="align-middle  rounded-circle d-inline-block" width="25px" :src="gravatar_url(t.switchtender.email, 25, t.switchtender.first_name + ' ' + t.switchtender.last_name)" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${t.switchtender.first_name} ${t.switchtender.last_name}`" style="z-index: 1000;" tabindex="0">
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
+
 																                            </div>
 															                          </div>
 

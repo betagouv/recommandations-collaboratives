@@ -1,5 +1,6 @@
 from django.contrib.auth import models as auth_models
 from rest_framework import serializers
+from urbanvitaliz.apps.geomatics.serializers import CommuneSerializer
 
 from .models import Project
 
@@ -22,6 +23,8 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "updated_on",
             "org_name",
             "switchtender",
+            "commune",
         ]
 
     switchtender = SwitchtenderSerializer(read_only=True)
+    commune = CommuneSerializer(read_only=True)
