@@ -42,7 +42,10 @@ class StatisticsView(TemplateView):
     def get_context_data(self, **kwargs):
         staff_emails = [user.email for user in auth.User.objects.filter(is_staff=True)]
         the_projects = projects.Project.objects.exclude(
-            Q(email__in=staff_emails) | Q(status="DRAFT") | Q(exclude_stats=True)
+            Q(email__in=staff_emails)
+            | Q(status="DRAFT")
+            | Q(status="STUCK")
+            | Q(exclude_stats=True)
         )
         context = super().get_context_data(**kwargs)
         context["reco_following_pc"] = 90
@@ -52,6 +55,7 @@ class StatisticsView(TemplateView):
             .exclude(
                 Q(project__email__in=staff_emails)
                 | Q(project__status="DRAFT")
+                | Q(project__status="STUCK")
                 | Q(project__exclude_stats=True)
             )
             .order_by("project_id")
