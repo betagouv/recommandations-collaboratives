@@ -61,8 +61,9 @@ function kanban_app() {
 								    status: t.status,
                     switchtender: t.switchtender,
 								    boardCode: t.status,
-								    date: t.created_on,
-                    organization: this.truncate(t.org_name)
+								    created_on: new Date(t.created_on),
+                    organization: this.truncate(t.org_name),
+                    commune: t.commune
 							  }
 						});
 				},
