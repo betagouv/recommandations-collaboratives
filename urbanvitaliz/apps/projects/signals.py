@@ -1,6 +1,9 @@
 import django.dispatch
 from actstream import action
 from django.dispatch import receiver
+from notifications.signals import notify
+
+from .utils import get_notification_recipients_for_project
 
 #####
 # Projects
@@ -79,10 +82,21 @@ def log_action_undone(sender, task, project, user, **kwargs):
 
 @receiver(action_commented)
 def log_action_commented(sender, task, project, user, **kwargs):
-    if not user.is_staff:
-        action.send(
-            user, verb="a commenté l'action", action_object=task, target=project
-        )
+    action.send(user, verb="a commenté l'action", action_object=task, target=project)
+
+
+@receiver(action_commented)
+def notify_action_commented(sender, task, project, user, **kwargs):
+    recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
+
+    notify.send(
+        sender=user,
+        recipient=recipients,
+        verb="a commenté l'action",
+        action_object=sender,
+        target=project,
+        private=True,
+    )
 
 
 # eof
