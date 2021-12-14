@@ -16,24 +16,15 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-    send_email,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403, send_email)
 
 from .. import models, signals
-from ..forms import (
-    CreateTaskForm,
-    RemindTaskForm,
-    ResourceTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskForm,
-)
-from ..utils import can_administrate_or_403, create_reminder, get_active_project_id
+from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
+                     RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskForm)
+from ..utils import (can_administrate_or_403, create_reminder,
+                     get_active_project_id)
 
 
 @login_required
@@ -341,8 +332,9 @@ def followup_task(request, task_id=None):
             followup.status = 0
             followup.save()
             signals.action_commented.send(
-                sender=followup_task, task=task, project=task.project, user=request.user
+                sender=followup, task=task, project=task.project, user=request.user
             )
+
     next_url = reverse("projects-project-detail", args=[task.project.id])
     return redirect(next_url + "#actions")
 
@@ -405,6 +397,13 @@ def create_resource_action(request, resource_id=None):
             # assign reminder in six weeks
             create_reminder(
                 request, 6 * 7, task, project.email, origin=api.models.Mail.STAFF
+            )
+
+            signals.reminder_created.send(
+                sender=models.Project,
+                task=task,
+                project=task.project,
+                user=request.user,
             )
 
             # Send notifications

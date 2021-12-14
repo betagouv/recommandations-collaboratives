@@ -17,7 +17,8 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -996,6 +997,33 @@ def test_user_can_followup_on_personal_task(client):
 
 
 @pytest.mark.django_db
+def test_followup_triggers_notifications(client):
+    group = auth.Group.objects.get(name="switchtender")
+    switchtender = baker.make(auth.User, groups=[group])
+
+    collab = baker.make(auth.User, email="collab@example.com")
+
+    data = dict(comment="some comment")
+
+    owner = None
+    with login(client) as user:
+        owner = user
+        project = baker.make(
+            models.Project,
+            status="READY",
+            email=user.email,
+            emails=[user.email, collab.email],
+        )
+        task = baker.make(models.Task, project=project)
+        url = reverse("projects-followup-task", args=[task.id])
+        client.post(url, data=data)
+
+    assert switchtender.notifications.unread().count() == 1
+    assert collab.notifications.unread().count() == 1
+    assert owner.notifications.unread().count() == 0
+
+
+@pytest.mark.django_db
 def test_user_is_redirected_after_followup_on_task(client):
     with login(client) as user:
         project = baker.make(models.Project, status="READY", email=user.email)
@@ -1535,7 +1563,7 @@ def test_current_project_tag():
 
 
 ########################################################################
-# API
+# REST API
 ########################################################################
 @pytest.mark.django_db
 def test_anonymous_cannot_use_project_api(client):
@@ -1545,11 +1573,41 @@ def test_anonymous_cannot_use_project_api(client):
 
 
 @pytest.mark.django_db
-def test_loggied_in_user_can_use_project_api(client):
+def test_logged_in_user_can_use_project_api(client):
     url = reverse("projects-list")
     with login(client):
         response = client.get(url)
     assert response.status_code == 200
+
+
+########################################################################
+# Utils
+########################################################################
+@pytest.mark.django_db
+def test_get_switchtender_for_project(client):
+    group = auth.Group.objects.get(name="switchtender")
+
+    dept62 = baker.make(geomatics.Department, code="62")
+    dept80 = baker.make(geomatics.Department, code="80")
+    dept59 = baker.make(geomatics.Department, code="59")
+
+    switchtenderA = baker.make(auth.User, groups=[group])
+    switchtenderA.profile.departments.set([dept62, dept80])
+
+    switchtenderB = baker.make(auth.User, groups=[group])
+    switchtenderB.profile.departments.set([dept59, dept80])
+
+    switchtenderC = baker.make(auth.User, groups=[group])
+    switchtenderC.profile.departments.set([])
+
+    project = baker.make(models.Project, status="READY", commune__department=dept62)
+
+    selected_switchtenders = utils.get_switchtenders_for_project(project)
+
+    assert len(selected_switchtenders) == 2
+    assert switchtenderA in selected_switchtenders
+    assert switchtenderB not in selected_switchtenders
+    assert switchtenderC in selected_switchtenders
 
 
 # eof

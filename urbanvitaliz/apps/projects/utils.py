@@ -16,7 +16,7 @@ from django.db.models import Q
 from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 
-from . import models, signals
+from . import models
 
 
 def can_administrate_project(project, user, allow_draft=False):
@@ -56,6 +56,29 @@ def can_administrate_or_403(project, user, allow_draft=False):
         return True
 
     raise PermissionDenied("L'information demandée n'est pas disponible")
+
+
+def get_switchtenders_for_project(project):
+    """Return all the switchtenders for a given project"""
+    users = auth_models.User.objects.filter(groups__name="switchtender")
+
+    if project.commune and project.commune.department:
+        users = users.filter(
+            Q(profile__departments=project.commune.department)
+            | Q(profile__departments=None)
+        ).distinct()
+
+    return users
+
+
+def get_collaborators_for_project(project):
+    return auth_models.User.objects.filter(email__in=project.emails).distinct()
+
+
+def get_notification_recipients_for_project(project):
+    return (
+        get_switchtenders_for_project(project) | get_collaborators_for_project(project)
+    ).distinct()
 
 
 def generate_ro_key():
@@ -148,10 +171,6 @@ def create_reminder(request, days, task, recipient, origin):
         origin=origin,
         delay=days,
         extra_context={"task": task, "delay": days, "rsvp": rsvp},
-    )
-
-    signals.reminder_created.send(
-        sender=models.Project, task=task, project=task.project, user=request.user
     )
 
     return True
