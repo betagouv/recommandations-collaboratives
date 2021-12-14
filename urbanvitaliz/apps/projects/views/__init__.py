@@ -13,6 +13,7 @@ from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
+from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -125,6 +126,12 @@ def project_detail(request, project_id=None):
     can_administrate_draft = can_administrate_project(
         project, request.user, allow_draft=True
     )
+
+    # Mark this project notifications unread
+    project_ct = ContentType.objects.get_for_model(project)
+    request.user.notifications.filter(
+        target_content_type=project_ct.pk, target_object_id=project.pk
+    ).mark_all_as_read()
 
     return render(request, "projects/project/detail.html", locals())
 

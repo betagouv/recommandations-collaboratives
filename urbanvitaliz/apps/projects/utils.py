@@ -66,9 +66,9 @@ def get_switchtenders_for_project(project):
         users = users.filter(
             Q(profile__departments=project.commune.department)
             | Q(profile__departments=None)
-        ).distinct()
+        )
 
-    return users
+    return users.distinct()
 
 
 def get_collaborators_for_project(project):
@@ -76,6 +76,7 @@ def get_collaborators_for_project(project):
 
 
 def get_notification_recipients_for_project(project):
+    """Get all the people that should receive notifications for a given project"""
     return (
         get_switchtenders_for_project(project) | get_collaborators_for_project(project)
     ).distinct()

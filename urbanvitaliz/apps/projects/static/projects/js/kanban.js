@@ -63,9 +63,18 @@ function kanban_app() {
 								    boardCode: t.status,
 								    created_on: new Date(t.created_on),
                     organization: this.truncate(t.org_name),
-                    commune: t.commune
-							  }
+                    commune: t.commune,
+                    notifications: t.notifications
+							  };
 						});
+
+            this.tasks.sort(function(a, b) {
+                if (b.notifications - a.notifications)
+                    return (b.notifications - a.notifications);
+                else {
+                    return b.created_on - a.created_on;
+                }
+            });
 				},
 
 				onDragStart(event, uuid) {
