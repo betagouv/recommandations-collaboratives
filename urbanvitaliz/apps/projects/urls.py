@@ -11,6 +11,7 @@ created : 2021-05-26 15:54:25 CEST
 from django.urls import path
 
 from . import views
+from .views import feeds, notes, sharing, tasks
 
 urlpatterns = [
     path(r"onboarding/", views.onboarding, name="projects-onboarding"),
@@ -21,7 +22,7 @@ urlpatterns = [
     ),
     # projects for switchtenders
     path(r"projects/", views.project_list, name="projects-project-list"),
-    path("projects/feed/", views.LatestProjectsFeed(), name="projects-feed"),
+    path("projects/feed/", feeds.LatestProjectsFeed(), name="projects-feed"),
     path(
         r"project/<int:project_id>/",
         views.project_detail,
@@ -34,7 +35,7 @@ urlpatterns = [
     ),
     path(
         r"project/<int:project_id>/suggestions/",
-        views.presuggest_task,
+        tasks.presuggest_task,
         name="projects-project-tasks-suggest",
     ),
     path(
@@ -54,98 +55,98 @@ urlpatterns = [
     ),
     path(
         r"project/<int:project_id>/task/",
-        views.create_task,
+        tasks.create_task,
         name="projects-create-task",
     ),
     path(
         r"task/<int:task_id>/update/",
-        views.update_task,
+        tasks.update_task,
         name="projects-update-task",
     ),
     path(
         r"task/<int:task_id>/visit/",
-        views.visit_task,
+        tasks.visit_task,
         name="projects-visit-task",
     ),
     path(
         r"task/<int:task_id>/toggle-done/",
-        views.toggle_done_task,
+        tasks.toggle_done_task,
         name="projects-toggle-done-task",
     ),
     path(
         r"task/<int:task_id>/refuse/",
-        views.refuse_task,
+        tasks.refuse_task,
         name="projects-refuse-task",
     ),
     path(
         r"task/<int:task_id>/already/",
-        views.already_done_task,
+        tasks.already_done_task,
         name="projects-already-done-task",
     ),
     path(
         r"task/<int:task_id>/delete/",
-        views.delete_task,
+        tasks.delete_task,
         name="projects-delete-task",
     ),
     path(
         r"task/<int:task_id>/remind/",
-        views.remind_task,
+        tasks.remind_task,
         name="projects-remind-task",
     ),
     path(
         r"task/<int:task_id>/followup/",
-        views.followup_task,
+        tasks.followup_task,
         name="projects-followup-task",
     ),
     path(
         r"task/rsvp/<uuid:rsvp_id>/<int:status>/",
-        views.rsvp_followup_task,
+        tasks.rsvp_followup_task,
         name="projects-rsvp-followup-task",
     ),
     path(
         r"project/<int:project_id>/note/",
-        views.create_note,
+        notes.create_note,
         name="projects-create-note",
     ),
     path(
         r"note/<int:note_id>/delete/",
-        views.delete_note,
+        notes.delete_note,
         name="projects-delete-note",
     ),
     path(
         r"note/<int:note_id>/",
-        views.update_note,
+        notes.update_note,
         name="projects-update-note",
     ),
     path(
         r"project/<int:resource_id>/resource/action/",
-        views.create_resource_action,
+        tasks.create_resource_action,
         name="projects-create-resource-action",
     ),
     path(
         r"project/<int:project_id>/access/",
-        views.access_update,
+        sharing.access_update,
         name="projects-access-update",
     ),
     path(
         r"project/<int:project_id>/access/<str:email>/delete",
-        views.access_delete,
+        sharing.access_delete,
         name="projects-access-delete",
     ),
     # Recommendations
     path(
         r"projects/task-recommendation",
-        views.task_recommendation_list,
+        tasks.task_recommendation_list,
         name="projects-task-recommendation-list",
     ),
     path(
         r"projects/task-recommendation/create",
-        views.task_recommendation_create,
+        tasks.task_recommendation_create,
         name="projects-task-recommendation-create",
     ),
     path(
         r"projects/task-recommendation/<int:recommendation_id>/update",
-        views.task_recommendation_update,
+        tasks.task_recommendation_update,
         name="projects-task-recommendation-update",
     ),
 ]

@@ -11,6 +11,7 @@ django-activity-stream
 django-leaflet
 django-admin-csvexport
 djangorestframework
+django-notifications-hq
 # STATIC FILES
 django-sass-processor
 libsass

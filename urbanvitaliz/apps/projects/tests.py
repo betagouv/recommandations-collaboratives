@@ -691,14 +691,14 @@ def test_create_task_assigns_new_switchtender(client):
 @pytest.mark.django_db
 def test_create_new_task_for_project_notify_user(mocker, client):
     project = Recipe(models.Project).make()
-    mocker.patch("urbanvitaliz.apps.projects.views.notify_action_created")
+    mocker.patch("urbanvitaliz.apps.projects.views.tasks.notify_action_created")
     with login(client, groups=["switchtender"]):
         client.post(
             reverse("projects-create-task", args=[project.id]),
             data={"content": "this is some content", "notify_email": True},
         )
 
-    views.notify_action_created.assert_called_once()
+    views.tasks.notify_action_created.assert_called_once()
 
 
 @pytest.mark.django_db
