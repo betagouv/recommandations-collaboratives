@@ -16,15 +16,24 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
-                                is_switchtender_or_403, send_email)
+from urbanvitaliz.utils import (
+    check_if_switchtender,
+    is_staff_or_403,
+    is_switchtender_or_403,
+    send_email,
+)
 
 from .. import models, signals
-from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
-                     RsvpTaskFollowupForm, TaskFollowupForm,
-                     TaskRecommendationForm, UpdateTaskForm)
-from ..utils import (can_administrate_or_403, create_reminder,
-                     get_active_project_id)
+from ..forms import (
+    CreateTaskForm,
+    RemindTaskForm,
+    ResourceTaskForm,
+    RsvpTaskFollowupForm,
+    TaskFollowupForm,
+    TaskRecommendationForm,
+    UpdateTaskForm,
+)
+from ..utils import can_administrate_or_403, create_reminder, get_active_project_id
 
 
 @login_required
