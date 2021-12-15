@@ -33,6 +33,7 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
     path("notifications/", include(notifications.urls, namespace="notifications")),
+    path("hijack/", include("hijack.urls")),
     path("nimda/", admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
