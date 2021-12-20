@@ -16,24 +16,15 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-    send_email,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403, send_email)
 
 from .. import models, signals
-from ..forms import (
-    CreateTaskForm,
-    RemindTaskForm,
-    ResourceTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskForm,
-)
-from ..utils import can_administrate_or_403, create_reminder, get_active_project_id
+from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
+                     RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskForm)
+from ..utils import (can_administrate_or_403, create_reminder,
+                     get_active_project_id)
 
 
 @login_required
@@ -55,7 +46,12 @@ def create_task(request, project_id=None):
 
             # Send notifications
             if form.cleaned_data["notify_email"]:
-                notify_action_created(request, project, task=instance)
+                notify_email_action_created(request, project, task=instance)
+
+            # Notify other switchtenders
+            signals.action_created.send(
+                sender=visit_task, task=instance, project=project, user=request.user
+            )
 
             return redirect(reverse("projects-project-detail", args=[project_id]))
     else:
@@ -417,7 +413,14 @@ def create_resource_action(request, resource_id=None):
 
             # Send notifications
             if form.cleaned_data["notify_email"]:
-                notify_action_created(request, project, task, resource)
+                notify_email_action_created(request, project, task, resource)
+
+            signals.action_created.send(
+                sender=create_resource_action,
+                task=task,
+                project=project,
+                user=request.user,
+            )
 
             next_url = reverse("projects-project-detail", args=[project.id])
             return redirect(next_url)
@@ -431,7 +434,7 @@ def create_resource_action(request, resource_id=None):
 ########################################################################
 
 
-def notify_action_created(request, project, task, resource=None):
+def notify_email_action_created(request, project, task, resource=None):
     """
     Notify the creation of an Action the user by sending an email and displaying
     a UI popup
