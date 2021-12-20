@@ -8,7 +8,7 @@
 {% block js %}
 <script src="{% static 'projects/js/kanban.js' %}"></script>
 <!-- Polyfill for older browsers -->
-<script src="https://polyfill.io/v3/polyfill.min.js?features=Array.prototype.map%2CqueueMicrotask"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CqueueMicrotask"></script>
 
 <script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg=" crossorigin="anonymous"></script>
@@ -188,7 +188,7 @@
                                     {{ notification.actor.last_name|default:"" }}
                                 </span>
                                 <span class="verb">
-                                    {{ notification.verb }} sur
+                                    <strong>{{ notification.verb }}</strong> sur
                                 </span>
                                 <span class="target">
                                     <a href="{{ notification.target.get_absolute_url }}">{{ notification.target }}</a>
@@ -196,9 +196,17 @@
                                 <span class="ms-1 small text-secondary">il y a {{ notification.timestamp|timesince }}</span>
                             </div>
 
+                            {% if notification.action_object.resource %}
+                            <div class="border p-2 rounded bg-white w-100">
+                                {{ notification.action_object.resource.title }}
+                            </div>
+                            {% endif %}
+
+                            {% if notification.action_object.comment %}
                             <div class="border p-2 rounded bg-white w-100">
                                 "{{ notification.action_object.comment }}" à propos de <a href=" {{ notification.action_object.task.get_absolute_url }}">{{ notification.action_object.task }}</a>
                             </div>
+                            {% endif %}
                         </div>
 
                     </li>

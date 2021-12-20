@@ -13,7 +13,7 @@ from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
 
-from .. import models
+from .. import models, signals
 from ..forms import NoteForm, StaffNoteForm
 from ..utils import can_administrate_or_403
 
@@ -37,6 +37,14 @@ def create_note(request, project_id=None):
             if not is_switchtender:
                 instance.public = True
             instance.save()
+
+            signals.note_created.send(
+                sender=create_note,
+                note=instance,
+                project=project,
+                user=request.user,
+            )
+
             return redirect(
                 reverse("projects-project-detail", args=[project_id]) + "#sheet"
             )
