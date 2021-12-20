@@ -359,9 +359,14 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
         form = RsvpTaskFollowupForm(request.POST)
         if form.is_valid():
             comment = form.cleaned_data.get("comment", "")
-            models.TaskFollowup(
+            followup = models.TaskFollowup(
                 status=status, comment=comment, task=task, who=rsvp.user
             ).save()
+
+            signals.action_commented.send(
+                sender=followup, task=task, project=task.project, user=rsvp.user
+            )
+
             rsvp.delete()  # we are done with this use only once object
             # TODO
             # task.status = status

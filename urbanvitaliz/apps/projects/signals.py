@@ -3,7 +3,8 @@ from actstream import action
 from django.dispatch import receiver
 from notifications.signals import notify
 
-from .utils import get_notification_recipients_for_project
+from .utils import (get_notification_recipients_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -55,7 +56,7 @@ def notify_action_created(sender, task, project, user, **kwargs):
         sender=user,
         recipient=recipients,
         verb="a recommandé l'action",
-        action_object=sender,
+        action_object=task,
         target=project,
         private=True,
     )
@@ -109,6 +110,31 @@ def notify_action_commented(sender, task, project, user, **kwargs):
         recipient=recipients,
         verb="a commenté l'action",
         action_object=sender,
+        target=project,
+        private=True,
+    )
+
+
+######
+# Notes
+#####
+note_created = django.dispatch.Signal()
+
+
+@receiver(note_created)
+def notify_note_created(sender, note, project, user, **kwargs):
+    if note.public is False:
+        recipients = get_switchtenders_for_project(project).exclude(id=user.id)
+    else:
+        recipients = get_notification_recipients_for_project(project).exclude(
+            id=user.id
+        )
+
+    notify.send(
+        sender=user,
+        recipient=recipients,
+        verb="a créé une note de suivi",
+        action_object=note,
         target=project,
         private=True,
     )
