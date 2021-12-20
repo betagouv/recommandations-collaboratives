@@ -92,7 +92,7 @@
         <ul class="nav nav-tabs" id="project-tabs" role="tablist">
             <!-- exploration/survey -->
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="exploration-tab" data-bs-toggle="tab" data-bs-target="#exploration" type="button" role="tab" aria-controls="exploration" aria-selected="true">
+                <button class="nav-link {% if is_switchtender == False %}active{% endif %}" id="exploration-tab" data-bs-toggle="tab" data-bs-target="#exploration" type="button" role="tab" aria-controls="exploration" aria-selected="{% if is_switchtender %}false{% else %}true{% endif %}">
                     <svg class="bi align-middle me-1" width="16" height="16">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
                     </svg>
@@ -125,13 +125,13 @@
             </li>
 
             <!-- main sheet -->
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="sheet-tab" data-bs-toggle="tab" data-bs-target="#sheet" type="button" role="tab" aria-controls="sheet" aria-selected="false">
+            <li class="nav-item {% if is_switchtender %}active{% endif %}" role="presentation">
+                <button class="nav-link" id="sheet-tab" data-bs-toggle="tab" data-bs-target="#sheet" type="button" role="tab" aria-controls="sheet" aria-selected="{% if is_switchtender %}true{% else %}false{% endif %}">
                     <svg class="bi align-middle me-1" width="16" height="16">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder"/>
                     </svg>
                     <span class="align-middle">
-                        Suivi
+                        Suivi & échanges
                     </span>
                 </button>
             </li>
@@ -153,7 +153,7 @@
 
         <div class="tab-content" id="project-tabs-content">
             <!-- TAB: exploration -->
-            <div class="tab-pane show active pt-4" id="exploration" role="tabpanel" aria-labelledby="exploration">
+            <div class="tab-pane show {% if not is_switchtender %}active{% endif %}" pt-4" id="exploration" role="tabpanel" aria-labelledby="exploration">
                 {% include "projects/project/fragments/exploration.html" with session=project.survey_session %}
             </div>
 
@@ -187,7 +187,7 @@
                 -->
             </div>
 
-            <div class="tab-pane pt-4" id="sheet" role="tabpanel" aria-labelledby="sheet">
+            <div class="tab-pane {% if is_switchtender %}active{% endif %} pt-4" id="sheet" role="tabpanel" aria-labelledby="sheet">
 
                 <!--
                      {% if request.GET.first_time %}
@@ -262,7 +262,7 @@
 
                 -->
 
-                {% if project.survey_session.answers.count > 0  or project.tasks.count %}
+                {% if project.survey_session.answers.count > 0  or project.tasks.count and not is_switchtender %}
                 <div class="bd-callout bd-callout-info position-relative mb-2">
                     <h4 class="mb-3">👋 Rebonjour !</h4>
                     {% if project.survey_session and project.survey_session.completion != 100 %}
