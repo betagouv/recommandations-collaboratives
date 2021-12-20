@@ -36,6 +36,7 @@ def log_reminder_created(sender, task, project, user, **kwargs):
 ######
 # Actions
 #####
+action_created = django.dispatch.Signal()
 action_visited = django.dispatch.Signal()
 action_rejected = django.dispatch.Signal()
 action_already_done = django.dispatch.Signal()
@@ -44,6 +45,20 @@ action_undone = django.dispatch.Signal()
 action_commented = django.dispatch.Signal()
 
 # TODO refactor arguements as project is know to task -> f(sender, task , user, **kwargs)
+
+
+@receiver(action_created)
+def notify_action_created(sender, task, project, user, **kwargs):
+    recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
+
+    notify.send(
+        sender=user,
+        recipient=recipients,
+        verb="a recommandé l'action",
+        action_object=sender,
+        target=project,
+        private=True,
+    )
 
 
 @receiver(action_visited)

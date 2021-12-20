@@ -17,7 +17,8 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -691,14 +692,14 @@ def test_create_task_assigns_new_switchtender(client):
 @pytest.mark.django_db
 def test_create_new_task_for_project_notify_user(mocker, client):
     project = Recipe(models.Project).make()
-    mocker.patch("urbanvitaliz.apps.projects.views.tasks.notify_action_created")
+    mocker.patch("urbanvitaliz.apps.projects.views.tasks.notify_email_action_created")
     with login(client, groups=["switchtender"]):
         client.post(
             reverse("projects-create-task", args=[project.id]),
             data={"content": "this is some content", "notify_email": True},
         )
 
-    views.tasks.notify_action_created.assert_called_once()
+    views.tasks.notify_email_action_created.assert_called_once()
 
 
 @pytest.mark.django_db
