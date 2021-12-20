@@ -12,19 +12,19 @@ Bonjour,
 Où en êtes-vous depuis que vous avez pris connaissance de cette proposition d'action ?
 
 C'est fait !
-{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 1 %}
-
-C'est en cours
-{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 2 %}
-
-Je rencontre un blocage sur cette action
 {{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 3 %}
 
+C'est en cours
+{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 1 %}
+
+Je rencontre un blocage sur cette action
+{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 2 %}
+
 Me le rappeler plus tard
-{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 4 %}
+{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 5 %}
 
 Finalement, ça ne m'intéresse pas
-{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 5 %}
+{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 4 %}
 
 
 Vous pouvez retrouver cette action en cliquant ou en copiant le lien ci dessous :
