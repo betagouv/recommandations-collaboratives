@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from urbanvitaliz.utils import send_email
+from urbanvitaliz.apps.communication.api import send_email
 
 from .. import models
 from ..utils import can_administrate_or_403
@@ -49,13 +49,11 @@ def access_update(request, project_id):
                     extra_tags=["email"],
                 )
                 send_email(
-                    request,
-                    user_email=email,
-                    email_subject="[UrbanVitaliz] Vous êtes invité·e à collaborer sur {0}".format(
-                        project.name
-                    ),
-                    template_base_name="projects/notifications/acl_new_collaborator",
-                    extra_context={"project": project, "email": email},
+                    template_name="sharing invitation",
+                    recipients=[email],
+                    params={
+                        "projet": {"nom": project.name},
+                    },
                 )
 
             return redirect(reverse("projects-project-detail", args=[project_id]))
