@@ -70,10 +70,20 @@
 
             <div class="input-group mb-3">
 
-                {% if limit_area != None and user.is_authenticated %}
+                {% if is_switchtender %}
                 <select id="limit_area" name="limit_area" class="form-select" style="flex: 0 0 auto !important; min-width: 200px" aria-label="Limiter la zone géographique">
-                    <option {% if not limit_area %}selected{% endif %} value="false">France entière</option>
-                    <option {% if limit_area %}selected{% endif %} value="1">
+                    <option {% if not limit_area %}selected{% endif %} value="">France entière</option>
+                    <option {% if limit_area == 'AUTO' %}selected{% endif %} value="AUTO">Mes départements</option>
+                    {% for department in departments %}
+                    <option {% if department.code == limit_area %}selected{% endif %} value="{{ department.code }}">
+                        {{ department.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% elif limit_area != '' and user.is_authenticated %}
+                <select id="limit_area" name="limit_area" class="form-select" style="flex: 0 0 auto !important; min-width: 200px" aria-label="Limiter la zone géographique">
+                    <option {% if not limit_area %}selected{% endif %} value="">France entière</option>
+                    <option {% if limit_area == 'AUTO' %}selected{% endif %} value="AUTO">
                         {% for department in departments %}{{ department.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
                     </option>
                 </select>
