@@ -150,32 +150,6 @@ class OnboardingForm(forms.ModelForm):
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
 
-    impediment_kinds = forms.MultipleChoiceField(
-        choices=[
-            (
-                "Méthode à suivre, guidage sur les prochaines étapes et questions à se poser",
-                "Méthode à suivre, guidage sur les prochaines étapes et questions à se poser",
-            ),
-            (
-                "Définition du projet de réhabilitation",
-                "Définition du projet de réhabilitation",
-            ),
-            (
-                "Accompagnement, conseil et compétences techniques avant travaux",
-                "Accompagnement, conseil et compétences techniques avant travaux",
-            ),
-            ("Financement pour des études", "Financement pour des études"),
-            ("Financement des travaux", "Financement des travaux"),
-            (
-                "Propriété de la friche, acquisition, contact avec le propriétaire",
-                "Propriété de la friche, acquisition, contact avec le propriétaire",
-            ),
-            ("Autre", "Autre (précisez en commentaire)"),
-        ],
-        required=True,
-        label="Quels sont les besoins et points de blocage?",
-    )
-
     class Meta:
         model = models.Project
         fields = [

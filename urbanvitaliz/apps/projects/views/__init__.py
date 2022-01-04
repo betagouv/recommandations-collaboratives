@@ -26,14 +26,9 @@ from urbanvitaliz.utils import is_staff_or_403, is_switchtender_or_403
 
 from .. import models, signals
 from ..forms import OnboardingForm, ProjectForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    generate_ro_key,
-    get_active_project,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     generate_ro_key, get_active_project,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -50,14 +45,6 @@ def onboarding(request):
             project.ro_key = generate_ro_key()
             postcode = form.cleaned_data.get("postcode")
             project.commune = geomatics.Commune.get_by_postal_code(postcode)
-            # concatener les impediment_kinds et la rajouter en debut d'impediment
-            impediment_kinds = form.cleaned_data.get("impediment_kinds", [])
-            project.impediments = (
-                "#### Besoins : "
-                + " ; ".join(impediment_kinds)
-                + "\n\n"
-                + project.impediments
-            )
             project.save()
             models.Note(
                 project=project,
