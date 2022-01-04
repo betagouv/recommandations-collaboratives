@@ -13,6 +13,7 @@ django-admin-csvexport
 djangorestframework
 django-notifications-hq
 django-hijack==3.1.4
+sentry-sdk
 # STATIC FILES
 django-sass-processor
 libsass
