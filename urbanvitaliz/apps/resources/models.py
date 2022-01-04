@@ -58,11 +58,8 @@ class ResourceQuerySet(models.QuerySet):
     def get_queryset(self):
         return super().get_queryset().order_by(Lower("title"))
 
-    def limit_area(self, communes):
-        """Limit resources that match at least one department of communes"""
-        if not communes:
-            return self
-        departments = set(c.department for c in communes if c)
+    def limit_area(self, departments):
+        """Limit resources that match at least one department"""
         return self.filter(
             models.Q(departments__in=departments) | models.Q(departments=None)
         ).distinct()

@@ -16,6 +16,7 @@ from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
+from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import utils as projects_utils
 from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
@@ -29,31 +30,53 @@ from . import models
 
 def resource_search(request):
     """Search existing resources"""
-    form = SearchForm(request.GET, initial={"limit_area": True})
+    form = SearchForm(request.GET)
     form.is_valid()
     query = form.cleaned_data.get("query", "")
 
-    searching = request.GET.get("searching", False)
-    if not searching:
-        limit_area = True
-    else:
-        limit_area = form.cleaned_data.get("limit_area", True)
+    limit_area = form.cleaned_data.get("limit_area")
+    searching = form.cleaned_data.get("searching", False)
+
+    if (not searching) and (limit_area is None):
+        limit_area = "AUTO"
 
     categories = form.selected_categories
 
-    # user communes from her projects if applicable
-    communes = []
-    if hasattr(request.user, "email"):
-        communes = [p.commune for p in projects.Project.fetch(email=request.user.email)]
-    if not communes:
-        limit_area = None  # does not apply if no projects
-    departments = set(c.department for c in communes if c)
-
     resources = models.Resource.search(query, categories)
     if not request.user.is_staff:
+        # If we are staff, show also PRIVATE resources
         resources = resources.filter(public=True)
-    if limit_area:
-        resources = resources.limit_area(communes)
+
+    # If we are a switchtender, allow any departement to be filtered
+    # Otherwise, show only departments related to my projects
+    departments = geomatics_models.Department.objects.none()
+    if check_if_switchtender(request.user):
+        departments = geomatics_models.Department.objects.order_by("name").all()
+        if limit_area:
+            if limit_area == "AUTO":
+                # Select departments from profile
+                selected_departments = geomatics_models.Department.objects.filter(
+                    code__in=request.user.profile.departments.all()
+                )
+            else:
+                # Get current one from parameters
+                selected_departments = geomatics_models.Department.objects.filter(
+                    code=limit_area
+                )
+            resources = resources.limit_area(selected_departments)
+
+    else:
+        communes = []
+        if hasattr(request.user, "email"):
+            communes = [
+                p.commune for p in projects.Project.fetch(email=request.user.email)
+            ]
+            if not communes:
+                limit_area = None  # does not apply if no projects
+
+            departments = set(c.department for c in communes if c)
+            if limit_area:
+                resources = resources.limit_area(departments)
 
     return render(request, "resources/resource/list.html", locals())
 
@@ -66,7 +89,9 @@ class SearchForm(forms.Form):
 
     query = forms.CharField(required=False)
 
-    limit_area = forms.BooleanField(required=False)
+    searching = forms.BooleanField(required=False)
+
+    limit_area = forms.CharField(required=False, empty_value=None)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
