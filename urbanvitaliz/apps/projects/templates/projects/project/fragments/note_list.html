@@ -6,7 +6,7 @@
 <div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
     <div>
         Aucune note actuellement pour ce projet.
-        {% if user.is_staff %}
+        {% if can_administrate %}
         C'est le bon moment pour
         <a href="{% url 'projects-create-note' project.id %}">
             en créer une première.
@@ -54,7 +54,7 @@
                 {% endif %}
                 &nbsp;
                 <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em>
-                {% if can_administrate %}
+                    {% if can_administrate %}
                     - <a href="{% url 'projects-update-note' note.id %}">éditer</a></span>
                 {% endif %}
             </div>
