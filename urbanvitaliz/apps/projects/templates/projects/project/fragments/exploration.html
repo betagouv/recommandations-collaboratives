@@ -8,6 +8,7 @@
 
     {% if can_administrate_draft %}
     {% if project.survey_session and project.survey_session.next_question %}
+    {% if project.survey_session.completion < 80 %}
     <div class="box-heading d-flex justify-content-between mb-4 mt-4">
         <div class="flex-grow-1">
 
@@ -34,6 +35,7 @@
             {% endif %}
         </div>
     </div>
+    {% endif %}
     {% endif %}
     {% endif %}
 
