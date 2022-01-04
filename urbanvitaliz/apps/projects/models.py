@@ -191,6 +191,13 @@ class Note(models.Model):
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )
+    created_by = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.SET_NULL,
+        related_name="notes_created",
+        null=True,
+        blank=True,
+    )
     updated_on = models.DateTimeField(
         default=timezone.now, verbose_name="Dernière mise à jour"
     )
