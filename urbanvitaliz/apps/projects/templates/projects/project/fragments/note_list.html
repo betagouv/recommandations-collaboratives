@@ -54,6 +54,7 @@
                 {% endif %}
                 &nbsp;
                 <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em>
+                    {% if note.created_by %}<em>par {{ note.created_by.get_full_name|default:note.created_by }}</em>{% endif %}
                     {% if can_administrate %}
                     - <a href="{% url 'projects-update-note' note.id %}">éditer</a></span>
                 {% endif %}

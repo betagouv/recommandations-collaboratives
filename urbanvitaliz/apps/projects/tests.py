@@ -1159,6 +1159,7 @@ def test_create_public_note_for_project_collaborator_and_redirect(client):
     note = models.Note.fetch()[0]
     assert note.project == project
     assert note.public is True
+    assert note.created_by is not None
     assert response.status_code == 302
 
 

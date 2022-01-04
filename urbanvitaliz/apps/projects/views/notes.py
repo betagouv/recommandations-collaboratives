@@ -34,6 +34,8 @@ def create_note(request, project_id=None):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.project = project
+            instance.created_by = request.user
+
             if not is_switchtender:
                 instance.public = True
             instance.save()
