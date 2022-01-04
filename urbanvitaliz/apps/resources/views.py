@@ -53,17 +53,24 @@ def resource_search(request):
     if check_if_switchtender(request.user):
         departments = geomatics_models.Department.objects.order_by("name").all()
         if limit_area:
+            selected_departments = geomatics_models.Department.objects.none()
             if limit_area == "AUTO":
                 # Select departments from profile
-                selected_departments = geomatics_models.Department.objects.filter(
-                    code__in=request.user.profile.departments.all()
-                )
+                user_departments = request.user.profile.departments.all()
+                if user_departments:
+                    selected_departments = geomatics_models.Department.objects.filter(
+                        code__in=user_departments
+                    )
+                else:
+                    limit_area = None
             else:
                 # Get current one from parameters
                 selected_departments = geomatics_models.Department.objects.filter(
                     code=limit_area
                 )
-            resources = resources.limit_area(selected_departments)
+
+            if selected_departments:
+                resources = resources.limit_area(selected_departments)
 
     else:
         communes = []
