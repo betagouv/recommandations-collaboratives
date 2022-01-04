@@ -82,12 +82,25 @@
                 </div>
 
                 <div class="row justify-content-center">
-                        {% include 'footer.html' %}
+                    {% include 'footer.html' %}
                 </div>
             </div>
 
         </main>
 
+
+        {% if not debug %}
+        <script
+            src="https://browser.sentry-cdn.com/6.16.1/bundle.tracing.min.js"
+            integrity="sha384-hySah00SvKME+98UjlzyfP852AXjPPTh2vgJu26gFcwTlZ02/zm82SINaKTKwIX2"
+            crossorigin="anonymous"
+        ></script>
+        <script type="text/javascript">
+         Sentry.init({
+             dsn: "https://94ca61f214804521ab3f4b80600dc837@o1107121.ingest.sentry.io/6133993",
+         });
+        </script>
+        {% endif %}
 
         <script src="{% static 'js/jquery-3.6.0.slim.min.js' %}"></script>
         <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
@@ -95,12 +108,14 @@
         <script src="{% static 'js/sidebars.js' %}"></script>
 
 
+
         <!-- bs5 notifications  -->
         <script type="text/javascript">
-         $(function() {
+            $(function() {
              $('.toast').toast('show');
          });
         </script>
+
 
         {% block js %}
         {% endblock %}
