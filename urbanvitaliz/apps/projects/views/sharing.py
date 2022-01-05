@@ -48,11 +48,17 @@ def access_update(request, project_id):
                     ),
                     extra_tags=["email"],
                 )
+
+                project_url = request.build_absolute_uri(
+                    reverse("projects-project-detail", args=[project_id])
+                )
+
                 send_email(
                     template_name="sharing invitation",
                     recipients=[email],
                     params={
-                        "projet": {"nom": project.name},
+                        "sender": {"email": request.user.email},
+                        "project": {"name": project.name, "url": project_url},
                     },
                 )
 

@@ -481,15 +481,19 @@ def notify_email_action_created(request, project, task):
         title = task.intent
         extract = ""
 
+    action_link = request.build_absolute_uri(
+        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+    )
+
     for user in get_collaborators_for_project(project):
         send_email(
             template_name="new reco",
             recipients=[user.email],
             params={
-                "projet": {"nom": project.name},
-                "contact": {"nom": user.first_name},
-                "expediteur": {"first_name": task.created_by.first_name},
-                "reco": {"title": title, "extract": extract},
+                "project": {"name": project.name},
+                "contact": {"name": user.first_name},
+                "sender": {"first_name": task.created_by.first_name},
+                "reco": {"title": title, "extract": extract, "url": action_link},
             },
         )
 
