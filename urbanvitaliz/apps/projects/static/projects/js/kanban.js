@@ -75,8 +75,8 @@ function kanban_app() {
 						});
 
             this.tasks.sort(function(a, b) {
-                if (b.notifications - a.notifications)
-                    return (b.notifications - a.notifications);
+                if (b.notifications.count - a.notifications.count)
+                    return (b.notifications.count - a.notifications.count);
                 else {
                     return b.created_on - a.created_on;
                 }
