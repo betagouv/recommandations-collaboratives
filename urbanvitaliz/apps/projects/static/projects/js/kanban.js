@@ -1,5 +1,6 @@
 function kanban_app() {
 		return {
+        isBusy: true,
 				dateDisplay: 'toLocaleDateString',
 				boards: [
 					  // {code: 'DRAFT', title: 'Brouillon', color_class: 'red'},
@@ -50,11 +51,16 @@ function kanban_app() {
 				async getTasks() {
             var tasksFromApi = [];
 
+            this.isBusy = true;
+
             const response = await fetch('/api/projects/');
             tasksFromApi = await response.json(); //extract JSON from the http response
 
-						this.tasks = tasksFromApi.map(t => {
-							  return {
+						this.tasks = [];
+
+            tasksFromApi.forEach(t => {
+                this.tasks.push(
+							   {
                     uuid: this.generateUUID(),
 								    id: t.id,
 								    name: this.truncate(t.name),
@@ -65,7 +71,7 @@ function kanban_app() {
                     organization: this.truncate(t.org_name),
                     commune: t.commune,
                     notifications: t.notifications
-							  };
+							   });
 						});
 
             this.tasks.sort(function(a, b) {
@@ -75,6 +81,8 @@ function kanban_app() {
                     return b.created_on - a.created_on;
                 }
             });
+
+            this.isBusy = false;
 				},
 
 				onDragStart(event, uuid) {
