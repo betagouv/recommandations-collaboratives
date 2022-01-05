@@ -93,6 +93,10 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(client):
     response = client.post(reverse("projects-onboarding"), data=data)
     project = models.Project.fetch()[0]
     user = auth.User.objects.get(username=project.email)
+
+    assert user.first_name == data["first_name"]
+    assert user.last_name == data["last_name"]
+
     assert user.is_authenticated
     url = reverse("survey-project-session", args=[project.id])
     assert response.status_code == 302
