@@ -137,10 +137,29 @@
                     </button>
                 </div>
                 {% endif %}
-                {% if user.is_staff and not disable_edit %}
-                <span class="align-middle p-2 small">
-                    <a class="" href="{% url 'projects-update-task' task.id %}">Éditer</a>
-                </span>
+
+                {% if is_switchtender and not disable_edit %}
+                <div class="dropdown mx-2 align-middle">
+                    <a class="btn btn-sm btn-info dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        Aiguillage
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="{% url 'projects-update-task' task.id %}">Éditer</a></li>
+                        <li>
+                            <form method="POST" action="{% url 'projects-email-task' task.id %}">
+                                {% csrf_token %}
+                                <button class="dropdown-item">Notifier par courriel</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form method="POST" action="{% url 'projects-remind-task-delete' task.id %}">
+                                {% csrf_token %}
+                                <button class="dropdown-item">Supprimer le rappel</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+
                 {% endif %}
 
                 {% if not hide_details and can_administrate %}

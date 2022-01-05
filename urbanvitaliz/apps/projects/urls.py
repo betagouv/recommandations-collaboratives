@@ -64,6 +64,11 @@ urlpatterns = [
         name="projects-update-task",
     ),
     path(
+        r"task/<int:task_id>/email/",
+        tasks.email_task,
+        name="projects-email-task",
+    ),
+    path(
         r"task/<int:task_id>/visit/",
         tasks.visit_task,
         name="projects-visit-task",
@@ -92,6 +97,11 @@ urlpatterns = [
         r"task/<int:task_id>/remind/",
         tasks.remind_task,
         name="projects-remind-task",
+    ),
+    path(
+        r"task/<int:task_id>/remind-delete/",
+        tasks.remind_task_delete,
+        name="projects-remind-task-delete",
     ),
     path(
         r"task/<int:task_id>/followup/",

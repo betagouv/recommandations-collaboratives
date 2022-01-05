@@ -16,24 +16,15 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-    send_email,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403, send_email)
 
 from .. import models, signals
-from ..forms import (
-    CreateTaskForm,
-    RemindTaskForm,
-    ResourceTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskForm,
-)
-from ..utils import can_administrate_or_403, create_reminder, get_active_project_id
+from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
+                     RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskForm)
+from ..utils import (can_administrate_or_403, create_reminder,
+                     get_active_project_id)
 
 
 @login_required
@@ -66,6 +57,21 @@ def create_task(request, project_id=None):
     else:
         form = CreateTaskForm()
     return render(request, "projects/project/task_create.html", locals())
+
+
+@login_required
+def email_task(request, task_id):
+    """Email the collaborators for a given task"""
+    is_switchtender_or_403(request.user)
+    task = get_object_or_404(models.Task, pk=task_id)
+
+    # Send email notifications
+    if request.method == "POST":
+        notify_email_action_created(request, project=task.project, task=task)
+
+    return redirect(
+        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+    )
 
 
 @login_required
@@ -325,6 +331,20 @@ def remind_task(request, task_id=None):
             messages.error(
                 request, "Impossible de programmer l'alarme : données invalides."
             )
+
+    return redirect(
+        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+    )
+
+
+@login_required
+def remind_task_delete(request, task_id=None):
+    """Delete a reminder for a task"""
+    task = get_object_or_404(models.Task, pk=task_id)
+    recipient = task.project.email
+
+    if request.method == "POST":
+        api.remove_reminder_email(task, recipient=recipient, origin=None)
 
     return redirect(
         reverse("projects-project-detail", args=[task.project_id]) + "#actions"
