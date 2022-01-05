@@ -42,6 +42,11 @@ INSTALLED_APPS = [
     "markdownx",
     "tagging",
     "leaflet",
+    "django_gravatar",
+    "actstream",
+    "notifications",
+    "rest_framework",
+    "csvexport",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",
@@ -49,11 +54,7 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.addressbook",
     "urbanvitaliz.apps.survey",
     "urbanvitaliz.apps.reminders",
-    "django_gravatar",
-    "actstream",
-    "notifications",
-    "rest_framework",
-    "csvexport",
+    "urbanvitaliz.apps.communication",
 ]
 
 SITE_ID = 1
@@ -193,5 +194,8 @@ SESSION_COOKIE_AGE = 30 * 24 * 60 * 60  # 30d * 24h * 60m * 60s
 
 # emails to use for notifications
 TEAM_EMAILS = ["friches@beta.gouv.fr"]
+
+# SENDINBLUE
+SENDINBLUE_API_KEY = "NO-API-KEY-DEFINED"
 
 # eof
