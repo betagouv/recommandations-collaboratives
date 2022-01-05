@@ -13,18 +13,19 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
-                                is_switchtender_or_403, send_email)
+                                is_switchtender_or_403)
 
 from .. import models, signals
 from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
                      RsvpTaskFollowupForm, TaskFollowupForm,
                      TaskRecommendationForm, UpdateTaskForm)
 from ..utils import (can_administrate_or_403, create_reminder,
-                     get_active_project_id)
+                     get_active_project_id, get_collaborators_for_project)
 
 
 @login_required
@@ -447,7 +448,7 @@ def create_resource_action(request, resource_id=None):
 
             # Send notifications
             if form.cleaned_data["notify_email"]:
-                notify_email_action_created(request, project, task, resource)
+                notify_email_action_created(request, project, task)
 
             signals.action_created.send(
                 sender=create_resource_action,
@@ -468,23 +469,29 @@ def create_resource_action(request, resource_id=None):
 ########################################################################
 
 
-def notify_email_action_created(request, project, task, resource=None):
+def notify_email_action_created(request, project, task):
     """
     Notify the creation of an Action the user by sending an email and displaying
     a UI popup
     """
-    # TODO send to all project emails
-    send_email(
-        request,
-        user_email=project.email,
-        email_subject="[{0}] UrbanVitaliz vous propose une action".format(project.name),
-        template_base_name="projects/notifications/task_new_email",
-        extra_context={
-            "task": task,
-            "project": project,
-            "resource": resource,
-        },
-    )
+    if task.resource:
+        title = task.resource.title
+        extract = task.resource.summary
+    else:
+        title = task.intent
+        extract = ""
+
+    for user in get_collaborators_for_project(project):
+        send_email(
+            template_name="new reco",
+            recipients=[user.email],
+            params={
+                "projet": {"nom": project.name},
+                "contact": {"nom": user.first_name},
+                "expediteur": {"first_name": task.created_by.first_name},
+                "reco": {"title": title, "extract": extract},
+            },
+        )
 
     messages.success(
         request,
