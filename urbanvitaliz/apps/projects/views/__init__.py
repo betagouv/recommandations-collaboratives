@@ -26,14 +26,9 @@ from urbanvitaliz.utils import is_staff_or_403, is_switchtender_or_403
 
 from .. import models, signals
 from ..forms import OnboardingForm, ProjectForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    generate_ro_key,
-    get_active_project,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     generate_ro_key, get_active_project,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -59,11 +54,12 @@ def onboarding(request):
 
             signals.project_submitted.send(sender=models.Project, project=project)
 
-            # TODO get or create user and log her in the application
             user, _ = auth.User.objects.get_or_create(
                 username=project.email,
                 defaults={
                     "email": project.email,
+                    "first_name": form.cleaned_data.get("first_name"),
+                    "last_name": form.cleaned_data.get("last_name"),
                 },
             )
             log_user(request, user)
