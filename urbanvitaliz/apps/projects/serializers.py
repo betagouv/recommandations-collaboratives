@@ -39,10 +39,17 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
         project_ct = ContentType.objects.get_for_model(obj)
 
-        return (
-            notifications.filter(
-                target_content_type=project_ct.pk, target_object_id=obj.pk
-            )
-            .unread()
-            .count()
-        )
+        switchtender_group = auth_models.Group.objects.get(name="switchtender")
+        switchtenders = switchtender_group.user_set.values_list("id", flat=True)
+        switchtenders = [int(switchtender) for switchtender in switchtenders]
+
+        unread_notifications = notifications.filter(
+            target_content_type=project_ct.pk, target_object_id=obj.pk
+        ).unread()
+
+        return {
+            "count": unread_notifications.count(),
+            "has_collaborator_activity": unread_notifications.exclude(
+                actor_object_id__in=switchtenders
+            ).exists(),
+        }
