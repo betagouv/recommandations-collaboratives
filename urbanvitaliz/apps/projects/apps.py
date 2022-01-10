@@ -11,3 +11,4 @@ class ProjectConfig(AppConfig):
 
         registry.register(self.get_model("Project"))
         registry.register(self.get_model("Task"))
+        registry.register(self.get_model("Note"))

@@ -3,10 +3,8 @@ from actstream import action
 from django.dispatch import receiver
 from notifications.signals import notify
 
-from .utils import (
-    get_notification_recipients_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (get_notification_recipients_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -127,6 +125,9 @@ note_created = django.dispatch.Signal()
 def notify_note_created(sender, note, project, user, **kwargs):
     if note.public is False:
         recipients = get_switchtenders_for_project(project).exclude(id=user.id)
+        action.send(
+            user, verb="a rédigé une note interne", action_object=note, target=project
+        )
     else:
         recipients = get_notification_recipients_for_project(project).exclude(
             id=user.id
