@@ -18,7 +18,7 @@ from . import models
 
 
 class NoteForm(forms.ModelForm):
-    """Form new project note creation"""
+    """Generic Note creation/edition"""
 
     class Meta:
         model = models.Note
@@ -31,6 +31,16 @@ class StaffNoteForm(NoteForm):
     class Meta:
         model = models.Note
         fields = ["content", "tags", "public"]
+
+
+class PrivateNoteForm(forms.ModelForm):
+    """Private Note creation"""
+
+    class Meta:
+        model = models.Note
+        fields = ["content"]
+
+    # content = MarkdownxFormField()
 
 
 ##################################################

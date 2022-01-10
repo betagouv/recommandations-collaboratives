@@ -1,66 +1,59 @@
 {% load static %}
 {% load humanize %}
+{% load gravatar %}
 
-{% if not notes.count %}
+<div class="row">
 
-<div class="bd-callout bd-callout-info d-flex align-items-center mb-5">
-    <div>
-        Aucune note actuellement pour ce projet.
-        {% if can_administrate %}
-        C'est le bon moment pour
-        <a href="{% url 'projects-create-note' project.id %}">
-            en créer une première.
-        </a>
-        {% endif %}
-    </div>
-</div>
+    <div class="col-8">
+        {% regroup project.notes.public by created_on.date as notes_by_day %}
 
-{% else %}
-
-<div class="row row-cols-1 row-cols-md-2">
-
-    {% for note in notes %}
-    <div class="col mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="card-subtitle mb-2 text-muted">
-                    {% for tag in note.tags_as_list %}
-                    #{{ tag }}&nbsp;
+        <div class="message-window">
+            <ul class="list-group">
+                {% for date, notes in notes_by_day|slice:":20" %}
+                <li class="list-group-item border-0">
+                    <div class="small my-2 text-center w-100 text-secondary">{{ date|naturalday|capfirst }}</div>
+                    {% for note in notes %}
+                    <div class="bg-light p-3 text-secondary">
+                        {{ note.content_rendered|safe }}
+                        {% if note.created_by %}
+                        <div>
+                        <span class="align-items-center link-dark text-decoration-none">
+                            <img
+                                src="{% gravatar_url action.actor.email 32 %}"
+                                alt="{{ action.actor.get_full_name }}"
+                                class="me-1 rounded-circle"
+                                style="width: 16px; height: 16px;"
+                            />
+                        </span>
+                        <span class="align-middle small">
+                            {{ note.created_by.get_full_name|capfirst|default:note.created_by }}
+                        </span>
+                        </div>
+                        {% endif %}
+                    </div>
                     {% endfor %}
-                </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
 
-                <div class="card-text">
-                    <span id="excerpt-{{ forloop.counter }}">{{ note.content_rendered|safe|truncatechars_html:500  }}</span>
-                    {% if note.content_rendered|safe|truncatechars_html:501|length > 500 %}
-                    <span id="more-{{ forloop.counter }}" style="display: none;">{{ note.content_rendered|safe }}</span>
-                    <a class="" href="#more-{{ forloop.counter }}" onclick="textFoldToggle({{ forloop.counter }})" id="foldBtn-{{ forloop.counter }}">[Lire tout]</a>
-                    {% endif %}
-                </div>
+        <div class="message-form">
+            <form class="form border p-3 d-flex align-items-end flex-column"
+                  method="POST"
+                  action="{% url 'projects-create-note' project.pk %}">
+                {% csrf_token %}
 
-            </div>
-            <div class="card-footer">
-                {% if note.public %}
-                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note publique">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
-                    </svg>
-                </span>
-                {% else %}
-                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Note privée">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-slash"/>
-                    </svg>
-                </span>
-                {% endif %}
-                &nbsp;
-                <span class="small text-secondary"><em>Rédigée {{ note.created_on|naturaltime }}</em>
-                    {% if note.created_by %}<em>par {{ note.created_by.get_full_name|default:note.created_by }}</em>{% endif %}
-                    {% if can_administrate %}
-                    - <a href="{% url 'projects-update-note' note.id %}">éditer</a></span>
-                {% endif %}
-            </div>
+                <textarea class="flex-grow-1 border-0 form-control {% if private_note_form.content.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-content" name="{{ private_note_form.content.name }}" value="{{ private_note_form.content.value|default:'' }}" placeholder="Écrivez une communication interne. Seuls les aiguilleurs pourront la voir."></textarea>
+                <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
+
+                {% for error in private_note_form.content.errors %}
+                <div class="text-danger text-end">{{ error }}</div>
+                {% endfor %}
+
+                <button class="btn mt-2 btn-primary flex-align-end" type="submit">Envoyer</button>
+            </form>
+
         </div>
     </div>
-    {% endfor %}
 </div>
-{% endif %}
+

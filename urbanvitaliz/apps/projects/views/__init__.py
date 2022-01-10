@@ -25,7 +25,7 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import is_staff_or_403, is_switchtender_or_403
 
 from .. import models, signals
-from ..forms import OnboardingForm, ProjectForm
+from ..forms import OnboardingForm, PrivateNoteForm, ProjectForm
 from ..utils import (can_administrate_or_403, can_administrate_project,
                      generate_ro_key, get_active_project,
                      refresh_user_projects_in_session, set_active_project_id)
@@ -120,6 +120,11 @@ def project_detail(request, project_id=None):
     request.user.notifications.filter(
         target_content_type=project_ct.pk, target_object_id=project.pk
     ).mark_all_as_read()
+
+    private_note_form = PrivateNoteForm()
+    switchtenders = auth.User.objects.filter(
+        tasks_created__in=project.tasks.all()
+    ).distinct()
 
     return render(request, "projects/project/detail.html", locals())
 
