@@ -74,7 +74,7 @@ def create_note(request, project_id=None):
             )
 
             return redirect(
-                reverse("projects-project-detail", args=[project_id]) + "#sheet"
+                reverse("projects-project-detail", args=[project_id]) + "#activity"
             )
     else:
         if is_switchtender:
