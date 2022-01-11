@@ -114,6 +114,11 @@ urlpatterns = [
         name="projects-rsvp-followup-task",
     ),
     path(
+        r"project/<int:project_id>/conversation/",
+        notes.create_public_note,
+        name="projects-conversation-create-message",
+    ),
+    path(
         r"project/<int:project_id>/note/",
         notes.create_note,
         name="projects-create-note",

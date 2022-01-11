@@ -7,25 +7,25 @@
     <div class="col-8">
         {% regroup project.notes.public by created_on.date as notes_by_day %}
 
-        <div class="message-window">
+        <div class="message-window flex-grow-1" style="overflow-y: auto; overflow-x: hidden; max-height: 40vh; display:flex; flex-direction:column-reverse;">
             <ul class="list-group">
-                {% for date, notes in notes_by_day|slice:":20" %}
-                <li class="list-group-item border-0">
+                {% for date, notes in notes_by_day|slice:":20" reversed %}
+                <li class="list-group-item border-0 m-0 p-0">
                     <div class="small my-2 text-center w-100 text-secondary">{{ date|naturalday|capfirst }}</div>
-                    {% for note in notes %}
-                    <div class="bg-light p-3 text-secondary">
+                    {% for note in notes reversed  %}
+                    <div class="bg-light rounded-3 p-3 text-secondary my-1">
                         {{ note.content_rendered|safe }}
                         {% if note.created_by %}
                         <div>
                         <span class="align-items-center link-dark text-decoration-none">
                             <img
-                                src="{% gravatar_url action.actor.email 32 %}"
-                                alt="{{ action.actor.get_full_name }}"
+                                src="{% gravatar_url note.created_by.email 16 %}"
+                                alt="{{ note.created_by.get_full_name }}"
                                 class="me-1 rounded-circle"
                                 style="width: 16px; height: 16px;"
                             />
                         </span>
-                        <span class="align-middle small">
+                        <span class="align-middle small text-dark">
                             {{ note.created_by.get_full_name|capfirst|default:note.created_by }}
                         </span>
                         </div>
@@ -37,13 +37,15 @@
             </ul>
         </div>
 
+        <hr/>
+
         <div class="message-form">
             <form class="form border p-3 d-flex align-items-end flex-column"
                   method="POST"
-                  action="{% url 'projects-create-note' project.pk %}">
+                  action="{% url 'projects-conversation-create-message' project.pk %}">
                 {% csrf_token %}
 
-                <textarea class="flex-grow-1 border-0 form-control {% if private_note_form.content.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-content" name="{{ private_note_form.content.name }}" value="{{ private_note_form.content.value|default:'' }}" placeholder="Écrivez une communication interne. Seuls les aiguilleurs pourront la voir."></textarea>
+                <textarea class="flex-grow-1 border-0 form-control {% if private_note_form.content.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-content" name="{{ private_note_form.content.name }}" value="{{ private_note_form.content.value|default:'' }}" placeholder="Entrez votre message."></textarea>
                 <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
 
                 {% for error in private_note_form.content.errors %}
@@ -54,6 +56,29 @@
             </form>
 
         </div>
+    </div>
+    <div class="col mx-auto">
+        {% if project.switchtender %}
+        <h6 class="mb-2">Votre aiguilleu·r·se</h6>
+
+        <div class="bg-light mt-3 p-4">
+            <span class="align-items-center link-dark text-decoration-none">
+                <img
+                    src="{% gravatar_url project.switchtender.email 32 %}"
+                    alt="{{ project.switchtender.get_full_name }}"
+                    class="me-2 rounded-circle"
+                    style="width: 32px; height: 32px;"
+                />
+            </span>
+            <span class="align-middle">
+                <strong>{{ project.switchtender.get_full_name|default:"Équipe UrbanVitaliz" }}</strong>
+            </span>
+            <p class="mt-3">
+                Bonjour, je suis là pour vous accompagner tout au long de votre parcours.
+                N'hésitez pas à prendre contact via les commentaires, je vous répondrai dès que possible.
+            </p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
