@@ -40,7 +40,13 @@ class PrivateNoteForm(forms.ModelForm):
         model = models.Note
         fields = ["content"]
 
-    # content = MarkdownxFormField()
+
+class PublicNoteForm(forms.ModelForm):
+    """Public Note creation"""
+
+    class Meta:
+        model = models.Note
+        fields = ["content"]
 
 
 ##################################################

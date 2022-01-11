@@ -262,24 +262,6 @@
 
                 -->
 
-                {% if project.survey_session.answers.count > 0  or project.tasks.count and not is_switchtender %}
-                <div class="bd-callout bd-callout-info position-relative mb-2">
-                    <h4 class="mb-3">👋 Rebonjour !</h4>
-                    {% if project.survey_session and project.survey_session.completion != 100 %}
-                    <p>
-                        N'hésitez pas à continuer l'<strong>exploration de votre site</strong> en cliquant sur l'onglet "<strong>Connaissance du site</strong>".
-                    </p>
-                    {% endif %}
-
-                    {% if project.tasks.open.count %}
-                    <p>
-                        Des <strong>recommandations d'actions</strong> de nos aiguilleuses vous attendent ! Cliquez sur l'onglet "<strong>Actions</strong>" pour y accéder.
-                    </p>
-                    {% endif %}
-
-                </div>
-                {% endif %}
-
                 <div>
                     {% include "projects/project/fragments/note_list.html" %}
                 </div>

@@ -14,8 +14,34 @@ from django.utils import timezone
 from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
 
 from .. import models, signals
-from ..forms import NoteForm, StaffNoteForm
+from ..forms import NoteForm, PublicNoteForm, StaffNoteForm
 from ..utils import can_administrate_or_403
+
+
+@login_required
+def create_public_note(request, project_id=None):
+    """Create a new note for a project"""
+    project = get_object_or_404(models.Project, pk=project_id)
+    can_administrate_or_403(project, request.user)
+
+    if request.method == "POST":
+        form = PublicNoteForm(request.POST)
+
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.project = project
+            instance.created_by = request.user
+            instance.public = True
+            instance.save()
+
+            signals.note_created.send(
+                sender=create_note,
+                note=instance,
+                project=project,
+                user=request.user,
+            )
+
+    return redirect(reverse("projects-project-detail", args=[project_id]) + "#sheet")
 
 
 @login_required
@@ -48,7 +74,7 @@ def create_note(request, project_id=None):
             )
 
             return redirect(
-                reverse("projects-project-detail", args=[project_id]) + "#sheet"
+                reverse("projects-project-detail", args=[project_id]) + "#activity"
             )
     else:
         if is_switchtender:
