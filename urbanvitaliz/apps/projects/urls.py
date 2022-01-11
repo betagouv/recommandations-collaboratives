@@ -16,6 +16,11 @@ from .views import feeds, notes, sharing, tasks
 urlpatterns = [
     path(r"onboarding/", views.onboarding, name="projects-onboarding"),
     path(
+        r"onboarding/<int:project_id>/commune/",
+        views.select_commune,
+        name="projects-onboarding-select-commune",
+    ),
+    path(
         r"login_redirect/",
         views.redirect_user_to_project,
         name="projects-redirect-user-to-project",

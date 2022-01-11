@@ -17,8 +17,7 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -144,6 +143,66 @@ def test_performing_onboarding_discard_unknown_postal_code(client):
     assert response.status_code == 302
     project = models.Project.fetch()[0]
     assert project.commune is None
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_allow_select_on_multiple_communes(client):
+    commune = Recipe(geomatics.Commune, postal="12345").make()
+    Recipe(geomatics.Commune, postal="12345").make()
+    with login(client):
+        response = client.post(
+            reverse("projects-onboarding"),
+            data={
+                "name": "a project",
+                "email": "a@example.com",
+                "location": "some place",
+                "first_name": "john",
+                "last_name": "doe",
+                "postcode": commune.postal,
+                "impediment_kinds": ["Autre"],
+                "impediments": "some impediment",
+            },
+        )
+    project = models.Project.fetch()[0]
+    assert response.status_code == 302
+    url = reverse("projects-onboarding-select-commune", args=[project.id])
+    assert response.url == (url)
+
+
+@pytest.mark.django_db
+def test_selecting_proper_commune_completes_project_creation(client):
+    commune = Recipe(geomatics.Commune, postal="12345").make()
+    selected = Recipe(geomatics.Commune, postal="12345").make()
+    with login(client) as user:
+        project = Recipe(models.Project, email=user.email, commune=commune).make()
+        response = client.post(
+            reverse("projects-onboarding-select-commune", args=[project.id]),
+            data={"commune": selected.id},
+        )
+    project = models.Project.objects.get(id=project.id)
+    assert project.commune == selected
+    assert response.status_code == 302
+    expected = reverse("survey-project-session", args=[project.id]) + "?first_time=1"
+    assert response.url == expected
+
+
+@pytest.mark.django_db
+def test_proper_commune_selection_contains_all_possible_commmunes(client):
+    expected = [
+        Recipe(geomatics.Commune, postal="12345").make(),
+        Recipe(geomatics.Commune, postal="12345").make(),
+    ]
+    unexpected = Recipe(geomatics.Commune, postal="67890").make()
+
+    with login(client) as user:
+        project = Recipe(models.Project, email=user.email, commune=expected[1]).make()
+        response = client.get(
+            reverse("projects-onboarding-select-commune", args=[project.id]),
+        )
+    page = str(response.content)
+    for commune in expected:
+        assert commune.name in page
+    assert unexpected.name not in page
 
 
 ########################################################################

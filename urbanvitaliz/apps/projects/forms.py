@@ -174,3 +174,12 @@ class OnboardingForm(forms.ModelForm):
             "impediments",
             "publish_to_cartofriches",
         ]
+
+
+class SelectCommuneForm(forms.Form):
+    def __init__(self, communes, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["commune"] = forms.ModelChoiceField(queryset=communes)
+
+
+# eof

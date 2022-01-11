@@ -3,8 +3,10 @@ from actstream import action
 from django.dispatch import receiver
 from notifications.signals import notify
 
-from .utils import (get_notification_recipients_for_project,
-                    get_switchtenders_for_project)
+from .utils import (
+    get_notification_recipients_for_project,
+    get_switchtenders_for_project,
+)
 
 #####
 # Projects
