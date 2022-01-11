@@ -1106,6 +1106,41 @@ def test_user_can_followup_on_rsvp(client):
 # notes
 ########################################################################
 
+# Public conversation
+@pytest.mark.django_db
+def test_create_conversation_message_not_available_for_non_logged_users(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-conversation-create-message", args=[project.id])
+    response = client.get(url)
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_create_conversation_message_not_available_for_outsiders(client):
+    with login(client) as user:
+        project = Recipe(models.Project).make()
+        url = reverse("projects-conversation-create-message", args=[project.id])
+        response = client.post(
+            url,
+            data={"content": "this is some content"},
+        )
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_create_conversation_message_available_for_project_collaborators(client):
+    with login(client) as user:
+        project = Recipe(models.Project, email=user.email, status="READY").make()
+        url = reverse("projects-conversation-create-message", args=[project.id])
+        response = client.post(
+            url,
+            data={"content": "this is some content"},
+        )
+    note = models.Note.objects.all()[0]
+    assert note.project == project
+    assert response.status_code == 302
+
+
 #
 # create
 
