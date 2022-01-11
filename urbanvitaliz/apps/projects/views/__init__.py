@@ -25,10 +25,20 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import is_staff_or_403, is_switchtender_or_403
 
 from .. import models, signals
-from ..forms import OnboardingForm, PrivateNoteForm, ProjectForm
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     generate_ro_key, get_active_project,
-                     refresh_user_projects_in_session, set_active_project_id)
+from ..forms import (
+    OnboardingForm,
+    SelectCommuneForm,
+    PrivateNoteForm,
+    ProjectForm,
+)
+from ..utils import (
+    can_administrate_or_403,
+    can_administrate_project,
+    generate_ro_key,
+    get_active_project,
+    refresh_user_projects_in_session,
+    set_active_project_id,
+)
 
 ########################################################################
 # On boarding
@@ -64,12 +74,43 @@ def onboarding(request):
             )
             log_user(request, user)
 
+            # NOTE check if commune is unique for code postal
+            if project.commune:
+                communes = geomatics.Commune.objects.filter(
+                    postal=project.commune.postal
+                )
+                if communes.count() > 1:
+                    url = reverse(
+                        "projects-onboarding-select-commune", args=[project.id]
+                    )
+                    return redirect(url)
+
             response = redirect("survey-project-session", project_id=project.id)
             response["Location"] += "?first_time=1"
             return response
     else:
         form = OnboardingForm()
     return render(request, "projects/onboarding.html", locals())
+
+
+@login_required
+def select_commune(request, project_id=None):
+    """Intermediate screen to select proper insee number of commune"""
+    project = get_object_or_404(models.Project, pk=project_id)
+    response = redirect("survey-project-session", project_id=project.id)
+    response["Location"] += "?first_time=1"
+    if not project.commune:
+        return response
+    communes = geomatics.Commune.objects.filter(postal=project.commune.postal)
+    if request.method == "POST":
+        form = SelectCommuneForm(communes, request.POST)
+        if form.is_valid():
+            project.commune = form.cleaned_data["commune"]
+            project.save()
+            return response
+    else:
+        form = SelectCommuneForm(communes)
+    return render(request, "projects/select-commune.html", locals())
 
 
 ########################################################################
