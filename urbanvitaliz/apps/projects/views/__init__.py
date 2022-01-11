@@ -29,6 +29,7 @@ from ..forms import (
     OnboardingForm,
     SelectCommuneForm,
     PrivateNoteForm,
+    PublicNoteForm,
     ProjectForm,
 )
 from ..utils import (
@@ -163,6 +164,8 @@ def project_detail(request, project_id=None):
     ).mark_all_as_read()
 
     private_note_form = PrivateNoteForm()
+    public_note_form = PublicNoteForm()
+
     switchtenders = auth.User.objects.filter(
         tasks_created__in=project.tasks.all()
     ).distinct()
