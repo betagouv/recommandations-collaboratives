@@ -34,11 +34,13 @@
                 <span class="small text-secondary">{{ date|naturalday|capfirst }}</span>
 
                 {% for action in actions %}
-                <div class="my-2 py-1 border-start border-4 ps-3">
+                <div class="my-3 mb-4 py-1 border-start border-4 ps-3">
 
                     {% if action.verb == 'a rédigé une note interne' %}
                     <div class="p-2 mb-2 bg-light">
                         {{ action.action_object.content_rendered|safe }}
+                        <br/>
+                        <span><a href="{% url 'projects-update-note' action.action_object.pk %}">éditer</a></span>
                     </div>
                     {% endif %}
 

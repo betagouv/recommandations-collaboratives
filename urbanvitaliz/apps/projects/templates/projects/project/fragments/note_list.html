@@ -58,27 +58,25 @@
         </div>
     </div>
     <div class="col mx-auto">
-        {% if project.switchtender %}
-        <h6 class="mb-2">Votre aiguilleu·r·se</h6>
-
+        <h6 class="mb-2">Les participant·e·s</h6>
+        {% for recipient in recipients %}
         <div class="bg-light mt-3 p-4">
             <span class="align-items-center link-dark text-decoration-none">
                 <img
-                    src="{% gravatar_url project.switchtender.email 32 %}"
-                    alt="{{ project.switchtender.get_full_name }}"
+                    src="{% gravatar_url recipient.email 32 %}"
+                    alt="{{ recipient.get_full_name }}"
                     class="me-2 rounded-circle"
                     style="width: 32px; height: 32px;"
                 />
             </span>
             <span class="align-middle">
-                <strong>{{ project.switchtender.get_full_name|default:"Équipe UrbanVitaliz" }}</strong>
+                <strong>{{ recipient.get_full_name|default:recipient.email }}</strong>
+                {% if recipient.profile.organization %}
+                - {{ recipient.profile.organization.name }}
+                {% endif %}
             </span>
-            <p class="mt-3">
-                Bonjour, je suis là pour vous accompagner tout au long de votre parcours.
-                N'hésitez pas à prendre contact via les commentaires, je vous répondrai dès que possible.
-            </p>
         </div>
-        {% endif %}
+        {% endfor %}
     </div>
 </div>
 
