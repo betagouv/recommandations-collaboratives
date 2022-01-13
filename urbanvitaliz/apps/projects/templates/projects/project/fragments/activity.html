@@ -87,7 +87,7 @@
             </span>
 
             <span class="align-middle">
-                <strong>{{ switchtender.get_full_name }}</strong>
+                <strong>{{ switchtender.get_full_name|default:"Equipe UrbanVitaliz" }}</strong>
                 {% if switchtender.profile.organization %}
                 - {{ switchtender.profile.organization.name }}
                 {% endif %}

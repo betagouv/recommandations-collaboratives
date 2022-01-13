@@ -60,7 +60,9 @@ def can_administrate_or_403(project, user, allow_draft=False):
 
 def get_switchtenders_for_project(project):
     """Return all the switchtenders for a given project"""
-    users = auth_models.User.objects.filter(groups__name="switchtender")
+    users = auth_models.User.objects.filter(groups__name="switchtender").exclude(
+        groups__name="fake_switchtender"
+    )
 
     if project.commune and project.commune.department:
         users = users.filter(
