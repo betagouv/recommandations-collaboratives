@@ -130,6 +130,19 @@
             </div>
 
             <div class="row">
+                <div class="col-12">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control {% if form.location.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.location.name }}" placeholder="Adresse" value="{{ form.location.value|default:'' }}" required>
+                        <label for="input-project-address">Adresse</label>
+                        <div id="input-email-help" class="form-text">Si la friche n'a pas d'adresse exacte, utilisez uniquement le nom de la commune.</div>
+
+                        {% for error in form.location.errors %}
+                        <div class="text-danger text-end">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
                 <div class="col-3">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control {% if form.postcode.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.postcode.name }}" placeholder="Code Postal" value="{{ form.postcode.value|default:'' }}" required>
@@ -139,18 +152,6 @@
                         <div class="text-danger text-end">{{ error }}</div>
                         {% endfor %}
                     </div>
-                </div>
-                <div class="col">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control {% if form.location.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.location.name }}" placeholder="Adresse" value="{{ form.location.value|default:'' }}" required>
-                        <label for="input-project-address">{{ form.location.label }}</label>
-                        <div id="input-email-help" class="form-text">Si la friche n'a pas d'adresse exacte, utilisez uniquement le nom de la commune.</div>
-
-                        {% for error in form.location.errors %}
-                        <div class="text-danger text-end">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-
                 </div>
 
             </div>
