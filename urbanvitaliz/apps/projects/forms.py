@@ -185,7 +185,9 @@ class OnboardingForm(forms.ModelForm):
 class SelectCommuneForm(forms.Form):
     def __init__(self, communes, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["commune"] = forms.ModelChoiceField(queryset=communes)
+        self.fields["commune"] = forms.ModelChoiceField(
+            queryset=communes, widget=forms.RadioSelect, label="Votre commune :"
+        )
 
 
 # eof
