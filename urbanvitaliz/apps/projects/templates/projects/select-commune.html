@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %} | Solliciter l'équipe UrbanVitaliz{% endblock %}
+
+{% block og_title %} | Solliciter l'équipe UrbanVitaliz{% endblock %}
+
+{% block css %}
+<style type="text/css">
+ .commune-select ul {
+     list-style-type: none;
+     margin-left: 0;
+     }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="col-11 col-lg-9 py-5 mx-auto">
+    <h2>
+        <svg class="bi me-2" width="32" height="32">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#megaphone"/>
+        </svg>
+        Solliciter l'équipe UrbanVitaliz
+    </h2>
+
+    <h3 class="py-2">Merci ! Pourriez-vous nous préciser votre commune ?</h3>
+
+    <form class="form" action="." method="POST">
+        {% csrf_token %}
+        <span class="mt-4">Nous avons trouvé <strong>plusieurs communes</strong> correspondantes à ce code postal, laquelle est la vôtre ?</span>
+        <div class="commune-select">
+            {{ form.as_p }}
+        </div>
+
+        <button class="btn btn-primary" type="submit">Valider</button>
+    </form>
+
+{% endblock %}
+
+
