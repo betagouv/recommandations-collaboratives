@@ -66,7 +66,7 @@ def test_performing_onboarding_create_a_new_project(client):
         "impediments": "some impediment",
     }
     response = client.post(reverse("projects-onboarding"), data=data)
-    project = models.Project.fetch()[0]
+    project = models.Project.objects.all()[0]
     assert project.name == "a project"
     assert project.status == "DRAFT"
     assert len(project.ro_key) == 32
@@ -103,6 +103,26 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(client):
 
 
 @pytest.mark.django_db
+def test_performing_onboarding_sends_notification_to_project_moderators(client):
+    group = Recipe(auth.Group, name="project_moderator").make()
+    moderator = Recipe(auth.User, email="moderator@example.com", groups=[group]).make()
+
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "location": "some place",
+        "first_name": "john",
+        "last_name": "doe",
+        "impediment_kinds": ["Autre"],
+        "impediments": "some impediment",
+    }
+
+    client.post(reverse("projects-onboarding"), data=data)
+
+    assert moderator.notifications.count() == 1
+
+
+@pytest.mark.django_db
 def test_performing_onboarding_sets_existing_postal_code(client):
     commune = Recipe(geomatics.Commune, postal="12345").make()
     with login(client):
@@ -120,7 +140,7 @@ def test_performing_onboarding_sets_existing_postal_code(client):
             },
         )
     assert response.status_code == 302
-    project = models.Project.fetch()[0]
+    project = models.Project.objects.all()[0]
     assert project.commune == commune
 
 
@@ -141,7 +161,7 @@ def test_performing_onboarding_discard_unknown_postal_code(client):
             },
         )
     assert response.status_code == 302
-    project = models.Project.fetch()[0]
+    project = models.Project.objects.all()[0]
     assert project.commune is None
 
 
@@ -490,6 +510,64 @@ def test_accept_project_and_redirect(client):
 
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertRedirects(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_accept_project_notifies_regional_actors(client):
+    group = auth.Group.objects.get(name="switchtender")
+
+    dpt_nord = Recipe(geomatics.Department, code=59, name="Nord").make()
+    commune = Recipe(
+        geomatics.Commune, name="Lille", postal="59000", department=dpt_nord
+    ).make()
+    regional_actor = Recipe(auth.User).make()
+    regional_actor.groups.add(group)
+    regional_actor.profile.departments.add(dpt_nord)
+
+    project = Recipe(models.Project, commune=commune, email=regional_actor.email).make()
+
+    with login(client, groups=["switchtender"]):
+        client.post(reverse("projects-project-accept", args=[project.id]))
+
+    assert regional_actor.notifications.count() == 1
+
+
+@pytest.mark.django_db
+def test_accept_project_does_not_notify_non_regional_actors(client):
+    group = auth.Group.objects.get(name="switchtender")
+
+    dpt_nord = Recipe(geomatics.Department, code=59, name="Nord").make()
+    dpt_pdc = Recipe(geomatics.Department, code=62, name="Pas de Calais").make()
+    commune = Recipe(
+        geomatics.Commune, name="Lille", postal="59000", department=dpt_nord
+    ).make()
+
+    non_regional_actor = Recipe(auth.User, email="somewhere@else.info").make()
+    non_regional_actor.groups.add(group)
+    non_regional_actor.profile.departments.add(dpt_pdc)
+
+    owner = Recipe(auth.User, email="here@project.info").make()
+    project = Recipe(models.Project, commune=commune, email=owner.email).make()
+
+    with login(client, groups=["switchtender"]):
+        client.post(reverse("projects-project-accept", args=[project.id]))
+
+    assert non_regional_actor.notifications.count() == 0
+
+
+@pytest.mark.django_db
+def test_accept_project_notifies_owners(client):
+    owner = Recipe(auth.User, email="owner@project.mine").make()
+    project = Recipe(
+        models.Project,
+        email=owner.email,
+        emails=[owner.email],
+    ).make()
+
+    with login(client, groups=["switchtender"]):
+        client.post(reverse("projects-project-accept", args=[project.id]))
+
+    assert owner.notifications.count() == 1
 
 
 ########################################################################
@@ -1176,7 +1254,7 @@ def test_create_conversation_message_not_available_for_non_logged_users(client):
 
 @pytest.mark.django_db
 def test_create_conversation_message_not_available_for_outsiders(client):
-    with login(client) as user:
+    with login(client):
         project = Recipe(models.Project).make()
         url = reverse("projects-conversation-create-message", args=[project.id])
         response = client.post(
