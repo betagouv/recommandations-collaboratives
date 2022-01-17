@@ -175,7 +175,7 @@
 
             <div class="mb-3">
                 <!-- Impediments -->
-                <textarea class="form-control {% if form.impediments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-impediments" name="{{ form.impediments.name }}" value="{{ form.impediments.value|default:'' }}" placeholder="N'hésitez pas à préciser votre demande en quelques mots"></textarea>
+                <textarea class="form-control {% if form.impediments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-impediments" name="{{ form.impediments.name }}" value="{{ form.impediments.value|default:'' }}" placeholder="N'hésitez pas à préciser votre demande en quelques mots" required></textarea>
                 <label class="visually-hidden" for="input-project-impediments">{{ form.impediments.label }}</label>
 
                 {% for error in form.impediments.errors %}
