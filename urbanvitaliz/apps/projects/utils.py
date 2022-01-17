@@ -58,11 +58,26 @@ def can_administrate_or_403(project, user, allow_draft=False):
     raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
+def get_project_moderators():
+    """Return all the moderators for projects"""
+    return auth_models.User.objects.filter(groups__name="project_moderator")
+
+
+def get_regional_actors_for_project(project):
+    """Return regional actors for a given project"""
+    if not project.commune or not project.commune.department:
+        return auth_models.User.objects.none()
+
+    users = auth_models.User.objects.filter(groups__name="switchtender")
+
+    users = users.filter(Q(profile__departments=project.commune.department))
+
+    return users.distinct()
+
+
 def get_switchtenders_for_project(project):
     """Return all the switchtenders for a given project"""
-    users = auth_models.User.objects.filter(groups__name="switchtender").exclude(
-        groups__name="fake_switchtender"
-    )
+    users = auth_models.User.objects.filter(groups__name="switchtender")
 
     if project.commune and project.commune.department:
         users = users.filter(

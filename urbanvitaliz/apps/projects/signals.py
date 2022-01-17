@@ -1,10 +1,14 @@
 import django.dispatch
 from actstream import action
+from django.contrib.auth import models as auth_models
 from django.dispatch import receiver
 from notifications.signals import notify
 
 from .utils import (
+    get_collaborators_for_project,
     get_notification_recipients_for_project,
+    get_project_moderators,
+    get_regional_actors_for_project,
     get_switchtenders_for_project,
 )
 
@@ -12,11 +16,54 @@ from .utils import (
 # Projects
 #####
 project_submitted = django.dispatch.Signal()
+project_validated = django.dispatch.Signal()
 
 
 @receiver(project_submitted)
-def log_project_submitted(sender, project, **kwargs):
+def log_project_submitted(sender, submitter, project, **kwargs):
     action.send(project, verb="a été déposé")
+
+    recipients = get_project_moderators()
+
+    # Notify project moderators
+    notify.send(
+        sender=submitter,
+        recipient=recipients,
+        verb="a déposé le projet",
+        action_object=project,
+        target=project,
+        private=True,
+    )
+
+
+@receiver(project_validated)
+def log_project_validated(sender, moderator, project, **kwargs):
+    action.send(project, verb="a été validé")
+
+    # Notify project owners of approval
+    notify.send(
+        sender=moderator,
+        recipient=get_collaborators_for_project(project),
+        verb="a validé le projet",
+        action_object=project,
+        target=project,
+        private=True,
+    )
+
+    # Notify regional actors of a new project
+    try:
+        owner = auth_models.User.objects.get(email=project.email)
+    except auth_models.User.DoesNotExist:
+        return
+
+    notify.send(
+        sender=owner,
+        recipient=get_regional_actors_for_project(project),
+        verb="a déposé le projet",
+        action_object=project,
+        target=project,
+        private=True,
+    )
 
 
 #####
