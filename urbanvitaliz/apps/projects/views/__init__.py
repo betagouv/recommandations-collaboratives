@@ -25,22 +25,12 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import is_staff_or_403, is_switchtender_or_403
 
 from .. import models, signals
-from ..forms import (
-    OnboardingForm,
-    PrivateNoteForm,
-    ProjectForm,
-    PublicNoteForm,
-    SelectCommuneForm,
-)
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    generate_ro_key,
-    get_active_project,
-    get_notification_recipients_for_project,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from ..forms import (OnboardingForm, PrivateNoteForm, ProjectForm,
+                     PublicNoteForm, SelectCommuneForm)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     generate_ro_key, get_active_project,
+                     get_notification_recipients_for_project,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -202,6 +192,7 @@ def project_update(request, project_id=None):
             project.commune = geomatics.Commune.get_by_postal_code(postcode)
             instance.updated_on = timezone.now()
             instance.save()
+            form.save_m2m()
             return redirect(reverse("projects-project-detail", args=[project_id]))
     else:
         if project.commune:
