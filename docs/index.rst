@@ -11,6 +11,7 @@ Welcome to UrbanVitaliz's documentation!
    :caption: Contents:
 
 
+   permissions.rst
    workflows.rst
 
 
