@@ -21,7 +21,7 @@
             </a>
         </span>
         {% endif %}
-        {% if is_switchtender %}
+        {% if request.user in project.switchtenders.all %}
         <span class="d-inline-block"> 
             <a href="{% url 'projects-project-update' project.id %}" class="btn btn-light w-100 btn-sm">
                 <svg class="bi" width="16" height="16" fill="currentColor">
@@ -37,6 +37,16 @@
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
                 </svg>
                 Ajouter une action
+            </a>
+        </span>
+        {% elif is_regional_actor %}
+        <span class="d-inline-block">
+            <a href="{% url 'projects-project-update' project.id %}" class="btn btn-light w-100 btn-sm">
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-split"/>
+                </svg>
+                &nbsp;
+                Aiguiller ce dossier
             </a>
         </span>
         {% endif %}

@@ -15,14 +15,14 @@ from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
 
 from .. import models, signals
 from ..forms import NoteForm, PublicNoteForm, StaffNoteForm
-from ..utils import can_administrate_or_403
+from ..utils import can_manage_or_403
 
 
 @login_required
 def create_public_note(request, project_id=None):
     """Create a new note for a project"""
     project = get_object_or_404(models.Project, pk=project_id)
-    can_administrate_or_403(project, request.user)
+    can_manage_or_403(project, request.user)
 
     if request.method == "POST":
         form = PublicNoteForm(request.POST)
@@ -48,7 +48,7 @@ def create_public_note(request, project_id=None):
 def create_note(request, project_id=None):
     """Create a new note for a project"""
     project = get_object_or_404(models.Project, pk=project_id)
-    can_administrate_or_403(project, request.user, allow_draft=True)
+    can_manage_or_403(project, request.user, allow_draft=True)
     is_switchtender = check_if_switchtender(request.user)
 
     if request.method == "POST":
@@ -89,7 +89,7 @@ def update_note(request, note_id=None):
     """Update an existing note for a project"""
     note = get_object_or_404(models.Note, pk=note_id)
     project = note.project  # For template consistency
-    can_administrate_or_403(project, request.user, allow_draft=True)
+    can_manage_or_403(project, request.user, allow_draft=True)
     is_switchtender = check_if_switchtender(request.user)
 
     if not note.public:

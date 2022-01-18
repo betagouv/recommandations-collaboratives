@@ -27,9 +27,11 @@ from urbanvitaliz.utils import is_staff_or_403, is_switchtender_or_403
 from .. import models, signals
 from ..forms import (OnboardingForm, PrivateNoteForm, ProjectForm,
                      PublicNoteForm, SelectCommuneForm)
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     generate_ro_key, get_active_project,
+from ..utils import (can_manage_or_403, can_manage_project, generate_ro_key,
+                     get_active_project,
                      get_notification_recipients_for_project,
+                     get_regional_actors_for_project,
+                     get_switchtenders_for_project,
                      refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
@@ -132,7 +134,7 @@ def project_detail(request, project_id=None):
 
     # check user can administrate projet (member or switchtender)
     if request.user.email != project.email:
-        can_administrate_or_403(project, request.user)
+        can_manage_or_403(project, request.user)
 
     # Set this project as active
     set_active_project_id(request, project.pk)
@@ -145,10 +147,15 @@ def project_detail(request, project_id=None):
     except survey_models.Survey.DoesNotExist:
         session = None
 
-    can_administrate = can_administrate_project(project, request.user)
-    can_administrate_draft = can_administrate_project(
-        project, request.user, allow_draft=True
-    )
+    # can_read
+    # can_edit
+    # can_manage
+    # can_administrate
+
+    can_manage = can_manage_project(project, request.user)
+    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
+    is_regional_actor = request.user in get_regional_actors_for_project(project)
+    # can_administrate = request.user in get_switchtenders_for_project(project)
 
     # Mark this project notifications unread
     project_ct = ContentType.objects.get_for_model(project)
@@ -159,9 +166,6 @@ def project_detail(request, project_id=None):
     private_note_form = PrivateNoteForm()
     public_note_form = PublicNoteForm()
 
-    switchtenders = auth.User.objects.filter(
-        tasks_created__in=project.tasks.all()
-    ).distinct()
     recipients = get_notification_recipients_for_project(project)
 
     return render(request, "projects/project/detail.html", locals())
@@ -174,7 +178,7 @@ def project_detail_from_sharing_link(request, project_ro_key):
     except Exception:
         raise Http404()
 
-    can_administrate = can_administrate_project(project, request.user)
+    can_manage = can_manage_project(project, request.user)
 
     return render(request, "projects/project/detail-ro.html", locals())
 
