@@ -20,19 +20,34 @@ from . import models
 
 
 def can_manage_project(project, user, allow_draft=False):
-    """Check if user is allowed to administrate this project"""
+    """Check if user is allowed to manage this project"""
+    """ Managing means editing most things, except internal data"""
     if user.is_anonymous:
         return False
 
     if is_member(user, project, allow_draft):
         return True
 
-    if user.has_perm("projects.can_administrate_project") and in_allowed_departments(
-        user, project
-    ):
+    return False
+
+
+def can_administrate_project(project, user):
+    """Check if user is allowed to manage this project"""
+    if user.is_anonymous:
+        return False
+
+    if user.is_staff:
         return True
 
-    return False
+    return user in project.switchtenders.all()
+
+
+def can_administrate_or_403(project, user):
+    """Raise a 403 error is user is not an assigned switchtender or admin"""
+    if can_administrate_project(project, user):
+        return True
+
+    raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
 def is_member(user, project, allow_draft):

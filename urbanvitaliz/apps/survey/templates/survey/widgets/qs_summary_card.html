@@ -61,11 +61,11 @@
 
                         {% if show_question or not choices %}
                             <div>
-                                {% if can_administrate %}
+                                {% if can_manage %}
                                 <a class="text-decoration-none stretched-link link-edit" href="{% url 'survey-question-details' session.id answer.question.id %}">
                                     {% endif %}
                                     <h6 class="m-0 d-inline align-middle text-uppercase">{{ answer.question.text_short|default:answer.question.text }}</h6>
-                                    {% if can_administrate %}
+                                    {% if can_manage %}
                                 </a>
                                 {% endif %}
                         </div>
@@ -74,7 +74,7 @@
 
                         {% if show_answers or show_conclusion %}
                         <ul class="list-unstyled">
-                            {% if can_administrate and not show_question %}
+                            {% if can_manage and not show_question %}
                             <a class="link-edit stretched-link text-decoration-none" href="{% url 'survey-question-details' session.id answer.question.id %}">
                                 {% endif %}
                             {% for choice in choices %}
@@ -89,7 +89,7 @@
                                 </li>
                             {% endif %}
                             {% endfor %}
-                            {% if can_administrate and not show_question %}
+                            {% if can_manage and not show_question %}
                             </a>
                             {% endif %}
                         </ul>
@@ -125,7 +125,7 @@
                     </div>
                     {% endif %}
                         </div>
-                        {% if can_administrate %}
+                        {% if can_manage %}
                         <div class="flex-shrink-1 next-arrow">
                             <svg class="align-middle bi" width="26px" height="26px" fill="currentColor" style="color: {{ question_set.color|default:'black' }} !important;">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-right-short"/>
@@ -138,7 +138,7 @@
             </p>
         </div>
 
-        {% if can_administrate and completion < 100 %}
+        {% if can_manage and completion < 100 %}
         <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}" class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2" style="background-color: {{ question_set.color|default:'black' }} !important;">Compléter cette section</a>
         {% endif %}
     </div>

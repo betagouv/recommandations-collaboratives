@@ -27,8 +27,8 @@ from urbanvitaliz.utils import is_staff_or_403, is_switchtender_or_403
 from .. import models, signals
 from ..forms import (OnboardingForm, PrivateNoteForm, ProjectForm,
                      PublicNoteForm, SelectCommuneForm)
-from ..utils import (can_manage_or_403, can_manage_project, generate_ro_key,
-                     get_active_project,
+from ..utils import (can_administrate_project, can_manage_or_403,
+                     can_manage_project, generate_ro_key, get_active_project,
                      get_notification_recipients_for_project,
                      get_regional_actors_for_project,
                      get_switchtenders_for_project,
@@ -147,15 +147,10 @@ def project_detail(request, project_id=None):
     except survey_models.Survey.DoesNotExist:
         session = None
 
-    # can_read
-    # can_edit
-    # can_manage
-    # can_administrate
-
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
     is_regional_actor = request.user in get_regional_actors_for_project(project)
-    # can_administrate = request.user in get_switchtenders_for_project(project)
+    can_administrate = can_administrate_project(project, request.user)
 
     # Mark this project notifications unread
     project_ct = ContentType.objects.get_for_model(project)
