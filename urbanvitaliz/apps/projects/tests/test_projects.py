@@ -104,8 +104,11 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(client):
 
 @pytest.mark.django_db
 def test_performing_onboarding_sends_notification_to_project_moderators(client):
-    group = Recipe(auth.Group, name="project_moderator").make()
-    moderator = Recipe(auth.User, email="moderator@example.com", groups=[group]).make()
+    md_group = Recipe(auth.Group, name="project_moderator").make()
+    st_group, created = auth.Group.objects.get_or_create(name="switchtender")
+    moderator = Recipe(
+        auth.User, email="moderator@example.com", groups=[md_group, st_group]
+    ).make()
 
     data = {
         "name": "a project",
@@ -318,27 +321,6 @@ def test_project_list_available_for_switchtender_user(client):
 
 
 @pytest.mark.django_db
-def test_project_list_includes_project_for_global_switchtender(client):
-    project = Recipe(models.Project).make()
-    url = reverse("projects-project-list")
-    with login(client, groups=["switchtender"]):
-        response = client.get(url)
-    detail_url = reverse("projects-project-detail", args=[project.id])
-    assertContains(response, detail_url)
-
-
-@pytest.mark.django_db
-def test_project_list_includes_project_in_switchtender_departments(client):
-    project = Recipe(models.Project, commune__department__code="01").make()
-    url = reverse("projects-project-list")
-    with login(client, groups=["switchtender"]) as user:
-        user.profile.departments.add(project.commune.department)
-        response = client.get(url)
-    detail_url = reverse("projects-project-detail", args=[project.id])
-    assertContains(response, detail_url)
-
-
-@pytest.mark.django_db
 def test_project_list_excludes_project_not_in_switchtender_departments(client):
     department = Recipe(geomatics.Department, code="00").make()
     project = Recipe(models.Project, commune__department__code="01").make()
@@ -384,14 +366,14 @@ def test_project_detail_available_for_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_project_detail_not_available_for_restricted_switchtender(client):
+def test_project_detail_available_for_restricted_switchtender(client):
     other = Recipe(geomatics.Department, code="02").make()
     project = Recipe(models.Project, commune__departments__code="01").make()
     url = reverse("projects-project-detail", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
         user.profile.departments.add(other)
         response = client.get(url)
-    assert response.status_code == 403
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
@@ -408,10 +390,11 @@ def test_project_detail_contains_informations(client):
 
 
 @pytest.mark.django_db
-def test_project_detail_contains_actions(client):
+def test_project_detail_contains_actions_for_switchtender(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-project-detail", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         response = client.get(url)
     add_task_url = reverse("projects-create-task", args=[project.id])
     assertContains(response, add_task_url)
@@ -437,7 +420,8 @@ def test_update_project_not_available_for_non_staff_users(client):
 def test_update_project_available_for_switchtender(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-project-update", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         response = client.get(url)
     assert response.status_code == 200
 
@@ -457,7 +441,8 @@ def test_update_project_wo_commune_and_redirect(client):
         "impediment": "some impediment",
     }
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         response = client.post(url, data=data)
 
     project = models.Project.objects.get(id=project.id)
@@ -474,7 +459,8 @@ def test_update_project_with_commune(client):
     project = Recipe(models.Project, commune=commune).make()
     url = reverse("projects-project-update", args=[project.id])
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         response = client.get(url)
 
     assertContains(response, "<form")
@@ -498,10 +484,11 @@ def test_accept_project_not_available_for_non_staff_users(client):
 @pytest.mark.django_db
 def test_accept_project_and_redirect(client):
     project = Recipe(models.Project).make()
+    Recipe(auth.Group, name="project_moderator").make()
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["project_moderator", "switchtender"]):
         response = client.post(url)
 
     project = models.Project.objects.get(id=project.id)
@@ -514,19 +501,20 @@ def test_accept_project_and_redirect(client):
 
 @pytest.mark.django_db
 def test_accept_project_notifies_regional_actors(client):
-    group = auth.Group.objects.get(name="switchtender")
+    st_group, created = auth.Group.objects.get_or_create(name="switchtender")
+    auth.Group.objects.get_or_create(name="project_moderator")
 
     dpt_nord = Recipe(geomatics.Department, code=59, name="Nord").make()
     commune = Recipe(
         geomatics.Commune, name="Lille", postal="59000", department=dpt_nord
     ).make()
     regional_actor = Recipe(auth.User).make()
-    regional_actor.groups.add(group)
+    regional_actor.groups.add(st_group)
     regional_actor.profile.departments.add(dpt_nord)
 
     project = Recipe(models.Project, commune=commune, email=regional_actor.email).make()
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender", "project_moderator"]):
         client.post(reverse("projects-project-accept", args=[project.id]))
 
     assert regional_actor.notifications.count() == 1
@@ -557,6 +545,7 @@ def test_accept_project_does_not_notify_non_regional_actors(client):
 
 @pytest.mark.django_db
 def test_accept_project_notifies_owners(client):
+    auth.Group.objects.get_or_create(name="project_moderator")
     owner = Recipe(auth.User, email="owner@project.mine").make()
     project = Recipe(
         models.Project,
@@ -564,7 +553,7 @@ def test_accept_project_notifies_owners(client):
         emails=[owner.email],
     ).make()
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender", "project_moderator"]):
         client.post(reverse("projects-project-accept", args=[project.id]))
 
     assert owner.notifications.count() == 1
@@ -624,7 +613,8 @@ def test_switchtender_can_add_email_to_project(client):
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "test@example.com"}
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         client.post(url, data=data)
 
     project = models.Project.objects.get(id=project.id)
@@ -712,7 +702,8 @@ def test_switchtender_can_delete_email_from_project(client):
     project = Recipe(models.Project, emails=[email]).make()
     url = reverse("projects-access-delete", args=[project.id, email])
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         response = client.post(url)
 
     project = models.Project.objects.get(id=project.id)
@@ -728,7 +719,8 @@ def test_owner_cannot_be_removed_from_project_acl(client):
     project = Recipe(models.Project, email=email, emails=[email]).make()
     url = reverse("projects-access-delete", args=[project.id, email])
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         response = client.post(url)
 
     project = models.Project.objects.get(id=project.id)
@@ -1119,6 +1111,7 @@ def test_followup_triggers_notifications(client):
             status="READY",
             email=user.email,
             emails=[user.email, collab.email],
+            switchtenders=[switchtender],
         )
         task = baker.make(models.Task, project=project)
         url = reverse("projects-followup-task", args=[task.id])
@@ -1260,7 +1253,8 @@ def test_create_note_not_available_for_non_staff_users(client):
 def test_create_note_available_for_switchtender(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-create-note", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-projects-add-note"')
@@ -1279,7 +1273,8 @@ def test_create_note_available_for_project_collaborators(client):
 @pytest.mark.django_db
 def test_create_new_note_for_project_and_redirect(client):
     project = Recipe(models.Project).make()
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
             data={"content": "this is some content"},
@@ -1336,7 +1331,8 @@ def test_public_note_available_to_readers(client):
     user_email = "not@admin.here"
     note_content = "this is a public note"
     project = Recipe(models.Project, emails=[user_email], status="READY").make()
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
             data={"content": note_content, "public": "True"},
@@ -1365,7 +1361,8 @@ def test_update_note_not_available_for_non_staff_users(client):
 def test_update_note_available_for_switchtender(client):
     note = Recipe(models.Note).make()
     url = reverse("projects-update-note", args=[note.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        note.project.switchtenders.add(user)
         response = client.get(url)
     assert response.status_code == 200
     # FIXME rename add-note to edit-note ?
@@ -1405,7 +1402,8 @@ def test_update_note_for_project_and_redirect(client):
     url = reverse("projects-update-note", args=[note.id])
     data = {"content": "this is some content"}
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        note.project.switchtenders.add(user)
         response = client.post(url, data=data)
 
     note = models.Note.objects.get(id=note.id)

@@ -22,9 +22,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
-        return models.Project.objects.in_departments(
-            self.request.user.profile.departments.all()
-        ).order_by("-created_on", "-updated_on")
+        return models.Project.objects.for_user(self.request.user).order_by(
+            "-created_on", "-updated_on"
+        )
 
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]

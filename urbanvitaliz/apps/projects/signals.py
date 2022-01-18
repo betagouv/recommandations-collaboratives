@@ -4,13 +4,10 @@ from django.contrib.auth import models as auth_models
 from django.dispatch import receiver
 from notifications.signals import notify
 
-from .utils import (
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -23,6 +20,9 @@ project_validated = django.dispatch.Signal()
 def log_project_submitted(sender, submitter, project, **kwargs):
     action.send(project, verb="a été déposé")
 
+
+@receiver(project_submitted)
+def notify_moderators_project_submitted(sender, submitter, project, **kwargs):
     recipients = get_project_moderators()
 
     # Notify project moderators

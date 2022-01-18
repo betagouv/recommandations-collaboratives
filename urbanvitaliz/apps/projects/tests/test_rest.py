@@ -10,7 +10,11 @@ created: 2021-06-01 10:11:56 CEST
 
 import pytest
 from django.urls import reverse
+from model_bakery.recipe import Recipe
+from pytest_django.asserts import assertContains
 from urbanvitaliz.utils import login
+
+from .. import models
 
 
 ########################################################################
@@ -29,3 +33,25 @@ def test_logged_in_user_can_use_project_api(client):
     with login(client):
         response = client.get(url)
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_list_includes_project_for_switchtender(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-list")
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+        response = client.get(url)
+
+    assertContains(response, project.name)
+
+
+@pytest.mark.django_db
+def test_project_list_includes_project_in_switchtender_departments(client):
+    project = Recipe(models.Project, commune__department__code="01").make()
+    url = reverse("projects-list")
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.departments.add(project.commune.department)
+        response = client.get(url)
+
+    assertContains(response, project.name)

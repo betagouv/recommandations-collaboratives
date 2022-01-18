@@ -40,6 +40,7 @@ def test_switchtender_can_manage_project(client):
     group = auth.Group.objects.get(name="switchtender")
     switchtender.groups.add(group)
     project = Recipe(models.Project, status="READY").make()
+    project.switchtenders.add(switchtender)
 
     assert utils.can_manage_project(project, switchtender)
 

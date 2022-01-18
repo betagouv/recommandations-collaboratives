@@ -54,6 +54,7 @@
 	      <div x-data="kanban_app()" x-init="getTasks()" x-cloak class="d-flex flex-column border p-0 m-0">
             <div class="topbar d-flex justify-content-between bg-light border-bottom p-2">
                 <span class="fs-5 flex-grow-1">
+                    {% if project_moderator %}
                     <svg class="align-middle bi" width="24px" height="24px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#binoculars"/>
                     </svg>
@@ -64,9 +65,12 @@
                         {% endif %}
                     </span>
 
+                    -
+                    {% endif %}
+
                     {% notifications_unread as unread_count %}
                     {% if unread_count %}
-                    -
+
                     <div class="d-inline">
                         <svg class="align-middle text-danger bi" width="16px" height="16px" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-fill"/>
@@ -222,6 +226,7 @@
             {% endif %}
         </div>
 
+        {% if project_moderator %}
         <!-- Draft Projects -->
         <div class="row mx-auto mt-4">
             <div class="col-12 mx-auto">
@@ -294,6 +299,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
 
 

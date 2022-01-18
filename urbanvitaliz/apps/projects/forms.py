@@ -8,6 +8,7 @@ created : 2021-12-14 10:36:20 CEST
 """
 
 from django import forms
+from django.contrib.auth import models as auth_models
 from markdownx.fields import MarkdownxFormField
 
 from . import models
@@ -138,6 +139,17 @@ class RemindTaskForm(forms.Form):
 ##################################################
 class ProjectForm(forms.ModelForm):
     """Form for updating the base information of a project"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        try:
+            st_group = auth_models.Group.objects.get(name="switchtender")
+            self.fields["switchtenders"].queryset = self.fields[
+                "switchtenders"
+            ].queryset.filter(groups=st_group)
+        except auth_models.Group.DoesNotExist:
+            pass
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
     publish_to_cartofriches = forms.BooleanField(

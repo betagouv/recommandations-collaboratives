@@ -22,6 +22,7 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.utils import check_if_switchtender
 
 from .utils import generate_ro_key
 
@@ -35,10 +36,33 @@ class ProjectQuerySet(models.QuerySet):
 
     def in_departments(self, departments):
         """Return only project with commune in department scope (empty=full)"""
-        result = self.filter(deleted=None)
+        result = self.filter(deleted=None).exclude(commune=None)
         if departments:
             result = result.filter(commune__department__in=departments)
         return result
+
+    def for_user(self, user):
+        """Return a list of projects visible to the user"""
+        result = self.filter(deleted=None)
+
+        # Staff can see anything
+        if user.is_staff:
+            return result
+
+        # Regional actors can see projects of their area
+        if check_if_switchtender(user):
+            actor_departments = user.profile.departments.all()
+            # XXX We may be missing arbitrary assigned projects as switchtender
+            # (outside of area)
+            results = self.in_departments(actor_departments)
+
+            results = results | self.filter(switchtenders=user)
+
+            return results.distinct()
+
+        # Regular user, only return its own projects
+        else:
+            return self.email(user.email)
 
 
 class DeletedProjectManager(models.Manager):

@@ -20,23 +20,32 @@ from . import models
 
 
 def can_manage_project(project, user, allow_draft=False):
-    """Check if user is allowed to manage this project"""
-    """ Managing means editing most things, except internal data"""
+    """
+    Check if user is allowed to manage this project.
+    Managing means editing most things, except internal data.
+    Project managers are mostly team members of the project.
+    """
     if user.is_anonymous:
         return False
 
     if is_member(user, project, allow_draft):
         return True
 
+    if can_administrate_project(project, user):
+        return True
+
     return False
 
 
 def can_administrate_project(project, user):
-    """Check if user is allowed to manage this project"""
+    """
+    Check if user is allowed to administrate this project.
+    Administrators are mostly assigned switchtenders
+    """
     if user.is_anonymous:
         return False
 
-    if user.is_staff:
+    if user.is_superuser:
         return True
 
     return user in project.switchtenders.all()
@@ -75,19 +84,42 @@ def can_manage_or_403(project, user, allow_draft=False):
 
 def get_project_moderators():
     """Return all the moderators for projects"""
-    return auth_models.User.objects.filter(groups__name="project_moderator")
+    return auth_models.User.objects.filter(groups__name="project_moderator").filter(
+        groups__name="switchtender"
+    )
 
 
-def get_regional_actors_for_project(project):
+def is_project_moderator(user):
+    """Check if this user is allowed to moderate new projects"""
+    return (user in get_project_moderators()) or user.is_superuser
+
+
+def is_project_moderator_or_403(user):
+    if is_project_moderator(user):
+        return True
+
+    raise PermissionDenied("L'information demandée n'est pas disponible")
+
+
+def get_regional_actors_for_project(project, allow_national=False):
     """Return regional actors for a given project"""
     if not project.commune or not project.commune.department:
         return auth_models.User.objects.none()
 
     users = auth_models.User.objects.filter(groups__name="switchtender")
 
-    users = users.filter(Q(profile__departments=project.commune.department))
+    area_filter = Q(profile__departments=project.commune.department)
+    if allow_national:
+        area_filter = area_filter | Q(profile__departments=None)
+
+    users = users.filter(area_filter)
 
     return users.distinct()
+
+
+def is_regional_actor_for_project(project, user, allow_national=False):
+    """Check if this user is a regional actor for a given project"""
+    return user in get_regional_actors_for_project(project, allow_national)
 
 
 def get_switchtenders_for_project(project):
