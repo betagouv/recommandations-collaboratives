@@ -122,6 +122,13 @@ def is_regional_actor_for_project(project, user, allow_national=False):
     return user in get_regional_actors_for_project(project, allow_national)
 
 
+def is_regional_actor_for_project_or_403(project, user, allow_national=False):
+    if is_regional_actor_for_project(project, user, allow_national):
+        return True
+
+    raise PermissionDenied("L'information demandée n'est pas disponible")
+
+
 def get_switchtenders_for_project(project):
     """Return all the switchtenders for a given project"""
     return project.switchtenders.all().distinct()

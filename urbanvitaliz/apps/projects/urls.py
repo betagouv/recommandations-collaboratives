@@ -39,6 +39,11 @@ urlpatterns = [
         name="projects-project-update",
     ),
     path(
+        r"project/<int:project_id>/switchtender/join",
+        views.project_switchtender_join,
+        name="projects-project-switchtender-join",
+    ),
+    path(
         r"project/<int:project_id>/suggestions/",
         tasks.presuggest_task,
         name="projects-project-tasks-suggest",

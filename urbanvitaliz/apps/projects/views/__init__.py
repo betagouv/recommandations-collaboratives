@@ -34,6 +34,7 @@ from ..utils import (can_administrate_or_403, can_administrate_project,
                      get_notification_recipients_for_project,
                      is_project_moderator, is_project_moderator_or_403,
                      is_regional_actor_for_project,
+                     is_regional_actor_for_project_or_403,
                      refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
@@ -231,6 +232,25 @@ def project_accept(request, project_id=None):
         signals.project_validated.send(
             sender=models.Project, moderator=request.user, project=project
         )
+
+    return redirect(reverse("projects-project-detail", args=[project_id]))
+
+
+@login_required
+def project_switchtender_join(request, project_id=None):
+    """Join switchtender"""
+    is_switchtender_or_403(request.user)
+    project = get_object_or_404(models.Project, pk=project_id)
+    is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+
+    if request.method == "POST":
+        project.switchtenders.add(request.user)
+        project.updated_on = timezone.now()
+        project.save()
+
+        signals.project_switchtender_joined.send(sender=request.user, project=project)
+    else:
+        return render(request, "projects/project/switchtender_join.html", locals())
 
     return redirect(reverse("projects-project-detail", args=[project_id]))
 
