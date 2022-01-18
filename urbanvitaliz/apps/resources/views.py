@@ -156,7 +156,7 @@ def resource_detail(request, resource_id=None):
     active_project = projects_utils.get_active_project(request)
     active_project_actions = []
 
-    if active_project and projects_utils.can_administrate_project(
+    if active_project and projects_utils.can_manage_project(
         active_project, request.user
     ):
         active_project_actions = (

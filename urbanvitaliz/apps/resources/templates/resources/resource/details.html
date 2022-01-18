@@ -223,7 +223,7 @@
         <div class="py-1">
             <h2 class="my-5">Actions associées</h2>
             {% for action in active_project_actions %}
-            {% include 'projects/project/fragments/action_list_item.html' with task=action disable_tracking=True can_administrate=True hide_details=True %}
+            {% include 'projects/project/fragments/action_list_item.html' with task=action disable_tracking=True can_manage=True hide_details=True %}
             {% endfor %}
         </div>
         {% endif %}

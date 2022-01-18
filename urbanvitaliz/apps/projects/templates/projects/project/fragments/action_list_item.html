@@ -91,7 +91,7 @@
             </a>
             {% endif %}
         </div>
-        {% if can_administrate %}
+        {% if can_manage %}
         <div class="toolbar d-flex border-start flex-column justify-content-between">
             {% if not task.done and not task.refused %}
             <button class="p-4 btn btn-text m-0 border-bottom flex-grow-1" data-bs-toggle="modal" data-bs-target="#modal-action-{{ task.id }}">
@@ -162,7 +162,7 @@
 
                 {% endif %}
 
-                {% if not hide_details and can_administrate %}
+                {% if not hide_details and can_manage %}
                 <span class="align-middle p-1">
                     <svg class="align-middle bi" width="14px" height="14px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
@@ -226,7 +226,7 @@
                 {% endif %}
                 {% endfor %}
 
-                {% if can_administrate %}
+                {% if can_manage %}
                 <div class="m-2 comment mt-4">
                     <span class="">Répondre</span>
                     <form class="mt-2 form d-flex flex-column align-items-end" method="POST" action="{% url 'projects-followup-task' task.id %}">
