@@ -17,15 +17,15 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import login
 
-from . import models, utils, views
-from .templatetags import projects_extra
+from .. import models, views
 
 # TODO when local authority can see & update her project
 # TODO check that project, note, and task belong to her
@@ -608,41 +608,6 @@ def test_delete_project_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_contributor_has_the_same_rights_as_the_owner(client):
-    owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
-    contributor = Recipe(
-        auth.User, username="contributor", email="contributor@example.com"
-    ).make()
-    project = Recipe(
-        models.Project,
-        email=owner.email,
-        emails=[owner.email, contributor.email],
-        status="READY",
-    ).make()
-
-    assert utils.can_administrate_project(project, owner)
-    assert utils.can_administrate_project(project, contributor)
-
-
-@pytest.mark.django_db
-def test_switchtender_can_administrate_project(client):
-    switchtender = Recipe(auth.User).make()
-    group = auth.Group.objects.get(name="switchtender")
-    switchtender.groups.add(group)
-    project = Recipe(models.Project, status="READY").make()
-
-    assert utils.can_administrate_project(project, switchtender)
-
-
-@pytest.mark.django_db
-def test_non_switchtender_cannot_administrate_project(client):
-    someone = Recipe(auth.User).make()
-    project = Recipe(models.Project, status="READY").make()
-
-    assert not utils.can_administrate_project(project, someone)
-
-
-@pytest.mark.django_db
 def test_non_staff_cannot_add_email_to_project(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-access-update", args=[project.id])
@@ -818,7 +783,7 @@ def test_create_task_available_for_switchtender(client):
 
 @pytest.mark.django_db
 def test_create_task_assigns_new_switchtender(client):
-    project = Recipe(models.Project, switchtender=None).make()
+    project = Recipe(models.Project, switchtenders=[]).make()
     url = reverse("projects-create-task", args=[project.id])
     with login(client, groups=["switchtender"]):
         client.post(
@@ -827,7 +792,7 @@ def test_create_task_assigns_new_switchtender(client):
         )
 
     project = models.Project.objects.all()[0]
-    assert project.switchtender is not None
+    assert project.switchtenders.count() == 1
 
 
 @pytest.mark.django_db
@@ -1498,7 +1463,7 @@ def test_switchtender_push_resource_to_project_fails_if_no_project_in_session(cl
 
 @pytest.mark.django_db
 def test_switchtender_push_resource_assigns_switchtender_to_project(client):
-    project = Recipe(models.Project, switchtender=None).make()
+    project = Recipe(models.Project, switchtenders=[]).make()
     resource = Recipe(resources.Resource, public=True).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
@@ -1510,7 +1475,7 @@ def test_switchtender_push_resource_assigns_switchtender_to_project(client):
         client.post(url, data=data)
 
     project = models.Project.objects.get(pk=project.id)
-    assert project.switchtender is not None
+    assert project.switchtenders.count() == 1
 
 
 @pytest.mark.django_db
@@ -1725,66 +1690,6 @@ def test_task_suggestion_available_with_localized_reco(client):
     with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
-
-
-########################################################################
-# template tags and filters
-########################################################################
-
-
-@pytest.mark.django_db
-def test_current_project_tag():
-    project = Recipe(models.Project).make()
-    session = {"project_id": project.id}
-    assert projects_extra.current_project(session) == project
-
-
-########################################################################
-# REST API
-########################################################################
-@pytest.mark.django_db
-def test_anonymous_cannot_use_project_api(client):
-    url = reverse("projects-list")
-    response = client.get(url)
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_logged_in_user_can_use_project_api(client):
-    url = reverse("projects-list")
-    with login(client):
-        response = client.get(url)
-    assert response.status_code == 200
-
-
-########################################################################
-# Utils
-########################################################################
-@pytest.mark.django_db
-def test_get_switchtender_for_project(client):
-    group = auth.Group.objects.get(name="switchtender")
-
-    dept62 = baker.make(geomatics.Department, code="62")
-    dept80 = baker.make(geomatics.Department, code="80")
-    dept59 = baker.make(geomatics.Department, code="59")
-
-    switchtenderA = baker.make(auth.User, groups=[group])
-    switchtenderA.profile.departments.set([dept62, dept80])
-
-    switchtenderB = baker.make(auth.User, groups=[group])
-    switchtenderB.profile.departments.set([dept59, dept80])
-
-    switchtenderC = baker.make(auth.User, groups=[group])
-    switchtenderC.profile.departments.set([])
-
-    project = baker.make(models.Project, status="READY", commune__department=dept62)
-
-    selected_switchtenders = utils.get_switchtenders_for_project(project)
-
-    assert len(selected_switchtenders) == 2
-    assert switchtenderA in selected_switchtenders
-    assert switchtenderB not in selected_switchtenders
-    assert switchtenderC in selected_switchtenders
 
 
 # eof

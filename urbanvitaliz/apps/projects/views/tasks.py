@@ -17,28 +17,15 @@ from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateTaskForm,
-    RemindTaskForm,
-    ResourceTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskForm,
-)
-from ..utils import (
-    can_administrate_or_403,
-    create_reminder,
-    get_active_project_id,
-    get_collaborators_for_project,
-)
+from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
+                     RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskForm)
+from ..utils import (can_administrate_or_403, create_reminder,
+                     get_active_project_id, get_collaborators_for_project)
 
 
 @login_required
@@ -54,9 +41,8 @@ def create_task(request, project_id=None):
             instance.project = project
             instance.save()
 
-            if not project.switchtender:
-                project.switchtender = request.user
-                project.save()
+            if request.user not in project.switchtenders.all():
+                project.switchtenders.add(request.user)
 
             # Send notifications
             if form.cleaned_data["notify_email"]:
@@ -443,9 +429,8 @@ def create_resource_action(request, resource_id=None):
             task.save()
 
             # Assign switchtender if none yet
-            if not project.switchtender:
-                project.switchtender = request.user
-                project.save()
+            if request.user not in project.switchtenders.all():
+                project.switchtenders.add(request.user)
 
             # assign reminder in six weeks
             create_reminder(
