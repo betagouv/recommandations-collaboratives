@@ -156,7 +156,7 @@ class ProjectForm(forms.ModelForm):
             "postcode",
             "location",
             "description",
-            "switchtender",
+            "switchtenders",
             "publish_to_cartofriches",
         ]
 
