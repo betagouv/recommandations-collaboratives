@@ -41,37 +41,15 @@
         </span>
         {% elif is_regional_actor %}
         <span class="d-inline-block">
-            <a href="{% url 'projects-project-update' project.id %}" class="btn btn-success w-100 btn-sm">
+            <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-success w-100 btn-sm">
                 <svg class="bi" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-split"/>
                 </svg>
                 &nbsp;
-                Aiguiller ce dossier
+                Rejoindre comme aiguilleur·se
             </a>
         </span>
         {% endif %}
     </div>
-
-
-    <!--
-         <p>
-         <span class="align-items-center link-dark text-decoration-none">
-         <img src="https://github.com/salomeDeschenes.png" alt="" width="32" height="32" class="rounded-circle me-2">
-         <strong>Salomé D.</strong>
-         </span> est votre <strong>accompagnatrice</strong> UrbanVitaliz sur ce projet. N'hésitez pas à <strong>prendre rendez-vous</strong> pour lui <strong>poser vos questions</strong> et faire avancer votre projet.
-
-         </p>
-
-         <button type="button" class="btn btn-primary mr-3" data-toggle="modal" data-target="#exampleModal">
-         <svg class="bi" width="16" height="16" fill="currentColor">
-         <use xlink:href="node_modules/bootstrap-icons/bootstrap-icons.svg#telephone"/>
-         </svg>
-         Prendre rendez-vous
-         </button>
-
-         ou <a href="#">poser une question</a>.
-         </button>
-
-    -->
 
 </div>

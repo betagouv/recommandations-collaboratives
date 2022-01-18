@@ -14,6 +14,7 @@ from .utils import (get_collaborators_for_project,
 #####
 project_submitted = django.dispatch.Signal()
 project_validated = django.dispatch.Signal()
+project_switchtender_joined = django.dispatch.Signal()
 
 
 @receiver(project_submitted)
@@ -60,6 +61,31 @@ def log_project_validated(sender, moderator, project, **kwargs):
         sender=owner,
         recipient=get_regional_actors_for_project(project),
         verb="a déposé le projet",
+        action_object=project,
+        target=project,
+        private=True,
+    )
+
+
+@receiver(project_switchtender_joined)
+def log_project_switchtender_joined(sender, project, **kwargs):
+    action.send(
+        sender,
+        verb="est devenu·e aiguilleur·se sur le projet",
+        action_object=project,
+        target=project,
+    )
+
+
+@receiver(project_switchtender_joined)
+def notify_project_switchtender_joined(sender, project, **kwargs):
+    recipients = get_regional_actors_for_project(project, allow_national=True)
+
+    # Notify regional actors
+    notify.send(
+        sender=sender,
+        recipient=recipients,
+        verb="est devenu·e aiguilleur·se sur le projet",
         action_object=project,
         target=project,
         private=True,

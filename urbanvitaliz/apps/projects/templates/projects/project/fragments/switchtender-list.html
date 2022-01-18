@@ -1,0 +1,24 @@
+{% load gravatar %}
+
+{% for switchtender in switchtenders %}
+<div class="bg-light mt-3 p-4 d-flex flex-row align-items-center">
+    <span class="align-items-center link-dark text-decoration-none flex-shrink-1">
+        <img
+            src="{% gravatar_url switchtender.email 32 %}"
+            alt="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }}"
+            class="me-2 rounded-circle"
+            style="width: 32px; height: 32px;"
+        />
+    </span>
+    <span class="align-middle d-flex align-items-start flex-column flex-grow-1">
+        <div>
+            <strong>{{ switchtender.get_full_name|default:switchtender }}</strong>
+        </div>
+        {% if switchtender.profile.organization %}
+        <div>
+            <span class="text-secondary small">{{ switchtender.profile.organization.name }}</span>
+        </div>
+        {% endif %}
+    </span>
+</div>
+{% endfor %}

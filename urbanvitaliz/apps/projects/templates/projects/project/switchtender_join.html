@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                </svg>&nbsp;
+                Projets
+            </li>
+            <li class="breadcrumb-item">
+                <span class="text-secondary">
+                    <a href="{% url 'projects-project-detail' project.pk %}">
+                        {{ project.name|capfirst }}
+                    </a>
+                </span>
+            </li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-3">
+        <svg class="bi" width="28" height="28" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost"/>
+        </svg>
+        <span class="align-middle">Rejoindre en tant qu'aiguilleur·se</span>
+    </h2>
+
+    <section class="mt-5">
+        <div class="m-4 p-4 fs-4">
+            En devenant aiguilleur·se sur ce dossier, vous vous engagez à aider cette collectivité.
+        </div>
+        <form id="form-projects-switchtender-join"
+				      method="post"
+				      action="{% url 'projects-project-switchtender-join' project.pk %}"
+				      class="form">
+            {% csrf_token %}
+            <button class="btn btn-success">Oui, je m'engage à animer ce dossier</button>
+        </form>
+    </section>
+
+{% endblock %}
+
+
+

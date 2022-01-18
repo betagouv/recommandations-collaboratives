@@ -4,6 +4,7 @@ from rest_framework import serializers
 from urbanvitaliz.apps.geomatics.serializers import CommuneSerializer
 
 from .models import Project
+from .utils import can_administrate_project
 
 
 class SwitchtenderSerializer(serializers.HyperlinkedModelSerializer):
@@ -23,12 +24,19 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "created_on",
             "updated_on",
             "org_name",
-            "switchtender",
+            "switchtenders",
+            "is_switchtender",
             "commune",
             "notifications",
         ]
 
-    switchtender = SwitchtenderSerializer(read_only=True)
+    switchtenders = SwitchtenderSerializer(read_only=True, many=True)
+    is_switchtender = serializers.SerializerMethodField()
+
+    def get_is_switchtender(self, obj):
+        request = self.context.get("request")
+        return request.user in obj.switchtenders.all()
+
     commune = CommuneSerializer(read_only=True)
 
     notifications = serializers.SerializerMethodField()

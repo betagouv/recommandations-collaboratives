@@ -175,14 +175,12 @@
                              <li><hr class="dropdown-divider"></li>
                         -->
                         <li><a class="dropdown-item" href="{% url 'logout' %}">Déconnexion</a></li>
-                        {% if is_switchtender or user.is_staff %}
+                        {% if user.is_staff %}
                         <li><hr class="dropdown-divider"></li>
                         {% if is_switchtender %}
                         <li><a class="dropdown-item" href="{% url 'switchtender-dashboard' %}">Tableau de Bord</a></li>
                         {% endif %}
-                        {% if user.is_staff %}
                         <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>
-                        {% endif %}
                         {% endif %}
                     </ul>
                 </div>
