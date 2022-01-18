@@ -132,7 +132,7 @@ class Project(models.Model):
         auth_models.User,
         related_name="projects_managed",
         blank=True,
-        verbose_name="Aiguilleu·r·se",
+        verbose_name="Aiguilleu·r·se·s",
     )
 
     @property
