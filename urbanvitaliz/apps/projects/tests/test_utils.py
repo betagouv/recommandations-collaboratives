@@ -30,18 +30,18 @@ def test_contributor_has_the_same_rights_as_the_owner(client):
         status="READY",
     ).make()
 
-    assert utils.can_administrate_project(project, owner)
-    assert utils.can_administrate_project(project, contributor)
+    assert utils.can_manage_project(project, owner)
+    assert utils.can_manage_project(project, contributor)
 
 
 @pytest.mark.django_db
-def test_switchtender_can_administrate_project(client):
+def test_switchtender_can_manage_project(client):
     switchtender = Recipe(auth.User).make()
     group = auth.Group.objects.get(name="switchtender")
     switchtender.groups.add(group)
     project = Recipe(models.Project, status="READY").make()
 
-    assert utils.can_administrate_project(project, switchtender)
+    assert utils.can_manage_project(project, switchtender)
 
 
 @pytest.mark.django_db
@@ -49,11 +49,11 @@ def test_non_switchtender_cannot_administrate_project(client):
     someone = Recipe(auth.User).make()
     project = Recipe(models.Project, status="READY").make()
 
-    assert not utils.can_administrate_project(project, someone)
+    assert not utils.can_manage_project(project, someone)
 
 
 @pytest.mark.django_db
-def test_get_switchtender_for_project(client):
+def test_get_regional_actors_for_project(client):
     group = auth.Group.objects.get(name="switchtender")
 
     dept62 = baker.make(geomatics.Department, code="62")
@@ -71,9 +71,9 @@ def test_get_switchtender_for_project(client):
 
     project = baker.make(models.Project, status="READY", commune__department=dept62)
 
-    selected_switchtenders = utils.get_switchtenders_for_project(project)
+    selected_actors = utils.get_regional_actors_for_project(project)
 
-    assert len(selected_switchtenders) == 2
-    assert switchtenderA in selected_switchtenders
-    assert switchtenderB not in selected_switchtenders
-    assert switchtenderC in selected_switchtenders
+    assert len(selected_actors) == 1
+    assert switchtenderA in selected_actors
+    assert switchtenderB not in selected_actors
+    assert switchtenderC not in selected_actors

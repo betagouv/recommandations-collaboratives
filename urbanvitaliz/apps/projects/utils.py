@@ -19,7 +19,7 @@ from urbanvitaliz.apps.reminders import api
 from . import models
 
 
-def can_administrate_project(project, user, allow_draft=False):
+def can_manage_project(project, user, allow_draft=False):
     """Check if user is allowed to administrate this project"""
     if user.is_anonymous:
         return False
@@ -50,9 +50,9 @@ def in_allowed_departments(user, project):
     return project.commune and (project.commune.department_id in allowed)
 
 
-def can_administrate_or_403(project, user, allow_draft=False):
+def can_manage_or_403(project, user, allow_draft=False):
     """Raise a 403 error is user is not a owner or admin"""
-    if can_administrate_project(project, user, allow_draft=allow_draft):
+    if can_manage_project(project, user, allow_draft=allow_draft):
         return True
 
     raise PermissionDenied("L'information demandée n'est pas disponible")
@@ -76,6 +76,11 @@ def get_regional_actors_for_project(project):
 
 
 def get_switchtenders_for_project(project):
+    """Return all the switchtenders for a given project"""
+    return project.switchtenders.all().distinct()
+
+
+def get_switchtenders_for_project_old(project):
     """Return all the switchtenders for a given project"""
     users = auth_models.User.objects.filter(groups__name="switchtender")
 

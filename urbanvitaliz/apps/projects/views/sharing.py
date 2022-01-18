@@ -15,7 +15,7 @@ from django.urls import reverse
 from urbanvitaliz.apps.communication.api import send_email
 
 from .. import models
-from ..utils import can_administrate_or_403
+from ..utils import can_manage_or_403
 
 
 ########################################################################
@@ -32,7 +32,7 @@ def access_update(request, project_id):
     """Handle ACL for a project"""
     project = get_object_or_404(models.Project, pk=project_id)
 
-    can_administrate_or_403(project, request.user)
+    can_manage_or_403(project, request.user)
 
     if request.method == "POST":
         form = AccessAddForm(request.POST)
@@ -73,7 +73,7 @@ def access_delete(request, project_id: int, email: str):
     """Delete en email from the project ACL"""
     project = get_object_or_404(models.Project, pk=project_id)
 
-    can_administrate_or_403(project, request.user)
+    can_manage_or_403(project, request.user)
 
     if request.method == "POST":
         if email == project.email:

@@ -24,8 +24,8 @@ from .. import models, signals
 from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
                      RsvpTaskFollowupForm, TaskFollowupForm,
                      TaskRecommendationForm, UpdateTaskForm)
-from ..utils import (can_administrate_or_403, create_reminder,
-                     get_active_project_id, get_collaborators_for_project)
+from ..utils import (can_manage_or_403, create_reminder, get_active_project_id,
+                     get_collaborators_for_project)
 
 
 @login_required
@@ -78,7 +78,7 @@ def email_task(request, task_id):
 def visit_task(request, task_id):
     """Visit the content of a task"""
     task = get_object_or_404(models.Task, pk=task_id)
-    can_administrate_or_403(task.project, request.user, allow_draft=True)
+    can_manage_or_403(task.project, request.user, allow_draft=True)
     is_switchtender = check_if_switchtender(request.user)
 
     if not task.visited and not is_switchtender:
@@ -101,7 +101,7 @@ def visit_task(request, task_id):
 def toggle_done_task(request, task_id):
     """Mark task as done for a project"""
     task = get_object_or_404(models.Task, pk=task_id)
-    can_administrate_or_403(task.project, request.user)
+    can_manage_or_403(task.project, request.user)
 
     if request.method == "POST":
         task.refused = False
@@ -135,7 +135,7 @@ def toggle_done_task(request, task_id):
 def refuse_task(request, task_id):
     """Mark task refused for a project"""
     task = get_object_or_404(models.Task, pk=task_id)
-    can_administrate_or_403(task.project, request.user)
+    can_manage_or_403(task.project, request.user)
 
     if request.method == "POST":
         task.done = False
@@ -155,7 +155,7 @@ def refuse_task(request, task_id):
 def already_done_task(request, task_id):
     """Mark task refused for a project"""
     task = get_object_or_404(models.Task, pk=task_id)
-    can_administrate_or_403(task.project, request.user)
+    can_manage_or_403(task.project, request.user)
 
     if request.method == "POST":
         task.done = True
@@ -355,7 +355,7 @@ def remind_task_delete(request, task_id=None):
 def followup_task(request, task_id=None):
     """Create a new followup for task"""
     task = get_object_or_404(models.Task, pk=task_id)
-    can_administrate_or_403(task.project, request.user)
+    can_manage_or_403(task.project, request.user)
     if request.method == "POST":
         form = TaskFollowupForm(request.POST)
         if form.is_valid():
