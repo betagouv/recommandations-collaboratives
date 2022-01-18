@@ -12,6 +12,7 @@
         {% activity_stream "target" project %}
         {% regroup stream by timestamp.date as stream_by_day %}
 
+        {% if can_administrate %}
         <form class="form border p-3 d-flex align-items-end flex-column"
               method="POST"
               action="{% url 'projects-create-note' project.pk %}">
@@ -26,6 +27,7 @@
 
             <button class="btn mt-2 btn-primary flex-align-end" type="submit">Envoyer</button>
         </form>
+        {% endif %}
 
         <ul class="list-group">
             {% for date, actions in stream_by_day|slice:":20" %}
@@ -39,8 +41,10 @@
                     {% if action.verb == 'a rédigé une note interne' %}
                     <div class="p-2 mb-2 bg-light">
                         {{ action.action_object.content_rendered|safe }}
+                        {% if can_administrate %}
                         <br/>
                         <span><a href="{% url 'projects-update-note' action.action_object.pk %}">éditer</a></span>
+                        {% endif %}
                     </div>
                     {% endif %}
 
@@ -75,25 +79,8 @@
 
     <div class="col-4">
         <h5>Équipe de suivi</h5>
-        {% for switchtender in switchtenders %}
-        <div class="bg-light mb-3 p-4">
-            <span class="align-items-center link-dark text-decoration-none">
-                <img
-                    src="{% gravatar_url project.switchtender.email 32 %}"
-                    alt="{{ project.switchtender.get_full_name }}"
-                    class="me-2 rounded-circle"
-                    style="width: 32px; height: 32px;"
-                />
-            </span>
 
-            <span class="align-middle">
-                <strong>{{ switchtender.get_full_name|default:"Equipe UrbanVitaliz" }}</strong>
-                {% if switchtender.profile.organization %}
-                - {{ switchtender.profile.organization.name }}
-                {% endif %}
-            </span>
-        </div>
-        {% endfor %}
+        {% include "projects/project/fragments/switchtender-list.html" with switchtenders=project.switchtenders.all %}
     </div>
 
 </div>

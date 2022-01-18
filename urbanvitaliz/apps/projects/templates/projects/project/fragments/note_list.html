@@ -37,8 +37,10 @@
             </ul>
         </div>
 
+        {% if can_manage %}
         <hr/>
 
+        <!-- Post message -->
         <div class="message-form">
             <form class="form border p-3 d-flex align-items-end flex-column"
                   method="POST"
@@ -56,9 +58,11 @@
             </form>
 
         </div>
+        {% endif %}
     </div>
     <div class="col mx-auto">
         <h6 class="mb-2">Les participant·e·s</h6>
+
         {% for recipient in recipients %}
         <div class="bg-light mt-3 p-4">
             <span class="align-items-center link-dark text-decoration-none">

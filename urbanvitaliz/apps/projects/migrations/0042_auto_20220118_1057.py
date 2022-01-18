@@ -8,17 +8,22 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('projects', '0041_note_created_by'),
+        ("projects", "0041_note_created_by"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='project',
-            name='switchtender',
+            model_name="project",
+            name="switchtender",
         ),
         migrations.AddField(
-            model_name='project',
-            name='switchtenders',
-            field=models.ManyToManyField(blank=True, related_name='projects_managed', to=settings.AUTH_USER_MODEL, verbose_name='Aiguilleu·r·se'),
+            model_name="project",
+            name="switchtenders",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="projects_managed",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Aiguilleu·r·se",
+            ),
         ),
     ]

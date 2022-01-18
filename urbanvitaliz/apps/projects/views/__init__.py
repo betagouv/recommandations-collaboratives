@@ -22,16 +22,18 @@ from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import is_staff_or_403, is_switchtender_or_403
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
 from ..forms import (OnboardingForm, PrivateNoteForm, ProjectForm,
                      PublicNoteForm, SelectCommuneForm)
-from ..utils import (can_administrate_project, can_manage_or_403,
-                     can_manage_project, generate_ro_key, get_active_project,
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403, can_manage_project, generate_ro_key,
+                     get_active_project,
                      get_notification_recipients_for_project,
-                     get_regional_actors_for_project,
-                     get_switchtenders_for_project,
+                     is_project_moderator, is_project_moderator_or_403,
+                     is_regional_actor_for_project,
                      refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
@@ -119,11 +121,18 @@ def select_commune(request, project_id=None):
 def project_list(request):
     """Return the projects for the switchtender"""
     is_switchtender_or_403(request.user)
-    draft_projects = (
-        models.Project.objects.in_departments(request.user.profile.departments.all())
-        .filter(status="DRAFT")
-        .order_by("-created_on")
-    )
+
+    project_moderator = is_project_moderator(request.user)
+
+    draft_projecfts = []
+    if is_project_moderator:
+        draft_projects = (
+            models.Project.objects.in_departments(
+                request.user.profile.departments.all()
+            )
+            .filter(status="DRAFT")
+            .order_by("-created_on")
+        )
     return render(request, "projects/project/list.html", locals())
 
 
@@ -132,9 +141,19 @@ def project_detail(request, project_id=None):
     """Return the details of given project for switchtender"""
     project = get_object_or_404(models.Project, pk=project_id)
 
-    # check user can administrate projet (member or switchtender)
+    # compute permissions
+    can_manage = can_manage_project(project, request.user)
+    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
+    is_regional_actor = is_regional_actor_for_project(
+        project, request.user, allow_national=True
+    )
+    can_administrate = can_administrate_project(project, request.user)
+
+    # check user can administrate project (member or switchtender)
     if request.user.email != project.email:
-        can_manage_or_403(project, request.user)
+        # bypass if user is switchtender, all are allowed to view at least
+        if not check_if_switchtender(request.user):
+            can_manage_or_403(project, request.user)
 
     # Set this project as active
     set_active_project_id(request, project.pk)
@@ -146,11 +165,6 @@ def project_detail(request, project_id=None):
         )
     except survey_models.Survey.DoesNotExist:
         session = None
-
-    can_manage = can_manage_project(project, request.user)
-    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_regional_actor = request.user in get_regional_actors_for_project(project)
-    can_administrate = can_administrate_project(project, request.user)
 
     # Mark this project notifications unread
     project_ct = ContentType.objects.get_for_model(project)
@@ -181,8 +195,9 @@ def project_detail_from_sharing_link(request, project_ro_key):
 @login_required
 def project_update(request, project_id=None):
     """Update the base information of a project"""
-    is_switchtender_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
+    can_administrate_or_403(project, request.user)
+
     if request.method == "POST":
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
@@ -205,7 +220,8 @@ def project_update(request, project_id=None):
 @login_required
 def project_accept(request, project_id=None):
     """Update project as accepted for processing"""
-    is_switchtender_or_403(request.user)
+    is_project_moderator_or_403(request.user)
+
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
         project.status = "TO_PROCESS"

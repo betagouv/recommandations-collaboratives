@@ -1,10 +1,9 @@
 {% load static %}
 {% load humanize %}
-{% load gravatar %}
 
 <div class="row">
     <div class="col col-xl-8 col-lg-10">
-        {% if is_switchtender %}
+        {% if can_administrate %}
         <p>
             <span class="badge bg-warning">Beta feature</span> <a href="{% url 'projects-project-tasks-suggest' project.pk %}">Accès aux suggestions de Recommandations</a>
         </p>
@@ -110,29 +109,7 @@
             N'hésitez pas à prendre contact via les commentaires, nous vous répondrons dès que possible.
         </p>
 
-
-        {% for switchtender in project.switchtenders.all %}
-        <div class="bg-light mt-3 p-4 d-flex flex-row align-items-center">
-            <span class="align-items-center link-dark text-decoration-none flex-shrink-1">
-                <img
-                    src="{% gravatar_url switchtender.email 32 %}"
-                    alt="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }}"
-                    class="me-2 rounded-circle"
-                    style="width: 32px; height: 32px;"
-                />
-            </span>
-            <span class="align-middle d-flex align-items-start flex-column flex-grow-1">
-                <div>
-                    <strong>{{ switchtender.get_full_name|default:switchtender }}</strong>
-                </div>
-                {% if switchtender.profile.organization %}
-                <div>
-                    <span class="text-secondary small">{{ switchtender.profile.organization.name }}</span>
-                </div>
-                {% endif %}
-            </span>
-        </div>
-        {% endfor %}
+        {% include "projects/project/fragments/switchtender-list.html" with switchtenders=project.switchtenders.all %}
         {% endif %}
     </div>
 
