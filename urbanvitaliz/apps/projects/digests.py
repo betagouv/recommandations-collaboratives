@@ -24,17 +24,21 @@ def send_digests_for_new_recommendations_by_user(user):
     if notifications.count() == 0:
         return False
 
+    skipped_projects = []
     for project_id, project_notifications in groupby(
         notifications, key=lambda x: x.target_object_id
     ):
         # Only treat notifications for project in DONE status
         project = models.Project.objects.get(pk=project_id)
         if project.status != "DONE":
+            skipped_projects.append(project_id)
             continue
 
         recommendations = []
+        notification_count = 0
         for notification in project_notifications:
             action = notification.action_object
+            notification_count += 1
 
             action_link = utils.build_absolute_url(
                 reverse("projects-project-detail", args=[action.project_id])
@@ -56,13 +60,17 @@ def send_digests_for_new_recommendations_by_user(user):
             reverse("projects-project-detail", args=[action.project_id])
         )
         email_params = {
-            "notification-count": len(project_notifications),
+            "notification-count": notification_count,
             "project": {
                 "name": action.project.name,
                 "url": project_link,
                 "commune": {
-                    "postal": action.project.commune.postal,
-                    "name": action.project.commune.name,
+                    "postal": action.project.commune
+                    and action.project.commune.postal
+                    or "",
+                    "name": action.project.commune
+                    and action.project.commune.name
+                    or "",
                 },
             },
             "reco": recommendations,
@@ -71,7 +79,7 @@ def send_digests_for_new_recommendations_by_user(user):
         send_email("new_recommendations_digest", user.email, params=email_params)
 
     # Mark them as dispatched
-    notifications.mark_as_sent()
+    notifications.exclude(target_object_id__in=skipped_projects).mark_as_sent()
 
     return True
 
@@ -89,17 +97,17 @@ def send_digests_for_new_sites_by_user(user):
         return False
 
     for notification in notifications:
-        action = notification.action_object
+        project = notification.action_object
         project_link = utils.build_absolute_url(
-            reverse("projects-project-detail", args=[action.project_id])
+            reverse("projects-project-detail", args=[project.pk])
         )
         email_params = {
             "project": {
-                "name": action.project.name,
+                "name": project.name,
                 "url": project_link,
                 "commune": {
-                    "postal": action.project.commune.postal,
-                    "name": action.project.commune.name,
+                    "postal": project.commune.postal,
+                    "name": project.commune.name,
                 },
             },
         }

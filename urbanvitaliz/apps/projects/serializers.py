@@ -4,7 +4,6 @@ from rest_framework import serializers
 from urbanvitaliz.apps.geomatics.serializers import CommuneSerializer
 
 from .models import Project
-from .utils import can_administrate_project
 
 
 class SwitchtenderSerializer(serializers.HyperlinkedModelSerializer):
