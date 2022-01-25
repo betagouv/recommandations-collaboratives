@@ -9,15 +9,11 @@ created: <2021-09-13 lun. 15:38>
 """
 
 import uuid
-from itertools import groupby
 
 from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.urls import reverse
 from django.utils import timezone
-from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.reminders import api
 
 from . import models
@@ -136,19 +132,6 @@ def is_regional_actor_for_project_or_403(project, user, allow_national=False):
 def get_switchtenders_for_project(project):
     """Return all the switchtenders for a given project"""
     return project.switchtenders.all().distinct()
-
-
-def get_switchtenders_for_project_old(project):
-    """Return all the switchtenders for a given project"""
-    users = auth_models.User.objects.filter(groups__name="switchtender")
-
-    if project.commune and project.commune.department:
-        users = users.filter(
-            Q(profile__departments=project.commune.department)
-            | Q(profile__departments=None)
-        )
-
-    return users.distinct()
 
 
 def get_collaborators_for_project(project):

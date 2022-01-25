@@ -7,10 +7,7 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-01-24 22:39:27 CEST
 """
 
-import datetime
 
-import django.core.mail
-from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core.management.base import BaseCommand
 from urbanvitaliz.apps.projects import digests

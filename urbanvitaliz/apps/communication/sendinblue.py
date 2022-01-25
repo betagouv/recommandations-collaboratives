@@ -1,6 +1,5 @@
 import sib_api_v3_sdk
 from django.conf import settings
-from sib_api_v3_sdk.rest import ApiException
 
 
 class SendInBlue:

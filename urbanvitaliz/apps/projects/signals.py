@@ -4,10 +4,12 @@ from django.contrib.auth import models as auth_models
 from django.dispatch import receiver
 from notifications.signals import notify
 
-from .utils import (get_collaborators_for_project,
-                    get_notification_recipients_for_project,
-                    get_project_moderators, get_regional_actors_for_project,
-                    get_switchtenders_for_project)
+from .utils import (
+    get_notification_recipients_for_project,
+    get_project_moderators,
+    get_regional_actors_for_project,
+    get_switchtenders_for_project,
+)
 
 #####
 # Projects
