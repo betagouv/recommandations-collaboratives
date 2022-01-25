@@ -14,7 +14,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from urbanvitaliz.apps.geomatics import models as geomatics
 
-from .. import models, utils
+from .. import models, signals, utils
 
 
 @pytest.mark.django_db

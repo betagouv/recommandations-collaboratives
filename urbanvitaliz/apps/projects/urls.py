@@ -74,11 +74,6 @@ urlpatterns = [
         name="projects-update-task",
     ),
     path(
-        r"task/<int:task_id>/email/",
-        tasks.email_task,
-        name="projects-email-task",
-    ),
-    path(
         r"task/<int:task_id>/visit/",
         tasks.visit_task,
         name="projects-visit-task",

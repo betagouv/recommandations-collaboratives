@@ -13,32 +13,17 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateTaskForm,
-    RemindTaskForm,
-    ResourceTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskForm,
-)
-from ..utils import (
-    can_manage_or_403,
-    create_reminder,
-    get_active_project_id,
-    get_collaborators_for_project,
-)
+from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
+                     RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskForm)
+from ..utils import (can_manage_or_403, create_reminder, get_active_project_id)
 
 
 @login_required
@@ -57,10 +42,6 @@ def create_task(request, project_id=None):
             if request.user not in project.switchtenders.all():
                 project.switchtenders.add(request.user)
 
-            # Send notifications
-            if form.cleaned_data["notify_email"]:
-                notify_email_action_created(request, project, task=instance)
-
             # Notify other switchtenders
             signals.action_created.send(
                 sender=visit_task, task=instance, project=project, user=request.user
@@ -70,21 +51,6 @@ def create_task(request, project_id=None):
     else:
         form = CreateTaskForm()
     return render(request, "projects/project/task_create.html", locals())
-
-
-@login_required
-def email_task(request, task_id):
-    """Email the collaborators for a given task"""
-    is_switchtender_or_403(request.user)
-    task = get_object_or_404(models.Task, pk=task_id)
-
-    # Send email notifications
-    if request.method == "POST":
-        notify_email_action_created(request, project=task.project, task=task)
-
-    return redirect(
-        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
-    )
 
 
 @login_required
@@ -457,10 +423,6 @@ def create_resource_action(request, resource_id=None):
                 user=request.user,
             )
 
-            # Send notifications
-            if form.cleaned_data["notify_email"]:
-                notify_email_action_created(request, project, task)
-
             signals.action_created.send(
                 sender=create_resource_action,
                 task=task,
@@ -473,48 +435,3 @@ def create_resource_action(request, resource_id=None):
     else:
         form = ResourceTaskForm()
     return render(request, "projects/project/push.html", locals())
-
-
-########################################################################
-# notifications
-########################################################################
-
-
-def notify_email_action_created(request, project, task):
-    """
-    Notify the creation of an Action the user by sending an email and displaying
-    a UI popup
-    """
-    if task.resource:
-        title = task.resource.title
-        extract = task.resource.summary
-    else:
-        title = task.intent
-        extract = ""
-
-    action_link = request.build_absolute_uri(
-        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
-    )
-
-    for user in get_collaborators_for_project(project):
-        send_email(
-            template_name="new reco",
-            recipients=[user.email],
-            params={
-                "project": {"name": project.name},
-                "contact": {"name": user.first_name},
-                "sender": {"first_name": task.created_by.first_name},
-                "reco": {"title": title, "extract": extract, "url": action_link},
-            },
-        )
-
-    messages.success(
-        request,
-        '{0} a été notifié(e) par courriel de l\'action "{1}".'.format(
-            project.full_name, task.intent
-        ),
-        extra_tags=["email"],
-    )
-
-
-# eof
