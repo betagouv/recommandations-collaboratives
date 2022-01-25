@@ -146,12 +146,6 @@
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                         <li><a class="dropdown-item" href="{% url 'projects-update-task' task.id %}">Éditer</a></li>
                         <li>
-                            <form method="POST" action="{% url 'projects-email-task' task.id %}">
-                                {% csrf_token %}
-                                <button class="dropdown-item">Notifier par courriel</button>
-                            </form>
-                        </li>
-                        <li>
                             <form method="POST" action="{% url 'projects-remind-task-delete' task.id %}">
                                 {% csrf_token %}
                                 <button class="dropdown-item">Supprimer le rappel</button>

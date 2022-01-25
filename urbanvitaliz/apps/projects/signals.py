@@ -41,16 +41,6 @@ def notify_moderators_project_submitted(sender, submitter, project, **kwargs):
 def log_project_validated(sender, moderator, project, **kwargs):
     action.send(project, verb="a été validé")
 
-    # Notify project owners of approval
-    notify.send(
-        sender=moderator,
-        recipient=get_collaborators_for_project(project),
-        verb="a validé le projet",
-        action_object=project,
-        target=project,
-        private=True,
-    )
-
     # Notify regional actors of a new project
     try:
         owner = auth_models.User.objects.get(email=project.email)

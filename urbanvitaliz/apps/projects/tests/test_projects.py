@@ -17,7 +17,8 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -542,22 +543,6 @@ def test_accept_project_does_not_notify_non_regional_actors(client):
     assert non_regional_actor.notifications.count() == 0
 
 
-@pytest.mark.django_db
-def test_accept_project_notifies_owners(client):
-    auth.Group.objects.get_or_create(name="project_moderator")
-    owner = Recipe(auth.User, email="owner@project.mine").make()
-    project = Recipe(
-        models.Project,
-        email=owner.email,
-        emails=[owner.email],
-    ).make()
-
-    with login(client, groups=["switchtender", "project_moderator"]):
-        client.post(reverse("projects-project-accept", args=[project.id]))
-
-    assert owner.notifications.count() == 1
-
-
 ########################################################################
 # delete project
 ########################################################################
@@ -787,16 +772,17 @@ def test_create_task_assigns_new_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_create_new_task_for_project_notify_user(mocker, client):
-    project = Recipe(models.Project).make()
-    mocker.patch("urbanvitaliz.apps.projects.views.tasks.notify_email_action_created")
+def test_create_new_task_for_project_notify_collaborators(mocker, client):
+    owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
+
+    project = Recipe(models.Project, emails=[owner.email]).make()
     with login(client, groups=["switchtender"]):
         client.post(
             reverse("projects-create-task", args=[project.id]),
             data={"content": "this is some content", "notify_email": True},
         )
 
-    views.tasks.notify_email_action_created.assert_called_once()
+    assert owner.notifications.count() == 1
 
 
 @pytest.mark.django_db
@@ -1496,42 +1482,6 @@ def test_switchtender_create_action_for_resource_push(client):
     assert task.content == data["content"]
     assert task.intent == data["intent"]
     # user is redirected to poject
-    newurl = reverse("projects-project-detail", args=[project.id])
-    assertRedirects(response, newurl)
-    # sessions is cleaned up
-    assert "project_id" not in client.session
-
-
-@pytest.mark.django_db
-def test_switchtender_create_action_for_resource_push_with_notification(client):
-    project = Recipe(models.Project).make()
-    resource = Recipe(resources.Resource, public=True).make()
-
-    url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, groups=["switchtender"]):
-        # project_id should be in session
-        session = client.session
-        session["active_project"] = project.id
-        session.save()
-
-        data = {
-            "intent": "read this",
-            "content": "some nice content",
-            "notify_email": True,
-        }
-        response = client.post(url, data=data)
-
-    # a new Recommmendation is created
-    task = models.Task.objects.all()[0]
-    assert task.project == project
-    assert task.resource == resource
-    assert task.content == data["content"]
-    assert task.intent == data["intent"]
-
-    # notification is found
-    assert len(get_messages(response.wsgi_request)) > 0
-
-    # user is redirected to project
     newurl = reverse("projects-project-detail", args=[project.id])
     assertRedirects(response, newurl)
     # sessions is cleaned up

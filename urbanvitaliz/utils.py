@@ -10,14 +10,12 @@ created: 2021-06-29 09:16:14 CEST
 from contextlib import contextmanager
 
 from django.conf import settings
-
+from django.contrib.auth import models as auth
+from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
-
 from django.template import loader
-
-from django.contrib.auth import models as auth
-from django.contrib.sites.shortcuts import get_current_site
 
 ########################################################################
 # View helpers
@@ -64,6 +62,16 @@ def send_email(
         recipient_list=[user_email],
         fail_silently=False,
     )
+
+
+def build_absolute_url(path):
+    """
+    Where we can't use request,
+    use this to build the absolute url,
+    assuming we're always using https
+    """
+    current_site = Site.objects.get_current()
+    return "https://%s%s" % (current_site.domain, path)
 
 
 ########################################################################
