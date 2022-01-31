@@ -205,15 +205,17 @@
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left-right"/>
                         </svg>
                         &nbsp;
-                            <span class="align-middle text-secondary">
-                                Action indiquée comme <strong>{{ followup.status_txt }}</strong>
-                            </span>
-                            <span class="align-middle">&#8212;&nbsp;</span>
-                            <small class="align-middle text-muted">{{ followup.timestamp|naturalday }}</small>
+                        <span class="align-middle text-secondary">
+                            Action indiquée comme <strong>{{ followup.status_txt }}</strong>
                         </span>
-                        <p class="m-0 p-0">
-                            <q>&nbsp;{{ followup.comment|safe }}&nbsp;</q>
-                        </p>
+                        <span class="align-middle">&#8212;&nbsp;</span>
+                        <small class="align-middle text-muted">{{ followup.timestamp|naturalday }}</small>
+                    </span>
+                    {% if followup.comment %}
+                    <p class="m-0 p-0">
+                        <q>&nbsp;{{ followup.comment|safe }}&nbsp;</q>
+                    </p>
+                    {% endif %}
                 </div>
                 {% else %}
                 {% include "projects/project/fragments/action_comment.html" with comment=followup.comment author=followup.who date=followup.timestamp %}
