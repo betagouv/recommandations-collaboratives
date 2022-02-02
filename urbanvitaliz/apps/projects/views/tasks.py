@@ -16,22 +16,13 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateTaskForm,
-    RemindTaskForm,
-    ResourceTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskForm,
-)
+from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
+                     RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -92,9 +83,9 @@ def toggle_done_task(request, task_id):
     can_manage_or_403(task.project, request.user)
 
     if request.method == "POST":
-        task.refused = False
-        task.done = not task.done
-        if task.done:
+        if task.status == models.Task.DONE:
+            task.status = models.Task.PROPOSED
+
             # NOTE should we remove all the reminders?
             api.remove_reminder_email(
                 task, recipient=request.user.email, origin=api.models.Mail.STAFF
@@ -106,6 +97,8 @@ def toggle_done_task(request, task_id):
                 user=request.user,
             )
         else:
+            task.status = models.Task.DONE
+
             signals.action_undone.send(
                 sender=toggle_done_task,
                 task=task,
@@ -121,16 +114,15 @@ def toggle_done_task(request, task_id):
 
 @login_required
 def refuse_task(request, task_id):
-    """Mark task refused for a project"""
+    """Mark task refused for a project (user not interested)"""
     task = get_object_or_404(models.Task, pk=task_id)
     can_manage_or_403(task.project, request.user)
 
     if request.method == "POST":
-        task.done = False
-        task.refused = True
+        task.status = models.Task.NOT_INTERESTED
         task.save()
         api.remove_reminder_email(task)
-        signals.action_rejected.send(
+        signals.action_not_interested.send(
             sender=refuse_task, task=task, project=task.project, user=request.user
         )
 
@@ -146,8 +138,7 @@ def already_done_task(request, task_id):
     can_manage_or_403(task.project, request.user)
 
     if request.method == "POST":
-        task.done = True
-        task.refused = True
+        task.status = models.Task.ALREADY_DONE
         task.save()
         api.remove_reminder_email(
             task, recipient=request.user.email, origin=api.models.Mail.STAFF
@@ -369,25 +360,50 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
         rsvp = models.TaskFollowupRsvp.objects.get(uuid=rsvp_id)
     except models.TaskFollowupRsvp.DoesNotExist:
         return render(request, "projects/task/rsvp_followup_invalid.html", locals())
+
     task = rsvp.task
-    if status not in [1, 2, 3, 4]:
+
+    rsvp_signals = {
+        models.Task.INPROGRESS: signals.action_inprogress,
+        models.Task.DONE: signals.action_done,
+        models.Task.ALREADY_DONE: signals.action_already_done,
+        models.Task.NOT_INTERESTED: signals.action_not_interested,
+        models.Task.BLOCKED: signals.action_blocked,
+    }
+
+    if status not in rsvp_signals.keys():
         raise Http404()
+
     if request.method == "POST":
         form = RsvpTaskFollowupForm(request.POST)
         if form.is_valid():
             comment = form.cleaned_data.get("comment", "")
             followup = models.TaskFollowup(
                 status=status, comment=comment, task=task, who=rsvp.user
-            ).save()
-
-            signals.action_commented.send(
-                sender=followup, task=task, project=task.project, user=rsvp.user
             )
+            followup.save()
 
             rsvp.delete()  # we are done with this use only once object
-            # TODO
-            # task.status = status
-            # task.save()
+
+            # Trigger status change notification
+            if task.status != followup.status:
+                task.status = status
+                task.save()
+
+                signal = rsvp_signals[task.status]
+                signal.send(
+                    sender=models.Task,
+                    task=task,
+                    project=task.project,
+                    user=rsvp.user,
+                )
+
+            # Trigger comment notification
+            if comment:
+                signals.action_commented.send(
+                    sender=followup, task=task, project=task.project, user=rsvp.user
+                )
+
             return render(request, "projects/task/rsvp_followup_thanks.html", locals())
     else:
         form = RsvpTaskFollowupForm()

@@ -4,12 +4,9 @@ from django.contrib.auth import models as auth_models
 from django.dispatch import receiver
 from notifications.signals import notify
 
-from .utils import (
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -106,7 +103,9 @@ def log_reminder_created(sender, task, project, user, **kwargs):
 #####
 action_created = django.dispatch.Signal()
 action_visited = django.dispatch.Signal()
-action_rejected = django.dispatch.Signal()
+action_not_interested = django.dispatch.Signal()
+action_blocked = django.dispatch.Signal()
+action_inprogress = django.dispatch.Signal()
 action_already_done = django.dispatch.Signal()
 action_done = django.dispatch.Signal()
 action_undone = django.dispatch.Signal()
@@ -135,10 +134,26 @@ def log_action_visited(sender, task, project, user, **kwargs):
         action.send(user, verb="a visité l'action", action_object=task, target=project)
 
 
-@receiver(action_rejected)
-def log_action_rejected(sender, task, project, user, **kwargs):
+@receiver(action_not_interested)
+def log_action_not_interested(sender, task, project, user, **kwargs):
     if not user.is_staff:
-        action.send(user, verb="a refusé l'action", action_object=task, target=project)
+        action.send(
+            user,
+            verb="n'est pas intéressé·e l'action",
+            action_object=task,
+            target=project,
+        )
+
+
+@receiver(action_blocked)
+def log_action_blocked(sender, task, project, user, **kwargs):
+    if not user.is_staff:
+        action.send(
+            user,
+            verb="est bloqué sur l'action",
+            action_object=task,
+            target=project,
+        )
 
 
 @receiver(action_already_done)
@@ -153,6 +168,17 @@ def log_action_already_done(sender, task, project, user, **kwargs):
 def log_action_done(sender, task, project, user, **kwargs):
     if not user.is_staff:
         action.send(user, verb="a terminé l'action", action_object=task, target=project)
+
+
+@receiver(action_inprogress)
+def log_action_inprogress(sender, task, project, user, **kwargs):
+    if not user.is_staff:
+        action.send(
+            user,
+            verb="travaille sur l'action",
+            action_object=task,
+            target=project,
+        )
 
 
 @receiver(action_undone)

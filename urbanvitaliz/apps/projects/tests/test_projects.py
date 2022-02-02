@@ -16,7 +16,8 @@ from django.contrib.auth import models as auth
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -845,13 +846,13 @@ def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(client)
     project = Recipe(
         models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
-    task = Recipe(models.Task, project=project, visited=True, done=False).make()
+    task = Recipe(models.Task, project=project, visited=True).make()
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-toggle-done-task", args=[task.id]),
         )
     task = models.Task.objects.all()[0]
-    assert task.done is True
+    assert task.status == models.Task.DONE
     assert response.status_code == 302
 
 
@@ -861,13 +862,17 @@ def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(client
     project = Recipe(
         models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
-    task = Recipe(models.Task, project=project, visited=True, done=True).make()
+    task = Recipe(
+        models.Task, project=project, visited=True, status=models.Task.DONE
+    ).make()
+
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-toggle-done-task", args=[task.id]),
         )
+
     task = models.Task.objects.all()[0]
-    assert task.done is False
+    assert task.status == models.Task.PROPOSED
     assert response.status_code == 302
 
 
@@ -877,31 +882,28 @@ def test_refuse_task_for_project_and_redirect_for_project_owner(client):
     project = Recipe(
         models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
-    task = Recipe(models.Task, project=project, visited=False, done=False).make()
+    task = Recipe(models.Task, project=project, visited=False).make()
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-refuse-task", args=[task.id]),
         )
     task = models.Task.objects.all()[0]
-    assert task.refused is True
-    assert task.done is False
+    assert task.status == models.Task.NOT_INTERESTED
     assert response.status_code == 302
 
 
-@pytest.mark.django_db
 def test_already_done_task_for_project_and_redirect_for_project_owner(client):
     owner_email = "owner@univer.se"
     project = Recipe(
         models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
-    task = Recipe(models.Task, project=project, visited=False, done=False).make()
+    task = Recipe(models.Task, project=project, visited=False).make()
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-already-done-task", args=[task.id]),
         )
     task = models.Task.objects.all()[0]
-    assert task.refused is True
-    assert task.done is True
+    assert task.status == models.Task.ALREADY_DONE
     assert response.status_code == 302
 
 

@@ -12,6 +12,7 @@ import uuid
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
@@ -275,23 +276,28 @@ class TaskManager(models.Manager):
     #     def visited(self):
     #         return self.filter(visited=True, refused=False)
 
+    def open(self):
+        return self.proposed()
+
     def proposed(self):
-        return self.filter(visited=False, refused=False)
+        return self.filter(status=Task.PROPOSED)
 
-    def refused(self):
-        return self.filter(refused=True, done=False)
+    def not_interested(self):
+        return self.filter(status=Task.NOT_INTERESTED)
 
-    #     def already_done(self):
-    #         return self.filter(refused=True, done=True)
-    #
-    #     def done(self):
-    #         return self.filter(visited=True, done=True, refused=False)
+    def already_done(self):
+        return self.filter(status=Task.ALREADY_DONE)
+
+    def done(self):
+        return self.filter(status=Task.DONE)
 
     def done_or_already_done(self):
-        return self.filter(done=True)
+        return self.filter(Q(status=Task.DONE) | Q(status=Task.ALREADY_DONE))
 
-    def open(self):
-        return self.filter(done=False, refused=False)
+    def closed(self):
+        return self.filter(
+            status__in=(Task.DONE, Task.ALREADY_DONE, Task.NOT_INTERESTED)
+        )
 
 
 class DeletedTaskManager(models.Manager):
@@ -307,17 +313,29 @@ class Task(models.Model):
     objects = TaskManager()
     deleted_objects = DeletedTaskManager()
 
+    PROPOSED = 0
     INPROGRESS = 1
     BLOCKED = 2
     DONE = 3
-    REFUSED = 4
+    NOT_INTERESTED = 4
+    ALREADY_DONE = 5
 
     STATUS_CHOICES = (
+        (PROPOSED, "proposé"),
         (INPROGRESS, "en cours"),
         (BLOCKED, "blocage"),
         (DONE, "terminé"),
-        (REFUSED, "refusé"),
+        (NOT_INTERESTED, "pas intéressé·e"),
+        (ALREADY_DONE, "déjà fait"),
     )
+
+    @property
+    def closed(self):
+        return self.status in [Task.DONE, Task.NOT_INTERESTED, Task.ALREADY_DONE]
+
+    @property
+    def open(self):
+        return self.status in [Task.PROPOSED, Task.INPROGRESS, Task.BLOCKED]
 
     project = models.ForeignKey(
         "Project", on_delete=models.CASCADE, related_name="tasks"
@@ -383,8 +401,11 @@ class Task(models.Model):
     #         return date.today() > self.deadline if self.deadline else False
 
     visited = models.BooleanField(default=False, blank=True)
+
     refused = models.BooleanField(default=False, blank=True)
     done = models.BooleanField(default=False, blank=True)
+
+    status = models.IntegerField(choices=STATUS_CHOICES, default=PROPOSED)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
@@ -417,7 +438,8 @@ class TaskFollowup(models.Model):
             Task.INPROGRESS: "en cours",
             Task.BLOCKED: "bloquée",
             Task.DONE: "terminée",
-            Task.REFUSED: "rejetée",
+            Task.NOT_INTERESTED: "pas intéressé",
+            Task.ALREADY_DONE: "déjà faite",
         }.get(self.status, "?")
 
     timestamp = models.DateTimeField(default=timezone.now)

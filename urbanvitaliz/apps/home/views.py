@@ -51,7 +51,10 @@ class StatisticsView(TemplateView):
         context["reco_following_pc"] = 90
         context["collectivity_supported"] = the_projects.count()
         context["collectivity_with_reco"] = (
-            projects.Task.objects.filter(refused=False)
+            projects.Task.objects.exclude(
+                Q(status=projects.Task.NOT_INTERESTED)
+                | Q(status=projects.Task.ALREADY_DONE)
+            )
             .exclude(
                 Q(project__email__in=staff_emails)
                 | Q(project__status="DRAFT")
