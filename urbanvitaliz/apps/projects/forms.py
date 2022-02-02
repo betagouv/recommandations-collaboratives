@@ -103,7 +103,6 @@ class CreateTaskForm(forms.ModelForm):
             "deadline",
             "resource",
             "contact",
-            "done",
             "notify_email",
         ]
 
@@ -124,7 +123,6 @@ class UpdateTaskForm(forms.ModelForm):
             "deadline",
             "resource",
             "contact",
-            "done",
         ]
 
 

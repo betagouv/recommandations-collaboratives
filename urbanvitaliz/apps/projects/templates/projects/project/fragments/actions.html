@@ -68,16 +68,16 @@
         {% endif %}
 
 
-        {% if project.tasks.done_or_already_done.count %}
+        {% if project.tasks.closed.count %}
 
         <h2 class="mt-5 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
             <span class="align-middle">Actions terminées</span>
             &nbsp;
-            <span class="align-middle badge rounded-pill bg-secondary">{{ project.tasks.done_or_already_done.count }}</span>
+            <span class="align-middle badge rounded-pill bg-secondary">{{ project.tasks.closed.count }}</span>
         </h2>
 
         <div class="accordion" id="task-list">
-		        {% for task in project.tasks.done_or_already_done %}
+		        {% for task in project.tasks.closed %}
             {% include 'projects/project/fragments/action_list_item.html' with hide_details=True %}
 		        {% endfor %}
         </div>

@@ -45,7 +45,7 @@
     <div class="accordion-header d-flex justify-content-between border-bottom">
         <div class="task-opening d-flex ps-4 pt-4 justify-content-between flew-grow-1 w-100 position-relative pb-4">
             <div class="d-flex flex-column flex-grow-1">
-                <div class="d-flex fw-bold fs-5 task-title mb-2 {% if task.done %}text-decoration-line-through{% endif %}">
+                <div class="d-flex fw-bold fs-5 task-title mb-2 {% if task.closed %}text-decoration-line-through{% endif %}">
                     {% if task.resource %}
                     <!-- Icon -->
                     <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }}" style="width:30px; height: 30px;" >
@@ -93,7 +93,7 @@
         </div>
         {% if can_manage %}
         <div class="toolbar d-flex border-start flex-column justify-content-between">
-            {% if not task.done and not task.refused %}
+            {% if task.open %}
             <button class="p-4 btn btn-text m-0 border-bottom flex-grow-1" data-bs-toggle="modal" data-bs-target="#modal-action-{{ task.id }}">
                 <span data-bs-toggle="tooltip" title="Rejeter cette recommandation">
                     <svg class="bi me-1 align-middle text-danger" width="16px" height="16px" fill="currentColor">
@@ -105,7 +105,7 @@
 
             <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}" class="flex-grow-1 d-flex">
                 {% csrf_token %}
-                {% if task.done or task.refused %}
+                {% if task.closed %}
                 <button title="Remettre l'action en cours" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
                     <svg class="bi align-middle" width="24" height="24" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-counterclockwise"/>
