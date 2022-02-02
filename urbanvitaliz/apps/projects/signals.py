@@ -49,7 +49,7 @@ def log_project_validated(sender, moderator, project, **kwargs):
     notify.send(
         sender=owner,
         recipient=get_regional_actors_for_project(project),
-        verb="a déposé le projet",
+        verb="a été validé",
         action_object=project,
         target=project,
         private=True,

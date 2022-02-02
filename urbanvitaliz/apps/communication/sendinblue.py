@@ -28,7 +28,9 @@ class SendInBlue:
             )
         else:
             send_to = [
-                sib_api_v3_sdk.SendSmtpEmailTo(email=recipient)
+                sib_api_v3_sdk.SendSmtpEmailTo(
+                    name=recipient["name"], email=recipient["email"]
+                )
                 for recipient in recipients
             ]
             send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(

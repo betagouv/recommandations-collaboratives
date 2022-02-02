@@ -81,7 +81,11 @@
             {% if disable_tracking %}
             <a class="stretched-link" href="{% url 'resources-resource-detail' task.resource.id %}">
             {% else %}
-            <a class="stretched-link" href="{% url 'projects-visit-task' task.id %}">
+                {% if can_administrate %}
+                <a class="stretched-link" href="{% url 'projects-visit-task' task.id %}">
+                {% else %}
+                <a class="stretched-link" href="{% url 'resources-resource-detail' task.resource.id %}">
+                {% endif %}
             {% endif %}
                 <div class="flex-shrink-1 px-3 arrow-link text-primary align-items-center">
                     <svg class="align-middle bi" width="26px" height="26px" fill="currentColor">
