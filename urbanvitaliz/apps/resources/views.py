@@ -6,6 +6,7 @@ Views for resources application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-06-16 10:59:08 CEST
 """
+import datetime
 
 from django import forms
 from django.contrib.auth.decorators import login_required
@@ -85,6 +86,11 @@ def resource_search(request):
             if limit_area:
                 resources = resources.limit_area(departments)
 
+    # filter out expired
+    expired = form.cleaned_data.get("expired", False)
+    if expired:
+        resources = resources.filter(expires_on__gte=datetime.date.today())
+
     return render(request, "resources/resource/list.html", locals())
 
 
@@ -99,6 +105,8 @@ class SearchForm(forms.Form):
     searching = forms.BooleanField(required=False)
 
     limit_area = forms.CharField(required=False, empty_value=None)
+
+    expired = forms.BooleanField(required=False, initial=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

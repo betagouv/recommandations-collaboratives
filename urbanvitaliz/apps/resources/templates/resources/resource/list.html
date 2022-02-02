@@ -20,6 +20,7 @@
 <script type="text/javascript">
  $(document).ready(function() {
      $(".filters-categories .form-check-input").click(function() { $(".quick-search form").submit(); });
+     $(".filters-internal .form-check-input").click(function() { $(".quick-search form").submit(); });
      $("#limit_area").change(function() { $(".quick-search form").submit(); });
  });
 </script>
@@ -117,6 +118,22 @@
                 </span>
                 {% endfor %}
             </div>
+
+            {% if user.is_staff %}
+            <!-- Internal filters -->
+            <div class="filters-internal mt-2">
+                <span class="small text-secondary">Gestion interne :</span>&nbsp;
+
+                <span class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="{{ form.expired.name }}"
+                           id="check-expired"
+                           {% if form.expired.value %}checked{% endif %}
+                    >
+                    <label class="form-check-label text-secondary" for="check-expired">Expirées</label>
+                </span>
+
+            </div>
+            {% endif %}
 
         </form>
     </div>
