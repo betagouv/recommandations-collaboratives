@@ -50,8 +50,17 @@ def send_digests_for_new_recommendations_by_user(user):
                     "created_by": {
                         "first_name": action.created_by.first_name,
                         "last_name": action.created_by.last_name,
+                        "organization": {
+                            "name": action.created_by.profile.organization
+                            and action.created_by.profile.organization.name
+                            or None
+                        },
                     },
                     "intent": action.intent,
+                    "content": action.content,
+                    "resource": {
+                        "title": action.resource and action.resource.title or ""
+                    },
                     "url": action_link,
                 }
             )
@@ -60,7 +69,7 @@ def send_digests_for_new_recommendations_by_user(user):
             reverse("projects-project-detail", args=[action.project_id])
         )
         email_params = {
-            "notification-count": notification_count,
+            "notification_count": notification_count,
             "project": {
                 "name": action.project.name,
                 "url": project_link,
@@ -73,10 +82,18 @@ def send_digests_for_new_recommendations_by_user(user):
                     or "",
                 },
             },
-            "reco": recommendations,
+            "recos": recommendations,
         }
 
-        send_email("new_recommendations_digest", user.email, params=email_params)
+        name = f"{user.first_name} {user.last_name}"
+        if name.strip() == "":
+            name = "Madame/Monsieur"
+
+        send_email(
+            "new_recommendations_digest",
+            {"name": name, "email": user.email},
+            params=email_params,
+        )
 
     # Mark them as dispatched
     notifications.exclude(target_object_id__in=skipped_projects).mark_as_sent()
@@ -89,7 +106,7 @@ def send_digests_for_new_sites_by_user(user):
 
     notifications = (
         user.notifications.unsent()
-        .filter(target_content_type=project_ct, verb="a déposé le projet")
+        .filter(target_content_type=project_ct, verb="a été validé")
         .order_by("target_object_id")
     )
 
@@ -104,15 +121,31 @@ def send_digests_for_new_sites_by_user(user):
         email_params = {
             "project": {
                 "name": project.name,
+                "org_name": project.org_name,
                 "url": project_link,
                 "commune": {
                     "postal": project.commune.postal,
                     "name": project.commune.name,
+                    "department": {
+                        "code": project.commune.department.code,
+                        "name": project.commune.department.name,
+                    },
                 },
             },
         }
 
-        send_email("new_site_for_switchtender", user.email, params=email_params)
+        name = f"{user.first_name} {user.last_name}"
+        if name.strip() == "":
+            name = "Madame/Monsieur"
+
+        send_email(
+            "new_site_for_switchtender",
+            {
+                "name": name,
+                "email": user.email,
+            },
+            params=email_params,
+        )
 
     # Mark them as dispatched
     notifications.mark_as_sent()
