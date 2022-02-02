@@ -30,12 +30,18 @@ class Command(BaseCommand):
         # Get all switchtenders
         sw_group = auth_models.Group.objects.get(name="switchtender")
 
+        # Digests for non switchtenders
+        for user in auth_models.User.objects.exclude(groups__in=[sw_group]):
+            if digests.send_digest_for_non_switchtender_by_user(user):
+                print(f"Sent general digest for {user})")
+
+        # Digests for switchtenders
         for user in auth_models.User.objects.filter(groups__in=[sw_group]):
             if digests.send_digests_for_new_sites_by_user(user):
                 print(f"Sent new site digests for {user}")
 
-            if digests.send_digests_for_new_switchtenders_on_project_by_user(user):
-                print(f"Sent new switchtenders for {user}")
+            if digests.send_digest_for_switchtender_by_user(user):
+                print(f"Sent general digest for switchtender (to {user})")
 
 
 # eof

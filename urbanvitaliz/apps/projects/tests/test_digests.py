@@ -106,7 +106,7 @@ def test_send_digests_for_new_sites_by_user(client):
     assert non_regional_actor.notifications.unsent().count() == 0
 
 
-def test_send_digests_for_new_switchtenders_on_project_by_user(client):
+def test_send_digests_for_switchtender_by_user(client):
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     auth.Group.objects.get_or_create(name="project_moderator")
 
@@ -152,9 +152,9 @@ def test_send_digests_for_new_switchtenders_on_project_by_user(client):
     assert regional_actor2.notifications.unsent().count() == 1
     assert non_regional_actor.notifications.unsent().count() == 0
 
-    digests.send_digests_for_new_switchtenders_on_project_by_user(regional_actor)
-    digests.send_digests_for_new_switchtenders_on_project_by_user(regional_actor2)
-    digests.send_digests_for_new_switchtenders_on_project_by_user(non_regional_actor)
+    digests.send_digest_for_switchtender_by_user(regional_actor)
+    digests.send_digest_for_switchtender_by_user(regional_actor2)
+    digests.send_digest_for_switchtender_by_user(non_regional_actor)
 
     assert regional_actor.notifications.unsent().count() == 0
     assert regional_actor2.notifications.unsent().count() == 0

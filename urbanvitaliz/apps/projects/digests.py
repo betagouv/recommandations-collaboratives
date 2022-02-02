@@ -153,50 +153,65 @@ def send_digests_for_new_sites_by_user(user):
     return True
 
 
-def send_digests_for_new_switchtenders_on_project_by_user(user):
-    """
-    When new switchtenders have joined a project, warn other regional
-    switchtenders.
-    """
-    project_ct = ContentType.objects.get_for_model(models.Project)
+def send_digest_for_non_switchtender_by_user(user):
+    return send_digest_by_user(user, template_name="digest_for_non_switchtender")
 
-    notifications = (
-        user.notifications.unsent()
-        .filter(
-            target_content_type=project_ct,
-            verb="est devenu·e aiguilleur·se sur le projet",
-        )
-        .order_by("target_object_id")
-    )
+
+def send_digest_for_switchtender_by_user(user):
+    return send_digest_by_user(user, template_name="digest_for_switchtender")
+
+
+def send_digest_by_user(user, template_name):
+    """
+    Digests for switchtenders. Should be run at the end, to collect
+    remaining notifications
+    """
+    notifications = user.notifications.unsent().order_by("target_object_id")
 
     if notifications.count() == 0:
         return False
 
-    for notification in notifications:
-        project = notification.action_object
-        switchtender = notification.actor
+    email_params = {"projects": [], "notification_count": notifications.count()}
+
+    for project_id, project_notifications in groupby(
+        notifications, key=lambda x: x.target_object_id
+    ):
+        project = models.Project.objects.get(pk=project_id)
         project_link = utils.build_absolute_url(
             reverse("projects-project-detail", args=[project.pk])
         )
-        email_params = {
-            "switchtender": {
-                "first_name": switchtender.first_name,
-                "last_name": switchtender.last_name,
+
+        email_project_params = {
+            "name": project.name,
+            "url": project_link,
+            "commune": {
+                "postal": project.commune.postal,
+                "name": project.commune.name,
             },
-            "project": {
-                "name": project.name,
-                "url": project_link,
-                "commune": {
-                    "postal": project.commune.postal,
-                    "name": project.commune.name,
-                },
-            },
+            "notifications": [],
+            "notification_count": 0,
         }
 
-        if switchtender.profile.organization:
-            email_params["organization"] = switchtender.profile.organization.name
+        notification_count = 0
+        for notification in project_notifications:
+            notification_count += 1
 
-        send_email("new_site_for_switchtender", user.email, params=email_params)
+            email_project_params["notifications"].append(
+                f"{notification.actor} {notification.verb} {notification.action_object}"
+            )
+
+        email_project_params["notification_count"] = notification_count
+        email_params["projects"].append(email_project_params)
+
+    name = f"{user.first_name} {user.last_name}"
+    if name.strip() == "":
+        name = "Madame/Monsieur"
+
+    send_email(
+        template_name,
+        {"name": name, "email": user.email},
+        params=email_params,
+    )
 
     # Mark them as dispatched
     notifications.mark_as_sent()
