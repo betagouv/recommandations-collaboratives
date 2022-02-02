@@ -11,6 +11,7 @@ import datetime
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.contrib.syndication.views import Feed
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
@@ -89,7 +90,12 @@ def resource_search(request):
     # filter out expired
     expired = form.cleaned_data.get("expired", False)
     if expired:
-        resources = resources.filter(expires_on__gte=datetime.date.today())
+        resources = resources.filter(Q(expires_on__lte=datetime.date.today()))
+
+    # filter out 'to be reviewed'
+    to_review = form.cleaned_data.get("to_review", False)
+    if to_review:
+        resources = resources.filter(status=models.Resource.TO_REVIEW)
 
     return render(request, "resources/resource/list.html", locals())
 
@@ -107,6 +113,7 @@ class SearchForm(forms.Form):
     limit_area = forms.CharField(required=False, empty_value=None)
 
     expired = forms.BooleanField(required=False, initial=False)
+    to_review = forms.BooleanField(required=False, initial=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -256,6 +263,7 @@ class EditResourceForm(forms.ModelForm):
         model = models.Resource
         fields = [
             "title",
+            "status",
             "subtitle",
             "summary",
             "tags",

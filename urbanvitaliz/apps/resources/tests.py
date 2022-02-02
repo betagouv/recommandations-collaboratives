@@ -13,7 +13,8 @@ import pytest
 from django.template import defaultfilters
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import login
@@ -194,6 +195,7 @@ def test_create_new_resource_and_redirect(client):
     data = {
         "title": "a title",
         "subtitle": "a sub title",
+        "status": 0,
         "summary": "a summary",
         "tags": "#tag",
         "content": "this is some content",
@@ -235,6 +237,7 @@ def test_update_resource_and_redirect(client):
     data = {
         "title": "a title",
         "subtitle": "a sub title",
+        "status": 0,
         "summary": "a summary",
         "tags": "#tag",
         "content": "this is some content",

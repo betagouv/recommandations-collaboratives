@@ -132,6 +132,14 @@
                     <label class="form-check-label text-secondary" for="check-expired">Expirées</label>
                 </span>
 
+                <span class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="{{ form.to_review.name }}"
+                           id="check-to-review"
+                           {% if form.to_review.value %}checked{% endif %}
+                    >
+                    <label class="form-check-label text-secondary" for="check-to-review">A relire</label>
+                </span>
+
             </div>
             {% endif %}
 

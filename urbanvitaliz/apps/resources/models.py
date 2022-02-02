@@ -68,7 +68,21 @@ class ResourceQuerySet(models.QuerySet):
 class Resource(models.Model):
     """Représente une ressource pour les utilisateur·ices d'UV"""
 
+    DRAFT = 0
+    TO_REVIEW = 1
+    PUBLISHED = 2
+
+    STATUS_CHOICES = (
+        (DRAFT, "Brouillon"),
+        (TO_REVIEW, "A relire"),
+        (PUBLISHED, "Publié"),
+    )
+
     objects = ResourceQuerySet.as_manager()
+
+    status = models.IntegerField(
+        choices=STATUS_CHOICES, verbose_name="État", default=DRAFT
+    )
 
     public = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(
