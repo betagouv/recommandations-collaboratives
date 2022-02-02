@@ -12,7 +12,7 @@ def send_email(template_name, recipients, params=None, test=False):
 
     # If we are in debug, use standard django send_email so it is printed
     # onto the terminal
-    if settings.DEBUG and False:
+    if settings.DEBUG:
         django_send_mail(
             "SIB Mail",
             f"Message utilisant le template {template_name} avec les paramètres : {params} (TEST MODE: {test})",
