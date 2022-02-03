@@ -1,3 +1,12 @@
+# encoding: utf-8
+
+"""
+tests for digesting emails
+
+authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
+created: 2022-02-03 16:14:54 CET
+"""
+
 from django.contrib.auth import models as auth
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -5,6 +14,11 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 
 from .. import digests, models, signals
+
+
+########################################################################
+# new reco digests
+########################################################################
 
 
 def test_send_digests_for_new_reco(client):
@@ -55,6 +69,11 @@ def test_send_digests_for_new_reco_not_sent_for_not_ready_projects(client):
     digests.send_digests_for_new_recommendations_by_user(user)
 
     assert user.notifications.unsent().count() == 1
+
+
+########################################################################
+# new sites digests
+########################################################################
 
 
 def test_send_digests_for_new_sites_by_user(client):
@@ -159,3 +178,6 @@ def test_send_digests_for_switchtender_by_user(client):
     assert regional_actor.notifications.unsent().count() == 0
     assert regional_actor2.notifications.unsent().count() == 0
     assert non_regional_actor.notifications.unsent().count() == 0
+
+
+# eof
