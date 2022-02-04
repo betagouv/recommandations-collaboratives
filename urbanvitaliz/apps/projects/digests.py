@@ -38,22 +38,18 @@ def send_digests_for_new_recommendations_by_user(user):
         # NOTE should we return a boolean or the number of notification sent?
         return False
 
-    skipped_projects = send_digest_by_project(user, notifications)
+    skipped_projects = send_recommendation_digest_by_project(user, notifications)
 
     # Mark them as dispatched
-    # NOTE it would mean more request but isn;t it cleaner to do it in inner function?
+    # NOTE it would mean more db request but could be more lean in inner function
     notifications.exclude(target_object_id__in=skipped_projects).mark_as_sent()
 
     # NOTE should we return a boolean or the number of notification sent?
     return True
 
 
-def send_digest_by_project(user, notifications):
+def send_recommendation_digest_by_project(user, notifications):
     """Send an email per project containing its notifications."""
-
-    user_name = f"{user.first_name} {user.last_name}"
-    if user_name.strip() == "":
-        user_name = "Madame/Monsieur"
 
     skipped_projects = []
     for project_id, project_notifications in groupby(
@@ -69,7 +65,7 @@ def send_digest_by_project(user, notifications):
 
         send_email(
             "new_recommendations_digest",
-            {"name": user_name, "email": user.email},
+            {"name": normalize_user_name(user), "email": user.email},
             params=digest,
         )
 
@@ -79,24 +75,12 @@ def send_digest_by_project(user, notifications):
 def make_digest_of_project_recommendations(project, project_notifications):
     """Return digest for project recommendations to be sent to user"""
     recommendations = make_recommendations_digest(project_notifications)
-
-    project_link = utils.build_absolute_url(
-        reverse("projects-project-detail", args=[project.id])
-    )
-    digest = {
+    project_digest = make_project_digest(project)
+    return {
         "notification_count": len(recommendations),
-        "project": {
-            "name": project.name,
-            "url": project_link,
-            "commune": {
-                "postal": project.commune and project.commune.postal or "",
-                "name": project.commune and project.commune.name or "",
-            },
-        },
+        "project": project_digest,
         "recos": recommendations,
     }
-
-    return digest
 
 
 def make_recommendations_digest(project_notifications):
@@ -111,6 +95,21 @@ def make_recommendations_digest(project_notifications):
     return recommendations
 
 
+def make_project_digest(project):
+    """Return base information digest for project"""
+    project_link = utils.build_absolute_url(
+        reverse("projects-project-detail", args=[project.id])
+    )
+    return {
+        "name": project.name,
+        "url": project_link,
+        "commune": {
+            "postal": project.commune and project.commune.postal or "",
+            "name": project.commune and project.commune.name or "",
+        },
+    }
+
+
 def make_action_digest(action):
     """Return digest of action"""
     action_link = utils.build_absolute_url(
@@ -121,14 +120,18 @@ def make_action_digest(action):
             "first_name": action.created_by.first_name,
             "last_name": action.created_by.last_name,
             "organization": {
-                "name": action.created_by.profile.organization
-                and action.created_by.profile.organization.name
-                or ""
+                "name": (
+                    action.created_by.profile.organization
+                    and action.created_by.profile.organization.name
+                    or ""
+                )
             },
         },
         "intent": action.intent,
         "content": action.content,
-        "resource": {"title": action.resource and action.resource.title or ""},
+        "resource": {
+            "title": action.resource and action.resource.title or "",
+        },
         "url": action_link,
     }
 
@@ -148,46 +151,62 @@ def send_digests_for_new_sites_by_user(user):
     )
 
     if notifications.count() == 0:
+        # NOTE should we return a boolean or the number of notification sent?
         return False
 
-    for notification in notifications:
-        project = notification.action_object
-        project_link = utils.build_absolute_url(
-            reverse("projects-project-detail", args=[project.pk])
-        )
-        email_params = {
-            "project": {
-                "name": project.name,
-                "org_name": project.org_name,
-                "url": project_link,
-                "commune": {
-                    "postal": project.commune.postal,
-                    "name": project.commune.name,
-                    "department": {
-                        "code": project.commune.department.code,
-                        "name": project.commune.department.name,
-                    },
-                },
-            },
-        }
+    send_new_site_digest_by_user(user, notifications)
 
-        name = f"{user.first_name} {user.last_name}"
-        if name.strip() == "":
-            name = "Madame/Monsieur"
+    # Mark them as dispatched
+    # NOTE it would mean more db request but could be more lean in inner function
+    notifications.mark_as_sent()
+
+    # NOTE should we return a boolean or the number of notification sent?
+    return True
+
+
+def send_new_site_digest_by_user(user, notifications):
+    """Send digest of new site by user"""
+
+    for notification in notifications:
+
+        digest = make_digest_for_new_site(notification)
 
         send_email(
             "new_site_for_switchtender",
-            {
-                "name": name,
-                "email": user.email,
-            },
-            params=email_params,
+            {"name": normalize_user_name(user), "email": user.email},
+            params=digest,
         )
 
-    # Mark them as dispatched
-    notifications.mark_as_sent()
 
-    return True
+def make_digest_for_new_site(notification):
+    """Return a digest of new site from notification"""
+    project = notification.action_object
+    project_link = utils.build_absolute_url(
+        reverse("projects-project-detail", args=[project.pk])
+    )
+    # NOTE mose information associated to project on this one.  can we make
+    # the same for all ? so make_project_digest could be used in all
+    # places?
+    return {
+        "project": {
+            "name": project.name,
+            "org_name": project.org_name,
+            "url": project_link,
+            "commune": {
+                "postal": project.commune.postal,
+                "name": project.commune.name,
+                "department": {
+                    "code": project.commune.department.code,
+                    "name": project.commune.department.name,
+                },
+            },
+        },
+    }
+
+
+########################################################################
+# send digest by user (NOTE for remaining notif?)
+########################################################################
 
 
 def send_digest_for_non_switchtender_by_user(user):
@@ -206,54 +225,79 @@ def send_digest_by_user(user, template_name):
     notifications = user.notifications.unsent().order_by("target_object_id")
 
     if notifications.count() == 0:
+        # NOTE should we return a boolean or the number of notification sent?
         return False
 
-    email_params = {"projects": [], "notification_count": notifications.count()}
+    projects_digest = make_remaining_notifications_digest(notifications)
+
+    digest = {
+        "projects": projects_digest,
+        "notification_count": notifications.count(),
+    }
+
+    send_email(
+        template_name,
+        {"name": normalize_user_name(user), "email": user.email},
+        params=digest,
+    )
+
+    # Mark them as dispatched
+    # NOTE it would mean more db request but could be more lean in inner function
+    notifications.mark_as_sent()
+
+    # NOTE should we return a boolean or the number of notification sent?
+    return True
+
+
+def make_remaining_notifications_digest(notifications):
+    """Return digests for given notifications"""
+    digest = []
 
     for project_id, project_notifications in groupby(
         notifications, key=lambda x: x.target_object_id
     ):
-        project = models.Project.objects.get(pk=project_id)
-        project_link = utils.build_absolute_url(
-            reverse("projects-project-detail", args=[project.pk])
-        )
+        project_digest = make_project_notifications_digest(project_id, notifications)
+        digest.append(project_digest)
 
-        email_project_params = {
-            "name": project.name,
-            "url": project_link,
-            "commune": {
-                "postal": project.commune.postal,
-                "name": project.commune.name,
-            },
-            "notifications": [],
-            "notification_count": 0,
+    return digest
+
+
+def make_project_notifications_digest(project_id, notifications):
+    """Return digest for given project notification"""
+    project = models.Project.objects.get(pk=project_id)
+
+    digest = make_project_digest(project)
+
+    # NOTE do you prefer a dict update or two lines of d[key] = value ?
+    notifications_digest = make_notifications_digest(notifications)
+    digest.update(
+        {
+            "notifications": notifications_digest,
+            "notification_count": len(notifications_digest),
         }
-
-        notification_count = 0
-        for notification in project_notifications:
-            notification_count += 1
-
-            email_project_params["notifications"].append(
-                f"{notification.actor} {notification.verb} {notification.action_object}"
-            )
-
-        email_project_params["notification_count"] = notification_count
-        email_params["projects"].append(email_project_params)
-
-    name = f"{user.first_name} {user.last_name}"
-    if name.strip() == "":
-        name = "Madame/Monsieur"
-
-    send_email(
-        template_name,
-        {"name": name, "email": user.email},
-        params=email_params,
     )
+    return digest
 
-    # Mark them as dispatched
-    notifications.mark_as_sent()
 
-    return True
+def make_notifications_digest(notifications):
+    """Return digest of given notifications"""
+    return [
+        f"{notification.actor} {notification.verb} {notification.action_object}"
+        for notification in notifications
+    ]
+
+
+########################################################################
+# helpers
+########################################################################
+
+
+def normalize_user_name(user):
+    """Return a user full name or standard greeting by default"""
+    user_name = f"{user.first_name} {user.last_name}"
+    if user_name.strip() == "":
+        user_name = "Madame/Monsieur"
+    return user_name
 
 
 # eof
