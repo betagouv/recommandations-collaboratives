@@ -180,6 +180,25 @@ def resource_detail(request, resource_id=None):
             .distinct()
         )
 
+    contacts = resource.contacts
+
+    # If our user is responsible for a local authority, only show the
+    # relevant contacts (=localized)
+    if not check_if_switchtender(request.user) and not request.user.is_anonymous:
+        user_projects = projects.Project.objects.filter(
+            emails__contains=request.user.email
+        )
+        if user_projects.count():
+            user_depts = (
+                user_projects.exclude(commune=None)
+                .values_list("commune__department__code", flat=True)
+                .distinct()
+            )
+            contacts = resource.contacts.filter(
+                Q(organization__departments__in=user_depts)
+                | Q(organization__departments=None)
+            )
+
     return render(request, "resources/resource/details.html", locals())
 
 

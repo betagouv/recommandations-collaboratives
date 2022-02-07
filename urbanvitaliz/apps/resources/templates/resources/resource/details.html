@@ -189,25 +189,25 @@
             {{ resource.content_rendered|safe }}
         </div>
 
-        {% if resource.contacts.count %}
+        {% if contacts.count %}
         <div class="contact-list mt-5 mb-5">
             <h3 class="mb-3">
                 <svg class="bi me-2 align-middle" width="24" height="24">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
                 </svg>
-                Contact{{ resource.contacts.count|pluralize }}
+                Contact{{ contacts.count|pluralize }}
             </h3>
             {% if user.is_anonymous %}
-            {% for contact in resource.contacts.all %}
+            {% for contact in contacts.all %}
             <span id="contact-{{ contact.id}}"></span>
             {% endfor %}
 
-            Nous avons {{ resource.contacts.count }} contact{{ resource.contacts.count|pluralize }} associé{{ resource.contacts.count|pluralize }}
+            Nous avons {{ contacts.count }} contact{{ contacts.count|pluralize }} associé{{ contacts.count|pluralize }}
             à cette fiche. Si vous souhaitez y accéder, veuillez <a href="{% url 'magicauth-login' %}">vous identifier</a>.
             {% else %}
 
             <div class="row row-cols-1 row-cols-md-2">
-                {% for contact in resource.contacts.all %}
+                {% for contact in contacts.all %}
                 <div class="col mb-3" id="contact-{{ contact.id }}">
                     {% include 'addressbook/widgets/card_contact_horizontal.html' with contact=contact show_id=True %}
                 </div>
