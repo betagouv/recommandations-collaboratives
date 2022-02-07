@@ -255,7 +255,9 @@ def make_remaining_notifications_digest(notifications):
     for project_id, project_notifications in groupby(
         notifications, key=lambda x: x.target_object_id
     ):
-        project_digest = make_project_notifications_digest(project_id, notifications)
+        project_digest = make_project_notifications_digest(
+            project_id, project_notifications
+        )
         digest.append(project_digest)
 
     return digest
