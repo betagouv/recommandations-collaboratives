@@ -186,7 +186,7 @@
                         {% if user.is_staff %}
                         <li><hr class="dropdown-divider"></li>
                         {% if is_switchtender %}
-                        <li><a class="dropdown-item" href="{% url 'switchtender-dashboard' %}">Tableau de Bord</a></li>
+                        <li><a class="dropdown-item" href="{% url 'projects-project-list' %}">Tableau de Bord</a></li>
                         {% endif %}
                         <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>
                         {% endif %}
