@@ -77,6 +77,8 @@
                 <strong>{{ recipient.get_full_name|default:recipient.email }}</strong>
                 {% if recipient.profile.organization %}
                 - {{ recipient.profile.organization.name }}
+                {% elif recipient.email in project.emails %}
+                - {{ project.org_name|capfirst }}
                 {% endif %}
             </span>
         </div>
