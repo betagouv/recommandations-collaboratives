@@ -214,6 +214,7 @@ def resource_create(request):
             resource = form.save(commit=False)
             resource.created_by = request.user
             resource.save()
+            form.save_m2m()
             next_url = reverse("resources-resource-detail", args=[resource.id])
             return redirect(next_url)
     else:
