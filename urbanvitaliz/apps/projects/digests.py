@@ -16,7 +16,6 @@ from urbanvitaliz.apps.communication.api import send_email
 
 from . import models
 
-
 ########################################################################
 # reco digests
 ########################################################################
@@ -35,8 +34,7 @@ def send_digests_for_new_recommendations_by_user(user):
     )
 
     if notifications.count() == 0:
-        # NOTE should we return a boolean or the number of notification sent?
-        return False
+        return 0
 
     skipped_projects = send_recommendation_digest_by_project(user, notifications)
 
@@ -44,8 +42,7 @@ def send_digests_for_new_recommendations_by_user(user):
     # NOTE it would mean more db request but could be more lean in inner function
     notifications.exclude(target_object_id__in=skipped_projects).mark_as_sent()
 
-    # NOTE should we return a boolean or the number of notification sent?
-    return True
+    return notifications.exclude(target_object_id__in=skipped_projects).count()
 
 
 def send_recommendation_digest_by_project(user, notifications):
@@ -151,8 +148,7 @@ def send_digests_for_new_sites_by_user(user):
     )
 
     if notifications.count() == 0:
-        # NOTE should we return a boolean or the number of notification sent?
-        return False
+        return 0
 
     send_new_site_digest_by_user(user, notifications)
 
@@ -160,8 +156,7 @@ def send_digests_for_new_sites_by_user(user):
     # NOTE it would mean more db request but could be more lean in inner function
     notifications.mark_as_sent()
 
-    # NOTE should we return a boolean or the number of notification sent?
-    return True
+    return notifications.count()
 
 
 def send_new_site_digest_by_user(user, notifications):
@@ -205,15 +200,21 @@ def make_digest_for_new_site(notification):
 
 
 ########################################################################
-# send digest by user (NOTE for remaining notif?)
+# send digest by user
 ########################################################################
 
 
 def send_digest_for_non_switchtender_by_user(user):
+    """
+    Digest containing generic notifications (=those which weren't collected)
+    """
     return send_digest_by_user(user, template_name="digest_for_non_switchtender")
 
 
 def send_digest_for_switchtender_by_user(user):
+    """
+    Digest containing generic notifications (=those which weren't collected)
+    """
     return send_digest_by_user(user, template_name="digest_for_switchtender")
 
 
@@ -225,8 +226,7 @@ def send_digest_by_user(user, template_name):
     notifications = user.notifications.unsent().order_by("target_object_id")
 
     if notifications.count() == 0:
-        # NOTE should we return a boolean or the number of notification sent?
-        return False
+        return 0
 
     projects_digest = make_remaining_notifications_digest(notifications)
 
@@ -245,8 +245,7 @@ def send_digest_by_user(user, template_name):
     # NOTE it would mean more db request but could be more lean in inner function
     notifications.mark_as_sent()
 
-    # NOTE should we return a boolean or the number of notification sent?
-    return True
+    return notifications.count()
 
 
 def make_remaining_notifications_digest(notifications):
@@ -268,7 +267,6 @@ def make_project_notifications_digest(project_id, notifications):
 
     digest = make_project_digest(project)
 
-    # NOTE do you prefer a dict update or two lines of d[key] = value ?
     notifications_digest = make_notifications_digest(notifications)
     digest.update(
         {
