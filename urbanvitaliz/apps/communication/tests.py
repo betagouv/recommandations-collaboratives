@@ -47,7 +47,10 @@ def test_sib_send_test_email(mocker, client):
     mocker.patch("sib_api_v3_sdk.TransactionalEmailsApi.send_test_template")
 
     sib.send_email(
-        template_id=1, recipients="bob@example.com", params={"p1": "v1"}, test=True
+        template_id=1,
+        recipients={"name": "Bob", "email": "bob@example.com"},
+        params={"p1": "v1"},
+        test=True,
     )
 
     sib.api_instance.send_test_template.assert_called_once()

@@ -208,22 +208,35 @@ def send_digest_for_non_switchtender_by_user(user):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
-    return send_digest_by_user(user, template_name="digest_for_non_switchtender")
+    queryset = user.notifications.exclude(
+        target_content_type=project_ct, verb="a recommandé l'action"
+    ).unsent()
+
+    return send_digest_by_user(
+        user, template_name="digest_for_non_switchtender", queryset=queryset
+    )
 
 
 def send_digest_for_switchtender_by_user(user):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
-    return send_digest_by_user(user, template_name="digest_for_switchtender")
+    queryset = user.notifications.exclude(verb="a recommandé l'action").unsent()
+    return send_digest_by_user(
+        user, template_name="digest_for_switchtender", queryset=queryset
+    )
 
 
-def send_digest_by_user(user, template_name):
+def send_digest_by_user(user, template_name, queryset=None):
     """
-    Digests for switchtenders. Should be run at the end, to collect
-    remaining notifications
+    Should be run at the end, to collect remaining notifications
     """
-    notifications = user.notifications.unsent().order_by("target_object_id")
+    if not queryset:
+        notifications = user.notifications.unsent()
+    else:
+        notifications = queryset
+
+    notifications.order_by("target_object_id")
 
     if notifications.count() == 0:
         return 0
