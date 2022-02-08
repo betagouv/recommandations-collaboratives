@@ -51,7 +51,7 @@ class Command(BaseCommand):
         if send_in_blue_email(template.name, recipients, params=payload):
             print("Email sent! :)")
         else:
-            print("Someting went wrong! :(")
+            print("Something went wrong! :(")
 
 
 # eof
