@@ -55,7 +55,7 @@ def access_update(request, project_id):
 
                 send_email(
                     template_name="sharing invitation",
-                    recipients=[email],
+                    recipients=[{"email": email}],
                     params={
                         "sender": {"email": request.user.email},
                         "project": {"name": project.name, "url": project_url},
