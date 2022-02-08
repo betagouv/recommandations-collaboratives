@@ -81,7 +81,7 @@
             </h3>
             {% activity_stream "model_actions" project_model %}
             <ul class="list-group">
-                {% for action in stream|slice:":20" %}
+                {% for action in stream|slice:":50" %}
                 <li class="list-group-item">
 
                     <span class="text-secondary">{{ action.timestamp|naturalday|capfirst }}</span> -
@@ -109,7 +109,7 @@
             </h3>
             {% activity_stream "model_actions" user_model %}
             <ul class="list-group">
-                {% for action in stream|slice:":10" %}
+                {% for action in stream|slice:":50" %}
                 {% if action.verb == "s'est connecté" %}
                 <li class="list-group-item">
                     {{ action.timestamp|naturalday|capfirst }} - {{ action.actor|capfirst }} {{ action.verb }}
@@ -135,7 +135,7 @@
 
             {% regroup request.user.tasks_created.all by project as project_list %}
             <ul class="list-group">
-                {% for project in project_list %}
+                {% for project in project_list|slice:":30" %}
                 <li class="list-group-item"><a href="{{project.grouper.get_absolute_url }}">{{ project.grouper }}</a></li>
                 {% endfor %}
             </ul>
@@ -148,7 +148,7 @@
                 <span class="align-middle">Mes dernières actions</span>
             </h3>
             <ul>
-                {% for task in request.user.tasks_created.all %}
+                {% for task in request.user.tasks_created.all|slice:":30" %}
                 <li><a href="{{ task.get_absolute_url }}">{{ task }}</a> ({{ task.project }})</li>
                 {% endfor %}
             </ul>
