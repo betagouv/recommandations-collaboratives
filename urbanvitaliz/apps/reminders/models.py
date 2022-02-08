@@ -12,6 +12,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
+from urbanvitaliz.apps.communication import models as communication_models
 
 
 class MailManager(models.Manager):
@@ -31,6 +32,7 @@ class SentMailManager(models.Manager):
 class Mail(models.Model):
     """Represents a mail to be sent on a given date"""
 
+    UNKNOWN = 0
     SELF = 1
     STAFF = 2
 
@@ -43,10 +45,22 @@ class Mail(models.Model):
     sent = SentMailManager()
 
     recipient = models.CharField(max_length=128)
+
+    deadline = models.DateField()
+
+    # django method (deprecated)
     subject = models.TextField(default="")
     text = models.TextField(default="")
     html = models.TextField(default="")
-    deadline = models.DateField()
+
+    # SendInBlue
+    template = models.ForeignKey(
+        communication_models.EmailTemplate,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+    template_params = models.JSONField(null=True, blank=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.PositiveIntegerField(default=0)

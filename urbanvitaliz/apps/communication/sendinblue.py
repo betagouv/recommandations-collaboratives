@@ -31,7 +31,8 @@ class SendInBlue:
         else:
             send_to = [
                 sib_api_v3_sdk.SendSmtpEmailTo(
-                    name=recipient["name"], email=recipient["email"]
+                    name=recipient.get("name", "Utilisateur UrbanVitaliz"),
+                    email=recipient["email"],
                 )
                 for recipient in recipients
             ]

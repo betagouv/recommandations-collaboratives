@@ -8,20 +8,17 @@ created: 2021-09-28 13:17:53 CEST
 """
 
 import datetime
-import pytest
 
-from django.test.client import RequestFactory
+import django.core.mail
+import pytest
 from django.conf import settings
 from django.core.management import call_command
-import django.core.mail
-
+from django.test.client import RequestFactory
 from model_bakery import baker
-
+from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.projects import models as projects
 
-from . import api
-from . import models
-
+from . import api, models
 
 ########################################################################
 # Create reminders
@@ -30,31 +27,26 @@ from . import models
 
 @pytest.mark.django_db
 def test_create_mail_reminder_using_provided_information():
-    url = "/project/action/0/"
-    request = RequestFactory().get(url)
+    task = baker.make(projects.Task)
     recipient = "test@example.com"
-    subject = "[UV] action reminder"
-    template = "reminders/test"
-    related = baker.make(projects.Task)
+    template = baker.make(communication.EmailTemplate)
+    related = task
     delay = 14
-    extra = {"notes": "some notes."}
+    template_params = {"key": "val"}
 
     api.create_reminder_email(
-        request,
-        recipient,
-        subject,
-        template,
+        recipient=recipient,
+        template_name=template.name,
+        template_params=template_params,
         related=related,
         delay=delay,
-        extra_context=extra,
     )
 
     reminder = models.Mail.to_send.all()[0]
 
     assert reminder.recipient == recipient
-    assert reminder.subject == subject
-    assert extra["notes"] in reminder.text
-    assert url in reminder.text
+    assert reminder.template == template
+    assert reminder.template_params == template_params
 
     assert reminder.deadline == datetime.date.today() + datetime.timedelta(days=delay)
 
@@ -63,24 +55,19 @@ def test_create_mail_reminder_using_provided_information():
 def test_create_mail_reminder_replace_existing_ones():
     task = baker.make(projects.Task)
     recipient = "test@example.com"
-    url = "/project/action/0/"
-    request = RequestFactory().get(url)
-    subject = "[UV] action reminder"
-    template = "reminders/test"
+    template = baker.make(communication.EmailTemplate)
     related = task
     delay = 14
-    extra = {"notes": "some notes."}
+    template_params = {"key": "val"}
 
     baker.make(models.Mail, related=task, recipient=recipient)
 
     api.create_reminder_email(
-        request,
-        recipient,
-        subject,
-        template,
+        recipient=recipient,
+        template_name=template.name,
+        template_params=template_params,
         related=related,
         delay=delay,
-        extra_context=extra,
     )
 
     assert models.Mail.to_send.count() == 1
@@ -88,9 +75,8 @@ def test_create_mail_reminder_replace_existing_ones():
     reminder = models.Mail.to_send.all()[0]
 
     assert reminder.recipient == recipient
-    assert reminder.subject == subject
-    assert extra["notes"] in reminder.text
-    assert url in reminder.text
+    assert reminder.template == template
+    assert reminder.template_params == template_params
 
     assert reminder.deadline == datetime.date.today() + datetime.timedelta(days=delay)
 
