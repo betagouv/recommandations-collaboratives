@@ -208,6 +208,8 @@ def send_digest_for_non_switchtender_by_user(user):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
+    project_ct = ContentType.objects.get_for_model(models.Project)
+
     queryset = user.notifications.exclude(
         target_content_type=project_ct, verb="a recommandé l'action"
     ).unsent()
