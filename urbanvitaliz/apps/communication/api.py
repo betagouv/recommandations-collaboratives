@@ -22,9 +22,6 @@ from .sendinblue import SendInBlue
 
 
 def send_in_blue_email(template_name, recipients, params=None, test=False):
-    if not type(recipients) == "list":
-        recipients = [recipients]
-
     sib = SendInBlue()
     try:
         template = EmailTemplate.objects.get(name__iexact=template_name)
@@ -38,7 +35,7 @@ def send_in_blue_email(template_name, recipients, params=None, test=False):
 
 
 def send_debug_email(template_name, recipients, params=None, test=False):
-    if not type(recipients) == "list":
+    if type(recipients) is not list:
         recipients = [recipients]
 
     django_send_mail(

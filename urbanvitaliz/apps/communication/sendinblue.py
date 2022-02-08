@@ -22,7 +22,9 @@ class SendInBlue:
             recipients = [recipients]
 
         if test:
-            send_test_email = sib_api_v3_sdk.SendTestEmail(email_to=recipients)
+            send_test_email = sib_api_v3_sdk.SendTestEmail(
+                email_to=[recipients[0]["email"]]
+            )
             response = self.api_instance.send_test_template(
                 template_id, send_test_email
             )
@@ -33,6 +35,7 @@ class SendInBlue:
                 )
                 for recipient in recipients
             ]
+
             send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
                 template_id=template_id, to=send_to, params=params
             )
