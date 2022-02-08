@@ -48,7 +48,7 @@ def send_debug_email(template_name, recipients, params=None, test=False):
     return True
 
 
-if settings.DEBUG:
+if settings.DEBUG and not (settings.SENDINBLUE_API_KEY):
     send_email = send_debug_email
 else:
     send_email = send_in_blue_email

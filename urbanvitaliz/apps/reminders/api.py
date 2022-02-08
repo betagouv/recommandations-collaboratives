@@ -9,24 +9,19 @@ created: 2021-09-28 12:59:08 CEST
 
 import datetime
 
-from django.template import loader
-
 from django.contrib.contenttypes.models import ContentType
-
-from django.contrib.sites.shortcuts import get_current_site
+from urbanvitaliz.apps.communication import models as communication_models
 
 from . import models
 
 
 def create_reminder_email(
-    request,
     recipient,
-    subject,
-    template_base_name,
+    template_name,
+    template_params,
     related,
-    origin=0,
+    origin=models.Mail.UNKNOWN,
     delay=15,
-    extra_context=None,
 ):
     """Prepare an email raw or html to be sent in delay days, inspired by magicauth"""
 
@@ -36,28 +31,21 @@ def create_reminder_email(
     if not related:
         return
     content_type = ContentType.objects.get_for_model(related)
+
+    # Remove old ones
     models.Mail.to_send.filter(
         content_type=content_type, object_id=related.id, recipient=recipient
     ).delete()
 
-    html_template = template_base_name + ".html"
-    text_template = template_base_name + ".txt"
-
-    context = {"site": get_current_site(request), "request": request}
-    if extra_context:
-        context.update(extra_context)
-
-    text_message = loader.render_to_string(text_template, context)
-    html_message = loader.render_to_string(html_template, context)
+    template = communication_models.EmailTemplate.objects.get(name=template_name)
 
     deadline = datetime.date.today() + datetime.timedelta(days=delay)
 
     models.Mail(
         recipient=recipient,
-        subject=subject,
-        text=text_message,
-        html=html_message,
         deadline=deadline,
+        template=template,
+        template_params=template_params,
         related=related,
         origin=origin,
     ).save()

@@ -12,7 +12,7 @@ import datetime
 import django.core.mail
 from django.conf import settings
 from django.core.management.base import BaseCommand
-
+from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.reminders import models
 
 
@@ -26,14 +26,21 @@ class Command(BaseCommand):
         today = datetime.date.today()
         reminders = models.Mail.to_send.filter(deadline__lte=today)
         for reminder in reminders:
-            django.core.mail.send_mail(
-                subject=reminder.subject,
-                message=reminder.text,
-                from_email=settings.EMAIL_FROM,
-                html_message=reminder.html,
-                recipient_list=[reminder.recipient],
-                fail_silently=False,
-            )
+            if reminder.template:
+                send_email(
+                    reminder.template.name,
+                    [{"email": reminder.recipient}],
+                    params=reminder.template_params,
+                )
+            else:
+                django.core.mail.send_mail(
+                    subject=reminder.subject,
+                    message=reminder.text,
+                    from_email=settings.EMAIL_FROM,
+                    html_message=reminder.html,
+                    recipient_list=[reminder.recipient],
+                    fail_silently=False,
+                )
             reminder.mark_as_sent()
 
 

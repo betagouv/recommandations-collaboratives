@@ -13,7 +13,11 @@ import uuid
 from django.contrib.auth import models as auth_models
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
+from django.urls import reverse
 from django.utils import timezone
+from urbanvitaliz import utils as uv_utils
+from urbanvitaliz.apps.projects.digests import (make_action_digest,
+                                                make_project_digest)
 from urbanvitaliz.apps.reminders import api
 
 from . import models
@@ -206,13 +210,16 @@ def refresh_user_projects_in_session(request, user):
     )
 
 
+def make_rsvp_link(rsvp, status):
+    return uv_utils.build_absolute_url(
+        reverse("projects-rsvp-followup-task", args=(rsvp.pk, status))
+    )
+
+
 def create_reminder(request, days, task, recipient, origin):
     """
     Create a reminder using the reminder API and schedule a RSVP to send to the target user
     """
-    subject = f'[UrbanVitaliz] Où en êtes vous suite à nos recommandations pour le site "{task.project.name}"'
-    template = "projects/notifications/task_remind_email"
-
     target_user = None
     try:
         target_user = auth_models.User.objects.get(email=recipient)
@@ -226,15 +233,25 @@ def create_reminder(request, days, task, recipient, origin):
         rsvp.created_on = timezone.now()
         rsvp.save()
 
+    template_params = {
+        "project": make_project_digest(task.project),
+        "reco": make_action_digest(task),
+        "rsvp": {
+            "link_done": make_rsvp_link(rsvp, models.Task.DONE),
+            "link_inprogress": make_rsvp_link(rsvp, models.Task.INPROGRESS),
+            "link_blocked": make_rsvp_link(rsvp, models.Task.BLOCKED),
+            "link_notinterested": make_rsvp_link(rsvp, models.Task.NOT_INTERESTED),
+            "link_already_done": make_rsvp_link(rsvp, models.Task.ALREADY_DONE),
+        },
+    }
+
     api.create_reminder_email(
-        request,
         recipient,
-        subject,
-        template,
+        template_name="rsvp_reco",
+        template_params=template_params,
         related=task,
         origin=origin,
         delay=days,
-        extra_context={"task": task, "delay": days, "rsvp": rsvp},
     )
 
     return True

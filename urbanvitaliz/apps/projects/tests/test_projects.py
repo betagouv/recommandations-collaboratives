@@ -18,6 +18,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import (assertContains, assertNotContains,
                                    assertRedirects)
+from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -978,6 +979,7 @@ def test_delete_task_from_project_and_redirect(client):
 
 @pytest.mark.django_db
 def test_create_reminder_for_task(client):
+    baker.make(communication.EmailTemplate, name="rsvp_reco")
     project = Recipe(models.Project, email="owner@example.com").make()
     task = Recipe(models.Task, project=project).make()
     url = reverse("projects-remind-task", args=[task.id])
@@ -994,6 +996,7 @@ def test_create_reminder_for_task(client):
 
 @pytest.mark.django_db
 def test_create_reminder_without_delay_for_task(client):
+    baker.make(communication.EmailTemplate, name="rsvp_reco")
     task = Recipe(models.Task, project__email="owner@example.com").make()
     url = reverse("projects-remind-task", args=[task.id])
     with login(client, email=task.project.email):
@@ -1005,6 +1008,7 @@ def test_create_reminder_without_delay_for_task(client):
 
 @pytest.mark.django_db
 def test_recreate_reminder_after_for_same_task(client):
+    baker.make(communication.EmailTemplate, name="rsvp_reco")
     task = Recipe(models.Task, project__email="owner@example.com").make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
@@ -1023,6 +1027,7 @@ def test_recreate_reminder_after_for_same_task(client):
 
 @pytest.mark.django_db
 def test_recreate_reminder_before_for_same_task(client):
+    baker.make(communication.EmailTemplate, name="rsvp_reco")
     task = Recipe(models.Task, project__email="owner@example.com").make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
