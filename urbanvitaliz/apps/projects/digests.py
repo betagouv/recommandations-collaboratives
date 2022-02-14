@@ -276,14 +276,19 @@ def make_remaining_notifications_digest(notifications):
         project_digest = make_project_notifications_digest(
             project_id, project_notifications
         )
-        digest.append(project_digest)
+        if project_digest:
+            digest.append(project_digest)
 
     return digest
 
 
 def make_project_notifications_digest(project_id, notifications):
     """Return digest for given project notification"""
-    project = models.Project.objects.get(pk=project_id)
+    # Ignore deleted projects
+    try:
+        project = models.Project.objects.get(pk=project_id)
+    except models.Project.DoesNotExist:
+        return None
 
     digest = make_project_digest(project)
 
