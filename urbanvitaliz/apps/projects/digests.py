@@ -57,6 +57,9 @@ def send_recommendation_digest_by_project(user, notifications):
     ):
         # Only treat notifications for project in DONE status
         project = models.Project.objects.get(pk=project_id)
+        if not project:
+            continue
+
         if project.status != "DONE":
             skipped_projects.append(project_id)
             continue
@@ -168,17 +171,20 @@ def send_new_site_digest_by_user(user, notifications):
     for notification in notifications:
 
         digest = make_digest_for_new_site(notification)
-
-        send_email(
-            "new_site_for_switchtender",
-            {"name": normalize_user_name(user), "email": user.email},
-            params=digest,
-        )
+        if digest:
+            send_email(
+                "new_site_for_switchtender",
+                {"name": normalize_user_name(user), "email": user.email},
+                params=digest,
+            )
 
 
 def make_digest_for_new_site(notification):
     """Return a digest of new site from notification"""
     project = notification.action_object
+    if not project:
+        return None
+
     project_link = utils.build_absolute_url(
         reverse("projects-project-detail", args=[project.pk])
     )
