@@ -7,7 +7,7 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 updated: 2022-02-03 16:16:37 CET
 """
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from itertools import groupby
 
 from django.contrib.auth import models as auth_models
@@ -300,7 +300,7 @@ def make_project_notifications_digest(project_id, notifications):
 def make_notifications_digest(notifications):
     """Return digest of given notifications"""
     formatter = NotificationFormatter()
-    return [formatter.format(notification) for notification in notifications]
+    return [asdict(formatter.format(notification)) for notification in notifications]
 
 
 ########################################################################
@@ -391,7 +391,6 @@ class NotificationFormatter:
     def format_action_commented(self, notification):
         """An action was commented by someone"""
         subject = self._represent_user(notification.actor)
-        print(notification.action_object)
         complement = self._represent_recommendation(notification.action_object.task)
         summary = f"{subject} a commenté la recommandation '{complement}'"
         excerpt = self._represent_followup(notification.action_object)

@@ -11,11 +11,13 @@ from django.contrib.auth import models as auth
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import models as notifications_models
+from notifications.signals import notify
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.resources import models as resources_models
 
 from .. import digests, models, signals
+from ..digests import NotificationFormatter
 
 ########################################################################
 # new reco digests
@@ -179,11 +181,6 @@ def test_send_digests_for_switchtender_by_user(client):
     assert regional_actor.notifications.unsent().count() == 0
     assert regional_actor2.notifications.unsent().count() == 0
     assert non_regional_actor.notifications.unsent().count() == 0
-
-
-from notifications.signals import notify
-
-from ..digests import NotificationFormatter
 
 
 def test_notification_formatter():
