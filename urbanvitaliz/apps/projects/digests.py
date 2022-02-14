@@ -7,10 +7,13 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 updated: 2022-02-03 16:16:37 CET
 """
 
+from dataclasses import dataclass
 from itertools import groupby
 
+from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
+from multimethod import multimethod
 from urbanvitaliz import utils
 from urbanvitaliz.apps.communication.api import send_email
 
@@ -296,10 +299,8 @@ def make_project_notifications_digest(project_id, notifications):
 
 def make_notifications_digest(notifications):
     """Return digest of given notifications"""
-    return [
-        f"{notification.actor} {notification.verb} {notification.action_object}"
-        for notification in notifications
-    ]
+    formatter = NotificationFormatter()
+    return [formatter.format(notification) for notification in notifications]
 
 
 ########################################################################
@@ -313,6 +314,96 @@ def normalize_user_name(user):
     if user_name.strip() == "":
         user_name = "Madame/Monsieur"
     return user_name
+
+
+@dataclass
+class FormattedNotification:
+    summary: str
+    excerpt: str = ""
+
+
+class NotificationFormatter:
+    def format(self, notification):
+        return self.format_for_actor(notification.actor, notification)
+
+    def _format_or_default(self, dispatch_table, notification):
+        """
+        Try formatting the notification by the dispatch table or
+        use the default reprensentation
+        """
+        try:
+            return dispatch_table[notification.verb](notification)
+        except KeyError:
+            return FormattedNotification(
+                summary=f"{notification.actor} {notification.verb} {notification.action_object}"
+            )
+
+    # ------ Formatter Utils -----#
+    def _represent_user(self, user):
+        if user.last_name:
+            fmt = f"{user.first_name} {user.last_name}"
+        else:
+            fmt = f"{user}"
+
+        if user.profile.organization:
+            fmt += f" ({user.profile.organization.name})"
+
+        return fmt
+
+    def _represent_recommendation(self, recommendation):
+        if recommendation.resource:
+            return recommendation.resource.title
+
+        return recommendation.intent
+
+    def _represent_project(self, project):
+        return f"{project.name (project.commune)}"
+
+    def _represent_recommendation_excerpt(self, recommendation):
+        return recommendation.content[:25]
+
+    def _represent_followup(self, followup):
+        return followup.comment
+
+    # -------- Routers -----------#
+    @multimethod
+    def format_for_actor(self, actor: auth_models.User, notification):
+        """Format for User"""
+        return self._format_or_default(
+            {
+                "a commenté l'action": self.format_action_commented,
+                "est devenu·e aiguilleur·se sur le projet": self.format_action_became_switchtender,
+                "a recommandé l'action": self.format_action_recommended,
+            },
+            notification,
+        )
+
+    # ------ Real Formatters -----#
+    def format_action_recommended(self, notification):
+        """An action was recommended by a switchtender"""
+        subject = self._represent_user(notification.actor)
+        complement = self._represent_recommendation(notification.action_object)
+        summary = f"{subject} a recommandé '{complement}'"
+        excerpt = self._represent_recommendation_excerpt(notification.action_object)
+
+        return FormattedNotification(summary=summary, excerpt=excerpt)
+
+    def format_action_commented(self, notification):
+        """An action was commented by someone"""
+        subject = self._represent_user(notification.actor)
+        print(notification.action_object)
+        complement = self._represent_recommendation(notification.action_object.task)
+        summary = f"{subject} a commenté la recommandation '{complement}'"
+        excerpt = self._represent_followup(notification.action_object)
+
+        return FormattedNotification(summary=summary, excerpt=excerpt)
+
+    def format_action_became_switchtender(self, notification):
+        """Someone joined a project as switchtender"""
+        subject = self._represent_user(notification.actor)
+        summary = f"{subject} s'est joint·e à l'équipe d'aiguillage."
+
+        return FormattedNotification(summary=summary, excerpt=None)
 
 
 # eof

@@ -19,3 +19,4 @@ sib-api-v3-sdk
 django-sass-processor
 libsass
 django-compressor
+multimethod==1.7
