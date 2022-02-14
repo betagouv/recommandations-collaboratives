@@ -10,11 +10,12 @@ created: 2022-02-03 16:14:54 CET
 from django.contrib.auth import models as auth
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from notifications import models as notifications_models
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
+from urbanvitaliz.apps.resources import models as resources_models
 
 from .. import digests, models, signals
-
 
 ########################################################################
 # new reco digests
@@ -178,6 +179,78 @@ def test_send_digests_for_switchtender_by_user(client):
     assert regional_actor.notifications.unsent().count() == 0
     assert regional_actor2.notifications.unsent().count() == 0
     assert non_regional_actor.notifications.unsent().count() == 0
+
+
+from notifications.signals import notify
+
+from ..digests import NotificationFormatter
+
+
+def test_notification_formatter():
+    formatter = NotificationFormatter()
+
+    user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
+    organization = Recipe(addressbook_models.Organization, name="DuckCorp").make()
+    user.profile.organization = organization
+    user.profile.save()
+    recipient = Recipe(auth.User).make()
+    resource = Recipe(resources_models.Resource, title="Belle Ressource").make()
+    task = Recipe(
+        models.Task,
+        intent="my intent",
+        content="A very nice content",
+        resource=resource,
+    ).make()
+    followup = Recipe(models.TaskFollowup, task=task, comment="Hello!").make()
+    project = Recipe(models.Project, name="Nice Project").make()
+
+    notify.send(
+        user,
+        recipient=recipient,
+        verb="a commenté l'action",
+        action_object=followup,
+        target=project,
+    )
+
+    notify.send(
+        user,
+        recipient=recipient,
+        verb="a recommandé l'action",
+        action_object=task,
+        target=project,
+    )
+
+    notify.send(
+        user,
+        recipient=recipient,
+        verb="est devenu·e aiguilleur·se sur le projet",
+        action_object=project,
+        target=project,
+    )
+
+    notify.send(
+        user,
+        recipient=recipient,
+        verb="action inconnue",
+        action_object=project,
+        target=project,
+    )
+
+    expected = (
+        ("Bob action inconnue Nice Project", None),
+        ("Bobi Joe (DuckCorp) s'est joint·e à l'équipe d'aiguillage.", None),
+        ("Bobi Joe (DuckCorp) a recommandé 'Belle Ressource'", task.content),
+        (
+            "Bobi Joe (DuckCorp) a commenté la recommandation 'Belle Ressource'",
+            followup.comment,
+        ),
+    )
+
+    for idx, notification in enumerate(notifications_models.Notification.objects.all()):
+        fmt_reco = formatter.format(notification)
+        assert expected[idx][0] in fmt_reco.summary
+        if expected[idx][1]:
+            assert expected[idx][1] in fmt_reco.excerpt
 
 
 # eof
