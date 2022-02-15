@@ -14,6 +14,7 @@ from . import views
 
 urlpatterns = [
     path(r"", views.HomePageView.as_view(), name="home"),
+    path(r"login-redirect", views.LoginRedirectView.as_view(), name="login-redirect"),
     path(r"stats", views.StatisticsView.as_view(), name="statistics"),
     path(r"methodologie", views.MethodologyPageView.as_view(), name="methodology"),
     path(r"qui-sommes-nous", views.WhoWeArePageView.as_view(), name="whoweare"),
