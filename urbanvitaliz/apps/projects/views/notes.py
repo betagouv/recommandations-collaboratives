@@ -106,8 +106,14 @@ def update_note(request, note_id=None):
             instance.save()
             instance.project.updated_on = instance.updated_on
             instance.project.save()
+            if instance.public:
+                return redirect(
+                    reverse("projects-project-detail", args=[note.project_id])
+                    + "#sheet"
+                )
+
             return redirect(
-                reverse("projects-project-detail", args=[note.project_id]) + "#sheet"
+                reverse("projects-project-detail", args=[note.project_id]) + "#activity"
             )
     else:
         if is_switchtender:

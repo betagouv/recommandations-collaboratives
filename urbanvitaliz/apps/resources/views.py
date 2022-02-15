@@ -168,18 +168,6 @@ def resource_detail(request, resource_id=None):
             .distinct()
         )
 
-    active_project = projects_utils.get_active_project(request)
-    active_project_actions = []
-
-    if active_project and projects_utils.can_manage_project(
-        active_project, request.user
-    ):
-        active_project_actions = (
-            projects.Task.objects.open()
-            .filter(project_id=active_project.id, resource_id=resource.pk)
-            .distinct()
-        )
-
     contacts = resource.contacts
 
     # If our user is responsible for a local authority, only show the
