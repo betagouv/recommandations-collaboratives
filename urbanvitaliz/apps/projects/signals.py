@@ -29,7 +29,7 @@ def notify_moderators_project_submitted(sender, submitter, project, **kwargs):
     notify.send(
         sender=submitter,
         recipient=recipients,
-        verb="a déposé le projet",
+        verb="a soumis pour modération le projet",
         action_object=project,
         target=project,
         private=True,
@@ -49,7 +49,7 @@ def log_project_validated(sender, moderator, project, **kwargs):
     notify.send(
         sender=owner,
         recipient=get_regional_actors_for_project(project),
-        verb="a été validé",
+        verb="a déposé le projet",
         action_object=project,
         target=project,
         private=True,

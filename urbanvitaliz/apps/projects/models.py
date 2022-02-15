@@ -177,7 +177,7 @@ class Project(models.Model):
         )
 
     def __str__(self):  # pragma: nocover
-        return f"{self.name} {self.location}"
+        return f"{self.name} - {self.location}"
 
     @classmethod
     def fetch(cls, email=None):

@@ -330,7 +330,7 @@ def normalize_user_name(user):
 @dataclass
 class FormattedNotification:
     summary: str
-    excerpt: str = ""
+    excerpt: str = None
 
 
 class NotificationFormatter:
@@ -367,11 +367,24 @@ class NotificationFormatter:
 
         return recommendation.intent
 
-    def _represent_project(self, project):
-        return f"{project.name (project.commune)}"
-
     def _represent_recommendation_excerpt(self, recommendation):
-        return recommendation.content[:25]
+        return recommendation.content[:50]
+
+    def _represent_project(self, project):
+        fmt = f"{project.name}"
+        if project.commune:
+            fmt += f" ({project.commune})"
+
+        return fmt
+
+    def _represent_project_excerpt(self, project):
+        if project.description:
+            return project.description[:50]
+
+        return None
+
+    def _represent_note_excerpt(self, note):
+        return note.content[:50] or None
 
     def _represent_followup(self, followup):
         return followup.comment
@@ -382,14 +395,25 @@ class NotificationFormatter:
         """Format for User"""
         return self._format_or_default(
             {
-                "a commenté l'action": self.format_action_commented,
+                "a créé une note de suivi": self.format_note_created,
                 "est devenu·e aiguilleur·se sur le projet": self.format_action_became_switchtender,
+                "a déposé le projet": self.format_new_project_available,
+                "a soumis pour modération le projet": self.format_project_submitted,
+                "a commenté l'action": self.format_action_commented,
                 "a recommandé l'action": self.format_action_recommended,
             },
             notification,
         )
 
     # ------ Real Formatters -----#
+    def format_note_created(self, notification):
+        """An action was recommended by a switchtender"""
+        subject = self._represent_user(notification.actor)
+        summary = f"{subject} a rédigé une note de suivi"
+        excerpt = self._represent_note_excerpt(notification.action_object)
+
+        return FormattedNotification(summary=summary, excerpt=excerpt)
+
     def format_action_recommended(self, notification):
         """An action was recommended by a switchtender"""
         subject = self._represent_user(notification.actor)
@@ -414,6 +438,26 @@ class NotificationFormatter:
         summary = f"{subject} s'est joint·e à l'équipe d'aiguillage."
 
         return FormattedNotification(summary=summary, excerpt=None)
+
+    def format_project_submitted(self, notification):
+        """A project was submitted for moderation"""
+        subject = self._represent_user(notification.actor)
+        complement = self._represent_project(notification.action_object)
+        summary = f"{subject} a soumis pour modération le projet '{complement}'"
+
+        excerpt = self._represent_project_excerpt(notification.action_object)
+
+        return FormattedNotification(summary=summary, excerpt=excerpt)
+
+    def format_new_project_available(self, notification):
+        """A new project is now available"""
+        subject = self._represent_user(notification.actor)
+        complement = self._represent_project(notification.action_object)
+        summary = f"{subject} a déposé le projet '{complement}'"
+
+        excerpt = self._represent_project_excerpt(notification.action_object)
+
+        return FormattedNotification(summary=summary, excerpt=excerpt)
 
 
 # eof
