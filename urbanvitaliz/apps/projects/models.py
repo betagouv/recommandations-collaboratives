@@ -126,6 +126,9 @@ class Project(models.Model):
         return False
 
     exclude_stats = models.BooleanField(default=False)
+    muted = models.BooleanField(
+        default=False, verbose_name="Ne pas envoyer de notifications"
+    )
 
     org_name = models.CharField(
         max_length=256, blank=True, default="", verbose_name="Nom de votre structure"

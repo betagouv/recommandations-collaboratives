@@ -10,12 +10,9 @@ created: 2022-01-24 22:39:27 CEST
 
 import json
 
-from django.contrib.auth import models as auth_models
 from django.core.management.base import BaseCommand
 from urbanvitaliz.apps.communication.api import send_in_blue_email
 from urbanvitaliz.apps.communication.models import EmailTemplate
-from urbanvitaliz.apps.projects import digests
-from urbanvitaliz.apps.projects import models as project_models
 
 
 class Command(BaseCommand):

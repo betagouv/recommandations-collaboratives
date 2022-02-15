@@ -6,18 +6,37 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0044_auto_20220131_1719'),
+        ("projects", "0044_auto_20220131_1719"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='task',
-            name='status',
-            field=models.IntegerField(choices=[(0, 'proposé'), (1, 'en cours'), (2, 'blocage'), (3, 'terminé'), (4, 'pas intéressé·e'), (5, 'déjà fait')], default=0),
+            model_name="task",
+            name="status",
+            field=models.IntegerField(
+                choices=[
+                    (0, "proposé"),
+                    (1, "en cours"),
+                    (2, "blocage"),
+                    (3, "terminé"),
+                    (4, "pas intéressé·e"),
+                    (5, "déjà fait"),
+                ],
+                default=0,
+            ),
         ),
         migrations.AlterField(
-            model_name='taskfollowup',
-            name='status',
-            field=models.IntegerField(choices=[(0, 'proposé'), (1, 'en cours'), (2, 'blocage'), (3, 'terminé'), (4, 'pas intéressé·e'), (5, 'déjà fait')]),
+            model_name="taskfollowup",
+            name="status",
+            field=models.IntegerField(
+                choices=[
+                    (0, "proposé"),
+                    (1, "en cours"),
+                    (2, "blocage"),
+                    (3, "terminé"),
+                    (4, "pas intéressé·e"),
+                    (5, "déjà fait"),
+                ]
+            ),
         ),
     ]
