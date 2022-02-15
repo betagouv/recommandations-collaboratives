@@ -44,6 +44,13 @@
          let hash = url.split('#')[1]
          $('#' + hash + "-tab").get(0).click();
      }
+     else {
+         {% if is_switchtender %}
+         $("#sheet-tab").get(0).click();
+         {% else %}
+         $("#actions-tab").get(0).click();
+         {% endif%}
+     };
  };
 
 

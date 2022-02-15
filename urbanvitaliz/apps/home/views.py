@@ -12,9 +12,12 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import models as auth
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, F, Q
 from django.shortcuts import redirect, render
+from django.utils.decorators import method_decorator
+from django.views.generic import View
 from django.views.generic.base import TemplateView
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import check_if_switchtender
@@ -22,6 +25,15 @@ from urbanvitaliz.utils import check_if_switchtender
 
 class HomePageView(TemplateView):
     template_name = "home/home.html"
+
+
+@method_decorator([login_required], name="dispatch")
+class LoginRedirectView(View):
+    def dispatch(self, request, *args, **kwargs):
+        if check_if_switchtender(request.user):
+            return redirect("projects-project-list")
+
+        return redirect("home")
 
 
 class MethodologyPageView(TemplateView):

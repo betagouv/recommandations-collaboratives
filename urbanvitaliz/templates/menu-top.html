@@ -66,7 +66,7 @@
                     </a>
                 </li>
 
-                {% if is_switchtender  %}
+                {% if request.user.is_staff  %}
                 <!-- Address Book -->
                 <li class="nav-item nav-item-admin">
                     <a href="{% url 'addressbook-organization-list' %}" class="nav-link link-dark">
