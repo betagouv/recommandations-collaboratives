@@ -54,12 +54,12 @@ def test_send_digests_for_new_reco_empty(client):
     assert user.notifications.unsent().count() == 0
 
 
-def test_send_digests_for_new_reco_not_sent_for_not_ready_projects(client):
+def test_send_digests_for_new_reco_not_sent_for_not_done_projects(client):
     user = Recipe(auth.User, username="auser", email="user@example.com").make()
     switchtender = Recipe(
         auth.User, username="switchtender", email="switchtender@example.com"
     ).make()
-    project = baker.make(models.Project, status="DRAFT", emails=[user.email])
+    project = baker.make(models.Project, status="READY", emails=[user.email])
 
     # Generate a notification
     signals.action_created.send(
@@ -79,7 +79,7 @@ def test_send_digests_for_new_reco_not_sent_for_not_ready_projects(client):
 ########################################################################
 
 
-def test_send_digests_for_new_sites_by_user(client):
+def test_send_digests_for_new_sites_by_user():
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     auth.Group.objects.get_or_create(name="project_moderator")
 
@@ -110,7 +110,7 @@ def test_send_digests_for_new_sites_by_user(client):
         email=user.email,
         emails=[user.email],
         commune=commune,
-        status="DRAFT",
+        status="READY",
     )
 
     # Generate a notification
@@ -164,7 +164,7 @@ def test_send_digests_for_switchtender_by_user(client):
         email=user.email,
         emails=[user.email],
         commune=commune,
-        status="DRAFT",
+        status="READY",
     )
 
     # Generate a notification

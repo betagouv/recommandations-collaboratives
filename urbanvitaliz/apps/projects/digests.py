@@ -129,7 +129,7 @@ def make_action_digest(action):
             },
         },
         "intent": action.intent,
-        "content": action.content,
+        "content": action.content[:50],
         "resource": {
             "title": action.resource and action.resource.title or "",
         },
@@ -257,11 +257,12 @@ def send_digest_by_user(user, template_name, queryset=None):
         "notification_count": notifications.count(),
     }
 
-    send_email(
-        template_name,
-        {"name": normalize_user_name(user), "email": user.email},
-        params=digest,
-    )
+    if len(digest) > 0:
+        send_email(
+            template_name,
+            {"name": normalize_user_name(user), "email": user.email},
+            params=digest,
+        )
 
     # Mark them as dispatched
     # NOTE it would mean more db request but could be more lean in inner function

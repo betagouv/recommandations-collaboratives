@@ -8,12 +8,9 @@ from notifications import models as notifications_models
 from notifications.signals import notify
 
 from . import models
-from .utils import (
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -47,6 +44,9 @@ def notify_moderators_project_submitted(sender, submitter, project, **kwargs):
 def log_project_validated(sender, moderator, project, **kwargs):
     action.send(project, verb="a été validé")
 
+    if project.status == "DRAFT" or project.muted:
+        return
+
     # Notify regional actors of a new project
     try:
         owner = auth_models.User.objects.get(email=project.email)
@@ -75,6 +75,9 @@ def log_project_switchtender_joined(sender, project, **kwargs):
 
 @receiver(project_switchtender_joined)
 def notify_project_switchtender_joined(sender, project, **kwargs):
+    if project.status == "DRAFT" or project.muted:
+        return
+
     recipients = get_regional_actors_for_project(project, allow_national=True)
 
     # Notify regional actors
@@ -123,6 +126,9 @@ action_commented = django.dispatch.Signal()
 
 @receiver(action_created)
 def notify_action_created(sender, task, project, user, **kwargs):
+    if project.status == "DRAFT" or project.muted:
+        return
+
     recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
 
     notify.send(
@@ -203,6 +209,9 @@ def log_action_commented(sender, task, project, user, **kwargs):
 
 @receiver(action_commented)
 def notify_action_commented(sender, task, project, user, **kwargs):
+    if project.status == "DRAFT" or project.muted:
+        return
+
     recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
 
     notify.send(
@@ -251,6 +260,9 @@ def notify_note_created(sender, note, project, user, **kwargs):
         recipients = get_notification_recipients_for_project(project).exclude(
             id=user.id
         )
+
+    if project.status == "DRAFT" or project.muted:
+        return
 
     notify.send(
         sender=user,
