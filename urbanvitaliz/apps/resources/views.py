@@ -46,7 +46,7 @@ def resource_search(request):
     resources = models.Resource.search(query, categories)
     if not request.user.is_staff:
         # If we are staff, show also PRIVATE resources
-        resources = resources.filter(public=True)
+        resources = resources.filter(status__gte=models.Resource.TO_REVIEW)
 
     # If we are a switchtender, allow any departement to be filtered
     # Otherwise, show only departments related to my projects
@@ -224,7 +224,7 @@ def resource_create(request):
             next_url = reverse("resources-resource-detail", args=[resource.id])
             return redirect(next_url)
     else:
-        form = EditResourceForm(initial={"public": True})
+        form = EditResourceForm()
     return render(request, "resources/resource/create.html", locals())
 
 
@@ -278,7 +278,6 @@ class EditResourceForm(forms.ModelForm):
             "departments",
             "content",
             "contacts",
-            "public",
             "expires_on",
         ]
 
