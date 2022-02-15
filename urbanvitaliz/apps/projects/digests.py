@@ -57,8 +57,6 @@ def send_recommendation_digest_by_project(user, notifications):
     ):
         # Only treat notifications for project in DONE status
         project = models.Project.objects.get(pk=project_id)
-        if not project:
-            continue
 
         if project.status != "DONE":
             skipped_projects.append(project_id)
@@ -149,7 +147,7 @@ def send_digests_for_new_sites_by_user(user):
 
     notifications = (
         user.notifications.unsent()
-        .filter(target_content_type=project_ct, verb="a été validé")
+        .filter(target_content_type=project_ct, verb="a déposé le projet")
         .order_by("target_object_id")
     )
 

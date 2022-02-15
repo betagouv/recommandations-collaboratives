@@ -16,6 +16,7 @@ from django.contrib.auth import models as auth
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from notifications import notify
 from pytest_django.asserts import (assertContains, assertNotContains,
                                    assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
@@ -573,6 +574,46 @@ def test_delete_project_and_redirect(client):
 
     list_url = reverse("projects-project-list")
     assertRedirects(response, list_url)
+
+
+@pytest.mark.django_db
+def test_notifications_are_deleted_on_project_delete():
+    user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
+    recipient = Recipe(auth.User).make()
+
+    project = Recipe(models.Project).make()
+
+    notify.send(
+        sender=user,
+        recipient=recipient,
+        verb="a reçu une notif",
+        action_object=project,
+        target=project,
+    )
+
+    assert recipient.notifications.count() == 1
+    project.delete()
+    assert recipient.notifications.count() == 0
+
+
+@pytest.mark.django_db
+def test_notifications_are_deleted_on_task_delete():
+    user = Recipe(auth.User).make()
+    recipient = Recipe(auth.User).make()
+
+    task = Recipe(models.Task).make()
+
+    notify.send(
+        sender=user,
+        recipient=recipient,
+        verb="a reçu une notif",
+        action_object=task,
+        target=task.project,
+    )
+
+    assert recipient.notifications.count() == 1
+    task.delete()
+    assert recipient.notifications.count() == 0
 
 
 ########################################################################
