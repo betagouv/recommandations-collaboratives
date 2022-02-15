@@ -84,7 +84,10 @@ class Resource(models.Model):
         choices=STATUS_CHOICES, verbose_name="État", default=DRAFT
     )
 
-    public = models.BooleanField(default=False, blank=True)
+    @property
+    def public(self):
+        return self.status >= self.TO_REVIEW
+
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )

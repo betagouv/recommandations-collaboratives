@@ -13,7 +13,8 @@ import pytest
 from django.template import defaultfilters
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import login
@@ -36,8 +37,10 @@ def test_resource_list_available_for_every_one(client):
 
 
 @pytest.mark.django_db
-def test_resource_list_contains_public_resource_title_and_link(client):
-    resource = Recipe(models.Resource, public=True, title=" public resource").make()
+def test_resource_list_contains_published_resource_title_and_link(client):
+    resource = Recipe(
+        models.Resource, status=models.Resource.PUBLISHED, title=" public resource"
+    ).make()
     url = reverse("resources-resource-search")
     response = client.get(url)
     assertContains(response, resource.title)
@@ -46,8 +49,10 @@ def test_resource_list_contains_public_resource_title_and_link(client):
 
 
 @pytest.mark.django_db
-def test_private_resources_are_not_available_to_non_staff_users(client):
-    resource = Recipe(models.Resource, public=False, title="private resource").make()
+def test_draft_resources_are_not_available_to_non_staff_users(client):
+    resource = Recipe(
+        models.Resource, status=models.Resource.DRAFT, title="draft resource"
+    ).make()
     url = reverse("resources-resource-search")
     response = client.get(url)
     detail_url = reverse("resources-resource-detail", args=[resource.id])
@@ -55,8 +60,10 @@ def test_private_resources_are_not_available_to_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_private_resources_are_available_to_staff_users(client):
-    resource = Recipe(models.Resource, public=False, title="a public resource").make()
+def test_draft_resources_are_available_to_staff_users(client):
+    resource = Recipe(
+        models.Resource, status=models.Resource.DRAFT, title="a draft resource"
+    ).make()
     url = reverse("resources-resource-search")
     with login(client, is_staff=True):
         response = client.get(url)
@@ -68,11 +75,17 @@ def test_private_resources_are_available_to_staff_users(client):
 def test_resource_list_contains_only_resource_with_category(client):
     category1 = Recipe(models.Category).make()
     resource1 = Recipe(
-        models.Resource, title="selected resource", public=True, category=category1
+        models.Resource,
+        title="selected resource",
+        status=models.Resource.PUBLISHED,
+        category=category1,
     ).make()
     category2 = Recipe(models.Category).make()
     resource2 = Recipe(
-        models.Resource, title="unselected resource", public=True, category=category2
+        models.Resource,
+        title="unselected resource",
+        status=models.Resource.PUBLISHED,
+        category=category2,
     ).make()
     url = reverse("resources-resource-search")
     url = f"{url}?cat{category1.id}=true&query=resource"
@@ -89,17 +102,19 @@ def test_resource_list_contains_only_resource_with_area(client):
     resource1 = Recipe(
         models.Resource,
         title="selected resource",
-        public=True,
+        status=models.Resource.PUBLISHED,
         departments=departments[1:],
     ).make()
     resource2 = Recipe(
         models.Resource,
         title="unselected resource",
-        public=True,
+        status=models.Resource.PUBLISHED,
         departments=departments[:1],
     ).make()
     resource_national = Recipe(
-        models.Resource, title="national resource", public=True
+        models.Resource,
+        title="national resource",
+        status=models.Resource.PUBLISHED,
     ).make()
 
     url = reverse("resources-resource-search")
@@ -318,7 +333,7 @@ def test_search_resources_by_category():
 
 @pytest.mark.django_db
 def test_user_has_access_to_page_for_bookmark_with_notes(client):
-    resource = Recipe(models.Resource, public=True).make()
+    resource = Recipe(models.Resource, status=models.Resource.PUBLISHED).make()
 
     url = reverse("resources-bookmark-create", args=[resource.id])
     with login(client, is_staff=True):
@@ -330,7 +345,7 @@ def test_user_has_access_to_page_for_bookmark_with_notes(client):
 
 @pytest.mark.django_db
 def test_user_bookmarks_a_resource(client):
-    resource = Recipe(models.Resource, public=True).make()
+    resource = Recipe(models.Resource, status=models.Resource.PUBLISHED).make()
 
     url = reverse("resources-bookmark-create", args=[resource.id])
     with login(client) as user:

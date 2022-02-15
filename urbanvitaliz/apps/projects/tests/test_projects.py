@@ -17,7 +17,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
@@ -1504,7 +1505,7 @@ def test_delete_note_for_project_and_redirect(client):
 @pytest.mark.django_db
 def test_switchtender_push_resource_to_project_needs_project_id(client):
     project = Recipe(models.Project).make()
-    resource = Recipe(resources.Resource, public=True).make()
+    resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
     with login(client, groups=["switchtender"]):
@@ -1518,7 +1519,7 @@ def test_switchtender_push_resource_to_project_needs_project_id(client):
 
 @pytest.mark.django_db
 def test_switchtender_push_resource_to_project_fails_if_no_project_in_session(client):
-    resource = Recipe(resources.Resource, public=True).make()
+    resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
     with login(client, groups=["switchtender"]):
@@ -1530,7 +1531,7 @@ def test_switchtender_push_resource_to_project_fails_if_no_project_in_session(cl
 @pytest.mark.django_db
 def test_switchtender_push_resource_assigns_switchtender_to_project(client):
     project = Recipe(models.Project, switchtenders=[]).make()
-    resource = Recipe(resources.Resource, public=True).make()
+    resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
     with login(client, groups=["switchtender"]):
@@ -1547,7 +1548,7 @@ def test_switchtender_push_resource_assigns_switchtender_to_project(client):
 @pytest.mark.django_db
 def test_switchtender_create_action_for_resource_push(client):
     project = Recipe(models.Project).make()
-    resource = Recipe(resources.Resource, public=True).make()
+    resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
     with login(client, groups=["switchtender"]):
