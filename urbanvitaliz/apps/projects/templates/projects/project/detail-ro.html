@@ -73,31 +73,6 @@ function activateTab(){
 
         <div class="tab-content" id="project-tabs-content">
             <div class="tab-pane  show active pt-4" id="sheet" role="tabpanel" aria-labelledby="sheet">
-
-                <!-- Notes de suivi -->
-                <div class="w-100">
-                    <h2 class="mb-3 d-inline-block">
-                        <svg class="bi" width="28" height="28" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
-                        </svg>
-                        Notes de suivi
-                    </h2>
-                    {% if user.is_staff %}
-                    <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'projects-create-note' project.id %}">
-                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
-                        </svg>
-                        Ajouter une note
-                    </a>
-                    {% endif %}
-                </div>
-
-                {% if user.is_staff %}
-                {% include "projects/project/fragments/note_list.html" with notes=project.notes.all %}
-                {% else %}
-                {% include "projects/project/fragments/note_list.html" with notes=project.notes.public %}
-                {% endif %}
-
             </div>
             <!-- TAB: exploration -->
             <div class="tab-pane pt-4" id="exploration" role="tabpanel" aria-labelledby="exploration">
@@ -109,29 +84,6 @@ function activateTab(){
 
                 {% include "projects/project/fragments/actions.html" %}
 
-                <!-- 
-                     <h4>Ressources connexes</h4>
-                     <div class="text-secondary">
-                     {% for bookmark in project.bookmarks.all %}
-                     <ul>
-                     <li><a href="{% url "resources-resource-detail" bookmark.resource.id %}">{{ bookmark.resource.title }}</a>
-                     {% if bookmark.comments %}
-                     <q>{{ bookmark.comments }}</q>
-                     {% endif %}
-                     <br/>
-                     <span class="small text-secondary">{% if bookmark.created_by %}(via {{ bookmark.created_by.get_full_name|default:bookmark.created_by }}){% endif %}</span>
-                     </li>
-                     </ul>
-                     {% empty %}
-                     <div class="mb-3 mt-3">
-                     <svg class="bi me-1" width="20" height="20" fill="currentColor">
-                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightbulb"/>
-                     </svg>
-                     Pour vous aider dans vos démarches, n'hésitez pas à <a href="{% url 'resources-resource-search' %}">identifier des ressources et les mettre en favoris</a>.
-                     </div>
-                     {% endfor %}
-                     </div>
-                -->
             </div>
 
         </div>
