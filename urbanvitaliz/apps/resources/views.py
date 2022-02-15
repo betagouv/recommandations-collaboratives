@@ -20,7 +20,6 @@ from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.apps.projects import utils as projects_utils
 from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
 
 from . import models
