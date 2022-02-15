@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('resources', '0019_resource_created_by'),
+        ("resources", "0019_resource_created_by"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='resource',
-            name='status',
-            field=models.IntegerField(choices=[(0, 'Brouillon'), (1, 'A relire'), (2, 'Publié')], default=0, verbose_name='État'),
+            model_name="resource",
+            name="status",
+            field=models.IntegerField(
+                choices=[(0, "Brouillon"), (1, "A relire"), (2, "Publié")],
+                default=0,
+                verbose_name="État",
+            ),
         ),
     ]

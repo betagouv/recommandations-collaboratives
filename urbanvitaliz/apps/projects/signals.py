@@ -8,9 +8,12 @@ from notifications import models as notifications_models
 from notifications.signals import notify
 
 from . import models
-from .utils import (get_notification_recipients_for_project,
-                    get_project_moderators, get_regional_actors_for_project,
-                    get_switchtenders_for_project)
+from .utils import (
+    get_notification_recipients_for_project,
+    get_project_moderators,
+    get_regional_actors_for_project,
+    get_switchtenders_for_project,
+)
 
 #####
 # Projects
@@ -224,7 +227,7 @@ def delete_notifications_on_project_delete(sender, instance, **kwargs):
 
 
 @receiver(pre_delete, sender=models.Task, dispatch_uid="task_delete_notifications")
-def delete_notifications_on_project_delete(sender, instance, **kwargs):
+def delete_notifications_on_task_delete(sender, instance, **kwargs):
     task_ct = ContentType.objects.get_for_model(instance)
     notifications_models.Notification.objects.filter(
         action_object_content_type_id=task_ct.pk, action_object_object_id=instance.pk

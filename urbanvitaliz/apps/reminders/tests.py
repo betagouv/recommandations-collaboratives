@@ -13,7 +13,6 @@ import django.core.mail
 import pytest
 from django.conf import settings
 from django.core.management import call_command
-from django.test.client import RequestFactory
 from model_bakery import baker
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.projects import models as projects

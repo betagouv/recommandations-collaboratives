@@ -7,19 +7,24 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('communication', '0003_alter_emailtemplate_name'),
-        ('reminders', '0003_auto_20211012_1743'),
+        ("communication", "0003_alter_emailtemplate_name"),
+        ("reminders", "0003_auto_20211012_1743"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mail',
-            name='template',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='communication.emailtemplate'),
+            model_name="mail",
+            name="template",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="communication.emailtemplate",
+            ),
         ),
         migrations.AddField(
-            model_name='mail',
-            name='template_params',
+            model_name="mail",
+            name="template_params",
             field=models.JSONField(blank=True, null=True),
         ),
     ]
