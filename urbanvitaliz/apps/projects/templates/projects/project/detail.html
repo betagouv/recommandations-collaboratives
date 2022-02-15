@@ -25,6 +25,10 @@
      });
 
      window.dispatchEvent(new Event('resize'));
+
+     $(function () {
+         $('[data-toggle="tooltip"]').tooltip()
+     })
  });
 
  // Change hash for page-reload
@@ -56,7 +60,9 @@
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
         </svg>
         <span class="align-middle">
-            {{ project.name|title }}
+            {{ project.name|title }} &nbsp;{% if project.muted %} <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi bg-warning p-2 rounded-circle" width="40px" height="40px" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#volume-mute"/> {% endif %}
+            </svg>
         </span>
     </h1>
 

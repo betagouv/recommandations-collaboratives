@@ -17,7 +17,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
@@ -25,7 +26,7 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import login
 
-from .. import models
+from .. import models, signals
 
 # TODO when local authority can see & update her project
 # TODO check that project, note, and task belong to her
@@ -620,6 +621,44 @@ def test_notifications_are_deleted_on_task_delete():
 ########################################################################
 
 
+def test_notification_not_sent_when_project_is_draft():
+    user = Recipe(auth.User, username="auser", email="user@example.com").make()
+    switchtender = Recipe(
+        auth.User, username="switchtender", email="switchtender@example.com"
+    ).make()
+    project = baker.make(models.Project, status="DRAFT", emails=[user.email])
+
+    # Generate a notification
+    signals.action_created.send(
+        sender=test_notification_not_sent_when_project_is_draft,
+        task=models.Task.objects.create(project=project, created_by=switchtender),
+        project=project,
+        user=switchtender,
+    )
+
+    assert user.notifications.unsent().count() == 0
+
+
+def test_notification_not_sent_when_project_is_muted():
+    user = Recipe(auth.User, username="auser", email="user@example.com").make()
+    switchtender = Recipe(
+        auth.User, username="switchtender", email="switchtender@example.com"
+    ).make()
+    project = baker.make(
+        models.Project, status="READY", muted=True, emails=[user.email]
+    )
+
+    # Generate a notification
+    signals.action_created.send(
+        sender=test_notification_not_sent_when_project_is_draft,
+        task=models.Task.objects.create(project=project, created_by=switchtender),
+        project=project,
+        user=switchtender,
+    )
+
+    assert user.notifications.unsent().count() == 0
+
+
 @pytest.mark.django_db
 def test_non_staff_cannot_add_email_to_project(client):
     project = Recipe(models.Project).make()
@@ -815,7 +854,7 @@ def test_create_task_assigns_new_switchtender(client):
 def test_create_new_task_for_project_notify_collaborators(mocker, client):
     owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
 
-    project = Recipe(models.Project, emails=[owner.email]).make()
+    project = Recipe(models.Project, status="READY", emails=[owner.email]).make()
     with login(client, groups=["switchtender"]):
         client.post(
             reverse("projects-create-task", args=[project.id]),

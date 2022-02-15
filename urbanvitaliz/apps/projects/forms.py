@@ -168,6 +168,7 @@ class ProjectForm(forms.ModelForm):
             "description",
             "switchtenders",
             "publish_to_cartofriches",
+            "muted",
         ]
 
 
