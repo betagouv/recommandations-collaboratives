@@ -25,8 +25,15 @@ class Region(models.Model):
         return self.name
 
 
+class DepartmentManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by("name")
+
+
 class Department(models.Model):
     """Represents a Department"""
+
+    objects = DepartmentManager()
 
     region = models.ForeignKey("Region", on_delete=models.CASCADE)
 
