@@ -198,56 +198,80 @@ def test_notification_formatter():
         content="A very nice content",
         resource=resource,
     ).make()
+    note = Recipe(
+        models.Note,
+        content="my content",
+    ).make()
     followup = Recipe(models.TaskFollowup, task=task, comment="Hello!").make()
-    project = Recipe(models.Project, name="Nice Project").make()
+    project = Recipe(
+        models.Project,
+        name="Nice Project",
+        description="Super description",
+        location="SomeWhere",
+    ).make()
 
-    notify.send(
-        user,
-        recipient=recipient,
-        verb="a commenté l'action",
-        action_object=followup,
-        target=project,
-    )
-
-    notify.send(
-        user,
-        recipient=recipient,
-        verb="a recommandé l'action",
-        action_object=task,
-        target=project,
-    )
-
-    notify.send(
-        user,
-        recipient=recipient,
-        verb="est devenu·e aiguilleur·se sur le projet",
-        action_object=project,
-        target=project,
-    )
-
-    notify.send(
-        user,
-        recipient=recipient,
-        verb="action inconnue",
-        action_object=project,
-        target=project,
-    )
-
-    expected = (
-        ("Bob action inconnue Nice Project", None),
-        ("Bobi Joe (DuckCorp) s'est joint·e à l'équipe d'aiguillage.", None),
-        ("Bobi Joe (DuckCorp) a recommandé 'Belle Ressource'", task.content),
+    tests = [
         (
-            "Bobi Joe (DuckCorp) a commenté la recommandation 'Belle Ressource'",
-            followup.comment,
+            "a créé une note de suivi",
+            note,
+            ("Bobi Joe (DuckCorp) a rédigé une note de suivi", "my content"),
         ),
-    )
+        (
+            "a commenté l'action",
+            followup,
+            (
+                "Bobi Joe (DuckCorp) a commenté la recommandation 'Belle Ressource'",
+                followup.comment,
+            ),
+        ),
+        (
+            "a recommandé l'action",
+            task,
+            ("Bobi Joe (DuckCorp) a recommandé 'Belle Ressource'", task.content),
+        ),
+        (
+            "est devenu·e aiguilleur·se sur le projet",
+            project,
+            ("Bobi Joe (DuckCorp) s'est joint·e à l'équipe d'aiguillage.", None),
+        ),
+        (
+            "a soumis pour modération le projet",
+            project,
+            (
+                "Bobi Joe (DuckCorp) a soumis pour modération le projet 'Nice Project'",
+                "Super description",
+            ),
+        ),
+        (
+            "a déposé le projet",
+            project,
+            (
+                "Bobi Joe (DuckCorp) a déposé le projet 'Nice Project'",
+                "Super description",
+            ),
+        ),
+        (
+            "action inconnue",
+            project,
+            ("Bob action inconnue Nice Project - SomeWhere", None),
+        ),
+    ]
 
-    for idx, notification in enumerate(notifications_models.Notification.objects.all()):
+    for test in tests:
+        notify.send(
+            sender=user,
+            recipient=recipient,
+            verb=test[0],
+            action_object=test[1],
+            target=project,
+        )
+
+    for idx, notification in enumerate(
+        reversed(notifications_models.Notification.objects.all())
+    ):
         fmt_reco = formatter.format(notification)
-        assert expected[idx][0] in fmt_reco.summary
-        if expected[idx][1]:
-            assert expected[idx][1] in fmt_reco.excerpt
+        assert tests[idx][2][0] == fmt_reco.summary
+        assert tests[idx][2][1] == fmt_reco.excerpt
 
 
 # eof
