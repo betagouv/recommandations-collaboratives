@@ -7,6 +7,7 @@ from . import models
 class OrganizationAdmin(admin.ModelAdmin):
     search_fields = ["name"]
     list_display = ["name"]
+    ordering = ["name"]
 
 
 @admin.register(models.Contact)

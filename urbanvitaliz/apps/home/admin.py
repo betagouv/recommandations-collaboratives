@@ -5,4 +5,5 @@ from . import models
 
 @admin.register(models.UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["user", "organization"]
+    ordering = ["user__username", "organization"]

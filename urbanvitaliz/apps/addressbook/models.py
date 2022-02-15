@@ -11,7 +11,14 @@ from django.db.models.functions import Lower
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 
 
+class OrganizationManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by(Lower("name"))
+
+
 class Organization(models.Model):
+    objects = OrganizationManager()
+
     name = models.CharField(max_length=90, verbose_name="Nom")
     departments = models.ManyToManyField(
         geomatics_models.Department,
@@ -20,7 +27,7 @@ class Organization(models.Model):
     )
 
     def __str__(self):  # pragma: nocover
-        return "Organization: {0}".format(self.name)
+        return "{0}".format(self.name)
 
 
 class ContactManager(models.Manager):
