@@ -1,9 +1,13 @@
 import django.dispatch
 from actstream import action
 from django.contrib.auth import models as auth_models
+from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+from notifications import models as notifications_models
 from notifications.signals import notify
 
+from . import models
 from .utils import (get_notification_recipients_for_project,
                     get_project_moderators, get_regional_actors_for_project,
                     get_switchtenders_for_project)
@@ -206,6 +210,25 @@ def notify_action_commented(sender, task, project, user, **kwargs):
         target=project,
         private=True,
     )
+
+
+# In case of deletion
+@receiver(
+    pre_delete, sender=models.Project, dispatch_uid="project_delete_notifications"
+)
+def delete_notifications_on_project_delete(sender, instance, **kwargs):
+    project_ct = ContentType.objects.get_for_model(instance)
+    notifications_models.Notification.objects.filter(
+        target_content_type=project_ct.pk, target_object_id=instance.pk
+    ).delete()
+
+
+@receiver(pre_delete, sender=models.Task, dispatch_uid="task_delete_notifications")
+def delete_notifications_on_project_delete(sender, instance, **kwargs):
+    task_ct = ContentType.objects.get_for_model(instance)
+    notifications_models.Notification.objects.filter(
+        action_object_content_type_id=task_ct.pk, action_object_object_id=instance.pk
+    ).delete()
 
 
 ######
