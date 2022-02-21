@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load humanize %}
+
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'projects/js/action_pusher.js' %}"></script>
+<!-- Polyfill for older browsers -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CqueueMicrotask"></script>
+<script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.min.js"></script>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="col-9 py-5 mx-auto">
+
+    <!-- Breadcrumb -->
+    <h2>
+        <svg class="bi me-1 " width="32" height="32" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
+        </svg>
+        Pousser une action
+    </h2>
+
+    <div x-data="action_pusher_app()" x-init="getResources()" x-cloak class="d-flex flex-column border p-0 m-0">
+        XXX APP XXX
+    </div>
+
+    <form class="form" id="form-create-action" action="{% url "projects-project-create-action" project.id %}" method="POST">
+        {% csrf_token %}
+    </form>
+</div>
+{% endblock %}
