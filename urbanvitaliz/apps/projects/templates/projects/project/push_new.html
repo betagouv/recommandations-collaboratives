@@ -13,7 +13,11 @@
 <script src="{% static 'projects/js/action_pusher.js' %}"></script>
 <!-- Polyfill for older browsers -->
 <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CqueueMicrotask"></script>
+{% if debug %}
+<script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.js"></script>
+{% else %}
 <script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.min.js"></script>
+{% endif %}
 {% endblock %}
 
 
@@ -30,7 +34,57 @@
     </h2>
 
     <div x-data="action_pusher_app()" x-init="getResources()" x-cloak class="d-flex flex-column border p-0 m-0">
-        XXX APP XXX
+        <form class="form">
+
+            <div id="action-type-selector">
+                <input type="radio" id="push-noresource" name="action_type" value="noresource" x-model="action_type">
+                <label for="push-noresource">No Ressource</label>
+
+                <input type="radio" id="push-single" name="action_type" value="single" x-model="action_type">
+                <label for="push-single">1 Ressource</label>
+
+                <input type="radio" id="push-multiple" name="action_type" value="multiple" x-model="action_type">
+                <label for="push-multiple">Multiple Ressources</label>
+            </div>
+
+            <!-- single pick -->
+            <div id="resource-list" x-show="action_type != 'noresource'">
+                <input x-model="search" placeholder="Rechercher...">
+
+                <!-- single -->
+                <ul x-show="action_type =='single'">
+                    <template x-for="resource in filteredResources" :key="resource.id">
+                        <li>
+                            <input type="radio" name="selected_resource" :value="resource.id" x-model="selected_resource">
+                            <span x-text="resource.title"></span>
+                        </li>
+                    </template>
+                </ul>
+
+                <!-- multiple -->
+                <ul x-show="action_type =='multiple'">
+                    <template x-for="resource in filteredResources" :key="resource.id">
+                        <li>
+                            <input type="checkbox" name="selected_resources" :value="resource.id" x-model="selected_resources">
+                            <span x-text="resource.title"></span>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+
+            <div id="action-details" x-show="action_type != 'multiple'">
+                <label for="title">Titre</label>
+                <input type="text" id="title" name="title" x-model="title">
+
+                <label for="message">Message</label>
+                <textarea id="message" name="message" x-model="message"></textarea>
+
+            </div>
+
+            <button class="btn">Brouillon</button>
+            <button class="btn btn-primary">Envoyer</button>
+
+        </form>
     </div>
 
     <form class="form" id="form-create-action" action="{% url "projects-project-create-action" project.id %}" method="POST">
