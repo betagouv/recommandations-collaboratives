@@ -1,9 +1,29 @@
 function action_pusher_app() {
 		return {
         isBusy: true,
+        action_type: 'noresource',
+
+        search: '',
+
+        title: '',
+        message: '',
+
+
+        resources: [],
+        selected_resource: null,
+        selected_resources: [],
+
+        get filteredResources() {
+            if (this.search == '')
+                return this.resources;
+
+            return this.resources.filter(
+                i => i.title.toLowerCase().includes(this.search.toLowerCase())
+            ) || [];
+        },
 
         truncate(input, size=30) {
-            return input.length > size ? `${input.substring(0, size)}...` : input
+            return input.length > size ? `${input.substring(0, size)}...` : input;
         },
 
 				formatDateDisplay(date) {
@@ -19,33 +39,22 @@ function action_pusher_app() {
             this.isBusy = true;
 
             const response = await fetch('/api/resources/');
-            tasksFromApi = await response.json(); //extract JSON from the http response
+            resourcesFromApi = await response.json(); //extract JSON from the http response
 
-						this.tasks = [];
+						this.resources = [];
 
-            tasksFromApi.forEach(t => {
-                this.tasks.push(
+            resourcesFromApi.forEach(t => {
+                this.resources.push(
 							   {
-                    uuid: this.generateUUID(),
 								    id: t.id,
-								    name: this.truncate(t.name),
+								    title: this.truncate(t.title),
 								    status: t.status,
-                    switchtenders: t.switchtenders,
-                    is_switchtender: t.is_switchtender,
-								    boardCode: t.status,
 								    created_on: new Date(t.created_on),
-                    organization: this.truncate(t.org_name),
-                    commune: t.commune,
-                    notifications: t.notifications
 							   });
 						});
 
-            this.tasks.sort(function(a, b) {
-                if (b.notifications.count - a.notifications.count)
-                    return (b.notifications.count - a.notifications.count);
-                else {
+            this.resources.sort(function(a, b) {
                     return b.created_on - a.created_on;
-                }
             });
 
             this.isBusy = false;
