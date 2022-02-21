@@ -16,22 +16,13 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateTaskForm,
-    RemindTaskForm,
-    ResourceTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskForm,
-)
+from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
+                     RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -422,6 +413,16 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
 ########################################################################
 # push resource to project
 ########################################################################
+
+
+@login_required
+def create_action(request, project_id=None):
+    """Create action for given project"""
+    project = get_object_or_404(models.Project, pk=project_id)
+
+    form = ResourceTaskForm(request.POST)
+
+    return render(request, "projects/project/push_new.html", locals())
 
 
 @login_required
