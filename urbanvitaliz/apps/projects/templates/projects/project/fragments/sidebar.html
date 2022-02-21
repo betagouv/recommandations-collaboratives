@@ -32,11 +32,19 @@
             </a>
         </span>
         <span class="d-inline-block">
-            <a class="btn btn-light w-100 btn-sm"  href="{% url 'projects-create-task' project.id %}">
+            <a class="btn btn-light w-100 btn-sm"  href="{% url 'projects-project-create-action' project.id %}">
                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
                 </svg>
                 Ajouter une action
+            </a>
+        </span>
+        <span class="d-inline-block">
+            <a class="btn btn-light w-100 btn-sm"  href="{% url 'projects-create-task' project.id %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
+                </svg>
+                Ajouter une action (OLD)
             </a>
         </span>
         {% elif is_regional_actor %}
