@@ -111,6 +111,27 @@ def test_logged_user_can_send_message_to_team(mocker, client):
 
 
 ########################################################################
+# Login routing based on user profile
+########################################################################
+@pytest.mark.django_db
+def test_project_owner_is_sent_to_home_on_login(client):
+    url = reverse("login-redirect")
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 302
+    assertRedirects(response, "/")
+
+
+@pytest.mark.django_db
+def test_switchtender_is_sent_to_project_list_on_login(client):
+    url = reverse("login-redirect")
+    with login(client, groups=["switchtender"]):
+        response = client.get(url)
+    assert response.status_code == 302
+    assertRedirects(response, "/projects/")
+
+
+########################################################################
 # Dashboard
 ########################################################################
 
