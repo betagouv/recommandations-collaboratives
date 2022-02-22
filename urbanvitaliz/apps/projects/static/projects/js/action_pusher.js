@@ -1,17 +1,15 @@
 function action_pusher_app() {
 		return {
         isBusy: true,
-        action_type: 'noresource',
-
         search: '',
-
-        title: '',
-        message: '',
-
-
         resources: [],
+
+        push_type: 'single',
+        intent: '',
+        content: '',
         selected_resource: null,
         selected_resources: [],
+        draft: false,
 
         get filteredResources() {
             if (this.search == '')
@@ -33,6 +31,11 @@ function action_pusher_app() {
 					  return new Date().toLocaleDateString('fr-FR');
 				},
 
+        setIntent(resource) {
+            if (this.intent =='')
+                this.intent = resource.title;
+        },
+
 				async getResources() {
             var tasksFromApi = [];
 
@@ -46,10 +49,11 @@ function action_pusher_app() {
             resourcesFromApi.forEach(t => {
                 this.resources.push(
 							   {
-								    id: t.id,
-								    title: this.truncate(t.title),
-								    status: t.status,
-								    created_on: new Date(t.created_on),
+								     id: t.id,
+								     title: this.truncate(t.title),
+                     subtitle: t.subtitle,
+								     status: t.status,
+								     created_on: new Date(t.created_on),
 							   });
 						});
 
@@ -58,6 +62,10 @@ function action_pusher_app() {
             });
 
             this.isBusy = false;
-				}
+				},
+
+        set_draft(draft) {
+            this.draft = draft;
+        }
 		}
 };
