@@ -20,7 +20,10 @@ from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
                                 is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (CreateTaskForm, RemindTaskForm, ResourceTaskForm,
+from ..forms import (CreateActionsFromResourcesForm,
+                     CreateActionWithoutResourceForm,
+                     CreateActionWithResourceForm, CreateTaskForm,
+                     PushTypeActionForm, RemindTaskForm, ResourceTaskForm,
                      RsvpTaskFollowupForm, TaskFollowupForm,
                      TaskRecommendationForm, UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
@@ -420,7 +423,48 @@ def create_action(request, project_id=None):
     """Create action for given project"""
     project = get_object_or_404(models.Project, pk=project_id)
 
-    form = ResourceTaskForm(request.POST)
+    if request.method == "POST":
+        # Pick a different form for better data handling based
+        # on the 'push_type' attribute
+        type_form = PushTypeActionForm(request.POST)
+
+        type_form.is_valid()
+
+        push_type = type_form.cleaned_data.get("push_type")
+
+        try:
+            push_form_type = {
+                "noresource": CreateActionWithoutResourceForm,
+                "single": CreateActionWithResourceForm,
+                "multiple": CreateActionsFromResourcesForm,
+            }[push_type]
+        except KeyError:
+            return render(request, "projects/project/push_new.html", locals())
+
+        form = push_form_type(request.POST)
+        if form.is_valid():
+            if push_type == "multiple":
+                for resource in form.cleaned_data.get("resources", []):
+                    action = models.Task.objects.create(
+                        project=project,
+                        resource=resource,
+                        intent=resource.title,
+                        created_by=request.user,
+                        public=form.cleaned_data.get("public", False),
+                    )
+
+            else:
+                action = form.save(commit=False)
+                action.project = project
+                action.created_by = request.user
+                action.save()
+
+            next_url = (
+                reverse("projects-project-detail", args=[project.id]) + "#actions"
+            )
+            return redirect(next_url)
+    else:
+        form = PushTypeActionForm()
 
     return render(request, "projects/project/push_new.html", locals())
 

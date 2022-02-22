@@ -34,55 +34,94 @@
     </h2>
 
     <div x-data="action_pusher_app()" x-init="getResources()" x-cloak class="d-flex flex-column border p-0 m-0">
-        <form class="form">
+        <form class="form" method="POST" action=".">
+            {% csrf_token %}
+            <div class="mb-3">
+                <h4>Sélectionnez les type de reco</h4>
 
-            <div id="action-type-selector">
-                <input type="radio" id="push-noresource" name="action_type" value="noresource" x-model="action_type">
-                <label for="push-noresource">No Ressource</label>
+                <div id="push-type-selector">
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <input type="radio" id="push-noresource" name="push_type" value="noresource" x-model="push_type">
+                            <label for="push-noresource">No Ressource</label>
+                        </div>
+                    </div>
 
-                <input type="radio" id="push-single" name="action_type" value="single" x-model="action_type">
-                <label for="push-single">1 Ressource</label>
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <input type="radio" id="push-single" name="push_type" value="single" x-model="push_type">
+                            <label for="push-single">1 Ressource</label>
+                        </div>
+                    </div>
 
-                <input type="radio" id="push-multiple" name="action_type" value="multiple" x-model="action_type">
-                <label for="push-multiple">Multiple Ressources</label>
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <input type="radio" id="push-multiple" name="push_type" value="multiple" x-model="push_type">
+                            <label for="push-multiple">Multiple Ressources</label>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- single pick -->
-            <div id="resource-list" x-show="action_type != 'noresource'">
+            <!-- resources -->
+            <div id="resource-list" class="mb-3" x-show="push_type != 'noresource'" x-transition>
+                <h4>Sélectionnez les ressources à publier</h4>
+
                 <input x-model="search" placeholder="Rechercher...">
 
-                <!-- single -->
-                <ul x-show="action_type =='single'">
+                <!-- listing -->
+                <span x-text="`${filteredResources.length} ressource(s) au total`"></span>
+                <ul x-show="filteredResources.length > 0">
                     <template x-for="resource in filteredResources" :key="resource.id">
                         <li>
-                            <input type="radio" name="selected_resource" :value="resource.id" x-model="selected_resource">
-                            <span x-text="resource.title"></span>
+                            <div class="card" style="width: 18rem;">
+                                <div class="card-body">
+                                    <input @click="setIntent(resource)" x-show="push_type =='single'" type="radio" name="resource" :value="resource.id" x-model="selected_resource">
+                                    <input x-show="push_type =='multiple'" type="checkbox" name="resources" :value="resource.id" x-model="selected_resources">
+                                    <h5 x-text="resource.title" class="card-title"></h5>
+                                    <p x-text="resource.subtitle" class="card-text"></p>
+                                </div>
+                            </div>
                         </li>
                     </template>
                 </ul>
-
-                <!-- multiple -->
-                <ul x-show="action_type =='multiple'">
-                    <template x-for="resource in filteredResources" :key="resource.id">
-                        <li>
-                            <input type="checkbox" name="selected_resources" :value="resource.id" x-model="selected_resources">
-                            <span x-text="resource.title"></span>
-                        </li>
-                    </template>
-                </ul>
-            </div>
-
-            <div id="action-details" x-show="action_type != 'multiple'">
-                <label for="title">Titre</label>
-                <input type="text" id="title" name="title" x-model="title">
-
-                <label for="message">Message</label>
-                <textarea id="message" name="message" x-model="message"></textarea>
+                <div class="mx-auto w-100">
+                    <span x-show="filteredResources.length <= 0">Aucune ressource correspondante</span>
+                </div>
 
             </div>
 
-            <button class="btn">Brouillon</button>
-            <button class="btn btn-primary">Envoyer</button>
+            <div x-show="push_type=='multiple' && selected_resources.length > 0" x-transition>
+                <span x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
+            </div>
+
+            <!-- Action details -->
+            <template x-if="push_type != 'multiple'">
+            <div id="action-details">
+
+                <h4>Décrivez votre recommandation</h4>
+                <div class="input-group mb-3">
+                    <label for="intent">Titre</label>
+                    <input type="text" id="intent" name="intent" x-model="intent" required>
+                    {% for error in form.intent.errors %}
+                    <div class="text-danger text-end">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="input-group mb-3">
+                    <label for="message">Message</label>
+                    <textarea id="content" name="content" x-model="content" required></textarea>
+                    {% for error in form.content.errors %}
+                    <div class="text-danger text-end">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            </template>
+
+            <input type="hidden" name="public" x-model="draft">
+
+            <button @click="set_draft(true)" class="btn">Brouillon</button>
+            <button @clikc="set_draft(false)" type="submit" class="btn btn-primary">Envoyer</button>
 
         </form>
     </div>
