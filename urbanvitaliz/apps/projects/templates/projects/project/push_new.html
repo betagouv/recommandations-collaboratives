@@ -120,8 +120,8 @@
 
             <input type="hidden" name="public" x-model="draft">
 
-            <button @click="set_draft(true)" class="btn">Brouillon</button>
-            <button @clikc="set_draft(false)" type="submit" class="btn btn-primary">Envoyer</button>
+            <button  @click="set_draft(true)" class="btn btn-secondary">Brouillon</button>
+            <button x-show="push_type != 'multiple'" @click="set_draft(false)" type="submit" class="btn btn-primary">Envoyer</button>
 
         </form>
     </div>
