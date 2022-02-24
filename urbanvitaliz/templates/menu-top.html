@@ -76,6 +76,8 @@
                         <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
                     </a>
                 </li>
+                {% endif %}
+                {% if request.user.is_staff or is_switchtender  %}
                 <!-- Project List -->
                 <li class="nav-item dropdown nav-item-admin me-2">
                     <div class="btn-group">
@@ -87,7 +89,6 @@
                         </a>
                     </div>
                 </li>
-
                 {% endif %}
 
                 <!-- Staff tools -->
