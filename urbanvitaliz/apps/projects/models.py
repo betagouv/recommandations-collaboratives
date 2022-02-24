@@ -283,7 +283,7 @@ class TaskManager(models.Manager):
         return self.proposed()
 
     def proposed(self):
-        return self.filter(status=Task.PROPOSED)
+        return self.filter(Q(status=Task.PROPOSED) | Q(status=Task.BLOCKED))
 
     def not_interested(self):
         return self.filter(status=Task.NOT_INTERESTED)
