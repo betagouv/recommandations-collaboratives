@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load humanize %}
+
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'projects/js/action_pusher.js' %}"></script>
+<!-- Polyfill for older browsers -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CqueueMicrotask"></script>
+{% if debug %}
+<script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.js"></script>
+{% else %}
+<script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.min.js"></script>
+{% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="col-9 py-5 mx-auto">
+
+    <!-- Breadcrumb -->
+    <h2>
+        <svg class="bi me-1 " width="32" height="32" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
+        </svg>
+        Pousser une action
+    </h2>
+
+    <div x-data="action_pusher_app()" x-init="getResources()" x-cloak class="d-flex flex-column border p-0 m-0">
+        <form class="form" method="POST" action=".">
+            {% csrf_token %}
+            <div class="mb-3">
+                <h4>Sélectionnez les type de reco</h4>
+
+                <div id="push-type-selector">
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <input type="radio" id="push-noresource" name="push_type" value="noresource" x-model="push_type">
+                            <label for="push-noresource">No Ressource</label>
+                        </div>
+                    </div>
+
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <input type="radio" id="push-single" name="push_type" value="single" x-model="push_type">
+                            <label for="push-single">1 Ressource</label>
+                        </div>
+                    </div>
+
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <input type="radio" id="push-multiple" name="push_type" value="multiple" x-model="push_type">
+                            <label for="push-multiple">Multiple Ressources</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- resources -->
+            <div id="resource-list" class="mb-3" x-show="push_type != 'noresource'" x-transition>
+                <h4>Sélectionnez les ressources à publier</h4>
+
+                <input x-model="search" placeholder="Rechercher...">
+
+                <!-- listing -->
+                <span x-text="`${filteredResources.length} ressource(s) au total`"></span>
+                <ul x-show="filteredResources.length > 0">
+                    <template x-for="resource in filteredResources" :key="resource.id">
+                        <li>
+                            <div class="card" style="width: 18rem;">
+                                <div class="card-body">
+                                    <input @click="setIntent(resource)" x-show="push_type =='single'" type="radio" name="resource" :value="resource.id" x-model="selected_resource">
+                                    <input x-show="push_type =='multiple'" type="checkbox" name="resources" :value="resource.id" x-model="selected_resources">
+                                    <h5 x-text="resource.title" class="card-title"></h5>
+                                    <p x-text="resource.subtitle" class="card-text"></p>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+                <div class="mx-auto w-100">
+                    <span x-show="filteredResources.length <= 0">Aucune ressource correspondante</span>
+                </div>
+
+            </div>
+
+            <div x-show="push_type=='multiple' && selected_resources.length > 0" x-transition>
+                <span x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
+            </div>
+
+            <!-- Action details -->
+            <template x-if="push_type != 'multiple'">
+            <div id="action-details">
+
+                <h4>Décrivez votre recommandation</h4>
+                <div class="input-group mb-3">
+                    <label for="intent">Titre</label>
+                    <input type="text" id="intent" name="intent" x-model="intent" required>
+                    {% for error in form.intent.errors %}
+                    <div class="text-danger text-end">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="input-group mb-3">
+                    <label for="message">Message</label>
+                    <textarea id="content" name="content" x-model="content" required></textarea>
+                    {% for error in form.content.errors %}
+                    <div class="text-danger text-end">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            </template>
+
+            <input type="hidden" name="public" x-model="draft">
+
+            <button  @click="set_draft(true)" class="btn btn-secondary">Brouillon</button>
+            <button x-show="push_type != 'multiple'" @click="set_draft(false)" type="submit" class="btn btn-primary">Envoyer</button>
+
+        </form>
+    </div>
+
+    <form class="form" id="form-create-action" action="{% url "projects-project-create-action" project.id %}" method="POST">
+        {% csrf_token %}
+    </form>
+</div>
+{% endblock %}

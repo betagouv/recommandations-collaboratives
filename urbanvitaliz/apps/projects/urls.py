@@ -144,6 +144,11 @@ urlpatterns = [
         name="projects-create-resource-action",
     ),
     path(
+        r"project/<int:project_id>/action/",
+        tasks.create_action,
+        name="projects-project-create-action",
+    ),
+    path(
         r"project/<int:project_id>/access/",
         sharing.access_update,
         name="projects-access-update",

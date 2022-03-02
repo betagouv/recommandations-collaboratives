@@ -18,7 +18,7 @@ from ..serializers import ProjectSerializer
 ########################################################################
 class ProjectViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint that allows projects to be viewed or edited.
     """
 
     def get_queryset(self):
