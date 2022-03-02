@@ -24,7 +24,11 @@ from urbanvitaliz.utils import (
 
 from .. import models, signals
 from ..forms import (
+    CreateActionsFromResourcesForm,
+    CreateActionWithoutResourceForm,
+    CreateActionWithResourceForm,
     CreateTaskForm,
+    PushTypeActionForm,
     RemindTaskForm,
     ResourceTaskForm,
     RsvpTaskFollowupForm,
@@ -422,6 +426,57 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
 ########################################################################
 # push resource to project
 ########################################################################
+
+
+@login_required
+def create_action(request, project_id=None):
+    """Create action for given project"""
+    project = get_object_or_404(models.Project, pk=project_id)
+
+    if request.method == "POST":
+        # Pick a different form for better data handling based
+        # on the 'push_type' attribute
+        type_form = PushTypeActionForm(request.POST)
+
+        type_form.is_valid()
+
+        push_type = type_form.cleaned_data.get("push_type")
+
+        try:
+            push_form_type = {
+                "noresource": CreateActionWithoutResourceForm,
+                "single": CreateActionWithResourceForm,
+                "multiple": CreateActionsFromResourcesForm,
+            }[push_type]
+        except KeyError:
+            return render(request, "projects/project/push_new.html", locals())
+
+        form = push_form_type(request.POST)
+        if form.is_valid():
+            if push_type == "multiple":
+                for resource in form.cleaned_data.get("resources", []):
+                    action = models.Task.objects.create(
+                        project=project,
+                        resource=resource,
+                        intent=resource.title,
+                        created_by=request.user,
+                        public=form.cleaned_data.get("public", False),
+                    )
+
+            else:
+                action = form.save(commit=False)
+                action.project = project
+                action.created_by = request.user
+                action.save()
+
+            next_url = (
+                reverse("projects-project-detail", args=[project.id]) + "#actions"
+            )
+            return redirect(next_url)
+    else:
+        form = PushTypeActionForm()
+
+    return render(request, "projects/project/push_new.html", locals())
 
 
 @login_required
