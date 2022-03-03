@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load humanize %}
+
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'projects/css/push.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'projects/js/action_pusher.js' %}"></script>
+<!-- Polyfill for older browsers -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CqueueMicrotask"></script>
+{% if debug %}
+<script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.js"></script>
+{% else %}
+<script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.min.js"></script>
+{% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="col-9 py-5 mx-auto">
+
+    <!-- Breadcrumb -->
+    <h2>
+        <svg class="bi me-1 " width="32" height="32" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
+        </svg>
+        Ajouter une recommandation
+    </h2>
+
+    <div class="p-3 my-4 bg-light rounded">
+        <h4 class="fs-6">Proposer une nouvelle action à effectuer</h4>
+        <p class="mb-0">Pour ajouter une nouvelle action à effectuer à votre interlocuteurs, vous pouvez leur pousser une ressource existante dans notre base de connaissances, ou leur proposer une action libre.</p>
+    </div>
+
+
+    <div x-data="action_pusher_app()" x-init="getResources()" x-cloak>
+        <form class="form" method="POST" action=".">
+            {% csrf_token %}
+            <div class="mb-4">
+                <h4 class="mb-3"><span class="text-muted me-1">1.</span>Sélectionnez le type de recommandation</h4>
+
+                <div id="push-type-selector" class="d-flex flex-row">
+                    <div class="card p-2 ps-5 rounded me-2">
+                        <div class="card-body">
+                            <label for="push-noresource">No Ressource</label>
+                            <input type="radio" id="push-noresource" name="push_type" value="noresource" x-model="push_type">
+                            <h5>Proposer une recommandation sans ressource</h5>
+                            <p class="mb-0">Vous devrez spécifier les détails de votre recommandation</p>
+                        </div>
+                    </div>
+
+                    <div class="card p-2 ps-5 rounded mx-2">
+                        <div class="card-body">
+                            <label for="push-single">Attacher une ressource existante</label>
+                            <input type="radio" id="push-single" name="push_type" value="single" x-model="push_type">
+                            <h5>Attacher une ressource existante</h5>
+                            <p class="mb-0">Vous pourrez sélectionner la ressource que vous souhaitez attacher</p>
+                        </div>
+                    </div>
+
+                    <div class="card p-2 ps-5 rounded ms-2">
+                        <div class="card-body">
+                            <label for="push-multiple">Multiple Ressources</label>
+                            <input type="radio" id="push-multiple" name="push_type" value="multiple" x-model="push_type">
+                            <h5>Prosposer plusieurs ressources</h5>
+                            <p class="mb-0">Vous devrez manuellement ajouter un message à votre brouillon avant de les publier</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- resources -->
+            <div id="resource-list" class="mb-4 grow" x-show="push_type != 'noresource'" x-transition:enter-start="grow-enter-start" x-transition:leave="grow-leave">
+                <h4 class="mb-3"><span class="text-muted me-1">2.</span>Sélectionnez les ressources à publier</h4>
+
+                <div class="search input-group-lg">
+                    <svg class="bi me-1 text-muted" width="24" height="24" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
+                    </svg>
+                    <input class="w-100 fs-5 form-control" type="text" x-model="search" placeholder="Rechercher une ressource...">
+                </div>
+
+                <!-- listing -->
+                <p class="search-counter fs-6 mb-0" x-text="`${filteredResources.length} ressource(s) au total`"></p>
+                <ul x-show="filteredResources.length > 0" class="cards d-flex row row-cols-3 g-4 ps-0 ms-0 mt-1">
+                    <template x-for="resource in filteredResources" :key="resource.id">
+                        <li class="col">
+                            <div class="card p-2 ps-5 rounded">
+                                <div class="card-body">
+                                    <template x-if="push_type == 'single'">
+                                        <input :id="'resource-' + resource.id" type="radio" name="resource" :value="resource.id" x-model="selected_resource" @click="setIntent(resource)">
+                                    </template>
+
+                                    <template x-if="push_type == 'multiple'">
+                                        <input :id="'resource-' + resource.id" type="checkbox" name="resources" :value="resource.id" x-model="selected_resources">
+                                    </template>
+                                    <label :for="'resource-' + resource.id" x-text="resource.title"></label>
+                                    <h5 x-text="resource.title"></h5>
+                                    <p x-text="resource.subtitle" class="mb-0"></p>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+
+                <div x-show="filteredResources.length <= 0" class="p-3 w-100 text-center rounded bg-light">
+                    <span>Aucune ressource correspondante</span>
+                </div>
+            </div>
+
+            <!-- Action details -->
+            <template x-if="push_type != 'multiple'">
+                <div class="message d-flex flex-row justify-content-between">
+                    <div id="action-details" class="form flex-fill d-flex flex-column">
+
+                        <h4><span class="text-muted me-1" x-text="push_type == 'noresource' ? '2.' : '3.'"></span>Décrivez votre recommandation</h4>
+                        
+                        <div>
+                            <label for="intent">Titre</label>
+                            <div class="input-group mb-3">
+                                <input class="form-control" type="text" id="intent" name="intent" x-model="intent" required>
+                                {% for error in form.intent.errors %}
+                                <div class="text-danger text-end">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="flex-fill d-flex flex-column">
+                            <label for="message">Message</label>
+                            <div class="input-group-lg mb-3 flex-fill d-flex">
+                                <textarea class="form-control flex-fill" id="content" name="content" x-model="content" required></textarea>
+                                {% for error in form.content.errors %}
+                                <div class="text-danger text-end">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="buttons d-flex flex-row justify-content-between">
+                            <button @click="set_draft(true)" class="btn btn-secondary">Brouillon</button>
+                            <button x-show="push_type != 'multiple'" @click="set_draft(false)" type="submit" class="btn btn-primary">Envoyer</button>    
+                        </div>
+                    </div>        
+                    <div class="help p-3 ms-3 w-50 bg-light rounded">
+                        <h6>Comment écrire une recommandation</h6>
+                        <img class="mt-3 img-fluid" src="{% static 'projects/img/push_example.png' %}" />
+                        <ol class="mt-3">
+                            <li>
+                                <strong>
+                                    Donnez un titre actionnable à votre recommandation
+                                </strong>
+                                <p>
+                                    Afin de faciliter la compréhension de votre interlocuteur, nous vous suggérons de donnez un titre à votre recommandation qui évoque une action à faire (de préférence avec un verbe) pour résoudre un problème concret.
+                                </p>
+                            </li>
+                            <li>
+                                <strong>
+                                    Détaillez la marche à suivre pour mener à bien cette action
+                                </strong>
+                                <p>
+                                    Après avoir rappelé les enjeux de la recommandation, donnez une description claire des différentes étapes de cette action, appuyées par des ressources externes et/ou des personnes à contacter pour progresser sur le sujet.
+                                </p>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </template>
+
+            <template x-if="push_type == 'multiple'">                
+                <div x-show="push_type == 'multiple' && selected_resources.length > 0">
+                    <button @click="set_draft(true)" class="btn btn-secondary">Brouillon</button>
+                    <span class="ms-2" x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
+                </div>
+            </template>
+
+            <input type="hidden" name="public" x-model="draft">
+        </form>
+    </div>
+
+    <form class="form" id="form-create-action" action="{% url "projects-project-create-action" project.id %}" method="POST">
+        {% csrf_token %}
+    </form>
+</div>
+{% endblock %}

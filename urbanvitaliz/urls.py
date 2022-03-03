@@ -20,12 +20,14 @@ from urbanvitaliz.apps.addressbook.urls import urlpatterns as addressbook_urls
 from urbanvitaliz.apps.home.urls import urlpatterns as home_urls
 from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
 from urbanvitaliz.apps.projects.views import rest as projects_rest
+from urbanvitaliz.apps.resources import views as resources_views
 from urbanvitaliz.apps.resources.urls import urlpatterns as resources_urls
 from urbanvitaliz.apps.survey.urls import urlpatterns as survey_urls
 
 # Rest
 router = routers.DefaultRouter()
 router.register(r"projects", projects_rest.ProjectViewSet, basename="projects")
+router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
 
 
 urlpatterns = [

@@ -129,6 +129,9 @@ action_commented = django.dispatch.Signal()
 
 @receiver(action_created)
 def notify_action_created(sender, task, project, user, **kwargs):
+    if task.public is False:
+        return
+
     if project.status == "DRAFT" or project.muted:
         return
 
