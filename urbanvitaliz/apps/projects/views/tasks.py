@@ -151,7 +151,9 @@ def update_task(request, task_id=None):
                 user=request.user,
             )
 
-            return redirect(reverse("projects-project-detail", args=[task.project_id]))
+            return redirect(
+                reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+            )
     else:
         form = UpdateTaskForm(instance=task)
     return render(request, "projects/project/task_update.html", locals())
