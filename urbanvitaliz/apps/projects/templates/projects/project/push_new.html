@@ -69,7 +69,7 @@
                         <div class="card-body">
                             <label for="push-multiple">Multiple Ressources</label>
                             <input type="radio" id="push-multiple" name="push_type" value="multiple" x-model="push_type">
-                            <h5>Prosposer plusieurs ressources</h5>
+                            <h5>Proposer plusieurs ressources</h5>
                             <p class="mb-0">Vous devrez manuellement ajouter un message à votre brouillon avant de les publier</p>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
                     <div id="action-details" class="form flex-fill d-flex flex-column">
 
                         <h4><span class="text-muted me-1" x-text="push_type == 'noresource' ? '2.' : '3.'"></span>Décrivez votre recommandation</h4>
-                        
+
                         <div>
                             <label for="intent">Titre</label>
                             <div class="input-group mb-3">
@@ -143,10 +143,10 @@
                         </div>
 
                         <div class="buttons d-flex flex-row justify-content-between">
-                            <button @click="set_draft(true)" class="btn btn-secondary">Brouillon</button>
-                            <button x-show="push_type != 'multiple'" @click="set_draft(false)" type="submit" class="btn btn-primary">Envoyer</button>    
+                            <button @click="set_draft(true)" class="btn btn-secondary" :disabled="!selected_resource">Brouillon</button>
+                            <button @click="set_draft(false)" type="submit" class="btn btn-primary" :disabled="!selected_resource">Envoyer</button>
                         </div>
-                    </div>        
+                    </div>
                     <div class="help p-3 ms-3 w-50 bg-light rounded">
                         <h6>Comment écrire une recommandation</h6>
                         <img class="mt-3 img-fluid" src="{% static 'projects/img/push_example.png' %}" />
@@ -172,9 +172,9 @@
                 </div>
             </template>
 
-            <template x-if="push_type == 'multiple'">                
-                <div x-show="push_type == 'multiple' && selected_resources.length > 0">
-                    <button @click="set_draft(true)" class="btn btn-secondary">Brouillon</button>
+            <template x-if="push_type == 'multiple'">
+                <div>
+                    <button @click="set_draft(true)" class="btn btn-secondary" :disabled="!selected_resources.length">Brouillon</button>
                     <span class="ms-2" x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
                 </div>
             </template>
