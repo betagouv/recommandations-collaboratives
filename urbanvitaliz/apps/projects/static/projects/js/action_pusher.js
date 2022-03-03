@@ -24,19 +24,18 @@ function action_pusher_app() {
             return input.length > size ? `${input.substring(0, size)}...` : input;
         },
 
-				formatDateDisplay(date) {
-					  if (this.dateDisplay === 'toDateString') return new Date(date).toDateString();
-					  if (this.dateDisplay === 'toLocaleDateString') return new Date(date).toLocaleDateString('fr-FR');
+        formatDateDisplay(date) {
+                if (this.dateDisplay === 'toDateString') return new Date(date).toDateString();
+                if (this.dateDisplay === 'toLocaleDateString') return new Date(date).toLocaleDateString('fr-FR');
 
-					  return new Date().toLocaleDateString('fr-FR');
-				},
-
-        setIntent(resource) {
-            if (this.intent =='')
-                this.intent = resource.title;
+                return new Date().toLocaleDateString('fr-FR');
         },
 
-				async getResources() {
+        setIntent(resource) {
+            this.intent = resource.title;
+        },
+
+		async getResources() {
             var tasksFromApi = [];
 
             this.isBusy = true;

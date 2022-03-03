@@ -283,7 +283,7 @@ class TaskManager(models.Manager):
         return self.proposed()
 
     def proposed(self):
-        return self.filter(status=Task.PROPOSED)
+        return self.filter(Q(status=Task.PROPOSED) | Q(status=Task.BLOCKED))
 
     def not_interested(self):
         return self.filter(status=Task.NOT_INTERESTED)
@@ -426,8 +426,17 @@ class Task(models.Model):
         return reverse("projects-project-detail", args=[self.project.id]) + "#actions"
 
 
+class TaskFollowupManager(models.Manager):
+    """Manager for followups"""
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("-timestamp")
+
+
 class TaskFollowup(models.Model):
     """An followup on the task -- achievements and comments"""
+
+    objects = TaskFollowupManager()
 
     task = models.ForeignKey("Task", on_delete=models.CASCADE, related_name="followups")
     who = models.ForeignKey(
