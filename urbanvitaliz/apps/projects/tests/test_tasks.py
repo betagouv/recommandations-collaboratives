@@ -402,7 +402,7 @@ def test_create_new_action_with_invalid_push_type(client):
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
 
-        response = client.post(
+        client.post(
             reverse("projects-project-create-action", args=[project.id]),
             data={
                 "push_type": "blah",

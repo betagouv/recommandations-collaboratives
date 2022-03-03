@@ -22,10 +22,9 @@ from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
 from .. import models, signals
 from ..forms import (CreateActionsFromResourcesForm,
                      CreateActionWithoutResourceForm,
-                     CreateActionWithResourceForm, CreateTaskForm,
-                     PushTypeActionForm, RemindTaskForm, ResourceTaskForm,
-                     RsvpTaskFollowupForm, TaskFollowupForm,
-                     TaskRecommendationForm, UpdateTaskForm)
+                     CreateActionWithResourceForm, PushTypeActionForm,
+                     RemindTaskForm, ResourceTaskForm, RsvpTaskFollowupForm,
+                     TaskFollowupForm, TaskRecommendationForm, UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -144,6 +143,14 @@ def update_task(request, task_id=None):
             api.remove_reminder_email(
                 task, recipient=request.user.email, origin=api.models.Mail.STAFF
             )
+
+            signals.action_created.send(
+                sender=update_task,
+                task=instance,
+                project=instance.project,
+                user=request.user,
+            )
+
             return redirect(reverse("projects-project-detail", args=[task.project_id]))
     else:
         form = UpdateTaskForm(instance=task)

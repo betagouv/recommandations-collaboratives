@@ -168,12 +168,8 @@ class UpdateTaskForm(forms.ModelForm):
         fields = [
             "intent",
             "content",
-            "tags",
             "public",
             "priority",
-            "deadline",
-            "resource",
-            "contact",
         ]
 
 
