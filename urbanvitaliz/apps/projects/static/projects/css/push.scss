@@ -1,0 +1,72 @@
+.card {
+    position: relative;
+
+    label {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+    }
+
+    input[type=radio], input[type=checkbox] {
+        transform: scale(1.5);
+        transform-origin: top left;
+        position: absolute;
+        top: 1.75em;
+        left: 1.75em;
+    }
+}
+.cards {
+    flex-wrap: wrap;
+
+    max-height: 500px;
+    overflow-y: auto;
+
+    li {
+        list-style: none;
+        padding-left: 0;
+    }
+}
+
+.search {
+    position: relative;
+
+    svg {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+    }
+
+    input[type=text] {
+        text-indent: 32px;
+    }
+}
+
+.form {
+    label {
+        display: block;
+    }
+
+    input[type=text] {
+        display: block;
+        border-color: #ddd;
+        border-style: solid;
+        border-width: 1px;
+    }
+}
+
+.grow {
+    transition: all ease-in 300ms;
+    max-height: 99em;
+    overflow: hidden;
+}
+
+.grow-enter-start {
+    max-height: 0em;
+}
+
+.grow-leave {
+    max-height: 0em;
+}
