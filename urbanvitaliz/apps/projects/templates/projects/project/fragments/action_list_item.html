@@ -38,8 +38,12 @@
 
 <div class="accordion border border-1 rounded-3 mb-4 position-relative">
 
-    {% if task.visited == False %}
+    {% if not task.visited and task.public  %}
     <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary" style="margin-left: 60px" >NOUVEAU</span>
+    {% endif %}
+
+    {% if not task.public %}
+    <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-warning" style="margin-left: 60px" >BROUILLON</span>
     {% endif %}
 
     <div class="accordion-header d-flex justify-content-between border-bottom">
@@ -95,7 +99,7 @@
             </a>
             {% endif %}
         </div>
-        {% if can_manage %}
+        {% if can_manage and task.public %}
         <div class="toolbar d-flex border-start flex-column justify-content-between">
             {% if task.open %}
             <button class="p-4 btn btn-text m-0 border-bottom flex-grow-1" data-bs-toggle="modal" data-bs-target="#modal-action-{{ task.id }}">
@@ -134,7 +138,7 @@
         <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
 
             <div class="d-flex justify-content-between w-100 px-4">
-                {% if not hide_comments %}
+                {% if not hide_comments  %}
                 <div class="align-middle flex-grow-1">
                     <button class="align-middle justify-content-start m-0 px-0 d-flex text-left btn btn-text collapsed text-primary w-100" data-bs-toggle="collapse" data-bs-target="#action-{{ task.id }}-content" aria-expanded="false" aria-controls="action-{{ task.id }}-content">
                         Lire les commentaires
@@ -226,7 +230,7 @@
                 {% endif %}
                 {% endfor %}
 
-                {% if can_manage %}
+                {% if can_manage and task.public %}
                 <div class="m-2 comment mt-4">
                     <span class="">Répondre</span>
                     <form class="mt-2 form d-flex flex-column align-items-end" method="POST" action="{% url 'projects-followup-task' task.id %}">
