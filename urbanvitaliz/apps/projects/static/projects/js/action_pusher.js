@@ -4,20 +4,25 @@ function action_pusher_app() {
         search: '',
         resources: [],
 
+        db: new MiniSearch({
+            fields: ['title', 'subtitle', 'tags'], // fields to index for full-text search
+            storeFields: ['title', 'subtitle'] //
+        }),
+
         push_type: 'single',
+
         intent: '',
         content: '',
+
+        results: [],
+        suggestions: [],
         selected_resource: null,
         selected_resources: [],
         draft: false,
 
-        get filteredResources() {
-            if (this.search == '')
-                return this.resources;
-
-            return this.resources.filter(
-                i => i.title.toLowerCase().includes(this.search.toLowerCase())
-            ) || [];
+        searchResources() {
+            this.suggestions = this.db.autoSuggest(this.search, { fuzzy: 0.2 }).slice(0, 2);
+            this.results = this.db.search(this.search, { fuzzy: 0.2 }).slice(0, 8);
         },
 
         truncate(input, size=30) {
@@ -25,17 +30,17 @@ function action_pusher_app() {
         },
 
         formatDateDisplay(date) {
-                if (this.dateDisplay === 'toDateString') return new Date(date).toDateString();
-                if (this.dateDisplay === 'toLocaleDateString') return new Date(date).toLocaleDateString('fr-FR');
+            if (this.dateDisplay === 'toDateString') return new Date(date).toDateString();
+            if (this.dateDisplay === 'toLocaleDateString') return new Date(date).toLocaleDateString('fr-FR');
 
-                return new Date().toLocaleDateString('fr-FR');
+            return new Date().toLocaleDateString('fr-FR');
         },
 
         setIntent(resource) {
             this.intent = resource.title;
         },
 
-		async getResources() {
+		    async getResources() {
             var tasksFromApi = [];
 
             this.isBusy = true;
@@ -46,19 +51,14 @@ function action_pusher_app() {
 						this.resources = [];
 
             resourcesFromApi.forEach(t => {
-                this.resources.push(
+                this.db.add(
 							   {
 								     id: t.id,
 								     title: this.truncate(t.title),
                      subtitle: t.subtitle,
-								     status: t.status,
-								     created_on: new Date(t.created_on),
+                     tags: t.tags,
 							   });
 						});
-
-            this.resources.sort(function(a, b) {
-                    return b.created_on - a.created_on;
-            });
 
             this.isBusy = false;
 				},
