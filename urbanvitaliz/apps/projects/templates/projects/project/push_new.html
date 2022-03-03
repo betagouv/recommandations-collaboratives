@@ -173,10 +173,10 @@
             </template>
 
             <template x-if="push_type == 'multiple'">                
-                <div x-show="push_type=='multiple' && selected_resources.length > 0"
-                    <span x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
+                <div x-show="push_type == 'multiple' && selected_resources.length > 0">
+                    <button @click="set_draft(true)" class="btn btn-secondary">Brouillon</button>
+                    <span class="ms-2" x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
                 </div>
-                <button @click="set_draft(true)" class="btn btn-secondary">Brouillon</button>
             </template>
 
             <input type="hidden" name="public" x-model="draft">
