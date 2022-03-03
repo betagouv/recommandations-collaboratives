@@ -64,7 +64,9 @@ def test_send_digests_for_new_reco_not_sent_for_not_done_projects(client):
     # Generate a notification
     signals.action_created.send(
         sender=test_send_digests_for_new_reco,
-        task=models.Task.objects.create(project=project, created_by=switchtender),
+        task=models.Task.objects.create(
+            project=project, created_by=switchtender, public=True
+        ),
         project=project,
         user=switchtender,
     )
