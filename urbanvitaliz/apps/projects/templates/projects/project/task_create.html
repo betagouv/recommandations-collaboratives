@@ -11,6 +11,8 @@
 {% endblock %}
 
 {% block js %}
+<script src="https://cdn.jsdelivr.net/npm/minisearch@4.0.3/dist/umd/index.min.js"></script>
+
 <script src="{% static 'projects/js/action_pusher.js' %}"></script>
 <!-- Polyfill for older browsers -->
 <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2CqueueMicrotask"></script>
@@ -19,6 +21,9 @@
 {% else %}
 <script defer src="https://unpkg.com/alpinejs@3.7.0/dist/cdn.min.js"></script>
 {% endif %}
+
+
+
 {% endblock %}
 
 
@@ -84,13 +89,14 @@
                     <svg class="bi me-1 text-muted" width="24" height="24" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
                     </svg>
-                    <input class="w-100 fs-5 form-control" type="text" x-model="search" placeholder="Rechercher une ressource...">
+                    <input class="w-100 fs-5 form-control" type="text" x-on:input.debounce="searchResources()" x-model="search" placeholder="Rechercher une ressource...">
                 </div>
 
                 <!-- listing -->
-                <p class="search-counter fs-6 mb-0" x-text="`${filteredResources.length} ressource(s) au total`"></p>
-                <ul x-show="filteredResources.length > 0" class="cards d-flex row row-cols-3 g-4 ps-0 ms-0 mt-1">
-                    <template x-for="resource in filteredResources" :key="resource.id">
+                <p class="search-counter fs-6 mb-0" x-show="!search" x-text="`${db.documentCount} ressources au total`"></p>
+                <p class="search-counter fs-6 mb-0" x-show="search" x-text="`${results.length} ressource(s) trouvée(s)`"></p>
+                <ul x-show="results.length > 0" class="cards d-flex row row-cols-3 g-4 ps-0 ms-0 mt-1">
+                    <template x-for="resource in results" :key="resource.id">
                         <li class="col">
                             <div class="card p-2 ps-5 rounded">
                                 <div class="card-body">
@@ -110,8 +116,15 @@
                     </template>
                 </ul>
 
-                <div x-show="filteredResources.length <= 0" class="p-3 w-100 text-center rounded bg-light">
-                    <span>Aucune ressource correspondante</span>
+                <div x-show="results.length <= 0 && search != ''" class="p-3 w-100 text-center rounded bg-light">
+                    <span class="fw-bolder">Aucune ressource correspondante</span>
+
+                    <div x-show="suggestions.length">
+                        Vous cherchez peut être : <template x-for="suggestion in suggestions">
+                        <a href="#" @click.prevent="search = suggestion.suggestion; searchResources();" x-text="suggestion.suggestion"></a>&nbsp;
+                        </template>
+
+                    </div>
                 </div>
             </div>
 

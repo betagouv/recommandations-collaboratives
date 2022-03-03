@@ -10,6 +10,7 @@ class ResourceSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "title",
             "subtitle",
+            "tags",
             "status",
             "created_on",
             "updated_on",
