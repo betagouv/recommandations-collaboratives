@@ -17,7 +17,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
@@ -395,7 +396,7 @@ def test_project_detail_contains_actions_for_switchtender(client):
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         response = client.get(url)
-    add_task_url = reverse("projects-create-task", args=[project.id])
+    add_task_url = reverse("projects-project-create-action", args=[project.id])
     assertContains(response, add_task_url)
     add_note_url = reverse("projects-create-note", args=[project.id])
     assertContains(response, add_note_url)
@@ -803,49 +804,6 @@ def test_projects_feed_available_for_all_users(client):
     response = client.get(url)
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertContains(response, detail_url)
-
-
-########################################################################
-# tasks
-########################################################################
-
-
-#
-# create
-
-
-@pytest.mark.django_db
-def test_create_task_not_available_for_non_staff_users(client):
-    project = Recipe(models.Project).make()
-    url = reverse("projects-create-task", args=[project.id])
-    with login(client):
-        response = client.get(url)
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_create_task_available_for_switchtender(client):
-    project = Recipe(models.Project).make()
-    url = reverse("projects-create-task", args=[project.id])
-    with login(client, groups=["switchtender"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-    assertContains(response, 'form id="form-projects-add-task"')
-
-
-@pytest.mark.django_db
-def test_create_task_assigns_new_switchtender(client):
-    project = Recipe(models.Project, switchtenders=[]).make()
-    url = reverse("projects-create-task", args=[project.id])
-    with login(client, groups=["switchtender"]):
-        client.post(
-            url,
-            data={"content": "this is some content", "notify_email": False},
-        )
-
-    project = models.Project.objects.all()[0]
-    assert project.switchtenders.count() == 1
 
 
 #

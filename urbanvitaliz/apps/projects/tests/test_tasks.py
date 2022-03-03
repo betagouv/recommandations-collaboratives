@@ -345,6 +345,10 @@ def test_delete_task_from_project_and_redirect(client):
 
 
 ########################################################################
+# Push Actions
+########################################################################
+
+########################################################################
 # Task Notifications
 ########################################################################
 
@@ -354,12 +358,15 @@ def test_create_new_task_for_project_notify_collaborators(mocker, client):
     owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
 
     project = Recipe(models.Project, status="READY", emails=[owner.email]).make()
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+
         client.post(
-            reverse("projects-create-task", args=[project.id]),
+            reverse("projects-project-create-action", args=[project.id]),
             data={
+                "push_type": "noresource",
+                "intent": "yeah",
                 "content": "this is some content",
-                "notify_email": True,
                 "public": True,
             },
         )
@@ -368,30 +375,33 @@ def test_create_new_task_for_project_notify_collaborators(mocker, client):
 
 
 @pytest.mark.django_db
-def test_create_new_task_for_project_and_redirect(client):
+def test_create_task_not_available_for_non_staff_users(client):
     project = Recipe(models.Project).make()
-    username = "bob"
-    with login(client, username=username, groups=["switchtender"]):
-        response = client.post(
-            reverse("projects-create-task", args=[project.id]),
-            data={"content": "this is some content", "public": True},
-        )
-    task = models.Task.objects.all()[0]
-    assert task.project == project
-    assert task.created_by.username == username
-    assert response.status_code == 302
+    url = reverse("projects-project-create-action", args=[project.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
 
 
-########################################################################
-# Push Actions
-########################################################################
+@pytest.mark.django_db
+def test_create_task_available_for_switchtender(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-create-action", args=[project.id])
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+
+        response = client.get(url)
+
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_create_new_action_with_invalid_push_type(client):
     project = Recipe(models.Project).make()
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
             data={
@@ -409,7 +419,9 @@ def test_create_new_action_as_draft(client):
     intent = "My Intent"
     content = "My Content"
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
             data={
@@ -430,7 +442,9 @@ def test_create_new_action_without_resource(client):
     intent = "My Intent"
     content = "My Content"
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
             data={
@@ -457,7 +471,9 @@ def test_create_new_action_with_single_resource(client):
     intent = "My Intent"
     content = "My Content"
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
             data={
@@ -477,12 +493,14 @@ def test_create_new_action_with_single_resource(client):
 
 
 @pytest.mark.django_db
-def test_create_new_action_with_multiple_resource(client):
+def test_create_new_action_with_multiple_resources(client):
     project = Recipe(models.Project).make()
     resource1 = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
     resource2 = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
             data={

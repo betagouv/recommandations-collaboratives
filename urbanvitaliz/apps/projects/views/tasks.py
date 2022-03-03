@@ -16,54 +16,17 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateActionsFromResourcesForm,
-    CreateActionWithoutResourceForm,
-    CreateActionWithResourceForm,
-    CreateTaskForm,
-    PushTypeActionForm,
-    RemindTaskForm,
-    ResourceTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskForm,
-)
+from ..forms import (CreateActionsFromResourcesForm,
+                     CreateActionWithoutResourceForm,
+                     CreateActionWithResourceForm, CreateTaskForm,
+                     PushTypeActionForm, RemindTaskForm, ResourceTaskForm,
+                     RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
-
-
-@login_required
-def create_task(request, project_id=None):
-    """Create a new task for a project"""
-    is_switchtender_or_403(request.user)
-    project = get_object_or_404(models.Project, pk=project_id)
-    if request.method == "POST":
-        form = CreateTaskForm(request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.created_by = request.user
-            instance.project = project
-            instance.save()
-
-            if request.user not in project.switchtenders.all():
-                project.switchtenders.add(request.user)
-
-            # Notify other switchtenders
-            signals.action_created.send(
-                sender=visit_task, task=instance, project=project, user=request.user
-            )
-
-            return redirect(reverse("projects-project-detail", args=[project_id]))
-    else:
-        form = CreateTaskForm()
-    return render(request, "projects/project/task_create.html", locals())
 
 
 @login_required
@@ -433,6 +396,8 @@ def create_action(request, project_id=None):
     """Create action for given project"""
     project = get_object_or_404(models.Project, pk=project_id)
 
+    can_manage_or_403(project, request.user)
+
     if request.method == "POST":
         # Pick a different form for better data handling based
         # on the 'push_type' attribute
@@ -449,24 +414,44 @@ def create_action(request, project_id=None):
                 "multiple": CreateActionsFromResourcesForm,
             }[push_type]
         except KeyError:
-            return render(request, "projects/project/push_new.html", locals())
+            return render(request, "projects/project/task_create.html", locals())
 
         form = push_form_type(request.POST)
         if form.is_valid():
             if push_type == "multiple":
                 for resource in form.cleaned_data.get("resources", []):
+                    public = form.cleaned_data.get("public", False)
                     action = models.Task.objects.create(
                         project=project,
                         resource=resource,
                         intent=resource.title,
                         created_by=request.user,
-                        public=form.cleaned_data.get("public", False),
+                        public=public,
                     )
+
+                    if public:
+                        # Notify other switchtenders
+                        signals.action_created.send(
+                            sender=create_action,
+                            task=action,
+                            project=project,
+                            user=request.user,
+                        )
 
             else:
                 action = form.save(commit=False)
                 action.project = project
                 action.created_by = request.user
+
+                if action.public:
+                    # Notify other switchtenders
+                    signals.action_created.send(
+                        sender=create_action,
+                        task=action,
+                        project=project,
+                        user=request.user,
+                    )
+
                 action.save()
 
             next_url = (
@@ -476,7 +461,7 @@ def create_action(request, project_id=None):
     else:
         form = PushTypeActionForm()
 
-    return render(request, "projects/project/push_new.html", locals())
+    return render(request, "projects/project/task_create.html", locals())
 
 
 @login_required
