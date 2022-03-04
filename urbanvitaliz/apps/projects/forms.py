@@ -32,7 +32,7 @@ class NoteForm(forms.ModelForm):
 class StaffNoteForm(NoteForm):
     class Meta:
         model = models.Note
-        fields = ["content", "tags", "public"]
+        fields = ["content", "tags"]
 
 
 class PrivateNoteForm(forms.ModelForm):
