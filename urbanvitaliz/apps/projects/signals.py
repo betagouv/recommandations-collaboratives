@@ -9,9 +9,12 @@ from notifications import models as notifications_models
 from notifications.signals import notify
 
 from . import models
-from .utils import (get_notification_recipients_for_project,
-                    get_project_moderators, get_regional_actors_for_project,
-                    get_switchtenders_for_project)
+from .utils import (
+    get_notification_recipients_for_project,
+    get_project_moderators,
+    get_regional_actors_for_project,
+    get_switchtenders_for_project,
+)
 
 #####
 # Projects
