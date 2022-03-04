@@ -12,7 +12,7 @@
     "use strict";
 
     const offcanvasToggle = document.querySelector(
-        '[data-bs-toggle="offcanvas"]',
+        '[data-bs-toggle="offcanvas"]'
     );
     const offcanvasCollapse = document.querySelector(".offcanvas-collapse");
 
