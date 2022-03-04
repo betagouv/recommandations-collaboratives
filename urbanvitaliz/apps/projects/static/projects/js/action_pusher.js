@@ -2,7 +2,6 @@ function action_pusher_app() {
 		return {
         isBusy: true,
         search: '',
-        resources: [],
 
         db: new MiniSearch({
             fields: ['title', 'subtitle', 'tags'], // fields to index for full-text search
@@ -14,15 +13,22 @@ function action_pusher_app() {
         intent: '',
         content: '',
 
+        resources: [],
         results: [],
         suggestions: [],
         selected_resource: null,
         selected_resources: [],
         draft: false,
 
-        searchResources() {
-            this.suggestions = this.db.autoSuggest(this.search, { fuzzy: 0.2 }).slice(0, 2);
-            this.results = this.db.search(this.search, { fuzzy: 0.2 }).slice(0, 8);
+        searchResources(text=null) {
+            if (!text) {
+                text = this.search;
+            } 
+
+            this.results = this.db.search(text, { fuzzy: 0.2 }).slice(0, 8);
+            this.suggestions = this.db.autoSuggest(text, { fuzzy: 0.2 }).slice(0, 2);
+
+            return true;
         },
 
         truncate(input, size=30) {
@@ -40,6 +46,23 @@ function action_pusher_app() {
             this.intent = resource.title;
         },
 
+        async init_pusher() {
+            const params = new URLSearchParams(document.location.search);
+            await this.getResources();
+
+            const selected_resource = parseInt(params.get('resource'));
+            if (selected_resource) {
+                this.results = _.where(this.resources, {'id': selected_resource });
+                if (this.results.length) {
+                    this.selected_resource = selected_resource;
+                    this.selected_resources = [selected_resource];
+                    this.setIntent(this.results[0]);
+                }
+
+            }
+
+        },
+
 		    async getResources() {
             var tasksFromApi = [];
 
@@ -48,16 +71,16 @@ function action_pusher_app() {
             const response = await fetch('/api/resources/');
             resourcesFromApi = await response.json(); //extract JSON from the http response
 
-						this.resources = [];
-
             resourcesFromApi.forEach(t => {
-                this.db.add(
-							   {
-								     id: t.id,
-								     title: this.truncate(t.title),
-                     subtitle: t.subtitle,
-                     tags: t.tags,
-							   });
+                let entry = {
+								    id: t.id,
+								    title: this.truncate(t.title),
+                    subtitle: t.subtitle,
+                    tags: t.tags,
+							  };
+
+                this.resources.push(entry);
+                this.db.add(entry);
 						});
 
             this.isBusy = false;

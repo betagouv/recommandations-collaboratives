@@ -215,7 +215,7 @@ def make_rsvp_link(rsvp, status):
     )
 
 
-def create_reminder(request, days, task, recipient, origin):
+def create_reminder(days, task, recipient, origin):
     """
     Create a reminder using the reminder API and schedule a RSVP to send to the target user
     """

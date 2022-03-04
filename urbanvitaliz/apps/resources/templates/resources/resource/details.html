@@ -275,6 +275,7 @@
             <!-- Push Resource -->
             <div class="d-grid gap-2 mt-3">
                 {% if active_project %}
+                {% if not resource.status == 0  %}
                 <form action="{% url "projects-create-resource-action" resource.id %}" method="GET">
                     <button type="submit" class="btn btn-success w-100 btn-sm" role="submit">
                         <svg class="bi" width="16" height="16" fill="currentColor">
@@ -284,6 +285,7 @@
                         Pousser la ressource
                     </button>
                 </form>
+                {% endif %}
                 {% else %}
                 <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="left" title="Sélectionner d'abord un projet pour pousser une ressource">
                     <button type="submit" class="btn btn-light w-100 btn-sm" role="submit" disabled>

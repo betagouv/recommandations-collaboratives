@@ -12,7 +12,7 @@
 
 {% block js %}
 <script src="https://cdn.jsdelivr.net/npm/minisearch@4.0.3/dist/umd/index.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/underscore@1.13.2/underscore-umd-min.js"></script>
 <script src="{% static 'projects/js/action_pusher.js' %}"></script>
 
 
@@ -39,7 +39,7 @@
     </div>
 
 
-    <div x-data="action_pusher_app()" x-init="getResources()" x-cloak>
+    <div x-data="action_pusher_app()" x-init="init_pusher()" x-cloak>
         <form class="form" method="POST" action=".">
             {% csrf_token %}
             <div class="mb-4">
@@ -186,7 +186,7 @@
                 </div>
             </template>
 
-            <input type="hidden" name="public" x-model="draft">
+            <input type="hidden" name="public" x-model="!draft">
         </form>
     </div>
 

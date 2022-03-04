@@ -135,7 +135,7 @@ urlpatterns = [
     ),
     path(
         r"project/<int:resource_id>/resource/action/",
-        tasks.create_resource_action,
+        tasks.create_resource_action_for_current_project,
         name="projects-create-resource-action",
     ),
     path(
