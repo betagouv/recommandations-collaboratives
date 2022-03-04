@@ -218,7 +218,9 @@ def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(client)
     project = Recipe(
         models.Project, status="READY", email=owner_email, emails=[owner_email]
     ).make()
-    task = Recipe(models.Task, project=project, visited=True).make()
+    task = Recipe(
+        models.Task, status=models.Task.PROPOSED, project=project, visited=True
+    ).make()
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-toggle-done-task", args=[task.id]),

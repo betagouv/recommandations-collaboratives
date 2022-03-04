@@ -16,15 +16,25 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    check_if_switchtender,
+    is_staff_or_403,
+    is_switchtender_or_403,
+)
 
 from .. import models, signals
-from ..forms import (CreateActionsFromResourcesForm,
-                     CreateActionWithoutResourceForm,
-                     CreateActionWithResourceForm, PushTypeActionForm,
-                     RemindTaskForm, ResourceTaskForm, RsvpTaskFollowupForm,
-                     TaskFollowupForm, TaskRecommendationForm, UpdateTaskForm)
+from ..forms import (
+    CreateActionsFromResourcesForm,
+    CreateActionWithoutResourceForm,
+    CreateActionWithResourceForm,
+    PushTypeActionForm,
+    RemindTaskForm,
+    ResourceTaskForm,
+    RsvpTaskFollowupForm,
+    TaskFollowupForm,
+    TaskRecommendationForm,
+    UpdateTaskForm,
+)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -58,8 +68,8 @@ def toggle_done_task(request, task_id):
     can_manage_or_403(task.project, request.user)
 
     if request.method == "POST":
-        if task.status == models.Task.DONE:
-            task.status = models.Task.PROPOSED
+        if task.open:
+            task.status = models.Task.DONE
 
             # NOTE should we remove all the reminders?
             api.remove_reminder_email(
@@ -72,7 +82,7 @@ def toggle_done_task(request, task_id):
                 user=request.user,
             )
         else:
-            task.status = models.Task.DONE
+            task.status = models.Task.PROPOSED
 
             signals.action_undone.send(
                 sender=toggle_done_task,

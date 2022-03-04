@@ -201,6 +201,8 @@ class ProjectForm(forms.ModelForm):
         label="Publication sur cartofriches", disabled=True, required=False
     )
 
+    email = forms.CharField(label="Email principal", disabled=True, required=False)
+
     class Meta:
         model = models.Project
         fields = [
