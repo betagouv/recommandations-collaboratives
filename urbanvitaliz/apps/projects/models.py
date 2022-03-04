@@ -202,7 +202,7 @@ class NoteManager(models.Manager):
         )
 
     def public(self):
-        return self.filter(public=True)
+        return self.get_queryset().filter(public=True)
 
 
 class Note(models.Model):
@@ -430,7 +430,7 @@ class TaskFollowupManager(models.Manager):
     """Manager for followups"""
 
     def get_queryset(self):
-        return super().get_queryset().order_by("-timestamp")
+        return super().get_queryset().order_by("timestamp")
 
 
 class TaskFollowup(models.Model):

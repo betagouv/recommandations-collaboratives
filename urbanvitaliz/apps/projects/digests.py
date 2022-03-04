@@ -386,7 +386,7 @@ class NotificationFormatter:
         return note.content[:50] or None
 
     def _represent_followup(self, followup):
-        return followup.comment
+        return followup.comment[:50]
 
     # -------- Routers -----------#
     @multimethod
