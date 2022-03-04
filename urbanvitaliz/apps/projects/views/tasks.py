@@ -29,7 +29,6 @@ from ..forms import (
     CreateActionWithResourceForm,
     PushTypeActionForm,
     RemindTaskForm,
-    ResourceTaskForm,
     RsvpTaskFollowupForm,
     TaskFollowupForm,
     TaskRecommendationForm,
@@ -289,9 +288,7 @@ def remind_task(request, task_id=None):
             days = form.cleaned_data.get("days")
             days = days or 6 * 7  # 6 weeks is default
 
-            if create_reminder(
-                request, days, task, recipient, origin=api.models.Mail.SELF
-            ):
+            if create_reminder(days, task, recipient, origin=api.models.Mail.SELF):
                 messages.success(
                     request,
                     "Une alarme a bien été programmée dans {0} jours.".format(days),
@@ -448,21 +445,6 @@ def create_action(request, project_id=None):
                         public=public,
                     )
 
-                    if public:
-                        # Notify other switchtenders
-                        signals.action_created.send(
-                            sender=create_action,
-                            task=action,
-                            project=project,
-                            user=request.user,
-                        )
-
-            else:
-                action = form.save(commit=False)
-                action.project = project
-                action.created_by = request.user
-
-                if action.public:
                     # Notify other switchtenders
                     signals.action_created.send(
                         sender=create_action,
@@ -471,7 +453,19 @@ def create_action(request, project_id=None):
                         user=request.user,
                     )
 
+            else:
+                action = form.save(commit=False)
+                action.project = project
+                action.created_by = request.user
                 action.save()
+
+                # Notify other switchtenders
+                signals.action_created.send(
+                    sender=create_action,
+                    task=action,
+                    project=project,
+                    user=request.user,
+                )
 
             next_url = (
                 reverse("projects-project-detail", args=[project.id]) + "#actions"
@@ -479,52 +473,19 @@ def create_action(request, project_id=None):
             return redirect(next_url)
     else:
         form = PushTypeActionForm()
+        print(form)
 
     return render(request, "projects/project/task_create.html", locals())
 
 
 @login_required
-def create_resource_action(request, resource_id=None):
+def create_resource_action_for_current_project(request, resource_id=None):
     """Create action for given resource to project stored in session"""
     is_switchtender_or_403(request.user)
     project_id = get_active_project_id(request)
     resource = get_object_or_404(resources.Resource, pk=resource_id)
     project = get_object_or_404(models.Project, pk=project_id)
-    if request.method == "POST":
-        form = ResourceTaskForm(request.POST)
-        if form.is_valid():
-            # create a new bookmark with provided information
-            task = form.save(commit=False)
-            task.project = project
-            task.resource = resource
-            task.created_by = request.user
-            task.save()
 
-            # Assign switchtender if none yet
-            if request.user not in project.switchtenders.all():
-                project.switchtenders.add(request.user)
-
-            # assign reminder in six weeks
-            create_reminder(
-                request, 6 * 7, task, project.email, origin=api.models.Mail.STAFF
-            )
-
-            signals.reminder_created.send(
-                sender=models.Project,
-                task=task,
-                project=task.project,
-                user=request.user,
-            )
-
-            signals.action_created.send(
-                sender=create_resource_action,
-                task=task,
-                project=project,
-                user=request.user,
-            )
-
-            next_url = reverse("projects-project-detail", args=[project.id])
-            return redirect(next_url)
-    else:
-        form = ResourceTaskForm()
-    return render(request, "projects/project/push.html", locals())
+    next_url = reverse("projects-project-create-action", args=[project.id])
+    next_url += f"?resource={resource.id}"
+    return redirect(next_url)

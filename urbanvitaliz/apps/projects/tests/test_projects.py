@@ -1025,21 +1025,6 @@ def test_user_can_followup_on_rsvp(client):
 
 
 @pytest.mark.django_db
-def test_switchtender_push_resource_to_project_needs_project_id(client):
-    project = Recipe(models.Project).make()
-    resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
-
-    url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, groups=["switchtender"]):
-        session = client.session
-        session["active_project"] = project.id
-        session.save()
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
 def test_switchtender_push_resource_to_project_fails_if_no_project_in_session(client):
     resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
 
@@ -1051,47 +1036,24 @@ def test_switchtender_push_resource_to_project_fails_if_no_project_in_session(cl
 
 
 @pytest.mark.django_db
-def test_switchtender_push_resource_assigns_switchtender_to_project(client):
-    project = Recipe(models.Project, switchtenders=[]).make()
-    resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
-
-    url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, groups=["switchtender"]):
-        session = client.session
-        session["active_project"] = project.id
-        session.save()
-        data = {"intent": "read this", "content": "some nice content"}
-        client.post(url, data=data)
-
-    project = models.Project.objects.get(pk=project.id)
-    assert project.switchtenders.count() == 1
-
-
-@pytest.mark.django_db
 def test_switchtender_create_action_for_resource_push(client):
     project = Recipe(models.Project).make()
     resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
         session = client.session
         session["active_project"] = project.id
         session.save()
 
-        data = {"intent": "read this", "content": "some nice content"}
-        response = client.post(url, data=data)
+        response = client.post(url)
 
-    # a new Task is created
-    task = models.Task.objects.all()[0]
-    assert task.project == project
-    assert task.resource == resource
-    assert task.content == data["content"]
-    assert task.intent == data["intent"]
-    # user is redirected to poject
-    newurl = reverse("projects-project-detail", args=[project.id])
+    newurl = (
+        reverse("projects-project-create-action", args=[project.id])
+        + f"?resource={resource.id}"
+    )
     assertRedirects(response, newurl)
-    # sessions is cleaned up
-    assert "project_id" not in client.session
 
 
 @pytest.mark.django_db
