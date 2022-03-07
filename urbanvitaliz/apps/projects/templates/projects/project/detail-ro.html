@@ -62,31 +62,7 @@ function activateTab(){
     {% endif %}
 
     <div class="row">
-        <div class="col-md-9">
-            {% include "projects/project/fragments/summary.html" %}
-        </div>
-        {% if project.survey_session %}
-        <div>
-            {% include "projects/project/fragments/exploration.html" with session=project.survey_session %}
-        </div>
-        {% endif %}
-
-        <div class="tab-content" id="project-tabs-content">
-            <div class="tab-pane  show active pt-4" id="sheet" role="tabpanel" aria-labelledby="sheet">
-            </div>
-            <!-- TAB: exploration -->
-            <div class="tab-pane pt-4" id="exploration" role="tabpanel" aria-labelledby="exploration">
-                {% include "projects/project/fragments/exploration.html" with session=project.survey_session %}
-            </div>
-
-            <!-- TAB: actions -->
-            <div class="tab-pane pt-4" id="actions" role="tabpanel" aria-labelledby="actions">
-
-                {% include "projects/project/fragments/actions.html" %}
-
-            </div>
-
-        </div>
+        {% include "projects/project/fragments/survey_grid.html" with session=project.survey_session %}
     </div>
 </div>
 <section>

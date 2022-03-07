@@ -17,7 +17,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
@@ -261,6 +262,7 @@ def test_project_access_proper_sharing_link(client):
         "projects-project-sharing-link", kwargs={"project_ro_key": project.ro_key}
     )
     response = client.get(url)
+
     assert response.status_code == 200
 
 
@@ -335,40 +337,160 @@ def test_project_list_excludes_project_not_in_switchtender_departments(client):
 # Project details
 ########################################################################
 
-
+## Knowledge
 @pytest.mark.django_db
-def test_project_detail_not_available_for_non_switchtender(client):
+def test_project_knowledge_not_available_for_non_switchtender(client):
     project = Recipe(models.Project).make()
-    url = reverse("projects-project-detail", args=[project.id])
+    url = reverse("projects-project-detail-knowledge", args=[project.id])
     with login(client):
         response = client.get(url)
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_project_detail_available_for_owner(client):
+def test_project_knowledge_available_for_owner(client):
     # project email is same as test user to be logged in
     with login(client, is_staff=False) as user:
         project = Recipe(models.Project, email=user.email).make()
-        url = reverse("projects-project-detail", args=[project.id])
+        url = reverse("projects-project-detail-knowledge", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_project_detail_available_for_switchtender(client):
+def test_project_knowledge_available_for_switchtender(client):
     project = Recipe(models.Project).make()
-    url = reverse("projects-project-detail", args=[project.id])
+    url = reverse("projects-project-detail-knowledge", args=[project.id])
     with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_project_detail_available_for_restricted_switchtender(client):
+def test_project_knowledge_available_for_restricted_switchtender(client):
     other = Recipe(geomatics.Department, code="02").make()
     project = Recipe(models.Project, commune__departments__code="01").make()
-    url = reverse("projects-project-detail", args=[project.id])
+    url = reverse("projects-project-detail-knowledge", args=[project.id])
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.departments.add(other)
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+## actions
+@pytest.mark.django_db
+def test_project_actions_not_available_for_non_switchtender(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-detail-actions", args=[project.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_actions_available_for_owner(client):
+    # project email is same as test user to be logged in
+    with login(client, is_staff=False) as user:
+        project = Recipe(models.Project, email=user.email).make()
+        url = reverse("projects-project-detail-actions", args=[project.id])
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_actions_available_for_switchtender(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-detail-actions", args=[project.id])
+    with login(client, groups=["switchtender"]):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_actions_available_for_restricted_switchtender(client):
+    other = Recipe(geomatics.Department, code="02").make()
+    project = Recipe(models.Project, commune__departments__code="01").make()
+    url = reverse("projects-project-detail-actions", args=[project.id])
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.departments.add(other)
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+## conversations
+@pytest.mark.django_db
+def test_project_conversations_not_available_for_non_switchtender(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-detail-conversations", args=[project.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_conversations_available_for_owner(client):
+    # project email is same as test user to be logged in
+    with login(client, is_staff=False) as user:
+        project = Recipe(models.Project, email=user.email).make()
+        url = reverse("projects-project-detail-conversations", args=[project.id])
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_conversations_available_for_switchtender(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-detail-conversations", args=[project.id])
+    with login(client, groups=["switchtender"]):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_conversations_available_for_restricted_switchtender(client):
+    other = Recipe(geomatics.Department, code="02").make()
+    project = Recipe(models.Project, commune__departments__code="01").make()
+    url = reverse("projects-project-detail-conversations", args=[project.id])
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.departments.add(other)
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+## internal
+@pytest.mark.django_db
+def test_project_internal_followup_not_available_for_non_switchtender(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-detail-internal-followup", args=[project.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_internal_followup_available_for_owner(client):
+    # project email is same as test user to be logged in
+    with login(client, is_staff=False) as user:
+        project = Recipe(models.Project, email=user.email).make()
+        url = reverse("projects-project-detail-internal-followup", args=[project.id])
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_internal_followup_available_for_switchtender(client):
+    project = Recipe(models.Project).make()
+    url = reverse("projects-project-detail-internal-followup", args=[project.id])
+    with login(client, groups=["switchtender"]):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_internal_followup_available_for_restricted_switchtender(client):
+    other = Recipe(geomatics.Department, code="02").make()
+    project = Recipe(models.Project, commune__departments__code="01").make()
+    url = reverse("projects-project-detail-internal-followup", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
         user.profile.departments.add(other)
         response = client.get(url)
@@ -380,7 +502,7 @@ def test_project_detail_contains_informations(client):
     project = Recipe(models.Project).make()
     task = Recipe(models.Task, project=project).make()
     note = Recipe(models.Note, project=project).make()
-    url = reverse("projects-project-detail", args=[project.id])
+    url = reverse("projects-project-detail-knowledge", args=[project.id])
     with login(client, groups=["switchtender"]):
         response = client.get(url)
     assertContains(response, project.description)
@@ -391,14 +513,12 @@ def test_project_detail_contains_informations(client):
 @pytest.mark.django_db
 def test_project_detail_contains_actions_for_switchtender(client):
     project = Recipe(models.Project).make()
-    url = reverse("projects-project-detail", args=[project.id])
+    url = reverse("projects-project-detail-actions", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         response = client.get(url)
     add_task_url = reverse("projects-project-create-action", args=[project.id])
     assertContains(response, add_task_url)
-    add_note_url = reverse("projects-create-note", args=[project.id])
-    assertContains(response, add_note_url)
 
 
 ########################################################################
@@ -448,8 +568,7 @@ def test_update_project_wo_commune_and_redirect(client):
     assert project.name == data["name"]
     assert project.updated_on > updated_on_before
 
-    detail_url = reverse("projects-project-detail", args=[project.id])
-    assertRedirects(response, detail_url)
+    assert response.status_code == 302
 
 
 @pytest.mark.django_db
@@ -494,8 +613,7 @@ def test_accept_project_and_redirect(client):
     assert project.status == "TO_PROCESS"
     assert project.updated_on > updated_on_before
 
-    detail_url = reverse("projects-project-detail", args=[project.id])
-    assertRedirects(response, detail_url)
+    assert response.status_code == 302
 
 
 @pytest.mark.django_db
@@ -952,9 +1070,8 @@ def test_user_is_redirected_after_followup_on_task(client):
         url = reverse("projects-followup-task", args=[task.id])
         response = client.post(url)
     assert response.status_code == 302
-    assert (
-        response.url
-        == reverse("projects-project-detail", args=[task.project.id]) + "#actions"
+    assert response.url == reverse(
+        "projects-project-detail-actions", args=[task.project.id]
     )
 
 
