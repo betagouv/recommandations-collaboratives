@@ -16,24 +16,15 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateActionsFromResourcesForm,
-    CreateActionWithoutResourceForm,
-    CreateActionWithResourceForm,
-    PushTypeActionForm,
-    RemindTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskForm,
-)
+from ..forms import (CreateActionsFromResourcesForm,
+                     CreateActionWithoutResourceForm,
+                     CreateActionWithResourceForm, PushTypeActionForm,
+                     RemindTaskForm, RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -55,9 +46,7 @@ def visit_task(request, task_id):
     if task.resource:
         return redirect(reverse("resources-resource-detail", args=[task.resource.pk]))
 
-    return redirect(
-        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
-    )
+    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
 
 
 @login_required
@@ -91,9 +80,7 @@ def toggle_done_task(request, task_id):
             )
         task.save()
 
-    return redirect(
-        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
-    )
+    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
 
 
 @login_required
@@ -110,9 +97,7 @@ def refuse_task(request, task_id):
             sender=refuse_task, task=task, project=task.project, user=request.user
         )
 
-    return redirect(
-        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
-    )
+    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
 
 
 @login_required
@@ -131,9 +116,7 @@ def already_done_task(request, task_id):
             sender=already_done_task, task=task, project=task.project, user=request.user
         )
 
-    return redirect(
-        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
-    )
+    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
 
 
 @login_required
@@ -161,7 +144,7 @@ def update_task(request, task_id=None):
             )
 
             return redirect(
-                reverse("projects-project-detail", args=[task.project_id]) + "#actions"
+                reverse("projects-project-detail-actions", args=[task.project_id])
             )
     else:
         form = UpdateTaskForm(instance=task)
@@ -303,9 +286,7 @@ def remind_task(request, task_id=None):
                 request, "Impossible de programmer l'alarme : données invalides."
             )
 
-    return redirect(
-        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
-    )
+    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
 
 
 @login_required
@@ -317,9 +298,7 @@ def remind_task_delete(request, task_id=None):
     if request.method == "POST":
         api.remove_reminder_email(task, recipient=recipient, origin=None)
 
-    return redirect(
-        reverse("projects-project-detail", args=[task.project_id]) + "#actions"
-    )
+    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
 
 
 @login_required
@@ -340,8 +319,7 @@ def followup_task(request, task_id=None):
                 sender=followup, task=task, project=task.project, user=request.user
             )
 
-    next_url = reverse("projects-project-detail", args=[task.project.id])
-    return redirect(next_url + "#actions")
+    return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
 
 
 def rsvp_followup_task(request, rsvp_id=None, status=None):
@@ -467,9 +445,7 @@ def create_action(request, project_id=None):
                     user=request.user,
                 )
 
-            next_url = (
-                reverse("projects-project-detail", args=[project.id]) + "#actions"
-            )
+            next_url = reverse("projects-project-detail-actions", args=[project.id])
             return redirect(next_url)
     else:
         form = PushTypeActionForm()

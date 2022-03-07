@@ -8,10 +8,6 @@
 
 {% load sass_tags %}
 
-{% block css %}
-<link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
-{% endblock %}
-
 {% block title %}
 {{ block.super }} > Suivi Interne
 {% endblock %}
@@ -19,7 +15,8 @@
 
 {% block project_detail %}
 
-<div class="row">
+<div class="col-12 mx-auto">
+    <div class="row">
 
     <div class="col-8">
         {% activity_stream "target" project %}
@@ -91,12 +88,16 @@
     </div>
 
     <div class="col-4">
+        <div class="mb-4">
+            {% include "projects/project/fragments/sidebar.html" %}
+        </div>
+
         <h5>Équipe de suivi</h5>
 
         {% include "projects/project/fragments/switchtender-list.html" with switchtenders=project.switchtenders.all %}
     </div>
 
 </div>
-
+</div>
 
 {% endblock %}
