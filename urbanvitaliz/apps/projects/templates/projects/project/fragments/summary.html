@@ -31,8 +31,6 @@
 
 
 <div class="col-lg-10 py-3 px-0">
-    <p class="lead">{{ project.description|linebreaks|default:'Aucune description.' }}</p>
-
     <!--<p>Le site est situé sur la commune d'<a href="#">Attignéville (88015), rue des Viviers</a>. Il concerne la parcelle cadastrale numéro <a href="#">A59</a>.</p> -->
 
     <p>
@@ -45,4 +43,8 @@
         {% endif %}
         .
     </p>
+
+    <p class="lead">{{ project.description|linebreaks|default:'Aucune description.' }}</p>
+
+
 </div>

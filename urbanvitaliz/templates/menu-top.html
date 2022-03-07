@@ -24,103 +24,6 @@
         <div
             class="navbar-collapse offcanvas-collapse bg-white"
         >
-
-            <ul class="main-menu navbar-nav me-auto">
-                {% if not active_project %}
-                <li class="nav-item fw-bold me-2">
-                    <a href="{% url 'projects-onboarding' %}" class="nav-link text-primary ">
-                        <svg class="bi align-middle" width="16" height="16">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus"/>
-                        </svg>
-                        <span class="align-middle">Déposer un projet</span>
-                    </a>
-                </li>
-                {% endif %}
-
-                <!-- Ressources -->
-                <li class="nav-item dropdown me-2">
-                    <div class="btn-group">
-                        <a href="{% url 'resources-resource-search' %}" class="nav-link link-dark">
-                            <svg class="bi align-middle" width="16" height="16">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
-                            </svg>
-                            <span class="ms-1 align-middle">Ressources</span>
-                        </a>
-                        {% if user.is_staff %}
-                        <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="visually-hidden">Toggle Dropdown</span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'resources-resource-create' %}">Créer</a></li>
-                        </ul>
-                        {% endif %}
-                    </div>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{% url 'methodology' %}" class="nav-link link-dark">
-                        <svg class="bi align-middle" width="16" height="16">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#grid"/>
-                        </svg>
-                        <span class="me-2 ms-1 align-middle">Méthodologie</span>
-                    </a>
-                </li>
-
-                {% if request.user.is_staff  %}
-                <!-- Address Book -->
-                <li class="nav-item nav-item-admin">
-                    <a href="{% url 'addressbook-organization-list' %}" class="nav-link link-dark">
-                        <svg class="bi align-middle" width="16" height="16">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-lines-fill"/>
-                        </svg>
-                        <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
-                    </a>
-                </li>
-                {% endif %}
-                {% if request.user.is_staff or is_switchtender  %}
-                <!-- Project List -->
-                <li class="nav-item dropdown nav-item-admin me-2">
-                    <div class="btn-group">
-                        <a href="{% url 'projects-project-list' %}" class="nav-link link-dark">
-                            <svg class="bi align-middle" width="16" height="16">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
-                            </svg>
-                            <span class="ms-1 align-middle">Projets</span>
-                        </a>
-                    </div>
-                </li>
-                {% endif %}
-
-                <!-- Staff tools -->
-                {% if user.is_staff  %}
-                <!-- Project List -->
-                <li class="nav-item dropdown nav-item-admin me-2">
-                    <button type="button" class="border-0 p-0 nav-link pt-2 d-inline-block btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                        <svg class="bi d-inline align-middle" width="16" height="16">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#sliders"/>
-                        </svg>
-                        <span class="text-secondary d-inline align-middle pe-1">Configuration</span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li class="dropdown-item border-0 d-inline-block position-relative">
-                            <svg class="bi me-2 d-inline" width="16" height="16">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-fill"/>
-                            </svg>
-                            <a class="stretched-link d-inline text-secondary" href="{% url 'projects-task-recommendation-list' %}">Pré-fléchage</a>
-                        </li>
-
-                        <li class="dropdown-item border-0 d-inline-block position-relative">
-                            <svg class="bi me-2 d-inline" width="16" height="16">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle"/>
-                            </svg>
-                            <a class="stretched-link d-inline text-secondary" href="{% url 'survey-editor-survey-details' 1 %}">Questionnaire</a>
-                        </li>
-                    </ul>
-                </li>
-                {% endif %}
-
-            </ul>
-
             <!-- Project selector -->
             {% if user.is_authenticated and active_project %}
             <div id="project-selector" class="nav-item border-start border-end ps-2 pe-2">
@@ -128,6 +31,11 @@
                 <div class="btn-group">
                     <a href="{% url 'projects-project-detail' active_project.pk %}" class="nav-link link-dark project-name-box">
                         <span class="fw-bold">{{ active_project.name|truncatechars:30 }}</span>
+                        {% if active_project.muted %} <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi bg-warning rounded-circle" width="20px" height="20px" fill="currentColor" style="padding: 3px;">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#volume-mute"/>
+                        </svg>
+                        {% endif %}
+
                         <br/>
                         <span class="text-primary small">Aller à la page du projet&nbsp;&rarr;</span>
                     </a>
@@ -158,9 +66,37 @@
                     </ul>
                     {% endif %}
                 </div>
-                {% else %}
                 {% endif %}
             </div>
+
+            <!-- tool bars -->
+            <ul class="main-menu navbar-nav me-auto ms-4">
+                {% if not active_project %}
+                <li class="nav-item fw-bold me-2">
+                    <a href="{% url 'projects-onboarding' %}" class="nav-link text-primary ">
+                        <svg class="bi align-middle" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus"/>
+                        </svg>
+                        <span class="align-middle">Déposer un projet</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'methodology' %}" class="nav-link link-dark">
+                        <svg class="bi align-middle" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#grid"/>
+                        </svg>
+                        <span class="me-2 ms-1 align-middle">Méthodologie</span>
+                    </a>
+                </li>
+
+                {% else %}
+
+                {% include 'menu-project-toolbar.html' with project=active_project %}
+
+                {% endif %}
+
+            </ul>
 
             <!-- User -->
             <div id="user-info" class="pe-2 ps-2 ms-2">
@@ -178,11 +114,6 @@
 
                     </a>
                     <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-                        <!-- 
-                             <li><a class="dropdown-item" href="#">Nouveau Projet...</a></li>
-                             <li><a class="dropdown-item" href="#">Profil</a></li>
-                             <li><hr class="dropdown-divider"></li>
-                        -->
                         {% if is_switchtender %}
                         <li><a class="dropdown-item" href="{% url 'projects-project-list' %}">Tableau de Bord</a></li>
                         {% endif %}
@@ -190,6 +121,20 @@
                         {% if user.is_staff %}
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{% url 'switchtender-dashboard' %}">CECPP&trade;</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="dropdown-item border-0 d-inline-block position-relative">
+                            <svg class="bi me-2 d-inline" width="16" height="16">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-fill"/>
+                            </svg>
+                            <a href="{% url 'projects-task-recommendation-list' %}">Pré-fléchage</a>
+                        </li>
+                        <li class="dropdown-item border-0 d-inline-block position-relative">
+                            <svg class="bi me-2 d-inline" width="16" height="16">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle"/>
+                            </svg>
+                            <a href="{% url 'survey-editor-survey-details' 1 %}">Questionnaire</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>
                         {% endif %}
                     </ul>
