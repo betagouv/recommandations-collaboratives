@@ -86,10 +86,9 @@
         </div>
 
         <div class="col mx-auto">
-
-            {% include "projects/project/fragments/sidebar.html" %}
-
-            <hr/>
+            <div class="mb-4">
+                {% include "projects/project/fragments/sidebar.html" %}
+            </div>
 
             {% if project.switchtenders.count %}
             <h6 class="mb-2 fw-bolder">Vos aiguilleu·r·se·s</h6>
