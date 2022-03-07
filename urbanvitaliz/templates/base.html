@@ -63,7 +63,12 @@
     <body class="bg-light">
 
         <h1 class="visually-hidden">UrbanVitaliz</h1>
+
+        {% if is_switchtender %}
+        {% include "menu-top-switchtender.html" %}
+        {% else %}
         {% include "menu-top.html" %}
+        {% endif %}
 
         <main>
             {% if messages %}
@@ -152,27 +157,8 @@
         <script type="text/javascript">
          $('document').ready(function() {
              $('.toast').toast('show');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
          });
+
         </script>
 
 

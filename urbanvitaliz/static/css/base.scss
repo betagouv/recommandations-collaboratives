@@ -9,8 +9,6 @@ body {
     min-height: 100vh;
     min-height: -webkit-fill-available;
 
-    padding-top: 56px;
-
 }
 
 html {
@@ -32,6 +30,10 @@ main {
     //overflow-y: hidden;
 }
 
+
+.secondary-navbar {
+    padding-top: 0px;
+}
 
 /* Info boxes */
 .bd-callout {
