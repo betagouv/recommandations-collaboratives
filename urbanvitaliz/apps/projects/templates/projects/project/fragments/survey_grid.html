@@ -1,0 +1,38 @@
+{% load survey %}
+<div class="row g-0" data-masonry='{"percentPosition": true, "transitionDuration": 0 }' >
+    <!-- Show QS with progress -->
+    {% regroup session.the_answers.all by question.question_set as answer_list %}
+
+    <div class="col-12 col-xl-4 col-md-6 mb-3 p-2">
+        <div class="card text-black rounded-3">
+            <div class="card-body m-1">
+                <h4 class="fw-bold">
+                    <h5 class="fw-bolder align-middle d-inline card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">Informations générales</h5>
+                </h4>
+                <p class="card-text">
+                    <h5>{{ project.name|title }}</h5>
+
+                    {% include "projects/project/fragments/summary.html" %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% for question_set, answers in answer_list %}
+    <div class="col-12 col-xl-4 col-md-6 mb-3 p-2">
+        {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set can_manage=can_manage_draft answers=answers show_conclusion=1 show_comment=1 %}
+    </div>
+    {% endfor %}
+
+    <!-- Show other QS not yet started -->
+    {%  for question_set in session.survey.question_sets.all %}
+
+    {% question_set_completion session question_set as qs_completion %}
+    {% if qs_completion == 0 %}
+    <div class="col-12 col-xl-4 col-md-6 mb-3 p-2">
+        {% include 'survey/widgets/qs_summary_card.html' with question_set=question_set can_manage=can_manage_draft %}
+    </div>
+    {% endif %}
+    {% endfor %}
+
+</div>

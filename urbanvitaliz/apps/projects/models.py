@@ -229,6 +229,16 @@ class Note(models.Model):
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
+    def get_absolute_url(self):
+        if self.public:
+            return reverse(
+                "projects-project-detail-conversations", args=[self.project.id]
+            )
+        else:
+            return reverse(
+                "projects-project-detail-internal-followup", args=[self.project.id]
+            )
+
     def tags_as_list(self):
         """
         Needed since django doesn't provide a split template tag

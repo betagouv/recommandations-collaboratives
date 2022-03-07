@@ -141,9 +141,9 @@ def test_private_note_hidden_from_project_members(client):
     note = Recipe(models.Note, content="short note", public=False).make()
 
     with login(client, username="project_owner", email=user_email, is_staff=False):
-        response = client.get(project.get_absolute_url())
+        response = client.get(note.get_absolute_url())
 
-    assertNotContains(response, note.content)
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
@@ -158,8 +158,9 @@ def test_public_note_available_to_readers(client):
             data={"content": note_content, "public": True},
         )
 
+    note = models.Note.objects.first()
     with login(client, username="project_owner", email=user_email, is_staff=False):
-        response = client.get(project.get_absolute_url())
+        response = client.get(note.get_absolute_url())
 
     assertContains(response, note_content)
 
