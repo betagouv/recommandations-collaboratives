@@ -1,10 +1,23 @@
-{% load static %}
+{% extends "projects/project/detail.html" %}
 
-{% load activity_tags %}
 {% load humanize %}
+{% load static %}
+{% load survey %}
+{% load activity_tags %}
 {% load gravatar %}
 
-{% block content %}
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block title %}
+{{ block.super }} > Suivi Interne
+{% endblock %}
+
+
+{% block project_detail %}
 
 <div class="row">
 
@@ -18,7 +31,7 @@
               action="{% url 'projects-create-note' project.pk %}">
             {% csrf_token %}
 
-            <textarea class="flex-grow-1 border-0 form-control {% if private_note_form.content.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-content" name="{{ private_note_form.content.name }}" value="{{ private_note_form.content.value|default:'' }}" placeholder="Écrivez une communication interne. Seuls les aiguilleurs pourront la voir."></textarea>
+            <textarea class="flex-grow-1 border-0 form-control {% if private_note_form.content.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-content" name="{{ private_note_form.content.name }}" value="{{ private_note_form.content.value|default:'' }}" placeholder="Écrivez une communication interne. Seuls les aiguilleur·se·s pourront la voir."></textarea>
             <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
 
             {% for error in private_note_form.content.errors %}
@@ -84,4 +97,6 @@
     </div>
 
 </div>
+
+
 {% endblock %}

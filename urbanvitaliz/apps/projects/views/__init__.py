@@ -22,35 +22,20 @@ from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    OnboardingForm,
-    PrivateNoteForm,
-    ProjectForm,
-    PublicNoteForm,
-    SelectCommuneForm,
-)
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    can_manage_or_403,
-    can_manage_project,
-    generate_ro_key,
-    get_active_project,
-    get_notification_recipients_for_project,
-    is_project_moderator,
-    is_project_moderator_or_403,
-    is_regional_actor_for_project,
-    is_regional_actor_for_project_or_403,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from ..forms import (OnboardingForm, PrivateNoteForm, ProjectForm,
+                     PublicNoteForm, SelectCommuneForm)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403, can_manage_project, generate_ro_key,
+                     get_active_project,
+                     get_notification_recipients_for_project,
+                     is_project_moderator, is_project_moderator_or_403,
+                     is_regional_actor_for_project,
+                     is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -150,50 +135,6 @@ def project_list(request):
             .order_by("-created_on")
         )
     return render(request, "projects/project/list.html", locals())
-
-
-@login_required
-def project_detail(request, project_id=None):
-    """Return the details of given project for switchtender"""
-    project = get_object_or_404(models.Project, pk=project_id)
-
-    # compute permissions
-    can_manage = can_manage_project(project, request.user)
-    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
-    )
-    can_administrate = can_administrate_project(project, request.user)
-
-    # check user can administrate project (member or switchtender)
-    if request.user.email != project.email:
-        # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_switchtender(request.user):
-            can_manage_or_403(project, request.user)
-
-    # Set this project as active
-    set_active_project_id(request, project.pk)
-
-    try:
-        survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
-        session, created = survey_models.Session.objects.get_or_create(
-            project=project, survey=survey
-        )
-    except survey_models.Survey.DoesNotExist:
-        session = None
-
-    # Mark this project notifications unread
-    project_ct = ContentType.objects.get_for_model(project)
-    request.user.notifications.filter(
-        target_content_type=project_ct.pk, target_object_id=project.pk
-    ).mark_all_as_read()
-
-    private_note_form = PrivateNoteForm()
-    public_note_form = PublicNoteForm()
-
-    recipients = get_notification_recipients_for_project(project)
-
-    return render(request, "projects/project/detail.html", locals())
 
 
 def project_detail_from_sharing_link(request, project_ro_key):

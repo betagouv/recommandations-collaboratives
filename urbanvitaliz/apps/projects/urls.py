@@ -11,7 +11,7 @@ created : 2021-05-26 15:54:25 CEST
 from django.urls import path
 
 from . import views
-from .views import feeds, notes, sharing, tasks
+from .views import detail, feeds, notes, sharing, tasks
 
 urlpatterns = [
     path(r"onboarding/", views.onboarding, name="projects-onboarding"),
@@ -30,8 +30,28 @@ urlpatterns = [
     path("projects/feed/", feeds.LatestProjectsFeed(), name="projects-feed"),
     path(
         r"project/<int:project_id>/",
-        views.project_detail,
+        detail.project_detail,
         name="projects-project-detail",
+    ),
+    path(
+        r"project/<int:project_id>/connaissance",
+        detail.project_knowledge,
+        name="projects-project-detail-knowledge",
+    ),
+    path(
+        r"project/<int:project_id>/suivi",
+        detail.project_internal_followup,
+        name="projects-project-detail-internal-followup",
+    ),
+    path(
+        r"project/<int:project_id>/actions",
+        detail.project_actions,
+        name="projects-project-detail-actions",
+    ),
+    path(
+        r"project/<int:project_id>/conversations",
+        detail.project_conversations,
+        name="projects-project-detail-conversations",
     ),
     path(
         r"project/<int:project_id>/update/",

@@ -41,7 +41,7 @@ def create_public_note(request, project_id=None):
                 user=request.user,
             )
 
-    return redirect(reverse("projects-project-detail", args=[project_id]) + "#sheet")
+    return redirect(reverse("projects-project-detail-conversations", args=[project_id]))
 
 
 @login_required
@@ -74,7 +74,7 @@ def create_note(request, project_id=None):
             )
 
             return redirect(
-                reverse("projects-project-detail", args=[project_id]) + "#activity"
+                reverse("projects-project-detail-internal-followup", args=[project_id])
             )
     else:
         if is_switchtender:
@@ -108,12 +108,15 @@ def update_note(request, note_id=None):
             instance.project.save()
             if instance.public:
                 return redirect(
-                    reverse("projects-project-detail", args=[note.project_id])
-                    + "#sheet"
+                    reverse(
+                        "projects-project-detail-conversations", args=[note.project_id]
+                    )
                 )
 
             return redirect(
-                reverse("projects-project-detail", args=[note.project_id]) + "#activity"
+                reverse(
+                    "projects-project-detail-internal-followup", args=[note.project_id]
+                )
             )
     else:
         if is_switchtender:
@@ -136,4 +139,11 @@ def delete_note(request, note_id=None):
         note.project.updated_on = note.updated_on
         note.project.save()
 
-    return redirect(reverse("projects-project-detail", args=[note.project_id]))
+        if note.public:
+            return redirect(
+                reverse("projects-project-detail-conversations", args=[note.project_id])
+            )
+
+    return redirect(
+        reverse("projects-project-detail-internal-followup", args=[note.project_id])
+    )

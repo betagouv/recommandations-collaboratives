@@ -1,55 +1,46 @@
 {% load static %}
 {% load humanize %}
-<div id="project-sidebar" class="col-md-3 border-start h-100">
-    <p class="small text-secondary d-inline">
-        <svg class="bi" width="16" height="16" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-history"/>
-        </svg>
-        &nbsp;
-        Fiche crée <em>{{ project.created_on|naturalday }}</em> et modifiée <em>{{ project.updated_on|naturaltime }}</em>.
-    </p>
 
-    <div class="d-grid gap-2 mt-3">
-        {% if can_manage %}
-        <span class="d-inline-block"> 
-            <a href="{% url 'projects-access-update' project.id %}" class="btn btn-light w-100 btn-sm">
-                <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock"/>
-                </svg>
-                &nbsp;
-                Partager
-            </a>
-        </span>
-        {% endif %}
-        {% if can_administrate %}
-        <span class="d-inline-block"> 
-            <a href="{% url 'projects-project-update' project.id %}" class="btn btn-light w-100 btn-sm">
-                <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
-                </svg>
-                &nbsp;
-                Éditer
-            </a>
-        </span>
-        <span class="d-inline-block">
-            <a class="btn btn-light w-100 btn-sm"  href="{% url 'projects-project-create-action' project.id %}">
-                <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
-                </svg>
-                Ajouter une action
-            </a>
-        </span>
-        {% elif is_regional_actor %}
-        <span class="d-inline-block">
-            <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-success w-100 btn-sm">
-                <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-split"/>
-                </svg>
-                &nbsp;
-                Rejoindre comme aiguilleur·se
-            </a>
-        </span>
-        {% endif %}
-    </div>
-
+<div class="d-grid gap-2 mt-3">
+    {% if can_manage %}
+    <span class="d-inline-block"> 
+        <a href="{% url 'projects-access-update' project.id %}" class="btn btn-primary w-100 btn-sm">
+            <svg class="bi" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock"/>
+            </svg>
+            &nbsp;
+            Partager
+        </a>
+    </span>
+    {% endif %}
+    {% if can_administrate %}
+    <span class="d-inline-block"> 
+        <a href="{% url 'projects-project-update' project.id %}" class="btn btn-primary w-100 btn-sm">
+            <svg class="bi" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
+            </svg>
+            &nbsp;
+            Éditer
+        </a>
+    </span>
+    <span class="d-inline-block">
+        <a class="btn btn-outline-primary w-100 btn-sm"  href="{% url 'projects-project-create-action' project.id %}">
+            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
+            </svg>
+            Ajouter une action
+        </a>
+    </span>
+    {% elif is_regional_actor %}
+    <span class="d-inline-block">
+        <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-success w-100 btn-sm">
+            <svg class="bi" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-split"/>
+            </svg>
+            &nbsp;
+            Rejoindre comme aiguilleur·se
+        </a>
+    </span>
+    {% endif %}
 </div>
+
