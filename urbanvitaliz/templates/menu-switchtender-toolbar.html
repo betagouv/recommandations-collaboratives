@@ -23,18 +23,6 @@
 </li>
 
 {% if request.user.is_staff or is_switchtender  %}
-<!-- Project List -->
-<li class="nav-item dropdown nav-item-admin me-2">
-    <div class="btn-group">
-        <a href="{% url 'projects-project-list' %}" class="nav-link link-dark {% if url_name == 'projects-project-list' %}active{% endif %}">
-            <svg class="bi align-middle" width="16" height="16">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#table"/>
-            </svg>
-            <span class="ms-1 align-middle">Tableau de Bord</span>
-        </a>
-    </div>
-</li>
-
 
 {% if request.user.is_staff  %}
 <!-- Address Book -->
@@ -47,6 +35,18 @@
     </a>
 </li>
 {% endif %}
+
+<!-- Project List -->
+<li class="nav-item dropdown nav-item-admin me-2">
+    <div class="btn-group">
+        <a href="{% url 'projects-project-list' %}" class="nav-link link-dark {% if url_name == 'projects-project-list' %}active{% endif %}">
+            <svg class="bi align-middle" width="16" height="16">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#table"/>
+            </svg>
+            <span class="ms-1 align-middle">Tableau de Bord</span>
+        </a>
+    </div>
+</li>
 
 {% endif %}
 
