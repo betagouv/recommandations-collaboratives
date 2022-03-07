@@ -37,6 +37,7 @@
     </a>
 </li>
 
+{% if active_project_can_administrate %}
 <li class="nav-item me-2">
     <a href="{% url 'projects-project-detail-internal-followup' project.pk %}" class="nav-link link-dark {% if url_name == 'projects-project-detail-internal-followup' %}active{% endif %}">
         <svg class="bi align-middle" width="16" height="16">
@@ -45,5 +46,6 @@
         <span class="ms-1 align-middle">Suivi Interne</span>
     </a>
 </li>
+{% endif %}
 
 {% endwith %}

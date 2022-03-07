@@ -21,10 +21,11 @@
 
     <div class="row">
 
-        {% if can_manage_draft %}
-        {% if session and session.next_question %}
-        {% if session.completion < 80 %}
         <div class="col box-heading d-flex justify-content-between mb-4 mt-4">
+            {% if can_manage_draft %}
+            {% if session and session.next_question %}
+            {% if session.completion < 80 %}
+
             <div class="flex-grow-1">
 
                 <h3>Complétez l'exploration du site !</h3>
@@ -49,10 +50,10 @@
                 </a>
                 {% endif %}
             </div>
+            {% endif %}
+            {% endif %}
+            {% endif %}
         </div>
-        {% endif %}
-        {% endif %}
-        {% endif %}
         <div id="project-sidebar" class="col-md-3 h-100">
             {% include "projects/project/fragments/sidebar.html" %}
         </div>
@@ -68,9 +69,10 @@
             <div class="card-body m-1">
                 <h4 class="fw-bold">
                     <h5 class="fw-bolder align-middle d-inline card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">Informations générales</h5>
-                                        {{ project.name|title }}
                 </h4>
                 <p class="card-text">
+                    <h5>{{ project.name|title }}</h5>
+
                     {% include "projects/project/fragments/summary.html" %}
                 </p>
             </div>
