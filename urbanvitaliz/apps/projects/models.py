@@ -290,7 +290,7 @@ class TaskManager(models.Manager):
     #         return self.filter(visited=True, refused=False)
 
     def open(self):
-        return self.proposed()
+        return self.proposed() | self.filter(status=Task.INPROGRESS)
 
     def proposed(self):
         return self.filter(Q(status=Task.PROPOSED) | Q(status=Task.BLOCKED))
