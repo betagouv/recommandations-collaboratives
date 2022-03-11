@@ -1,38 +1,78 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load sass_tags %}
+
+{% block js %}
+<script src="{% static 'projects/js/access_update.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 
-<div class="col-11 py-5 mx-auto">
-
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
-                </svg>&nbsp;
-                Projets
-            </li>
-            <li class="breadcrumb-item">
-                <span class="text-secondary">
-                    <a href="{% url 'projects-project-detail' project.pk %}">
-                        {{ project.name|capfirst }}
-                    </a>
-                </span>
-            </li>
-        </ol>
-    </nav>
-
+<div class="col-9 py-5 mx-auto">
     <h2 class="mb-3">
-        <svg class="bi" width="28" height="28" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock"/>
-        </svg>
-        <span class="align-middle">Gestion des accès</span>
+        <span class="align-middle">Options de partage</span>
     </h2>
 
-    <section class="mt-5">
+    <section class="mt-5 col-7">
+        <h3 class="fs-5">Lien public vers le projet</h3>
+        <p>Partagez ce lien pour donner accès en lecture seule à la page Connaissance du site et aux Actions recommandées.</p>
+        <div x-data="access_update_app('{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}')" class="input-group input-group-lg">
+            <input type="text" readonly class="form-control fst-italic" :value="url" />
+            <button class="btn btn-outline-primary" @click="clipboardCopy()" x-ref="button">
+                <svg class="bi align-baseline" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard" x-show="!isCopied" />
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-check" x-show="isCopied" />
+                </svg>
+            </button> 
+        </div>
+    </section>
+
+    <section class="mt-5 col-7">
+        <h3 class="fs-5">Ajouter des collaborateurs</h3>
+        <p>Ajoutez ici des personnes qui auront le droit de modifier, commenter et partager ce dossier.</p>
+        <form id="form-projects-access-add-user" action="." method="post">
+            <div class="input-group input-group-lg">
+                <input type="text"  name="email" required class="form-control" placeholder="Entrez l'adresse email de votre collaborateur" />
+                <button class="btn btn-outline-primary" type="submit">
+                    Ajouter
+                </button>
+            </div>
+            {% csrf_token %}
+            {{ form.media }}
+        </form>
+        <h5 class="mt-4 fs-6">{{ project.emails|length|add:1 }} Collaborat{{ project.emails|length|add:1|pluralize:"eur,eurs" }}</h5>
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    {{ project.email }}
+                </div>
+                <div>
+                    <div class="fst-italic my-1">Utilisateur principal</div>
+                </div>
+            </li>
+
+
+            {% for email in project.emails %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    {{ email }}
+                </div>
+                <div>
+                    {% if email != project.email %}
+                    <form id="form-projects-access-remove-user" action="{% url 'projects-access-delete' project.pk email %}" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-danger btn-sm">Supprimer</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+</div> 
+    
+    <!-- <section class="mt-5">
         <div class="fs-5 mb-3">Usager principal : <strong>{{ project.email }}</strong> <em>(non révocable)</em></div>
 
 
@@ -103,8 +143,7 @@
 
         {{ form.media }}
 
-    </section>
-
+    </section> -->
 {% endblock %}
 
 
