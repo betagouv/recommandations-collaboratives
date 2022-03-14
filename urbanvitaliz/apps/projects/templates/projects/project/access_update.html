@@ -18,7 +18,7 @@
         <h3 class="fs-5">Lien public vers le projet</h3>
         <p>Partagez ce lien pour donner accès en lecture seule à la page Connaissance du site et aux Actions recommandées.</p>
         <div x-data="access_update_app('{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}')" class="input-group input-group-lg">
-            <input type="text" readonly class="form-control fst-italic" :value="url" />
+            <input type="text" readonly class="form-control fst-italic" :value="url" x-ref="input" @focus="selectText()" />
             <button class="btn btn-outline-primary" @click="clipboardCopy()" x-ref="button">
                 <svg class="bi align-baseline" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard" x-show="!isCopied" />
