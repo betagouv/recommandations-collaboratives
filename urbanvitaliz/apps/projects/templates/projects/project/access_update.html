@@ -41,18 +41,8 @@
             {% csrf_token %}
             {{ form.media }}
         </form>
-        <h5 class="mt-4 fs-6">{{ project.emails|length|add:1 }} Collaborat{{ project.emails|length|add:1|pluralize:"eur,eurs" }}</h5>
+        <h5 class="mt-4 fs-6">{{ project.emails|length }} Collaborat{{ project.emails|length|pluralize:"eur,eurs" }}</h5>
         <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    {{ project.email }}
-                </div>
-                <div>
-                    <div class="fst-italic my-1">Utilisateur principal</div>
-                </div>
-            </li>
-
-
             {% for email in project.emails %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
@@ -64,86 +54,15 @@
                         {% csrf_token %}
                         <button class="btn btn-outline-danger btn-sm">Supprimer</button>
                     </form>
+                    {% else %}
+                    <div class="fst-italic my-1">Utilisateur principal</div>
                     {% endif %}
                 </div>
             </li>
             {% endfor %}
         </ul>
     </section>
-</div> 
-    
-    <!-- <section class="mt-5">
-        <div class="fs-5 mb-3">Usager principal : <strong>{{ project.email }}</strong> <em>(non révocable)</em></div>
-
-
-        <div class="fs-5 mb-3">Lien de partage de votre projet (consultation uniquement) : <a target="_new" href="{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}"><strong>{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}</strong></a></div>
-
-        <table class="table">
-            <h3>
-                <svg class="bi" width="24" height="24" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
-                </svg>
-                <span class="align-middle">Collaborateur·rice·s <em>(avec droit d'édition)</em></span>
-            </h3>
-            <tr>
-                <th>Courriel</th>
-                <th>Action</th>
-            </tr>
-            {% for email in project.emails %}
-            <tr>
-                <td>{{ email }}</td>
-                <td>
-                    {% if email != project.email %}
-                    <form id="form-projects-access-remove-user"
-				                  method="post"
-				                  action="{% url 'projects-access-delete' project.pk email %}"
-				                  class="form">
-                        {% csrf_token %}
-                        <button class="btn btn-danger">Supprimer</button>
-                    </form>
-                    {% else %}
-                    <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Vous ne pouvez pas retirer le propriétaire de son propre projet">
-                        <button type="button" class="btn btn-danger disabled" >Supprimer</button>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="2" class="text-center">
-                    Aucun·e collaborateur·rice pour le moment, seul l'usager principal peut éditer.
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </section>
-
-    <section class="mt-5">
-
-        <h3>
-            <svg class="bi" width="24" height="24" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
-            </svg>&nbsp;
-            <span class="align-middle">Ajouter un·e collaborateur·rice</span>
-        </h3>
-
-	      <form id="form-projects-access-add-user"
-				      method="post"
-				      action="."
-				      class="form">
-
-		        {% csrf_token %}
-
-            {{ form.as_p }}
-
-		        <button type="submit" class="btn btn-primary">
-			          Ajouter
-		        </button>
-
-	      </form>
-
-        {{ form.media }}
-
-    </section> -->
+</div>
 {% endblock %}
 
 
