@@ -62,7 +62,7 @@ def access_update(request, project_id):
                     },
                 )
 
-            return redirect(reverse("projects-project-detail", args=[project_id]))
+            return redirect(reverse("projects-access-update", args=[project_id]))
     else:
         form = AccessAddForm()
     return render(request, "projects/project/access_update.html", locals())
