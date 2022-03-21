@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from urbanvitaliz.apps.communication.api import send_email
 
-from .. import models
+from .. import digests, models
 from ..utils import can_manage_or_403
 
 
@@ -49,16 +49,12 @@ def access_update(request, project_id):
                     extra_tags=["email"],
                 )
 
-                project_url = request.build_absolute_uri(
-                    reverse("projects-project-detail", args=[project_id])
-                )
-
                 send_email(
                     template_name="sharing invitation",
                     recipients=[{"email": email}],
                     params={
                         "sender": {"email": request.user.email},
-                        "project": {"name": project.name, "url": project_url},
+                        "project": digests.make_project_digest(project),
                     },
                 )
 
