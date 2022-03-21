@@ -109,7 +109,8 @@ def make_project_digest(project):
 def make_action_digest(action):
     """Return digest of action"""
     action_link = utils.build_absolute_url(
-        reverse("projects-project-detail", args=[action.project_id]) + "#actions",
+        reverse("projects-project-detail-actions", args=[action.project_id])
+        + f"#action-{action.id}",
     )
     return {
         "created_by": {
