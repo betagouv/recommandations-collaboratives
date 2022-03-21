@@ -136,12 +136,14 @@ def update_task(request, task_id=None):
                 task, recipient=request.user.email, origin=api.models.Mail.STAFF
             )
 
-            signals.action_created.send(
-                sender=update_task,
-                task=instance,
-                project=instance.project,
-                user=request.user,
-            )
+            # If we are going public, notify
+            if task.public == False and instance.public == True:
+                signals.action_created.send(
+                    sender=update_task,
+                    task=instance,
+                    project=instance.project,
+                    user=request.user,
+                )
 
             return redirect(
                 reverse("projects-project-detail-actions", args=[task.project_id])
