@@ -3,10 +3,20 @@
 {% with request.resolver_match.url_name as url_name %}
 <li class="nav-item me-2">
     <a href="{% url 'projects-project-detail-knowledge' project.pk %}" class="nav-link link-dark {% if url_name == 'projects-project-detail-knowledge' %}active{% endif %}">
+        <span class="position-relative">
             <svg class="bi align-middle" width="16" height="16">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle"/>
             </svg>
             <span class="ms-1 align-middle">Connaissance du site</span>
+            {% if active_project_survey_session %}
+            <div class="progress" style="height: 10px">
+                <div class="progress-bar progress-bar-striped" style="width: {{ active_project_survey_session.completion }}%" role="progress-bar">
+                    <span style="font-size: 8px;">{{ active_project_survey_session.completion }}%</span>
+                </div>
+            </div>
+
+            {% endif %}
+        </span>
     </a>
 </li>
 
