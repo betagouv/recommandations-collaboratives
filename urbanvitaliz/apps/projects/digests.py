@@ -55,12 +55,7 @@ def send_recommendation_digest_by_project(user, notifications):
     for project_id, project_notifications in groupby(
         notifications, key=lambda x: x.target_object_id
     ):
-        # Only treat notifications for project in DONE status
         project = models.Project.objects.get(pk=project_id)
-
-        if project.status != "DONE":
-            skipped_projects.append(project_id)
-            continue
 
         digest = make_digest_of_project_recommendations(project, project_notifications)
 
