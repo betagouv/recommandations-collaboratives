@@ -13,7 +13,7 @@
             {% if user.is_authenticated %}
             <img src="{% static 'img/logo-small.png' %}" height="30px" alt="Logo UrbanVitaliz"/>
             {% else %}
-            <img src="{% static 'img/logo-uv.png' %}" width="180" alt="Logo UrbanVitaliz"/>
+            <img src="{% static 'img/logo-uv.png' %}" width="180px" alt="Logo UrbanVitaliz"/>
             {% endif %}
         </a>
         <button
@@ -84,6 +84,18 @@
                         <span class="align-middle">Déposer un projet</span>
                     </a>
                 </li>
+
+                <li class="nav-item dropdown me-2">
+                    <div class="btn-group">
+                        <a href="{% url 'resources-resource-search' %}" class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">
+                            <svg class="bi align-middle" width="16" height="16">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bookshelf"/>
+                            </svg>
+                            <span class="ms-1 align-middle">Ressources</span>
+                        </a>
+                    </div>
+                </li>
+
 
                 <li class="nav-item">
                     <a href="{% url 'methodology' %}" class="nav-link link-dark">
