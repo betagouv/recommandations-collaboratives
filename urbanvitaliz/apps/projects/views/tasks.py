@@ -451,7 +451,6 @@ def create_action(request, project_id=None):
             return redirect(next_url)
     else:
         form = PushTypeActionForm()
-        print(form)
 
     return render(request, "projects/project/task_create.html", locals())
 

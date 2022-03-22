@@ -8,6 +8,7 @@ created: 2021-06-29 09:16:14 CEST
 """
 
 from contextlib import contextmanager
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth import models as auth
@@ -16,6 +17,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.template import loader
+from sesame.utils import get_query_string
 
 ########################################################################
 # View helpers
@@ -64,14 +66,20 @@ def send_email(
     )
 
 
-def build_absolute_url(path):
+def build_absolute_url(path, auto_login_user=None):
     """
     Where we can't use request,
     use this to build the absolute url,
     assuming we're always using https
     """
     current_site = Site.objects.get_current()
-    return "https://%s%s" % (current_site.domain, path)
+    base = "https://" + current_site.domain
+    url = urljoin(base, path)
+
+    if auto_login_user:
+        url = urljoin(url, get_query_string(auto_login_user))
+
+    return url
 
 
 ########################################################################

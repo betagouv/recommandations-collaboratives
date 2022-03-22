@@ -57,7 +57,9 @@ def send_recommendation_digest_by_project(user, notifications):
     ):
         project = models.Project.objects.get(pk=project_id)
 
-        digest = make_digest_of_project_recommendations(project, project_notifications)
+        digest = make_digest_of_project_recommendations(
+            project, project_notifications, user
+        )
 
         send_email(
             "new_recommendations_digest",
@@ -68,10 +70,10 @@ def send_recommendation_digest_by_project(user, notifications):
     return skipped_projects
 
 
-def make_digest_of_project_recommendations(project, project_notifications):
+def make_digest_of_project_recommendations(project, project_notifications, user):
     """Return digest for project recommendations to be sent to user"""
-    recommendations = make_recommendations_digest(project_notifications)
-    project_digest = make_project_digest(project)
+    recommendations = make_recommendations_digest(project_notifications, user)
+    project_digest = make_project_digest(project, user)
     return {
         "notification_count": len(recommendations),
         "project": project_digest,
@@ -79,22 +81,22 @@ def make_digest_of_project_recommendations(project, project_notifications):
     }
 
 
-def make_recommendations_digest(project_notifications):
+def make_recommendations_digest(project_notifications, user):
     """Return a digest of all project recommendations"""
     recommendations = []
 
     for notification in project_notifications:
         action = notification.action_object
-        recommendation = make_action_digest(action)
+        recommendation = make_action_digest(action, user)
         recommendations.append(recommendation)
 
     return recommendations
 
 
-def make_project_digest(project):
+def make_project_digest(project, user=None):
     """Return base information digest for project"""
     project_link = utils.build_absolute_url(
-        reverse("projects-project-detail", args=[project.id])
+        reverse("projects-project-detail", args=[project.id]), auto_login_user=user
     )
     return {
         "name": project.name,
@@ -106,11 +108,15 @@ def make_project_digest(project):
     }
 
 
-def make_action_digest(action):
+def make_action_digest(action, user):
+    if not action:
+        return
+
     """Return digest of action"""
     action_link = utils.build_absolute_url(
         reverse("projects-project-detail-actions", args=[action.project_id])
         + f"#action-{action.id}",
+        auto_login_user=user,
     )
     return {
         "created_by": {
@@ -164,7 +170,7 @@ def send_new_site_digest_by_user(user, notifications):
 
     for notification in notifications:
 
-        digest = make_digest_for_new_site(notification)
+        digest = make_digest_for_new_site(notification, user)
         if digest:
             send_email(
                 "new_site_for_switchtender",
@@ -173,14 +179,14 @@ def send_new_site_digest_by_user(user, notifications):
             )
 
 
-def make_digest_for_new_site(notification):
+def make_digest_for_new_site(notification, user):
     """Return a digest of new site from notification"""
     project = notification.action_object
     if not project:
         return None
 
     project_link = utils.build_absolute_url(
-        reverse("projects-project-detail", args=[project.pk])
+        reverse("projects-project-detail", args=[project.pk]), auto_login_user=user
     )
     # NOTE mose information associated to project on this one.  can we make
     # the same for all ? so make_project_digest could be used in all
@@ -227,6 +233,7 @@ def send_digest_for_switchtender_by_user(user):
     Digest containing generic notifications (=those which weren't collected)
     """
     queryset = user.notifications.exclude(verb="a recommandé l'action").unsent()
+
     return send_digest_by_user(
         user, template_name="digest_for_switchtender", queryset=queryset
     )
@@ -246,7 +253,7 @@ def send_digest_by_user(user, template_name, queryset=None):
     if notifications.count() == 0:
         return 0
 
-    projects_digest = make_remaining_notifications_digest(notifications)
+    projects_digest = make_remaining_notifications_digest(notifications, user)
 
     digest = {
         "projects": projects_digest,
@@ -267,7 +274,7 @@ def send_digest_by_user(user, template_name, queryset=None):
     return notifications.count()
 
 
-def make_remaining_notifications_digest(notifications):
+def make_remaining_notifications_digest(notifications, user):
     """Return digests for given notifications"""
     digest = []
 
@@ -275,7 +282,7 @@ def make_remaining_notifications_digest(notifications):
         notifications, key=lambda x: x.target_object_id
     ):
         project_digest = make_project_notifications_digest(
-            project_id, project_notifications
+            project_id, project_notifications, user
         )
         if project_digest:
             digest.append(project_digest)
@@ -283,7 +290,7 @@ def make_remaining_notifications_digest(notifications):
     return digest
 
 
-def make_project_notifications_digest(project_id, notifications):
+def make_project_notifications_digest(project_id, notifications, user):
     """Return digest for given project notification"""
     # Ignore deleted projects
     try:
@@ -291,7 +298,7 @@ def make_project_notifications_digest(project_id, notifications):
     except models.Project.DoesNotExist:
         return None
 
-    digest = make_project_digest(project)
+    digest = make_project_digest(project, user)
 
     notifications_digest = make_notifications_digest(notifications)
     digest.update(
