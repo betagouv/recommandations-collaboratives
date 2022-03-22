@@ -234,8 +234,8 @@ def create_reminder(days, task, recipient, origin):
         rsvp.save()
 
     template_params = {
-        "project": make_project_digest(task.project),
-        "reco": make_action_digest(task),
+        "project": make_project_digest(task.project, target_user),
+        "reco": make_action_digest(task, target_user),
         "rsvp": {
             "link_done": make_rsvp_link(rsvp, models.Task.DONE),
             "link_inprogress": make_rsvp_link(rsvp, models.Task.INPROGRESS),
