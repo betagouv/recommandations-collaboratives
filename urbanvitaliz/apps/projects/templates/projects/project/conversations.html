@@ -76,7 +76,7 @@
                 {% include "projects/project/fragments/sidebar.html" %}
             </div>
 
-            <h6 class="mb-2">Les participant·e·s</h6>
+            <h6 class="mb-2">Membres de la conversation</h6>
 
             {% for recipient in recipients %}
             <div class="bg-light mt-3 p-4">
@@ -92,7 +92,7 @@
                     <strong>{{ recipient.get_full_name|default:recipient.email }}</strong>
                     {% if recipient.profile.organization %}
                     - {{ recipient.profile.organization.name }}
-                    {% elif recipient.email in project.emails %}
+                    {% elif recipient.email == project.email %}
                     - {{ project.org_name|capfirst }}
                     {% endif %}
                 </span>
