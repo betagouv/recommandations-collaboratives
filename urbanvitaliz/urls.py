@@ -17,6 +17,7 @@ from magicauth.urls import urlpatterns as magicauth_urls
 from rest_framework import routers
 
 from urbanvitaliz.apps.addressbook.urls import urlpatterns as addressbook_urls
+from urbanvitaliz.apps.geomatics import rest as geomatics_rest
 from urbanvitaliz.apps.home.urls import urlpatterns as home_urls
 from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
 from urbanvitaliz.apps.projects.views import rest as projects_rest
@@ -28,6 +29,9 @@ from urbanvitaliz.apps.survey.urls import urlpatterns as survey_urls
 router = routers.DefaultRouter()
 router.register(r"projects", projects_rest.ProjectViewSet, basename="projects")
 router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
+router.register(
+    r"departments", geomatics_rest.DepartmentViewSet, basename="departments"
+)
 
 
 urlpatterns = [

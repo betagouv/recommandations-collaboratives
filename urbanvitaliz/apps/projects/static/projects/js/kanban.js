@@ -14,10 +14,13 @@ function kanban_app() {
 
 				],
 
+
 				tasks: [],
+        departments: [],
+        selectedDepartment: null,
 
         truncate(input, size=30) {
-            return input.length > size ? `${input.substring(0, size)}...` : input
+            return input.length > size ? `${input.substring(0, size)}...` : input;
         },
 
 				formatDateDisplay(date) {
@@ -26,6 +29,13 @@ function kanban_app() {
 
 					  return new Date().toLocaleDateString('fr-FR');
 				},
+
+        filteredTasks() {
+            if (this.selectedDepartment)
+                return this.tasks.filter(t => t.commune.department.code == this.selectedDepartment);
+            else
+                return this.tasks
+        },
 
         async moveTask(uuid, boardCode) {
             let taskIndex = this.tasks.findIndex(t => t.uuid === uuid);
@@ -74,6 +84,19 @@ function kanban_app() {
                     notifications: t.notifications
 							   });
 						});
+
+            /* Feed department list */
+            const response2 = await fetch('/api/departments/');
+            departmentsFromApi = await response2.json();
+
+            this.departments = [];
+
+            departmentsFromApi.forEach(t => {
+                this.departments.push({
+                    code: t.code,
+                    name: t.name
+                });
+            });
 
             this.tasks.sort(function(a, b) {
                 if (b.notifications.count - a.notifications.count)

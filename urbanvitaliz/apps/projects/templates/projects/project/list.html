@@ -87,6 +87,12 @@
                     </div>
                 </div>
 
+                <select x-model="selectedDepartment" style="width: 250px" class="form-select me-2" aria-label="sélection du département">
+                    <option selected value="">Toute la France</option>
+                    <template x-for="department in departments" :key="department.code">
+                        <option :value="department.code" x-text="department.name"></option>
+                    </template>
+                </select>
 
                 <a class="btn btn-secondary btn-sm" href="{% url 'projects-onboarding' %}" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
@@ -122,7 +128,7 @@
 													                          class="pt-2 pb-4 rounded"
 												                        >
                                                     <!-- Task Template -->
-													                          <template x-for="(t, taskIndex) in tasks.filter(t => t.boardCode === board.code)" :key="taskIndex">
+													                          <template x-for="(t, taskIndex) in filteredTasks().filter(t => t.boardCode === board.code)" :key="taskIndex">
 
 
 																                        <div :id="t.uuid"
