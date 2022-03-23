@@ -17,7 +17,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.template import loader
-# from sesame.utils import get_query_string
+from sesame.utils import get_query_string
 
 ########################################################################
 # View helpers
@@ -76,8 +76,8 @@ def build_absolute_url(path, auto_login_user=None):
     base = "https://" + current_site.domain
     url = urljoin(base, path)
 
-    #if auto_login_user:
-        #url = urljoin(url, get_query_string(auto_login_user))
+    if auto_login_user:
+        url = urljoin(url, get_query_string(auto_login_user))
 
     return url
 
