@@ -18,17 +18,33 @@ function action_pusher_app() {
         suggestions: [],
         selected_resource: null,
         selected_resources: [],
+        public: true,
         draft: false,
 
         searchResources(text=null) {
             if (!text) {
                 text = this.search;
-            } 
+            }
 
             this.results = this.db.search(text, { fuzzy: 0.2 }).slice(0, 8);
             this.suggestions = this.db.autoSuggest(text, { fuzzy: 0.2 }).slice(0, 2);
 
             return true;
+        },
+
+        resultsAndSelected() {
+            if (this.push_type == 'multiple') {
+                for(var resource of this.selected_resources) {
+                    var f = _.find(this.resources, function(r) { return resource == r.id; });
+
+                    /* Add it to the list of results */
+                    if (! _.find(this.results, function(r) { return resource == r.id; } )) {
+                        this.results.push(f);
+                    }
+                }
+            }
+
+            return this.results;
         },
 
         truncate(input, size=30) {
@@ -74,7 +90,7 @@ function action_pusher_app() {
             resourcesFromApi.forEach(t => {
                 let entry = {
 								    id: t.id,
-								    title: this.truncate(t.title),
+								    title: t.title,
                     subtitle: t.subtitle,
                     tags: t.tags,
 							  };
@@ -88,6 +104,7 @@ function action_pusher_app() {
 
         set_draft(draft) {
             this.draft = draft;
+            this.public = ! this.draft;
         }
 		}
 };

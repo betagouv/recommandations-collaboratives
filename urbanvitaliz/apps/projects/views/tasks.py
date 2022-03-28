@@ -257,7 +257,7 @@ def delete_task(request, task_id=None):
         task.deleted = timezone.now()
         task.save()
         api.remove_reminder_email(task)
-    next_url = reverse("projects-project-detail", args=[task.project_id])
+    next_url = reverse("projects-project-detail-actions", args=[task.project_id])
     return redirect(next_url)
 
 
