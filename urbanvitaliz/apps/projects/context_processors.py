@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.models import ContentType
+from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import check_if_switchtender
 
@@ -24,6 +26,19 @@ def active_project_processor(request):
         except survey_models.Survey.DoesNotExist:
             session = None
 
+        # Mark this project notifications as read
+        project_ct = ContentType.objects.get_for_model(projects_models.Project)
+        task_ct = ContentType.objects.get_for_model(projects_models.Task)
+        action_notification_count = (
+            request.user.notifications.filter(
+                action_object_content_type=task_ct,
+                target_content_type=project_ct.pk,
+                target_object_id=active_project.pk,
+            )
+            .unread()
+            .count()
+        )
+
         context.update(
             {
                 "active_project_can_manage": can_manage_project(
@@ -33,6 +48,7 @@ def active_project_processor(request):
                     active_project, request.user
                 ),
                 "active_project_survey_session": session,
+                "active_project_action_notification_count": action_notification_count,
             }
         )
 
