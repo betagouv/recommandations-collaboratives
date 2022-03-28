@@ -190,9 +190,11 @@ class ProjectForm(forms.ModelForm):
 
         try:
             st_group = auth_models.Group.objects.get(name="switchtender")
-            self.fields["switchtenders"].queryset = self.fields[
-                "switchtenders"
-            ].queryset.filter(groups=st_group)
+            self.fields["switchtenders"].queryset = (
+                self.fields["switchtenders"]
+                .queryset.filter(groups=st_group)
+                .order_by("username")
+            )
         except auth_models.Group.DoesNotExist:
             pass
 

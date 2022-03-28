@@ -90,7 +90,7 @@
                 <p class="search-counter fs-6 mb-0" x-show="!search" x-text="`${db.documentCount} ressources au total`"></p>
                 <p class="search-counter fs-6 mb-0" x-show="search" x-text="`${results.length} ressource(s) trouvée(s)`"></p>
                 <ul x-show="results.length > 0" class="cards d-flex row row-cols-3 g-4 ps-0 ms-0 mt-1">
-                    <template x-for="resource in results" :key="resource.id">
+                    <template x-for="resource in resultsAndSelected()" :key="resource.id">
                         <li class="col">
                             <div class="card p-2 ps-5 rounded">
                                 <div class="card-body">
@@ -195,12 +195,9 @@
                 </div>
             </template>
 
-            <input type="hidden" name="public" x-model="!draft">
+            <input type="hidden" name="public" x-model="public">
         </form>
     </div>
 
-    <form class="form" id="form-create-action" action="{% url "projects-project-create-action" project.id %}" method="POST">
-        {% csrf_token %}
-    </form>
 </div>
 {% endblock %}
