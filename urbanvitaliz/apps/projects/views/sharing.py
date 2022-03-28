@@ -9,6 +9,7 @@ created : 2021-05-26 15:56:20 CEST
 
 from django import forms
 from django.contrib import messages
+from django.contrib.auth import models as auth_models
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -33,6 +34,12 @@ def access_update(request, project_id):
     project = get_object_or_404(models.Project, pk=project_id)
 
     can_manage_or_403(project, request.user)
+
+    # Compute who has created an account yet
+    accepted_invites = []
+    for email in project.emails:
+        if auth_models.User.objects.filter(email=email).exists():
+            accepted_invites.append(email)
 
     if request.method == "POST":
         form = AccessAddForm(request.POST)
