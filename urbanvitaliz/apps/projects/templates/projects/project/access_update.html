@@ -45,8 +45,14 @@
         <ul class="list-group">
             {% for email in project.emails %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
+                <div class="align-middle">
                     {{ email }}
+                    {% if email not in accepted_invites %}
+                    <em>- Invitation en attente</em>
+                    <svg class="align-middle bi" width="14px" height="14px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hourglass-split"/>
+                    </svg>
+                    {% endif %}
                 </div>
                 <div>
                     {% if email != project.email %}
