@@ -9,24 +9,29 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+import csv
+import datetime
+
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.utils import is_staff_or_403, is_switchtender_or_403
+from urbanvitaliz.utils import (build_absolute_url, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
 from ..forms import OnboardingForm, ProjectForm, SelectCommuneForm
 from ..utils import (can_administrate_or_403, can_manage_project,
-                     generate_ro_key, get_active_project, is_project_moderator,
-                     is_project_moderator_or_403,
+                     format_switchtender_identity, generate_ro_key,
+                     get_active_project, get_switchtenders_for_project,
+                     is_project_moderator, is_project_moderator_or_403,
                      is_regional_actor_for_project_or_403,
                      refresh_user_projects_in_session, set_active_project_id)
 
@@ -112,13 +117,79 @@ def select_commune(request, project_id=None):
 
 @login_required
 @ensure_csrf_cookie
+def project_list_export_csv(request):
+    """Export the projects for the switchtender as CSV"""
+    is_switchtender_or_403(request.user)
+
+    projects = (
+        models.Project.objects.in_departments(request.user.profile.departments.all())
+        .exclude(status="DRAFT")
+        .order_by("-created_on")
+    )
+
+    today = datetime.datetime.today().date()
+
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="urbanvitaliz-projects-{today}.csv"'
+        },
+    )
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "departement",
+            "commune_insee",
+            "nom_friche",
+            "detail_adresse",
+            "date_contact",
+            "contact_dossier",
+            "mail",
+            "tel",
+            "conseillers",
+            "statut_conseil",
+            "nb_reco",
+            "lien_projet",
+        ]
+    )
+    for project in projects:
+        switchtenders = get_switchtenders_for_project(project)
+        switchtenders_txt = ", ".join(
+            [format_switchtender_identity(u) for u in switchtenders]
+        )
+
+        writer.writerow(
+            [
+                project.commune.department.code,
+                project.commune.insee,
+                project.name,
+                project.location,
+                project.created_on.date(),
+                f"{project.first_name} {project.last_name}",
+                project.email,
+                project.phone,
+                switchtenders_txt,
+                project.status,
+                project.tasks.exclude(public=False).count(),
+                build_absolute_url(
+                    reverse("projects-project-detail", args=[project.id])
+                ),
+            ]
+        )
+
+    return response
+
+
+@login_required
+@ensure_csrf_cookie
 def project_list(request):
     """Return the projects for the switchtender"""
     is_switchtender_or_403(request.user)
 
     project_moderator = is_project_moderator(request.user)
 
-    draft_projecfts = []
+    draft_projects = []
     if is_project_moderator:
         draft_projects = (
             models.Project.objects.in_departments(
