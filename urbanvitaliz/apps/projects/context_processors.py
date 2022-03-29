@@ -1,4 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import check_if_switchtender
@@ -26,14 +27,41 @@ def active_project_processor(request):
         except survey_models.Survey.DoesNotExist:
             session = None
 
-        # Mark this project notifications as read
+        # Retrieve notification count
         project_ct = ContentType.objects.get_for_model(projects_models.Project)
+        project_notifications = request.user.notifications.filter(
+            target_content_type=project_ct.pk,
+            target_object_id=active_project.pk,
+        )
+
+        # Task notifications
         task_ct = ContentType.objects.get_for_model(projects_models.Task)
+        task_followup_ct = ContentType.objects.get_for_model(
+            projects_models.TaskFollowup
+        )
         action_notification_count = (
-            request.user.notifications.filter(
-                action_object_content_type=task_ct,
-                target_content_type=project_ct.pk,
-                target_object_id=active_project.pk,
+            project_notifications.filter(
+                Q(action_object_content_type=task_ct)
+                | Q(action_object_content_type=task_followup_ct)
+            )
+            .unread()
+            .count()
+        )
+
+        note_ct = ContentType.objects.get_for_model(projects_models.Note)
+        # Conversations notifications
+        conversations_notification_count = (
+            project_notifications.filter(
+                action_object_content_type=note_ct, action_notes__public=True
+            )
+            .unread()
+            .count()
+        )
+
+        # Internal followup notifications
+        followup_notification_count = (
+            project_notifications.filter(
+                action_object_content_type=note_ct, action_notes__public=False
             )
             .unread()
             .count()
@@ -49,6 +77,8 @@ def active_project_processor(request):
                 ),
                 "active_project_survey_session": session,
                 "active_project_action_notification_count": action_notification_count,
+                "active_project_conversations_notification_count": conversations_notification_count,
+                "active_project_followup_notification_count": followup_notification_count,
             }
         )
 

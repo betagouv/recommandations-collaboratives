@@ -16,6 +16,7 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
+from notifications import models as notifications_models
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -23,7 +24,7 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.utils import check_if_switchtender
+from urbanvitaliz.utils import CastedGenericRelation, check_if_switchtender
 
 from .utils import generate_ro_key
 
@@ -228,6 +229,13 @@ class Note(models.Model):
         default=timezone.now, verbose_name="Dernière mise à jour"
     )
     tags = models.CharField(max_length=256, blank=True, default="")
+
+    notifications_as_action = CastedGenericRelation(
+        notifications_models.Notification,
+        related_query_name="action_notes",
+        content_type_field="action_object_content_type",
+        object_id_field="action_object_object_id",
+    )
 
     def get_absolute_url(self):
         if self.public:

@@ -82,14 +82,38 @@ def project_actions(request, project_id=None):
     # Set this project as active
     set_active_project_id(request, project.pk)
 
-    # Mark this project notifications as read
+    # Mark this project action notifications as read
     project_ct = ContentType.objects.get_for_model(project)
     task_ct = ContentType.objects.get_for_model(models.Task)
-    request.user.notifications.filter(
+    task_notifications = request.user.notifications.filter(
         action_object_content_type=task_ct,
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
-    ).mark_all_as_read()
+    )
+
+    actions_with_notifications = [
+        int(pk)
+        for pk in task_notifications.values_list("action_object_object_id", flat=True)
+    ]
+
+    task_notifications.mark_all_as_read()
+
+    # Mark the followup as seen
+    task_followup_ct = ContentType.objects.get_for_model(models.TaskFollowup)
+    followup_notifications = request.user.notifications.filter(
+        action_object_content_type=task_followup_ct,
+        target_content_type=project_ct.pk,
+        target_object_id=project.pk,
+    )
+
+    followups_with_notifications = [
+        int(pk)
+        for pk in followup_notifications.values_list(
+            "action_object_object_id", flat=True
+        )
+    ]
+
+    followup_notifications.mark_all_as_read()
 
     return render(request, "projects/project/actions.html", locals())
 
@@ -120,6 +144,16 @@ def project_conversations(request, project_id=None):
 
     recipients = get_notification_recipients_for_project(project)
 
+    # Mark this project notifications as read
+    project_ct = ContentType.objects.get_for_model(project)
+    note_ct = ContentType.objects.get_for_model(models.Note)
+    request.user.notifications.filter(
+        action_object_content_type=note_ct,
+        action_notes__public=True,
+        target_content_type=project_ct.pk,
+        target_object_id=project.pk,
+    ).mark_all_as_read()
+
     return render(request, "projects/project/conversations.html", locals())
 
 
@@ -144,6 +178,16 @@ def project_internal_followup(request, project_id=None):
 
     # Set this project as active
     set_active_project_id(request, project.pk)
+
+    # Mark this project notifications as read
+    project_ct = ContentType.objects.get_for_model(project)
+    note_ct = ContentType.objects.get_for_model(models.Note)
+    request.user.notifications.filter(
+        action_object_content_type=note_ct,
+        action_notes__public=False,
+        target_content_type=project_ct.pk,
+        target_object_id=project.pk,
+    ).mark_all_as_read()
 
     private_note_form = PrivateNoteForm()
 
