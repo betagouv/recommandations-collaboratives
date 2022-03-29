@@ -12,10 +12,13 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib.auth import models as auth
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
+from django.db import models as db_models
+from django.db.models.functions import Cast
 from django.template import loader
 from sesame.utils import get_query_string
 
@@ -101,6 +104,25 @@ def login(
         group.user_set.add(user)
     client.force_login(user)
     yield user
+
+
+#######################################################################
+# Database Helpers
+#######################################################################
+class CastedGenericRelation(GenericRelation):
+    def get_joining_columns(self, reverse_join=False):
+        return ()
+
+    def get_extra_restriction(self, where_class, alias, remote_alias):
+        cond = super().get_extra_restriction(where_class, alias, remote_alias)
+        from_field = self.model._meta.pk
+        to_field = self.remote_field.model._meta.get_field(self.object_id_field_name)
+        lookup = from_field.get_lookup("exact")(
+            Cast(from_field.get_col(alias), output_field=db_models.TextField()),
+            to_field.get_col(remote_alias),
+        )
+        cond.add(lookup, "AND")
+        return cond
 
 
 # eof

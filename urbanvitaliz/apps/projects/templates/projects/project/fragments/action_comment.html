@@ -1,6 +1,6 @@
 {% load gravatar %}
 {% load humanize %}
-<div class="d-flex flex-column m-2 bg-light p-4 comment">
+<div class="d-flex flex-column m-2 p-4 comment {% if followup.pk in followups_with_notifications %}bg-light-yellow{% else %}bg-light{% endif %}">
     <p class="m-0 p-0">
         {{ comment|safe }}
     </p>
