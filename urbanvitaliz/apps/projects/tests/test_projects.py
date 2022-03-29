@@ -7,7 +7,9 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
+import csv
 import datetime
+import io
 import uuid
 
 import django.core.mail
@@ -1200,6 +1202,36 @@ def test_switchtender_joins_project(client):
     assert response.status_code == 302
     assert project.switchtenders.count() == 1
     assert project.switchtenders.first() == user
+
+
+#################################################################
+# CSV
+#################################################################
+
+
+def test_switchtender_exports_csv(client):
+    # Expected project
+    p1 = Recipe(models.Project, name="Projet 1", status="READY").make()
+    p1.commune = Recipe(geomatics.Commune).make()
+    p1.save()
+
+    # Project that should not appear
+    Recipe(models.Project, name="Projet 2").make()
+
+    url = reverse("projects-project-list-export-csv")
+    with login(client, groups=["switchtender"]) as user:
+        p1.switchtenders.add(user)
+
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    content = response.content.decode("utf-8")
+    cvs_reader = csv.reader(io.StringIO(content))
+    body = list(cvs_reader)
+    body.pop(0)
+
+    assert len(body) == 1
 
 
 # eof
