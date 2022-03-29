@@ -2,7 +2,8 @@ django<4.0
 ipython
 django-markdownx
 markdown-link-attr-modifier
-django-magicauth
+#django-magicauth
+git+http://github.com/glibersat/django-magicauth@master#egg=django-magicauth
 django_otp
 django-tagging
 django-gravatar2
