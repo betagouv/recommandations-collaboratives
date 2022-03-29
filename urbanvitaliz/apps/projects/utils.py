@@ -255,3 +255,12 @@ def create_reminder(days, task, recipient, origin):
     )
 
     return True
+
+
+def format_switchtender_identity(user):
+    fmt = f"{user.first_name}"
+    fmt += f" {user.last_name}"
+    if user.profile and user.profile.organization:
+        fmt += f" - {user.profile.organization.name}"
+
+    return fmt

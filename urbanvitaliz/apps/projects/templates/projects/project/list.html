@@ -94,13 +94,24 @@
                     </template>
                 </select>
 
-                <a class="btn btn-secondary btn-sm" href="{% url 'projects-onboarding' %}" role="button">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
-                    </svg>
-                    &nbsp;
-                    Ajouter un projet
-                </a>
+                <div class="btn-group" role="group" aria-label="Admin actions">
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'projects-onboarding' %}" role="button">
+                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+                        </svg>
+                        <span class="align-middle">
+                            Ajouter un projet
+                        </span>
+                    </a>
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'projects-project-list-export-csv' %}" role="button">
+                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#filetype-csv"/>
+                        </svg>
+                        <span class="align-middle">
+                            Export CSV
+                        </span>
+                    </a>
+                </div>
             </div>
 		        <div class="d-flex">
 				        <!-- Main Page -->
