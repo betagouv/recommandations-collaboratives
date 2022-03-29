@@ -90,7 +90,7 @@
                 <select x-model="selectedDepartment" style="width: 250px" class="form-select me-2" aria-label="sélection du département">
                     <option selected value="">Toute la France</option>
                     <template x-for="department in departments" :key="department.code">
-                        <option :value="department.code" x-text="department.name"></option>
+                        <option :value="department.code" x-text="`${department.name} (${department.code})`"></option>
                     </template>
                 </select>
 

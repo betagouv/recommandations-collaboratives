@@ -122,7 +122,7 @@ def project_list_export_csv(request):
     is_switchtender_or_403(request.user)
 
     projects = (
-        models.Project.objects.in_departments(request.user.profile.departments.all())
+        models.Project.objects.for_user(request.user)
         .exclude(status="DRAFT")
         .order_by("-created_on")
     )
@@ -153,6 +153,7 @@ def project_list_export_csv(request):
             "lien_projet",
         ]
     )
+
     for project in projects:
         switchtenders = get_switchtenders_for_project(project)
         switchtenders_txt = ", ".join(
@@ -161,8 +162,8 @@ def project_list_export_csv(request):
 
         writer.writerow(
             [
-                project.commune.department.code,
-                project.commune.insee,
+                project.commune.department.code if project.commune else "??",
+                project.commune.insee if project.commune else "??",
                 project.name,
                 project.location,
                 project.created_on.date(),
