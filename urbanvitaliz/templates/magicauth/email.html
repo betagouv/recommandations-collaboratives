@@ -309,7 +309,7 @@
                                 <table border="0" cellpadding="0" cellspacing="0">
                                   <tbody>
                                     <tr>
-                                      <td align="center"> <a href="https://urbanvitaliz.fr{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}">Connexion</a> </td>
+                                      <td align="center"> <a href="https://{{ site_domain }}{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}">Connexion</a> </td>
                                     </tr>
                                   </tbody>
                                 </table>
@@ -326,7 +326,7 @@
                           </p>
                           <p class="mb-6 align-center">
                             <strong>
-                              https://{{ site.domain }}{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}
+                              https://{{ site_domain }}{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}
                             </strong>
                           </p>
                           <p>Bonne journée,</p>
