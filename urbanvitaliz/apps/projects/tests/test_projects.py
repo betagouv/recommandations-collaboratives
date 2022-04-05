@@ -695,6 +695,36 @@ def test_delete_project_and_redirect(client):
 
 
 @pytest.mark.django_db
+def test_general_notifications_are_consumed_on_project_knowledge(client):
+
+    project = Recipe(models.Project, name="Proj1", location="Somewhere").make()
+
+    with login(client, groups=["switchtender"], is_staff=False, username="Bob") as user:
+        notify.send(
+            sender=user,
+            recipient=user,
+            verb="est devenu·e aiguilleur·se sur le projet",
+            target=project,
+        )
+
+        notify.send(
+            sender=project,
+            recipient=user,
+            verb="a été validé",
+            target=project,
+        )
+
+        assert user.notifications.unread().count() == 2
+
+        url = reverse("projects-project-detail-knowledge", args=[project.id])
+
+        response = client.get(url)
+        assert response.status_code == 200
+
+        assert user.notifications.unread().count() == 0
+
+
+@pytest.mark.django_db
 def test_notifications_are_deleted_on_project_delete():
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     recipient = Recipe(auth.User).make()

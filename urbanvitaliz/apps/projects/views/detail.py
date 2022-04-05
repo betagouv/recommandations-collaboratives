@@ -9,6 +9,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import check_if_switchtender
@@ -57,6 +58,18 @@ def project_knowledge(request, project_id=None):
     except survey_models.Survey.DoesNotExist:
         session = None
 
+    # Mark some notifications as seen (general ones)
+    project_ct = ContentType.objects.get_for_model(project)
+    general_notifications = request.user.notifications.unread().filter(
+        Q(verb="est devenu·e aiguilleur·se sur le projet")
+        | Q(verb="a été validé")
+        | Q(verb="a validé le projet"),
+        target_content_type=project_ct.pk,
+        target_object_id=project.pk,
+    )
+
+    general_notifications.mark_all_as_read()
+
     return render(request, "projects/project/knowledge.html", locals())
 
 
@@ -85,7 +98,7 @@ def project_actions(request, project_id=None):
     # Mark this project action notifications as read
     project_ct = ContentType.objects.get_for_model(project)
     task_ct = ContentType.objects.get_for_model(models.Task)
-    task_notifications = request.user.notifications.filter(
+    task_notifications = request.user.notifications.unread().filter(
         action_object_content_type=task_ct,
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
@@ -100,7 +113,7 @@ def project_actions(request, project_id=None):
 
     # Mark the followup as seen
     task_followup_ct = ContentType.objects.get_for_model(models.TaskFollowup)
-    followup_notifications = request.user.notifications.filter(
+    followup_notifications = request.user.notifications.unread().filter(
         action_object_content_type=task_followup_ct,
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
@@ -147,7 +160,7 @@ def project_conversations(request, project_id=None):
     # Mark this project notifications as read
     project_ct = ContentType.objects.get_for_model(project)
     note_ct = ContentType.objects.get_for_model(models.Note)
-    request.user.notifications.filter(
+    request.user.notifications.unread().filter(
         action_object_content_type=note_ct,
         action_notes__public=True,
         target_content_type=project_ct.pk,
@@ -182,7 +195,7 @@ def project_internal_followup(request, project_id=None):
     # Mark this project notifications as read
     project_ct = ContentType.objects.get_for_model(project)
     note_ct = ContentType.objects.get_for_model(models.Note)
-    request.user.notifications.filter(
+    request.user.notifications.unread().filter(
         action_object_content_type=note_ct,
         action_notes__public=False,
         target_content_type=project_ct.pk,
