@@ -157,6 +157,11 @@ class Project(models.Model):
     )
     impediments = models.TextField(default="", blank=True, verbose_name="Difficultés")
 
+    @property
+    def impediments_rendered(self):
+        """Return impediments as markdown"""
+        return markdownify(self.impediments)
+
     switchtenders = models.ManyToManyField(
         auth_models.User,
         related_name="projects_managed",
@@ -214,6 +219,7 @@ class Note(models.Model):
     project = models.ForeignKey(
         "Project", on_delete=models.CASCADE, related_name="notes"
     )
+
     public = models.BooleanField(default=False, blank=True)
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
