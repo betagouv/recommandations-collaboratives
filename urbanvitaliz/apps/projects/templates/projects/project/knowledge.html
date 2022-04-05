@@ -21,6 +21,7 @@
 
     <div class="row">
 
+        {% if not is_switchtender %}
         <div class="col box-heading d-flex justify-content-between mb-4 mt-4">
             {% if can_manage_draft %}
             {% if session and session.next_question %}
@@ -54,6 +55,9 @@
             {% endif %}
             {% endif %}
         </div>
+        {% else %}
+        <div class="col"></div>
+        {% endif %}
         <div id="project-sidebar" class="col-md-3 h-100">
             {% include "projects/project/fragments/sidebar.html" %}
         </div>
