@@ -5,7 +5,7 @@
 
 <nav
     id="switchtender-navbar"
-    class="navbar p-0 navbar-expand-lg sticky-top navbar-light bg-light"
+    class="navbar p-0 navbar-expand-lg fixed-top navbar-light bg-light"
     aria-label="Switchtender navigation"
 >
     <a href="{% url 'home' %}" class="d-flex align-middle p-2 border-end">
@@ -27,10 +27,10 @@
 {% if active_project %}
 <nav
     id="secondary-navbar"
-    class="navbar navbar-expand-lg sticky-top navbar-light border-top border-light bg-white shadow-sm"
+    class="navbar navbar-expand-lg fixed-top navbar-light border-top border-light bg-white shadow-sm"
     aria-label="Main navigation"
     class="secondary-navbar"
-    style="padding: 0px; height: 60px; z-index: 1000;"
+    style="padding: 0px; margin-top: 45px; height: 60px; z-index: 1000;"
 >
     <div class="container-fluid">
         <button
