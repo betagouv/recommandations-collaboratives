@@ -11,6 +11,7 @@ import datetime
 from django.contrib.auth import models as auth
 from django.db import models
 from django.db.models.functions import Lower
+from django.shortcuts import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from urbanvitaliz.apps.addressbook import models as addressbook_models
@@ -103,6 +104,10 @@ class Resource(models.Model):
         related_name="authored_resources",
         null=True,
     )
+
+    @property
+    def get_absolute_url(self):
+        return reverse("resources-resource-detail", kwargs={"resource_id": self.pk})
 
     @property
     def expired(self):

@@ -5,7 +5,7 @@ function action_pusher_app() {
 
         db: new MiniSearch({
             fields: ['title', 'subtitle', 'tags'], // fields to index for full-text search
-            storeFields: ['title', 'subtitle'] //
+            storeFields: ['title', 'subtitle', 'url'] //
         }),
 
         push_type: 'single',
@@ -93,6 +93,7 @@ function action_pusher_app() {
 								    title: t.title,
                     subtitle: t.subtitle,
                     tags: t.tags,
+                    url: t.web_url
 							  };
 
                 this.resources.push(entry);
