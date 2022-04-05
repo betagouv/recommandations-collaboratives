@@ -14,4 +14,7 @@ class ResourceSerializer(serializers.HyperlinkedModelSerializer):
             "status",
             "created_on",
             "updated_on",
+            "web_url",
         ]
+
+    web_url = serializers.URLField(source="get_absolute_url", read_only=True)

@@ -10,6 +10,9 @@
         opacity: 0;
     }
 
+}
+
+#push-type-selector {
     input[type=radio], input[type=checkbox] {
         transform: scale(1.5);
         transform-origin: top left;
@@ -18,6 +21,18 @@
         left: 1.75em;
     }
 }
+
+
+.resource-card {
+    input[type=radio], input[type=checkbox] {
+        transform: scale(1.5);
+        transform-origin: top left;
+        position: absolute;
+        top: 1.1em;
+        left: -1em;
+    }
+}
+
 .cards {
     flex-wrap: wrap;
 

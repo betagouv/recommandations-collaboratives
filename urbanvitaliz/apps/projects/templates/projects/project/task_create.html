@@ -92,8 +92,8 @@
                 <ul x-show="results.length > 0" class="cards d-flex row row-cols-3 g-4 ps-0 ms-0 mt-1">
                     <template x-for="resource in resultsAndSelected()" :key="resource.id">
                         <li class="col">
-                            <div class="card p-2 ps-5 rounded">
-                                <div class="card-body">
+                            <div class="resource-card card p-2 ps-5 rounded">
+                                <div class="card-body position-relative">
                                     <template x-if="push_type == 'single'">
                                         <input :id="'resource-' + resource.id" type="radio" name="resource" :value="resource.id" x-model="selected_resource" @click="setIntent(resource)">
                                     </template>
@@ -104,6 +104,12 @@
                                     <label :for="'resource-' + resource.id" x-text="resource.title"></label>
                                     <h5 x-text="resource.title"></h5>
                                     <p x-text="resource.subtitle" class="mb-0"></p>
+
+                                </div>
+                                <div class="card-body">
+                                    <a :href="resource.url" target="_new" class="btn btn-sm btn-secondary">
+                                        Ouvrir cette ressource
+                                    </a>
                                 </div>
                             </div>
                         </li>
