@@ -106,6 +106,10 @@ function kanban_app() {
                 }
             });
 
+            this.departments.sort(function(a, b) {
+                return b.name - a.name;
+            });
+
             this.isBusy = false;
 				},
 
