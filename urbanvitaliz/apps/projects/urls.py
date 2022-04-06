@@ -134,6 +134,11 @@ urlpatterns = [
         name="projects-followup-task",
     ),
     path(
+        r"task/followup/<int:followup_id>/edit/",
+        tasks.followup_task_update,
+        name="projects-task-followup-update",
+    ),
+    path(
         r"task/rsvp/<uuid:rsvp_id>/<int:status>/",
         tasks.rsvp_followup_task,
         name="projects-rsvp-followup-task",

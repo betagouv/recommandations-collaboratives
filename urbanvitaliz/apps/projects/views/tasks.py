@@ -9,7 +9,7 @@ created : 2021-05-26 15:56:20 CEST
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -24,7 +24,8 @@ from ..forms import (CreateActionsFromResourcesForm,
                      CreateActionWithoutResourceForm,
                      CreateActionWithResourceForm, PushTypeActionForm,
                      RemindTaskForm, RsvpTaskFollowupForm, TaskFollowupForm,
-                     TaskRecommendationForm, UpdateTaskForm)
+                     TaskRecommendationForm, UpdateTaskFollowupForm,
+                     UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -322,6 +323,30 @@ def followup_task(request, task_id=None):
             )
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
+
+
+@login_required
+def followup_task_update(request, followup_id=None):
+    """Update a followup for task"""
+    followup = get_object_or_404(models.TaskFollowup, pk=followup_id)
+
+    if followup.who != request.user:
+        return HttpResponseForbidden()
+
+    form = UpdateTaskFollowupForm(
+        request.POST or request.GET or None, instance=followup
+    )
+    if request.method == "POST":
+        if form.is_valid():
+            followup = form.save()
+
+            return redirect(
+                reverse(
+                    "projects-project-detail-actions", args=[followup.task.project.id]
+                )
+                + f"#action-{followup.task.id}"
+            )
+    return render(request, "projects/task/task_followup_update.html", locals())
 
 
 def rsvp_followup_task(request, rsvp_id=None, status=None):
