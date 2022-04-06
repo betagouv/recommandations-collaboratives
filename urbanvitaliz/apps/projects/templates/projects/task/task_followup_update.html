@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'projects-project-detail' followup.task.project.id %}">{{ followup.task.project.name|title|truncatechars:20 }}</a>
+            </li>
+            <li class="breadcrumb-item active">{{ followup.task.intent|truncatechars:20 }}
+            </li>
+        </ol>
+    </nav>
+
+    <h1 class=" align-items-center">
+        <svg class="bi" width="40" height="40" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
+        </svg>
+        Mettre à jour un commentaire
+    </h1>
+
+    <section>
+
+	      <form id="form-task-followup-update"
+				          method="post"
+				          action="."
+				          class="form">
+
+		        {% csrf_token %}
+
+		        {{ form.as_p }}
+
+		        <button type="submit" class="btn btn-primary">
+			          Enregistrer
+		        </button>
+
+            {{ form.media }}
+	      </form>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+

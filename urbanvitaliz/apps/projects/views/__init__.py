@@ -90,6 +90,60 @@ def onboarding(request):
     return render(request, "projects/onboarding.html", locals())
 
 
+def create_project_prefilled(request):
+    """Create a new project for someone else"""
+    is_switchtender_or_403(request.user)
+
+    if request.method == "POST":
+        form = OnboardingForm(request.POST)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.emails.append(project.email)
+            project.ro_key = generate_ro_key()
+            postcode = form.cleaned_data.get("postcode")
+            project.commune = geomatics.Commune.get_by_postal_code(postcode)
+            project.save()
+            project.switchtenders.add(request.user)
+            project.save()
+
+            models.Note(
+                project=project,
+                content=f"# Demande initiale\n\n{project.impediments}",
+                public=True,
+            ).save()
+
+            user, _ = auth.User.objects.get_or_create(
+                username=project.email,
+                defaults={
+                    "email": project.email,
+                    "first_name": form.cleaned_data.get("first_name"),
+                    "last_name": form.cleaned_data.get("last_name"),
+                },
+            )
+
+            signals.project_submitted.send(
+                sender=models.Project, submitter=user, project=project
+            )
+
+            # NOTE check if commune is unique for code postal
+            if project.commune:
+                communes = geomatics.Commune.objects.filter(
+                    postal=project.commune.postal
+                )
+                if communes.count() > 1:
+                    url = reverse(
+                        "projects-onboarding-select-commune", args=[project.id]
+                    )
+                    return redirect(url)
+
+            return redirect("projects-project-detail-knowledge", project_id=project.id)
+
+    else:
+        form = OnboardingForm()
+
+    return render(request, "projects/project/create_prefilled.html", locals())
+
+
 @login_required
 def select_commune(request, project_id=None):
     """Intermediate screen to select proper insee number of commune"""

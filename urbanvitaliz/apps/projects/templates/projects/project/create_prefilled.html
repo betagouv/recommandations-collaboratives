@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %} | Solliciter l'équipe UrbanVitaliz{% endblock %}
+
+{% block og_title %} | Solliciter l'équipe UrbanVitaliz{% endblock %}
+
+
+{% block content %}
+
+<div class="col-11 col-lg-9 py-5 mx-auto">
+    <h2>
+        <svg class="bi me-2" width="32" height="32">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#megaphone"/>
+        </svg>
+        Pré-remplir un dossier
+    </h2>
+
+	  <form id="form-projects-onboarding"
+				  method="post"
+				  action="{% url 'projects-project-prefill' %}"
+          class="{% if form.errors %}was-validated{% endif %}"
+	  >
+
+        {% csrf_token %}
+
+        {{ form.errors }}
+
+        <div id="form-leader" class="mb-5 mt-5">
+
+            <h3 class="mb-3">
+                <svg class="bi me-2" width="28" height="28">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
+                </svg>
+                Pour qui remplissez-vous ce dossier ?
+            </h3>
+
+
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.name }}" placeholder="Camille" value="{{ form.first_name.value }}" required>
+                        <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+
+                        {% for error in form.first_name.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.name }}" placeholder="Dupont" value="{{ form.last_name.value }}" required>
+                        <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+
+                        {% for error in form.last_name.errors %}
+                        <div class="text-danger text-end">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" id="{{ form.email.id_for_label }}" name="{{ form.email.name }}" placeholder="nom@organisme.fr" value="{{ form.email.value|default:'' }}" required>
+                        <div class="form-text">Ce courriel ne sera jamais partagé en dehors de notre équipe.</div>
+                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                        {% for error in form.email.errors %}
+                        <div class="text-danger text-end">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="tel" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" id="{{ form.phone.id_for_label }}" name="{{ form.phone.name }}"  value="{{ form.phone.value }}" placeholder="" >
+                        <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                        <div class="form-text">Facultatif mais recommandé</div>
+                        {% for error in form.phone.errors %}
+                        <div class="text-danger text-end">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-floating">
+                <input type="text" class="form-control {% if form.org_name.errors %}is-invalid{% endif %}" id="{{ form.org_name.id_for_label }}" name="{{ form.org_name.name }}" placeholder="Mon organisatino" value="{{ form.org_name.value|default:'' }}" required>
+                <label for="{{ form.org_name.id_for_label }}">{{ form.org_name.label }}</label>
+
+                {% for error in form.org_name.errors %}
+                <div class="text-danger text-end">{{ error }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <div id="form-project" class="mb-3">
+
+            <h3 class="mb-3">
+                <svg class="bi me-2" width="28" height="28">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#cone-striped"/>
+                </svg>
+                De quelle friche parle-t-on ?
+            </h3>
+
+            <div class="form-floating mb-3">
+                <input type="text" id="{{ form.name.id_for_label }}" class="form-control {% if form.name.errors %}is-invalid{% endif %}" name="{{ form.name.name }}" maxlength="35" placeholder="Mon projet de friche" value="{{ form.name.value|default:'' }}" required>
+                <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+
+                {% for error in form.name.errors %}
+                <div class="text-danger text-end">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control {% if form.location.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.location.name }}" placeholder="Adresse" value="{{ form.location.value|default:'' }}" required>
+                        <label for="input-project-address">Adresse</label>
+                        <div id="input-email-help" class="form-text">Si la friche n'a pas d'adresse exacte, utilisez uniquement le nom de la commune.</div>
+
+                        {% for error in form.location.errors %}
+                        <div class="text-danger text-end">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+                <div class="col-3">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control {% if form.postcode.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.postcode.name }}" placeholder="Code Postal" value="{{ form.postcode.value|default:'' }}" required>
+                        <label for="input-project-address">{{ form.postcode.label }}</label>
+
+                        {% for error in form.postcode.errors %}
+                        <div class="text-danger text-end">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-floating mb-3">
+                <textarea maxlength="500" class="form-control {% if form.description.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-description" name="{{ form.description.name }}" placeholder="">{{ form.description.value|default:'' }}</textarea>
+                <label class="mb-2" for="input-project-description">Dites-nous quelques mots sur le contexte si vous le souhaitez...</label>
+                <div id="input-description-help" class="form-text">Limité à 500 caractères, vous pourrez nous en dire beaucoup plus par la suite !</div>
+
+                {% for error in form.description.errors %}
+                <div class="text-danger text-end">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <h3 class="mb-3 mt-5">
+                <svg class="bi me-2" width="28" height="28">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#life-preserver"/>
+                </svg>
+                Quelle est le besoin ?
+            </h3>
+
+            <div class="mb-3">
+                <!-- Impediments -->
+                <textarea class="form-control {% if form.impediments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-impediments" name="{{ form.impediments.name }}" value="{{ form.impediments.value|default:'' }}" placeholder="N'hésitez pas à préciser le besoin en quelques mots" required></textarea>
+                <label class="visually-hidden" for="input-project-impediments">{{ form.impediments.label }}</label>
+
+                {% for error in form.impediments.errors %}
+                <div class="text-danger text-end">{{ error }}</div>
+                {% endfor %}
+
+                <!-- Cartofriches -->
+                <div class="mt-2">
+                    <input class="form-check-input" type="checkbox" name="publish_to_cartofriches" id="input-project-publish-cartofriches" checked>
+                    <label for="input-project-publish-cartofriches">Je souhaite ajouter cette friche à la <a href="https://cartofriches.cerema.fr" target="_new">cartographie publique des friches</a> - ce qui me permet de faire connaître ce site à des porteurs de projet potentiels !</label>
+                </div>
+
+            </div>
+
+        </div>
+
+		    <button type="submit" class="btn btn-primary">
+            Ajouter cette friche et rejoindre l'équipe de suivi
+		    </button>
+	</form>
+
+</div>
+
+{% endblock %}
