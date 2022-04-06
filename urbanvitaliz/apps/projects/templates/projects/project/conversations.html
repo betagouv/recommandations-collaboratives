@@ -39,6 +39,11 @@
                                 <span class="align-middle small text-dark">
                                     {{ note.created_by.get_full_name|capfirst|default:note.created_by }}
                                 </span>
+                                {% if note.created_by == request.user %}
+                                <span class="align-middle small text-dark">
+                                    - <a href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                                </span>
+                                {% endif %}
                             </div>
                             {% endif %}
                         </div>
