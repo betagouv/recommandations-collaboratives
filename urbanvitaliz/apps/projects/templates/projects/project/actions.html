@@ -25,6 +25,8 @@
             </h2>
             {% endif %}
 
+            {% if can_administrate %}
+
             {% if project.tasks.open.count %}
 
             <div  id="task-list">
@@ -32,9 +34,8 @@
                 {% include 'projects/project/fragments/action_list_item.html' %}
 		            {% endfor %}
             </div>
+
             {% else %}
-            <!-- Empty -->
-            {% if is_switchtender %}
             <div class="bg-light p-4 rounded-2">
                 <h3 class="fw-light">Pas encore d'actions recommandées à la collectivité ?</h3>
                 {% if project.tasks.proposed.count == 0 %}
@@ -51,10 +52,22 @@
                 </p>
                 {% endif %}
             </div>
+            {% endif %}
+
+
             {% else %}
+            {% if project.tasks.published.open.count %}
+
+            <div  id="task-list">
+		            {% for task in project.tasks.published.open %}
+                {% include 'projects/project/fragments/action_list_item.html' %}
+		            {% endfor %}
+            </div>
+            {% else %}
+            <!-- Empty -->
             <div class="bg-light p-4 rounded-2">
                 <h3 class="fw-light">Vous n'avez pas d'actions en cours</h3>
-                {% if project.tasks.proposed.count == 0 %}
+
                 <p class="fst-italic fw-light">
                     Des actions vous seront proposées par notre équipe dès que possible.
                 </p>
@@ -62,16 +75,12 @@
                     Vous pouvez accélerer les recommandations <span class="fw-bolder">en complétant le questionnaire d'exploration</span>.
                 </p>
                 <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary">Compléter le questionnaire d'exploration</a>
-                {% else %}
-                <p class="fst-italic fw-light">
-                    Nos aiguilleuses vous <span class="fw-bolder">recommandent des actions</span>, n'hésitez pas à les consulter et vous les approprier ! Toutes les propositions d'actions se trouvent sur <strong>la colonne de droite</strong>.
-                </p>
-                {% endif %}
             </div>
             {% endif %}
             {% endif %}
 
 
+            {% if can_administrate %}
             {% if project.tasks.closed.count %}
 
             <h2 class="mt-5 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
@@ -85,6 +94,26 @@
                 {% include 'projects/project/fragments/action_list_item.html' with hide_details=True %}
 		            {% endfor %}
             </div>
+            {% endif %}
+
+            {% else %}
+
+            {% if project.tasks.published.closed.count %}
+
+            <h2 class="mt-5 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
+                <span class="align-middle">Actions terminées</span>
+                &nbsp;
+                <span class="align-middle badge rounded-pill bg-secondary">{{ project.tasks.published.closed.count }}</span>
+            </h2>
+
+            <div class="accordion" id="task-list">
+		            {% for task in project.tasks.published.closed %}
+                {% include 'projects/project/fragments/action_list_item.html' with hide_details=True %}
+		            {% endfor %}
+            </div>
+            {% endif %}
+
+
             {% endif %}
 
             {% if project.tasks.refused.count %}
