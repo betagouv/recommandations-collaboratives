@@ -536,3 +536,40 @@ def test_create_new_action_with_multiple_resources(client):
         assert task.public is True
 
     assert response.status_code == 302
+
+
+################################################################################
+# Task Followups
+################################################################################
+
+
+@pytest.mark.django_db
+def test_update_task_followup_not_available_for_non_creator(client):
+    followup = Recipe(models.TaskFollowup).make()
+    url = reverse("projects-task-followup-update", args=[followup.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_update_task_followup_accesible_by_creator(client):
+    with login(client) as user:
+        followup = Recipe(models.TaskFollowup, who=user, status=0).make()
+        url = reverse("projects-task-followup-update", args=[followup.id])
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_update_task_followup_by_creator(client):
+    data = {"comment": "hello"}
+
+    with login(client) as user:
+        followup = Recipe(models.TaskFollowup, status=0, who=user).make()
+        url = reverse("projects-task-followup-update", args=[followup.id])
+        response = client.post(url, data=data)
+
+    followup = models.TaskFollowup.objects.get(pk=followup.pk)
+    assert followup.comment == data["comment"]
+    assert response.status_code == 302

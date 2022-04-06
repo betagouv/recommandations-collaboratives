@@ -72,6 +72,14 @@ class TaskFollowupForm(forms.ModelForm):
         fields = ["comment"]
 
 
+class UpdateTaskFollowupForm(forms.ModelForm):
+    """Update a followup for a task"""
+
+    class Meta:
+        model = models.TaskFollowup
+        fields = ["comment"]
+
+
 class RsvpTaskFollowupForm(forms.Form):
     comment = forms.CharField(widget=forms.Textarea, required=False)
 
