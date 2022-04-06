@@ -206,4 +206,8 @@ TEAM_EMAILS = ["friches@beta.gouv.fr"]
 # SENDINBLUE
 SENDINBLUE_API_KEY = "NO-API-KEY-DEFINED"
 
+
+# IFrames
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 # eof
