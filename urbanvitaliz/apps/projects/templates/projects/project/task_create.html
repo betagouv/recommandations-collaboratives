@@ -107,9 +107,24 @@
 
                                 </div>
                                 <div class="card-body">
-                                    <a :href="resource.url" target="_new" class="btn btn-sm btn-secondary">
-                                        Ouvrir cette ressource
-                                    </a>
+                                    <!-- Full screen modal -->
+                                    <div class="modal fade" :id="`resource-preview-`+resource.id" tabindex="-1" :aria-labelledby="`resource-preview-`+resource.id" aria-hidden="true">
+                                        <div class="modal-dialog modal-fullscreen" >
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title"">Prévisualisation de la ressource</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <iframe class="w-100 h-100" :src="resource.url"></iframe>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+resource.id" class="btn btn-sm btn-secondary">
+                                        Prévisualiser cette fiche
+                                    </button>
                                 </div>
                             </div>
                         </li>
