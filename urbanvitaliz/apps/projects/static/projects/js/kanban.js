@@ -106,9 +106,7 @@ function kanban_app() {
                 }
             });
 
-            this.departments.sort(function(a, b) {
-                return b.name - a.name;
-            });
+            this.departments.sort((a, b) => a.name.localeCompare(b.name));
 
             this.isBusy = false;
 				},
