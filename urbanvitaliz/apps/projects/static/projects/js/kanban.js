@@ -32,7 +32,7 @@ function kanban_app() {
 
         filteredTasks() {
             if (this.selectedDepartment)
-                return this.tasks.filter(t => t.commune.department.code == this.selectedDepartment);
+                return this.tasks.filter(t => t.commune && (t.commune.department.code == this.selectedDepartment));
             else
                 return this.tasks
         },
@@ -67,8 +67,9 @@ function kanban_app() {
             tasksFromApi = await response.json(); //extract JSON from the http response
 
 						this.tasks = [];
+            this.departments = [];
 
-            tasksFromApi.forEach(t => {
+            tasksFromApi.forEach((t) => {
                 this.tasks.push(
 							   {
                     uuid: this.generateUUID(),
@@ -83,19 +84,18 @@ function kanban_app() {
                     commune: t.commune,
                     notifications: t.notifications
 							   });
-						});
 
-            /* Feed department list */
-            const response2 = await fetch('/api/departments/');
-            departmentsFromApi = await response2.json();
+                if (t.commune != null) {
+                    const dept = {
+                        code: t.commune.department.code,
+                        name: t.commune.department.name,
+                    };
 
-            this.departments = [];
-
-            departmentsFromApi.forEach(t => {
-                this.departments.push({
-                    code: t.code,
-                    name: t.name
-                });
+                    const index = this.departments.findIndex(obj => obj.code == dept.code);
+                    if (index == -1) {
+                        this.departments.push(dept);
+                    }
+                }
             });
 
             this.tasks.sort(function(a, b) {
