@@ -29,8 +29,11 @@ from urbanvitaliz.utils import CastedGenericRelation, check_if_switchtender
 from .utils import generate_ro_key
 
 
-class ProjectQuerySet(models.QuerySet):
-    """QuerySet for active projects"""
+class ProjectManager(models.Manager):
+    """Manager for projects"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
 
     def email(self, mail):
         """Return projects accessible to given email"""
@@ -89,7 +92,7 @@ class Project(models.Model):
         ("REJECTED", "Rejeté"),
     )
 
-    objects = ProjectQuerySet.as_manager()
+    objects = ProjectManager()
     objects_deleted = DeletedProjectManager()
 
     status = models.CharField(max_length=20, choices=PROJECT_STATES, default="DRAFT")
