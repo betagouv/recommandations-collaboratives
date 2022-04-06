@@ -16,6 +16,11 @@ from .views import detail, feeds, notes, sharing, tasks
 urlpatterns = [
     path(r"onboarding/", views.onboarding, name="projects-onboarding"),
     path(
+        r"projects/prefill/",
+        views.create_project_prefilled,
+        name="projects-project-prefill",
+    ),
+    path(
         r"onboarding/<int:project_id>/commune/",
         views.select_commune,
         name="projects-onboarding-select-commune",
