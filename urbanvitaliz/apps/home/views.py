@@ -20,6 +20,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from urbanvitaliz.apps.projects import models as projects
+from urbanvitaliz.apps.projects.utils import get_active_project
 from urbanvitaliz.utils import check_if_switchtender
 
 
@@ -32,6 +33,10 @@ class LoginRedirectView(View):
     def dispatch(self, request, *args, **kwargs):
         if check_if_switchtender(request.user):
             return redirect("projects-project-list")
+
+        project = get_active_project(request)
+        if project:
+            return redirect("projects-project-detail-actions", project.pk)
 
         return redirect("home")
 

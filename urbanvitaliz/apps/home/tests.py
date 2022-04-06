@@ -16,6 +16,7 @@ from django.db.utils import IntegrityError
 from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
+from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
 from . import utils
@@ -114,7 +115,20 @@ def test_logged_user_can_send_message_to_team(mocker, client):
 # Login routing based on user profile
 ########################################################################
 @pytest.mark.django_db
-def test_project_owner_is_sent_to_home_on_login(client):
+def test_project_owner_is_sent_to_action_page_on_login(client):
+    url = reverse("login-redirect")
+    with login(client) as user:
+        project = baker.make(
+            projects_models.Project, email=user.email, emails=[user.email]
+        )
+        response = client.get(url)
+    assert response.status_code == 302
+    project_action_url = reverse("projects-project-detail-actions", args=(project.pk,))
+    assertRedirects(response, project_action_url)
+
+
+@pytest.mark.django_db
+def test_logged_in_user_is_sent_to_home_on_login(client):
     url = reverse("login-redirect")
     with login(client):
         response = client.get(url)
