@@ -12,6 +12,7 @@ created : 2021-05-26 15:56:20 CEST
 import csv
 import datetime
 
+from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
@@ -22,7 +23,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
+from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.projects import digests
 from urbanvitaliz.utils import (build_absolute_url, is_staff_or_403,
                                 is_switchtender_or_403)
 
@@ -118,6 +121,23 @@ def create_project_prefilled(request):
                     "email": project.email,
                     "first_name": form.cleaned_data.get("first_name"),
                     "last_name": form.cleaned_data.get("last_name"),
+                },
+            )
+
+            messages.success(
+                request,
+                "Un courriel d'invitation à rejoindre le projet a été envoyé à {0}.".format(
+                    project.email
+                ),
+                extra_tags=["email"],
+            )
+
+            send_email(
+                template_name="sharing invitation",
+                recipients=[{"email": project.email}],
+                params={
+                    "sender": {"email": request.user.email},
+                    "project": digests.make_project_digest(project),
                 },
             )
 
