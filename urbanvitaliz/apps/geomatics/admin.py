@@ -15,4 +15,5 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(models.Commune)
 class CommuneAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ["name", "postal", "insee"]
+    list_display = ["name", "postal", "insee"]
