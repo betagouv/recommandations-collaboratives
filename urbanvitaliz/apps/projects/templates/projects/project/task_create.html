@@ -172,14 +172,14 @@
 
                         <template x-if="push_type == 'single'">
                             <div class="buttons d-flex flex-row justify-content-between">
-                                <button @click="set_draft(true)" class="btn btn-secondary" :disabled="!selected_resource">Brouillon</button>
-                                <button @click="set_draft(false)" type="submit" class="btn btn-primary" :disabled="!selected_resource">Envoyer</button>
+                                <button @click="set_draft(true)" class="btn btn-secondary" :disabled="!selected_resource">Enregistrer comme Brouillon</button>
+                                <button @click="set_draft(false)" type="submit" class="btn btn-primary" :disabled="!selected_resource">Publier</button>
                             </div>
                         </template>
                         <template x-if="push_type == 'noresource'">
                             <div class="buttons d-flex flex-row justify-content-between">
-                                <button @click="set_draft(true)" class="btn btn-secondary">Brouillon</button>
-                                <button @click="set_draft(false)" type="submit" class="btn btn-primary">Envoyer</button>
+                                <button @click="set_draft(true)" class="btn btn-secondary">Enregister comme Brouillon</button>
+                                <button @click="set_draft(false)" type="submit" class="btn btn-primary">Publier</button>
                             </div>
                         </template>
 
@@ -211,7 +211,7 @@
 
             <template x-if="push_type == 'multiple'">
                 <div>
-                    <button @click="set_draft(true)" class="btn btn-secondary" :disabled="!selected_resources.length">Brouillon</button>
+                    <button @click="set_draft(true)" class="btn btn-secondary" :disabled="!selected_resources.length">Enregistrer comme Brouillon</button>
                     <span class="ms-2" x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
                 </div>
             </template>
