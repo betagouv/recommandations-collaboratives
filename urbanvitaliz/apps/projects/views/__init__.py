@@ -298,8 +298,8 @@ def project_update(request, project_id=None):
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
             instance = form.save(commit=False)
-            postcode = form.cleaned_data.get("postcode")
-            project.commune = geomatics.Commune.get_by_postal_code(postcode)
+            # postcode = form.cleaned_data.get("postcode")
+            # project.commune = geomatics.Commune.get_by_postal_code(postcode)
             instance.updated_on = timezone.now()
             instance.save()
             form.save_m2m()
