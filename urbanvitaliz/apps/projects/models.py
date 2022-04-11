@@ -303,14 +303,14 @@ class TaskManager(models.Manager):
             .filter(deleted=None)
         )
 
-    #     def visited(self):
-    #         return self.filter(visited=True, refused=False)
-
     def unpublished_open(self):
-        return self.proposed() | self.filter(status=Task.INPROGRESS)
+        return self.unpublished_proposed() | self.filter(status=Task.INPROGRESS)
 
     def open(self):
         return self.proposed() | self.filter(status=Task.INPROGRESS, public=True)
+
+    def unpublished_proposed(self):
+        return self.filter(Q(status=Task.PROPOSED) | Q(status=Task.BLOCKED))
 
     def proposed(self):
         return self.filter(
