@@ -300,7 +300,8 @@ def test_update_task_not_available_for_non_staff_users(client):
 def test_update_task_available_for_switchtender(client):
     task = Recipe(models.Task).make()
     url = reverse("projects-update-task", args=[task.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        task.project.switchtenders.add(user)
         response = client.get(url)
     assert response.status_code == 200
     # FIXME rename add-task to edit-task ?
@@ -314,7 +315,8 @@ def test_update_task_for_project_and_redirect(client):
     url = reverse("projects-update-task", args=[task.id])
     data = {"content": "this is some content"}
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        task.project.switchtenders.add(user)
         response = client.post(url, data=data)
 
     task = models.Task.objects.get(id=task.id)

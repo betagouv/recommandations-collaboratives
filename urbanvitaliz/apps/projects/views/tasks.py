@@ -132,8 +132,9 @@ def already_done_task(request, task_id):
 @login_required
 def update_task(request, task_id=None):
     """Update an existing task for a project"""
-    is_switchtender_or_403(request.user)
     task = get_object_or_404(models.Task, pk=task_id)
+    can_manage_or_403(task.project, request.user)
+
     if request.method == "POST":
         form = UpdateTaskForm(request.POST, instance=task)
         if form.is_valid():
@@ -157,6 +158,7 @@ def update_task(request, task_id=None):
 
             return redirect(
                 reverse("projects-project-detail-actions", args=[task.project_id])
+                + f"#action-{task.id}"
             )
     else:
         form = UpdateTaskForm(instance=task)
@@ -482,7 +484,7 @@ def create_action(request, project_id=None):
                 )
 
             next_url = reverse("projects-project-detail-actions", args=[project.id])
-            return redirect(next_url)
+            return redirect(next_url + f"#action-{action.id}")
     else:
         form = PushTypeActionForm()
 

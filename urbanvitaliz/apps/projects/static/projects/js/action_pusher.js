@@ -62,11 +62,36 @@ function action_pusher_app() {
             this.intent = resource.title;
         },
 
-        async init_pusher() {
-            const params = new URLSearchParams(document.location.search);
+        async update_recommendation(task_id, intent, content, resource_id) {
+            this.intent = intent;
+            this.content = content;
+
+            if (resource_id)
+                this.push_type = 'single';
+            else
+                this.push_type = 'noresource';
+
             await this.getResources();
 
+            if (resource_id) {
+                this.results = _.where(this.resources, {'id': resource_id });
+
+                if (this.results.length) {
+                    this.selected_resource = resource_id;
+                    this.selected_resources = [resource_id];
+                    this.setIntent(this.results[0]);
+                }
+            }
+
+        },
+
+        async create_recommendation() {
+            await this.getResources();
+
+            const params = new URLSearchParams(document.location.search);
+
             const selected_resource = parseInt(params.get('resource'));
+
             if (selected_resource) {
                 this.results = _.where(this.resources, {'id': selected_resource });
                 if (this.results.length) {
@@ -74,9 +99,7 @@ function action_pusher_app() {
                     this.selected_resources = [selected_resource];
                     this.setIntent(this.results[0]);
                 }
-
             }
-
         },
 
 		    async getResources() {

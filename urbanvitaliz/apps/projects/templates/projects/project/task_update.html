@@ -1,27 +1,25 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load sass_tags %}
+
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'projects/css/push.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/minisearch@4.0.3/dist/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/underscore@1.13.2/underscore-umd-min.js"></script>
+<script src="{% static 'projects/js/action_pusher.js' %}"></script>
+
+{% endblock %}
 
 
 {% block content %}
 
 <div class="col-11 py-5 mx-auto">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
-                </svg>&nbsp;
-                <a href="{% url 'projects-project-list' %}">Projets</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{% url 'projects-project-detail' task.project.id %}">{{ task.project.name|title|truncatechars:20 }}</a>
-            </li>
-            <li class="breadcrumb-item active">{{ task.intent|truncatechars:20 }}
-            </li>
-        </ol>
-    </nav>
 
     <h1 class=" align-items-center">
         <svg class="bi" width="40" height="40" fill="currentColor">
@@ -32,21 +30,27 @@
 
     <section>
 
-	      <form id="form-projects-add-task"
+        <div x-data="action_pusher_app()" x-init="update_recommendation({{ task.pk }}, '{{ task.intent|escapejs }}', '{{ task.content|escapejs }}', {{ task.resource_id|default:'null' }})" x-cloak>
+
+	          <form id="form-projects-update-task"
 				          method="post"
 				          action="."
 				          class="form">
 
-		        {% csrf_token %}
+		            {% csrf_token %}
 
-		        {{ form.as_p }}
+                {% include 'projects/project/fragments/action_pusher/type.html' with disable_multi=True %}
 
-		        <button type="submit" class="btn btn-primary">
-			          Enregistrer
-		        </button>
+                {% include 'projects/project/fragments/action_pusher/resource_search.html' %}
 
-            {{ form.media }}
-	      </form>
+                {% include 'projects/project/fragments/action_pusher/details_form.html' with disable_draft=task.public %}
+
+                <input type="hidden" name="public" x-model="public">
+
+                {{ form.media }}
+	          </form>
+
+        </div>
 
         <hr/>
         <div class="d-flex justify-content-end">
