@@ -16,16 +16,25 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    check_if_switchtender,
+    is_staff_or_403,
+    is_switchtender_or_403,
+)
 
 from .. import models, signals
-from ..forms import (CreateActionsFromResourcesForm,
-                     CreateActionWithoutResourceForm,
-                     CreateActionWithResourceForm, PushTypeActionForm,
-                     RemindTaskForm, RsvpTaskFollowupForm, TaskFollowupForm,
-                     TaskRecommendationForm, UpdateTaskFollowupForm,
-                     UpdateTaskForm)
+from ..forms import (
+    CreateActionsFromResourcesForm,
+    CreateActionWithoutResourceForm,
+    CreateActionWithResourceForm,
+    PushTypeActionForm,
+    RemindTaskForm,
+    RsvpTaskFollowupForm,
+    TaskFollowupForm,
+    TaskRecommendationForm,
+    UpdateTaskFollowupForm,
+    UpdateTaskForm,
+)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -138,7 +147,7 @@ def update_task(request, task_id=None):
             )
 
             # If we are going public, notify
-            if task.public == False and instance.public == True:
+            if task.public is False and instance.public is True:
                 signals.action_created.send(
                     sender=update_task,
                     task=instance,

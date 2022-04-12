@@ -19,8 +19,7 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
@@ -339,7 +338,7 @@ def test_project_list_excludes_project_not_in_switchtender_departments(client):
 # Project details
 ########################################################################
 
-## Knowledge
+# Knowledge
 @pytest.mark.django_db
 def test_project_knowledge_not_available_for_non_switchtender(client):
     project = Recipe(models.Project).make()
@@ -379,7 +378,7 @@ def test_project_knowledge_available_for_restricted_switchtender(client):
     assert response.status_code == 200
 
 
-## actions
+# actions
 @pytest.mark.django_db
 def test_project_actions_not_available_for_non_switchtender(client):
     project = Recipe(models.Project).make()
@@ -419,7 +418,7 @@ def test_project_actions_available_for_restricted_switchtender(client):
     assert response.status_code == 200
 
 
-## conversations
+# conversations
 @pytest.mark.django_db
 def test_project_conversations_not_available_for_non_switchtender(client):
     project = Recipe(models.Project).make()
@@ -459,7 +458,7 @@ def test_project_conversations_available_for_restricted_switchtender(client):
     assert response.status_code == 200
 
 
-## internal
+# internal
 @pytest.mark.django_db
 def test_project_internal_followup_not_available_for_non_switchtender(client):
     project = Recipe(models.Project).make()
@@ -725,7 +724,7 @@ def test_general_notifications_are_consumed_on_project_knowledge(client):
 
 
 @pytest.mark.django_db
-def test_notifications_are_deleted_on_project_delete():
+def test_notifications_are_deleted_on_project_hard_delete():
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     recipient = Recipe(auth.User).make()
 
@@ -741,26 +740,6 @@ def test_notifications_are_deleted_on_project_delete():
 
     assert recipient.notifications.count() == 1
     project.delete()
-    assert recipient.notifications.count() == 0
-
-
-@pytest.mark.django_db
-def test_notifications_are_deleted_on_task_delete():
-    user = Recipe(auth.User).make()
-    recipient = Recipe(auth.User).make()
-
-    task = Recipe(models.Task).make()
-
-    notify.send(
-        sender=user,
-        recipient=recipient,
-        verb="a reçu une notif",
-        action_object=task,
-        target=task.project,
-    )
-
-    assert recipient.notifications.count() == 1
-    task.delete()
     assert recipient.notifications.count() == 0
 
 

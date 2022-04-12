@@ -11,7 +11,9 @@ created: 2021-06-01 10:11:56 CEST
 import pytest
 from django.contrib.auth import models as auth
 from django.urls import reverse
+from django.utils import timezone
 from model_bakery.recipe import Recipe
+from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
@@ -392,6 +394,52 @@ def test_task_update_does_not_trigger_notifications(client):
 
     assert response.status_code == 302
     assert owner.notifications.count() == 0
+
+
+@pytest.mark.django_db
+def test_notifications_are_deleted_on_task_soft_delete():
+    user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
+    recipient = Recipe(auth.User).make()
+
+    task = Recipe(models.Task).make()
+
+    notify.send(
+        sender=user,
+        recipient=recipient,
+        verb="a reçu une notif",
+        action_object=task,
+        target=task.project,
+    )
+
+    assert recipient.notifications.count() == 1
+    task.deleted = timezone.now()
+    task.save()
+    assert recipient.notifications.count() == 0
+
+
+@pytest.mark.django_db
+def test_notifications_are_deleted_on_task_hard_delete():
+    user = Recipe(auth.User).make()
+    recipient = Recipe(auth.User).make()
+
+    task = Recipe(models.Task).make()
+
+    notify.send(
+        sender=user,
+        recipient=recipient,
+        verb="a reçu une notif",
+        action_object=task,
+        target=task.project,
+    )
+
+    assert recipient.notifications.count() == 1
+    task.delete()
+    assert recipient.notifications.count() == 0
+
+
+################################################################
+# Create task
+################################################################
 
 
 @pytest.mark.django_db
