@@ -32,6 +32,7 @@ router.register(r"resources", resources_views.ResourceViewSet, basename="resourc
 router.register(
     r"departments", geomatics_rest.DepartmentViewSet, basename="departments"
 )
+router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
 
 
 urlpatterns = [

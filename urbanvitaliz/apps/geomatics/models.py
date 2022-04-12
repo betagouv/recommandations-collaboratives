@@ -75,5 +75,13 @@ class Commune(models.Model):
         except IndexError:
             return
 
+    @classmethod
+    def get_by_insee_code(cls, code):
+        """Return commune matching the given insee code or None"""
+        try:
+            return cls.objects.filter(insee=code).first()
+        except IndexError:
+            return
+
 
 # eof

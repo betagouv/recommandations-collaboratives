@@ -228,6 +228,7 @@ class OnboardingForm(forms.ModelForm):
     """Form for onboarding a new local authority"""
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
+    insee = forms.CharField(max_length=5, required=False, label="Code Insee")
 
     class Meta:
         model = models.Project
@@ -239,6 +240,7 @@ class OnboardingForm(forms.ModelForm):
             "org_name",
             "name",
             "location",
+            "insee",
             "description",
             "impediments",
             "publish_to_cartofriches",

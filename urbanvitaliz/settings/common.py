@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "actstream",
     "notifications",
     "rest_framework",
+    "django_filters",
     "csvexport",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
