@@ -51,8 +51,13 @@ def onboarding(request):
             project = form.save(commit=False)
             project.emails.append(project.email)
             project.ro_key = generate_ro_key()
-            postcode = form.cleaned_data.get("postcode")
-            project.commune = geomatics.Commune.get_by_postal_code(postcode)
+            insee = form.cleaned_data.get("insee", None)
+            if insee:
+                project.commune = geomatics.Commune.get_by_insee_code(insee)
+            else:
+                postcode = form.cleaned_data.get("postcode")
+                project.commune = geomatics.Commune.get_by_postal_code(postcode)
+
             project.save()
             models.Note(
                 project=project,
@@ -75,7 +80,7 @@ def onboarding(request):
             )
 
             # NOTE check if commune is unique for code postal
-            if project.commune:
+            if not insee and project.commune:
                 communes = geomatics.Commune.objects.filter(
                     postal=project.commune.postal
                 )
