@@ -25,7 +25,7 @@
             </h2>
             {% endif %}
 
-            {% if can_administrate %}
+            {% if can_administrate or is_regional_actor %}
 
             {% if project.tasks.unpublished_open.count %}
 
@@ -41,13 +41,18 @@
                 <p class="fst-italic fw-light">
                     Soyez la première personne à proposer des actions ou des ressources à la collectivité !
                 </p>
+
+                {% if can_administrate %}
                 <a href="{% url 'projects-project-create-action' project.id %}" class="btn btn-primary">Émettre une recommandation</a>
                 <a href="{% url 'projects-project-detail-knowledge' project.id %}" class="btn btn-secondary">Consulter les détails du projet</a>
 
-                {% if can_administrate %}
+
                 <p class="mt-3">
                     <span class="badge bg-warning">Beta feature</span> <a href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les actions suggérées automatiquement pour ce dossier</a>
                 </p>
+                {% else %}
+                <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-primary">Rejoindre ce dossier pour l'aiguiller</a>
+
                 {% endif %}
             </div>
             {% endif %}
