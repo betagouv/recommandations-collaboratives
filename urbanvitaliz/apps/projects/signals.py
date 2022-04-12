@@ -1,3 +1,5 @@
+import datetime
+
 import django.dispatch
 from actstream import action
 from actstream.models import action_object_stream
@@ -5,19 +7,17 @@ from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
+from django.utils import timezone
 from notifications import models as notifications_models
 from notifications.signals import notify
 from urbanvitaliz.apps.reminders import models as reminders_models
+from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -313,6 +313,42 @@ def notify_note_created(sender, note, project, user, **kwargs):
         recipient=recipients,
         verb="a créé une note de suivi",
         action_object=note,
+        target=project,
+        private=True,
+    )
+
+
+################################################################
+# Project Survey events
+################################################################
+@receiver(
+    survey_signals.survey_session_updated,
+    dispatch_uid="survey_answer_created_or_updated",
+)
+def log_survey_session_updated(sender, session, request, **kwargs):
+    project = session.project
+    user = request.user
+
+    # If we already sent this notification less a day ago, skip it
+    one_day_ago = timezone.now() - datetime.timedelta(days=1)
+    if session.action_object_actions.filter(
+        verb="a mis à jour le questionnaire", timestamp__gte=one_day_ago
+    ).count():
+        return
+
+    action.send(
+        user,
+        verb="a mis à jour le questionnaire",
+        action_object=session,
+        target=session.project,
+    )
+
+    recipients = get_switchtenders_for_project(project).exclude(id=user.id)
+    notify.send(
+        sender=user,
+        recipient=recipients,
+        verb="a mis à jour le questionnaire",
+        action_object=session,
         target=project,
         private=True,
     )

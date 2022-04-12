@@ -6,6 +6,8 @@ class SurveyConfig(AppConfig):
     name = "urbanvitaliz.apps.survey"
 
     def ready(self):
-        from actstream import registry
+        import urbanvitaliz.apps.survey.signals  # noqa
+        from actstream import registry  # noqa
 
         registry.register(self.get_model("Survey"))
+        registry.register(self.get_model("Session"))

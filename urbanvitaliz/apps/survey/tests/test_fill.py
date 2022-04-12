@@ -8,15 +8,15 @@ created: 2021-06-27 12:06:10 CEST
 """
 
 import pytest
+from django.contrib.auth import models as auth_models
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
+from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import login
 
-from urbanvitaliz.apps.projects import models as projects
 from .. import models
-
 
 ########################################################################
 # creating sessions
@@ -245,6 +245,52 @@ def test_question_redirects_to_next_question(client):
 
     assert response.status_code == 302
     assert response.url == reverse("survey-question-next", args=(session.id, q1.id))
+
+
+@pytest.mark.django_db
+def test_answered_question_triggers_notification(client):
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    Recipe(models.Question, question_set=qs).make()
+    choice = Recipe(models.Choice, question=q1, value="yep").make()
+    Recipe(models.Choice, question=q1, value="nope").make()
+
+    my_comment = "this is a comment"
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+
+    st = Recipe(auth_models.User).make()
+    with login(client, is_staff=False) as user:
+        session.project.switchtenders.add(st)
+        client.post(url, data={"answer": choice.value, "comment": my_comment})
+
+    assert user.notifications.unread().count() == 0
+    assert st.notifications.unread().count() == 1
+
+
+@pytest.mark.django_db
+def test_answered_question_debounces_notification(client):
+    session = Recipe(models.Session).make()
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    Recipe(models.Question, question_set=qs).make()
+    choice = Recipe(models.Choice, question=q1, value="yep").make()
+    Recipe(models.Choice, question=q1, value="nope").make()
+
+    my_comment = "this is a comment"
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+
+    st = Recipe(auth_models.User).make()
+
+    with login(client, is_staff=False) as user:
+        session.project.switchtenders.add(st)
+        client.post(url, data={"answer": choice.value, "comment": my_comment})
+        client.post(url, data={"answer": choice.value, "comment": my_comment})
+
+    assert user.notifications.unread().count() == 0
+    assert st.notifications.unread().count() == 1
 
 
 ########################################################################
