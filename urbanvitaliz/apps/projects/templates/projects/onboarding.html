@@ -15,6 +15,9 @@
          postal: null,
          cities: null,
          fetchCities() {
+             if (this.postal == "")
+                 return
+
              this.isLoading = true;
              fetch(`{% url 'communes-list' %}?postal=${this.postal}`)
                  .then(res => res.json())
