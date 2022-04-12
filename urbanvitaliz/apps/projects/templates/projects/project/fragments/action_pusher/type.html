@@ -5,7 +5,7 @@
         <div class="card p-2 ps-5 rounded me-2">
             <div class="card-body">
                 <label for="push-noresource">No Ressource</label>
-                <input type="radio" id="push-noresource" name="push_type" value="noresource" x-model="push_type">
+                <input type="radio" id="push-noresource" name="push_type" value="noresource" x-model="push_type" @click="intent = ''">
                 <h5>Proposer une recommandation sans ressource</h5>
                 <p class="mb-0">Vous devrez spécifier les détails de votre recommandation</p>
             </div>
