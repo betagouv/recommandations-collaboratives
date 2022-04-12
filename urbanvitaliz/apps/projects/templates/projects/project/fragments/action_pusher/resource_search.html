@@ -1,0 +1,69 @@
+{% load static %}
+
+<!-- resources -->
+<div id="resource-list" class="mb-4 grow" x-show="push_type != 'noresource'" x-transition:enter-start="grow-enter-start" x-transition:leave="grow-leave">
+    <h4 class="mb-3"><span class="text-muted me-1">2.</span>Sélectionnez les ressources à publier</h4>
+
+    <div class="search input-group-lg">
+        <svg class="bi me-1 text-muted" width="24" height="24" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
+        </svg>
+        <input class="w-100 fs-5 form-control" type="text" x-on:input.debounce="searchResources()" x-model="search" placeholder="Rechercher une ressource...">
+    </div>
+
+    <!-- listing -->
+    <p class="search-counter fs-6 mb-0" x-show="!search" x-text="`${db.documentCount} ressources au total`"></p>
+    <p class="search-counter fs-6 mb-0" x-show="search" x-text="`${results.length} ressource(s) trouvée(s)`"></p>
+    <ul x-show="results.length > 0" class="cards d-flex row row-cols-3 g-4 ps-0 ms-0 mt-1">
+        <template x-for="resource in resultsAndSelected()" :key="resource.id">
+            <li class="col">
+                <div class="resource-card card p-2 ps-5 rounded">
+                    <div class="card-body position-relative">
+                        <template x-if="push_type == 'single'">
+                            <input :id="'resource-' + resource.id" type="radio" name="resource" :value="resource.id" x-model="selected_resource" @click="setIntent(resource)">
+                        </template>
+
+                        <template x-if="push_type == 'multiple'">
+                            <input :id="'resource-' + resource.id" type="checkbox" name="resources" :value="resource.id" x-model="selected_resources">
+                        </template>
+                        <label :for="'resource-' + resource.id" x-text="resource.title"></label>
+                        <h5 x-text="resource.title"></h5>
+                        <p x-text="resource.subtitle" class="mb-0"></p>
+
+                    </div>
+                    <div class="card-body">
+                        <!-- Full screen modal -->
+                        <div class="modal fade" :id="`resource-preview-`+resource.id" tabindex="-1" :aria-labelledby="`resource-preview-`+resource.id" aria-hidden="true">
+                            <div class="modal-dialog modal-fullscreen" >
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"">Prévisualisation de la ressource</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <iframe class="w-100 h-100" :src="resource.url"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button @click.prevent data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+resource.id" class="btn btn-sm btn-secondary">
+                            Prévisualiser cette fiche
+                        </button>
+                    </div>
+                </div>
+            </li>
+        </template>
+    </ul>
+
+    <div x-show="results.length <= 0 && search != ''" class="p-3 w-100 text-center rounded bg-light">
+        <span class="fw-bolder">Aucune ressource correspondante</span>
+
+        <div x-show="suggestions.length">
+            Vous cherchez peut être : <template x-for="suggestion in suggestions">
+            <a href="#" @click.prevent="search = suggestion.suggestion; searchResources();" x-text="suggestion.suggestion"></a>&nbsp;
+            </template>
+
+        </div>
+    </div>
+</div>

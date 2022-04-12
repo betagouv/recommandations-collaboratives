@@ -1,0 +1,77 @@
+{% load static %}
+<!-- Action details -->
+<template x-if="push_type != 'multiple'">
+    <div class="message d-flex flex-row justify-content-between">
+        <div id="action-details" class="form flex-fill d-flex flex-column">
+
+            <h4><span class="text-muted me-1" x-text="push_type == 'noresource' ? '2.' : '3.'"></span>Décrivez votre recommandation</h4>
+
+            <div>
+                <label for="intent">Titre</label>
+                <div class="input-group mb-3">
+                    <input class="form-control" type="text" id="intent" name="intent" x-model="intent" required :readonly="push_type != 'noresource'">
+                    {% for error in form.intent.errors %}
+                    <div class="text-danger text-end">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="flex-fill d-flex flex-column">
+                <label for="message">Message</label>
+                <div class="input-group-lg mb-3 flex-fill d-flex">
+                    <textarea class="form-control flex-fill" id="content" name="content" x-model="content" required></textarea>
+                    {% for error in form.content.errors %}
+                    <div class="text-danger text-end">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <template x-if="push_type == 'single'">
+                <div class="buttons d-flex flex-row justify-content-between">
+                    {% if not disable_draft %}
+                    <button @click="set_draft(true)" class="btn btn-secondary" :disabled="!selected_resource">Enregistrer comme Brouillon</button>
+                    {% endif %}
+                    <button @click="set_draft(false)" type="submit" class="btn btn-primary" :disabled="!selected_resource">Publier</button>
+                </div>
+            </template>
+            <template x-if="push_type == 'noresource'">
+                <div class="buttons d-flex flex-row justify-content-between">
+                    {% if not disable_draft %}
+                    <button @click="set_draft(true)" class="btn btn-secondary">Enregister comme Brouillon</button>
+                    {% endif %}
+                    <button @click="set_draft(false)" type="submit" class="btn btn-primary">Publier</button>
+                </div>
+            </template>
+
+        </div>
+        <div class="help p-3 ms-3 w-50 bg-light rounded">
+            <h6>Comment écrire une recommandation</h6>
+            <img class="mt-3 img-fluid" src="{% static 'projects/img/push_example.png' %}" />
+            <ol class="mt-3">
+                <li>
+                    <strong>
+                        Donnez un titre actionnable à votre recommandation
+                    </strong>
+                    <p>
+                        Afin de faciliter la compréhension de votre interlocuteur, nous vous suggérons de donnez un titre à votre recommandation qui évoque une action à faire (de préférence avec un verbe) pour résoudre un problème concret.
+                    </p>
+                </li>
+                <li>
+                    <strong>
+                        Détaillez la marche à suivre pour mener à bien cette action
+                    </strong>
+                    <p>
+                        Après avoir rappelé les enjeux de la recommandation, donnez une description claire des différentes étapes de cette action, appuyées par des ressources externes et/ou des personnes à contacter pour progresser sur le sujet.
+                    </p>
+                </li>
+            </ol>
+        </div>
+    </div>
+</template>
+
+<template x-if="push_type == 'multiple'">
+    <div>
+        <button @click="set_draft(true)" class="btn btn-secondary" :disabled="!selected_resources.length">Enregistrer comme Brouillon</button>
+        <span class="ms-2" x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
+    </div>
+</template>

@@ -1,0 +1,34 @@
+<div class="mb-4">
+    <h4 class="mb-3"><span class="text-muted me-1">1.</span>Sélectionnez le type de recommandation</h4>
+
+    <div id="push-type-selector" class="d-flex flex-row">
+        <div class="card p-2 ps-5 rounded me-2">
+            <div class="card-body">
+                <label for="push-noresource">No Ressource</label>
+                <input type="radio" id="push-noresource" name="push_type" value="noresource" x-model="push_type">
+                <h5>Proposer une recommandation sans ressource</h5>
+                <p class="mb-0">Vous devrez spécifier les détails de votre recommandation</p>
+            </div>
+        </div>
+
+        <div class="card p-2 ps-5 rounded mx-2">
+            <div class="card-body">
+                <label for="push-single">Attacher une ressource existante</label>
+                <input type="radio" id="push-single" name="push_type" value="single" x-model="push_type">
+                <h5>Attacher une ressource existante</h5>
+                <p class="mb-0">Vous pourrez sélectionner la ressource que vous souhaitez attacher</p>
+            </div>
+        </div>
+
+        {% if not disable_multi %}
+        <div class="card p-2 ps-5 rounded ms-2">
+            <div class="card-body">
+                <label for="push-multiple">Multiple Ressources</label>
+                <input type="radio" id="push-multiple" name="push_type" value="multiple" x-model="push_type">
+                <h5>Proposer plusieurs ressources</h5>
+                <p class="mb-0">Vous devrez manuellement ajouter un message à votre brouillon avant de les publier</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
