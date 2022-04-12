@@ -149,20 +149,13 @@ class CreateTaskForm(forms.ModelForm):
 
     content = MarkdownxFormField(required=False)
 
-    notify_email = forms.BooleanField(initial=False, required=False)
-
     class Meta:
         model = models.Task
         fields = [
             "intent",
             "content",
-            "tags",
             "public",
-            "priority",
-            "deadline",
             "resource",
-            "contact",
-            "notify_email",
         ]
 
 
@@ -176,8 +169,8 @@ class UpdateTaskForm(forms.ModelForm):
         fields = [
             "intent",
             "content",
+            "resource",
             "public",
-            "priority",
         ]
 
 
