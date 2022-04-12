@@ -10,7 +10,8 @@ from notifications.signals import notify
 from urbanvitaliz.apps.reminders import models as reminders_models
 
 from . import models
-from .utils import (create_reminder, get_notification_recipients_for_project,
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
                     get_project_moderators, get_regional_actors_for_project,
                     get_switchtenders_for_project)
 
@@ -80,7 +81,10 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    recipients = get_regional_actors_for_project(project, allow_national=True)
+    recipients = (
+        get_regional_actors_for_project(project, allow_national=True)
+        | get_collaborators_for_project(project)
+    ).distinct()
 
     # Notify regional actors
     notify.send(
