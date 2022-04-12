@@ -37,7 +37,7 @@
         </svg>
         <a href="https://nominatim.openstreetmap.org/ui/search.html?q={{ project.location|urlencode }}" target="_new" >{{ project.location }}</a>
         {% if project.commune %}
-        ({{ project.commune.postal }}, {{ project.commune.department }} - {{ project.commune.department.region }})
+        ({{ project.commune.postal }}, {{ project.commune.department }} - {{ project.commune.department.region }} - INSEE: {{ project.commune.insee }})
         {% endif %}
         .
     </p>
