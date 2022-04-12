@@ -302,7 +302,7 @@ def test_update_task_available_for_switchtender(client):
         response = client.get(url)
     assert response.status_code == 200
     # FIXME rename add-task to edit-task ?
-    assertContains(response, 'form id="form-projects-add-task"')
+    assertContains(response, 'form id="form-projects-update-task"')
 
 
 @pytest.mark.django_db
