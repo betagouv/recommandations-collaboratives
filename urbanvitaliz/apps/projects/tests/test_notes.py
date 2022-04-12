@@ -12,7 +12,7 @@ import pytest
 from actstream.models import action_object_stream
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains
 from urbanvitaliz.utils import login
 
 from .. import models
@@ -20,6 +20,7 @@ from .. import models
 ########################################################################
 # notes
 ########################################################################
+
 
 # Public conversation
 @pytest.mark.django_db
@@ -136,7 +137,7 @@ def test_create_private_note_not_available_for_project_collaborator(client):
 @pytest.mark.django_db
 def test_private_note_hidden_from_project_members(client):
     user_email = "not@admin.here"
-    project = Recipe(models.Project, status="READY", emails=[user_email]).make()
+    Recipe(models.Project, status="READY", emails=[user_email]).make()
 
     note = Recipe(models.Note, content="short note", public=False).make()
 
