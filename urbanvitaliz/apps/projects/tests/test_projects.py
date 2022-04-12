@@ -19,7 +19,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
@@ -227,6 +228,52 @@ def test_proper_commune_selection_contains_all_possible_commmunes(client):
     for commune in expected:
         assert commune.name in page
     assert unexpected.name not in page
+
+
+#################################################################
+# Prefilled projects
+#################################################################
+def test_create_prefilled_project_is_not_reachable_without_login(client):
+    url = reverse("projects-project-prefill")
+    response = client.get(url)
+    assert response.status_code == 403
+
+
+def test_create_prefilled_project_is_not_reachable_with_simple_login(client):
+    with login(client):
+        response = client.get(reverse("projects-project-prefill"))
+
+    assert response.status_code == 403
+
+
+def test_create_prefilled_project_reachable_by_switchtenders(client):
+    with login(client, groups=["switchtender"]):
+        response = client.get(reverse("projects-project-prefill"))
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_create_prefilled_project_creates_a_new_project(client):
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "location": "some place",
+        "first_name": "john",
+        "last_name": "doe",
+        "impediment_kinds": ["Autre"],
+        "impediments": "some impediment",
+    }
+    with login(client, groups=["switchtender"]):
+        response = client.post(reverse("projects-project-prefill"), data=data)
+
+    project = models.Project.objects.all()[0]
+    assert project.name == "a project"
+    assert project.status == "TO_PROCESS"
+    assert len(project.ro_key) == 32
+    assert data["email"] in project.emails
+
+    assert response.status_code == 302
 
 
 ########################################################################
