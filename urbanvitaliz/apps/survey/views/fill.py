@@ -64,6 +64,13 @@ def survey_question_details(request, session_id, question_id):
         form = forms.AnswerForm(question, answer, request.POST, request.FILES)
         if form.is_valid():
             form.update_session(session)
+
+            signals.survey_session_updated.send(
+                sender=survey_question_details,
+                session=session,
+                request=request,
+            )
+
             return redirect(
                 "survey-question-next", session_id=session_id, question_id=question_id
             )
@@ -78,11 +85,9 @@ def survey_create_session_for_project(request, project_id):
     project = get_object_or_404(projects_models.Project, pk=project_id)
     survey = get_object_or_404(models.Survey, pk=1)  # XXX Hardcoded survey ID
 
-    session, created = models.Session.objects.get_or_create(
-        project=project, survey=survey
-    )
+    session, _ = models.Session.objects.get_or_create(project=project, survey=survey)
 
-    signals.survey_started.send(
+    signals.survey_session_started.send(
         sender=None, survey=survey, project=project, request=request
     )
 
