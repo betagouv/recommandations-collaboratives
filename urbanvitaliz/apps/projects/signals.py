@@ -10,10 +10,14 @@ from notifications.signals import notify
 from urbanvitaliz.apps.reminders import models as reminders_models
 
 from . import models
-from .utils import (create_reminder, get_collaborators_for_project,
-                    get_notification_recipients_for_project,
-                    get_project_moderators, get_regional_actors_for_project,
-                    get_switchtenders_for_project)
+from .utils import (
+    create_reminder,
+    get_collaborators_for_project,
+    get_notification_recipients_for_project,
+    get_project_moderators,
+    get_regional_actors_for_project,
+    get_switchtenders_for_project,
+)
 
 #####
 # Projects
@@ -261,12 +265,26 @@ def delete_notifications_on_project_delete(sender, instance, **kwargs):
     ).delete()
 
 
-@receiver(pre_delete, sender=models.Task, dispatch_uid="task_delete_notifications")
-def delete_notifications_on_task_delete(sender, instance, **kwargs):
-    task_ct = ContentType.objects.get_for_model(instance)
+def delete_task_history(task):
+    """Remove all logging history and notification is a task is deleted"""
+    task_ct = ContentType.objects.get_for_model(task)
     notifications_models.Notification.objects.filter(
-        action_object_content_type_id=task_ct.pk, action_object_object_id=instance.pk
+        action_object_content_type_id=task_ct.pk, action_object_object_id=task.pk
     ).delete()
+
+    action_object_stream(task).delete()
+
+
+@receiver(pre_save, sender=models.Task, dispatch_uid="task_soft_delete_notifications")
+def delete_notifications_on_soft_task_delete(sender, instance, **kwargs):
+    if not instance.deleted:
+        return
+    delete_task_history(instance)
+
+
+@receiver(pre_delete, sender=models.Task, dispatch_uid="task_hard_delete_notifications")
+def delete_notifications_on_hard_task_delete(sender, instance, **kwargs):
+    delete_task_history(instance)
 
 
 ######
