@@ -428,9 +428,14 @@ class NotificationFormatter:
     def format_action_commented(self, notification):
         """An action was commented by someone"""
         subject = self._represent_user(notification.actor)
-        complement = self._represent_recommendation(notification.action_object.task)
-        summary = f"{subject} a commenté la recommandation '{complement}'"
-        excerpt = self._represent_followup(notification.action_object)
+
+        if notification.action_object is None:
+            summary = f"{subject} a commenté une recommandation"
+            excerpt = ""
+        else:
+            complement = self._represent_recommendation(notification.action_object.task)
+            summary = f"{subject} a commenté la recommandation '{complement}'"
+            excerpt = self._represent_followup(notification.action_object)
 
         return FormattedNotification(summary=summary, excerpt=excerpt)
 
