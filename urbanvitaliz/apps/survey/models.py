@@ -1,7 +1,10 @@
 import math
 import statistics
+from datetime import datetime, timedelta
 
+from django.contrib.auth import models as auth_models
 from django.db import models
+from django.utils import timezone
 from markdownx.utils import markdownify
 from tagging.fields import TagField
 from tagging.models import Tag
@@ -358,6 +361,28 @@ class Answer(models.Model):
 
     class Meta:
         unique_together = (("session", "question"),)
+
+    created_on = models.DateTimeField(
+        default=timezone.now, verbose_name="Date de création"
+    )
+    updated_on = models.DateTimeField(
+        default=timezone.now, verbose_name="Dernière mise à jour"
+    )
+
+    @property
+    def updated_recently(self):
+        if self.updated_on:
+            return (timezone.now() - self.updated_on) < timedelta(days=4)
+
+        return False
+
+    updated_by = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.SET_NULL,
+        related_name="survey_answers",
+        blank=True,
+        null=True,
+    )
 
     session = models.ForeignKey(
         Session, related_name="answers", on_delete=models.CASCADE

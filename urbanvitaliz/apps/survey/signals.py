@@ -1,6 +1,5 @@
 import django.dispatch
 from actstream import action
-from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 survey_session_started = django.dispatch.Signal()

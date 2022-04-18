@@ -56,7 +56,7 @@ class AnswerForm(forms.Form):
             if "attachment" in self.fields:
                 self.fields["attachment"].initial = answer.attachment
 
-    def update_session(self, session: models.Session):
+    def update_session(self, session: models.Session, user=None):
         answer_values = self.cleaned_data.get("answer", "")
         comment = self.cleaned_data.get("comment", None)
         attachment = self.cleaned_data.get("attachment", None)
@@ -83,6 +83,7 @@ class AnswerForm(forms.Form):
                 "comment": comment,
                 "signals": signals,
                 "attachment": attachment,
+                "updated_by": user,
             },
         )
         if not created:
@@ -90,6 +91,7 @@ class AnswerForm(forms.Form):
             answer.comment = comment
             answer.signals = signals
             answer.attachment = attachment
+            answer.updated_by = user
             answer.save()
 
         answer.choices.set(choices)
