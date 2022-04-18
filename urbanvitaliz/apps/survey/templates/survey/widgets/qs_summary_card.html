@@ -1,6 +1,7 @@
 {% load survey %}
 {% load static %}
 {% load sass_tags %}
+{% load humanize %}
 
 {% block css %}
 <link href="{% sass_src 'survey/css/survey.scss' %}" rel="stylesheet" type="text/css">
@@ -57,12 +58,13 @@
                     {% for answer in answers %}
                     <li class="answer mb-2 mt-4 d-flex justify-content-between position-relative">
                         <div class="flex-grow-1">
+
                         {% lookup_choices_from_answer answer as choices %}
 
                         {% if show_question or not choices %}
                             <div>
                                 {% if can_manage %}
-                                <a class="text-decoration-none stretched-link link-edit" href="{% url 'survey-question-details' session.id answer.question.id %}">
+                                <a class="text-decoration-none stretched-link link-edit" href="{% url 'survey-question-details' session.id answer.question.id %}" >
                                     {% endif %}
                                     <h6 class="m-0 d-inline align-middle text-uppercase">{{ answer.question.text_short|default:answer.question.text }}</h6>
                                     {% if can_manage %}
@@ -127,12 +129,23 @@
                         </div>
                         {% if can_manage %}
                         <div class="flex-shrink-1 next-arrow">
+                            {% if can_administrate and answer.updated_recently %}
+                            <svg class="text-danger align-middle bi" width="14px" height="14px" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#asterisk"/>
+                            </svg>
+                            {% endif %}
+
                             <svg class="align-middle bi" width="26px" height="26px" fill="currentColor" style="color: {{ question_set.color|default:'black' }} !important;">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-right-short"/>
                             </svg>
                         </div>
                         {% endif %}
                     </li>
+                    {% if can_administrate and answer.updated_recently %}
+                    <li class="small bg-light-yellow p-1">
+                        <div display="">Mis à jour {{ answer.updated_on|naturalday }}{% if answer.updated_by %} par {{ answer.updated_by }}{% endif %}</div>
+                    </li>
+                    {% endif %}
                     {% endfor %}
                 </ul>
             </p>

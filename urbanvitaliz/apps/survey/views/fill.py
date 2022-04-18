@@ -63,7 +63,7 @@ def survey_question_details(request, session_id, question_id):
     if request.method == "POST":
         form = forms.AnswerForm(question, answer, request.POST, request.FILES)
         if form.is_valid():
-            form.update_session(session)
+            form.update_session(session, request.user)
 
             signals.survey_session_updated.send(
                 sender=survey_question_details,
