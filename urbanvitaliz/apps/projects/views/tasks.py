@@ -16,25 +16,16 @@ from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateActionsFromResourcesForm,
-    CreateActionWithoutResourceForm,
-    CreateActionWithResourceForm,
-    PushTypeActionForm,
-    RemindTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskFollowupForm,
-    UpdateTaskForm,
-)
+from ..forms import (CreateActionsFromResourcesForm,
+                     CreateActionWithoutResourceForm,
+                     CreateActionWithResourceForm, PushTypeActionForm,
+                     RemindTaskForm, RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskFollowupForm,
+                     UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -127,6 +118,45 @@ def already_done_task(request, task_id):
         )
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
+
+
+@login_required
+def sort_task(request, task_id, order):
+    """Update an existing task for a project"""
+    task = get_object_or_404(models.Task, pk=task_id)
+    can_manage_or_403(task.project, request.user)
+
+    closest = None
+    if order == "up":
+        closest = (
+            models.Task.objects.unpublished_open()
+            .exclude(id=task.id)
+            .filter(project__id=task.project.id, priority__gte=task.priority)
+            .order_by("priority")
+            .first()
+        )
+        if closest is not None:
+            task.priority = closest.priority + 1
+
+    elif order == "down":
+        closest = (
+            models.Task.objects.unpublished_open()
+            .exclude(id=task.id)
+            .filter(project__id=task.project.id, priority__lte=task.priority)
+            .order_by("-priority")
+            .first()
+        )
+        if closest is not None:
+            task.priority = max(closest.priority - 1, 0)
+    else:
+        return HttpResponseForbidden()
+
+    task.save()
+
+    return redirect(
+        reverse("projects-project-detail-actions", args=[task.project_id])
+        + f"#action-{task.id}"
+    )
 
 
 @login_required

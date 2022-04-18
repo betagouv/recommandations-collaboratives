@@ -377,7 +377,7 @@ class Task(models.Model):
     )
     public = models.BooleanField(default=False, blank=True)
     priority = models.PositiveIntegerField(
-        default=0,
+        default=1000,
         blank=True,
         verbose_name="Priorité",
         help_text=(

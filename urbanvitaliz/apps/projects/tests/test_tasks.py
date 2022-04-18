@@ -588,6 +588,68 @@ def test_create_new_action_with_multiple_resources(client):
     assert response.status_code == 302
 
 
+@pytest.mark.django_db
+def test_sort_action_up(client):
+    project = Recipe(models.Project).make()
+    taskA = Recipe(models.Task, project=project, priority=1000).make()
+    taskB = Recipe(models.Task, project=project, priority=1002).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+        client.post(reverse("projects-sort-task", args=[taskA.id, "up"]))
+
+    taskA = models.Task.objects.get(pk=taskA.id)
+    taskB = models.Task.objects.get(pk=taskB.id)
+
+    assert taskA.priority == 1003
+    assert taskB.priority == 1002
+
+
+@pytest.mark.django_db
+def test_sort_action_down(client):
+    project = Recipe(models.Project).make()
+    taskA = Recipe(models.Task, project=project, priority=1000).make()
+    taskB = Recipe(models.Task, project=project, priority=900).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+        client.post(reverse("projects-sort-task", args=[taskA.id, "down"]))
+
+    taskA = models.Task.objects.get(pk=taskA.id)
+    taskB = models.Task.objects.get(pk=taskB.id)
+
+    assert taskA.priority == 899
+    assert taskB.priority == 900
+
+
+@pytest.mark.django_db
+def test_sort_action_down_when_zero(client):
+    project = Recipe(models.Project).make()
+    taskA = Recipe(models.Task, project=project, priority=0).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+        client.post(reverse("projects-sort-task", args=[taskA.id, "down"]))
+
+    taskA = models.Task.objects.get(pk=taskA.id)
+
+    assert taskA.priority == 0
+
+
+@pytest.mark.django_db
+def test_sort_action_up_when_no_follower(client):
+    project = Recipe(models.Project).make()
+    taskA = Recipe(models.Task, project=project, priority=1000).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+        client.post(reverse("projects-sort-task", args=[taskA.id, "up"]))
+
+    taskA = models.Task.objects.get(pk=taskA.id)
+
+    assert taskA.priority == 1000
+
+
 ################################################################################
 # Task Followups
 ################################################################################

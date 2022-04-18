@@ -38,6 +38,7 @@
 
 <div id="action-{{ task.id }}" class="accordion border border-1 rounded-3 mb-4 position-relative {% if task.id in actions_with_notifications %}bg-light-yellow{% endif %}">
 
+    {{ task.priority }}
 
     {% if not task.visited and task.public  %}
     <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary" style="margin-left: 60px" >NOUVEAU</span>
@@ -164,6 +165,10 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                         <li><a class="dropdown-item" href="{% url 'projects-update-task' task.id %}">Éditer</a></li>
+                        <li><a class="dropdown-item" href="{% url 'projects-sort-task' task.id 'up' %}?action=up">Remonter</a></li>
+                        {% if task.priority > 0 %}
+                        <li><a class="dropdown-item" href="{% url 'projects-sort-task' task.id 'down' %}">Descendre</a></li>
+                        {% endif %}
                         <li>
                             <form method="POST" action="{% url 'projects-remind-task-delete' task.id %}">
                                 {% csrf_token %}

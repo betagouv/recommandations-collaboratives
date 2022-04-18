@@ -99,6 +99,11 @@ urlpatterns = [
         name="projects-update-task",
     ),
     path(
+        r"task/<int:task_id>/sort/<str:order>",
+        tasks.sort_task,
+        name="projects-sort-task",
+    ),
+    path(
         r"task/<int:task_id>/visit/",
         tasks.visit_task,
         name="projects-visit-task",
