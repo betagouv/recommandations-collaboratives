@@ -50,6 +50,8 @@ class UserProfile(models.Model):
         on_delete=models.SET_NULL,
     )
 
+    organization_position = models.CharField(null=True, blank=True, max_length=200)
+
     deleted = models.DateTimeField(null=True, blank=True)
 
     class Meta:
