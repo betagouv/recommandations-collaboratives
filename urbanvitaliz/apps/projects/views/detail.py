@@ -16,14 +16,10 @@ from urbanvitaliz.utils import check_if_switchtender
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm
-from ..utils import (
-    can_administrate_project,
-    can_manage_or_403,
-    can_manage_project,
-    get_notification_recipients_for_project,
-    is_regional_actor_for_project,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_project, can_manage_or_403,
+                     can_manage_project,
+                     get_notification_recipients_for_project,
+                     is_regional_actor_for_project, set_active_project_id)
 
 
 @login_required
@@ -69,6 +65,7 @@ def project_knowledge(request, project_id=None):
         | Q(verb="a été validé")
         | Q(verb="a validé le projet")
         | Q(verb="a soumis pour modération le projet"),
+        | Q(verb="a mis à jour le questionnaire"),
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
     )
