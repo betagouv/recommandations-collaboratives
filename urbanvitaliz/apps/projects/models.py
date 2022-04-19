@@ -455,7 +455,10 @@ class Task(models.Model):
         return "Task:{0}".format(self.intent or self.id)
 
     def get_absolute_url(self):
-        return reverse("projects-project-detail", args=[self.project.id]) + "#actions"
+        return (
+            reverse("projects-project-actions", args=[self.project.id])
+            + f"#action-{self.pk}"
+        )
 
 
 class TaskFollowupManager(models.Manager):

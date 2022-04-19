@@ -10,18 +10,15 @@ from django.dispatch import receiver
 from django.utils import timezone
 from notifications import models as notifications_models
 from notifications.signals import notify
+from urbanvitaliz.apps.reminders import api as reminders_api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -277,6 +274,8 @@ def delete_task_history(task):
     ).delete()
 
     action_object_stream(task).delete()
+
+    reminders_api.remove_reminder_email(task)
 
 
 @receiver(pre_save, sender=models.Task, dispatch_uid="task_soft_delete_notifications")
