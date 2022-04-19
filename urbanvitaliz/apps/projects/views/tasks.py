@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.apps.reminders import api
+from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
@@ -298,7 +299,7 @@ def delete_task(request, task_id=None):
     if request.method == "POST":
         task.deleted = timezone.now()
         task.save()
-        api.remove_reminder_email(task)
+
     next_url = reverse("projects-project-detail-actions", args=[task.project_id])
     return redirect(next_url)
 
@@ -361,6 +362,11 @@ def followup_task(request, task_id=None):
             followup.save()
             signals.action_commented.send(
                 sender=followup, task=task, project=task.project, user=request.user
+            )
+
+            # Create or reset 6 weeks reminder
+            create_reminder(
+                7 * 6, task, request.user, origin=reminders_models.Mail.UNKNOWN
             )
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
@@ -441,6 +447,14 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
                 signals.action_commented.send(
                     sender=followup, task=task, project=task.project, user=rsvp.user
                 )
+
+            # Reminder update
+            if task.status in [models.Task.INPROGRESS, models.Task.BLOCKED]:
+                create_reminder(
+                    7 * 6, task, request.user, origin=reminders_models.Mail.UNKNOWN
+                )
+            else:
+                api.remove_reminder_email(task)
 
             return render(request, "projects/task/rsvp_followup_thanks.html", locals())
     else:

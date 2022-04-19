@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.reminders import models
+from urbanvitaliz.apps.reminders.api import create_reminder_email
 
 
 class Command(BaseCommand):
@@ -42,6 +43,17 @@ class Command(BaseCommand):
                     fail_silently=False,
                 )
             reminder.mark_as_sent()
+
+            # Create a new reminder in 6 weeks
+            if reminder.template:
+                create_reminder_email(
+                    recipient=reminder.recipient,
+                    template_name=reminder.template.name,
+                    template_params=reminder.template_params,
+                    related=reminder.related,
+                    origin=models.Mail.UNKNOWN,
+                    delay=7 * 6,
+                )
 
 
 # eof
