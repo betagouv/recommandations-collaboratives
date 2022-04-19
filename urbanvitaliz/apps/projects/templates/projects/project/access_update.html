@@ -14,60 +14,107 @@
         <span class="align-middle">Options de partage</span>
     </h2>
 
-    <section class="mt-5 col-7">
-        <h3 class="fs-5">Lien public vers le projet</h3>
-        <p>Partagez ce lien pour donner accès en lecture seule à la page Connaissance du site et aux Actions recommandées.</p>
-        <div x-data="access_update_app('{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}')" class="input-group input-group-lg">
-            <input type="text" readonly class="form-control fst-italic" :value="url" x-ref="input" @focus="selectText()" />
-            <button class="btn btn-outline-primary" @click="clipboardCopy()" x-ref="button">
-                <svg class="bi align-baseline" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard" x-show="!isCopied" />
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-check" x-show="isCopied" />
-                </svg>
-            </button> 
-        </div>
-    </section>
 
-    <section class="mt-5 col-7">
-        <h3 class="fs-5">Ajouter des collaborateur·rice·s</h3>
-        <p>Ajoutez ici des personnes qui auront le droit de modifier, commenter et partager ce dossier.</p>
-        <form id="form-projects-access-add-user" action="." method="post">
-            <div class="input-group input-group-lg">
-                <input type="text"  name="email" required class="form-control" placeholder="Entrez l'adresse email de votre collaborateur·rice·s" />
-                <button class="btn btn-outline-primary" type="submit">
-                    Ajouter
-                </button>
+    <div class="row">
+        <section class="mt-5 col-7">
+            <div>
+                <h3 class="fs-5">Lien public vers le projet</h3>
+                <p>Partagez ce lien pour donner accès en lecture seule à la page Connaissance du site et aux Actions recommandées.</p>
+                <div x-data="access_update_app('{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}')" class="input-group input-group-lg">
+                    <input type="text" readonly class="form-control fst-italic" :value="url" x-ref="input" @focus="selectText()" />
+                    <button class="btn btn-outline-primary" @click="clipboardCopy()" x-ref="button">
+                        <svg class="bi align-baseline" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard" x-show="!isCopied" />
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-check" x-show="isCopied" />
+                        </svg>
+                    </button> 
+                </div>
+
             </div>
-            {% csrf_token %}
-            {{ form.media }}
-        </form>
-        <h5 class="mt-4 fs-6">{{ project.emails|length }} Collaborat{{ project.emails|length|pluralize:"eur,eurs" }}</h5>
-        <ul class="list-group">
-            {% for email in project.emails %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div class="align-middle">
-                    {{ email }}
-                    {% if email not in accepted_invites %}
-                    <em>- Invitation en attente</em>
+
+            <div>
+                <h5 class="mt-4 fs-6">{{ project.emails|length }} Collaborat{{ project.emails|length|pluralize:"eur,eurs" }}</h5>
+                <ul class="list-group">
+                    {% for email in project.emails %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="align-middle">
+                            {{ email }}
+                        </div>
+                        <div>
+                            {% if email != project.email %}
+                            <form id="form-projects-access-remove-user" action="{% url 'projects-access-delete' project.pk email %}" method="post">
+                                {% csrf_token %}
+                                <button class="btn btn-outline-danger btn-sm">Supprimer</button>
+                            </form>
+                            {% else %}
+                            <div class="fst-italic my-1">Usager principal</div>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div>
+                <h5 class="mt-4 fs-6">
                     <svg class="align-middle bi" width="14px" height="14px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hourglass-split"/>
                     </svg>
-                    {% endif %}
+
+                    <span>
+                        {{ pending_invites|length }} Invitation{{ project.emails|length|pluralize }}
+                    </span>
+                </h5>
+
+                <ul class="list-group">
+                    {% for invite in pending_invites %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="align-middle">
+                            {{ invite.email }} - <em>invité·e par {{ invite.inviter }}</em>
+                        </div>
+                        <div>
+                            <div class="fst-italic my-1">{{ invite.get_role_display }}</div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        <section class="mt-5 col-5 bg-light rounded p-3">
+            <h3 class="fs-5">Ajouter des collaborateur·rice·s</h3>
+            <p class="mb-4">Vous pouvez ajouter des collaborateur·rice·s sur le projet qui
+                pourrout accéder à toutes les fonctionnalités de gestion du site, ou
+                bien un·e intervenant·e externe qui pourra uniquement intéragir dans
+                les conversations.</p>
+            <form class="form" id="form-projects-access-add-user" action="." method="post">
+                <div class="mb-3">
+                    <label class="form-label fw-bolder" for="invite-email">Email de votre collaborateur·trice</label>
+                    <input id="invite-email" type="text" name="email" required class="form-control {% if form.email.errors %}is-invalid{% endif %}" placeholder="camille@region-hdf.fr" value="{{ form.email.value|default:'' }}"/>
                 </div>
-                <div>
-                    {% if email != project.email %}
-                    <form id="form-projects-access-remove-user" action="{% url 'projects-access-delete' project.pk email %}" method="post">
-                        {% csrf_token %}
-                        <button class="btn btn-outline-danger btn-sm">Supprimer</button>
-                    </form>
-                    {% else %}
-                    <div class="fst-italic my-1">Usager principal</div>
-                    {% endif %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-bolder" for="invite-role">Type d'invitation</label>
+                    <select name="role" class="form-select" id="invite-role" required>
+                        {% for role in form.role %}
+                        {{ role }}
+                        {% endfor %}
+                    </select>
                 </div>
-            </li>
-            {% endfor %}
-        </ul>
-    </section>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bolder" for="invite-message">Message d'invitation (optionnel)</label>
+                    <textarea id="invite-message" name="message" class="form-control {% if form.message.errors %}is-invalid{% endif %}" placeholder="J'aimerais vous inviter car...">{{ form.message.value|default:'' }}</textarea>
+                </div>
+
+                <button class="btn btn-primary" type="submit">
+                    Envoyer l'invitation
+                </button>
+
+                {% csrf_token %}
+                {{ form.media }}
+            </form>
+        </section>
+    </div>
 </div>
 {% endblock %}
 

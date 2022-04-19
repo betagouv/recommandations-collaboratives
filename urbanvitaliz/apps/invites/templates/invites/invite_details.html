@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+{% load static %}
+
+{% load sass_tags %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block title %}
+{{ site.name }} | Invitation à rejoindre le projet {{ invite.project.name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="col-10 py-5 mx-auto">
+
+    <span class="fs-4">Vous êtes invité·e sur le projet</span>
+    <h4 class="fw-bolder">{{ invite.project.name }}</h4>
+
+    <div class="mt-3">
+        <strong>{{ invite.inviter.get_full_name }}</strong> vous invite à contribuer
+        sur le projet <strong>{{ invite.project.name }}</strong> en tant
+        que <strong>{{ invite.get_role_display }}</strong>.
+    </div>
+
+    <div class="row">
+        <div class="col-7">
+            {% if not existing_account %}
+            <h5>Créez votre compte UrbanVitaliz</h5>
+            {% endif %}
+            <form class="form mt-2" action="{% url 'invites-invite-accept' invite.pk %}" method="POST">
+                {% csrf_token %}
+                {% if not existing_account %}
+                {{ form.as_p }}
+                {% endif %}
+                <button class="btn btn-primary" type="submit">Accepter l'invitation</button>
+            </form>
+        </div>
+        <div class="col-4">
+            {% if invite.message %}
+            <div class="bg-light p-3">
+                <h6 class="fw-bolder">Message de l'utilisateur</h6>
+                <p>{{ invite.message }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+
+
+</div>
+{% endblock %}

@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.survey",
     "urbanvitaliz.apps.reminders",
     "urbanvitaliz.apps.communication",
+    "urbanvitaliz.apps.invites",
 ]
 
 SITE_ID = 1

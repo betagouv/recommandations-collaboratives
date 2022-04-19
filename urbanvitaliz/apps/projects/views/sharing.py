@@ -13,19 +13,17 @@ from django.contrib.auth import models as auth_models
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from urbanvitaliz import utils
 from urbanvitaliz.apps.communication.api import send_email
+from urbanvitaliz.apps.invites import models as invites_models
+from urbanvitaliz.apps.invites.forms import InviteForm
 
 from .. import digests, models
 from ..utils import can_manage_or_403
 
-
 ########################################################################
 # Access
 ########################################################################
-class AccessAddForm(forms.Form):
-    """A form to add an Access"""
-
-    email = forms.EmailField()
 
 
 @login_required
@@ -35,19 +33,57 @@ def access_update(request, project_id):
 
     can_manage_or_403(project, request.user)
 
-    # Compute who has created an account yet
-    accepted_invites = []
-    for email in project.emails:
-        if auth_models.User.objects.filter(email=email).exists():
-            accepted_invites.append(email)
+    # Fetch pending invites
+    pending_invites = []
+    for invite in invites_models.Invite.objects.filter(
+        project=project, accepted_on=None
+    ):
+        pending_invites.append(invite)
 
     if request.method == "POST":
-        form = AccessAddForm(request.POST)
+        form = InviteForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data["email"]
+            role = form.cleaned_data["role"]
             if email not in project.emails:
-                project.emails.append(email)
-                project.save()
+                already_invited = False
+                try:
+                    already_invited = invites_models.Invite.objects.filter(
+                        project=project, email=email, role=role
+                    ).exists()
+                except invites_models.Invite.DoesNotExist:
+                    pass
+
+                # Already invited, skip
+                if already_invited:
+                    messages.warning(
+                        request,
+                        "Cet usager ({0}) a déjà été invité, aucun courrier n'a été envoyé.".format(
+                            email
+                        ),
+                    )
+                    return render(
+                        request, "projects/project/access_update.html", locals()
+                    )
+
+                # XXX Check if invite does not already exist
+                invite = form.save(commit=False)
+                invite.project = project
+                invite.inviter = request.user
+                invite.save()
+
+                send_email(
+                    template_name="sharing invitation",
+                    recipients=[{"email": email}],
+                    params={
+                        "sender": {"email": request.user.email},
+                        "invite_url": utils.build_absolute_url(
+                            invite.get_absolute_url()
+                        ),
+                        "project": digests.make_project_digest(project),
+                    },
+                )
+
                 messages.success(
                     request,
                     "Un courriel d'invitation à rejoindre le projet a été envoyé à {0}.".format(
@@ -56,18 +92,9 @@ def access_update(request, project_id):
                     extra_tags=["email"],
                 )
 
-                send_email(
-                    template_name="sharing invitation",
-                    recipients=[{"email": email}],
-                    params={
-                        "sender": {"email": request.user.email},
-                        "project": digests.make_project_digest(project),
-                    },
-                )
-
             return redirect(reverse("projects-access-update", args=[project_id]))
     else:
-        form = AccessAddForm()
+        form = InviteForm()
     return render(request, "projects/project/access_update.html", locals())
 
 
