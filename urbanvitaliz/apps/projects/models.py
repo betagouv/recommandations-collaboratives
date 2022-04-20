@@ -456,7 +456,7 @@ class Task(models.Model):
 
     def get_absolute_url(self):
         return (
-            reverse("projects-project-actions", args=[self.project.id])
+            reverse("projects-project-detail-actions", args=[self.project.id])
             + f"#action-{self.pk}"
         )
 
