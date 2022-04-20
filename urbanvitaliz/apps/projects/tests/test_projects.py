@@ -19,9 +19,11 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -847,17 +849,14 @@ def test_non_staff_cannot_add_email_to_project(client):
 def test_switchtender_can_add_email_to_project(client):
     project = Recipe(models.Project).make()
     url = reverse("projects-access-update", args=[project.id])
-    data = {"email": "test@example.com"}
+    data = {"email": "test@example.com", "role": "COLLABORATOR"}
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         client.post(url, data=data)
 
-    project = models.Project.objects.get(id=project.id)
-    assert data["email"] in project.emails
-
-    # detail_url = reverse("projects-project-detail", args=[project.id])
-    # assertRedirects(response, detail_url)
+    invite = invites_models.Invite.objects.first()
+    assert invite.email == data["email"]
 
 
 @pytest.mark.django_db
@@ -865,13 +864,13 @@ def test_owner_can_add_email_to_project_if_not_draft(client):
     email = "owner@example.com"
     project = Recipe(models.Project, email=email, status="READY").make()
     url = reverse("projects-access-update", args=[project.id])
-    data = {"email": "collaborator@example.com"}
+    data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
 
     with login(client, email=email, is_staff=False):
         client.post(url, data=data)
 
-    project = models.Project.objects.get(id=project.id)
-    assert data["email"] in project.emails
+    invite = invites_models.Invite.objects.first()
+    assert invite.email == data["email"]
 
 
 @pytest.mark.django_db

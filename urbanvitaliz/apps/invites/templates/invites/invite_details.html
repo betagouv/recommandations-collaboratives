@@ -31,12 +31,61 @@
             {% if not existing_account %}
             <h5>Créez votre compte UrbanVitaliz</h5>
             {% endif %}
-            <form class="form mt-2" action="{% url 'invites-invite-accept' invite.pk %}" method="POST">
+            <form class="form mt-4" action="{% url 'invites-invite-accept' invite.pk %}" method="POST">
                 {% csrf_token %}
                 {% if not existing_account %}
-                {{ form.as_p }}
+
+                <label class="form-label" for="email">Adresse courriel</label>
+                <input type="text" class="form-control" id="email" value="{{ invite.email }}" disabled>
+
+                <div class="row">
+                    <div class="col-6">
+                        <div class="my-3">
+                            <label class="form-label" for="input-first-name">Prénom</label>
+                            <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" id="input-first-name" name="{{ form.first_name.name }}" placeholder="Camille" value="{{ form.first_name.value|default:'' }}" required>
+
+                            {% for error in form.first_name.errors %}
+                            <div class="text-danger text-end">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="my-3">
+                            <label class="form-label" for="input-last-name">Nom</label>
+                            <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" id="input-last-name" name="{{ form.last_name.name }}" placeholder="Dupont" value="{{ form.last_name.value|default:'' }}" required>
+
+                            {% for error in form.last_name.errors %}
+                            <div class="text-danger text-end">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <div class="my-2">
+                            <label class="form-label" for="input-organization">Orgnization</label>
+                            <input type="text" class="form-control {% if form.organization.errors %}is-invalid{% endif %}" id="input-organization" name="{{ form.organization.name }}" placeholder="DEFR59" value="{{ form.organization.value|default:'' }}" required>
+
+                            {% for error in form.organization.errors %}
+                            <div class="text-danger text-end">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="my-2">
+                            <label class="form-label" for="input-position">Fonction</label>
+                            <input type="text" class="form-control {% if form.position.errors %}is-invalid{% endif %}" id="input-position" name="{{ form.position.name }}" placeholder="Chargée de mission" value="{{ form.position.value|default:'' }}" required>
+
+                            {% for error in form.position.errors %}
+                            <div class="text-danger text-end">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
                 {% endif %}
-                <button class="btn btn-primary" type="submit">Accepter l'invitation</button>
+                <button class="my-2 btn btn-primary" type="submit">Accepter l'invitation</button>
             </form>
         </div>
         <div class="col-4">
@@ -44,8 +93,17 @@
             <div class="bg-light p-3">
                 <h6 class="fw-bolder">Message de l'utilisateur</h6>
                 <p>{{ invite.message }}</p>
+                <p>-- {{ invite.inviter.get_full_name }}</p>
             </div>
             {% endif %}
+
+            <div class="bg-light p-3 my-2">
+                <h6 class="fw-bolder">Qu'est ce que UrbanVializ ?</h6>
+                <p>Un service numérique et gratuit qui aiguille les collectivités dans leur projet de réhabilitation de foncier à l’abandon.</p>
+
+                <p><a href="{% url 'home' %}">En savoir plus</a></p>
+            </div>
+
         </div>
     </div>
 
