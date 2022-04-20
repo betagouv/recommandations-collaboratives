@@ -56,13 +56,29 @@
             </div>
 
             <div>
+                <h5 class="mt-4 fs-6">{{ project.switchtenders.all|length }} Aiguilleur·se{{ project.switchtenders|length|pluralize:"·s" }}</h5>
+                <ul class="list-group">
+                    {% for switchtender in project.switchtenders.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="align-middle">
+                            {{ switchtender.get_full_name }}
+                        </div>
+                        <div>
+                            <div class="fst-italic my-1">Aiguilleur·se</div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div>
                 <h5 class="mt-4 fs-6">
                     <svg class="align-middle bi" width="14px" height="14px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hourglass-split"/>
                     </svg>
 
                     <span>
-                        {{ pending_invites|length }} Invitation{{ project.emails|length|pluralize }}
+                        {{ pending_invites|length }} Invitation{{ pending_invites|length|pluralize }}
                     </span>
                 </h5>
 
