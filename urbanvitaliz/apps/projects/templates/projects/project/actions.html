@@ -81,13 +81,7 @@
                                         <div :id="t.uuid" class="drag-targetable py-2 my-2" @dragover="onDragOver(event)" @drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)" >
                                             <div class="rounded bg-white shadow p-1 px-2 position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)" @dragend="onDragEnd(event)">
                                                 <h6 class="mt-1 mb-0 fw-bold" x-text="truncate(t.intent)"></h6>
-                                                <template x-if="t.resource">
-                                                    <a @click.prevent data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+t.resource.id" style="font-size: 0.8em">Consulter la ressource</a>
-                                                </template>
-
-                                                <template x-if="!t.resource">
-                                                    <a @click.prevent data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+t.resource.id" style="font-size: 0.8em">Consulter la ressource</a>
-                                                </template>
+                                                <a @click="onPreviewClick(event, t.uuid)" style="font-size: 0.8em">Consulter la ressource</a>
 
                                                 <template x-if="t.followups.length > 0" x-data="{ f: t.followups[0] }">
                                                     <div class="rounded bg-light p-2 my-2" style="font-size: 0.8em">
@@ -136,33 +130,41 @@
                                                         </ul>
                                                     </div>
                                                     {% endif %}
-
                                                 </div>
                                             </div>
                                         </div>  
-
-                                        <!-- Full screen modal -->
-                                        <div class="modal fade" :id="`resource-preview-`+t.resource.id" tabindex="-1" :aria-labelledby="`resource-preview-`+t.resource.id" aria-hidden="true">
-                                            <div class="modal-dialog modal-fullscreen" >
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title"">Prévisualisation de la ressource</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <iframe class="w-100 h-100" :src="t.resource.url"></iframe>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </template>
                             </div>
                         </div>
                     </div>
                 </template>
-            </div>
 
+                <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <template x-if="currentTask">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 :text="currentTask.intent"></h3>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="d-flex align-items-stretch h-100" style="min-height: 85vh;">
+                                        <div class="flex-fill">
+                                            <template x-if="currentTask.resource_id">
+                                                <iframe class="w-100 h-100" :src="resourcePreviewUrl(currentTask.resource_id)"></iframe>
+                                            </template>
+                                        </div>
+                                        <div class="w-25">
+                                            Hello.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- <div class="col-3 mx-auto position-sticky">
