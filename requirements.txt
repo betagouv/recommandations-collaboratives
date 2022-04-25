@@ -16,10 +16,11 @@ django-filter
 django-notifications-hq
 django-hijack==3.1.4
 django-sesame[ua]==2.4
+django-recaptcha==3.0.0
 sentry-sdk
 sib-api-v3-sdk
 # STATIC FILES
 django-sass-processor
 libsass
-django-compressor
+django-compressor==3.1
 multimethod==1.7
