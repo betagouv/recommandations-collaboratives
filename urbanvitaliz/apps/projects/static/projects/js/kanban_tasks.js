@@ -2,7 +2,7 @@ function boardTasksApp(projectId) {
     const testData = {
         id: 1,
         intent: "Ressource 2",
-        content: "Lorem Ipsum Dolor Sit Amet.",
+        content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eu ullamcorper tellus, eu iaculis dui. Integer malesuada mi sit amet feugiat finibus. Integer fringilla nunc in lorem interdum, at consectetur turpis mattis. Vestibulum sollicitudin convallis turpis non fermentum. Ut sit amet fermentum neque. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Maecenas quis nisl mi.",
 
         created_by: {
             email: "kalfane.rahman@gmail.com",
@@ -13,10 +13,10 @@ function boardTasksApp(projectId) {
 
         deadline: new Date(),
 
-        resource: {
-            id: 2,
-            url: `/ressource/2`
-        },
+        // resource: {
+        //     id: 2,
+        //     url: '/ressource/2'
+        // },
 
         public: true,
         status: 0,
@@ -72,9 +72,10 @@ function boardTasksApp(projectId) {
 
     const app = {
         boards: [
-            { status: 0, title: "Nouvelles recommandations", color_class: 'border-primary' },
-            { status: 1, title: "Recommandations en cours", color_class: 'border-secondary' },
-            { status: 2, title: "Recommandations en attente", color_class: 'border-warning' }
+            { status: 0, title: "Nouvelles ", color_class: 'border-primary' },
+            { status: 1, title: "En cours", color_class: 'border-secondary' },
+            { status: 2, title: "En attente", color_class: 'border-warning' },
+            { status: 3, title: "Archivées", color_class: 'border-error' }
         ]
     };
 

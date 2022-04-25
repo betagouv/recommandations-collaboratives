@@ -49,7 +49,7 @@
     {% include "projects/project/fragments/reminder_modal.html" %}
 
     <div class="row">
-        <div class="col-9">
+        <div class="col">
             {% if is_switchtender %}
             <h2 class="mt-1 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
                 <span class="align-middle">Actions proposées à la collectivité</span>
@@ -61,11 +61,11 @@
             {% endif %}
 
 
-            <div x-data="boardTasksApp({{ project.id }})" x-init="getData()" class="d-flex pb-2">
+            <div x-data="boardTasksApp({{ project.id }})" x-init="getData()" class="d-flex pb-2 align-items-stretch">
                 <template x-for="board in boards">
                     <div class="col px-2" style="min-height: 100px">
                         <div class="pb-4 rounded border-top border-4" :class="board.color_class">
-                            <div class="d-flex justify-content-between justify-items-center px-2 py-2 bg-light sticky top-0">
+                            <div class="d-flex justify-content-between justify-items-center px-2 py-2 bg-light sticky-top top-0">
                                 <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
                             </div>
 
@@ -82,6 +82,10 @@
                                             <div class="rounded bg-white shadow p-1 px-2 position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)" @dragend="onDragEnd(event)">
                                                 <h6 class="mt-1 mb-0 fw-bold" x-text="truncate(t.intent)"></h6>
                                                 <template x-if="t.resource">
+                                                    <a @click.prevent data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+t.resource.id" style="font-size: 0.8em">Consulter la ressource</a>
+                                                </template>
+
+                                                <template x-if="!t.resource">
                                                     <a @click.prevent data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+t.resource.id" style="font-size: 0.8em">Consulter la ressource</a>
                                                 </template>
 
@@ -161,7 +165,7 @@
 
         </div>
 
-        <div class="col-3 mx-auto position-sticky">
+        <!-- <div class="col-3 mx-auto position-sticky">
             <div class="mb-4">
                 {% include "projects/project/fragments/sidebar.html" %}
             </div>
@@ -176,7 +180,7 @@
 
             {% include "projects/project/fragments/switchtender-list.html" with switchtenders=project.switchtenders.all %}
             {% endif %}
-        </div>
+        </div> -->
 
     </div>
 </div>
