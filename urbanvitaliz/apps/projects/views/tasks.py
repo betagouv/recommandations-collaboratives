@@ -62,9 +62,7 @@ def toggle_done_task(request, task_id):
             task.status = models.Task.DONE
 
             # NOTE should we remove all the reminders?
-            api.remove_reminder_email(
-                task, recipient=request.user.email, origin=api.models.Mail.STAFF
-            )
+            api.remove_reminder_email(task)
             signals.action_done.send(
                 sender=toggle_done_task,
                 task=task,
@@ -111,9 +109,7 @@ def already_done_task(request, task_id):
     if request.method == "POST":
         task.status = models.Task.ALREADY_DONE
         task.save()
-        api.remove_reminder_email(
-            task, recipient=request.user.email, origin=api.models.Mail.STAFF
-        )
+        api.remove_reminder_email(task)
         signals.action_already_done.send(
             sender=already_done_task, task=task, project=task.project, user=request.user
         )
@@ -341,7 +337,7 @@ def remind_task_delete(request, task_id=None):
     recipient = task.project.email
 
     if request.method == "POST":
-        api.remove_reminder_email(task, recipient=recipient, origin=None)
+        api.remove_reminder_email(task)
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
 
