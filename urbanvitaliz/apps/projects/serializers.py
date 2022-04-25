@@ -2,8 +2,9 @@ from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 from urbanvitaliz.apps.geomatics.serializers import CommuneSerializer
+from urbanvitaliz.apps.reminders.serializers import MailSerializer
 
-from .models import Project
+from .models import Project, Task, TaskFollowup
 
 
 class SwitchtenderSerializer(serializers.HyperlinkedModelSerializer):
@@ -60,3 +61,34 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
                 actor_object_id__in=switchtenders
             ).exists(),
         }
+
+
+class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = TaskFollowup
+        fields = ["status", "status_txt", "comment", "who", "timestamp"]
+
+    who = SwitchtenderSerializer(read_only=True, many=False)
+
+
+class TaskSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "status",
+            "public",
+            "priority",
+            "created_on",
+            "updated_on",
+            "created_by",
+            "intent",
+            "content",
+            "followups",
+            "reminders",
+            "resource_id",
+        ]
+
+    created_by = SwitchtenderSerializer(read_only=True, many=False)
+    followups = TaskFollowupSerializer(read_only=True, many=True)
+    reminders = MailSerializer(read_only=True, many=True)
