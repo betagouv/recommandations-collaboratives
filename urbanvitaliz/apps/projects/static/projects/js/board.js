@@ -35,41 +35,27 @@ function configureBoardApp(app, options) {
         },
         onDragEnd(event) {
             event.target.classList.remove('drag-dragging');
-            document.querySelectorAll(".drag-target").forEach(e => e.classList.remove("drag-target"));
+            this.$nextTick(() => document.querySelectorAll(".drag-target").forEach(e => e.classList.remove("drag-target")));
         },
         onDragOver(event) {
             event.preventDefault();
             event.dropEffect = "move";
         },
         onDragEnter(event) {
-            if (this.dragCounter === 0) {
-                const target = event.target;
-                if (event.target.classList.contains('.drag-targetable')) {
-                    target.classList.add('drag-target');
-                } else {
-                    target.closest(".drag-targetable").classList.add("drag-target");
-                }
+            if (this.dragCounter <= 0) {
+                event.currentTarget.classList.add('drag-target');
             }
             this.dragCounter += 1;
         },
         onDragLeave(event) {
             this.dragCounter -= 1;
-
-            if (this.dragCounter === 0) {
-                const target = event.target;
-                if (event.target.classList.contains('.drag-targetable')) {
-                    target.classList.remove('drag-target');
-                } else {
-                    target.closest(".drag-targetable").classList.remove("drag-target");
-                }
+            if (this.dragCounter <= 0) {
+                event.currentTarget.classList.remove('drag-target');
             }
         },
         async onDrop(event, status, targetUuid) {
-            const uuid = event.dataTransfer.getData("text/plain");
-            event.target.classList.remove('drag-dragging');
             this.$nextTick(() => document.querySelectorAll(".drag-target").forEach(e => e.classList.remove("drag-target")));
-            this.dragCounter = 0;
-
+            const uuid = event.dataTransfer.getData("text/plain");
             event.dataTransfer.clearData();
 
             const data = this.data.find(d => d.uuid === uuid);
