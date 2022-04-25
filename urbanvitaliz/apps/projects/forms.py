@@ -7,6 +7,8 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-12-14 10:36:20 CEST
 """
 
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV3
 from django import forms
 from django.contrib.auth import models as auth_models
 from markdownx.fields import MarkdownxFormField
@@ -229,6 +231,7 @@ class OnboardingForm(forms.ModelForm):
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
     insee = forms.CharField(max_length=5, required=False, label="Code Insee")
+    captcha = ReCaptchaField(widget=ReCaptchaV3(api_params={"hl": "fr"}))
 
     class Meta:
         model = models.Project
@@ -244,6 +247,7 @@ class OnboardingForm(forms.ModelForm):
             "description",
             "impediments",
             "publish_to_cartofriches",
+            "captcha",
         ]
 
 

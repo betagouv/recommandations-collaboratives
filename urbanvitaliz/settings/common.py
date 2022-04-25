@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "csvexport",
+    "captcha",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",
@@ -211,5 +212,8 @@ SENDINBLUE_API_KEY = "NO-API-KEY-DEFINED"
 
 # IFrames
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# RECAPTCHA, V3
+RECAPTCHA_REQUIRED_SCORE = 0.85
 
 # eof
