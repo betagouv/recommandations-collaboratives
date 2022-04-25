@@ -17,7 +17,7 @@ from .serializers import CommuneSerializer, DepartmentSerializer
 ########################################################################
 # REST API
 ########################################################################
-class DepartmentViewSet(viewsets.ModelViewSet):
+class DepartmentViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows departments to be viewed or edited.
     """
@@ -26,10 +26,9 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         return models.Department.objects.all().order_by("name")
 
     serializer_class = DepartmentSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 
-class CommuneViewSet(viewsets.ModelViewSet):
+class CommuneViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows Commune to be viewed or edited.
     """
@@ -38,7 +37,6 @@ class CommuneViewSet(viewsets.ModelViewSet):
         return models.Commune.objects.all().order_by("name")
 
     serializer_class = CommuneSerializer
-    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["postal"]
 
