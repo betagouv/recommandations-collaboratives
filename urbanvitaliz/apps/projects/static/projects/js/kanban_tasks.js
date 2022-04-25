@@ -13,10 +13,7 @@ function boardTasksApp(projectId) {
 
         deadline: new Date(),
 
-        // resource: {
-        //     id: 2,
-        //     url: '/ressource/2'
-        // },
+        resource_id: 2,
 
         public: true,
         status: 0,
@@ -76,8 +73,23 @@ function boardTasksApp(projectId) {
             { status: 1, title: "En cours", color_class: 'border-secondary' },
             { status: 2, title: "En attente", color_class: 'border-warning' },
             { status: 3, title: "Archivées", color_class: 'border-error' }
-        ]
+        ],
+        getTask(uuid) {
+            const datum = this.data.find(d => d.uuid === uuid);
+            return this.data.find(d => d.uuid === uuid);
+        },
+        currentTask: null,
+        modalHandle: new bootstrap.Modal(document.getElementById("task-preview")),
+        onPreviewClick(event, uuid) {
+            this.currentTask = this.getTask(uuid);
+            console.log(this.currentTask);
+            this.$nextTick(() => this.modalHandle.show());
+        }
     };
 
     return configureBoardApp(app, options);
+}
+
+function resourcePreviewUrl(id) {
+    return `/ressource/${id}`;
 }
