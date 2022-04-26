@@ -10,6 +10,7 @@ created : 2021-12-14 10:36:20 CEST
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV3
 from django import forms
+from django.conf import settings
 from django.contrib.auth import models as auth_models
 from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.resources import models as resources_models
@@ -228,6 +229,11 @@ class ProjectForm(forms.ModelForm):
 
 class OnboardingForm(forms.ModelForm):
     """Form for onboarding a new local authority"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if getattr(settings, "RECAPTCHA_REQUIRED_SCORE", 1.0) == 0:
+            self.fields.pop("captcha")
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
     insee = forms.CharField(max_length=5, required=False, label="Code Insee")
