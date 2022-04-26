@@ -166,6 +166,7 @@ def test_performing_onboarding_discard_unknown_postal_code(client):
                 "impediments": "some impediment",
             },
         )
+
     assert response.status_code == 302
     project = models.Project.objects.all()[0]
     assert project.commune is None
@@ -189,8 +190,9 @@ def test_performing_onboarding_allow_select_on_multiple_communes(client):
                 "impediments": "some impediment",
             },
         )
-    project = models.Project.fetch()[0]
+
     assert response.status_code == 302
+    project = models.Project.fetch()[0]
     url = reverse("projects-onboarding-select-commune", args=[project.id])
     assert response.url == (url)
 
@@ -260,6 +262,7 @@ def test_create_prefilled_project_creates_a_new_project(client):
         "name": "a project",
         "email": "a@example.com",
         "location": "some place",
+        "postal": "59000",
         "first_name": "john",
         "last_name": "doe",
         "impediment_kinds": ["Autre"],
