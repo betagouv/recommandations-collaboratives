@@ -73,12 +73,18 @@ def log_project_validated(sender, moderator, project, **kwargs):
 
 @receiver(project_switchtender_joined)
 def log_project_switchtender_joined(sender, project, **kwargs):
-    action.send(
-        sender,
-        verb="est devenu·e aiguilleur·se sur le projet",
-        action_object=project,
-        target=project,
-    )
+    recipients = (
+        get_regional_actors_for_project(project, allow_national=True)
+        | get_collaborators_for_project(project)
+    ).distinct()
+
+    for recipient in recipients:
+        action.send(
+            recipient,
+            verb="est devenu·e aiguilleur·se sur le projet",
+            action_object=project,
+            target=project,
+        )
 
 
 @receiver(project_switchtender_joined)
@@ -133,6 +139,18 @@ action_undone = django.dispatch.Signal()
 action_commented = django.dispatch.Signal()
 
 # TODO refactor arguements as project is know to task -> f(sender, task , user, **kwargs)
+
+
+@receiver(action_created)
+def log_action_created(sender, task, project, user, **kwargs):
+    if task.public is False:
+        return
+
+    recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
+    for recipient in recipients:
+        action.send(
+            recipient, verb="a recommandé l'action", action_object=task, target=project
+        )
 
 
 @receiver(action_created)
@@ -221,7 +239,15 @@ def log_action_undone(sender, task, project, user, **kwargs):
 
 @receiver(action_commented)
 def log_action_commented(sender, task, project, user, **kwargs):
-    action.send(user, verb="a commenté l'action", action_object=task, target=project)
+    if project.status == "DRAFT" or project.muted:
+        return
+
+    recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
+
+    for recipient in recipients:
+        action.send(
+            recipient, verb="a commenté l'action", action_object=task, target=project
+        )
 
 
 @receiver(action_commented)
@@ -245,7 +271,7 @@ def notify_action_commented(sender, task, project, user, **kwargs):
 @receiver(pre_delete, sender=models.Note, dispatch_uid="note_hard_delete_logs")
 @receiver(pre_save, sender=models.Note, dispatch_uid="note_soft_delete_logs")
 def delete_activity_on_note_delete(sender, instance, **kwargs):
-    if not instance.deleted:
+    if instance.deleted is False:
         return
 
     project_ct = ContentType.objects.get_for_model(instance)
@@ -280,7 +306,7 @@ def delete_task_history(task):
 
 @receiver(pre_save, sender=models.Task, dispatch_uid="task_soft_delete_notifications")
 def delete_notifications_on_soft_task_delete(sender, instance, **kwargs):
-    if not instance.deleted:
+    if instance.deleted is False:
         return
     delete_task_history(instance)
 

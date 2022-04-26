@@ -381,11 +381,13 @@ def test_create_new_task_for_project_notify_collaborators(mocker, client):
 
 
 @pytest.mark.django_db
-def test_task_update_does_not_trigger_notifications(client):
+def test_public_task_update_does_not_trigger_notifications(client):
     owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
     project = Recipe(models.Project, status="READY", emails=[owner.email]).make()
 
-    task = Recipe(models.Task, project=project, public=True).make()
+    task = Recipe(
+        models.Task, project=project, status=models.Task.PROPOSED, public=True
+    ).make()
 
     url = reverse("projects-update-task", args=(task.pk,))
 
@@ -396,6 +398,28 @@ def test_task_update_does_not_trigger_notifications(client):
 
     assert response.status_code == 302
     assert owner.notifications.count() == 0
+
+
+@pytest.mark.django_db
+def test_draft_task_update_triggers_notifications(client):
+    owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
+    project = Recipe(
+        models.Project, status="READY", email=owner.email, emails=[owner.email]
+    ).make()
+
+    task = Recipe(
+        models.Task, status=models.Task.PROPOSED, project=project, public=False
+    ).make()
+
+    url = reverse("projects-update-task", args=(task.pk,))
+
+    data = {"content": "new-text", "public": True}
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+    assert owner.notifications.count() == 1
 
 
 @pytest.mark.django_db
