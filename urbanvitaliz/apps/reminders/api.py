@@ -37,7 +37,10 @@ def create_reminder_email(
         content_type=content_type, object_id=related.id, recipient=recipient
     ).delete()
 
-    template = communication_models.EmailTemplate.objects.get(name=template_name)
+    try:
+        template = communication_models.EmailTemplate.objects.get(name=template_name)
+    except communication_models.EmailTemplate.DoesNotExist:
+        return False
 
     deadline = datetime.date.today() + datetime.timedelta(days=delay)
 

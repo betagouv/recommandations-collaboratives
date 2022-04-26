@@ -162,6 +162,8 @@ def update_task(request, task_id=None):
     task = get_object_or_404(models.Task, pk=task_id)
     can_manage_or_403(task.project, request.user)
 
+    was_public = task.public
+
     if request.method == "POST":
         form = UpdateTaskForm(request.POST, instance=task)
         if form.is_valid():
@@ -175,7 +177,7 @@ def update_task(request, task_id=None):
             )
 
             # If we are going public, notify
-            if task.public is False and instance.public is True:
+            if was_public is False and instance.public is True:
                 signals.action_created.send(
                     sender=update_task,
                     task=instance,
