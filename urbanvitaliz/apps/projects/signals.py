@@ -80,7 +80,7 @@ def log_project_switchtender_joined(sender, project, **kwargs):
 
     for recipient in recipients:
         action.send(
-            recipient,
+            sender,
             verb="est devenu·e aiguilleur·se sur le projet",
             action_object=project,
             target=project,
@@ -149,7 +149,7 @@ def log_action_created(sender, task, project, user, **kwargs):
     recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
     for recipient in recipients:
         action.send(
-            recipient, verb="a recommandé l'action", action_object=task, target=project
+            user, verb="a recommandé l'action", action_object=task, target=project
         )
 
 
@@ -246,7 +246,7 @@ def log_action_commented(sender, task, project, user, **kwargs):
 
     for recipient in recipients:
         action.send(
-            recipient, verb="a commenté l'action", action_object=task, target=project
+            user, verb="a commenté l'action", action_object=task, target=project
         )
 
 
