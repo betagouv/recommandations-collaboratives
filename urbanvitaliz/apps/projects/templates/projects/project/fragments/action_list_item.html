@@ -167,17 +167,21 @@
                         {% if task.priority > 0 %}
                         <li><a class="dropdown-item" href="{% url 'projects-sort-task' task.id 'down' %}">Descendre</a></li>
                         {% endif %}
+
+                        {% if task.public %}
                         <li>
                             <form method="POST" action="{% url 'projects-remind-task-delete' task.id %}">
                                 {% csrf_token %}
                                 <button class="dropdown-item">Supprimer le rappel</button>
                             </form>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
 
                 {% endif %}
 
+                {% if task.public %}
                 {% if not hide_details and can_manage %}
                 <span class="align-middle p-1">
                     <svg class="align-middle bi" width="14px" height="14px" fill="currentColor">
@@ -207,6 +211,7 @@
                         {% endif %}
                     </a>
                 </span>
+                {% endif %}
                 {% endif %}
 
             </div>
