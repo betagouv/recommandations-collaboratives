@@ -146,11 +146,7 @@ def log_action_created(sender, task, project, user, **kwargs):
     if task.public is False:
         return
 
-    recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
-    for recipient in recipients:
-        action.send(
-            user, verb="a recommandé l'action", action_object=task, target=project
-        )
+    action.send(user, verb="a recommandé l'action", action_object=task, target=project)
 
 
 @receiver(action_created)
@@ -242,12 +238,7 @@ def log_action_commented(sender, task, project, user, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
-
-    for recipient in recipients:
-        action.send(
-            user, verb="a commenté l'action", action_object=task, target=project
-        )
+    action.send(user, verb="a commenté l'action", action_object=task, target=project)
 
 
 @receiver(action_commented)
