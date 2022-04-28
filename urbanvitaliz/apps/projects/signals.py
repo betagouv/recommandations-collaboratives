@@ -73,18 +73,12 @@ def log_project_validated(sender, moderator, project, **kwargs):
 
 @receiver(project_switchtender_joined)
 def log_project_switchtender_joined(sender, project, **kwargs):
-    recipients = (
-        get_regional_actors_for_project(project, allow_national=True)
-        | get_collaborators_for_project(project)
-    ).distinct()
-
-    for recipient in recipients:
-        action.send(
-            sender,
-            verb="est devenu·e aiguilleur·se sur le projet",
-            action_object=project,
-            target=project,
-        )
+    action.send(
+        sender,
+        verb="est devenu·e aiguilleur·se sur le projet",
+        action_object=project,
+        target=project,
+    )
 
 
 @receiver(project_switchtender_joined)
@@ -93,9 +87,13 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
         return
 
     recipients = (
-        get_regional_actors_for_project(project, allow_national=True)
-        | get_collaborators_for_project(project)
-    ).distinct()
+        (
+            get_regional_actors_for_project(project, allow_national=True)
+            | get_collaborators_for_project(project)
+        )
+        .exclude(id=sender.id)
+        .distinct()
+    )
 
     # Notify regional actors
     notify.send(
