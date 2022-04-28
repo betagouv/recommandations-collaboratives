@@ -150,7 +150,9 @@ def test_send_digests_for_switchtender_by_user(client):
     # Generate a notification
     signals.project_switchtender_joined.send(sender=regional_actor, project=project)
 
-    assert regional_actor.notifications.unsent().count() == 1
+    assert (
+        regional_actor.notifications.unsent().count() == 0
+    )  # shouldn't get her own action notified
     assert regional_actor2.notifications.unsent().count() == 1
     assert non_regional_actor.notifications.unsent().count() == 0
     assert user.notifications.unsent().count() == 1
