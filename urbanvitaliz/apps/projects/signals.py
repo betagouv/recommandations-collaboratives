@@ -260,7 +260,7 @@ def notify_action_commented(sender, task, project, user, **kwargs):
 @receiver(pre_delete, sender=models.Note, dispatch_uid="note_hard_delete_logs")
 @receiver(pre_save, sender=models.Note, dispatch_uid="note_soft_delete_logs")
 def delete_activity_on_note_delete(sender, instance, **kwargs):
-    if instance.deleted is False:
+    if instance.deleted is None:
         return
 
     project_ct = ContentType.objects.get_for_model(instance)
@@ -295,7 +295,7 @@ def delete_task_history(task):
 
 @receiver(pre_save, sender=models.Task, dispatch_uid="task_soft_delete_notifications")
 def delete_notifications_on_soft_task_delete(sender, instance, **kwargs):
-    if instance.deleted is False:
+    if instance.deleted is None:
         return
     delete_task_history(instance)
 
