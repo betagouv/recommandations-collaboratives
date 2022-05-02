@@ -117,6 +117,17 @@ def log_project_switchtender_leaved(sender, project, **kwargs):
     )
 
 
+@receiver(project_switchtender_leaved)
+def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
+    project_ct = ContentType.objects.get_for_model(project)
+    notifications_models.Notification.objects.filter(
+        target_content_type=project_ct.pk,
+        target_object_id=project.pk,
+        verb="est devenu·e aiguilleur·se sur le projet",
+        timestamp__gte=timezone.now() - datetime.timedelta(hours=12),
+    ).delete()
+
+
 #####
 # Reminders
 #####

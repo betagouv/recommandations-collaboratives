@@ -95,6 +95,13 @@ class Project(models.Model):
     objects = ProjectManager()
     objects_deleted = DeletedProjectManager()
 
+    notifications_as_target = CastedGenericRelation(
+        notifications_models.Notification,
+        related_query_name="target_projects",
+        content_type_field="target_content_type",
+        object_id_field="target_object_id",
+    )
+
     status = models.CharField(max_length=20, choices=PROJECT_STATES, default="DRAFT")
 
     email = models.CharField(max_length=128)
