@@ -41,14 +41,14 @@ class TaskViewSet(viewsets.ModelViewSet):
     """
 
     @action(
-        methods=["get"],
+        methods=["post"],
         detail=True,
     )
     def move(self, request, project_id, pk):
         task = self.get_object()
 
-        above_id = request.GET.get("above", None)
-        below_id = request.GET.get("below", None)
+        above_id = request.POST.get("above", None)
+        below_id = request.POST.get("below", None)
 
         if above_id:
             other_pk = above_id
