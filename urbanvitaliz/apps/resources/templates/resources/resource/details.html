@@ -44,6 +44,7 @@
 
     <div class="col-7 px-5 mx-auto">
 
+
         {% include 'resources/resource/fragments/resource_content.html' with resource=resource %}
         <div class="bd-callout mt-6">
             <svg class="bi me-2 align-middle" width="24" height="24">
@@ -126,6 +127,7 @@
             </div>
 
             <!-- Edit -->
+            {% if request.user.is_staff %}
             <div class="d-grid gap-2 mt-3">
                 <a class="btn btn-light btn-sm" href="{% url 'resources-resource-update' resource.id %}" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
@@ -135,6 +137,7 @@
                     Éditer
                 </a>
             </div>
+            {% endif %}
 
             {% endif %}
 
