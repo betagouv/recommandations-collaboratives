@@ -10,23 +10,33 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('survey', '0029_answer_choices'),
+        ("survey", "0029_answer_choices"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='answer',
-            name='created_on',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Date de création'),
+            model_name="answer",
+            name="created_on",
+            field=models.DateTimeField(
+                default=django.utils.timezone.now, verbose_name="Date de création"
+            ),
         ),
         migrations.AddField(
-            model_name='answer',
-            name='updated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='survey_answers', to=settings.AUTH_USER_MODEL),
+            model_name="answer",
+            name="updated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="survey_answers",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='answer',
-            name='updated_on',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Dernière mise à jour'),
+            model_name="answer",
+            name="updated_on",
+            field=models.DateTimeField(
+                default=django.utils.timezone.now, verbose_name="Dernière mise à jour"
+            ),
         ),
     ]
