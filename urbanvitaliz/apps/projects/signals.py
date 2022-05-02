@@ -26,6 +26,7 @@ from .utils import (create_reminder, get_collaborators_for_project,
 project_submitted = django.dispatch.Signal()
 project_validated = django.dispatch.Signal()
 project_switchtender_joined = django.dispatch.Signal()
+project_switchtender_leaved = django.dispatch.Signal()
 
 
 @receiver(project_submitted)
@@ -103,6 +104,16 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
         action_object=project,
         target=project,
         private=True,
+    )
+
+
+@receiver(project_switchtender_leaved)
+def log_project_switchtender_leaved(sender, project, **kwargs):
+    action.send(
+        sender,
+        verb="n'aiguille plus le projet",
+        action_object=project,
+        target=project,
     )
 
 
