@@ -13,7 +13,7 @@ django-leaflet
 django-admin-csvexport
 djangorestframework
 django-filter
-django-notifications-hq
+django-notifications-hq==1.7.0
 django-hijack==3.1.4
 django-sesame[ua]==2.4
 django-recaptcha==3.0.0
