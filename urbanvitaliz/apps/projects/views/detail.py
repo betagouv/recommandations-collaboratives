@@ -17,7 +17,7 @@ from urbanvitaliz.utils import check_if_switchtender
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm
 from ..utils import (can_administrate_project, can_manage_or_403,
-                     can_manage_project,
+                     can_manage_project, check_if_national_actor,
                      get_notification_recipients_for_project,
                      is_regional_actor_for_project, set_active_project_id)
 
@@ -36,6 +36,7 @@ def project_knowledge(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
+    is_national_actor = check_if_national_actor(request.user)
     is_regional_actor = is_regional_actor_for_project(
         project, request.user, allow_national=True
     )
@@ -83,6 +84,7 @@ def project_actions(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
+    is_national_actor = check_if_national_actor(request.user)
     is_regional_actor = is_regional_actor_for_project(
         project, request.user, allow_national=True
     )
@@ -141,6 +143,7 @@ def project_conversations(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
+    is_national_actor = check_if_national_actor(request.user)
     is_regional_actor = is_regional_actor_for_project(
         project, request.user, allow_national=True
     )
@@ -183,6 +186,7 @@ def project_internal_followup(request, project_id=None):
     is_regional_actor = is_regional_actor_for_project(
         project, request.user, allow_national=True
     )
+    is_national_actor = check_if_national_actor(request.user)
     can_administrate = can_administrate_project(project, request.user)
 
     # check user can administrate project (member or switchtender)

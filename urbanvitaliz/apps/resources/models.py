@@ -109,6 +109,11 @@ class Resource(models.Model):
     def get_absolute_url(self):
         return reverse("resources-resource-detail", kwargs={"resource_id": self.pk})
 
+    def get_embeded_url(self):
+        return reverse(
+            "resources-resource-detail-embeded", kwargs={"resource_id": self.pk}
+        )
+
     @property
     def expired(self):
         return self.expires_on > datetime.date.today()
