@@ -187,8 +187,8 @@ def test_update_note_available_for_switchtender(client):
         note.project.switchtenders.add(user)
         response = client.get(url)
     assert response.status_code == 200
-    # FIXME rename add-note to edit-note ?
-    assertContains(response, 'form id="form-projects-add-note"')
+
+    assertContains(response, 'form id="form-projects-update-note"')
 
 
 @pytest.mark.django_db

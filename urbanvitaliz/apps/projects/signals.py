@@ -26,6 +26,7 @@ from .utils import (create_reminder, get_collaborators_for_project,
 project_submitted = django.dispatch.Signal()
 project_validated = django.dispatch.Signal()
 project_switchtender_joined = django.dispatch.Signal()
+project_switchtender_leaved = django.dispatch.Signal()
 
 
 @receiver(project_submitted)
@@ -104,6 +105,27 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
         target=project,
         private=True,
     )
+
+
+@receiver(project_switchtender_leaved)
+def log_project_switchtender_leaved(sender, project, **kwargs):
+    action.send(
+        sender,
+        verb="n'aiguille plus le projet",
+        action_object=project,
+        target=project,
+    )
+
+
+@receiver(project_switchtender_leaved)
+def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
+    project_ct = ContentType.objects.get_for_model(project)
+    notifications_models.Notification.objects.filter(
+        target_content_type=project_ct.pk,
+        target_object_id=project.pk,
+        verb="est devenu·e aiguilleur·se sur le projet",
+        timestamp__gte=timezone.now() - datetime.timedelta(hours=12),
+    ).delete()
 
 
 #####
@@ -260,7 +282,7 @@ def notify_action_commented(sender, task, project, user, **kwargs):
 @receiver(pre_delete, sender=models.Note, dispatch_uid="note_hard_delete_logs")
 @receiver(pre_save, sender=models.Note, dispatch_uid="note_soft_delete_logs")
 def delete_activity_on_note_delete(sender, instance, **kwargs):
-    if instance.deleted is False:
+    if instance.deleted is None:
         return
 
     project_ct = ContentType.objects.get_for_model(instance)
@@ -295,7 +317,7 @@ def delete_task_history(task):
 
 @receiver(pre_save, sender=models.Task, dispatch_uid="task_soft_delete_notifications")
 def delete_notifications_on_soft_task_delete(sender, instance, **kwargs):
-    if instance.deleted is False:
+    if instance.deleted is None:
         return
     delete_task_history(instance)
 

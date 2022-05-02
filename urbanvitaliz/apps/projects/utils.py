@@ -16,7 +16,8 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz import utils as uv_utils
-from urbanvitaliz.apps.projects.digests import make_action_digest, make_project_digest
+from urbanvitaliz.apps.projects.digests import (make_action_digest,
+                                                make_project_digest)
 from urbanvitaliz.apps.reminders import api
 
 from . import models
@@ -120,9 +121,21 @@ def get_regional_actors_for_project(project, allow_national=False):
     return users.distinct()
 
 
+def get_national_actors():
+    """Return national actors"""
+    users = auth_models.User.objects.filter(groups__name="switchtender")
+    users = users.filter(profile__departments=None)
+    return users.distinct()
+
+
 def is_regional_actor_for_project(project, user, allow_national=False):
     """Check if this user is a regional actor for a given project"""
     return user in get_regional_actors_for_project(project, allow_national)
+
+
+def check_if_national_actor(user):
+    """Check if this user is a national actor"""
+    return user in get_national_actors()
 
 
 def is_regional_actor_for_project_or_403(project, user, allow_national=False):

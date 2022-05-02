@@ -1247,10 +1247,6 @@ def test_switchtender_joins_project(client):
 
     url = reverse("projects-project-switchtender-join", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
-        # Test GET
-        response = client.get(url)
-        assert response.status_code == 200
-
         # Then POST to join projet
         response = client.post(url)
 
@@ -1259,6 +1255,66 @@ def test_switchtender_joins_project(client):
     assert response.status_code == 302
     assert project.switchtenders.count() == 1
     assert project.switchtenders.first() == user
+
+
+@pytest.mark.django_db
+def test_switchtender_leaves_project(client):
+    commune = Recipe(geomatics.Commune).make()
+    dept = Recipe(geomatics.Department).make()
+    Recipe(
+        models.TaskRecommendation,
+        condition="",
+        departments=[
+            dept,
+        ],
+    ).make()
+    project = Recipe(models.Project, commune=commune).make()
+
+    url = reverse("projects-project-switchtender-leave", args=[project.id])
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders.add(user)
+        assert project.switchtenders.count() == 1
+
+        # Then POST to leave projet
+        response = client.post(url)
+
+    project = models.Project.objects.get(pk=project.pk)
+
+    assert response.status_code == 302
+    assert project.switchtenders.count() == 0
+
+
+@pytest.mark.django_db
+def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(client):
+    commune = Recipe(geomatics.Commune).make()
+    dept = Recipe(geomatics.Department).make()
+
+    collab = Recipe(auth.User, username="collab", email="collab@example.com").make()
+
+    Recipe(
+        models.TaskRecommendation,
+        condition="",
+        departments=[
+            dept,
+        ],
+    ).make()
+    project = Recipe(
+        models.Project,
+        status="BLAH",
+        email=collab.email,
+        emails=[collab.email],
+        commune=commune,
+    ).make()
+
+    join_url = reverse("projects-project-switchtender-join", args=[project.id])
+    leave_url = reverse("projects-project-switchtender-leave", args=[project.id])
+    with login(client, groups=["switchtender"]):
+        client.post(join_url)
+        assert collab.notifications.count() == 1
+
+        client.post(leave_url)
+
+        assert collab.notifications.count() == 0
 
 
 #################################################################

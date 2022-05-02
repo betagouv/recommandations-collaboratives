@@ -1,0 +1,157 @@
+{% load static %}
+
+<div class="row resource-details mb-3">
+    <div class="col-sm-12 col-lg-8 col-xl-9">
+
+        <h1 class="mb-3 text-break">
+            <span data-bs-toggle="tooltip" data-bs-placement="left" title="{{ resource.category.name|default:"Ressource" }}">
+                <svg class="bi me-1 rounded-circle align-middle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"key" }}"/>
+                </svg>
+            </span>
+            <span class="align-middle">{{ resource.title|capfirst }}</span>
+
+            <!-- Toggle Bookmarking -->
+            {% if user.is_authenticated %}
+            {% if resource.id in user.bookmarks.as_list %}
+            <form class="d-inline align-middle" method="POST" action="{% url "resources-bookmark-delete" resource.id %}">
+                {% csrf_token %}
+                <button class="d-inline-block btn btn-text"  data-bs-toggle="tooltip" data-bs-placement="right" title="Retirer de vos favoris">
+                    <svg class="bi align-baseline text-warning" width="24" height="24">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill"/>
+                    </svg>
+                </button>
+            </form>
+
+            {% else %}
+
+            <form class="d-inline align-middle" method="GET" action="{% url "resources-bookmark-create" resource.id %}">
+                <button class="d-inline-block btn btn-text"  data-bs-toggle="tooltip" data-bs-placement="right" title="Ajouter à vos favoris">
+                    <svg class="bi align-baseline text-warning" width="24" height="24">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
+                    </svg>
+                </button>
+            </form>
+
+            {% endif %}
+            {% endif %}
+        </h1>
+
+        <!-- Area -->
+        {% if resource.departments.count %}
+        <div class="d-inline text-secondary">
+            <svg class="bi" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#globe"/>
+            </svg>&nbsp;
+            <span class="small">
+                {% for department in resource.departments.all %}
+                {{ department.name }}
+                {% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </span>
+        </div>
+        {% endif %}
+
+        <!-- Show banner if expired -->
+        {% if not resource.expired %}
+        <div class="bd-callout bd-callout-warning">
+            <svg class="bi align-middle text-danger" width="24" height="24" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#exclamation-octagon-fill"/>
+            </svg>&nbsp;
+            <span class="align-middle">
+                Cette fiche-ressource a expiré, les informations ne sont probablement plus à jour  !
+            </span>
+        </div>
+        {% endif %}
+
+        {% if resource.departments.count and resource.tags %}
+        &nbsp;-&nbsp;
+        {% endif %}
+
+        <div class="mb-2 d-inline">
+            {% for tag in resource.tags_as_list  %}
+            <span class="badge rounded-pill bg-light text-dark">#{{ tag }}</span>
+            {% endfor %}
+        </div>
+
+        <!-- Show banner if draft -->
+        {% if is_switchtender %}
+        {% if not resource.public %}
+        <div class="bd-callout bd-callout-warning">
+            <svg class="bi align-middle" width="24" height="24" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hammer"/>
+            </svg>&nbsp;
+            Cette fiche-ressource est en cours d'écriture. Pensez à la
+            <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <em>Public</em> si vous souhaitez que les visiteurs puissent la consulter !
+        </div>
+        {% endif %}
+
+
+        {% endif %}
+
+        {% if resource.subtitle %}
+        <h3 class="subtitle text-secondary mt-3">{{ resource.subtitle }}</h3>
+        {% endif %}
+
+        {% if bookmark and bookmark.comments %}
+        <div class="text-secondary mt-2 p-1">
+            <svg class="bi align-baseline" width="12" height="12" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+            </svg>
+            <span class="small">Note personnelle</span>
+            <br/>
+            <q> {{ bookmark.comments }} </q>
+            -
+            <a href="{% url "resources-bookmark-create" bookmark.resource.id %}" class="small">éditer</a>
+
+        </div>
+        {% endif %}
+
+    </div>
+
+
+</div>
+
+{% if resource.summary %}
+<div class="bd-callout text-secondary">
+    <svg class="bi me-2 align-middle" width="16" height="16">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-right-quote"/>
+    </svg>
+    &nbsp; 
+    {{ resource.summary }}
+</div>
+{% endif %}
+
+<div class="text-justified">
+    {{ resource.content_rendered|safe }}
+</div>
+
+{% if contacts.count %}
+<div class="contact-list mt-5 mb-5">
+    <h3 class="mb-3">
+        <svg class="bi me-2 align-middle" width="24" height="24">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
+        </svg>
+        Contact{{ contacts.count|pluralize }}
+    </h3>
+    {% if user.is_anonymous %}
+    {% for contact in contacts.all %}
+    <span id="contact-{{ contact.id}}"></span>
+    {% endfor %}
+
+    Nous avons {{ contacts.count }} contact{{ contacts.count|pluralize }} associé{{ contacts.count|pluralize }}
+    à cette fiche. Si vous souhaitez y accéder, veuillez <a href="{% url 'magicauth-login' %}">vous identifier</a>.
+    {% else %}
+
+    <div class="row row-cols-1 row-cols-md-2">
+        {% for contact in contacts.all %}
+        <div class="col mb-3" id="contact-{{ contact.id }}">
+            {% include 'addressbook/widgets/card_contact_horizontal.html' with contact=contact show_id=True %}
+        </div>
+        {% endfor %}
+    </div>
+
+    {% endif %}
+</div>
+
+{% endif %}

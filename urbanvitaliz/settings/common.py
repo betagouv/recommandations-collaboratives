@@ -175,7 +175,7 @@ EMAIL_FROM = "UrbanVitaliz <no-reply@urbanvitaliz.fr>"
 
 # MagicAuth configuration
 LOGIN_URL = "/login/"
-LOGOUT_REDIRECT_URL = "login-redirect"
+LOGIN_REDIRECT_URL = "login-redirect"
 MAGICAUTH_FROM_EMAIL = EMAIL_FROM
 MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à UrbanVitaliz ici"
 MAGICAUTH_EMAIL_FIELD = "email"
