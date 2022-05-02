@@ -304,7 +304,7 @@ class TaskManager(OrderedModelManager):
     def get_queryset(self):
         return (
             TaskQuerySet(self.model, using=self._db)
-            .order_by("-priority", "-updated_on")
+            .order_by("order", "-updated_on")
             .filter(deleted=None)
         )
 
