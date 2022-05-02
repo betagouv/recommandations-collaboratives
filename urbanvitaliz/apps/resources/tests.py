@@ -13,7 +13,8 @@ import pytest
 from django.template import defaultfilters
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import login
@@ -155,11 +156,13 @@ def test_resource_detail_available_for_logged_users(client):
 
 @pytest.mark.django_db
 def test_resource_detail_contains_informations(client):
-    resource = Recipe(models.Resource, title="a nice title").make()
+    resource = Recipe(models.Resource, title="A Nice title").make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client):
         response = client.get(url)
-    assertContains(response, defaultfilters.title(resource.title))
+
+    assert response.status_code == 200
+    assertContains(response, resource.title)
 
 
 @pytest.mark.django_db
