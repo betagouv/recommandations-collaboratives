@@ -22,7 +22,8 @@ from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from . import models
 from .serializers import ResourceSerializer
@@ -225,7 +226,7 @@ class EmbededResourceDetailView(DetailView):
 @login_required
 def resource_update(request, resource_id=None):
     """Update informations for resource"""
-    is_switchtender_or_403(request.user)
+    is_staff_or_403(request.user)
     resource = get_object_or_404(models.Resource, pk=resource_id)
     next_url = reverse("resources-resource-detail", args=[resource.id])
     if request.method == "POST":
