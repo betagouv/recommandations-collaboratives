@@ -10,11 +10,9 @@ created: 2021-06-16 17:56:10 CEST
 from datetime import datetime
 
 import pytest
-from django.template import defaultfilters
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import login
@@ -166,20 +164,20 @@ def test_resource_detail_contains_informations(client):
 
 
 @pytest.mark.django_db
-def test_resource_detail_contains_update_for_switchtender(client):
+def test_resource_detail_contains_update_for_staff(client):
     resource = Recipe(models.Resource).make()
     url = reverse("resources-resource-detail", args=[resource.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, is_staff=True, groups=["switchtender"]):
         response = client.get(url)
     update_url = reverse("resources-resource-update", args=[resource.id])
     assertContains(response, update_url)
 
 
 @pytest.mark.django_db
-def test_resource_detail_does_not_contain_update_for_non_switchtender(client):
-    resource = Recipe(models.Resource).make()
+def test_resource_detail_does_not_contain_update_for_non_staff(client):
+    resource = Recipe(models.Resource, status=models.Resource.PUBLISHED).make()
     url = reverse("resources-resource-detail", args=[resource.id])
-    with login(client):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     update_url = reverse("resources-resource-update", args=[resource.id])
     assertNotContains(response, update_url)
@@ -231,16 +229,16 @@ def test_create_new_resource_and_redirect(client):
 def test_update_resource_not_available_for_non_switchtenders(client):
     resource = Recipe(models.Resource).make()
     url = reverse("resources-resource-update", args=[resource.id])
-    with login(client):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_update_resource_available_for_switchtenders(client):
+def test_update_resource_available_for_staff(client):
     resource = Recipe(models.Resource).make()
     url = reverse("resources-resource-update", args=[resource.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"], is_staff=True):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-update"')
@@ -259,7 +257,7 @@ def test_update_resource_and_redirect(client):
         "content": "this is some content",
     }
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"], is_staff=True):
         response = client.post(url, data=data)
 
     resource = models.Resource.objects.get(id=resource.id)

@@ -1,6 +1,6 @@
 import math
 import statistics
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.contrib.auth import models as auth_models
 from django.db import models

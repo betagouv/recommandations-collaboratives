@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0046_project_muted'),
+        ("projects", "0046_project_muted"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='task',
-            name='priority',
-            field=models.PositiveIntegerField(blank=True, default=1000, help_text="Plus le chiffre est élevé, plus la recommandation s'affichera en haut.", verbose_name='Priorité'),
+            model_name="task",
+            name="priority",
+            field=models.PositiveIntegerField(
+                blank=True,
+                default=1000,
+                help_text="Plus le chiffre est élevé, plus la recommandation s'affichera en haut.",
+                verbose_name="Priorité",
+            ),
         ),
     ]

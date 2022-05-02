@@ -8,7 +8,7 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions, viewsets
+from rest_framework import viewsets
 
 from . import models
 from .serializers import CommuneSerializer, DepartmentSerializer
