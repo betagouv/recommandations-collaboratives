@@ -17,6 +17,7 @@ from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import timezone
+from django.views.generic.detail import DetailView
 from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.geomatics import models as geomatics_models
@@ -149,46 +150,71 @@ class SearchForm(forms.Form):
 ########################################################################
 # Seeing resources
 ########################################################################
-
-
-def resource_detail(request, resource_id=None):
+class BaseResourceDetailView(DetailView):
     """Return the details of given resource"""
-    resource = get_object_or_404(models.Resource, pk=resource_id)
 
-    if request.user.is_authenticated:
-        bookmark = models.Bookmark.objects.filter(
-            resource=resource, created_by=request.user
-        ).first()
-    else:
-        bookmark = None
+    model = models.Resource
+    template_name = "resources/resource/details.html"
+    pk_url_kwarg = "resource_id"
 
-    if check_if_switchtender(request.user):
-        projects_used_by = (
-            projects.Project.objects.filter(tasks__resource_id=resource.pk)
-            .order_by("name")
-            .distinct()
-        )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    contacts = resource.contacts
+        resource = self.object
 
-    # If our user is responsible for a local authority, only show the
-    # relevant contacts (=localized)
-    if not check_if_switchtender(request.user) and not request.user.is_anonymous:
-        user_projects = projects.Project.objects.filter(
-            emails__contains=request.user.email
-        )
-        if user_projects.count():
-            user_depts = (
-                user_projects.exclude(commune=None)
-                .values_list("commune__department__code", flat=True)
+        if self.request.user.is_authenticated:
+            context["bookmark"] = models.Bookmark.objects.filter(
+                resource=resource, created_by=self.request.user
+            ).first()
+
+        # If our user is responsible for a local authority, only show the
+        # relevant contacts (=localized)
+        if (
+            not check_if_switchtender(self.request.user)
+            and not self.request.user.is_anonymous
+        ):
+            user_projects = projects.Project.objects.filter(
+                emails__contains=self.request.user.email
+            )
+            if user_projects.count():
+                user_depts = (
+                    user_projects.exclude(commune=None)
+                    .values_list("commune__department__code", flat=True)
+                    .distinct()
+                )
+                context["contacts"] = resource.contacts.filter(
+                    Q(organization__departments__in=user_depts)
+                    | Q(organization__departments=None)
+                )
+            else:
+                context["contacts"] = resource.contacts
+
+        return context
+
+
+class ResourceDetailView(DetailView):
+    model = models.Resource
+    template_name = "resources/resource/details.html"
+    pk_url_kwarg = "resource_id"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        resource = self.object
+
+        if check_if_switchtender(self.request.user):
+            context["projects_used_by"] = (
+                projects.Project.objects.filter(tasks__resource_id=resource.pk)
+                .order_by("name")
                 .distinct()
             )
-            contacts = resource.contacts.filter(
-                Q(organization__departments__in=user_depts)
-                | Q(organization__departments=None)
-            )
 
-    return render(request, "resources/resource/details.html", locals())
+        return context
+
+
+class EmbededResourceDetailView(DetailView):
+    model = models.Resource
+    template_name = "resources/resource/details_embeded.html"
+    pk_url_kwarg = "resource_id"
 
 
 ########################################################################

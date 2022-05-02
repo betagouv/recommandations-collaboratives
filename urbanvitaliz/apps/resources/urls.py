@@ -12,7 +12,6 @@ from django.urls import path
 
 from . import views
 
-
 urlpatterns = [
     path(r"ressource/", views.resource_search, name="resources-resource-search"),
     path(r"ressource/feed/", views.LatestResourcesFeed(), name="resources-feed"),
@@ -23,8 +22,13 @@ urlpatterns = [
     ),
     path(
         r"ressource/<int:resource_id>/",
-        views.resource_detail,
+        views.ResourceDetailView.as_view(),
         name="resources-resource-detail",
+    ),
+    path(
+        r"ressource/<int:resource_id>/embed",
+        views.EmbededResourceDetailView.as_view(),
+        name="resources-resource-detail-embeded",
     ),
     path(
         r"ressource/<int:resource_id>/update/",
