@@ -123,28 +123,10 @@ def sort_task(request, task_id, order):
     task = get_object_or_404(models.Task, pk=task_id)
     can_manage_or_403(task.project, request.user)
 
-    closest = None
     if order == "up":
-        closest = (
-            models.Task.objects.unpublished_open()
-            .exclude(id=task.id)
-            .filter(project__id=task.project.id, priority__gte=task.priority)
-            .order_by("priority")
-            .first()
-        )
-        if closest is not None:
-            task.priority = closest.priority + 1
-
+        task.up()
     elif order == "down":
-        closest = (
-            models.Task.objects.unpublished_open()
-            .exclude(id=task.id)
-            .filter(project__id=task.project.id, priority__lte=task.priority)
-            .order_by("-priority")
-            .first()
-        )
-        if closest is not None:
-            task.priority = max(closest.priority - 1, 0)
+        task.down()
     else:
         return HttpResponseForbidden()
 
