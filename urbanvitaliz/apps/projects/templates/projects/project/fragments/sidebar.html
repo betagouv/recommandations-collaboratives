@@ -1,7 +1,7 @@
 {% load static %}
 {% load humanize %}
 
-<div class="d-grid gap-2 mt-3">
+<div class="d-grid gap-2 my-3">
     {% if can_manage %}
     <span class="d-inline-block"> 
         <a href="{% url 'projects-access-update' project.id %}" class="btn btn-primary w-100 btn-sm">
@@ -31,15 +31,32 @@
             Ajouter une recommandation
         </a>
     </span>
+    <span class="d-inline-block">
+        <form method="POST" action="{% url 'projects-project-switchtender-leave' project.id %}">
+            {% csrf_token %}
+            <button class="btn btn-outline-secondary w-100 btn-sm">
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-slash"/>
+                </svg>
+                &nbsp;
+                Ne plus suivre ce projet
+
+            </button>
+        </form>
+    </span>
     {% elif is_regional_actor %}
     <span class="d-inline-block">
-        <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-success w-100 btn-sm">
-            <svg class="bi" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-split"/>
-            </svg>
-            &nbsp;
-            Rejoindre comme aiguilleur·se
-        </a>
+        <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
+            {% csrf_token %}
+            <button class="btn btn-success w-100 btn-sm">
+                <svg class="bi" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell"/>
+                </svg>
+                &nbsp;
+                Suivre ce projet
+
+            </button>
+        </form>
     </span>
     {% endif %}
 </div>

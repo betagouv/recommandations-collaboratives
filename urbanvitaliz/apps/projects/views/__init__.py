@@ -350,8 +350,23 @@ def project_switchtender_join(request, project_id=None):
         project.save()
 
         signals.project_switchtender_joined.send(sender=request.user, project=project)
-    else:
-        return render(request, "projects/project/switchtender_join.html", locals())
+
+    return redirect(reverse("projects-project-detail", args=[project_id]))
+
+
+@login_required
+def project_switchtender_leave(request, project_id=None):
+    """Leave switchtender"""
+    is_switchtender_or_403(request.user)
+    project = get_object_or_404(models.Project, pk=project_id)
+    is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+
+    if request.method == "POST":
+        project.switchtenders.remove(request.user)
+        project.updated_on = timezone.now()
+        project.save()
+
+        signals.project_switchtender_leaved.send(sender=request.user, project=project)
 
     return redirect(reverse("projects-project-detail", args=[project_id]))
 
