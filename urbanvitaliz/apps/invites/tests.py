@@ -11,11 +11,8 @@ created: 2022-04-20 10:11:56 CEST
 import pytest
 from django.contrib.auth import models as auth_models
 from django.urls import reverse
-from django.utils import timezone
 from model_bakery.recipe import Recipe
-from notifications import notify
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains
 from urbanvitaliz.utils import login
 
 from . import models
