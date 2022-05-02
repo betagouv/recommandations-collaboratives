@@ -484,6 +484,7 @@ def create_action(request, project_id=None):
                         created_by=request.user,
                         public=public,
                     )
+                    action.top()
 
                     # Notify other switchtenders
                     signals.action_created.send(
@@ -498,6 +499,7 @@ def create_action(request, project_id=None):
                 action.project = project
                 action.created_by = request.user
                 action.save()
+                action.top()
 
                 # Notify other switchtenders
                 signals.action_created.send(
