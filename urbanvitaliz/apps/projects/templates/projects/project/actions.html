@@ -2,6 +2,41 @@
 
 {% load static %}
 {% load humanize %}
+{% load notifications_tags %}
+{% load gravatar %}
+{% load sass_tags %}
+
+{% block js %}
+<script src="{% static 'projects/js/board.js' %}"></script>
+<script src="{% static 'projects/js/kanban_tasks.js' %}"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+
+<script type="text/javascript">
+ const project_url_tmpl = "{% url 'projects-project-detail' 0 %}";
+ function makeProjectURL(id) {
+     return project_url_tmpl.replace('0', id);
+ }
+
+ function gravatar_url(email, size=50, name="Inconnu") {
+     if (name.trim() == '') name = "Inconnu";
+
+     hash = md5(email);
+     encoded_fallback_uri = encodeURIComponent(`https://ui-avatars.com/api/${name}/${size}`);
+
+     return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=${encoded_fallback_uri}`
+ }
+</script>
+
+<script src="{% static 'notifications/notify.js' %}" type="text/javascript"></script>
+{% register_notify_callbacks callbacks='fill_notification_list,fill_notification_badge' %}
+
+{% endblock %}
+
+
+{% block css %}
+<link href="{% sass_src 'projects/css/board.scss' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
 
 {% block title %}
 {{ block.super }} > Actions
@@ -14,125 +49,175 @@
     {% include "projects/project/fragments/reminder_modal.html" %}
 
     <div class="row">
-        <div class="col col-xl-8 col-lg-10">
-            {% if is_switchtender %}
-            <h2 class="mt-1 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
-                <span class="align-middle">Actions proposées à la collectivité</span>
-            </h2>
-            {% else %}
-            <h2 class="mt-1 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
-                <span class="align-middle">Mes actions en cours</span>
-            </h2>
-            {% endif %}
-
-            {% if can_administrate or is_regional_actor %}
-
-            {% if project.tasks.unpublished_open.count %}
-
-            <div  id="task-list">
-		            {% for task in project.tasks.unpublished_open %}
-                {% include 'projects/project/fragments/action_list_item.html' %}
-		            {% endfor %}
-            </div>
-
-            {% else %}
-            <div class="bg-light p-4 rounded-2">
-                <h3 class="fw-light">Pas encore d'actions recommandées à la collectivité ?</h3>
-                <p class="fst-italic fw-light">
-                    Soyez la première personne à proposer des actions ou des ressources à la collectivité !
-                </p>
-
-                {% if can_administrate %}
-                <a href="{% url 'projects-project-create-action' project.id %}" class="btn btn-primary">Émettre une recommandation</a>
-                <a href="{% url 'projects-project-detail-knowledge' project.id %}" class="btn btn-secondary">Consulter les détails du projet</a>
-
-
-                <p class="mt-3">
-                    <span class="badge bg-warning">Beta feature</span> <a href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les actions suggérées automatiquement pour ce dossier</a>
-                </p>
+        <div class="col">
+            <div class="d-flex mt-1 mb-4">
+                {% if is_switchtender %}
+                <h2 class="text-secondary text-uppercase fw-bolder mb-0" style="font-size: 12px;">
+                    <span class="align-middle">Actions proposées à la collectivité</span>
+                </h2>
                 {% else %}
-                <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-primary">Rejoindre ce dossier pour l'aiguiller</a>
-
+                <h2 class="mt-1 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
+                    <span class="align-middle">Mes actions en cours</span>
+                </h2>
                 {% endif %}
+
+                <div class="d-flex align-items-center ms-2">
+                    {% for switchtender in project.switchtenders.all %}
+                    <img class="align-middle rounded-circle d-inline-block" width="20px" height="20px"
+                        src="{% gravatar_url switchtender.email 25 %}" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                        title="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }}" style="z-index: 1000;" tabindex="0" />
+                    {% endfor %}
+                </div>
+                </div>
+
+            <div x-data="boardTasksApp({{ project.id }})" x-init="getData()" class="d-flex pb-2 align-items-stretch">
+                <template x-for="board in boards">
+                    <div class="col px-2" style="min-height: 100px">
+                        <div class="pb-4 rounded border-top border-4" :class="board.color_class">
+                            <div class="d-flex justify-content-between justify-items-center px-2 py-2 bg-light sticky-top top-0">
+                                <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
+                            </div>
+
+                            <div class="px-2 py-1 pb-1 bg-light shadow-sm">
+                                <template x-if="column(board.status).length === 0">
+                                    <div class="drag-targetable py-2" @dragover="onDragOver(event, null)" @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
+                                        <div class="drag-placeholder"></div>
+                                    </div>
+                                </template>
+
+                                <template x-for="(t, i) in column(board.status)" :key="t.id">
+                                    <div>
+                                        <div :id="t.uuid" class="drag-targetable py-2 my-2" @dragover="onDragOver(event)" @drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)" >
+                                            <div class="rounded bg-white shadow p-1 px-2 position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)" @dragend="onDragEnd(event)">
+                                                <h6 class="mt-1 mb-0 fw-bold" x-text="truncate(t.intent)"></h6>
+                                                <template x-if="t.resource_id">
+                                                    <a @click="onPreviewClick(event, t.uuid)" style="font-size: 0.8em">Consulter la ressource</a>
+                                                </template>
+
+                                                <template x-if="!t.resource_id">
+                                                    <a @click="onPreviewClick(event, t.uuid)" style="font-size: 0.8em">Voir la recommandation</a>
+                                                </template>
+
+                                                <div class="rounded bg-light p-2 my-2" style="font-size: 0.8em">
+                                                    <p x-text="truncate(t.content, 200)" class="mb-2"></p>
+                                                    <div>
+                                                        <img class="align-middle rounded-circle d-inline-block" width="20px" height="20px"
+                                                            :src="gravatar_url(t.created_by.email, 25, t.created_by.first_name + ' ' + t.created_by.last_name)"
+                                                            data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${t.created_by.first_name} ${t.created_by.last_name}`"
+                                                            style="z-index: 1000;" tabindex="0" />
+                                                        <span class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
+                                                            style="line-height: 20px"></span>
+                                                        </div>
+                                                    </div>
+
+                                                <div class="border-top py-1 d-flex align-middle justify-content-between" style="font-size: 0.8em">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="text-primary">
+                                                            <svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
+                                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
+                                                            </svg>
+                                                            <span x-text="t.followups.length"></span>
+                                                        </div>
+
+                                                        <div class="text-primary ms-2">
+                                                            <svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
+                                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
+                                                            </svg>
+                                                            <span x-text="t.reminders.length"></span>
+                                                        </div>
+                                                    </div>
+
+                                                    {% if can_administrate and not disable_edit %}
+                                                    <div class="dropdown align-middle">
+                                                        <a class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            Aiguillage
+                                                        </a>
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                                            <li><a class="dropdown-item" :href="editTaskUrl(t.id)">Éditer</a></li>
+                                                            <li>
+                                                                <form method="POST" :action="deleteTaskReminderUrl(t.id)">
+                                                                    {% csrf_token %}
+                                                                    <button class="dropdown-item">Supprimer le rappel</button>
+                                                                </form>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>  
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-fullscreen">
+                        <template x-if="currentTask">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 :text="currentTask.intent"></h3>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body p-0">
+                                    <div class="d-flex align-items-stretch h-100" style="min-height: 85vh;">
+                                        <div class="flex-fill p-3">
+                                            <template x-if="currentTask.resource_id">
+                                                <iframe class="w-100 h-100" :src="resourcePreviewUrl(currentTask.resource_id)"></iframe>
+                                            </template>
+                                            <template x-if="!currentTask.resource_id">
+                                                <div class="col-10 px-5 mx-auto">
+                                                    <div class="resource-details pb-3">
+                                                        <h1 x-text="currentTask.intent" class="mb-3"></h1>
+                                                    </div>
+                                                    <p class="text-justified" x-text="currentTask.content"></p>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <div class="w-25 p-3 border border-top-0 border-bottom-0 border-right-0">
+                                            <div class="d-flex flex-column justify-content-between h-100">      
+                                                <div class="flex-fill">
+                                                    <h2 class="text-secondary text-uppercase fw-bolder mb-0" style="font-size: 12px;">
+                                                        <span class="align-middle">Conversation</span>
+                                                    </h2>
+                                                    <div class="overflow-x-auto">
+                                                        <template x-for="f in currentTask.followups">
+                                                            <div class="rounded bg-light p-2 my-2" style="font-size: 0.8em">
+                                                                <p x-text="f.comment" class="mb-2"></p>
+                                                                <div>
+                                                                    <img class="align-middle rounded-circle d-inline-block" width="20px" height="20px"
+                                                                        :src="gravatar_url(f.who.email, 25, f.who.first_name + ' ' + f.who.last_name)"
+                                                                        data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${f.who.first_name} $f.who.last_name}`"
+                                                                        style="z-index: 1000;" tabindex="0" />
+                                                                    <span class="ms-1 fst-italic" x-text="`${f.who.first_name} ${f.who.last_name}`"
+                                                                        style="line-height: 20px"></span>
+                                                                    <span class="ms-1 text-muted" x-text="formatDate(f.timestamp)"
+                                                                        style="line-height: 20px"></span>
+                                                                </div>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>     
+                                                <div>
+                                                    <span>Répondre</span>
+                                                    <form class="mt-2 form d-flex flex-column align-items-end" method="POST" :action="sendCommentUrl(currentTask.id)">
+                                                        {% csrf_token %}
+                                                        <textarea name="comment" style="min-height: 100px; border-color: #ccc;" class="w-100 p-2 rounded rounded-4 my-1 border" placeholder="Votre message..."></textarea>
+                                                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                                                    </form>
+                                                </div>     
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
-            {% endif %}
-
-
-            {% else %}
-            {% if project.tasks.open.count %}
-
-            <div  id="task-list">
-		            {% for task in project.tasks.open %}
-                {% include 'projects/project/fragments/action_list_item.html' %}
-		            {% endfor %}
-            </div>
-            {% else %}
-            <!-- Empty -->
-            <div class="bg-light p-4 rounded-2">
-                <h3 class="fw-light">Vous n'avez pas d'actions en cours</h3>
-
-                <p class="fst-italic fw-light">
-                    Des actions vous seront proposées par notre équipe dès que possible.
-                </p>
-                <p class="fst-italic fw-light">
-                    Vous pouvez accélerer les recommandations <span class="fw-bolder">en complétant le questionnaire d'exploration</span>.
-                </p>
-                <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary">Compléter le questionnaire d'exploration</a>
-            </div>
-            {% endif %}
-            {% endif %}
-
-
-            {% if project.tasks.closed.count %}
-
-            <h2 class="mt-5 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
-                <span class="align-middle">Actions terminées</span>
-                &nbsp;
-                <span class="align-middle badge rounded-pill bg-secondary">{{ project.tasks.closed.count }}</span>
-            </h2>
-
-            <div class="accordion" id="task-list">
-		            {% for task in project.tasks.closed %}
-                {% include 'projects/project/fragments/action_list_item.html' with hide_details=True %}
-		            {% endfor %}
-            </div>
-            {% endif %}
-
-
-            {% if project.tasks.refused.count %}
-
-            <h2 class="mt-5 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
-                <span class="align-middle">Actions refusées</span>
-                &nbsp;
-                <span class="align-middle badge rounded-pill bg-secondary">{{ project.tasks.refused.count }}</span>
-            </h2>
-
-            <div class="accordion" id="task-list">
-		            {% for task in project.tasks.refused %}
-                {% include 'projects/project/fragments/action_list_item.html' %}
-		            {% endfor %}
-            </div>
-            {% endif %}
-
         </div>
-
-        <div class="col mx-auto">
-            <div class="mb-4">
-                {% include "projects/project/fragments/sidebar.html" %}
-            </div>
-
-            {% if project.switchtenders.count %}
-            <h6 class="mb-2 fw-bolder">Vos aiguilleu·r·se·s</h6>
-
-            <p class="mt-3">
-                Bonjour, l'équipe est là pour vous accompagner tout au long de votre parcours.
-                N'hésitez pas à prendre contact via les commentaires, nous vous répondrons dès que possible.
-            </p>
-
-            {% include "projects/project/fragments/switchtender-list.html" with switchtenders=project.switchtenders.all %}
-            {% endif %}
-        </div>
-
     </div>
 </div>
 {% endblock %}
