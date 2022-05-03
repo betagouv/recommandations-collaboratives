@@ -21,6 +21,12 @@ function configureBoardApp(app, options) {
             this.isBusy = false;
             this.data = data;
         },
+        findByUuid(uuid) {
+            return this.data.find(d => d.uuid === uuid);
+        },
+        findById(id) {
+            return this.data.find(d => d.id === id);
+        },
         get view() {
             return this.data.filter(options.filterFn.bind(this)).sort(options.sortFn.bind(this));
         },
@@ -28,35 +34,32 @@ function configureBoardApp(app, options) {
             return this.view.filter(d => d.status === status);
         },
         onDragStart(event, uuid) {
-            this.dragCounter = 0;
-            event.dataTransfer.setData('text/plain', uuid);
+            event.dataTransfer.clearData();
             event.dataTransfer.effectAllowed = "move";
+            
+            this.dragCounter = 0;
+            event.dataTransfer.setData('application/uuid', uuid);
             event.target.classList.add('drag-dragging');
         },
         onDragEnd(event) {
             event.target.classList.remove('drag-dragging');
             this.$nextTick(() => document.querySelectorAll(".drag-target").forEach(e => e.classList.remove("drag-target")));
         },
-        onDragOver(event) {
-            event.preventDefault();
-            event.dropEffect = "move";
-        },
         onDragEnter(event) {
-            if (this.dragCounter <= 0) {
-                event.currentTarget.classList.add('drag-target');
-            }
-            this.dragCounter += 1;
+            event.currentTarget.classList.add('drag-target');
         },
         onDragLeave(event) {
-            this.dragCounter -= 1;
-            if (this.dragCounter <= 0) {
-                event.currentTarget.classList.remove('drag-target');
-            }
+            event.currentTarget.classList.remove('drag-target');
         },
-        async onDrop(event, status, targetUuid) {
+        onDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "move";
+        },
+        async onDrop(event, status, targetUuid) {           
+            event.preventDefault();
+
             this.$nextTick(() => document.querySelectorAll(".drag-target").forEach(e => e.classList.remove("drag-target")));
-            const uuid = event.dataTransfer.getData("text/plain");
-            event.dataTransfer.clearData();
+            const uuid = event.dataTransfer.getData("application/uuid");
 
             const data = this.data.find(d => d.uuid === uuid);
             const nextData = this.data.find(d => d.uuid === targetUuid);
