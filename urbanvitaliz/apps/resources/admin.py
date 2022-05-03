@@ -23,8 +23,8 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(models.Resource)
 class ResourceAdmin(admin.ModelAdmin):
     search_fields = ["title", "content"]
-    list_filter = ["updated_on"]
-    list_display = ["updated_on", "title"]
+    list_filter = ["sites", "updated_on"]
+    list_display = ["title", "status", "category", "updated_on"]
 
 
 @admin.register(models.Bookmark)
