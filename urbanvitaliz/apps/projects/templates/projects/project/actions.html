@@ -50,25 +50,40 @@
 
     <div class="row">
         <div class="col">
-            <div class="d-flex mt-1 mb-4">
+            <div class="d-flex mt-1 mb-4 align-items-center justify-content-between">
                 {% if is_switchtender %}
                 <h2 class="text-secondary text-uppercase fw-bolder mb-0" style="font-size: 12px;">
-                    <span class="align-middle">Actions proposées à la collectivité</span>
+                    Actions proposées à la collectivité
                 </h2>
                 {% else %}
                 <h2 class="mt-1 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
-                    <span class="align-middle">Mes actions en cours</span>
+                    Mes actions en cours
                 </h2>
                 {% endif %}
 
-                <div class="d-flex align-items-center ms-2">
-                    {% for switchtender in project.switchtenders.all %}
-                    <img class="align-middle rounded-circle d-inline-block" width="20px" height="20px"
-                        src="{% gravatar_url switchtender.email 25 %}" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                        title="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }}" style="z-index: 1000;" tabindex="0" />
-                    {% endfor %}
+                <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center ms-2">
+                        <span class="text-muted me-2">Vos aiguilleurs :</span>
+                        {% for switchtender in project.switchtenders.all %}
+                        <img class="rounded-circle d-inline-block ms-1" width="20px" height="20px"
+                            src="{% gravatar_url switchtender.email 25 %}" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                            title="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }}" style="z-index: 1000;" tabindex="0" />
+                        {% endfor %}
+                    </div>
+    
+                    {% if is_switchtender %}
+                    <span class="ms-4">
+                        <a class="btn btn-outline-primary w-100 btn-sm"  href="{% url 'projects-project-create-action' project.id %}">
+                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
+                            </svg>
+                            Ajouter une recommandation
+                        </a>
+                    </span>
+                    {% endif %}
                 </div>
-                </div>
+            </div>
+
 
             <div x-data="boardTasksApp({{ project.id }})" x-init="getData()" class="d-flex pb-2 align-items-stretch">
                 <template x-for="board in boards">
