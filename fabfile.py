@@ -23,6 +23,7 @@ PACKAGE = f"urbanvitaliz-django-{urbanvitaliz.VERSION}.tar.gz"
 # - develop if branch == develop, and
 # - error otherwise.
 
+
 @task
 def upgrade(cnx, site=None):
     """Upgrade requirements to last version on server for site"""

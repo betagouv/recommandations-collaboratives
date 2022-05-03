@@ -5,6 +5,7 @@ markdown-link-attr-modifier
 #django-magicauth
 git+http://github.com/glibersat/django-magicauth@master#egg=django-magicauth
 django-multisite
+git+http://github.com/django-ordered-model/django-ordered-model@master#egg=django-ordered-model
 django_otp
 django-tagging
 django-gravatar2
