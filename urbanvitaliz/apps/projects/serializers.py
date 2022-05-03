@@ -1,5 +1,6 @@
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
+from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
 from urbanvitaliz.apps.geomatics.serializers import CommuneSerializer
 from urbanvitaliz.apps.reminders.serializers import MailSerializer
@@ -71,7 +72,7 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
     who = SwitchtenderSerializer(read_only=True, many=False)
 
 
-class TaskSerializer(serializers.HyperlinkedModelSerializer):
+class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSerializer):
     class Meta:
         model = Task
         fields = [
@@ -79,6 +80,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             "status",
             "public",
             "priority",
+            "order",
             "created_on",
             "updated_on",
             "created_by",

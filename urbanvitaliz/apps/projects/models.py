@@ -17,6 +17,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -299,14 +301,17 @@ class Note(models.Model):
         return cls.objects.filter(deleted=None)
 
 
-class TaskManager(models.Manager):
+class TaskQuerySet(OrderedModelQuerySet):
+    pass
+
+
+class TaskManager(OrderedModelManager):
     """Manager for active tasks"""
 
     def get_queryset(self):
         return (
-            super()
-            .get_queryset()
-            .order_by("-priority", "-updated_on")
+            TaskQuerySet(self.model, using=self._db)
+            .order_by("order", "-updated_on")
             .filter(deleted=None)
         )
 
@@ -349,11 +354,13 @@ class DeletedTaskManager(models.Manager):
         return super().get_queryset().exclude(deleted=None)
 
 
-class Task(models.Model):
+class Task(OrderedModel):
     """Représente une action pour faire avancer un project"""
 
     objects = TaskManager()
     deleted_objects = DeletedTaskManager()
+
+    order_with_respect_to = "project"
 
     PROPOSED = 0
     INPROGRESS = 1

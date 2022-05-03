@@ -625,8 +625,7 @@ def test_sort_action_up(client):
     taskA = models.Task.objects.get(pk=taskA.id)
     taskB = models.Task.objects.get(pk=taskB.id)
 
-    assert taskA.priority == 1003
-    assert taskB.priority == 1002
+    assert taskA.order < taskB.order
 
 
 @pytest.mark.django_db
@@ -642,8 +641,7 @@ def test_sort_action_down(client):
     taskA = models.Task.objects.get(pk=taskA.id)
     taskB = models.Task.objects.get(pk=taskB.id)
 
-    assert taskA.priority == 899
-    assert taskB.priority == 900
+    assert taskA.order > taskB.order
 
 
 @pytest.mark.django_db
