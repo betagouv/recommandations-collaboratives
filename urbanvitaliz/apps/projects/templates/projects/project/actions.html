@@ -165,7 +165,7 @@
                     </div>
                 </template>
 
-                <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true">
+                <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true" x-init="initModal()">
                     <div class="modal-dialog modal-fullscreen">
                         <template x-if="currentTaskId" x-data="{ get currentTask() { return this.findById(this.currentTaskId) }  }">
                             <div class="modal-content">
@@ -175,27 +175,27 @@
                                 </div>
                                 <div class="modal-body p-0">
                                     <div class="d-flex align-items-stretch h-100">
-                                        <div class="flex-fill p-3 overflow-auto">
                                             <template x-if="currentTask.resource_id">
                                                 <iframe class="w-100 h-100" :src="resourcePreviewUrl(currentTask.resource_id)"></iframe>
                                             </template>
                                             <template x-if="!currentTask.resource_id">
-                                                <div class="col-10 px-5 mx-auto">
-                                                    <div class="resource-details pb-3">
-                                                        <h1 x-text="currentTask.intent" class="mb-3"></h1>
+                                                <div class="flex-fill p-3 overflow-auto">
+                                                    <div class="col-10 px-5 mx-auto">
+                                                        <div class="resource-details pb-3">
+                                                            <h1 x-text="currentTask.intent" class="mb-3"></h1>
+                                                        </div>
+                                                        <p class="text-justified" x-html="renderMarkdown(currentTask.content)"></p>
                                                     </div>
-                                                    <p class="text-justified" x-html="renderMarkdown(currentTask.content)"></p>
-                                                </div>
+                                               </div>
                                             </template>
-                                        </div>
                                         <div class="w-25 border border-top-0 border-bottom-0 border-right-0 flex-shrink-0 d-flex flex-column justify-content-between">
                                             <div class="d-flex flex-column flex-fill overflow-hidden">
                                                 <h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
                                                     <span class="align-middle">Conversation</span>
                                                 </h2>
                                                 <div class="flex-fill overflow-auto h-100">
-                                                    <template x-for="f in currentTask.followups">
-                                                        <div class="rounded bg-light p-2 m-3" style="font-size: 0.8em">
+                                                    <template x-for="f in currentTask.followups" x-key="f.timestamp" x-effect="currentTask.followups && scrollToLastElement">
+                                                        <div class="rounded bg-light p-2 m-3 message" style="font-size: 0.8em">
                                                             <p x-text="f.comment" class="mb-2"></p>
                                                             <div>
                                                                 <img class="align-middle rounded-circle d-inline-block" width="20px" height="20px"
