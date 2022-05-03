@@ -93,3 +93,7 @@ function sendCommentUrl(taskId) {
 function formatDate(timestamp) {
     return new Date(timestamp).toLocaleString();
 }
+
+function renderMarkdown(content) {
+    return marked.parse(content);
+}
