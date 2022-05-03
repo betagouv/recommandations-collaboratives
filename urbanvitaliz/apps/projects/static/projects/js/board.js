@@ -79,4 +79,3 @@ function truncate(input, size = 30) {
 function formatDateDisplay(date) {
     return new Date(date).toLocaleDateString('fr-FR');
 }
-
