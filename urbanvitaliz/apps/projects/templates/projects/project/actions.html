@@ -91,11 +91,11 @@
                                             <div class="rounded bg-white shadow p-1 px-2 position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)" @dragend="onDragEnd(event)">
                                                 <h6 class="mt-1 mb-0 fw-bold" x-text="truncate(t.intent)"></h6>
                                                 <template x-if="t.resource_id">
-                                                    <a @click="onPreviewClick(event, t.uuid)" style="font-size: 0.8em">Consulter la ressource</a>
+                                                    <a @click="onPreviewClick(event, t.id)" style="font-size: 0.8em">Consulter la ressource</a>
                                                 </template>
 
                                                 <template x-if="!t.resource_id">
-                                                    <a @click="onPreviewClick(event, t.uuid)" style="font-size: 0.8em">Voir la recommandation</a>
+                                                    <a @click="onPreviewClick(event, t.id)" style="font-size: 0.8em">Voir la recommandation</a>
                                                 </template>
 
                                                 <div class="rounded bg-light p-2 my-2" style="font-size: 0.8em">
@@ -155,7 +155,7 @@
 
                 <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-fullscreen">
-                        <template x-if="currentTask">
+                        <template x-if="currentTaskId" x-data="{ get currentTask() { return this.findById(this.currentTaskId) }  }">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h3 :text="currentTask.intent"></h3>
@@ -202,9 +202,9 @@
                                                 </div>     
                                                 <div>
                                                     <span>Répondre</span>
-                                                    <form class="mt-2 form d-flex flex-column align-items-end" method="POST" :action="sendCommentUrl(currentTask.id)">
+                                                    <form class="mt-2 form d-flex flex-column align-items-end" @submit.prevent="onSubmitComment">
                                                         {% csrf_token %}
-                                                        <textarea name="comment" style="min-height: 100px; border-color: #ccc;" class="w-100 p-2 rounded rounded-4 my-1 border" placeholder="Votre message..."></textarea>
+                                                        <textarea name="comment" style="min-height: 100px; border-color: #ccc;" class="w-100 p-2 rounded rounded-4 my-1 border" placeholder="Votre message..." x-model="pendingComment"></textarea>
                                                         <button type="submit" class="btn btn-primary">Envoyer</button>
                                                     </form>
                                                 </div>     

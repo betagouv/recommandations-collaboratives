@@ -21,6 +21,12 @@ function configureBoardApp(app, options) {
             this.isBusy = false;
             this.data = data;
         },
+        findByUuid(uuid) {
+            return this.data.find(d => d.uuid === uuid);
+        },
+        findById(id) {
+            return this.data.find(d => d.id === id);
+        },
         get view() {
             return this.data.filter(options.filterFn.bind(this)).sort(options.sortFn.bind(this));
         },
