@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "django_filters",
     "csvexport",
     "captcha",
+    "ordered_model",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",
