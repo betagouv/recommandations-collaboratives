@@ -48,14 +48,26 @@ function boardTasksApp(projectId) {
       { status: 2, title: "En attente", color_class: "border-warning" },
       { status: 3, title: "Archivées", color_class: "border-error" },
     ],
-    getTask(uuid) {
-      return this.data.find((d) => d.uuid === uuid);
-    },
-    currentTask: null,
+    currentTaskId: null,
     modalHandle: new bootstrap.Modal(document.getElementById("task-preview")),
-    onPreviewClick(event, uuid) {
-      this.currentTask = this.getTask(uuid);
+    onPreviewClick(event, id) {
+      this.currentTaskId = id;
       this.$nextTick(() => this.modalHandle.show());
+    },
+    pendingComment: "",
+    async onSubmitComment() {
+        await fetch(sendCommentUrl(this.currentTask.id), {
+            method: "POST",
+            cache: "no-cache",
+            mode: "same-origin",
+            credentials: "same-origin",
+            headers: {
+              "X-CSRFToken": Cookies.get("csrftoken"),
+            },
+            body: new URLSearchParams({ comment: this.pendingComment })
+        });
+        this.pendingComment = "";
+        await this.getData();
     }
   };
 
