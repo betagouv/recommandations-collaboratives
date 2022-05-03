@@ -130,31 +130,33 @@
                                                             </svg>
                                                             <span x-text="t.followups.length"></span>
                                                         </div>
+                                                    </div>
 
-                                                        <div class="text-primary ms-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="text-primary me-2">
                                                             <svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
                                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
                                                             </svg>
                                                             <span x-text="t.reminders.length"></span>
                                                         </div>
-                                                    </div>
 
-                                                    {% if can_administrate and not disable_edit %}
-                                                    <div class="dropdown align-middle">
-                                                        <a class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            Aiguillage
-                                                        </a>
-                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                                            <li><a class="dropdown-item" :href="editTaskUrl(t.id)">Éditer</a></li>
-                                                            <li>
-                                                                <form method="POST" :action="deleteTaskReminderUrl(t.id)">
-                                                                    {% csrf_token %}
-                                                                    <button class="dropdown-item">Supprimer le rappel</button>
-                                                                </form>
-                                                            </li>
-                                                        </ul>
+                                                        {% if can_administrate and not disable_edit %}
+                                                        <div class="dropdown">
+                                                            <a class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                Aiguillage
+                                                            </a>
+                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                                                <li><a class="dropdown-item" :href="editTaskUrl(t.id)">Éditer</a></li>
+                                                                <li>
+                                                                    <form method="POST" :action="deleteTaskReminderUrl(t.id)">
+                                                                        {% csrf_token %}
+                                                                        <button class="dropdown-item">Supprimer le rappel</button>
+                                                                    </form>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        {% endif %}
                                                     </div>
-                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>  
@@ -196,7 +198,7 @@
                                                 <div class="flex-fill overflow-auto h-100">
                                                     <template x-for="f in currentTask.followups" x-key="f.timestamp" x-effect="currentTask.followups && scrollToLastElement">
                                                         <div class="rounded bg-light p-2 m-3 message" style="font-size: 0.8em">
-                                                            <p x-text="f.comment" class="mb-2"></p>
+                                                            <p x-html="renderMarkdown(f.comment)" class="mb-2"></p>
                                                             <div>
                                                                 <img class="align-middle rounded-circle d-inline-block" width="20px" height="20px"
                                                                     :src="gravatar_url(f.who.email, 25, f.who.first_name + ' ' + f.who.last_name)"
