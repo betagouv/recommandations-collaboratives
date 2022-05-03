@@ -39,6 +39,8 @@ function boardTasksApp(projectId) {
     postProcessData(data) {},
   };
 
+  const pendingReminderDate = daysFromNow(15);
+
   const app = {
     boards: [
       { status: 0, title: "Nouvelles ", color_class: "border-primary" },
@@ -47,16 +49,30 @@ function boardTasksApp(projectId) {
       { status: 3, title: "Archivées", color_class: "border-error" },
     ],
     currentTaskId: null,
-    initModal() {
+    currentReminderTaskId: null,
+    initPreviewModal() {
       const element = document.getElementById("task-preview");
-      this.modalHandle = new bootstrap.Modal(element);
+      this.previewModalHandle = new bootstrap.Modal(element);
       element.addEventListener("shown.bs.modal", () => {
         this.scrollToLastElement();
       });
     },
-    onPreviewClick(event, id) {
+    initReminderModal() {
+      const element = document.getElementById("reminder-modal");
+      this.reminderModalHandle = new bootstrap.Modal(element);
+    },
+    initTooltips() {
+      new bootstrap.Tooltip(this.$el, { 
+        selector: "[data-bs-toggle='tooltip']"
+      })
+    },
+    onPreviewClick(id) {
       this.currentTaskId = id;
-      this.modalHandle.show();
+      this.previewModalHandle.show();
+    },
+    onReminderClick(id) {
+      this.currentReminderTaskId = id;
+      this.reminderModalHandle.show();
     },
     pendingComment: "",
     async onSubmitComment() {
@@ -79,6 +95,18 @@ function boardTasksApp(projectId) {
         nodes[nodes.length - 1].scrollIntoView();
       });
     },
+    pendingReminderDate: formatReminderDate(daysFromNow(15)),
+    onSubmitReminder() {
+      const form = this.$refs.reminderForm;
+      const dateInput = form.querySelector('#reminder-date');
+      const daysInput = form.querySelector('#reminder-days');
+      console.log(form);
+      daysInput.value = Math.ceil((new Date(dateInput.value) - new Date())  / 86400000);
+      form.submit();
+    },
+    updatePendingReminderDate(days) {
+      this.pendingReminderDate = formatReminderDate(daysFromNow(days));
+    }
   };
 
   return configureBoardApp(app, options);
@@ -100,10 +128,31 @@ function sendCommentUrl(taskId) {
   return `/task/${taskId}/followup/`;
 }
 
+function editReminderUrl(taskId) {
+  return `/task/${taskId}/remind/`;
+}
+
 function formatDate(timestamp) {
   return new Date(timestamp).toLocaleString();
 }
 
 function renderMarkdown(content) {
   return marked.parse(content);
+}
+
+function daysFromNow(days) {
+  return new Date((new Date()).getTime() + (days * 86400000 /* seconds in a day */))
+}
+
+function formatReminderDate(date) {
+  return date.toISOString().substring(0, 10);
+}
+
+function reminderTooltip(task) {
+  if (task.reminders.length > 0) {
+    const reminder = task.reminders[0];
+    return `Rappel pour ${reminder.recipient} prévu le ${reminder.deadline}`
+  } else {
+    return "Aucun rappel prévu"
+  }
 }

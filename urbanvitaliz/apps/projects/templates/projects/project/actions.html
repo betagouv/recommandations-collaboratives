@@ -47,9 +47,6 @@
 {% block project_detail %}
 
 <div class="col-12 mx-auto">
-
-    {% include "projects/project/fragments/reminder_modal.html" %}
-
     <div class="row">
         <div class="col">
             <div class="d-flex mt-1 mb-4 align-items-center justify-content-between">
@@ -69,7 +66,7 @@
                         {% for switchtender in project.switchtenders.all %}
                         <img class="rounded-circle d-inline-block ms-1" width="20px" height="20px"
                             src="{% gravatar_url switchtender.email 25 %}" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                            title="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }}" style="z-index: 1000;" tabindex="0" />
+                            title="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }}" tabindex="0" />
                         {% endfor %}
                     </div>
     
@@ -87,7 +84,7 @@
             </div>
 
 
-            <div x-data="boardTasksApp({{ project.id }})" x-init="getData()" class="d-flex pb-2 align-items-stretch">
+            <div x-data="boardTasksApp({{ project.id }})" x-init="getData(); initTooltips();" class="d-flex pb-2 align-items-stretch">
                 <template x-for="board in boards">
                     <div class="col px-2" style="min-height: 100px">
                         <div class="rounded border-top border-2 drop-column" :class="board.color_class">
@@ -106,13 +103,13 @@
                                     <div>
                                         <div :id="t.uuid" class="drag-targetable py-3" @dragover="onDragOver(event)" @drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)" >
                                             <div class="rounded bg-white shadow p-1 px-2 position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)" @dragend="onDragEnd(event)">
-                                                <div @click="onPreviewClick(event, t.id)" style="cursor: pointer">
+                                                <div @click="onPreviewClick(t.id)" style="cursor: pointer">
                                                     <h6 class="mt-1 mb-0 fw-bold" x-text="truncate(t.intent)"></h6>
     
                                                     <div class="rounded bg-light p-2 my-2" style="font-size: 0.8em">
                                                         <p x-text="truncate(t.content, 200)" class="mb-2"></p>
                                                         <div>
-                                                            <img class="align-middle rounded-circle d-inline-block" width="20px" height="20px"
+                                                            <img class="rounded-circle d-inline-block" width="20px" height="20px"
                                                                 :src="gravatar_url(t.created_by.email, 25, t.created_by.first_name + ' ' + t.created_by.last_name)"
                                                                 data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${t.created_by.first_name} ${t.created_by.last_name}`"
                                                                 style="z-index: 1000;" tabindex="0" />
@@ -122,22 +119,21 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="border-top py-1 d-flex align-middle justify-content-between" style="font-size: 0.8em">
+                                                <div class="border-top py-1 d-flex justify-content-between" style="font-size: 0.8em">
                                                     <div class="d-flex align-items-center">
                                                         <div class="text-primary">
-                                                            <svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
+                                                            <svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
                                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
                                                             </svg>
                                                             <span x-text="t.followups.length"></span>
                                                         </div>
                                                     </div>
 
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="text-primary me-2">
+                                                    <div class="d-flex align-items-center" x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
+                                                        <div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(t.id)">
                                                             <svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
                                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
                                                             </svg>
-                                                            <span x-text="t.reminders.length"></span>
                                                         </div>
 
                                                         {% if can_administrate and not disable_edit %}
@@ -167,9 +163,9 @@
                     </div>
                 </template>
 
-                <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true" x-init="initModal()">
+                <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true" x-init="initPreviewModal()">
                     <div class="modal-dialog modal-fullscreen">
-                        <template x-if="currentTaskId" x-data="{ get currentTask() { return this.findById(this.currentTaskId) }  }">
+                        <template x-if="currentTaskId" x-data="{ get currentTask() { return findById(this.currentTaskId) } }">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h3 :text="currentTask.intent"></h3>
@@ -193,14 +189,14 @@
                                         <div class="w-25 border border-top-0 border-bottom-0 border-right-0 flex-shrink-0 d-flex flex-column justify-content-between">
                                             <div class="d-flex flex-column flex-fill overflow-hidden">
                                                 <h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
-                                                    <span class="align-middle">Conversation</span>
+                                                    Conversation
                                                 </h2>
                                                 <div class="flex-fill overflow-auto h-100">
                                                     <template x-for="f in currentTask.followups" x-key="f.timestamp" x-effect="currentTask.followups && scrollToLastElement">
                                                         <div class="rounded bg-light p-2 m-3 message" style="font-size: 0.8em">
                                                             <p x-html="renderMarkdown(f.comment)" class="mb-2"></p>
                                                             <div>
-                                                                <img class="align-middle rounded-circle d-inline-block" width="20px" height="20px"
+                                                                <img class="rounded-circle d-inline-block" width="20px" height="20px"
                                                                     :src="gravatar_url(f.who.email, 25, f.who.first_name + ' ' + f.who.last_name)"
                                                                     data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${f.who.first_name} $f.who.last_name}`"
                                                                     style="z-index: 1000;" tabindex="0" />
@@ -223,6 +219,50 @@
                                             </div>     
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+           
+                <div class="modal fade" id="reminder-modal" tabindex="-1" aria-labelledby="reminder-modal-label" aria-hidden="true" x-init="initReminderModal()">
+                    <div class="modal-dialog">
+                        <template x-if="currentReminderTaskId">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="reminder-modal-label">
+                                        <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
+                                        </svg>
+                                        <span class="align-middle">
+                                            Programmer une alerte
+                                        </span>
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                    
+                                <div class="modal-body">
+                                    En validant cette alerte, vous recevrez un courriel pour vous remémorer de prendre
+                                    une action sur cette recommandation.
+                                    <form method="POST" x-ref="reminderForm" :action="editReminderUrl(currentReminderTaskId)">
+                                        {% csrf_token %}
+                                        <input name="days" type="hidden" class="form-control" id="reminder-days">
+                                        <div class="btn-group w-100 mt-4 mb-2" role="group" aria-label="Shortcuts">
+                                            <a @click="updatePendingReminderDate(daysFromNow(15))" class="btn btn-outline-secondary">Dans 15 jours</a>
+                                            <a @click="updatePendingReminderDate(30)" class="btn btn-outline-secondary">Dans 1 mois</a>
+                                            <a @click="updatePendingReminderDate(30 * 6)" class="btn btn-outline-secondary">Dans 6 mois</a>
+                                        </div>
+                                        <div class="input-group mt-2 mb-3">
+                                            <span class="input-group-text" id="date-input">Date : </span>
+                                            <input required aria-describedby="date-input" name="date" id="reminder-date" class="form-control" size="16" type="date" x-model="pendingReminderDate">
+                                        </div>
+                                    </form>
+                                    <span x-text="pendingReminderDate"></span>
+                                </div>
+                    
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <button type="button" type="submit" class="btn btn-primary" @click="onSubmitReminder">Programmer</button>
                                 </div>
                             </div>
                         </template>
