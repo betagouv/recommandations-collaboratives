@@ -1,5 +1,5 @@
 [run]
-#plugins = django_coverage_plugin
+plugins = django_coverage_plugin
 source =
     urbanvitaliz
 omit =
