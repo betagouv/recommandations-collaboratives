@@ -36,9 +36,7 @@ function boardTasksApp(projectId) {
     filterFn(d) {
       return true;
     },
-    postProcessData(data) {
-      console.log(data);
-    },
+    postProcessData(data) {},
   };
 
   const app = {
@@ -49,26 +47,38 @@ function boardTasksApp(projectId) {
       { status: 3, title: "Archivées", color_class: "border-error" },
     ],
     currentTaskId: null,
-    modalHandle: new bootstrap.Modal(document.getElementById("task-preview")),
+    initModal() {
+      const element = document.getElementById("task-preview");
+      this.modalHandle = new bootstrap.Modal(element);
+      element.addEventListener("shown.bs.modal", () => {
+        this.scrollToLastElement();
+      });
+    },
     onPreviewClick(event, id) {
       this.currentTaskId = id;
-      this.$nextTick(() => this.modalHandle.show());
+      this.modalHandle.show();
     },
     pendingComment: "",
     async onSubmitComment() {
-        await fetch(sendCommentUrl(this.currentTask.id), {
-            method: "POST",
-            cache: "no-cache",
-            mode: "same-origin",
-            credentials: "same-origin",
-            headers: {
-              "X-CSRFToken": Cookies.get("csrftoken"),
-            },
-            body: new URLSearchParams({ comment: this.pendingComment })
-        });
-        this.pendingComment = "";
-        await this.getData();
-    }
+      await fetch(sendCommentUrl(this.currentTask.id), {
+        method: "POST",
+        cache: "no-cache",
+        mode: "same-origin",
+        credentials: "same-origin",
+        headers: {
+          "X-CSRFToken": Cookies.get("csrftoken"),
+        },
+        body: new URLSearchParams({ comment: this.pendingComment }),
+      });
+      this.pendingComment = "";
+      await this.getData();
+    },
+    scrollToLastElement() {
+      const nodes = this.$root.querySelectorAll(".message");
+      this.$nextTick(() => {
+        nodes[nodes.length - 1].scrollIntoView();
+      });
+    },
   };
 
   return configureBoardApp(app, options);
@@ -87,13 +97,13 @@ function deleteTaskReminderUrl(taskId) {
 }
 
 function sendCommentUrl(taskId) {
-    return `/task/${taskId}/followup/`
+  return `/task/${taskId}/followup/`;
 }
 
 function formatDate(timestamp) {
-    return new Date(timestamp).toLocaleString();
+  return new Date(timestamp).toLocaleString();
 }
 
 function renderMarkdown(content) {
-    return marked.parse(content);
+  return marked.parse(content);
 }
