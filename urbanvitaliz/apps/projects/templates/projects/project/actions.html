@@ -95,14 +95,14 @@
 
                             <div class="px-2 py-1 pb-1 bg-light shadow-sm">
                                 <template x-if="column(board.status).length === 0">
-                                    <div class="drag-targetable py-2" @dragover="onDragOver(event, null)" @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
+                                    <div class="drag-targetable py-3" @dragover="onDragOver(event, null)" @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
                                         <div class="drag-placeholder"></div>
                                     </div>
                                 </template>
 
                                 <template x-for="(t, i) in column(board.status)" :key="t.id">
                                     <div>
-                                        <div :id="t.uuid" class="drag-targetable py-2 my-2" @dragover="onDragOver(event)" @drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)" >
+                                        <div :id="t.uuid" class="drag-targetable py-3" @dragover="onDragOver(event)" @drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)" >
                                             <div class="rounded bg-white shadow p-1 px-2 position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)" @dragend="onDragEnd(event)">
                                                 <h6 class="mt-1 mb-0 fw-bold" x-text="truncate(t.intent)"></h6>
                                                 <template x-if="t.resource_id">

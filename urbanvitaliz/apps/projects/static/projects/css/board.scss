@@ -1,9 +1,5 @@
-.drag-targetable {
-    padding-top: 4px;
-}
-
 .drag-placeholder {
-    height: 50px;
+    height: 4em;
 }
 
 .drag-target {
@@ -13,11 +9,11 @@
 .drag-target::before {
     content: '';
     width: 100%;
-    height: 2px;
+    height: 3px;
     position: absolute;
     background-color: #0d6efd;
-    border-radius: 2px;
-    margin-top: -12px;
+    border-radius: 3px;
+    margin-top: -15px;
     z-index: 9999;
 }
 
