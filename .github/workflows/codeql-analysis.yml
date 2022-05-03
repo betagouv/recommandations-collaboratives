@@ -58,16 +58,17 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
 
-    - name: Python Blacken
+    - if: matrix.language == 'python'
+      name: Python Blacken
       # You may pin to the exact commit or the version.
       # uses: piotrpawlaczek/python-blacken@3300482ee29b6fe01c4c67e1e579a26b3ac17bf5
       uses: piotrpawlaczek/python-blacken@v22.3.0
       with:
         # File or directory to run black on.
-        path: # optional, default is .
+        path: . # optional, default is .
         # The number of characters allowed per line.
-        line-length: # optional, default is 88
+        line-length: 88 # optional, default is 88
         # Sanity check [fast|safe]
-        sanity-check: # optional, default is safe
+        sanity-check: safe # optional, default is safe
         # Only check the files instead of modify them [yes|no] 
-        only-check: # optional, default is yes
+        only-check: yes # optional, default is yes
