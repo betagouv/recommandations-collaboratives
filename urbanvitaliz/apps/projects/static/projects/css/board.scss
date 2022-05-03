@@ -2,6 +2,18 @@
     height: 4em;
 }
 
+.drop-column {
+    padding: 0 2px;
+}
+
+.drop-column.drop-highlight {
+    padding: 0px;
+    border-width: 2px;
+    border-style: dashed;
+    border-top-style: solid;
+    border-color: #0d6efd !important;
+}
+
 .drag-target {
     position: relative;
 }
@@ -19,4 +31,5 @@
 
 .drag-dragging {
     background-color: #ffc107 !important;
+    opacity: .5;
 }
