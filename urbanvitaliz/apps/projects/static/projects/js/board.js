@@ -39,9 +39,11 @@ function configureBoardApp(app, options) {
             event.dataTransfer.effectAllowed = "move";
             event.dataTransfer.setData('application/uuid', uuid);
             event.target.classList.add('drag-dragging');
+            document.querySelectorAll(".drop-column").forEach(e => e.classList.add("drop-highlight"));
         },
         onDragEnd(event) {
             event.target.classList.remove('drag-dragging');
+            document.querySelectorAll(".drop-column").forEach(e => e.classList.remove("drop-highlight"));
         },
         onDragEnter(event) {
             if (this.currentlyHoveredElement && this.currentlyHoveredElement !== event.currentTarget) {

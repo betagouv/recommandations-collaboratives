@@ -88,7 +88,7 @@
             <div x-data="boardTasksApp({{ project.id }})" x-init="getData()" class="d-flex pb-2 align-items-stretch">
                 <template x-for="board in boards">
                     <div class="col px-2" style="min-height: 100px">
-                        <div class="pb-4 rounded border-top border-4" :class="board.color_class">
+                        <div class="rounded border-top border-2 drop-column" :class="board.color_class">
                             <div class="d-flex justify-content-between justify-items-center px-2 py-2 bg-light">
                                 <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
                             </div>
