@@ -89,11 +89,11 @@
                 <template x-for="board in boards">
                     <div class="col px-2" style="min-height: 100px">
                         <div class="pb-4 rounded border-top border-4" :class="board.color_class">
-                            <div class="d-flex justify-content-between justify-items-center px-2 py-2 bg-light sticky-top top-0">
+                            <div class="d-flex justify-content-between justify-items-center px-2 py-2 bg-light">
                                 <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
                             </div>
 
-                            <div class="px-2 py-1 pb-1 bg-light shadow-sm">
+                            <div class="px-2 py-1 pb-1 bg-light shadow-sm overflow-auto" style="max-height: 70vh;">
                                 <template x-if="column(board.status).length === 0">
                                     <div class="drag-targetable py-3" @dragover="onDragOver(event, null)" @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
                                         <div class="drag-placeholder"></div>
