@@ -10,6 +10,8 @@ created: 2021-06-16 17:56:10 CEST
 from datetime import datetime
 
 import pytest
+from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
@@ -408,6 +410,20 @@ def test_user_cannot_delete_someone_else_bookmark(client):
     assert not bookmark.deleted
     newurl = reverse("resources-resource-detail", args=[bookmark.resource_id])
     assertRedirects(response, newurl)
+
+
+################################################################################
+# Multisite
+################################################################################
+@pytest.mark.django_db
+def test_search_resources_honors_multisite(request):
+    other_site = Recipe(Site).make()
+    current_site = get_current_site(request)
+    my_resource = Recipe(models.Resource, sites=[current_site]).make()
+    other_resource = Recipe(models.Resource, sites=[other_site]).make()
+    result = models.Resource.search()
+    assert my_resource in result
+    assert other_resource not in result
 
 
 # eof

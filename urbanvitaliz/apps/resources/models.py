@@ -9,6 +9,8 @@ created: 2021-06-16 10:57:13 CEST
 import datetime
 
 from django.contrib.auth import models as auth
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.functions import Lower
 from django.shortcuts import reverse
@@ -80,6 +82,9 @@ class Resource(models.Model):
     )
 
     objects = ResourceQuerySet.as_manager()
+    on_site = CurrentSiteManager()
+
+    sites = models.ManyToManyField(Site)
 
     status = models.IntegerField(
         choices=STATUS_CHOICES, verbose_name="État", default=DRAFT
@@ -169,7 +174,7 @@ class Resource(models.Model):
 
     @classmethod
     def fetch(cls):
-        return cls.objects.filter(deleted=None)
+        return cls.on_site.filter(deleted=None)
 
     @classmethod
     def search(cls, query="", categories=None):
