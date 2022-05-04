@@ -36,10 +36,10 @@ function boardTasksApp(projectId) {
     filterFn(d) {
       return true;
     },
-    postProcessData(data) {
-      console.log(data);
-    },
+    postProcessData(data) {},
   };
+
+  const pendingReminderDate = daysFromNow(15);
 
   const app = {
     boards: [
@@ -49,25 +49,63 @@ function boardTasksApp(projectId) {
       { status: 3, title: "Archivées", color_class: "border-error" },
     ],
     currentTaskId: null,
-    modalHandle: new bootstrap.Modal(document.getElementById("task-preview")),
-    onPreviewClick(event, id) {
+    currentReminderTaskId: null,
+    initPreviewModal() {
+      const element = document.getElementById("task-preview");
+      this.previewModalHandle = new bootstrap.Modal(element);
+      element.addEventListener("shown.bs.modal", () => {
+        this.scrollToLastElement();
+      });
+    },
+    initReminderModal() {
+      const element = document.getElementById("reminder-modal");
+      this.reminderModalHandle = new bootstrap.Modal(element);
+    },
+    initTooltips() {
+      new bootstrap.Tooltip(this.$el, { 
+        selector: "[data-bs-toggle='tooltip']"
+      })
+    },
+    onPreviewClick(id) {
       this.currentTaskId = id;
-      this.$nextTick(() => this.modalHandle.show());
+      this.previewModalHandle.show();
+    },
+    onReminderClick(id) {
+      this.currentReminderTaskId = id;
+      this.reminderModalHandle.show();
     },
     pendingComment: "",
     async onSubmitComment() {
-        await fetch(sendCommentUrl(this.currentTask.id), {
-            method: "POST",
-            cache: "no-cache",
-            mode: "same-origin",
-            credentials: "same-origin",
-            headers: {
-              "X-CSRFToken": Cookies.get("csrftoken"),
-            },
-            body: new URLSearchParams({ comment: this.pendingComment })
-        });
-        this.pendingComment = "";
-        await this.getData();
+      await fetch(sendCommentUrl(this.currentTask.id), {
+        method: "POST",
+        cache: "no-cache",
+        mode: "same-origin",
+        credentials: "same-origin",
+        headers: {
+          "X-CSRFToken": Cookies.get("csrftoken"),
+        },
+        body: new URLSearchParams({ comment: this.pendingComment }),
+      });
+      this.pendingComment = "";
+      await this.getData();
+    },
+    scrollToLastElement() {
+      const nodes = this.$root.querySelectorAll(".message");
+      this.$nextTick(() => {
+        nodes[nodes.length - 1].scrollIntoView();
+      });
+    },
+    pendingReminderDate: formatReminderDate(daysFromNow(15)),
+    onSubmitReminder() {
+      const form = this.$refs.reminderForm;
+      const dateInput = form.querySelector('#reminder-date');
+      const daysInput = form.querySelector('#reminder-days');
+      console.log(form);
+      daysInput.value = Math.ceil((new Date(dateInput.value) - new Date())  / 86400000);
+      form.submit();
+    },
+    updatePendingReminderDate(days) {
+      this.pendingReminderDate = formatReminderDate(daysFromNow(days));
     }
   };
 
@@ -87,9 +125,34 @@ function deleteTaskReminderUrl(taskId) {
 }
 
 function sendCommentUrl(taskId) {
-    return `/task/${taskId}/followup/`
+  return `/task/${taskId}/followup/`;
+}
+
+function editReminderUrl(taskId) {
+  return `/task/${taskId}/remind/`;
 }
 
 function formatDate(timestamp) {
-    return new Date(timestamp).toLocaleString();
+  return new Date(timestamp).toLocaleString();
+}
+
+function renderMarkdown(content) {
+  return marked.parse(content);
+}
+
+function daysFromNow(days) {
+  return new Date((new Date()).getTime() + (days * 86400000 /* seconds in a day */))
+}
+
+function formatReminderDate(date) {
+  return date.toISOString().substring(0, 10);
+}
+
+function reminderTooltip(task) {
+  if (task.reminders.length > 0) {
+    const reminder = task.reminders[0];
+    return `Rappel pour ${reminder.recipient} prévu le ${reminder.deadline}`
+  } else {
+    return "Aucun rappel prévu"
+  }
 }
