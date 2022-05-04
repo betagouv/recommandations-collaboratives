@@ -55,7 +55,7 @@ def send_recommendation_digest_by_project(user, notifications):
     for project_id, project_notifications in groupby(
         notifications, key=lambda x: x.target_object_id
     ):
-        project = models.Project.objects.get(pk=project_id)
+        project = models.Project.on_site.get(pk=project_id)
 
         digest = make_digest_of_project_recommendations(
             project, project_notifications, user
@@ -294,7 +294,7 @@ def make_project_notifications_digest(project_id, notifications, user):
     """Return digest for given project notification"""
     # Ignore deleted projects
     try:
-        project = models.Project.objects.get(pk=project_id)
+        project = models.Project.on_site.get(pk=project_id)
     except models.Project.DoesNotExist:
         return None
 

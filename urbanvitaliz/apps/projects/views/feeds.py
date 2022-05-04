@@ -23,7 +23,7 @@ class LatestProjectsFeed(Feed):
     description = "Derniers ajouts de projets"
 
     def items(self):
-        return models.Project.objects.order_by("-created_on")[:5]
+        return models.Project.on_site.order_by("-created_on")[:5]
 
     def item_title(self, item):
         return item.name

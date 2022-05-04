@@ -22,6 +22,7 @@ class Command(BaseCommand):
 
     def send_email_digests(self):
         # Send project collaborators new recommendations
+        # FIXME Handle multisites!
         for project in project_models.Project.objects.all():
             for user in auth_models.User.objects.filter(email__in=project.emails):
                 if digests.send_digests_for_new_recommendations_by_user(user):

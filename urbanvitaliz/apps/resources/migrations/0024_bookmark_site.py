@@ -7,15 +7,17 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sites', '0002_alter_domain_unique'),
-        ('resources', '0023_auto_20220504_0941'),
+        ("sites", "0002_alter_domain_unique"),
+        ("resources", "0023_auto_20220504_0941"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bookmark',
-            name='site',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='sites.site'),
+            model_name="bookmark",
+            name="site",
+            field=models.ForeignKey(
+                default=1, on_delete=django.db.models.deletion.CASCADE, to="sites.site"
+            ),
             preserve_default=False,
         ),
     ]
