@@ -10,6 +10,7 @@ created: 2021-06-01 10:11:56 CEST
 
 import pytest
 from django.contrib.auth import models as auth
+from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery.recipe import Recipe
@@ -558,9 +559,13 @@ def test_create_new_action_without_resource(client):
 
 
 @pytest.mark.django_db
-def test_create_new_action_with_single_resource(client):
+def test_create_new_action_with_single_resource(request, client):
     project = Recipe(models.Project).make()
-    resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
+    resource = Recipe(
+        resources.Resource,
+        sites=[get_current_site(request)],
+        status=resources.Resource.PUBLISHED,
+    ).make()
 
     intent = "My Intent"
     content = "My Content"
@@ -587,10 +592,18 @@ def test_create_new_action_with_single_resource(client):
 
 
 @pytest.mark.django_db
-def test_create_new_action_with_multiple_resources(client):
+def test_create_new_action_with_multiple_resources(request, client):
     project = Recipe(models.Project).make()
-    resource1 = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
-    resource2 = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
+    resource1 = Recipe(
+        resources.Resource,
+        sites=[get_current_site(request)],
+        status=resources.Resource.PUBLISHED,
+    ).make()
+    resource2 = Recipe(
+        resources.Resource,
+        sites=[get_current_site(request)],
+        status=resources.Resource.PUBLISHED,
+    ).make()
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)

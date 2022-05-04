@@ -38,9 +38,12 @@ def test_resource_list_available_for_every_one(client):
 
 
 @pytest.mark.django_db
-def test_resource_list_contains_published_resource_title_and_link(client):
+def test_resource_list_contains_published_resource_title_and_link(request, client):
     resource = Recipe(
-        models.Resource, status=models.Resource.PUBLISHED, title=" public resource"
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.PUBLISHED,
+        title=" public resource",
     ).make()
     url = reverse("resources-resource-search")
     response = client.get(url)
@@ -50,9 +53,12 @@ def test_resource_list_contains_published_resource_title_and_link(client):
 
 
 @pytest.mark.django_db
-def test_draft_resources_are_not_available_to_non_staff_users(client):
+def test_draft_resources_are_not_available_to_non_staff_users(request, client):
     resource = Recipe(
-        models.Resource, status=models.Resource.DRAFT, title="draft resource"
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.DRAFT,
+        title="draft resource",
     ).make()
     url = reverse("resources-resource-search")
     response = client.get(url)
@@ -61,9 +67,12 @@ def test_draft_resources_are_not_available_to_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_draft_resources_are_available_to_staff_users(client):
+def test_draft_resources_are_available_to_staff_users(request, client):
     resource = Recipe(
-        models.Resource, status=models.Resource.DRAFT, title="a draft resource"
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.DRAFT,
+        title="a draft resource",
     ).make()
     url = reverse("resources-resource-search")
     with login(client, is_staff=True):
@@ -73,10 +82,11 @@ def test_draft_resources_are_available_to_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_resource_list_contains_only_resource_with_category(client):
+def test_resource_list_contains_only_resource_with_category(request, client):
     category1 = Recipe(models.Category).make()
     resource1 = Recipe(
         models.Resource,
+        sites=[get_current_site(request)],
         title="selected resource",
         status=models.Resource.PUBLISHED,
         category=category1,
@@ -84,6 +94,7 @@ def test_resource_list_contains_only_resource_with_category(client):
     category2 = Recipe(models.Category).make()
     resource2 = Recipe(
         models.Resource,
+        sites=[get_current_site(request)],
         title="unselected resource",
         status=models.Resource.PUBLISHED,
         category=category2,
@@ -98,22 +109,25 @@ def test_resource_list_contains_only_resource_with_category(client):
 
 
 @pytest.mark.django_db
-def test_resource_list_contains_only_resource_with_area(client):
+def test_resource_list_contains_only_resource_with_area(request, client):
     departments = Recipe(geomatics.Department).make(_quantity=3)
     resource1 = Recipe(
         models.Resource,
+        sites=[get_current_site(request)],
         title="selected resource",
         status=models.Resource.PUBLISHED,
         departments=departments[1:],
     ).make()
     resource2 = Recipe(
         models.Resource,
+        sites=[get_current_site(request)],
         title="unselected resource",
         status=models.Resource.PUBLISHED,
         departments=departments[:1],
     ).make()
     resource_national = Recipe(
         models.Resource,
+        sites=[get_current_site(request)],
         title="national resource",
         status=models.Resource.PUBLISHED,
     ).make()
@@ -138,8 +152,8 @@ def test_resource_list_contains_only_resource_with_area(client):
 
 
 @pytest.mark.django_db
-def test_resource_detail_available_for_all_users(client):
-    resource = Recipe(models.Resource).make()
+def test_resource_detail_available_for_all_users(request, client):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     response = client.get(url)
 
@@ -147,8 +161,8 @@ def test_resource_detail_available_for_all_users(client):
 
 
 @pytest.mark.django_db
-def test_resource_detail_available_for_logged_users(client):
-    resource = Recipe(models.Resource).make()
+def test_resource_detail_available_for_logged_users(request, client):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client):
         response = client.get(url)
@@ -156,8 +170,10 @@ def test_resource_detail_available_for_logged_users(client):
 
 
 @pytest.mark.django_db
-def test_resource_detail_contains_informations(client):
-    resource = Recipe(models.Resource, title="A Nice title").make()
+def test_resource_detail_contains_informations(request, client):
+    resource = Recipe(
+        models.Resource, sites=[get_current_site(request)], title="A Nice title"
+    ).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client):
         response = client.get(url)
@@ -167,8 +183,8 @@ def test_resource_detail_contains_informations(client):
 
 
 @pytest.mark.django_db
-def test_resource_detail_contains_update_for_staff(client):
-    resource = Recipe(models.Resource).make()
+def test_resource_detail_contains_update_for_staff(request, client):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client, is_staff=True, groups=["switchtender"]):
         response = client.get(url)
@@ -177,8 +193,12 @@ def test_resource_detail_contains_update_for_staff(client):
 
 
 @pytest.mark.django_db
-def test_resource_detail_does_not_contain_update_for_non_staff(client):
-    resource = Recipe(models.Resource, status=models.Resource.PUBLISHED).make()
+def test_resource_detail_does_not_contain_update_for_non_staff(request, client):
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.PUBLISHED,
+    ).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client, groups=["switchtender"]):
         response = client.get(url)
@@ -219,7 +239,7 @@ def test_create_new_resource_and_redirect(client):
     }
     with login(client, groups=["switchtender"]):
         response = client.post(reverse("resources-resource-create"), data=data)
-    resource = models.Resource.fetch()[0]
+    resource = models.Resource.on_site.all()[0]
     assert resource.content == data["content"]
     assert response.status_code == 302
 
@@ -229,8 +249,8 @@ def test_create_new_resource_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_update_resource_not_available_for_non_switchtenders(client):
-    resource = Recipe(models.Resource).make()
+def test_update_resource_not_available_for_non_switchtenders(request, client):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-update", args=[resource.id])
     with login(client, groups=["switchtender"]):
         response = client.get(url)
@@ -238,8 +258,8 @@ def test_update_resource_not_available_for_non_switchtenders(client):
 
 
 @pytest.mark.django_db
-def test_update_resource_available_for_staff(client):
-    resource = Recipe(models.Resource).make()
+def test_update_resource_available_for_staff(request, client):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-update", args=[resource.id])
     with login(client, groups=["switchtender"], is_staff=True):
         response = client.get(url)
@@ -248,8 +268,8 @@ def test_update_resource_available_for_staff(client):
 
 
 @pytest.mark.django_db
-def test_update_resource_and_redirect(client):
-    resource = Recipe(models.Resource).make()
+def test_update_resource_and_redirect(request, client):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-update", args=[resource.id])
     data = {
         "title": "a title",
@@ -263,7 +283,7 @@ def test_update_resource_and_redirect(client):
     with login(client, groups=["switchtender"], is_staff=True):
         response = client.post(url, data=data)
 
-    resource = models.Resource.objects.get(id=resource.id)
+    resource = models.Resource.on_site.get(id=resource.id)
     assert resource.content == data["content"]
     assert response.status_code == 302
 
@@ -274,56 +294,67 @@ def test_update_resource_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_search_resources_without_query():
-    resource = Recipe(models.Resource).make()
+def test_search_resources_without_query(request):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     unmatched = models.Resource.search()
     assert resource in unmatched
 
 
 @pytest.mark.django_db
-def test_search_resources_do_not_match_query():
-    resource = Recipe(models.Resource).make()
+def test_search_resources_do_not_match_query(request):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     unmatched = models.Resource.search(query="notfound")
     assert resource not in unmatched
 
 
 @pytest.mark.django_db
-def test_search_resources_by_tag():
-    resource = Recipe(models.Resource, tags="atag").make()
+def test_search_resources_by_tag(request):
+    resource = Recipe(
+        models.Resource, sites=[get_current_site(request)], tags="atag"
+    ).make()
     matched = models.Resource.search(query="tag")
     assert resource in matched
 
 
 @pytest.mark.django_db
-def test_search_resources_by_summary():
-    resource = Recipe(models.Resource, summary="a summary").make()
+def test_search_resources_by_summary(request):
+    resource = Recipe(
+        models.Resource, sites=[get_current_site(request)], summary="a summary"
+    ).make()
     matched = models.Resource.search(query="summa")
     assert resource in matched
 
 
 @pytest.mark.django_db
-def test_search_resources_by_title():
-    resource = Recipe(models.Resource, title="a title").make()
+def test_search_resources_by_title(request):
+    resource = Recipe(
+        models.Resource, sites=[get_current_site(request)], title="a title"
+    ).make()
     matched = models.Resource.search(query="titl")
     assert resource in matched
 
 
 @pytest.mark.django_db
-def test_search_resources_by_content():
-    resource = Recipe(models.Resource, content="some content...").make()
+def test_search_resources_by_content(request):
+    resource = Recipe(
+        models.Resource, sites=[get_current_site(request)], content="some content..."
+    ).make()
     matched = models.Resource.search(query="cont")
     assert resource in matched
 
 
 @pytest.mark.django_db
-def test_search_resources_by_category():
+def test_search_resources_by_category(request):
     # categories are search like: any category that fits
     categories = [
-        Recipe(models.Category).make(),
-        Recipe(models.Category).make(),
+        Recipe(models.Category, sites=[get_current_site(request)]).make(),
+        Recipe(models.Category, sites=[get_current_site(request)]).make(),
     ]
     resources = [
-        Recipe(models.Resource, category=category).make() for category in categories
+        Recipe(
+            models.Resource, sites=[get_current_site(request)], category=category
+        ).make()
+        for category in categories
     ]
     matched = models.Resource.search(categories=categories)
     assert set(resources) == set(matched)
@@ -335,8 +366,12 @@ def test_search_resources_by_category():
 
 
 @pytest.mark.django_db
-def test_user_has_access_to_page_for_bookmark_with_notes(client):
-    resource = Recipe(models.Resource, status=models.Resource.PUBLISHED).make()
+def test_user_has_access_to_page_for_bookmark_with_notes(request, client):
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.PUBLISHED,
+    ).make()
 
     url = reverse("resources-bookmark-create", args=[resource.id])
     with login(client, is_staff=True):
@@ -347,8 +382,12 @@ def test_user_has_access_to_page_for_bookmark_with_notes(client):
 
 
 @pytest.mark.django_db
-def test_user_bookmarks_a_resource(client):
-    resource = Recipe(models.Resource, status=models.Resource.PUBLISHED).make()
+def test_user_bookmarks_a_resource(request, client):
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.PUBLISHED,
+    ).make()
 
     url = reverse("resources-bookmark-create", args=[resource.id])
     with login(client) as user:
@@ -366,11 +405,14 @@ def test_user_bookmarks_a_resource(client):
 
 
 @pytest.mark.django_db
-def test_user_refresh_bookmark_of_a_resource(client):
+def test_user_refresh_bookmark_of_a_resource(request, client):
 
     with login(client) as user:
         bookmark = Recipe(
-            models.Bookmark, created_by=user, deleted=datetime.now()
+            models.Bookmark,
+            site=get_current_site(request),
+            created_by=user,
+            deleted=datetime.now(),
         ).make()
         url = reverse("resources-bookmark-create", args=[bookmark.resource_id])
         data = {"comments": "some nice comments"}
@@ -386,28 +428,30 @@ def test_user_refresh_bookmark_of_a_resource(client):
 
 
 @pytest.mark.django_db
-def test_user_deletes_a_personal_bookmark(client):
+def test_user_deletes_a_personal_bookmark(request, client):
 
     with login(client) as user:
-        bookmark = Recipe(models.Bookmark, created_by=user).make()
+        bookmark = Recipe(
+            models.Bookmark, site=get_current_site(request), created_by=user
+        ).make()
         url = reverse("resources-bookmark-delete", args=[bookmark.resource_id])
         response = client.post(url)
 
-    bookmark = models.Bookmark.deleted_objects.get(id=bookmark.id)
+    bookmark = models.Bookmark.deleted_on_site.get(id=bookmark.id)
     assert bookmark.deleted
     newurl = reverse("resources-resource-detail", args=[bookmark.resource_id])
     assertRedirects(response, newurl)
 
 
 @pytest.mark.django_db
-def test_user_cannot_delete_someone_else_bookmark(client):
-    bookmark = Recipe(models.Bookmark).make()
+def test_user_cannot_delete_someone_else_bookmark(request, client):
+    bookmark = Recipe(models.Bookmark, site=get_current_site(request)).make()
     url = reverse("resources-bookmark-delete", args=[bookmark.resource_id])
 
     with login(client):
         response = client.post(url)
 
-    bookmark = models.Bookmark.objects.get(id=bookmark.id)
+    bookmark = models.Bookmark.on_site.get(id=bookmark.id)
     assert not bookmark.deleted
     newurl = reverse("resources-resource-detail", args=[bookmark.resource_id])
     assertRedirects(response, newurl)

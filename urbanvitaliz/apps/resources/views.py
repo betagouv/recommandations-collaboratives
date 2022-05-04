@@ -10,6 +10,7 @@ import datetime
 
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -22,11 +23,8 @@ from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from . import models
 from .serializers import ResourceSerializer
@@ -167,7 +165,7 @@ class BaseResourceDetailView(DetailView):
         resource = self.object
 
         if self.request.user.is_authenticated:
-            context["bookmark"] = models.Bookmark.objects.filter(
+            context["bookmark"] = models.Bookmark.on_site.filter(
                 resource=resource, created_by=self.request.user
             ).first()
 
@@ -252,6 +250,7 @@ def resource_create(request):
             resource = form.save(commit=False)
             resource.created_by = request.user
             resource.save()
+            resource.sites.add(get_current_site(request))
             form.save_m2m()
             next_url = reverse("resources-resource-detail", args=[resource.id])
             return redirect(next_url)
@@ -325,7 +324,7 @@ class LatestResourcesFeed(Feed):
     description = "Derniers ajouts de ressources"
 
     def items(self):
-        return models.Resource.objects.order_by("-created_on")[:5]
+        return models.Resource.on_site.order_by("-created_on")[:5]
 
     def item_title(self, item):
         return item.title
@@ -356,7 +355,7 @@ def create_bookmark(request, resource_id=None):
         )
     except models.Bookmark.DoesNotExist:
         bookmark, _ = models.Bookmark.objects.get_or_create(
-            resource=resource, created_by=request.user
+            resource=resource, created_by=request.user, site=get_current_site(request)
         )
     if request.method == "POST":
         form = BookmarkForm(request.POST, instance=bookmark)
@@ -405,7 +404,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
-        return models.Resource.objects.exclude(status=models.Resource.DRAFT).order_by(
+        return models.Resource.on_site.exclude(status=models.Resource.DRAFT).order_by(
             "-created_on", "-updated_on"
         )
 

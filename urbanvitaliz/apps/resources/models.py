@@ -8,6 +8,7 @@ created: 2021-06-16 10:57:13 CEST
 """
 import datetime
 
+from django.conf import settings
 from django.contrib.auth import models as auth
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
@@ -18,6 +19,24 @@ from django.utils import timezone
 from markdownx.utils import markdownify
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
+
+
+class CategoryManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
+class CategoryOnSiteManager(CurrentSiteManager, CategoryManager):
+    pass
+
+
+class DeletedCategoryManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().exclude(deleted=None)
+
+
+class DeletedCategoryOnSiteManager(CurrentSiteManager, DeletedCategoryManager):
+    pass
 
 
 class Category(models.Model):
@@ -33,7 +52,11 @@ class Category(models.Model):
         ("violet", "Violet"),
     )
 
-    on_site = CurrentSiteManager()
+    objects = CategoryManager()
+    deleted_objects = DeletedCategoryManager()
+
+    on_site = CategoryOnSiteManager()
+    deleted_on_site = DeletedCategoryOnSiteManager()
 
     sites = models.ManyToManyField(Site)
 
@@ -62,14 +85,20 @@ class Category(models.Model):
 class ResourceQuerySet(models.QuerySet):
     """Specific filters for resources"""
 
-    def get_queryset(self):
-        return super().get_queryset().order_by(Lower("title"))
-
     def limit_area(self, departments):
         """Limit resources that match at least one department"""
         return self.filter(
             models.Q(departments__in=departments) | models.Q(departments=None)
         ).distinct()
+
+
+class ResourceManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by(Lower("title"))
+
+
+class ResourceOnSiteManager(CurrentSiteManager, ResourceManager):
+    pass
 
 
 class Resource(models.Model):
@@ -85,8 +114,8 @@ class Resource(models.Model):
         (PUBLISHED, "Publié"),
     )
 
-    objects = ResourceQuerySet.as_manager()
-    on_site = CurrentSiteManager()
+    objects = ResourceManager.from_queryset(ResourceQuerySet)()
+    on_site = ResourceOnSiteManager.from_queryset(ResourceQuerySet)()
 
     sites = models.ManyToManyField(Site)
 
@@ -178,13 +207,13 @@ class Resource(models.Model):
 
     @classmethod
     def fetch(cls):
-        return cls.on_site.filter(deleted=None)
+        return cls.on_site.all()
 
     @classmethod
     def search(cls, query="", categories=None):
         # A very basic search strategy to be replaced by postgres full text search
         categories = categories or []
-        resources = cls.fetch()
+        resources = cls.on_site.all()
         if categories:
             resources = resources.filter(
                 models.Q(category__in=categories) | models.Q(category=None)
