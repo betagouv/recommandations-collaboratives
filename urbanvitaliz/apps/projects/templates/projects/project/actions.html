@@ -83,8 +83,10 @@
                 </div>
             </div>
 
+            {{ actions_with_notifications|json_script:"notificationData" }}
+            {{ is_switchtender|json_script:"switchtenderData" }}
 
-            <div x-data="boardTasksApp({{ project.id }})" x-init="getData(); initTooltips();" class="d-flex pb-2 align-items-stretch">
+            <div x-data="boardTasksApp({{ project.id }})" x-init="getData(); initTooltips(); loadNotifications(); loadSwitchtender();" class="d-flex pb-2 align-items-stretch">
                 <template x-for="board in boards">
                     <div class="col px-2" style="min-height: 100px">
                         <div class="rounded border-top border-2 drop-column" :class="board.color_class">
@@ -100,11 +102,22 @@
                                 </template>
 
                                 <template x-for="(t, i) in column(board.status)" :key="t.id">
-                                    <div>
+                                    <template x-if="t.public || isSwitchtender">
                                         <div :id="t.uuid" class="drag-targetable py-3" @dragover="onDragOver(event)" @drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)" >
-                                            <div class="rounded bg-white shadow p-1 px-2 position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)" @dragend="onDragEnd(event)">
-                                                <div @click="onPreviewClick(t.id)" style="cursor: pointer">
-                                                    <h6 class="mt-1 mb-0 fw-bold" x-text="truncate(t.intent)"></h6>
+                                            <div class="rounded bg-white shadow position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)" @dragend="onDragEnd(event)">
+                                                <template x-if="notifications.indexOf(t.id) !== -1">
+                                                    <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger" style="padding: .5em;"><span class="visually-hidden">Notification</span></span>
+                                                </template>
+                                                <div class="position-absolute top-0 left-0 d-flex" style="margin: -10px 0 0 5px;">
+                                                    <template x-if="!t.public">
+                                                        <span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white" style="font-size: 0.7em;">Brouillon</span>
+                                                    </template>
+                                                    <template x-if="t.public && !t.visited">
+                                                        <span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white" style="font-size: 0.7em;">Nouveau</span>
+                                                    </template>
+                                                </div>
+                                                <div class="p-2" @click="onPreviewClick(t.id)" style="cursor: pointer">
+                                                    <h6 class=mt-1 mb-0 fw-bold" x-text="truncate(t.intent)"></h6>
     
                                                     <div class="rounded bg-light p-2 my-2" style="font-size: 0.8em">
                                                         <p x-text="truncate(t.content, 200)" class="mb-2"></p>
@@ -119,9 +132,9 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="border-top py-1 d-flex justify-content-between" style="font-size: 0.8em">
+                                                <div class="border-top p-2 d-flex justify-content-between" style="font-size: 0.8em">
                                                     <div class="d-flex align-items-center">
-                                                        <div class="text-primary">
+                                                        <div class="text-primary position-relative" @click="onPreviewClick(t.id)" style="cursor: pointer;">
                                                             <svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
                                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
                                                             </svg>
@@ -130,7 +143,7 @@
                                                     </div>
 
                                                     <div class="d-flex align-items-center" x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
-                                                        <div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(t.id)">
+                                                        <div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(t.id)" style="cursor: pointer;">
                                                             <svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
                                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
                                                             </svg>
@@ -156,7 +169,7 @@
                                                 </div>
                                             </div>
                                         </div>  
-                                    </div>
+                                    </template>
                                 </template>
                             </div>
                         </div>
