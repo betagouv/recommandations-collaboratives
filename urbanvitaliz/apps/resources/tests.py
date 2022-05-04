@@ -14,7 +14,8 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import login
@@ -424,6 +425,43 @@ def test_search_resources_honors_multisite(request):
     result = models.Resource.search()
     assert my_resource in result
     assert other_resource not in result
+
+
+@pytest.mark.django_db
+def test_category_honors_multisite(request):
+    other_site = Recipe(Site).make()
+    current_site = get_current_site(request)
+    my_category = Recipe(models.Category, sites=[current_site]).make()
+    other_category = Recipe(models.Category, sites=[other_site]).make()
+    result = models.Category.on_site.all()
+    assert my_category in result
+    assert other_category not in result
+
+
+@pytest.mark.django_db
+def test_bookmark_honors_multisite(request):
+    other_site = Recipe(Site).make()
+    current_site = get_current_site(request)
+    my_bookmark = Recipe(models.Bookmark, site=current_site).make()
+    other_bookmark = Recipe(models.Bookmark, site=other_site).make()
+    result = models.Bookmark.on_site.all()
+    assert my_bookmark in result
+    assert other_bookmark not in result
+
+
+@pytest.mark.django_db
+def test_deleted_bookmark_honors_multisite(request):
+    other_site = Recipe(Site).make()
+    current_site = get_current_site(request)
+    my_bookmark = Recipe(
+        models.Bookmark, site=current_site, deleted="2022-03-10"
+    ).make()
+    other_bookmark = Recipe(
+        models.Bookmark, site=other_site, deleted="2022-03-10"
+    ).make()
+    result = models.Bookmark.deleted_on_site.all()
+    assert my_bookmark in result
+    assert other_bookmark not in result
 
 
 # eof

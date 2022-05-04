@@ -33,6 +33,10 @@ class Category(models.Model):
         ("violet", "Violet"),
     )
 
+    on_site = CurrentSiteManager()
+
+    sites = models.ManyToManyField(Site)
+
     name = models.CharField(max_length=128)
     color = models.CharField(max_length=16, choices=COLOR_CHOICES)
     icon = models.CharField(max_length=32)
@@ -206,6 +210,10 @@ class BookmarkManager(models.Manager):
         return self.values_list("resource", flat=True)
 
 
+class BookmarkOnSiteManager(CurrentSiteManager, BookmarkManager):
+    pass
+
+
 class DeletedBookmarkManager(models.Manager):
     """Manager for deleted bookmarks"""
 
@@ -213,11 +221,22 @@ class DeletedBookmarkManager(models.Manager):
         return super().get_queryset().exclude(deleted=None)
 
 
+class DeletedBookmarkOnSiteManager(CurrentSiteManager, DeletedBookmarkManager):
+    """Manager for on site deleted bookmarks"""
+
+    pass
+
+
 class Bookmark(models.Model):
     """Represents a bookmark to a resource"""
 
     objects = BookmarkManager()
     deleted_objects = DeletedBookmarkManager()
+
+    on_site = BookmarkOnSiteManager()
+    deleted_on_site = DeletedBookmarkOnSiteManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     resource = models.ForeignKey("Resource", on_delete=models.CASCADE)
     created_by = models.ForeignKey(
