@@ -248,7 +248,7 @@
                                         {% csrf_token %}
                                         <input name="days" type="hidden" class="form-control" id="reminder-days">
                                         <div class="btn-group w-100 mt-4 mb-2" role="group" aria-label="Shortcuts">
-                                            <a @click="updatePendingReminderDate(daysFromNow(15))" class="btn btn-outline-secondary">Dans 15 jours</a>
+                                            <a @click="updatePendingReminderDate(15)" class="btn btn-outline-secondary">Dans 15 jours</a>
                                             <a @click="updatePendingReminderDate(30)" class="btn btn-outline-secondary">Dans 1 mois</a>
                                             <a @click="updatePendingReminderDate(30 * 6)" class="btn btn-outline-secondary">Dans 6 mois</a>
                                         </div>
@@ -257,7 +257,6 @@
                                             <input required aria-describedby="date-input" name="date" id="reminder-date" class="form-control" size="16" type="date" x-model="pendingReminderDate">
                                         </div>
                                     </form>
-                                    <span x-text="pendingReminderDate"></span>
                                 </div>
                     
                                 <div class="modal-footer">
