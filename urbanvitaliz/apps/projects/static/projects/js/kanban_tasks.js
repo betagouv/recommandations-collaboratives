@@ -36,9 +36,7 @@ function boardTasksApp(projectId) {
     filterFn(d) {
       return true;
     },
-    postProcessData(data) {
-      console.log(data);
-    },
+    postProcessData(data) {},
   };
 
   const app = {
@@ -126,7 +124,6 @@ function boardTasksApp(projectId) {
       const form = this.$refs.reminderForm;
       const dateInput = form.querySelector('#reminder-date');
       const daysInput = form.querySelector('#reminder-days');
-      console.log(form);
       daysInput.value = Math.ceil((new Date(dateInput.value) - new Date())  / 86400000);
       form.submit();
     },
@@ -135,7 +132,6 @@ function boardTasksApp(projectId) {
     }
   };
 
-  console.log(app);
   return configureBoardApp(app, options);
 }
 
