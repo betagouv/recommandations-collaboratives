@@ -39,8 +39,6 @@ function boardTasksApp(projectId) {
     postProcessData(data) {},
   };
 
-  const pendingReminderDate = daysFromNow(15);
-
   const app = {
     boards: [
       { status: 0, title: "Nouvelles ", color_class: "border-primary" },
@@ -50,6 +48,16 @@ function boardTasksApp(projectId) {
     ],
     currentTaskId: null,
     currentReminderTaskId: null,
+    notifications: [],
+    isSwitchtender: false,
+    loadNotifications() {
+      const notificationData = document.getElementById("notificationData").textContent;
+      this.notifications = JSON.parse(notificationData);
+    },
+    loadSwitchtender() {
+      const switchtenderData = document.getElementById("switchtenderData").textContent;
+      this.isSwitchtender = JSON.parse(switchtenderData);     
+    },
     initPreviewModal() {
       const element = document.getElementById("task-preview");
       this.previewModalHandle = new bootstrap.Modal(element);
@@ -66,9 +74,23 @@ function boardTasksApp(projectId) {
         selector: "[data-bs-toggle='tooltip']"
       })
     },
-    onPreviewClick(id) {
+    async onPreviewClick(id) {
       this.currentTaskId = id;
       this.previewModalHandle.show();
+
+      await fetch(`/api/projects/${projectId}/tasks/${id}/`, {
+        method: "PATCH",
+        cache: "no-cache",
+        mode: "same-origin",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": Cookies.get("csrftoken"),
+        },
+        body: JSON.stringify({ visited: true }),
+      });
+
+      await this.getData();
     },
     onReminderClick(id) {
       this.currentReminderTaskId = id;
@@ -91,16 +113,17 @@ function boardTasksApp(projectId) {
     },
     scrollToLastElement() {
       const nodes = this.$root.querySelectorAll(".message");
-      this.$nextTick(() => {
-        nodes[nodes.length - 1].scrollIntoView();
-      });
+      if (nodes.length > 0) {
+        this.$nextTick(() => {
+          nodes[nodes.length - 1].scrollIntoView();
+        });
+      }
     },
     pendingReminderDate: formatReminderDate(daysFromNow(15)),
     onSubmitReminder() {
       const form = this.$refs.reminderForm;
       const dateInput = form.querySelector('#reminder-date');
       const daysInput = form.querySelector('#reminder-days');
-      console.log(form);
       daysInput.value = Math.ceil((new Date(dateInput.value) - new Date())  / 86400000);
       form.submit();
     },
