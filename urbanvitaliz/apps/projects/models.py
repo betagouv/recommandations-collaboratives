@@ -11,6 +11,8 @@ import uuid
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
@@ -71,11 +73,19 @@ class ProjectManager(models.Manager):
             return self.email(user.email)
 
 
+class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
+    pass
+
+
 class DeletedProjectManager(models.Manager):
     """Manager for deleted projects"""
 
     def get_queryset(self):
         return super().get_queryset().exclude(deleted=None)
+
+
+class DeletedProjectOnSiteManager(CurrentSiteManager, DeletedProjectManager):
+    pass
 
 
 class Project(models.Model):
@@ -95,6 +105,11 @@ class Project(models.Model):
 
     objects = ProjectManager()
     objects_deleted = DeletedProjectManager()
+
+    on_site = ProjectOnSiteManager()
+    deleted_on_site = DeletedProjectOnSiteManager()
+
+    sites = models.ManyToManyField(Site)
 
     notifications_as_target = CastedGenericRelation(
         notifications_models.Notification,

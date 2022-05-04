@@ -23,8 +23,11 @@ from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    check_if_switchtender,
+    is_staff_or_403,
+    is_switchtender_or_403,
+)
 
 from . import models
 from .serializers import ResourceSerializer
@@ -176,7 +179,7 @@ class BaseResourceDetailView(DetailView):
             not check_if_switchtender(self.request.user)
             and not self.request.user.is_anonymous
         ):
-            user_projects = projects.Project.objects.filter(
+            user_projects = projects.Project.on_site.filter(
                 emails__contains=self.request.user.email
             )
             if user_projects.count():
@@ -204,7 +207,7 @@ class ResourceDetailView(BaseResourceDetailView):
 
         if check_if_switchtender(self.request.user):
             context["projects_used_by"] = (
-                projects.Project.objects.filter(tasks__resource_id=resource.pk)
+                projects.Project.on_site.filter(tasks__resource_id=resource.pk)
                 .order_by("name")
                 .distinct()
             )

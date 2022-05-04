@@ -212,7 +212,7 @@ def project_list_export_csv(request):
     is_switchtender_or_403(request.user)
 
     projects = (
-        models.Project.objects.for_user(request.user)
+        models.Project.on_site.for_user(request.user)
         .exclude(status="DRAFT")
         .order_by("-created_on")
     )
@@ -283,7 +283,7 @@ def project_list(request):
     draft_projects = []
     if is_project_moderator:
         draft_projects = (
-            models.Project.objects.in_departments(
+            models.Project.on_site.in_departments(
                 request.user.profile.departments.all()
             )
             .filter(status="DRAFT")
@@ -407,7 +407,7 @@ def post_login_set_active_project(sender, user, request, **kwargs):
 
     if not active_project:
         # Try to fetch a project
-        active_project = models.Project.objects.filter(email=user.email).first()
+        active_project = models.Project.on_site.filter(email=user.email).first()
         if active_project:
             set_active_project_id(request, active_project.id)
 

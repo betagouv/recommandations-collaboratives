@@ -8,7 +8,6 @@ created: 2021-06-16 10:57:13 CEST
 """
 import datetime
 
-from django.conf import settings
 from django.contrib.auth import models as auth
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
@@ -97,7 +96,10 @@ class ResourceManager(models.Manager):
         return super().get_queryset().order_by(Lower("title"))
 
 
-class ResourceOnSiteManager(CurrentSiteManager, ResourceManager):
+ResourceManagerWithQS = ResourceManager.from_queryset(ResourceQuerySet)
+
+
+class ResourceOnSiteManager(CurrentSiteManager, ResourceManagerWithQS):
     pass
 
 
@@ -114,8 +116,8 @@ class Resource(models.Model):
         (PUBLISHED, "Publié"),
     )
 
-    objects = ResourceManager.from_queryset(ResourceQuerySet)()
-    on_site = ResourceOnSiteManager.from_queryset(ResourceQuerySet)()
+    objects = ResourceManagerWithQS()
+    on_site = ResourceOnSiteManager()
 
     sites = models.ManyToManyField(Site)
 
@@ -252,8 +254,6 @@ class DeletedBookmarkManager(models.Manager):
 
 class DeletedBookmarkOnSiteManager(CurrentSiteManager, DeletedBookmarkManager):
     """Manager for on site deleted bookmarks"""
-
-    pass
 
 
 class Bookmark(models.Model):

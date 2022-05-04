@@ -25,7 +25,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
-        return models.Project.objects.for_user(self.request.user).order_by(
+        return models.Project.on_site.for_user(self.request.user).order_by(
             "-created_on", "-updated_on"
         )
 
@@ -74,7 +74,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         project_id = int(self.kwargs["project_id"])
 
         user_projects = list(
-            models.Project.objects.for_user(self.request.user).values_list(flat=True)
+            models.Project.on_site.for_user(self.request.user).values_list(flat=True)
         )
 
         if project_id not in user_projects:
