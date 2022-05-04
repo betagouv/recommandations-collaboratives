@@ -19,7 +19,7 @@
         <section class="mt-5 col-7">
             <div>
                 <h3 class="fs-5">Lien public vers le projet</h3>
-                <p>Partagez ce lien pour donner accès en lecture seule à la page Connaissance du site et aux Actions recommandées.</p>
+                <p>Partagez ce lien pour donner accès en lecture seule à la page Connaissance du site</p>
                 <div x-data="access_update_app('{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}')" class="input-group input-group-lg">
                     <input type="text" readonly class="form-control fst-italic" :value="url" x-ref="input" @focus="selectText()" />
                     <button class="btn btn-outline-primary" @click="clipboardCopy()" x-ref="button">
@@ -111,17 +111,23 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-bolder" for="invite-role">Type d'invitation</label>
-                    {% for role in form.role %}
-                    <div class="position-relative">
-                        <input name="role" type="radio" id="{{ role }}" value="{{ role }}" />
-                        <label for="{{ role }}"></label>
+
+                    <div class="position-relative bg-white border rounded p-3 mb-2">
+                        <input name="{{ form.role.html_name }}" type="radio" id="role-switchtender" value="SWITCHTENDER" style="transform: scale(1.2);">
+                        <label for="role-switchtender" class="position-absolute w-100 h-100 top-0 left-0"><span class="visually-hidden">Aiguilleur·se</span></label>
+                        <span class="ms-1">Aiguilleur·se</span>
                     </div>
-                    {% endfor %}
+
+                    <div class="position-relative bg-white border rounded p-3 mb-2">
+                        <input name="{{ form.role.html_name }}" type="radio" id="role-collaborator" value="COLLABORATOR" style="transform: scale(1.2);">
+                        <label for="role-collaborator" class="position-absolute w-100 h-100 top-0 left-0"><span class="visually-hidden">Collaborateur·rice</span></label>
+                        <span class="ms-1">Collaborateur·rice</span>
+                    </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-bolder" for="invite-message">Message d'invitation (optionnel)</label>
-                    <textarea id="invite-message" name="message" class="form-control {% if form.message.errors %}is-invalid{% endif %}" placeholder="J'aimerais vous inviter car...">{{ form.message.value|default:'' }}</textarea>
+                    <textarea id="invite-message" rows="8" name="message" class="form-control {% if form.message.errors %}is-invalid{% endif %}" placeholder="J'aimerais vous inviter car...">{{ form.message.value|default:'' }}</textarea>
                 </div>
 
                 <button class="btn btn-primary" type="submit">
