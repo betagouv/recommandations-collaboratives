@@ -9,6 +9,7 @@ function configureBoardApp(app, options) {
     const configuredApp = {
         data: [],
         isBusy: false,
+        currentlyHoveredElement: null,
         async getData() {
             this.isBusy = true;
             const json = await options.fetchData.call(this);
@@ -36,20 +37,25 @@ function configureBoardApp(app, options) {
         onDragStart(event, uuid) {
             event.dataTransfer.clearData();
             event.dataTransfer.effectAllowed = "move";
-            
-            this.dragCounter = 0;
             event.dataTransfer.setData('application/uuid', uuid);
             event.target.classList.add('drag-dragging');
+            document.querySelectorAll(".drop-column").forEach(e => e.classList.add("drop-highlight"));
         },
         onDragEnd(event) {
             event.target.classList.remove('drag-dragging');
-            this.$nextTick(() => document.querySelectorAll(".drag-target").forEach(e => e.classList.remove("drag-target")));
+            document.querySelectorAll(".drop-column").forEach(e => e.classList.remove("drop-highlight"));
         },
         onDragEnter(event) {
+            if (this.currentlyHoveredElement && this.currentlyHoveredElement !== event.currentTarget) {
+                this.currentlyHoveredElement.classList.remove('drag-target');
+            }
+            this.currentlyHoveredElement = event.currentTarget;
             event.currentTarget.classList.add('drag-target');
         },
         onDragLeave(event) {
-            event.currentTarget.classList.remove('drag-target');
+            if (event.target === this.currentlyHoveredElement) {
+                event.target.classList.remove('drag-target');
+            }
         },
         onDragOver(event) {
             event.preventDefault();
@@ -57,8 +63,10 @@ function configureBoardApp(app, options) {
         },
         async onDrop(event, status, targetUuid) {           
             event.preventDefault();
+            
+            this.currentlyHoveredElement.classList.remove('drag-target');
+            this.currentlyHoveredElement = null;
 
-            this.$nextTick(() => document.querySelectorAll(".drag-target").forEach(e => e.classList.remove("drag-target")));
             const uuid = event.dataTransfer.getData("application/uuid");
 
             const data = this.data.find(d => d.uuid === uuid);
