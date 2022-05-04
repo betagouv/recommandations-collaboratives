@@ -86,6 +86,38 @@
             {{ actions_with_notifications|json_script:"notificationData" }}
             {{ is_switchtender|json_script:"switchtenderData" }}
 
+            {% if is_switchtender and project.tasks.unpublished_open.count == 0 %}
+            <div class="bg-light p-4 rounded-2">
+                <h3 class="fw-light">Pas encore d'actions recommandées à la collectivité ?</h3>
+                <p class="fst-italic fw-light">
+                    Soyez la première personne à proposer des actions ou des ressources à la collectivité !
+                </p>
+
+                {% if can_administrate %}
+                <a href="{% url 'projects-project-create-action' project.id %}" class="btn btn-primary">Émettre une recommandation</a>
+                <a href="{% url 'projects-project-detail-knowledge' project.id %}" class="btn btn-secondary">Consulter les détails du projet</a>
+
+
+                <p class="mt-3">
+                    <span class="badge bg-warning">Beta feature</span> <a href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les actions suggérées automatiquement pour ce dossier</a>
+                </p>
+                {% else %}
+                <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-primary">Rejoindre ce dossier pour l'aiguiller</a>
+                {% endif %}
+            </div>
+            {% elif not is_switchtender and projects.tasks.open.count == 0 %}
+            <div class="bg-light p-4 rounded-2">
+                <h3 class="fw-light">Vous n'avez pas d'actions en cours</h3>
+
+                <p class="fst-italic fw-light">
+                    Des actions vous seront proposées par notre équipe dès que possible.
+                </p>
+                <p class="fst-italic fw-light">
+                    Vous pouvez accélerer les recommandations <span class="fw-bolder">en complétant le questionnaire d'exploration</span>.
+                </p>
+                <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary">Compléter le questionnaire d'exploration</a>
+            </div>
+            {% else %}
             <div x-data="boardTasksApp({{ project.id }})" x-init="getData(); initTooltips(); loadNotifications(); loadSwitchtender();" class="d-flex pb-2 align-items-stretch">
                 <template x-for="board in boards">
                     <div class="col px-2" style="min-height: 100px">
@@ -281,6 +313,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
