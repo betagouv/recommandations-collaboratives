@@ -123,7 +123,7 @@ class CreateActionWithoutResourceForm(forms.ModelForm):
 
 class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
     resource = forms.ModelChoiceField(
-        queryset=resources_models.Resource.objects.exclude(
+        queryset=resources_models.Resource.on_site.exclude(
             status=resources_models.Resource.DRAFT
         ),
         required=True,
@@ -136,7 +136,7 @@ class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
 
 class CreateActionsFromResourcesForm(forms.ModelForm):
     resources = forms.ModelMultipleChoiceField(
-        queryset=resources_models.Resource.objects.exclude(
+        queryset=resources_models.Resource.on_site.exclude(
             status=resources_models.Resource.DRAFT
         ),
         required=True,
