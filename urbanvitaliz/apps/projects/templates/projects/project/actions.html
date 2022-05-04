@@ -19,15 +19,6 @@
  function makeProjectURL(id) {
      return project_url_tmpl.replace('0', id);
  }
-
- function gravatar_url(email, size=50, name="Inconnu") {
-     if (name.trim() == '') name = "Inconnu";
-
-     hash = md5(email);
-     encoded_fallback_uri = encodeURIComponent(`https://ui-avatars.com/api/${name}/${size}`);
-
-     return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=${encoded_fallback_uri}`
- }
 </script>
 
 <script src="{% static 'notifications/notify.js' %}" type="text/javascript"></script>
@@ -157,7 +148,7 @@
                                                         <p x-text="truncate(t.content, 200)" class="mb-2"></p>
                                                         <div>
                                                             <img class="rounded-circle d-inline-block" width="20px" height="20px"
-                                                                :src="gravatar_url(t.created_by.email, 25, t.created_by.first_name + ' ' + t.created_by.last_name)"
+                                                                :src="generateGravatarUrl(t.created_by)"
                                                                 data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${t.created_by.first_name} ${t.created_by.last_name}`"
                                                                 style="z-index: 1000;" tabindex="0" />
                                                             <span class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
@@ -244,7 +235,7 @@
                                                             <p x-html="renderMarkdown(f.comment)" class="mb-2"></p>
                                                             <div>
                                                                 <img class="rounded-circle d-inline-block" width="20px" height="20px"
-                                                                    :src="gravatar_url(f.who.email, 25, f.who.first_name + ' ' + f.who.last_name)"
+                                                                    :src="generateGravatarUrl(f.who)"
                                                                     data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${f.who.first_name} $f.who.last_name}`"
                                                                     style="z-index: 1000;" tabindex="0" />
                                                                 <span class="ms-1 fst-italic" x-text="`${f.who.first_name} ${f.who.last_name}`"
