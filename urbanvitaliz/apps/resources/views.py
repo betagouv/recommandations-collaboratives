@@ -22,11 +22,8 @@ from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from . import models
 from .serializers import ResourceSerializer
@@ -190,8 +187,8 @@ class BaseResourceDetailView(DetailView):
                     Q(organization__departments__in=user_depts)
                     | Q(organization__departments=None)
                 )
-            else:
-                context["contacts"] = resource.contacts
+        else:
+            context["contacts"] = resource.contacts
 
         return context
 
