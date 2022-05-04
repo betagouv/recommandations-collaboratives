@@ -22,11 +22,8 @@ from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from . import models
 from .serializers import ResourceSerializer
@@ -173,6 +170,7 @@ class BaseResourceDetailView(DetailView):
 
         # If our user is responsible for a local authority, only show the
         # relevant contacts (=localized)
+        context["contacts"] = resource.contacts
         if (
             not check_if_switchtender(self.request.user)
             and not self.request.user.is_anonymous
@@ -190,13 +188,11 @@ class BaseResourceDetailView(DetailView):
                     Q(organization__departments__in=user_depts)
                     | Q(organization__departments=None)
                 )
-            else:
-                context["contacts"] = resource.contacts
 
         return context
 
 
-class ResourceDetailView(DetailView):
+class ResourceDetailView(BaseResourceDetailView):
     model = models.Resource
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
@@ -215,7 +211,7 @@ class ResourceDetailView(DetailView):
         return context
 
 
-class EmbededResourceDetailView(DetailView):
+class EmbededResourceDetailView(BaseResourceDetailView):
     model = models.Resource
     template_name = "resources/resource/details_embeded.html"
     pk_url_kwarg = "resource_id"
