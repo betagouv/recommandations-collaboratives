@@ -15,11 +15,13 @@ import uuid
 import django.core.mail
 import pytest
 from django.contrib.auth import models as auth
+from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.invites import models as invites_models
@@ -285,8 +287,10 @@ def test_create_prefilled_project_creates_a_new_project(client):
 
 
 @pytest.mark.django_db
-def test_my_projects_are_stored_in_session_on_login(client):
-    project = Recipe(models.Project, email="my@example.com").make()
+def test_my_projects_are_stored_in_session_on_login(request, client):
+    project = Recipe(
+        models.Project, sites=[get_current_site(request)], email="my@example.com"
+    ).make()
     with login(client, is_staff=False, email="my@example.com"):
         pass
 
@@ -973,8 +977,8 @@ def test_owner_cannot_be_removed_from_project_acl(client):
 
 
 @pytest.mark.django_db
-def test_projects_feed_available_for_all_users(client):
-    project = Recipe(models.Project).make()
+def test_projects_feed_available_for_all_users(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-feed")
     response = client.get(url)
     detail_url = reverse("projects-project-detail", args=[project.id])
@@ -1321,9 +1325,14 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(client)
 #################################################################
 
 
-def test_switchtender_exports_csv(client):
+def test_switchtender_exports_csv(request, client):
     # Expected project
-    p1 = Recipe(models.Project, name="Projet 1", status="READY").make()
+    p1 = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        name="Projet 1",
+        status="READY",
+    ).make()
     p1.commune = Recipe(geomatics.Commune).make()
     p1.save()
 
