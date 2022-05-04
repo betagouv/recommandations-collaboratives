@@ -129,7 +129,7 @@
                             <div class="px-2 py-1 pb-1 bg-light shadow-sm overflow-auto" style="max-height: 70vh;">
                                 <template x-if="column(board.status).length === 0">
                                     <div class="drag-targetable py-3" @dragover="onDragOver(event, null)" @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
-                                        <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase" style="height: 100px; font-size: 0.8em;border: 2px dashed #ccc;color: #ccc">
+                                        <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase" style="height: 100px; font-size: 0.8em;">
                                             Glissez et déposez une carte ici
                                         </div>
                                     </div>
