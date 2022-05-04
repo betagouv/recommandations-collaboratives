@@ -97,11 +97,12 @@
             </div>
         </section>
         <section class="mt-5 col-5 bg-light rounded p-3">
-            <h3 class="fs-5">Ajouter des collaborateur·rice·s</h3>
-            <p class="mb-4">Vous pouvez ajouter des collaborateur·rice·s sur le projet qui
-                pourrout accéder à toutes les fonctionnalités de gestion du site, ou
-                bien un·e intervenant·e externe qui pourra uniquement intéragir dans
-                les conversations.</p>
+            <h3 class="fs-5">Partagez le dossier</h3>
+            <p class="mb-4">
+                Profil collaborateur : similaire aux droits du demandeur initial, pour travailler à plusieurs au sein de la collectivité par exemple.
+                <br />
+                Profil aiguilleur : acteur invité à conseiller le dossier aux côté des aiguilleurs déjà présents
+            </p>
             <form class="form" id="form-projects-access-add-user" action="." method="post">
                 <div class="mb-3">
                     <label class="form-label fw-bolder" for="invite-email">Email de votre collaborateur·trice</label>
@@ -110,11 +111,12 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-bolder" for="invite-role">Type d'invitation</label>
-                    <select name="role" class="form-select" id="invite-role" required>
-                        {% for role in form.role %}
-                        {{ role }}
-                        {% endfor %}
-                    </select>
+                    {% for role in form.role %}
+                    <div class="position-relative">
+                        <input name="role" type="radio" id="{{ role }}" value="{{ role }}" />
+                        <label for="{{ role }}"></label>
+                    </div>
+                    {% endfor %}
                 </div>
 
                 <div class="mb-3">
@@ -133,6 +135,3 @@
     </div>
 </div>
 {% endblock %}
-
-
-
