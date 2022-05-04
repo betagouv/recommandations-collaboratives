@@ -78,6 +78,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
         fields = [
             "id",
             "status",
+            "visited",
             "public",
             "priority",
             "order",
