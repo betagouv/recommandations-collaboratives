@@ -21,7 +21,7 @@ from ..utils import can_manage_or_403
 @login_required
 def create_public_note(request, project_id=None):
     """Create a new note for a project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     can_manage_or_403(project, request.user)
 
     if request.method == "POST":
@@ -47,7 +47,7 @@ def create_public_note(request, project_id=None):
 @login_required
 def create_note(request, project_id=None):
     """Create a new note for a project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     can_manage_or_403(project, request.user, allow_draft=True)
     is_switchtender = check_if_switchtender(request.user)
 

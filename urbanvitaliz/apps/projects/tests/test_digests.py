@@ -6,6 +6,7 @@ tests for digesting emails
 authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2022-02-03 16:14:54 CET
 """
+import test  # noqa
 
 from django.contrib.auth import models as auth
 from model_bakery import baker
