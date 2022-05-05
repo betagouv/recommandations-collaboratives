@@ -54,9 +54,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             other_pk = below_id
 
         try:
-            other_task = models.Task.objects.get(
-                project_id=task.project_id, pk=other_pk
-            )
+            other_task = self.queryset.get(project_id=task.project_id, pk=other_pk)
         except models.Task.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -80,10 +78,11 @@ class TaskViewSet(viewsets.ModelViewSet):
         if project_id not in user_projects:
             raise PermissionDenied()
 
-        return models.Task.objects.filter(project_id=project_id).order_by(
+        return self.queryset.filter(project_id=project_id).order_by(
             "-created_on", "-updated_on"
         )
 
+    queryset = models.Task.on_site.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 

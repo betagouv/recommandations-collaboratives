@@ -62,7 +62,7 @@ class NoteAdmin(admin.ModelAdmin):
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
     search_fields = ["content", "tags"]
-    list_filter = ["deadline", "tags"]
+    list_filter = ["site", "deadline", "tags"]
     list_display = ["created_on", "deadline", "project_name", "tags"]
 
     def project_name(self, o):
