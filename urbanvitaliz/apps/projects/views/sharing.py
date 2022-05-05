@@ -33,7 +33,7 @@ def access_update(request, project_id):
 
     # Fetch pending invites
     pending_invites = []
-    for invite in invites_models.Invite.objects.filter(
+    for invite in invites_models.Invite.on_site.filter(
         project=project, accepted_on=None
     ):
         pending_invites.append(invite)
@@ -46,7 +46,7 @@ def access_update(request, project_id):
             if email not in project.emails:
                 already_invited = False
                 try:
-                    already_invited = invites_models.Invite.objects.filter(
+                    already_invited = invites_models.Invite.on_site.filter(
                         project=project, email=email, role=role
                     ).exists()
                 except invites_models.Invite.DoesNotExist:
@@ -68,6 +68,7 @@ def access_update(request, project_id):
                 invite = form.save(commit=False)
                 invite.project = project
                 invite.inviter = request.user
+                invite.site = request.site
                 invite.save()
 
                 send_email(

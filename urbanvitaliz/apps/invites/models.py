@@ -1,10 +1,20 @@
 import uuid
 
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.apps.projects import models as projects_models
+
+
+class InviteManager(models.Manager):
+    pass
+
+
+class InviteOnSiteManager(CurrentSiteManager, InviteManager):
+    pass
 
 
 class Invite(models.Model):
@@ -17,6 +27,11 @@ class Invite(models.Model):
         ("COLLABORATOR", "Collaborateur·rice"),
         ("SWITCHTENDER", "Aiguilleur·se"),
     )
+
+    objects = InviteManager()
+    on_site = InviteOnSiteManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 

@@ -10,7 +10,9 @@ from . import forms, models
 
 
 def invite_accept(request, invite_id):
-    invite = get_object_or_404(models.Invite, pk=invite_id, accepted_on=None)
+    invite = get_object_or_404(
+        models.Invite, pk=invite_id, site=request.site, accepted_on=None
+    )
     project = invite.project
 
     # Check if this email already exists as an account
@@ -76,7 +78,9 @@ def invite_accept(request, invite_id):
 
 
 def invite_details(request, invite_id):
-    invite = get_object_or_404(models.Invite, pk=invite_id, accepted_on=None)
+    invite = get_object_or_404(
+        models.Invite, site=request.site, pk=invite_id, accepted_on=None
+    )
 
     # Check if this email already exists as an account
     existing_account = None
