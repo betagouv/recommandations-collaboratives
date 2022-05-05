@@ -147,7 +147,7 @@ def test_performing_onboarding_sets_existing_postal_code(client):
             },
         )
     assert response.status_code == 302
-    project = models.Project.objects.all()[0]
+    project = models.Project.on_site.all()[0]
     assert project.commune == commune
 
 
@@ -169,7 +169,7 @@ def test_performing_onboarding_discard_unknown_postal_code(client):
         )
 
     assert response.status_code == 302
-    project = models.Project.objects.all()[0]
+    project = models.Project.on_site.all()[0]
     assert project.commune is None
 
 
@@ -199,16 +199,21 @@ def test_performing_onboarding_allow_select_on_multiple_communes(client):
 
 
 @pytest.mark.django_db
-def test_selecting_proper_commune_completes_project_creation(client):
+def test_selecting_proper_commune_completes_project_creation(request, client):
     commune = Recipe(geomatics.Commune, postal="12345").make()
     selected = Recipe(geomatics.Commune, postal="12345").make()
     with login(client) as user:
-        project = Recipe(models.Project, email=user.email, commune=commune).make()
+        project = Recipe(
+            models.Project,
+            sites=[get_current_site(request)],
+            email=user.email,
+            commune=commune,
+        ).make()
         response = client.post(
             reverse("projects-onboarding-select-commune", args=[project.id]),
             data={"commune": selected.id},
         )
-    project = models.Project.objects.get(id=project.id)
+    project = models.Project.on_site.get(id=project.id)
     assert project.commune == selected
     assert response.status_code == 302
     expected = reverse("survey-project-session", args=[project.id]) + "?first_time=1"
@@ -272,7 +277,7 @@ def test_create_prefilled_project_creates_a_new_project(client):
     with login(client, groups=["switchtender"]):
         response = client.post(reverse("projects-project-prefill"), data=data)
 
-    project = models.Project.objects.all()[0]
+    project = models.Project.on_site.all()[0]
     assert project.name == "a project"
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
@@ -601,8 +606,8 @@ def test_update_project_available_for_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_update_project_wo_commune_and_redirect(client):
-    project = Recipe(models.Project).make()
+def test_update_project_wo_commune_and_redirect(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     updated_on_before = project.updated_on
     url = reverse("projects-project-update", args=[project.id])
     data = {
@@ -619,7 +624,7 @@ def test_update_project_wo_commune_and_redirect(client):
         project.switchtenders.add(user)
         response = client.post(url, data=data)
 
-    project = models.Project.objects.get(id=project.id)
+    project = models.Project.on_site.get(id=project.id)
     assert project.name == data["name"]
     assert project.updated_on > updated_on_before
 
@@ -646,8 +651,8 @@ def test_update_project_with_commune(client):
 
 
 @pytest.mark.django_db
-def test_accept_project_not_available_for_non_staff_users(client):
-    project = Recipe(models.Project).make()
+def test_accept_project_not_available_for_non_staff_users(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-accept", args=[project.id])
     with login(client):
         response = client.get(url)
@@ -655,8 +660,8 @@ def test_accept_project_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_accept_project_and_redirect(client):
-    project = Recipe(models.Project).make()
+def test_accept_project_and_redirect(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     Recipe(auth.Group, name="project_moderator").make()
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
@@ -664,7 +669,7 @@ def test_accept_project_and_redirect(client):
     with login(client, groups=["project_moderator", "switchtender"]):
         response = client.post(url)
 
-    project = models.Project.objects.get(id=project.id)
+    project = models.Project.on_site.get(id=project.id)
     assert project.status == "TO_PROCESS"
     assert project.updated_on > updated_on_before
 
@@ -672,7 +677,7 @@ def test_accept_project_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_accept_project_notifies_regional_actors(client):
+def test_accept_project_notifies_regional_actors(request, client):
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     auth.Group.objects.get_or_create(name="project_moderator")
 
@@ -684,7 +689,12 @@ def test_accept_project_notifies_regional_actors(client):
     regional_actor.groups.add(st_group)
     regional_actor.profile.departments.add(dpt_nord)
 
-    project = Recipe(models.Project, commune=commune, email=regional_actor.email).make()
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        commune=commune,
+        email=regional_actor.email,
+    ).make()
 
     with login(client, groups=["switchtender", "project_moderator"]):
         client.post(reverse("projects-project-accept", args=[project.id]))
@@ -693,7 +703,7 @@ def test_accept_project_notifies_regional_actors(client):
 
 
 @pytest.mark.django_db
-def test_accept_project_does_not_notify_non_regional_actors(client):
+def test_accept_project_does_not_notify_non_regional_actors(request, client):
     group = auth.Group.objects.get(name="switchtender")
 
     dpt_nord = Recipe(geomatics.Department, code=59, name="Nord").make()
@@ -707,7 +717,12 @@ def test_accept_project_does_not_notify_non_regional_actors(client):
     non_regional_actor.profile.departments.add(dpt_pdc)
 
     owner = Recipe(auth.User, email="here@project.info").make()
-    project = Recipe(models.Project, commune=commune, email=owner.email).make()
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        commune=commune,
+        email=owner.email,
+    ).make()
 
     with login(client, groups=["switchtender"]):
         client.post(reverse("projects-project-accept", args=[project.id]))
@@ -721,8 +736,8 @@ def test_accept_project_does_not_notify_non_regional_actors(client):
 
 
 @pytest.mark.django_db
-def test_delete_project_not_available_for_non_staff_users(client):
-    project = Recipe(models.Project).make()
+def test_delete_project_not_available_for_non_staff_users(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-delete", args=[project.id])
     with login(client):
         response = client.get(url)
@@ -730,8 +745,8 @@ def test_delete_project_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_delete_project_and_redirect(client):
-    project = Recipe(models.Project).make()
+def test_delete_project_and_redirect(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     updated_on_before = project.updated_on
     url = reverse("projects-project-delete", args=[project.id])
 
@@ -739,7 +754,7 @@ def test_delete_project_and_redirect(client):
     with login(client, groups=["switchtender"], is_staff=True):
         response = client.post(url)
 
-    project = models.Project.objects_deleted.get(id=project.id)
+    project = models.Project.deleted_on_site.get(id=project.id)
     assert project.deleted
     assert project.updated_on > updated_on_before
 
@@ -904,11 +919,15 @@ def test_non_staff_cannot_delete_email_from_project(client):
 
 
 @pytest.mark.django_db
-def test_owner_can_remove_email_from_project_if_not_draft(client):
+def test_owner_can_remove_email_from_project_if_not_draft(request, client):
     email = "owner@example.com"
     colab_email = "collaborator@example.com"
     project = Recipe(
-        models.Project, email=email, emails=[email, colab_email], status="READY"
+        models.Project,
+        sites=[get_current_site(request)],
+        email=email,
+        emails=[email, colab_email],
+        status="READY",
     ).make()
     url = reverse(
         "projects-access-delete",
@@ -918,7 +937,7 @@ def test_owner_can_remove_email_from_project_if_not_draft(client):
     with login(client, email=email, is_staff=False):
         client.post(url)
 
-    project = models.Project.objects.get(id=project.id)
+    project = models.Project.on_site.get(id=project.id)
     assert colab_email not in project.emails
 
 
@@ -938,16 +957,18 @@ def test_owner_cannot_remove_email_from_project_if_draft(client):
 
 
 @pytest.mark.django_db
-def test_switchtender_can_delete_email_from_project(client):
+def test_switchtender_can_delete_email_from_project(request, client):
     email = "test@example.com"
-    project = Recipe(models.Project, emails=[email]).make()
+    project = Recipe(
+        models.Project, sites=[get_current_site(request)], emails=[email]
+    ).make()
     url = reverse("projects-access-delete", args=[project.id, email])
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         response = client.post(url)
 
-    project = models.Project.objects.get(id=project.id)
+    project = models.Project.on_site.get(id=project.id)
     assert email not in project.emails
 
     update_url = reverse("projects-access-update", args=[project.id])
@@ -955,16 +976,18 @@ def test_switchtender_can_delete_email_from_project(client):
 
 
 @pytest.mark.django_db
-def test_owner_cannot_be_removed_from_project_acl(client):
+def test_owner_cannot_be_removed_from_project_acl(request, client):
     email = "test@example.com"
-    project = Recipe(models.Project, email=email, emails=[email]).make()
+    project = Recipe(
+        models.Project, sites=[get_current_site(request)], email=email, emails=[email]
+    ).make()
     url = reverse("projects-access-delete", args=[project.id, email])
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         response = client.post(url)
 
-    project = models.Project.objects.get(id=project.id)
+    project = models.Project.on_site.get(id=project.id)
     assert email in project.emails
 
     update_url = reverse("projects-access-update", args=[project.id])
@@ -1236,7 +1259,7 @@ def test_switchtender_create_action_for_resource_push(client):
 
 
 @pytest.mark.django_db
-def test_switchtender_joins_project(client):
+def test_switchtender_joins_project(request, client):
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
     Recipe(
@@ -1246,14 +1269,16 @@ def test_switchtender_joins_project(client):
             dept,
         ],
     ).make()
-    project = Recipe(models.Project, commune=commune).make()
+    project = Recipe(
+        models.Project, sites=[get_current_site(request)], commune=commune
+    ).make()
 
     url = reverse("projects-project-switchtender-join", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
         # Then POST to join projet
         response = client.post(url)
 
-    project = models.Project.objects.get(pk=project.pk)
+    project = models.Project.on_site.get(pk=project.pk)
 
     assert response.status_code == 302
     assert project.switchtenders.count() == 1
@@ -1261,7 +1286,7 @@ def test_switchtender_joins_project(client):
 
 
 @pytest.mark.django_db
-def test_switchtender_leaves_project(client):
+def test_switchtender_leaves_project(request, client):
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
     Recipe(
@@ -1271,7 +1296,9 @@ def test_switchtender_leaves_project(client):
             dept,
         ],
     ).make()
-    project = Recipe(models.Project, commune=commune).make()
+    project = Recipe(
+        models.Project, sites=[get_current_site(request)], commune=commune
+    ).make()
 
     url = reverse("projects-project-switchtender-leave", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
@@ -1281,7 +1308,7 @@ def test_switchtender_leaves_project(client):
         # Then POST to leave projet
         response = client.post(url)
 
-    project = models.Project.objects.get(pk=project.pk)
+    project = models.Project.on_site.get(pk=project.pk)
 
     assert response.status_code == 302
     assert project.switchtenders.count() == 0
