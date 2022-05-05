@@ -10,6 +10,7 @@ created: 2021-06-01 10:11:56 CEST
 
 import pytest
 from actstream.models import action_object_stream
+from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains
@@ -24,17 +25,19 @@ from .. import models
 
 # Public conversation
 @pytest.mark.django_db
-def test_create_conversation_message_not_available_for_non_logged_users(client):
-    project = Recipe(models.Project).make()
+def test_create_conversation_message_not_available_for_non_logged_users(
+    request, client
+):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-conversation-create-message", args=[project.id])
     response = client.get(url)
     assert response.status_code == 302
 
 
 @pytest.mark.django_db
-def test_create_conversation_message_not_available_for_outsiders(client):
+def test_create_conversation_message_not_available_for_outsiders(request, client):
     with login(client):
-        project = Recipe(models.Project).make()
+        project = Recipe(models.Project, sites=[get_current_site(request)]).make()
         url = reverse("projects-conversation-create-message", args=[project.id])
         response = client.post(
             url,
@@ -44,9 +47,16 @@ def test_create_conversation_message_not_available_for_outsiders(client):
 
 
 @pytest.mark.django_db
-def test_create_conversation_message_available_for_project_collaborators(client):
+def test_create_conversation_message_available_for_project_collaborators(
+    request, client
+):
     with login(client) as user:
-        project = Recipe(models.Project, email=user.email, status="READY").make()
+        project = Recipe(
+            models.Project,
+            sites=[get_current_site(request)],
+            email=user.email,
+            status="READY",
+        ).make()
         url = reverse("projects-conversation-create-message", args=[project.id])
         response = client.post(
             url,
@@ -62,8 +72,8 @@ def test_create_conversation_message_available_for_project_collaborators(client)
 
 
 @pytest.mark.django_db
-def test_create_note_not_available_for_non_staff_users(client):
-    project = Recipe(models.Project).make()
+def test_create_note_not_available_for_non_staff_users(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-create-note", args=[project.id])
     with login(client):
         response = client.get(url)
@@ -71,8 +81,8 @@ def test_create_note_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_create_note_available_for_switchtender(client):
-    project = Recipe(models.Project).make()
+def test_create_note_available_for_switchtender(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-create-note", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
@@ -82,9 +92,11 @@ def test_create_note_available_for_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_create_note_available_for_project_collaborators(client):
+def test_create_note_available_for_project_collaborators(request, client):
     with login(client) as user:
-        project = Recipe(models.Project, email=user.email).make()
+        project = Recipe(
+            models.Project, sites=[get_current_site(request)], email=user.email
+        ).make()
         url = reverse("projects-create-note", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
@@ -92,8 +104,8 @@ def test_create_note_available_for_project_collaborators(client):
 
 
 @pytest.mark.django_db
-def test_create_new_note_for_project_and_redirect(client):
-    project = Recipe(models.Project).make()
+def test_create_new_note_for_project_and_redirect(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         response = client.post(
@@ -106,9 +118,11 @@ def test_create_new_note_for_project_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_create_public_note_for_project_collaborator_and_redirect(client):
+def test_create_public_note_for_project_collaborator_and_redirect(request, client):
     with login(client) as user:
-        project = Recipe(models.Project, email=user.email).make()
+        project = Recipe(
+            models.Project, sites=[get_current_site(request)], email=user.email
+        ).make()
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
             data={"content": "this is some content"},
@@ -121,9 +135,11 @@ def test_create_public_note_for_project_collaborator_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_create_private_note_not_available_for_project_collaborator(client):
+def test_create_private_note_not_available_for_project_collaborator(request, client):
     with login(client) as user:
-        project = Recipe(models.Project, email=user.email).make()
+        project = Recipe(
+            models.Project, sites=[get_current_site(request)], email=user.email
+        ).make()
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
             data={"content": "this is some content", "public": False},
@@ -135,23 +151,36 @@ def test_create_private_note_not_available_for_project_collaborator(client):
 
 
 @pytest.mark.django_db
-def test_private_note_hidden_from_project_members(client):
+def test_private_note_hidden_from_project_members(request, client):
     user_email = "not@admin.here"
-    Recipe(models.Project, status="READY", emails=[user_email]).make()
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+        emails=[user_email],
+    ).make()
 
-    note = Recipe(models.Note, content="short note", public=False).make()
+    note = Recipe(
+        models.Note, project=project, content="short note", public=False
+    ).make()
 
     with login(client, username="project_owner", email=user_email, is_staff=False):
         response = client.get(note.get_absolute_url())
 
+    print(response.content)
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_public_note_available_to_readers(client):
+def test_public_note_available_to_readers(request, client):
     user_email = "not@admin.here"
     note_content = "this is a public note"
-    project = Recipe(models.Project, emails=[user_email], status="READY").make()
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        emails=[user_email],
+        status="READY",
+    ).make()
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         response = client.post(
@@ -192,9 +221,11 @@ def test_update_note_available_for_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_update_public_note_for_project_collaborator_and_redirect(client):
+def test_update_public_note_for_project_collaborator_and_redirect(request, client):
     with login(client) as user:
-        project = Recipe(models.Project, email=user.email).make()
+        project = Recipe(
+            models.Project, email=user.email, sites=[get_current_site(request)]
+        ).make()
         note = Recipe(models.Note, project=project, public=True).make()
         response = client.post(
             reverse("projects-update-note", args=[note.id]),
@@ -207,9 +238,11 @@ def test_update_public_note_for_project_collaborator_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_update_private_note_for_project_collaborator(client):
+def test_update_private_note_for_project_collaborator(request, client):
     with login(client) as user:
-        project = Recipe(models.Project, email=user.email).make()
+        project = Recipe(
+            models.Project, email=user.email, sites=[get_current_site(request)]
+        ).make()
         note = Recipe(models.Note, project=project, public=False).make()
         url = reverse("projects-update-note", args=[note.id])
         response = client.get(url)
@@ -237,8 +270,8 @@ def test_update_note_for_project_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_delete_note_for_project_and_redirect(client):
-    project = Recipe(models.Project).make()
+def test_delete_note_for_project_and_redirect(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     note = Recipe(models.Note, project=project).make()
     url = reverse("projects-delete-note", args=[note.id])
 
@@ -251,8 +284,8 @@ def test_delete_note_for_project_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_delete_note_removes_activity(client):
-    project = Recipe(models.Project).make()
+def test_delete_note_removes_activity(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
     with login(client, username="addman", groups=["switchtender"]) as user:
         project.switchtenders.add(user)

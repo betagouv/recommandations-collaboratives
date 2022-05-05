@@ -176,7 +176,7 @@ def create_project_prefilled(request):
 @login_required
 def select_commune(request, project_id=None):
     """Intermediate screen to select proper insee number of commune"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     response = redirect("survey-project-session", project_id=project.id)
     response["Location"] += "?first_time=1"
     if not project.commune:
@@ -300,7 +300,7 @@ def project_detail_from_sharing_link(request, project_ro_key):
 @login_required
 def project_update(request, project_id=None):
     """Update the base information of a project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     can_administrate_or_403(project, request.user)
 
     if request.method == "POST":

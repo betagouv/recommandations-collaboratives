@@ -16,7 +16,7 @@ from . import models
 @admin.register(models.Category)
 class CategoryAdmin(admin.ModelAdmin):
     search_fields = ["name", "icon"]
-    list_filter = []
+    list_filter = ["sites"]
     list_display = ["name", "icon", "color"]
 
 
