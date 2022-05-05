@@ -861,7 +861,7 @@ def test_switchtender_can_add_email_to_project(client):
         project.switchtenders.add(user)
         client.post(url, data=data)
 
-    invite = invites_models.Invite.objects.first()
+    invite = invites_models.Invite.on_site.first()
     assert invite.email == data["email"]
 
 
@@ -875,7 +875,7 @@ def test_owner_can_add_email_to_project_if_not_draft(client):
     with login(client, email=email, is_staff=False):
         client.post(url, data=data)
 
-    invite = invites_models.Invite.objects.first()
+    invite = invites_models.Invite.on_site.first()
     assert invite.email == data["email"]
 
 
