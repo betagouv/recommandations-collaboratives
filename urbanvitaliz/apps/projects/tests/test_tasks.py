@@ -179,36 +179,58 @@ def test_task_suggestion_available_with_localized_reco(client):
 
 
 @pytest.mark.django_db
-def test_visit_task_for_project_and_redirect_for_project_owner(client):
+def test_visit_task_for_project_and_redirect_for_project_owner(request, client):
     owner_email = "owner@univer.se"
     project = Recipe(
-        models.Project, status="READY", email=owner_email, emails=[owner_email]
+        models.Project,
+        status="READY",
+        sites=[get_current_site(request)],
+        email=owner_email,
+        emails=[owner_email],
     ).make()
-    task = Recipe(models.Task, project=project, visited=False, resource=None).make()
+    task = Recipe(
+        models.Task,
+        project=project,
+        site=get_current_site(request),
+        visited=False,
+        resource=None,
+    ).make()
     with login(client, email=owner_email):
         response = client.get(
             reverse("projects-visit-task", args=[task.id]),
         )
-    task = models.Task.objects.all()[0]
+    task = models.Task.on_site.all()[0]
     assert task.visited is True
     assert response.status_code == 302
 
 
 @pytest.mark.django_db
-def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(client):
+def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(
+    request, client
+):
     owner_email = "owner@univer.se"
     resource = resources.Resource()
     resource.save()
 
     project = Recipe(
-        models.Project, status="READY", email=owner_email, emails=[owner_email]
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+        email=owner_email,
+        emails=[owner_email],
     ).make()
-    task = Recipe(models.Task, project=project, visited=False, resource=resource).make()
+    task = Recipe(
+        models.Task,
+        project=project,
+        site=get_current_site(request),
+        visited=False,
+        resource=resource,
+    ).make()
     with login(client, email=owner_email):
         response = client.get(
             reverse("projects-visit-task", args=[task.id]),
         )
-    task = models.Task.objects.all()[0]
+    task = models.Task.on_site.all()[0]
     assert task.visited is True
     assert response.status_code == 302
 
@@ -216,31 +238,51 @@ def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(clien
 #
 # mark as done
 @pytest.mark.django_db
-def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(client):
+def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(
+    request, client
+):
     owner_email = "owner@univer.se"
     project = Recipe(
-        models.Project, status="READY", email=owner_email, emails=[owner_email]
+        models.Project,
+        status="READY",
+        sites=[get_current_site(request)],
+        email=owner_email,
+        emails=[owner_email],
     ).make()
     task = Recipe(
-        models.Task, status=models.Task.PROPOSED, project=project, visited=True
+        models.Task,
+        status=models.Task.PROPOSED,
+        project=project,
+        visited=True,
+        site=get_current_site(request),
     ).make()
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-toggle-done-task", args=[task.id]),
         )
-    task = models.Task.objects.all()[0]
+    task = models.Task.on_site.all()[0]
     assert task.status == models.Task.DONE
     assert response.status_code == 302
 
 
 @pytest.mark.django_db
-def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(client):
+def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(
+    request, client
+):
     owner_email = "owner@univer.se"
     project = Recipe(
-        models.Project, status="READY", email=owner_email, emails=[owner_email]
+        models.Project,
+        status="READY",
+        email=owner_email,
+        emails=[owner_email],
+        sites=[get_current_site(request)],
     ).make()
     task = Recipe(
-        models.Task, project=project, visited=True, status=models.Task.DONE
+        models.Task,
+        project=project,
+        visited=True,
+        status=models.Task.DONE,
+        site=get_current_site(request),
     ).make()
 
     with login(client, email=owner_email):
@@ -248,38 +290,50 @@ def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(client
             reverse("projects-toggle-done-task", args=[task.id]),
         )
 
-    task = models.Task.objects.all()[0]
+    task = models.Task.on_site.all()[0]
     assert task.status == models.Task.PROPOSED
     assert response.status_code == 302
 
 
 @pytest.mark.django_db
-def test_refuse_task_for_project_and_redirect_for_project_owner(client):
+def test_refuse_task_for_project_and_redirect_for_project_owner(request, client):
     owner_email = "owner@univer.se"
     project = Recipe(
-        models.Project, status="READY", email=owner_email, emails=[owner_email]
+        models.Project,
+        status="READY",
+        email=owner_email,
+        emails=[owner_email],
+        sites=[get_current_site(request)],
     ).make()
-    task = Recipe(models.Task, project=project, visited=False).make()
+    task = Recipe(
+        models.Task, site=get_current_site(request), project=project, visited=False
+    ).make()
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-refuse-task", args=[task.id]),
         )
-    task = models.Task.objects.all()[0]
+    task = models.Task.on_site.all()[0]
     assert task.status == models.Task.NOT_INTERESTED
     assert response.status_code == 302
 
 
-def test_already_done_task_for_project_and_redirect_for_project_owner(client):
+def test_already_done_task_for_project_and_redirect_for_project_owner(request, client):
     owner_email = "owner@univer.se"
     project = Recipe(
-        models.Project, status="READY", email=owner_email, emails=[owner_email]
+        models.Project,
+        status="READY",
+        email=owner_email,
+        emails=[owner_email],
+        sites=[get_current_site(request)],
     ).make()
-    task = Recipe(models.Task, project=project, visited=False).make()
+    task = Recipe(
+        models.Task, site=get_current_site(request), project=project, visited=False
+    ).make()
     with login(client, email=owner_email):
         response = client.post(
             reverse("projects-already-done-task", args=[task.id]),
         )
-    task = models.Task.objects.all()[0]
+    task = models.Task.on_site.all()[0]
     assert task.status == models.Task.ALREADY_DONE
     assert response.status_code == 302
 
@@ -289,8 +343,8 @@ def test_already_done_task_for_project_and_redirect_for_project_owner(client):
 
 
 @pytest.mark.django_db
-def test_update_task_not_available_for_non_staff_users(client):
-    task = Recipe(models.Task).make()
+def test_update_task_not_available_for_non_staff_users(request, client):
+    task = Recipe(models.Task, site=get_current_site(request)).make()
     url = reverse("projects-update-task", args=[task.id])
     with login(client):
         response = client.get(url)
@@ -298,8 +352,8 @@ def test_update_task_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_update_task_available_for_switchtender(client):
-    task = Recipe(models.Task).make()
+def test_update_task_available_for_switchtender(request, client):
+    task = Recipe(models.Task, site=get_current_site(request)).make()
     url = reverse("projects-update-task", args=[task.id])
     with login(client, groups=["switchtender"]) as user:
         task.project.switchtenders.add(user)
@@ -310,8 +364,8 @@ def test_update_task_available_for_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_update_task_for_project_and_redirect(client):
-    task = Recipe(models.Task).make()
+def test_update_task_for_project_and_redirect(request, client):
+    task = Recipe(models.Task, site=get_current_site(request)).make()
     updated_on_before = task.updated_on
     url = reverse("projects-update-task", args=[task.id])
     data = {"content": "this is some content"}
@@ -320,7 +374,7 @@ def test_update_task_for_project_and_redirect(client):
         task.project.switchtenders.add(user)
         response = client.post(url, data=data)
 
-    task = models.Task.objects.get(id=task.id)
+    task = models.Task.on_site.get(id=task.id)
     assert task.content == data["content"]
     assert task.updated_on > updated_on_before
     assert task.project.updated_on == task.updated_on
@@ -361,10 +415,15 @@ def test_delete_task_from_project_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_create_new_task_for_project_notify_collaborators(mocker, client):
+def test_create_new_task_for_project_notify_collaborators(mocker, client, request):
     owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
 
-    project = Recipe(models.Project, status="READY", emails=[owner.email]).make()
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+        emails=[owner.email],
+    ).make()
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
 
@@ -504,12 +563,12 @@ def test_create_new_action_with_invalid_push_type(client):
                 "public": True,
             },
         )
-    assert models.Task.objects.count() == 0
+    assert models.Task.on_site.count() == 0
 
 
 @pytest.mark.django_db
-def test_create_new_action_as_draft(client):
-    project = Recipe(models.Project).make()
+def test_create_new_action_as_draft(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
     intent = "My Intent"
     content = "My Content"
@@ -525,14 +584,14 @@ def test_create_new_action_as_draft(client):
                 "content": content,
             },
         )
-    task = models.Task.objects.all()[0]
+    task = models.Task.on_site.all()[0]
     assert task.public is False
     assert response.status_code == 302
 
 
 @pytest.mark.django_db
-def test_create_new_action_without_resource(client):
-    project = Recipe(models.Project).make()
+def test_create_new_action_without_resource(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
     intent = "My Intent"
     content = "My Content"
@@ -549,7 +608,7 @@ def test_create_new_action_without_resource(client):
                 "content": content,
             },
         )
-    task = models.Task.objects.all()[0]
+    task = models.Task.on_site.all()[0]
     assert task.project == project
     assert task.content == content
     assert task.public is True
@@ -583,7 +642,7 @@ def test_create_new_action_with_single_resource(request, client):
                 "content": content,
             },
         )
-    task = models.Task.objects.first()
+    task = models.Task.on_site.first()
     assert task
     assert task.project == project
     assert task.public is True
@@ -616,9 +675,9 @@ def test_create_new_action_with_multiple_resources(request, client):
                 "resources": [resource1.pk, resource2.pk],
             },
         )
-    assert models.Task.objects.count() == 2
+    assert models.Task.on_site.count() == 2
 
-    for task in models.Task.objects.all():
+    for task in models.Task.on_site.all():
         assert task.project == project
         assert task.public is True
 
@@ -626,61 +685,73 @@ def test_create_new_action_with_multiple_resources(request, client):
 
 
 @pytest.mark.django_db
-def test_sort_action_up(client):
-    project = Recipe(models.Project).make()
-    taskA = Recipe(models.Task, project=project, priority=1000).make()
-    taskB = Recipe(models.Task, project=project, priority=1002).make()
+def test_sort_action_up(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    taskA = Recipe(
+        models.Task, site=get_current_site(request), project=project, priority=1000
+    ).make()
+    taskB = Recipe(
+        models.Task, site=get_current_site(request), project=project, priority=1002
+    ).make()
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         client.post(reverse("projects-sort-task", args=[taskA.id, "up"]))
 
-    taskA = models.Task.objects.get(pk=taskA.id)
-    taskB = models.Task.objects.get(pk=taskB.id)
+    taskA = models.Task.on_site.get(pk=taskA.id)
+    taskB = models.Task.on_site.get(pk=taskB.id)
 
     assert taskA.order < taskB.order
 
 
 @pytest.mark.django_db
-def test_sort_action_down(client):
-    project = Recipe(models.Project).make()
-    taskA = Recipe(models.Task, project=project, priority=1000).make()
-    taskB = Recipe(models.Task, project=project, priority=900).make()
+def test_sort_action_down(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    taskA = Recipe(
+        models.Task, site=get_current_site(request), project=project, priority=1000
+    ).make()
+    taskB = Recipe(
+        models.Task, site=get_current_site(request), project=project, priority=900
+    ).make()
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         client.post(reverse("projects-sort-task", args=[taskA.id, "down"]))
 
-    taskA = models.Task.objects.get(pk=taskA.id)
-    taskB = models.Task.objects.get(pk=taskB.id)
+    taskA = models.Task.on_site.get(pk=taskA.id)
+    taskB = models.Task.on_site.get(pk=taskB.id)
 
     assert taskA.order > taskB.order
 
 
 @pytest.mark.django_db
-def test_sort_action_down_when_zero(client):
-    project = Recipe(models.Project).make()
-    taskA = Recipe(models.Task, project=project, priority=0).make()
+def test_sort_action_down_when_zero(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    taskA = Recipe(
+        models.Task, site=get_current_site(request), project=project, priority=0
+    ).make()
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         client.post(reverse("projects-sort-task", args=[taskA.id, "down"]))
 
-    taskA = models.Task.objects.get(pk=taskA.id)
+    taskA = models.Task.on_site.get(pk=taskA.id)
 
     assert taskA.priority == 0
 
 
 @pytest.mark.django_db
-def test_sort_action_up_when_no_follower(client):
-    project = Recipe(models.Project).make()
-    taskA = Recipe(models.Task, project=project, priority=1000).make()
+def test_sort_action_up_when_no_follower(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    taskA = Recipe(
+        models.Task, site=get_current_site(request), project=project, priority=1000
+    ).make()
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         client.post(reverse("projects-sort-task", args=[taskA.id, "up"]))
 
-    taskA = models.Task.objects.get(pk=taskA.id)
+    taskA = models.Task.on_site.get(pk=taskA.id)
 
     assert taskA.priority == 1000
 
