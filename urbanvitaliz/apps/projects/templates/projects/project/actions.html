@@ -130,7 +130,7 @@
                                                     </template>
                                                 </div>
                                                 <div class="p-2" @click="onPreviewClick(t.id)" style="cursor: pointer">
-                                                    <h6 class=mt-1 mb-0 fw-bold" x-text="truncate(t.intent)"></h6>
+                                                    <h6 class=mt-1 mb-0 fw-bold" x-text="t.intent"></h6>
     
                                                     <div class="rounded bg-light p-2 my-2" style="font-size: 0.8em">
                                                         <p x-text="truncate(t.content, 200)" class="mb-2"></p>
@@ -218,6 +218,21 @@
                                                     Conversation
                                                 </h2>
                                                 <div class="flex-fill overflow-auto h-100">
+                                                    <template x-if="currentTask.resource_id">
+                                                        <div class="rounded bg-light p-2 m-3 message" style="font-size: 0.8em">
+                                                            <p x-html="renderMarkdown(currentTask.content)" class="mb-2"></p>
+                                                            <div>
+                                                                <img class="rounded-circle d-inline-block" width="20px" height="20px"
+                                                                    :src="generateGravatarUrl(currentTask.created_by)"
+                                                                    data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
+                                                                    style="z-index: 1000;" tabindex="0" />
+                                                                <span class="ms-1 fst-italic" x-text="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
+                                                                    style="line-height: 20px"></span>
+                                                                <span class="ms-1 text-muted" x-text="formatDate(f.timestamp)"
+                                                                    style="line-height: 20px"></span>
+                                                            </div>
+                                                        </div>
+                                                    </template>
                                                     <template x-for="f in currentTask.followups" x-key="f.timestamp" x-effect="currentTask.followups && scrollToLastElement">
                                                         <div class="rounded bg-light p-2 m-3 message" style="font-size: 0.8em">
                                                             <p x-html="renderMarkdown(f.comment)" class="mb-2"></p>
