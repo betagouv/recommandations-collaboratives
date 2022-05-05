@@ -361,6 +361,10 @@ class TaskManager(OrderedModelManager):
         )
 
 
+class TaskOnSiteManager(CurrentSiteManager, TaskManager):
+    pass
+
+
 class DeletedTaskManager(models.Manager):
     """Manager for deleted tasks"""
 
@@ -368,11 +372,18 @@ class DeletedTaskManager(models.Manager):
         return super().get_queryset().exclude(deleted=None)
 
 
+class DeletedTaskOnSiteManager(CurrentSiteManager, DeletedTaskManager):
+    pass
+
+
 class Task(OrderedModel):
     """Représente une action pour faire avancer un project"""
 
     objects = TaskManager()
     deleted_objects = DeletedTaskManager()
+
+    on_site = TaskOnSiteManager()
+    deleted_on_site = DeletedTaskOnSiteManager()
 
     order_with_respect_to = "project"
 
@@ -391,6 +402,8 @@ class Task(OrderedModel):
         (NOT_INTERESTED, "pas intéressé·e"),
         (ALREADY_DONE, "déjà fait"),
     )
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     @property
     def closed(self):

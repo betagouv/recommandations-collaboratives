@@ -9,6 +9,7 @@ created: 2022-02-03 16:14:54 CET
 import test  # noqa
 
 from django.contrib.auth import models as auth
+from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import models as notifications_models
@@ -25,17 +26,24 @@ from ..digests import NotificationFormatter
 ########################################################################
 
 
-def test_send_digests_for_new_reco(client):
+def test_send_digests_for_new_reco(request):
     user = Recipe(auth.User, username="auser", email="user@example.com").make()
     switchtender = Recipe(
         auth.User, username="switchtender", email="switchtender@example.com"
     ).make()
-    project = baker.make(models.Project, status="DONE", emails=[user.email])
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="DONE",
+        emails=[user.email],
+    )
 
     # Generate a notification
     signals.action_created.send(
         sender=test_send_digests_for_new_reco,
-        task=models.Task.objects.create(project=project, created_by=switchtender),
+        task=models.Task.objects.create(
+            project=project, site=get_current_site(request), created_by=switchtender
+        ),
         project=project,
         user=switchtender,
     )

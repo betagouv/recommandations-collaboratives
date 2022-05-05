@@ -874,7 +874,11 @@ def test_notification_not_sent_when_project_is_draft(request):
     # Generate a notification
     signals.action_created.send(
         sender=test_notification_not_sent_when_project_is_draft,
-        task=models.Task.objects.create(project=project, created_by=switchtender),
+        task=models.Task.objects.create(
+            project=project,
+            site=get_current_site(request),
+            created_by=switchtender,
+        ),
         project=project,
         user=switchtender,
     )
@@ -898,7 +902,9 @@ def test_notification_not_sent_when_project_is_muted(request):
     # Generate a notification
     signals.action_created.send(
         sender=test_notification_not_sent_when_project_is_draft,
-        task=models.Task.objects.create(project=project, created_by=switchtender),
+        task=models.Task.on_site.create(
+            project=project, site=get_current_site(request), created_by=switchtender
+        ),
         project=project,
         user=switchtender,
     )
