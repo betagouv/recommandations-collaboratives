@@ -19,7 +19,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -385,7 +386,7 @@ class Task(OrderedModel):
     on_site = TaskOnSiteManager()
     deleted_on_site = DeletedTaskOnSiteManager()
 
-    order_with_respect_to = "project"
+    order_with_respect_to = ("site", "project")
 
     PROPOSED = 0
     INPROGRESS = 1
