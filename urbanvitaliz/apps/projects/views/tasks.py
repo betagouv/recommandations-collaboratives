@@ -33,7 +33,7 @@ from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 @login_required
 def visit_task(request, task_id):
     """Visit the content of a task"""
-    task = get_object_or_404(models.Task, pk=task_id)
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     can_manage_or_403(task.project, request.user, allow_draft=True)
     is_switchtender = check_if_switchtender(request.user)
 
@@ -54,7 +54,7 @@ def visit_task(request, task_id):
 @login_required
 def toggle_done_task(request, task_id):
     """Mark task as done for a project"""
-    task = get_object_or_404(models.Task, pk=task_id)
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     can_manage_or_403(task.project, request.user)
 
     if request.method == "POST":
@@ -86,7 +86,7 @@ def toggle_done_task(request, task_id):
 @login_required
 def refuse_task(request, task_id):
     """Mark task refused for a project (user not interested)"""
-    task = get_object_or_404(models.Task, pk=task_id)
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     can_manage_or_403(task.project, request.user)
 
     if request.method == "POST":
@@ -103,7 +103,7 @@ def refuse_task(request, task_id):
 @login_required
 def already_done_task(request, task_id):
     """Mark task refused for a project"""
-    task = get_object_or_404(models.Task, pk=task_id)
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     can_manage_or_403(task.project, request.user)
 
     if request.method == "POST":
@@ -120,7 +120,7 @@ def already_done_task(request, task_id):
 @login_required
 def sort_task(request, task_id, order):
     """Update an existing task for a project"""
-    task = get_object_or_404(models.Task, pk=task_id)
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     can_manage_or_403(task.project, request.user)
 
     if order == "up":
@@ -141,7 +141,7 @@ def sort_task(request, task_id, order):
 @login_required
 def update_task(request, task_id=None):
     """Update an existing task for a project"""
-    task = get_object_or_404(models.Task, pk=task_id)
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     can_manage_or_403(task.project, request.user)
 
     was_public = task.public
@@ -229,7 +229,7 @@ def presuggest_task(request, project_id):
     """Suggest tasks"""
     is_switchtender_or_403(request.user)
 
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     try:
         survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
@@ -275,7 +275,7 @@ def presuggest_task(request, project_id):
 def delete_task(request, task_id=None):
     """Delete a task from a project"""
     is_switchtender_or_403(request.user)
-    task = get_object_or_404(models.Task, pk=task_id)
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     if request.method == "POST":
         task.deleted = timezone.now()
         task.save()
@@ -287,7 +287,7 @@ def delete_task(request, task_id=None):
 @login_required
 def remind_task(request, task_id=None):
     """Set a reminder for a task"""
-    task = get_object_or_404(models.Task, pk=task_id)
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     recipient = task.project.email
 
     if request.method == "POST":
@@ -317,7 +317,7 @@ def remind_task(request, task_id=None):
 @login_required
 def remind_task_delete(request, task_id=None):
     """Delete a reminder for a task"""
-    task = get_object_or_404(models.Task, pk=task_id)
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
 
     if request.method == "POST":
         api.remove_reminder_email(task)
@@ -328,7 +328,7 @@ def remind_task_delete(request, task_id=None):
 @login_required
 def followup_task(request, task_id=None):
     """Create a new followup for task"""
-    task = get_object_or_404(models.Task, pk=task_id)
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
     can_manage_or_403(task.project, request.user)
     if request.method == "POST":
         form = TaskFollowupForm(request.POST)
@@ -354,7 +354,9 @@ def followup_task(request, task_id=None):
 @login_required
 def followup_task_update(request, followup_id=None):
     """Update a followup for task"""
-    followup = get_object_or_404(models.TaskFollowup, pk=followup_id)
+    followup = get_object_or_404(
+        models.TaskFollowup, task__site=request.site, pk=followup_id
+    )
 
     if followup.who != request.user:
         return HttpResponseForbidden()
@@ -449,7 +451,7 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
 @login_required
 def create_action(request, project_id=None):
     """Create action for given project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     can_manage_or_403(project, request.user)
 
@@ -523,8 +525,8 @@ def create_resource_action_for_current_project(request, resource_id=None):
     """Create action for given resource to project stored in session"""
     is_switchtender_or_403(request.user)
     project_id = get_active_project_id(request)
-    resource = get_object_or_404(resources.Resource, pk=resource_id)
-    project = get_object_or_404(models.Project, pk=project_id)
+    resource = get_object_or_404(resources.Resource, sites=request.site, pk=resource_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     next_url = reverse("projects-project-create-action", args=[project.id])
     next_url += f"?resource={resource.id}"

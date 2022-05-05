@@ -124,8 +124,8 @@ def test_task_suggestion_not_available_for_non_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_task_suggestion_when_no_survey(client):
-    project = Recipe(models.Project).make()
+def test_task_suggestion_when_no_survey(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client, groups=["switchtender"]):
         response = client.get(url)
@@ -133,10 +133,10 @@ def test_task_suggestion_when_no_survey(client):
 
 
 @pytest.mark.django_db
-def test_task_suggestion_available_with_bare_project(client):
+def test_task_suggestion_available_with_bare_project(request, client):
     Recipe(survey_models.Survey, pk=1).make()
     Recipe(models.TaskRecommendation, condition="").make()
-    project = Recipe(models.Project).make()
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client, groups=["switchtender"]):
         response = client.get(url)
@@ -144,11 +144,13 @@ def test_task_suggestion_available_with_bare_project(client):
 
 
 @pytest.mark.django_db
-def test_task_suggestion_available_with_filled_project(client):
+def test_task_suggestion_available_with_filled_project(request, client):
     Recipe(survey_models.Survey, pk=1).make()
     commune = Recipe(geomatics.Commune).make()
     Recipe(models.TaskRecommendation, condition="").make()
-    project = Recipe(models.Project, commune=commune).make()
+    project = Recipe(
+        models.Project, sites=[get_current_site(request)], commune=commune
+    ).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client, groups=["switchtender"]):
         response = client.get(url)
@@ -156,7 +158,7 @@ def test_task_suggestion_available_with_filled_project(client):
 
 
 @pytest.mark.django_db
-def test_task_suggestion_available_with_localized_reco(client):
+def test_task_suggestion_available_with_localized_reco(request, client):
     Recipe(survey_models.Survey, pk=1).make()
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
@@ -167,7 +169,9 @@ def test_task_suggestion_available_with_localized_reco(client):
             dept,
         ],
     ).make()
-    project = Recipe(models.Project, commune=commune).make()
+    project = Recipe(
+        models.Project, sites=[get_current_site(request)], commune=commune
+    ).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client, groups=["switchtender"]):
         response = client.get(url)
@@ -396,11 +400,11 @@ def test_delete_task_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_delete_task_from_project_and_redirect(client):
-    task = Recipe(models.Task).make()
+def test_delete_task_from_project_and_redirect(request, client):
+    task = Recipe(models.Task, site=get_current_site(request)).make()
     with login(client, groups=["switchtender"]):
         response = client.post(reverse("projects-delete-task", args=[task.id]))
-    task = models.Task.deleted_objects.get(id=task.id)
+    task = models.Task.deleted_on_site.get(id=task.id)
     assert task.deleted
     assert response.status_code == 302
 
@@ -441,12 +445,21 @@ def test_create_new_task_for_project_notify_collaborators(mocker, client, reques
 
 
 @pytest.mark.django_db
-def test_public_task_update_does_not_trigger_notifications(client):
+def test_public_task_update_does_not_trigger_notifications(request, client):
     owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
-    project = Recipe(models.Project, status="READY", emails=[owner.email]).make()
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+        emails=[owner.email],
+    ).make()
 
     task = Recipe(
-        models.Task, project=project, status=models.Task.PROPOSED, public=True
+        models.Task,
+        project=project,
+        site=get_current_site(request),
+        status=models.Task.PROPOSED,
+        public=True,
     ).make()
 
     url = reverse("projects-update-task", args=(task.pk,))
@@ -461,14 +474,22 @@ def test_public_task_update_does_not_trigger_notifications(client):
 
 
 @pytest.mark.django_db
-def test_draft_task_update_triggers_notifications(client):
+def test_draft_task_update_triggers_notifications(request, client):
     owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
     project = Recipe(
-        models.Project, status="READY", email=owner.email, emails=[owner.email]
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+        email=owner.email,
+        emails=[owner.email],
     ).make()
 
     task = Recipe(
-        models.Task, status=models.Task.PROPOSED, project=project, public=False
+        models.Task,
+        status=models.Task.PROPOSED,
+        project=project,
+        public=False,
+        site=get_current_site(request),
     ).make()
 
     url = reverse("projects-update-task", args=(task.pk,))
@@ -483,11 +504,11 @@ def test_draft_task_update_triggers_notifications(client):
 
 
 @pytest.mark.django_db
-def test_notifications_are_deleted_on_task_soft_delete():
+def test_notifications_are_deleted_on_task_soft_delete(request):
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     recipient = Recipe(auth.User).make()
 
-    task = Recipe(models.Task).make()
+    task = Recipe(models.Task, site=get_current_site(request)).make()
 
     notify.send(
         sender=user,
@@ -504,11 +525,11 @@ def test_notifications_are_deleted_on_task_soft_delete():
 
 
 @pytest.mark.django_db
-def test_notifications_are_deleted_on_task_hard_delete():
+def test_notifications_are_deleted_on_task_hard_delete(request):
     user = Recipe(auth.User).make()
     recipient = Recipe(auth.User).make()
 
-    task = Recipe(models.Task).make()
+    task = Recipe(models.Task, site=get_current_site(request)).make()
 
     notify.send(
         sender=user,
@@ -529,8 +550,8 @@ def test_notifications_are_deleted_on_task_hard_delete():
 
 
 @pytest.mark.django_db
-def test_create_task_not_available_for_non_staff_users(client):
-    project = Recipe(models.Project).make()
+def test_create_task_not_available_for_non_staff_users(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-create-action", args=[project.id])
     with login(client):
         response = client.get(url)
@@ -538,8 +559,8 @@ def test_create_task_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_create_task_available_for_switchtender(client):
-    project = Recipe(models.Project).make()
+def test_create_task_available_for_switchtender(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-create-action", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
@@ -550,8 +571,8 @@ def test_create_task_available_for_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_create_new_action_with_invalid_push_type(client):
-    project = Recipe(models.Project).make()
+def test_create_new_action_with_invalid_push_type(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
@@ -619,10 +640,11 @@ def test_create_new_action_without_resource(request, client):
 
 @pytest.mark.django_db
 def test_create_new_action_with_single_resource(request, client):
-    project = Recipe(models.Project).make()
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
     resource = Recipe(
         resources.Resource,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         status=resources.Resource.PUBLISHED,
     ).make()
 
@@ -652,15 +674,16 @@ def test_create_new_action_with_single_resource(request, client):
 
 @pytest.mark.django_db
 def test_create_new_action_with_multiple_resources(request, client):
-    project = Recipe(models.Project).make()
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
     resource1 = Recipe(
         resources.Resource,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         status=resources.Resource.PUBLISHED,
     ).make()
     resource2 = Recipe(
         resources.Resource,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         status=resources.Resource.PUBLISHED,
     ).make()
 
@@ -762,8 +785,8 @@ def test_sort_action_up_when_no_follower(request, client):
 
 
 @pytest.mark.django_db
-def test_update_task_followup_not_available_for_non_creator(client):
-    followup = Recipe(models.TaskFollowup).make()
+def test_update_task_followup_not_available_for_non_creator(request, client):
+    followup = Recipe(models.TaskFollowup, task__site=get_current_site(request)).make()
     url = reverse("projects-task-followup-update", args=[followup.id])
     with login(client):
         response = client.get(url)
@@ -771,20 +794,30 @@ def test_update_task_followup_not_available_for_non_creator(client):
 
 
 @pytest.mark.django_db
-def test_update_task_followup_accesible_by_creator(client):
+def test_update_task_followup_accesible_by_creator(request, client):
     with login(client) as user:
-        followup = Recipe(models.TaskFollowup, who=user, status=0).make()
+        followup = Recipe(
+            models.TaskFollowup,
+            task__site=get_current_site(request),
+            who=user,
+            status=0,
+        ).make()
         url = reverse("projects-task-followup-update", args=[followup.id])
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_update_task_followup_by_creator(client):
+def test_update_task_followup_by_creator(request, client):
     data = {"comment": "hello"}
 
     with login(client) as user:
-        followup = Recipe(models.TaskFollowup, status=0, who=user).make()
+        followup = Recipe(
+            models.TaskFollowup,
+            task__site=get_current_site(request),
+            status=0,
+            who=user,
+        ).make()
         url = reverse("projects-task-followup-update", args=[followup.id])
         response = client.post(url, data=data)
 

@@ -1074,10 +1074,12 @@ def test_projects_feed_available_for_all_users(request, client):
 
 
 @pytest.mark.django_db
-def test_create_reminder_for_task(client):
+def test_create_reminder_for_task(request, client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
-    project = Recipe(models.Project, email="owner@example.com").make()
-    task = Recipe(models.Task, project=project).make()
+    project = Recipe(
+        models.Project, sites=[get_current_site(request)], email="owner@example.com"
+    ).make()
+    task = Recipe(models.Task, site=get_current_site(request), project=project).make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
     with login(client, email=project.email):
@@ -1091,9 +1093,11 @@ def test_create_reminder_for_task(client):
 
 
 @pytest.mark.django_db
-def test_create_reminder_without_delay_for_task(client):
+def test_create_reminder_without_delay_for_task(request, client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
-    task = Recipe(models.Task, project__email="owner@example.com").make()
+    task = Recipe(
+        models.Task, site=get_current_site(request), project__email="owner@example.com"
+    ).make()
     url = reverse("projects-remind-task", args=[task.id])
     with login(client, email=task.project.email):
         response = client.post(url)
@@ -1103,9 +1107,11 @@ def test_create_reminder_without_delay_for_task(client):
 
 
 @pytest.mark.django_db
-def test_recreate_reminder_after_for_same_task(client):
+def test_recreate_reminder_after_for_same_task(request, client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
-    task = Recipe(models.Task, project__email="owner@example.com").make()
+    task = Recipe(
+        models.Task, site=get_current_site(request), project__email="owner@example.com"
+    ).make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
     data2 = {"days": 10}
@@ -1122,9 +1128,11 @@ def test_recreate_reminder_after_for_same_task(client):
 
 
 @pytest.mark.django_db
-def test_recreate_reminder_before_for_same_task(client):
+def test_recreate_reminder_before_for_same_task(request, client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
-    task = Recipe(models.Task, project__email="owner@example.com").make()
+    task = Recipe(
+        models.Task, site=get_current_site(request), project__email="owner@example.com"
+    ).make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
     data2 = {"days": 2}
@@ -1157,8 +1165,8 @@ def test_user_cannot_followup_on_non_existant_task(client):
 
 
 @pytest.mark.django_db
-def test_user_cannot_followup_on_someone_else_task(client):
-    task = baker.make(models.Task)
+def test_user_cannot_followup_on_someone_else_task(request, client):
+    task = baker.make(models.Task, site=get_current_site(request))
     with login(client):
         url = reverse("projects-followup-task", args=[task.id])
         response = client.post(url)
@@ -1166,11 +1174,16 @@ def test_user_cannot_followup_on_someone_else_task(client):
 
 
 @pytest.mark.django_db
-def test_user_can_followup_on_personal_task(client):
+def test_user_can_followup_on_personal_task(request, client):
     data = dict(comment="some comment")
     with login(client) as user:
-        project = baker.make(models.Project, status="READY", email=user.email)
-        task = baker.make(models.Task, project=project)
+        project = baker.make(
+            models.Project,
+            sites=[get_current_site(request)],
+            status="READY",
+            email=user.email,
+        )
+        task = baker.make(models.Task, site=get_current_site(request), project=project)
         url = reverse("projects-followup-task", args=[task.id])
         client.post(url, data=data)
     followup = models.TaskFollowup.objects.all()[0]
@@ -1181,7 +1194,7 @@ def test_user_can_followup_on_personal_task(client):
 
 
 @pytest.mark.django_db
-def test_followup_triggers_notifications(client):
+def test_followup_triggers_notifications(request, client):
     group = auth.Group.objects.get(name="switchtender")
     switchtender = baker.make(auth.User, groups=[group])
 
@@ -1195,11 +1208,12 @@ def test_followup_triggers_notifications(client):
         project = baker.make(
             models.Project,
             status="READY",
+            sites=[get_current_site(request)],
             email=user.email,
             emails=[user.email, collab.email],
             switchtenders=[switchtender],
         )
-        task = baker.make(models.Task, project=project)
+        task = baker.make(models.Task, site=get_current_site(request), project=project)
         url = reverse("projects-followup-task", args=[task.id])
         client.post(url, data=data)
 
@@ -1209,10 +1223,15 @@ def test_followup_triggers_notifications(client):
 
 
 @pytest.mark.django_db
-def test_user_is_redirected_after_followup_on_task(client):
+def test_user_is_redirected_after_followup_on_task(request, client):
     with login(client) as user:
-        project = baker.make(models.Project, status="READY", email=user.email)
-        task = baker.make(models.Task, project=project)
+        project = baker.make(
+            models.Project,
+            sites=[get_current_site(request)],
+            status="READY",
+            email=user.email,
+        )
+        task = baker.make(models.Task, site=get_current_site(request), project=project)
         url = reverse("projects-followup-task", args=[task.id])
         response = client.post(url)
     assert response.status_code == 302
@@ -1299,9 +1318,12 @@ def test_switchtender_push_resource_to_project_fails_if_no_project_in_session(cl
 
 
 @pytest.mark.django_db
-def test_switchtender_create_action_for_resource_push(client):
-    project = Recipe(models.Project).make()
-    resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
+def test_switchtender_create_action_for_resource_push(request, client):
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
+    resource = Recipe(
+        resources.Resource, sites=[current_site], status=resources.Resource.PUBLISHED
+    ).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
     with login(client, groups=["switchtender"]) as user:
