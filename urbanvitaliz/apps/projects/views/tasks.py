@@ -17,25 +17,16 @@ from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateActionsFromResourcesForm,
-    CreateActionWithoutResourceForm,
-    CreateActionWithResourceForm,
-    PushTypeActionForm,
-    RemindTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskFollowupForm,
-    UpdateTaskForm,
-)
+from ..forms import (CreateActionsFromResourcesForm,
+                     CreateActionWithoutResourceForm,
+                     CreateActionWithResourceForm, PushTypeActionForm,
+                     RemindTaskForm, RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskFollowupForm,
+                     UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -198,7 +189,10 @@ def task_recommendation_create(request):
     if request.method == "POST":
         form = TaskRecommendationForm(request.POST)
         if form.is_valid():
-            form.save()
+            reco = form.save(commit=False)
+            reco.site = request.site
+            reco.save()
+
             return redirect(reverse("projects-task-recommendation-list"))
     else:
         form = TaskRecommendationForm()
@@ -210,7 +204,9 @@ def task_recommendation_update(request, recommendation_id):
     """Update a task recommendation"""
     is_staff_or_403(request.user)
 
-    recommendation = get_object_or_404(models.TaskRecommendation, pk=recommendation_id)
+    recommendation = get_object_or_404(
+        models.TaskRecommendation, site=request.site, pk=recommendation_id
+    )
 
     if request.method == "POST":
         form = TaskRecommendationForm(request.POST, instance=recommendation)
@@ -228,7 +224,7 @@ def task_recommendation_list(request):
     """List task recommendations for a project"""
     is_staff_or_403(request.user)
 
-    recommendations = models.TaskRecommendation.objects.all()
+    recommendations = models.TaskRecommendation.on_site.all()
 
     return render(request, "projects/tasks/recommendation_list.html", locals())
 
@@ -253,7 +249,7 @@ def presuggest_task(request, project_id):
     if session:
         session_signals = session.signals
 
-        for recommandation in models.TaskRecommendation.objects.all():
+        for recommandation in models.TaskRecommendation.on_site.all():
             if not project.commune:
                 continue
 
