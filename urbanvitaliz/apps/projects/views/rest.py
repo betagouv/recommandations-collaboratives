@@ -25,10 +25,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
-        return models.Project.on_site.for_user(self.request.user).order_by(
+        return self.queryset.for_user(self.request.user).order_by(
             "-created_on", "-updated_on"
         )
 
+    queryset = models.Project.on_site
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
 

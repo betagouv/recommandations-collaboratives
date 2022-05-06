@@ -24,5 +24,8 @@ class EmailTemplateForm(forms.ModelForm):
 class EmailTemplateAdmin(admin.ModelAdmin):
     form = EmailTemplateForm
 
+    list_filter = ["site"]
+    list_display = ["name", "site"]
+
 
 # eof
