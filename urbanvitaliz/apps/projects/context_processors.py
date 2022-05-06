@@ -19,7 +19,7 @@ def active_project_processor(request):
 
     if active_project:
         try:
-            survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
+            survey = survey_models.Survey.on_site.get(pk=1)  # XXX Hardcoded survey ID
             session, created = survey_models.Session.objects.get_or_create(
                 project=active_project, survey=survey
             )
