@@ -566,10 +566,17 @@ class TaskRecommendationManager(models.Manager):
         return super().get_queryset().order_by("resource__title")
 
 
+class TaskRecommendationOnSiteManager(CurrentSiteManager, TaskRecommendationManager):
+    pass
+
+
 class TaskRecommendation(models.Model):
     """Recommendation mechanisms for Tasks"""
 
     objects = TaskRecommendationManager()
+    on_site = TaskRecommendationOnSiteManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     condition = TagField(verbose_name="Condition", blank=True, null=True)
     resource = models.ForeignKey(
