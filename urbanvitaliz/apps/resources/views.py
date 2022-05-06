@@ -23,11 +23,8 @@ from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from . import models
 from .serializers import ResourceSerializer
@@ -124,7 +121,7 @@ class SearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.the_categories = models.Category.fetch()
+        self.the_categories = models.Category.on_site.all()
         # add one field per category defined in the database
         for category in self.the_categories:
             name = category.form_label
@@ -252,7 +249,7 @@ def resource_create(request):
             resource = form.save(commit=False)
             resource.created_by = request.user
             resource.save()
-            resource.sites.add(get_current_site(request))
+            resource.sites.add(request.site)
             form.save_m2m()
             next_url = reverse("resources-resource-detail", args=[resource.id])
             return redirect(next_url)
@@ -266,6 +263,11 @@ class EditResourceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Queryset needs to be here since on_site is dynamic and form is read too soon
+        self.fields["category"] = forms.ModelChoiceField(
+            queryset=models.Category.on_site.all(), empty_label="(Aucune)"
+        )
 
         # Try to load the Markdown template into 'content' field
         try:

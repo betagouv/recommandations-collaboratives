@@ -62,15 +62,15 @@ def test_create_task_recommendation_available_for_staff(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_is_created(client):
+def test_task_recommendation_is_created(request, client):
     url = reverse("projects-task-recommendation-create")
-    resource = Recipe(resources.Resource).make()
+    resource = Recipe(resources.Resource, sites=[get_current_site(request)]).make()
 
     data = {"text": "mew", "resource": resource.pk}
     with login(client, is_staff=True):
         response = client.post(url, data=data)
 
-    assert models.TaskRecommendation.objects.count() == 1
+    assert models.TaskRecommendation.on_site.count() == 1
 
     assert response.status_code == 302
     newurl = reverse("projects-task-recommendation-list")
@@ -78,8 +78,10 @@ def test_task_recommendation_is_created(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_update_not_available_for_non_staff(client):
-    recommendation = Recipe(models.TaskRecommendation).make()
+def test_task_recommendation_update_not_available_for_non_staff(request, client):
+    recommendation = Recipe(
+        models.TaskRecommendation, site=get_current_site(request)
+    ).make()
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
     with login(client):
         response = client.get(url)
@@ -87,8 +89,10 @@ def test_task_recommendation_update_not_available_for_non_staff(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_update_available_for_staff(client):
-    recommendation = Recipe(models.TaskRecommendation).make()
+def test_task_recommendation_update_available_for_staff(request, client):
+    recommendation = Recipe(
+        models.TaskRecommendation, site=get_current_site(request)
+    ).make()
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
     with login(client, is_staff=True):
         response = client.get(url)
@@ -96,8 +100,10 @@ def test_task_recommendation_update_available_for_staff(client):
 
 
 @pytest.mark.django_db
-def test_task_recommendation_is_updated(client):
-    recommendation = Recipe(models.TaskRecommendation).make()
+def test_task_recommendation_is_updated(request, client):
+    recommendation = Recipe(
+        models.TaskRecommendation, site=get_current_site(request)
+    ).make()
 
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
 
@@ -109,8 +115,8 @@ def test_task_recommendation_is_updated(client):
     newurl = reverse("projects-task-recommendation-list")
     assertRedirects(response, newurl)
 
-    assert models.TaskRecommendation.objects.count() == 1
-    updated_recommendation = models.TaskRecommendation.objects.all()[0]
+    assert models.TaskRecommendation.on_site.count() == 1
+    updated_recommendation = models.TaskRecommendation.on_site.all()[0]
     assert updated_recommendation.text == data["text"]
 
 
