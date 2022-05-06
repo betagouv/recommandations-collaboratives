@@ -27,7 +27,7 @@ from ..utils import can_manage_or_403
 @login_required
 def access_update(request, project_id):
     """Handle ACL for a project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     can_manage_or_403(project, request.user)
 
@@ -100,7 +100,7 @@ def access_update(request, project_id):
 @login_required
 def access_delete(request, project_id: int, email: str):
     """Delete en email from the project ACL"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     can_manage_or_403(project, request.user)
 

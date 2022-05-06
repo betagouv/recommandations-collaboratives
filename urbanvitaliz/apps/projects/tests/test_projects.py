@@ -20,7 +20,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.invites import models as invites_models
@@ -1002,11 +1003,15 @@ def test_owner_can_remove_email_from_project_if_not_draft(request, client):
 
 
 @pytest.mark.django_db
-def test_owner_cannot_remove_email_from_project_if_draft(client):
+def test_owner_cannot_remove_email_from_project_if_draft(request, client):
     email = "owner@example.com"
     colab_email = "collaborator@example.com"
     project = Recipe(
-        models.Project, email=email, emails=[email, colab_email], status="DRAFT"
+        models.Project,
+        sites=[get_current_site(request)],
+        email=email,
+        emails=[email, colab_email],
+        status="DRAFT",
     ).make()
     url = reverse("projects-access-delete", args=[project.id, colab_email])
 
