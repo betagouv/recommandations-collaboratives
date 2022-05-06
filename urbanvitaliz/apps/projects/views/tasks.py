@@ -241,7 +241,7 @@ def presuggest_task(request, project_id):
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     try:
-        survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
+        survey = survey_models.Survey.on_site.get(pk=1)  # XXX Hardcoded survey ID
         session, created = survey_models.Session.objects.get_or_create(
             project=project, survey=survey
         )

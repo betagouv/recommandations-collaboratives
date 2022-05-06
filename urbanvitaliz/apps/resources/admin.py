@@ -30,7 +30,7 @@ class ResourceAdmin(admin.ModelAdmin):
 @admin.register(models.Bookmark)
 class BookmarkAdmin(admin.ModelAdmin):
     search_fields = ["resource__title", "comments"]
-    list_filter = []
+    list_filter = ["site"]
     list_display = ["resource", "created_by"]
 
 

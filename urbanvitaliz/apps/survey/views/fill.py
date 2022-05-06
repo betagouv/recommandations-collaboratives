@@ -53,7 +53,9 @@ class SessionDoneView(RedirectView):
 
 def survey_question_details(request, session_id, question_id):
     """Display a single question and go to next"""
-    session = get_object_or_404(models.Session, pk=session_id)
+    session = get_object_or_404(
+        models.Session, pk=session_id, survey__site=request.site
+    )
     question = get_object_or_404(models.Question, pk=question_id)
     try:
         answer = models.Answer.objects.get(question=question, session=session)
@@ -82,11 +84,14 @@ def survey_question_details(request, session_id, question_id):
 
 def survey_create_session_for_project(request, project_id):
     """Create a session for the given project if necessary. Redirects to session."""
-    project = get_object_or_404(projects_models.Project, pk=project_id)
-    survey = get_object_or_404(models.Survey, pk=1)  # XXX Hardcoded survey ID
+    project = get_object_or_404(
+        projects_models.Project, sites=request.site, pk=project_id
+    )
+    survey = get_object_or_404(
+        models.Survey, site=request.site, pk=1
+    )  # XXX Hardcoded survey ID
 
     session, _ = models.Session.objects.get_or_create(project=project, survey=survey)
-
     signals.survey_session_started.send(
         sender=None, survey=survey, project=project, request=request
     )
@@ -100,7 +105,9 @@ def survey_create_session_for_project(request, project_id):
 
 def survey_next_question(request, session_id, question_id=None):
     """Redirect to next unanswered/answerable question from survey"""
-    session = get_object_or_404(models.Session, pk=session_id)
+    session = get_object_or_404(
+        models.Session, survey__site=request.site, pk=session_id
+    )
 
     if question_id is not None:
         question = get_object_or_404(models.Question, pk=question_id)
@@ -122,7 +129,9 @@ def survey_next_question(request, session_id, question_id=None):
 
 def survey_previous_question(request, session_id, question_id):
     """Redirect to previous unanswered/answerable question from survey"""
-    session = get_object_or_404(models.Session, pk=session_id)
+    session = get_object_or_404(
+        models.Session, survey__site=request.site, pk=session_id
+    )
     question = get_object_or_404(models.Question, pk=question_id)
 
     previous_question = session.previous_question(question)
@@ -143,7 +152,9 @@ def survey_signals_refresh(request, session_id):
     """Refresh a given session with new signals, on request"""
 
     is_staff_or_403(request.user)
-    session = get_object_or_404(models.Session, pk=session_id)
+    session = get_object_or_404(
+        models.Session, survey__site=request.site, pk=session_id
+    )
 
     update_count = 0
     for answer in session.answers.all():

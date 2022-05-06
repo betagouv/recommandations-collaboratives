@@ -229,7 +229,7 @@ def project_list_export_csv(request):
         },
     )
 
-    writer = csv.writer(response)
+    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
     writer.writerow(
         [
             "departement",

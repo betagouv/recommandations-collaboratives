@@ -58,7 +58,7 @@ def project_knowledge(request, project_id=None):
     set_active_project_id(request, project.pk)
 
     try:
-        survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
+        survey = survey_models.Survey.on_site.get(pk=1)  # XXX Hardcoded survey ID
         session, created = survey_models.Session.objects.get_or_create(
             project=project, survey=survey
         )

@@ -3,6 +3,8 @@ import statistics
 from datetime import timedelta
 
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.db import models
 from django.utils import timezone
 from markdownx.utils import markdownify
@@ -15,7 +17,12 @@ from . import utils
 
 
 class Survey(models.Model):
+    objects = models.Manager()
+    on_site = CurrentSiteManager()
+
     name = models.CharField(max_length=80)
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     def __str__(self):  # pragma: nocover
         return f"Survey: {self.name}"
