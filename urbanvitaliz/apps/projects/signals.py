@@ -5,7 +5,7 @@ from actstream import action
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import pre_delete, pre_save
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from notifications import models as notifications_models
@@ -15,14 +15,10 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -396,6 +392,18 @@ def log_survey_session_updated(sender, session, request, **kwargs):
         target=project,
         private=True,
     )
+
+
+######################################################################################
+# TaskFollowup
+######################################################################################
+@receiver(
+    post_save, sender=models.TaskFollowup, dispatch_uid="taskfollowup_set_task_status"
+)
+def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs):
+    if created and instance.status:
+        instance.task.status = instance.status
+        instance.task.save()
 
 
 # eof
