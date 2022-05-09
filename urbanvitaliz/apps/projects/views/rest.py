@@ -14,12 +14,8 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from .. import models
-from ..serializers import (
-    ProjectSerializer,
-    TaskFollowupSerializer,
-    TaskNotificationSerializer,
-    TaskSerializer,
-)
+from ..serializers import (ProjectSerializer, TaskFollowupSerializer,
+                           TaskNotificationSerializer, TaskSerializer)
 
 
 ########################################################################
@@ -123,7 +119,7 @@ class TaskNotificationViewSet(
     viewsets.GenericViewSet,
 ):
     """
-    API endpoint that allows projects to be viewed or edited.
+    API endpoint for Task
     """
 
     def get_queryset(self):
@@ -150,6 +146,7 @@ class TaskNotificationViewSet(
         return task_actions | followup_actions
 
     def destroy(self, request, pk=None, **kwargs):
+        """Don't actually destroy, mark as read"""
         self.get_queryset().get(pk=pk).mark_as_read()
         return Response({}, status=status.HTTP_200_OK)
 

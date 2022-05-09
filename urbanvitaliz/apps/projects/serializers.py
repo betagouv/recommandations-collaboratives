@@ -102,22 +102,17 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
     def get_notifications(self, obj):
         request = self.context.get("request")
 
-        task_ct = ContentType.objects.get_for_model(obj)
+        followup_ct = ContentType.objects.get_for_model(TaskFollowup)
 
+        followup_ids = list(obj.followups.all().values_list("id", flat=True))
         unread_notifications = request.user.notifications.filter(
-            action_object_content_type=task_ct.pk, action_object_object_id=obj.pk
+            action_object_content_type=followup_ct.pk,
+            action_object_object_id__in=followup_ids,
         ).unread()
 
         return {
             "count": unread_notifications.count(),
         }
-
-
-class ActivityObjectRelatedField(serializers.RelatedField):
-    def to_representation(self, value):
-        if isinstance(value, User):
-            return "User: " + value.username
-        raise Exception("Unexpected type of object")
 
 
 class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):
