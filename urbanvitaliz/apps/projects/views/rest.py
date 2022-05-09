@@ -7,14 +7,19 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from .. import models
-from ..serializers import (ProjectSerializer, TaskFollowupSerializer,
-                           TaskSerializer)
+from ..serializers import (
+    ProjectSerializer,
+    TaskFollowupSerializer,
+    TaskNotificationSerializer,
+    TaskSerializer,
+)
 
 
 ########################################################################
@@ -108,6 +113,47 @@ class TaskViewSet(viewsets.ModelViewSet):
         )
 
     serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class TaskNotificationViewSet(
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+    """
+    API endpoint that allows projects to be viewed or edited.
+    """
+
+    def get_queryset(self):
+        task_id = int(self.kwargs["task_id"])
+        task = models.Task.objects.get(pk=task_id)
+
+        notifications = self.request.user.notifications.unread()
+
+        task_ct = ContentType.objects.get_for_model(models.Task)
+        followup_ct = ContentType.objects.get_for_model(models.TaskFollowup)
+
+        task_actions = notifications.filter(
+            action_object_content_type=task_ct.pk,
+            action_object_object_id=task_id,
+        )
+
+        followup_ids = list(task.followups.all().values_list("id", flat=True))
+
+        followup_actions = notifications.filter(
+            action_object_content_type=followup_ct.pk,
+            action_object_object_id__in=followup_ids,
+        )
+
+        return task_actions | followup_actions
+
+    def destroy(self, request, pk=None, **kwargs):
+        self.get_queryset().get(pk=pk).mark_as_read()
+        return Response({}, status=status.HTTP_200_OK)
+
+    serializer_class = TaskNotificationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 

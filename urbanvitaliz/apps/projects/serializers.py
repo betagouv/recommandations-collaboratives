@@ -1,5 +1,7 @@
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
+from generic_relations.relations import GenericRelatedField
+from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
 from urbanvitaliz.apps.geomatics.serializers import CommuneSerializer
@@ -8,7 +10,7 @@ from urbanvitaliz.apps.reminders.serializers import MailSerializer
 from .models import Project, Task, TaskFollowup
 
 
-class SwitchtenderSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = auth_models.User
 
@@ -31,7 +33,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "notifications",
         ]
 
-    switchtenders = SwitchtenderSerializer(read_only=True, many=True)
+    switchtenders = UserSerializer(read_only=True, many=True)
     is_switchtender = serializers.SerializerMethodField()
 
     def get_is_switchtender(self, obj):
@@ -69,7 +71,7 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
         model = TaskFollowup
         fields = ["id", "status", "status_txt", "comment", "who", "timestamp"]
 
-    who = SwitchtenderSerializer(read_only=True, many=False)
+    who = UserSerializer(read_only=True, many=False)
 
 
 class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSerializer):
@@ -89,7 +91,41 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "content",
             "reminders",
             "resource_id",
+            "notifications",
         ]
 
-    created_by = SwitchtenderSerializer(read_only=True, many=False)
+    created_by = UserSerializer(read_only=True, many=False)
     reminders = MailSerializer(read_only=True, many=True)
+
+    notifications = serializers.SerializerMethodField()
+
+    def get_notifications(self, obj):
+        request = self.context.get("request")
+
+        task_ct = ContentType.objects.get_for_model(obj)
+
+        unread_notifications = request.user.notifications.filter(
+            action_object_content_type=task_ct.pk, action_object_object_id=obj.pk
+        ).unread()
+
+        return {
+            "count": unread_notifications.count(),
+        }
+
+
+class ActivityObjectRelatedField(serializers.RelatedField):
+    def to_representation(self, value):
+        if isinstance(value, User):
+            return "User: " + value.username
+        raise Exception("Unexpected type of object")
+
+
+class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = notifications_models.Notification
+        fields = ["id", "actor", "verb", "action_object", "timestamp"]
+
+    actor = GenericRelatedField({auth_models.User: UserSerializer()})
+    action_object = GenericRelatedField(
+        {Task: TaskSerializer(), TaskFollowup: TaskFollowupSerializer()}
+    )
