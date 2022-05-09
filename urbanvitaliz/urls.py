@@ -39,6 +39,11 @@ router.register(
     projects_rest.TaskViewSet,
     basename="project-tasks",
 )
+router.register(
+    r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/notifications",
+    projects_rest.TaskNotificationViewSet,
+    basename="project-tasks-notifications",
+)
 router.register(r"projects", projects_rest.ProjectViewSet, basename="projects")
 
 router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
