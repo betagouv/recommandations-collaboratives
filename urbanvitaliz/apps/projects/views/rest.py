@@ -7,13 +7,14 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
-from rest_framework import permissions, status, viewsets
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from .. import models
-from ..serializers import ProjectSerializer, TaskSerializer
+from ..serializers import (ProjectSerializer, TaskFollowupSerializer,
+                           TaskSerializer)
 
 
 ########################################################################
@@ -31,6 +32,28 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class TaskFollowupViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for TaskFollowups
+    """
+
+    serializer_class = TaskFollowupSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        project_id = int(self.kwargs["project_id"])
+        task_id = int(self.kwargs["task_id"])
+
+        user_projects = list(
+            models.Project.objects.for_user(self.request.user).values_list(flat=True)
+        )
+
+        if project_id not in user_projects:
+            raise PermissionDenied()
+
+        return models.TaskFollowup.objects.filter(task_id=task_id)
 
 
 class TaskViewSet(viewsets.ModelViewSet):

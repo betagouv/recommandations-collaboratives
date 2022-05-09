@@ -28,12 +28,19 @@ from urbanvitaliz.apps.survey.urls import urlpatterns as survey_urls
 
 # Rest
 router = routers.DefaultRouter()
+
+router.register(
+    r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/followups",
+    projects_rest.TaskFollowupViewSet,
+    basename="project-tasks-followups",
+)
 router.register(
     r"projects/(?P<project_id>[^/.]+)/tasks",
     projects_rest.TaskViewSet,
     basename="project-tasks",
 )
 router.register(r"projects", projects_rest.ProjectViewSet, basename="projects")
+
 router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
 router.register(
     r"departments", geomatics_rest.DepartmentViewSet, basename="departments"

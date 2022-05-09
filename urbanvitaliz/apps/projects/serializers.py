@@ -67,7 +67,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = TaskFollowup
-        fields = ["status", "status_txt", "comment", "who", "timestamp"]
+        fields = ["id", "status", "status_txt", "comment", "who", "timestamp"]
 
     who = SwitchtenderSerializer(read_only=True, many=False)
 
@@ -87,11 +87,9 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "created_by",
             "intent",
             "content",
-            "followups",
             "reminders",
             "resource_id",
         ]
 
     created_by = SwitchtenderSerializer(read_only=True, many=False)
-    followups = TaskFollowupSerializer(read_only=True, many=True)
     reminders = MailSerializer(read_only=True, many=True)
