@@ -79,7 +79,7 @@
             </th>
             <th></th>
         </tr>
-        {% for contact in organization.contacts.all %}
+        {% for contact in organization.contacts.on_site.all %}
         <tr>
             <td>
                 {{ contact.first_name }}

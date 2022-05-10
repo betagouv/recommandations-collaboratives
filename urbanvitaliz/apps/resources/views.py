@@ -21,6 +21,7 @@ from django.utils import timezone
 from django.views.generic.detail import DetailView
 from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
+from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
@@ -266,7 +267,14 @@ class EditResourceForm(forms.ModelForm):
 
         # Queryset needs to be here since on_site is dynamic and form is read too soon
         self.fields["category"] = forms.ModelChoiceField(
-            queryset=models.Category.on_site.all(), empty_label="(Aucune)"
+            queryset=models.Category.on_site.all(),
+            empty_label="(Aucune)",
+            required=False,
+        )
+
+        self.fields["contacts"] = forms.ModelMultipleChoiceField(
+            queryset=addressbook_models.Contact.on_site.all(),
+            required=False,
         )
 
         # Try to load the Markdown template into 'content' field
@@ -354,11 +362,11 @@ def create_bookmark(request, resource_id=None):
     resource = get_object_or_404(models.Resource, pk=resource_id)
     try:
         # look if bookmark exists and is deleted
-        bookmark = models.Bookmark.deleted_objects.get(
+        bookmark = models.Bookmark.deleted_on_site.get(
             resource=resource, created_by=request.user
         )
     except models.Bookmark.DoesNotExist:
-        bookmark, _ = models.Bookmark.objects.get_or_create(
+        bookmark, _ = models.Bookmark.on_site.get_or_create(
             resource=resource, created_by=request.user, site=get_current_site(request)
         )
     if request.method == "POST":
@@ -366,6 +374,7 @@ def create_bookmark(request, resource_id=None):
         if form.is_valid():
             # save bookmark with comments
             instance = form.save(commit=False)
+            instance.site = request.site
             instance.deleted = None
             instance.save()
             next_url = reverse("resources-resource-detail", args=[resource.id])
@@ -388,7 +397,7 @@ def delete_bookmark(request, resource_id=None):
     """Delete (soft) user bookmark associated to resource if exists"""
     if request.method == "POST":
         try:
-            bookmark = models.Bookmark.objects.get(
+            bookmark = models.Bookmark.on_site.get(
                 resource_id=resource_id, created_by=request.user
             )
             bookmark.deleted = timezone.now()

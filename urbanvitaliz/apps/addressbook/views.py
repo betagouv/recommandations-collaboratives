@@ -102,6 +102,7 @@ def contact_create(request, organization_id: int):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.organization = organization
+            instance.site = request.site
             instance.save()
             return redirect(
                 reverse("addressbook-organization-details", args=[organization.pk])
@@ -116,7 +117,7 @@ def contact_update(request, contact_id=None):
     """Update a Contact"""
     is_switchtender_or_403(request.user)
 
-    contact = get_object_or_404(models.Contact, pk=contact_id)
+    contact = get_object_or_404(models.Contact, site=request.site, pk=contact_id)
     if request.method == "POST":
         form = ContactForm(request.POST, instance=contact)
         if form.is_valid():
