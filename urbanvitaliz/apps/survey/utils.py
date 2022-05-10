@@ -1,5 +1,8 @@
 import math
 
+from django.core.exceptions import ImproperlyConfigured
+from urbanvitaliz.apps.home.models import SiteConfiguration
+
 from . import models
 
 
@@ -16,3 +19,12 @@ def compute_qs_completion(session, question_set):
         return 0
 
     return min(math.ceil(answer_count / question_count * 100), 100)
+
+
+def get_site_config_or_503(site):
+    try:
+        return SiteConfiguration.objects.get(site=site)
+    except SiteConfiguration.DoesNotExist:
+        raise ImproperlyConfigured(
+            "Please create a SiteConfiguration before using this feature",
+        )

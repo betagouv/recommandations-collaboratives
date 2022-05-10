@@ -9,12 +9,15 @@ created: 2021-08-03 14:26:39 CEST
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import DetailView, RedirectView
+from urbanvitaliz.apps.home.models import SiteConfiguration
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import is_staff_or_403
 
 from .. import forms, models, signals
+from ..utils import get_site_config_or_503
 
 #####
 # Session
@@ -87,13 +90,13 @@ def survey_create_session_for_project(request, project_id):
     project = get_object_or_404(
         projects_models.Project, sites=request.site, pk=project_id
     )
-    survey = get_object_or_404(
-        models.Survey, site=request.site, pk=1
-    )  # XXX Hardcoded survey ID
+    site_config = get_site_config_or_503(request.site)
 
-    session, _ = models.Session.objects.get_or_create(project=project, survey=survey)
+    session, _ = models.Session.objects.get_or_create(
+        project=project, survey=site_config.project_survey
+    )
     signals.survey_session_started.send(
-        sender=None, survey=survey, project=project, request=request
+        sender=None, survey=site_config.project_survey, project=project, request=request
     )
 
     url = reverse("survey-session-start", args=(session.id,))

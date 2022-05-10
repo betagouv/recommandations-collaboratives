@@ -140,7 +140,6 @@ def test_task_suggestion_when_no_survey(request, client):
 
 @pytest.mark.django_db
 def test_task_suggestion_available_with_bare_project(request, client):
-    Recipe(survey_models.Survey, pk=1).make()
     Recipe(models.TaskRecommendation, condition="").make()
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
@@ -151,7 +150,6 @@ def test_task_suggestion_available_with_bare_project(request, client):
 
 @pytest.mark.django_db
 def test_task_suggestion_available_with_filled_project(request, client):
-    Recipe(survey_models.Survey, pk=1).make()
     commune = Recipe(geomatics.Commune).make()
     Recipe(models.TaskRecommendation, condition="").make()
     project = Recipe(
@@ -165,7 +163,6 @@ def test_task_suggestion_available_with_filled_project(request, client):
 
 @pytest.mark.django_db
 def test_task_suggestion_available_with_localized_reco(request, client):
-    Recipe(survey_models.Survey, pk=1).make()
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
     Recipe(

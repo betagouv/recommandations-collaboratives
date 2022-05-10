@@ -10,10 +10,12 @@ created: 2021-06-27 12:06:10 CEST
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
+from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import login
 
@@ -28,7 +30,10 @@ from .. import models
 def test_new_survey_session_is_created(request, client):
     current_site = get_current_site(request)
     project = Recipe(projects.Project, sites=[current_site]).make()
-    survey = Recipe(models.Survey, site=current_site, id=1).make()  # hard coded
+    survey = Recipe(models.Survey, site=current_site).make()
+    Recipe(
+        home_models.SiteConfiguration, site=current_site, project_survey=survey
+    ).make()
 
     url = reverse("survey-project-session", args=(project.id,))
     with login(client, is_staff=False):
@@ -41,10 +46,26 @@ def test_new_survey_session_is_created(request, client):
 
 
 @pytest.mark.django_db
+def test_new_survey_session_makes_500_if_no_siteconfiguration(request, client):
+    current_site = get_current_site(request)
+
+    project = Recipe(projects.Project, sites=[current_site]).make()
+    survey = Recipe(models.Survey, site=current_site).make()
+
+    url = reverse("survey-project-session", args=(project.id,))
+    with login(client, is_staff=False):
+        with pytest.raises(ImproperlyConfigured):
+            response = client.get(url)
+
+
+@pytest.mark.django_db
 def test_existing_survey_session_is_reused(request, client):
     current_site = get_current_site(request)
     project = Recipe(projects.Project, sites=[current_site]).make()
-    survey = Recipe(models.Survey, site=current_site, id=1).make()  # hard coded
+    survey = Recipe(models.Survey, site=current_site).make()
+    Recipe(
+        home_models.SiteConfiguration, site=current_site, project_survey=survey
+    ).make()
     session = Recipe(models.Session, project=project, survey=survey).make()
 
     url = reverse("survey-project-session", args=(project.id,))

@@ -12,20 +12,16 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from urbanvitaliz.apps.survey import models as survey_models
+from urbanvitaliz.apps.survey.utils import get_site_config_or_503
 from urbanvitaliz.utils import check_if_switchtender
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    can_manage_or_403,
-    can_manage_project,
-    check_if_national_actor,
-    get_notification_recipients_for_project,
-    is_regional_actor_for_project,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403, can_manage_project,
+                     check_if_national_actor,
+                     get_notification_recipients_for_project,
+                     is_regional_actor_for_project, set_active_project_id)
 
 
 @login_required
@@ -58,9 +54,9 @@ def project_knowledge(request, project_id=None):
     set_active_project_id(request, project.pk)
 
     try:
-        survey = survey_models.Survey.on_site.get(pk=1)  # XXX Hardcoded survey ID
+        site_config = get_site_config_or_503(request.site)
         session, created = survey_models.Session.objects.get_or_create(
-            project=project, survey=survey
+            project=project, survey=site_config.project_survey
         )
     except survey_models.Survey.DoesNotExist:
         session = None
