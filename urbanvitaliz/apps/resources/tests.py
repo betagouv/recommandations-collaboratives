@@ -14,7 +14,8 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import login
@@ -82,18 +83,20 @@ def test_draft_resources_are_available_to_staff_users(request, client):
 
 @pytest.mark.django_db
 def test_resource_list_contains_only_resource_with_category(request, client):
-    category1 = Recipe(models.Category).make()
+    current_site = get_current_site(request)
+
+    category1 = Recipe(models.Category, sites=[current_site]).make()
     resource1 = Recipe(
         models.Resource,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         title="selected resource",
         status=models.Resource.PUBLISHED,
         category=category1,
     ).make()
-    category2 = Recipe(models.Category).make()
+    category2 = Recipe(models.Category, sites=[current_site]).make()
     resource2 = Recipe(
         models.Resource,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         title="unselected resource",
         status=models.Resource.PUBLISHED,
         category=category2,
@@ -268,7 +271,11 @@ def test_update_resource_available_for_staff(request, client):
 
 @pytest.mark.django_db
 def test_update_resource_and_redirect(request, client):
-    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
+    resource = Recipe(
+        models.Resource,
+        category__sites=[get_current_site(request)],
+        sites=[get_current_site(request)],
+    ).make()
     url = reverse("resources-resource-update", args=[resource.id])
     data = {
         "title": "a title",
@@ -282,9 +289,9 @@ def test_update_resource_and_redirect(request, client):
     with login(client, groups=["switchtender"], is_staff=True):
         response = client.post(url, data=data)
 
+    assert response.status_code == 302
     resource = models.Resource.on_site.get(id=resource.id)
     assert resource.content == data["content"]
-    assert response.status_code == 302
 
 
 ########################################################################
