@@ -13,7 +13,7 @@ from tagging.models import Tag
 from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.projects import models as projects_models
 
-from . import utils
+from .utils import get_site_config_or_503
 
 
 class Survey(models.Model):

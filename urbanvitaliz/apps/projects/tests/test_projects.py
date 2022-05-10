@@ -20,9 +20,11 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -417,11 +419,12 @@ def test_project_knowledge_not_available_for_non_switchtender(request, client):
 
 @pytest.mark.django_db
 def test_project_knowledge_available_for_owner(request, client):
+    current_site = get_current_site(request)
+    Recipe(home_models.SiteConfiguration, site=current_site).make()
+
     # project email is same as test user to be logged in
     with login(client, is_staff=False) as user:
-        project = Recipe(
-            models.Project, sites=[get_current_site(request)], email=user.email
-        ).make()
+        project = Recipe(models.Project, sites=[current_site], email=user.email).make()
         url = reverse("projects-project-detail-knowledge", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
@@ -429,7 +432,10 @@ def test_project_knowledge_available_for_owner(request, client):
 
 @pytest.mark.django_db
 def test_project_knowledge_available_for_switchtender(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+    Recipe(home_models.SiteConfiguration, site=current_site).make()
+
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
     with login(client, groups=["switchtender"]):
         response = client.get(url)
@@ -438,10 +444,13 @@ def test_project_knowledge_available_for_switchtender(request, client):
 
 @pytest.mark.django_db
 def test_project_knowledge_available_for_restricted_switchtender(request, client):
+    current_site = get_current_site(request)
+    Recipe(home_models.SiteConfiguration, site=current_site).make()
+
     other = Recipe(geomatics.Department, code="02").make()
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         commune__departments__code="01",
     ).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
@@ -593,7 +602,9 @@ def test_project_internal_followup_not_available_for_restricted_switchtender(
 
 @pytest.mark.django_db
 def test_project_detail_contains_informations(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+    Recipe(home_models.SiteConfiguration, site=current_site).make()
+    project = Recipe(models.Project, sites=[current_site]).make()
     task = Recipe(models.Task, project=project).make()
     note = Recipe(models.Note, project=project).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
@@ -800,10 +811,11 @@ def test_delete_project_and_redirect(request, client):
 
 @pytest.mark.django_db
 def test_general_notifications_are_consumed_on_project_knowledge(request, client):
-
+    current_site = get_current_site(request)
+    Recipe(home_models.SiteConfiguration, site=current_site).make()
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         name="Proj1",
         location="Somewhere",
     ).make()

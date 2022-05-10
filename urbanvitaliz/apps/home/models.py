@@ -8,6 +8,7 @@ created: 2021-11-15 14:44:55 CET
 """
 
 from django.contrib.auth import models as auth
+from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -60,6 +61,12 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"<UserProfile: {self.user.username}>"
+
+
+class SiteConfiguration(models.Model):
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, unique=True)
+
+    project_survey = models.ForeignKey("survey.Survey", on_delete=models.CASCADE)
 
 
 @receiver(post_save, sender=auth.User)
