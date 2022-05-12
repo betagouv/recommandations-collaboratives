@@ -11,18 +11,26 @@
 			</template>
 			<div class="position-absolute top-0 left-0 d-flex" style="margin: -10px 0 0 5px;">
 				<template x-if="!t.public">
-					<span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white"
+					<span class="rounded-pill px-2 bg-warning z-index-dropdown text-uppercase fw-bold text-white"
 						style="font-size: 0.7em;">Brouillon</span>
 				</template>
 				<template x-if="t.public && !t.visited">
 					<span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white"
 						style="font-size: 0.7em;">Nouveau</span>
 				</template>
+				<template x-if="t.status === 3">
+					<span class="rounded-pill px-2 bg-success z-index-dropdown text-uppercase fw-bold text-white"
+						style="font-size: 0.7em;">Fait</span>
+				</template>
+				<template x-if="t.status === 4">
+					<span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white"
+						style="font-size: 0.7em;">Non applicable</span>
+				</template>
 			</div>
 			<div class="p-2" @click="onPreviewClick(t.id)" style="cursor: pointer">
 				<h6 class=mt-1 mb-0 fw-bold" x-text="t.intent"></h6>
 
-				<div class="rounded bg-light p-2 my-2" style="font-size: 0.8em">
+				<div class="rounded bg-light p-2 my-2">
 					<template x-if="t.content === ''">
 						<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
 					</template>
