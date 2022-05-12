@@ -113,29 +113,29 @@ def project_actions(request, project_id=None):
         target_object_id=project.pk,
     )
 
-    actions_with_notifications = [
-        int(pk)
-        for pk in task_notifications.values_list("action_object_object_id", flat=True)
-    ]
+    # actions_with_notifications = [
+    #     int(pk)
+    #     for pk in task_notifications.values_list("action_object_object_id", flat=True)
+    # ]
 
-    task_notifications.mark_all_as_read()
+    # task_notifications.mark_all_as_read()
 
-    # Mark the followup as seen
-    task_followup_ct = ContentType.objects.get_for_model(models.TaskFollowup)
-    followup_notifications = request.user.notifications.unread().filter(
-        action_object_content_type=task_followup_ct,
-        target_content_type=project_ct.pk,
-        target_object_id=project.pk,
-    )
+    # # Mark the followup as seen
+    # task_followup_ct = ContentType.objects.get_for_model(models.TaskFollowup)
+    # followup_notifications = request.user.notifications.unread().filter(
+    #     action_object_content_type=task_followup_ct,
+    #     target_content_type=project_ct.pk,
+    #     target_object_id=project.pk,
+    # )
 
-    followups_with_notifications = [
-        int(pk)
-        for pk in followup_notifications.values_list(
-            "action_object_object_id", flat=True
-        )
-    ]
+    # followups_with_notifications = [
+    #     int(pk)
+    #     for pk in followup_notifications.values_list(
+    #         "action_object_object_id", flat=True
+    #     )
+    # ]
 
-    followup_notifications.mark_all_as_read()
+    # followup_notifications.mark_all_as_read()
 
     return render(request, "projects/project/actions.html", locals())
 
