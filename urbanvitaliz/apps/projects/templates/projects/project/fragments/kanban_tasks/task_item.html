@@ -1,0 +1,92 @@
+{% load static %}
+
+<template x-if="t.public || isSwitchtender">
+	<div :id="t.uuid" class="drag-targetable py-3" @dragover="onDragOver(event)"
+		@drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
+		<div class="rounded bg-white shadow position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)"
+			@dragend="onDragEnd(event)">
+			<template x-if="t.notifications.count > 0">
+				<span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold"
+					style="font-size: 0.7em;" x-text="t.notifications.count"></span>
+			</template>
+			<div class="position-absolute top-0 left-0 d-flex" style="margin: -10px 0 0 5px;">
+				<template x-if="!t.public">
+					<span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white"
+						style="font-size: 0.7em;">Brouillon</span>
+				</template>
+				<template x-if="t.public && !t.visited">
+					<span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white"
+						style="font-size: 0.7em;">Nouveau</span>
+				</template>
+			</div>
+			<div class="p-2" @click="onPreviewClick(t.id)" style="cursor: pointer">
+				<h6 class=mt-1 mb-0 fw-bold" x-text="t.intent"></h6>
+
+				<div class="rounded bg-light p-2 my-2" style="font-size: 0.8em">
+					<template x-if="t.content === ''">
+						<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
+					</template>
+					<template x-if="t.content !== ''">
+						<p x-text="truncate(t.content, 200)" class="mb-2"></p>
+					</template>
+					<div class="d-flex justify-content-between">
+						<div>
+							<img class="rounded-circle d-inline-block" width="20px" height="20px"
+								:src="generateGravatarUrl(t.created_by)" data-bs-toggle="tooltip" data-bs-placement="bottom"
+								:title="`${t.created_by.first_name} ${t.created_by.last_name}`" style="z-index: 1000;" tabindex="0" />
+							<span class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
+								style="line-height: 20px"></span>
+						</div>
+						<span class="ms-1 text-muted" x-text="formatDate(t.created_on)" style="line-height: 20px"></span>
+					</div>
+				</div>
+			</div>
+
+			<div class="border-top p-2 d-flex justify-content-between" style="font-size: 0.8em">
+				<div class="d-flex align-items-center">
+					<div class="text-primary position-relative" @click="onPreviewClick(t.id)" style="cursor: pointer;">
+						<svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
+							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat" />
+						</svg>
+						<span x-text="t.followups_count"></span>
+					</div>
+				</div>
+
+				<div class="d-flex align-items-center"
+					x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
+					<div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" data-bs-toggle="tooltip"
+						data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(t.id)"
+						style="cursor: pointer;">
+						<svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
+							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
+						</svg>
+					</div>
+
+					{% if can_administrate and not disable_edit %}
+					<div class="dropdown">
+						<a class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button"
+							id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+							Aiguillage
+						</a>
+						<ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+							<li><a class="dropdown-item" :href="editTaskUrl(t.id)">Éditer</a></li>
+							<li>
+								<form method="POST" :action="deleteTaskReminderUrl(t.id)">
+									{% csrf_token %}
+									<button class="dropdown-item">Supprimer le rappel</button>
+								</form>
+							</li>
+							<template x-if="t.content !== '' && !t.public">
+								<li><a class="dropdown-item" @click="onSetTaskPublic(t.id, true)">Publier</a></li>
+							</template>
+							<template x-if="t.public">
+								<li><a class="dropdown-item" @click="onSetTaskPublic(t.id, false)">Passer en brouillon</a></li>
+							</template>
+						</ul>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

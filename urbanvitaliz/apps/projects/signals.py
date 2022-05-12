@@ -271,7 +271,6 @@ def notify_action_commented(sender, task, project, user, **kwargs):
         return
 
     recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
-
     notify.send(
         sender=user,
         recipient=recipients,
@@ -405,7 +404,7 @@ def log_survey_session_updated(sender, session, request, **kwargs):
     post_save, sender=models.TaskFollowup, dispatch_uid="taskfollowup_set_task_status"
 )
 def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs):
-    if created and instance.status:
+    if created and instance.status != instance.task.status:
         instance.task.status = instance.status
         instance.task.save()
 
