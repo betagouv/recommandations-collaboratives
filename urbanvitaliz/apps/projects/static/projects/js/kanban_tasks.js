@@ -154,11 +154,14 @@ function boardTasksApp(projectId) {
       element.addEventListener("shown.bs.modal", () => {
         this.scrollToLastElement();
       });
-      element.addEventListener("hidePrevented.bs.modal", () => {
+      const cleanup = () => {
         this.currentTaskId = null;
         this.currentTaskFollowups = null;
         this.currentTaskNotifications = null;
-      });
+        location.hash = '';
+      }
+      element.addEventListener("hidePrevented.bs.modal", cleanup);
+      element.addEventListener('hidden.bs.modal', cleanup);
 
       if (this.currentTaskId) this.openPreviewModal();
     },
@@ -167,6 +170,7 @@ function boardTasksApp(projectId) {
       this.openPreviewModal();
     },
     async openPreviewModal() {
+      location.hash = `#action-${this.currentTaskId}`;
       this.previewModalHandle.show();
 
       this.loadFollowups(this.currentTaskId);
@@ -233,10 +237,12 @@ function boardTasksApp(projectId) {
     initReminderModal() {
       const element = document.getElementById("reminder-modal");
       this.reminderModalHandle = new bootstrap.Modal(element);
-      element.addEventListener("hidePrevented.bs.modal", () => {
+      const cleanup = () => {
         this.currentReminderTaskId = null;
         this.pendingReminderDate = formatReminderDate(daysFromNow(15));
-      });
+      };
+      element.addEventListener("hidePrevented.bs.modal", cleanup);
+      element.addEventListener("hidden.bs.modal", cleanup);
     },
     onReminderClick(id) {
       this.currentReminderTaskId = id;
@@ -264,11 +270,13 @@ function boardTasksApp(projectId) {
     initFeedbackModal() {
       const element = document.getElementById("feedback-modal");
       this.feedbackModal = new bootstrap.Modal(element);
-      element.addEventListener("hidePrevented.bs.modal", () => {
+      const cleanup = () => {
         this.feedbackStatus = 3;
         this.feedbackComment = '';
         this.currentFeedbackTask = null;
-      });
+      }
+      element.addEventListener("hidePrevented.bs.modal", cleanup);
+      element.addEventListener("hidden.bs.modal", cleanup);
     },
     openFeedbackModal(task) {
       this.currentFeedbackTask = task;
