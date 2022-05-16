@@ -5,19 +5,12 @@ from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
 from urbanvitaliz.apps.geomatics.serializers import CommuneSerializer
+from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.reminders.serializers import MailSerializer
 
-from . import signals
 from .models import Project, Task, TaskFollowup
 from .utils import create_reminder
-
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = auth_models.User
-
-        fields = ["username", "first_name", "last_name", "email"]
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
