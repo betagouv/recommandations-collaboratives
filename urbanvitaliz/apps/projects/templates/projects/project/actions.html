@@ -27,8 +27,8 @@
         <div class="col">
             {% include 'projects/project/fragments/kanban_tasks/kanban_header.html' %}
 
-            {{ is_switchtender|json_script:"switchtenderData" }}
-            {{ user.id|json_script:"userId" }}
+            {{ can_administrate|json_script:"canAdministrate" }}
+            {{ user.email|json_script:"userEmail" }}
 
             {% if is_switchtender and project.tasks.unpublished_open.count == 0 %}
             <div class="bg-light p-4 rounded-2">
@@ -70,7 +70,7 @@
             </div>
             {% else %}
             <div x-data="boardTasksApp({{ project.id }})"
-                x-init="getData(); initTooltips(); loadSwitchtender(); loadUserId(); processUrl();"
+                x-init="getData(); initTooltips(); loadCanAdministrate(); loadUserId(); processUrl();"
                 class="d-flex pb-2 align-items-stretch">
                 <template x-for="board in boards">
                     <div class="col px-2">
