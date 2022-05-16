@@ -1,13 +1,18 @@
 function boardTasksApp(projectId) {
+  const requestParams = {
+    cache: "no-cache",
+    mode: "same-origin",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": Cookies.get("csrftoken"),
+    },
+  }
+
   const moveTask = async (taskId, nextTaskId) => {
     await fetch(moveTaskUrl(projectId, taskId), {
       method: "POST",
-      cache: "no-cache",
-      mode: "same-origin",
-      credentials: "same-origin",
-      headers: {
-        "X-CSRFToken": Cookies.get("csrftoken"),
-      },
+      ...requestParams,
       body: new URLSearchParams(`above=${nextTaskId}`),
     });
   }
@@ -20,13 +25,7 @@ function boardTasksApp(projectId) {
 
     const response = await fetch(followupsUrl(projectId, task.id), {
       method: "POST",
-      cache: "no-cache",
-      mode: "same-origin",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": Cookies.get("csrftoken"),
-      },
+      ...requestParams,
       body: JSON.stringify(body),
     });
   }
@@ -34,13 +33,7 @@ function boardTasksApp(projectId) {
   const editComment = async (taskId, followupId, comment) => {
     const response = await fetch(followupUrl(projectId, taskId, followupId), {
       method: "PATCH",
-      cache: "no-cache",
-      mode: "same-origin",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": Cookies.get("csrftoken"),
-      },
+      ...requestParams,
       body: JSON.stringify({ comment }),
     });
   }
@@ -48,13 +41,7 @@ function boardTasksApp(projectId) {
   const patchTask = async (taskId, patch) => {
     const response = await fetch(taskUrl(projectId, taskId), {
       method: "PATCH",
-      cache: "no-cache",
-      mode: "same-origin",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": Cookies.get("csrftoken"),
-      },
+      ...requestParams,
       body: JSON.stringify(patch),
     });
   }
@@ -62,13 +49,7 @@ function boardTasksApp(projectId) {
   const markAllAsRead = async (taskId) => {
     const response = await fetch(markTaskNotificationsAsReadUrl(projectId, taskId), {
       method: "POST",
-      cache: "no-cache",
-      mode: "same-origin",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": Cookies.get("csrftoken"),
-      },
+      ...requestParams,
       body: JSON.stringify({}),
     });
   }
@@ -79,7 +60,7 @@ function boardTasksApp(projectId) {
       return response.json();
     },
     async onDrop(task, status, nextTask) {
-      if ([0, 1, 2].indexOf(status) !== -1) {
+      if (isArchivedStatus(status)) {
         await issueFollowup(task, status);
         if (nextTask) await moveTask(task.id, nextTask.id);
       } else {
@@ -106,18 +87,18 @@ function boardTasksApp(projectId) {
       { status: [3, 4, 5], title: "Archivées", color_class: "border-error" },
     ],
 
-    // Switchtenders
-    isSwitchtender: false,
-    loadSwitchtender() {
-      const switchtenderData = document.getElementById("switchtenderData").textContent;
-      this.isSwitchtender = JSON.parse(switchtenderData);
+    // Administrate
+    canAdministrate: false,
+    loadCanAdministrate() {
+      const canAdministrate = document.getElementById("canAdministrate").textContent;
+      this.canAdministrate = JSON.parse(canAdministrate);
     },
 
     // UserId
-    userId: null,
+    userEmail: null,
     loadUserId() {
-      const userId = document.getElementById("userId").textContent;
-      this.userId = JSON.parse(userId);
+      const userEmail = document.getElementById("userEmail").textContent;
+      this.userEmail = JSON.parse(userEmail);
     },
 
     // Tooltips
@@ -176,7 +157,7 @@ function boardTasksApp(projectId) {
       this.loadFollowups(this.currentTaskId);
       this.loadNotifications(this.currentTaskId);
 
-      if (!this.isSwitchtender) {
+      if (!this.canAdministrate) {
         await patchTask(this.currentTaskId, { visited: true });
       }
 
@@ -344,8 +325,23 @@ function editReminderUrl(taskId) {
 }
 
 // Utilities
+const STATUSES = {
+  PROPOSED: 0,
+  INPROGRESS: 1,
+  BLOCKED: 2,
+  DONE: 3,
+  NOT_INTERESTED: 4,
+  ALREADY_DONE: 5,
+}
+
+function isArchivedStatus(status) {
+  return status === STATUSES.DONE
+    || status === STATUSES.NOT_INTERESTED
+    || status === STATUSES.ALREADY_DONE
+}
+
 function isStatusUpdate(followup) {
-  return followup.status > 2 || followup.comment === "";
+  return isArchivedStatus(followup.status) || followup.comment === "";
 }
 
 const STATUS_TEXT = {
