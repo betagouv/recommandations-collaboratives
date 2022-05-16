@@ -14,8 +14,12 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from .. import models
-from ..serializers import (ProjectSerializer, TaskFollowupSerializer,
-                           TaskNotificationSerializer, TaskSerializer)
+from ..serializers import (
+    ProjectSerializer,
+    TaskFollowupSerializer,
+    TaskNotificationSerializer,
+    TaskSerializer,
+)
 
 
 ########################################################################
@@ -67,8 +71,11 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
 
         headers = self.get_success_headers(serializer.data)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-    
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
+
 class TaskViewSet(viewsets.ModelViewSet):
     """
     API endpoint for project tasks

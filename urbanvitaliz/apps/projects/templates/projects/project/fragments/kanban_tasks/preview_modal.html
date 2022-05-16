@@ -53,7 +53,7 @@
 													<span class="ms-1 text-muted" x-text="formatDate(currentTask.created_on)"
 														style="line-height: 20px"></span>
 												</div>
-												<template x-if="isSwitchtender">
+												<template x-if="canAdministrate">
 													<a class="text-muted" @click="onEditContent()">Editer</a>
 												</template>
 											</div>
@@ -78,7 +78,7 @@
 																<span class="ms-1 text-muted" x-text="formatDate(f.timestamp)"
 																	style="line-height: 20px"></span>
 															</div>
-															<template x-if="f.who.id === userId">
+															<template x-if="f.who.email === userEmail">
 																<a class="text-muted" @click="onEditComment(f)">Editer</a>
 															</template>
 														</div>
@@ -105,7 +105,7 @@
 																		<span class="ms-1 text-muted" x-text="formatDate(f.timestamp)"
 																			style="line-height: 20px"></span>
 																	</div>
-																	<template x-if="f.who.id === userId">
+																	<template x-if="f.who.email === userEmail">
 																		<a class="text-muted" @click="onEditComment(f)">Editer</a>
 																	</template>
 																</div>

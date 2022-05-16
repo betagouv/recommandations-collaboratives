@@ -12,11 +12,12 @@ from . import signals
 from .utils import create_reminder
 from urbanvitaliz.apps.reminders import models as reminders_models
 
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = auth_models.User
 
-        fields = ["id", "username", "first_name", "last_name", "email"]
+        fields = ["username", "first_name", "last_name", "email"]
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
@@ -71,17 +72,27 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = TaskFollowup
-        fields = ["id", "status", "status_txt", "comment", "who", "timestamp", "task_id", "who_id"]
+        fields = [
+            "id",
+            "status",
+            "status_txt",
+            "comment",
+            "who",
+            "timestamp",
+            "task_id",
+            "who_id",
+        ]
         read_only_fields = ["who"]
-        extra_kwargs =  {
-            'task_id': {'write_only': True},
-            'who_id': {'write_only': True}
-        }
+        extra_kwargs = {"task_id": {"write_only": True}, "who_id": {"write_only": True}}
 
     who = UserSerializer(read_only=True, many=False)
 
-    task_id = serializers.PrimaryKeyRelatedField(many=False, write_only=True, queryset=Task.objects)
-    who_id = serializers.PrimaryKeyRelatedField(many=False, write_only=True, queryset=auth_models.User.objects)
+    task_id = serializers.PrimaryKeyRelatedField(
+        many=False, write_only=True, queryset=Task.objects
+    )
+    who_id = serializers.PrimaryKeyRelatedField(
+        many=False, write_only=True, queryset=auth_models.User.objects
+    )
 
     def create(self, validated_data):
         followup = TaskFollowup(
@@ -92,17 +103,17 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
         followup.who = validated_data["who_id"]
 
         old_status = followup.task.status
-        
+
         followup.save()
-        
+
         task = followup.task
 
         rsvp_signals = {
-                Task.INPROGRESS: signals.action_inprogress,
-                Task.DONE: signals.action_done,
-                Task.ALREADY_DONE: signals.action_already_done,
-                Task.NOT_INTERESTED: signals.action_not_interested,
-                Task.BLOCKED: signals.action_blocked,
+            Task.INPROGRESS: signals.action_inprogress,
+            Task.DONE: signals.action_done,
+            Task.ALREADY_DONE: signals.action_already_done,
+            Task.NOT_INTERESTED: signals.action_not_interested,
+            Task.BLOCKED: signals.action_blocked,
         }
         if old_status != followup.status and followup.status in rsvp_signals.keys():
             signal = rsvp_signals[followup.status]
@@ -112,7 +123,7 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
                 project=task.project,
                 user=followup.who,
             )
-        elif followup.comment != '':
+        elif followup.comment != "":
             signals.action_commented.send(
                 sender=followup, task=task, project=task.project, user=followup.who
             )
@@ -151,7 +162,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
 
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()
-    
+
     def get_notifications(self, obj):
         request = self.context.get("request")
 
