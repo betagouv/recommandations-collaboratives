@@ -5,12 +5,12 @@ from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
 from urbanvitaliz.apps.geomatics.serializers import CommuneSerializer
+from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.reminders.serializers import MailSerializer
 
-from .models import Project, Task, TaskFollowup
 from . import signals
+from .models import Project, Task, TaskFollowup
 from .utils import create_reminder
-from urbanvitaliz.apps.reminders import models as reminders_models
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -102,31 +102,9 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
         followup.task = validated_data["task_id"]
         followup.who = validated_data["who_id"]
 
-        old_status = followup.task.status
-
         followup.save()
 
         task = followup.task
-
-        rsvp_signals = {
-            Task.INPROGRESS: signals.action_inprogress,
-            Task.DONE: signals.action_done,
-            Task.ALREADY_DONE: signals.action_already_done,
-            Task.NOT_INTERESTED: signals.action_not_interested,
-            Task.BLOCKED: signals.action_blocked,
-        }
-        if old_status != followup.status and followup.status in rsvp_signals.keys():
-            signal = rsvp_signals[followup.status]
-            signal.send(
-                sender=Task,
-                task=task,
-                project=task.project,
-                user=followup.who,
-            )
-        elif followup.comment != "":
-            signals.action_commented.send(
-                sender=followup, task=task, project=task.project, user=followup.who
-            )
 
         if followup.status not in [Task.ALREADY_DONE, Task.NOT_INTERESTED, Task.DONE]:
             create_reminder(
