@@ -12,7 +12,7 @@ function configureBoardApp(app, options) {
         currentlyHoveredElement: null,
         async getData() {
             this.isBusy = true;
-            const json = await options.fetchData.call(this);
+            const json = await options.getData.call(this);
             const data = json.map(d => Object.assign(d, {
                 uuid: generateUUID()
             }));
@@ -32,7 +32,11 @@ function configureBoardApp(app, options) {
             return this.data.filter(options.filterFn.bind(this)).sort(options.sortFn.bind(this));
         },
         column(status) {
-            return this.view.filter(d => d.status === status);
+            if (status instanceof Array) {
+                return this.view.filter(d => status.indexOf(d.status) !== -1);
+            } else {
+                return this.view.filter(d => d.status === status);
+            }
         },
         onDragStart(event, uuid) {
             event.dataTransfer.clearData();
@@ -61,9 +65,9 @@ function configureBoardApp(app, options) {
             event.preventDefault();
             event.dataTransfer.dropEffect = "move";
         },
-        async onDrop(event, status, targetUuid) {           
+        async onDrop(event, status, targetUuid) {
             event.preventDefault();
-            
+
             this.currentlyHoveredElement.classList.remove('drag-target');
             this.currentlyHoveredElement = null;
 
@@ -72,10 +76,7 @@ function configureBoardApp(app, options) {
             const data = this.data.find(d => d.uuid === uuid);
             const nextData = this.data.find(d => d.uuid === targetUuid);
 
-            this.isBusy = true;
-            await options.patchData.call(this, data, status, nextData);
-            this.isBusy = false;
-
+            await options.onDrop.call(this, data, status, nextData);
             await this.getData();
         }
     };

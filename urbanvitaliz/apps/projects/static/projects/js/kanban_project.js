@@ -1,10 +1,10 @@
 function boardProjectsApp() {
     const options = {
-        async fetchData() {
+        async getData() {
             const response = await fetch('/api/projects/');
             return response.json();
         },
-        async patchData(data, status, nextData) {
+        async onDrop(data, status, nextData) {
             await fetch(`/api/projects/${data.id}/`, {
                 method: "PATCH",
                 cache: "no-cache",

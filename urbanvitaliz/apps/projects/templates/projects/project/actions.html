@@ -2,7 +2,6 @@
 
 {% load static %}
 {% load humanize %}
-{% load notifications_tags %}
 {% load gravatar %}
 {% load sass_tags %}
 
@@ -11,8 +10,6 @@
 <script src="{% static 'projects/js/kanban_tasks.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="{% static 'notifications/notify.js' %}" type="text/javascript"></script>
-{% register_notify_callbacks callbacks='fill_notification_list,fill_notification_badge' %}
 {% endblock %}
 
 
@@ -28,42 +25,10 @@
 <div class="col-12 mx-auto">
     <div class="row">
         <div class="col">
-            <div class="d-flex mt-1 mb-4 align-items-center justify-content-between">
-                {% if is_switchtender %}
-                <h2 class="text-secondary text-uppercase fw-bolder mb-0" style="font-size: 12px;">
-                    Actions proposées à la collectivité
-                </h2>
-                {% else %}
-                <h2 class="mt-1 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
-                    Mes actions en cours
-                </h2>
-                {% endif %}
+            {% include 'projects/project/fragments/kanban_tasks/kanban_header.html' %}
 
-                <div class="d-flex align-items-center">
-                    <div class="d-flex align-items-center ms-2">
-                        <span class="text-muted me-2">Vos aiguilleurs :</span>
-                        {% for switchtender in project.switchtenders.all %}
-                        <img class="rounded-circle d-inline-block ms-1" width="20px" height="20px"
-                            src="{% gravatar_url switchtender.email 25 %}" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                            title="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }}" tabindex="0" />
-                        {% endfor %}
-                    </div>
-    
-                    {% if is_switchtender %}
-                    <span class="ms-4">
-                        <a class="btn btn-outline-primary w-100 btn-sm"  href="{% url 'projects-project-create-action' project.id %}">
-                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
-                            </svg>
-                            Ajouter une recommandation
-                        </a>
-                    </span>
-                    {% endif %}
-                </div>
-            </div>
-
-            {{ actions_with_notifications|json_script:"notificationData" }}
             {{ is_switchtender|json_script:"switchtenderData" }}
+            {{ user.id|json_script:"userId" }}
 
             {% if is_switchtender and project.tasks.unpublished_open.count == 0 %}
             <div class="bg-light p-4 rounded-2">
@@ -73,15 +38,20 @@
                 </p>
 
                 {% if can_administrate %}
-                <a href="{% url 'projects-project-create-action' project.id %}" class="btn btn-primary">Émettre une recommandation</a>
-                <a href="{% url 'projects-project-detail-knowledge' project.id %}" class="btn btn-secondary">Consulter les détails du projet</a>
+                <a href="{% url 'projects-project-create-action' project.id %}" class="btn btn-primary">Émettre une
+                    recommandation</a>
+                <a href="{% url 'projects-project-detail-knowledge' project.id %}" class="btn btn-secondary">Consulter
+                    les détails du projet</a>
 
 
                 <p class="mt-3">
-                    <span class="badge bg-warning">Beta feature</span> <a href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les actions suggérées automatiquement pour ce dossier</a>
+                    <span class="badge bg-warning">Beta feature</span> <a
+                        href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les actions suggérées
+                        automatiquement pour ce dossier</a>
                 </p>
                 {% else %}
-                <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-primary">Rejoindre ce dossier pour l'aiguiller</a>
+                <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-primary">Rejoindre ce
+                    dossier pour l'aiguiller</a>
                 {% endif %}
             </div>
             {% elif not is_switchtender and projects.tasks.open.count == 0 %}
@@ -92,222 +62,46 @@
                     Des actions vous seront proposées par notre équipe dès que possible.
                 </p>
                 <p class="fst-italic fw-light">
-                    Vous pouvez accélerer les recommandations <span class="fw-bolder">en complétant le questionnaire d'exploration</span>.
+                    Vous pouvez accélerer les recommandations <span class="fw-bolder">en complétant le questionnaire
+                        d'exploration</span>.
                 </p>
-                <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary">Compléter le questionnaire d'exploration</a>
+                <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary">Compléter le
+                    questionnaire d'exploration</a>
             </div>
             {% else %}
-            <div x-data="boardTasksApp({{ project.id }})" x-init="getData(); initTooltips(); loadNotifications(); loadSwitchtender();" class="d-flex pb-2 align-items-stretch">
+            <div x-data="boardTasksApp({{ project.id }})"
+                x-init="getData(); initTooltips(); loadSwitchtender(); loadUserId(); processUrl();"
+                class="d-flex pb-2 align-items-stretch">
                 <template x-for="board in boards">
                     <div class="col px-2">
                         <div class="rounded border-top border-2 drop-column" :class="board.color_class">
-                            <div class="d-flex justify-content-between justify-items-center px-2 py-2 bg-light">
+                            <div class="d-flex justify-content-between justify-items-center px-3 py-2 bg-light">
                                 <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
                             </div>
 
-                            <div class="px-2 py-1 pb-1 bg-light shadow-sm overflow-auto" style="max-height: 70vh;">
+                            <div class="px-3 py-1 pb-1 bg-light shadow-sm overflow-auto" style="max-height: 70vh;">
                                 <template x-if="column(board.status).length === 0">
-                                    <div class="drag-targetable py-3" @dragover="onDragOver(event, null)" @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
-                                        <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase" style="height: 100px; font-size: 0.8em;">
+                                    <div class="drag-targetable py-3" @dragover="onDragOver(event, null)"
+                                        @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)"
+                                        @dragleave="onDragLeave(event)">
+                                        <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase"
+                                            style="height: 100px; font-size: 0.8em;">
                                             Glissez et déposez une carte ici
                                         </div>
                                     </div>
                                 </template>
 
                                 <template x-for="(t, i) in column(board.status)" :key="t.id">
-                                    <template x-if="t.public || isSwitchtender">
-                                        <div :id="t.uuid" class="drag-targetable py-3" @dragover="onDragOver(event)" @drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)" >
-                                            <div class="rounded bg-white shadow position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)" @dragend="onDragEnd(event)">
-                                                <template x-if="notifications.indexOf(t.id) !== -1">
-                                                    <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger" style="padding: .5em;"><span class="visually-hidden">Notification</span></span>
-                                                </template>
-                                                <div class="position-absolute top-0 left-0 d-flex" style="margin: -10px 0 0 5px;">
-                                                    <template x-if="!t.public">
-                                                        <span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white" style="font-size: 0.7em;">Brouillon</span>
-                                                    </template>
-                                                    <template x-if="t.public && !t.visited">
-                                                        <span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white" style="font-size: 0.7em;">Nouveau</span>
-                                                    </template>
-                                                </div>
-                                                <div class="p-2" @click="onPreviewClick(t.id)" style="cursor: pointer">
-                                                    <h6 class=mt-1 mb-0 fw-bold" x-text="t.intent"></h6>
-    
-                                                    <div class="rounded bg-light p-2 my-2" style="font-size: 0.8em">
-                                                        <p x-text="truncate(t.content, 200)" class="mb-2"></p>
-                                                        <div>
-                                                            <img class="rounded-circle d-inline-block" width="20px" height="20px"
-                                                                :src="generateGravatarUrl(t.created_by)"
-                                                                data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${t.created_by.first_name} ${t.created_by.last_name}`"
-                                                                style="z-index: 1000;" tabindex="0" />
-                                                            <span class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
-                                                                style="line-height: 20px"></span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="border-top p-2 d-flex justify-content-between" style="font-size: 0.8em">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="text-primary position-relative" @click="onPreviewClick(t.id)" style="cursor: pointer;">
-                                                            <svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
-                                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat"/>
-                                                            </svg>
-                                                            <span x-text="t.followups.length"></span>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="d-flex align-items-center" x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
-                                                        <div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(t.id)" style="cursor: pointer;">
-                                                            <svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
-                                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
-                                                            </svg>
-                                                        </div>
-
-                                                        {% if can_administrate and not disable_edit %}
-                                                        <div class="dropdown">
-                                                            <a class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                Aiguillage
-                                                            </a>
-                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                                                <li><a class="dropdown-item" :href="editTaskUrl(t.id)">Éditer</a></li>
-                                                                <li>
-                                                                    <form method="POST" :action="deleteTaskReminderUrl(t.id)">
-                                                                        {% csrf_token %}
-                                                                        <button class="dropdown-item">Supprimer le rappel</button>
-                                                                    </form>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>  
-                                    </template>
+                                    {% include 'projects/project/fragments/kanban_tasks/task_item.html' %}
                                 </template>
                             </div>
                         </div>
                     </div>
                 </template>
 
-                <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true" x-init="initPreviewModal()">
-                    <div class="modal-dialog modal-fullscreen">
-                        <template x-if="currentTaskId" x-data="{ get currentTask() { return findById(this.currentTaskId) } }">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h3 :text="currentTask.intent"></h3>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body p-0">
-                                    <div class="d-flex align-items-stretch h-100">
-                                            <template x-if="currentTask.resource_id">
-                                                <iframe class="w-100 h-100" :src="resourcePreviewUrl(currentTask.resource_id)"></iframe>
-                                            </template>
-                                            <template x-if="!currentTask.resource_id">
-                                                <div class="flex-fill p-3 overflow-auto">
-                                                    <div class="col-10 px-5 mx-auto">
-                                                        <div class="resource-details pb-3">
-                                                            <h1 x-text="currentTask.intent" class="mb-3"></h1>
-                                                        </div>
-                                                        <p class="text-justified" x-html="renderMarkdown(currentTask.content)"></p>
-                                                    </div>
-                                               </div>
-                                            </template>
-                                        <div class="w-25 border border-top-0 border-bottom-0 border-right-0 flex-shrink-0 d-flex flex-column justify-content-between">
-                                            <div class="d-flex flex-column flex-fill overflow-hidden">
-                                                <h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
-                                                    Conversation
-                                                </h2>
-                                                <div class="flex-fill overflow-auto h-100">
-                                                    <template x-if="currentTask.resource_id">
-                                                        <div class="rounded bg-light p-2 m-3 message" style="font-size: 0.8em">
-                                                            <p x-html="renderMarkdown(currentTask.content)" class="mb-2"></p>
-                                                            <div>
-                                                                <img class="rounded-circle d-inline-block" width="20px" height="20px"
-                                                                    :src="generateGravatarUrl(currentTask.created_by)"
-                                                                    data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
-                                                                    style="z-index: 1000;" tabindex="0" />
-                                                                <span class="ms-1 fst-italic" x-text="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
-                                                                    style="line-height: 20px"></span>
-                                                                <span class="ms-1 text-muted" x-text="formatDate(f.timestamp)"
-                                                                    style="line-height: 20px"></span>
-                                                            </div>
-                                                        </div>
-                                                    </template>
-                                                    <template x-for="f in currentTask.followups" x-key="f.timestamp" x-effect="currentTask.followups && scrollToLastElement">
-                                                        <div class="rounded bg-light p-2 m-3 message" style="font-size: 0.8em">
-                                                            <p x-html="renderMarkdown(f.comment)" class="mb-2"></p>
-                                                            <div>
-                                                                <img class="rounded-circle d-inline-block" width="20px" height="20px"
-                                                                    :src="generateGravatarUrl(f.who)"
-                                                                    data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${f.who.first_name} ${f.who.last_name}`"
-                                                                    style="z-index: 1000;" tabindex="0" />
-                                                                <span class="ms-1 fst-italic" x-text="`${f.who.first_name} ${f.who.last_name}`"
-                                                                    style="line-height: 20px"></span>
-                                                                <span class="ms-1 text-muted" x-text="formatDate(f.timestamp)"
-                                                                    style="line-height: 20px"></span>
-                                                            </div>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                            </div>     
-                                            <div class="p-3 border-top">
-                                                <span>Répondre</span>
-                                                <form class="mt-2 form d-flex flex-column align-items-end" @submit.prevent="onSubmitComment">
-                                                    {% csrf_token %}
-                                                    <textarea name="comment" style="min-height: 100px; border-color: #ccc;" class="w-100 p-2 rounded rounded-4 my-1 border" placeholder="Votre message..." x-model="pendingComment"></textarea>
-                                                    <button type="submit" class="btn btn-primary">Envoyer</button>
-                                                </form>
-                                            </div>     
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-           
-                <div class="modal fade" id="reminder-modal" tabindex="-1" aria-labelledby="reminder-modal-label" aria-hidden="true" x-init="initReminderModal()">
-                    <div class="modal-dialog">
-                        <template x-if="currentReminderTaskId">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="reminder-modal-label">
-                                        <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
-                                        </svg>
-                                        <span class="align-middle">
-                                            Programmer une alerte
-                                        </span>
-                                    </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                    
-                                <div class="modal-body">
-                                    En validant cette alerte, vous recevrez un courriel pour vous remémorer de prendre
-                                    une action sur cette recommandation.
-                                    <form method="POST" x-ref="reminderForm" :action="editReminderUrl(currentReminderTaskId)">
-                                        {% csrf_token %}
-                                        <input name="days" type="hidden" class="form-control" id="reminder-days">
-                                        <div class="btn-group w-100 mt-4 mb-2" role="group" aria-label="Shortcuts">
-                                            <a @click="updatePendingReminderDate(15)" class="btn btn-outline-secondary">Dans 15 jours</a>
-                                            <a @click="updatePendingReminderDate(30)" class="btn btn-outline-secondary">Dans 1 mois</a>
-                                            <a @click="updatePendingReminderDate(30 * 6)" class="btn btn-outline-secondary">Dans 6 mois</a>
-                                        </div>
-                                        <div class="input-group mt-2 mb-3">
-                                            <span class="input-group-text" id="date-input">Date : </span>
-                                            <input required aria-describedby="date-input" name="date" id="reminder-date" class="form-control" size="16" type="date" x-model="pendingReminderDate">
-                                        </div>
-                                    </form>
-                                </div>
-                    
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                    <button type="button" type="submit" class="btn btn-primary" @click="onSubmitReminder">Programmer</button>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
+                {% include 'projects/project/fragments/kanban_tasks/preview_modal.html' %}
+                {% include 'projects/project/fragments/kanban_tasks/reminder_modal.html' %}
+                {% include 'projects/project/fragments/kanban_tasks/feedback_modal.html' %}
             </div>
             {% endif %}
         </div>
