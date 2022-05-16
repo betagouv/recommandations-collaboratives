@@ -1,6 +1,6 @@
 {% load static %}
 
-<template x-if="t.public || isSwitchtender">
+<template x-if="t.public || canAdministrate">
 	<div :id="t.uuid" class="drag-targetable py-3" @dragover="onDragOver(event)"
 		@drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
 		<div class="rounded bg-white shadow position-relative" draggable="true" @dragstart="onDragStart(event, t.uuid)"
@@ -10,19 +10,19 @@
 					style="font-size: 0.7em;" x-text="t.notifications.count"></span>
 			</template>
 			<div class="position-absolute top-0 left-0 d-flex" style="margin: -10px 0 0 5px;">
-				<template x-if="!t.public">
+				<template x-if="!t.public && !isArchivedStatus(t.status)">
 					<span class="rounded-pill px-2 bg-warning z-index-dropdown text-uppercase fw-bold text-white"
 						style="font-size: 0.7em;">Brouillon</span>
 				</template>
-				<template x-if="t.public && !t.visited">
+				<template x-if="t.public && !t.visited && !isArchivedStatus(t.status)">
 					<span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white"
 						style="font-size: 0.7em;">Nouveau</span>
 				</template>
-				<template x-if="t.status === 3">
+				<template x-if="t.status === STATUSES.DONE || t.status === STATUSES.ALREADY_DONE">
 					<span class="rounded-pill px-2 bg-success z-index-dropdown text-uppercase fw-bold text-white"
 						style="font-size: 0.7em;">Fait</span>
 				</template>
-				<template x-if="t.status === 4">
+				<template x-if="t.status === STATUSES.NOT_INTERESTED">
 					<span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white"
 						style="font-size: 0.7em;">Non applicable</span>
 				</template>
@@ -30,8 +30,8 @@
 			<div class="p-2" @click="onPreviewClick(t.id)" style="cursor: pointer">
 				<h6 class=mt-1 mb-0 fw-bold" x-text="t.intent"></h6>
 
-				<div class="rounded bg-light p-2 my-2">
-					<template x-if="t.content === ''">
+				<div class="rounded bg-light p-2 my-2" :class="canAdministrate && t.content === '' && 'border border-warning'">
+					<template x-if="canAdministrate && t.content === ''">
 						<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
 					</template>
 					<template x-if="t.content !== ''">
@@ -85,10 +85,12 @@
 								</form>
 							</li>
 							<template x-if="t.content !== '' && !t.public">
-								<li><a class="dropdown-item" @click="onSetTaskPublic(t.id, true)">Publier</a></li>
+								<li><a class="dropdown-item" style="cursor: pointer;" @click="onSetTaskPublic(t.id, true)">Publier</a>
+								</li>
 							</template>
 							<template x-if="t.public">
-								<li><a class="dropdown-item" @click="onSetTaskPublic(t.id, false)">Passer en brouillon</a></li>
+								<li><a class="dropdown-item" style="cursor: pointer;" @click="onSetTaskPublic(t.id, false)">Passer en
+										brouillon</a></li>
 							</template>
 						</ul>
 					</div>

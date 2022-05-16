@@ -1,3 +1,12 @@
+const STATUSES = {
+  PROPOSED: 0,
+  INPROGRESS: 1,
+  BLOCKED: 2,
+  DONE: 3,
+  NOT_INTERESTED: 4,
+  ALREADY_DONE: 5,
+}
+
 function boardTasksApp(projectId) {
   const requestParams = {
     cache: "no-cache",
@@ -59,19 +68,19 @@ function boardTasksApp(projectId) {
       const response = await fetch(tasksUrl(projectId));
       return response.json();
     },
-    async onDrop(task, status, nextTask) {
-      if (isArchivedStatus(status)) {
-        await issueFollowup(task, status);
-        if (nextTask) await moveTask(task.id, nextTask.id);
-      } else {
+    async onDrop(task, column, nextTask) {
+      if (column instanceof Array) {
         this.openFeedbackModal(task);
+      } else {
+        await issueFollowup(task, column);
+        if (nextTask) await moveTask(task.id, nextTask.id);
       }
     },
     sortFn(a, b) {
       return a.order - b.order;
     },
     filterFn(d) {
-      return this.isSwitchtender || d.public;
+      return this.canAdministrate || d.public;
     },
     postProcessData(data) {
       console.log(data);
@@ -81,10 +90,10 @@ function boardTasksApp(projectId) {
   const app = {
     // Boards
     boards: [
-      { status: 0, title: "Nouvelles ", color_class: "border-primary" },
-      { status: 1, title: "En cours", color_class: "border-secondary" },
-      { status: 2, title: "En attente", color_class: "border-warning" },
-      { status: [3, 4, 5], title: "Archivées", color_class: "border-error" },
+      { status: STATUSES.PROPOSED, title: "Nouvelles ", color_class: "border-primary" },
+      { status: STATUSES.INPROGRESS, title: "En cours", color_class: "border-secondary" },
+      { status: STATUSES.BLOCKED, title: "En attente", color_class: "border-warning" },
+      { status: [STATUSES.DONE, STATUSES.NOT_INTERESTED, STATUSES.ALREADY_DONE], title: "Archivées", color_class: "border-error" },
     ],
 
     // Administrate
@@ -214,19 +223,22 @@ function boardTasksApp(projectId) {
 
     // Reminiders
     currentReminderTaskId: null,
-    pendingReminderDate: formatReminderDate(daysFromNow(15)),
+    pendingReminderDate: formatReminderDate(daysFromNow(30 * 6)),
     initReminderModal() {
       const element = document.getElementById("reminder-modal");
       this.reminderModalHandle = new bootstrap.Modal(element);
       const cleanup = () => {
         this.currentReminderTaskId = null;
-        this.pendingReminderDate = formatReminderDate(daysFromNow(15));
+        this.pendingReminderDate = formatReminderDate(daysFromNow(30 * 6));
       };
       element.addEventListener("hidePrevented.bs.modal", cleanup);
       element.addEventListener("hidden.bs.modal", cleanup);
     },
     onReminderClick(id) {
-      this.currentReminderTaskId = id;
+      const task = this.findById(id)
+      if (task.reminders.length >= 0)
+        this.pendingReminderDate = task.reminders[0].deadline
+      this.currentReminderTaskId = task.id;
       this.openReminderModal();
     },
     openReminderModal() {
@@ -244,7 +256,7 @@ function boardTasksApp(projectId) {
     },
 
     // Feedback
-    feedbackStatus: 3,
+    feedbackStatus: STATUSES.DONE,
     feedbackComment: '',
     feedbackModal: null,
     currentFeedbackTask: null,
@@ -325,15 +337,6 @@ function editReminderUrl(taskId) {
 }
 
 // Utilities
-const STATUSES = {
-  PROPOSED: 0,
-  INPROGRESS: 1,
-  BLOCKED: 2,
-  DONE: 3,
-  NOT_INTERESTED: 4,
-  ALREADY_DONE: 5,
-}
-
 function isArchivedStatus(status) {
   return status === STATUSES.DONE
     || status === STATUSES.NOT_INTERESTED
