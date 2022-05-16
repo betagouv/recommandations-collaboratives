@@ -22,7 +22,7 @@
 			{% endfor %}
 		</div>
 
-		{% if is_switchtender %}
+		{% if can_administrate %}
 		<span class="ms-4">
 			<a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'projects-project-create-action' project.id %}">
 				<svg class="bi me-1" width="16" height="16" fill="currentColor">
