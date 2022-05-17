@@ -1,0 +1,46 @@
+{% load static %}
+
+<div class="modal fade" id="reminder-modal" tabindex="-1" aria-labelledby="reminder-modal-label" aria-hidden="true"
+  x-init="initReminderModal()">
+  <div class="modal-dialog">
+    <template x-if="currentReminderTaskId">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reminder-modal-label">
+            <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
+              <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
+            </svg>
+            <span class="align-middle">
+              Programmer une alerte
+            </span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          En validant cette alerte, vous recevrez un courriel pour vous remémorer de prendre
+          une action sur cette recommandation.
+          <form method="POST" x-ref="reminderForm" :action="editReminderUrl(currentReminderTaskId)">
+            {% csrf_token %}
+            <input name="days" type="hidden" class="form-control" id="reminder-days">
+            <div class="btn-group w-100 mt-4 mb-2" role="group" aria-label="Shortcuts">
+              <a @click="updatePendingReminderDate(15)" class="btn btn-outline-secondary">Dans 15 jours</a>
+              <a @click="updatePendingReminderDate(30)" class="btn btn-outline-secondary">Dans 1 mois</a>
+              <a @click="updatePendingReminderDate(30 * 6)" class="btn btn-outline-secondary">Dans 6 mois</a>
+            </div>
+            <div class="input-group mt-2 mb-3">
+              <span class="input-group-text" id="date-input">Date : </span>
+              <input required aria-describedby="date-input" name="date" id="reminder-date" class="form-control"
+                size="16" type="date" x-model="pendingReminderDate">
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" type="submit" class="btn btn-primary" @click="onSubmitReminder">Programmer</button>
+        </div>
+      </div>
+    </template>
+  </div>
+</div>
