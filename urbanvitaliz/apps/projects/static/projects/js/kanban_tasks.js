@@ -21,7 +21,12 @@ function boardTasksApp(projectId) {
   const moveTask = async (taskId, nextTaskId) => {
     await fetch(moveTaskUrl(projectId, taskId), {
       method: "POST",
-      ...requestParams,
+      cache: "no-cache",
+      mode: "same-origin",
+      credentials: "same-origin",
+      headers: {
+        "X-CSRFToken": Cookies.get("csrftoken"),
+      },
       body: new URLSearchParams(`above=${nextTaskId}`),
     });
   }
@@ -73,6 +78,7 @@ function boardTasksApp(projectId) {
         this.openFeedbackModal(task);
       } else {
         await issueFollowup(task, column);
+        console.log(nextTask)
         if (nextTask) await moveTask(task.id, nextTask.id);
       }
     },
