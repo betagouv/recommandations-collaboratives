@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "actstream",
     "notifications",
     "rest_framework",
+    "generic_relations",
     "django_filters",
     "csvexport",
     "captcha",

@@ -5,7 +5,7 @@ from actstream import action
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import pre_delete, pre_save
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from notifications import models as notifications_models
@@ -271,7 +271,6 @@ def notify_action_commented(sender, task, project, user, **kwargs):
         return
 
     recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
-
     notify.send(
         sender=user,
         recipient=recipients,
@@ -396,6 +395,52 @@ def log_survey_session_updated(sender, session, request, **kwargs):
         target=project,
         private=True,
     )
+
+
+######################################################################################
+# TaskFollowup / Task Status update
+######################################################################################
+@receiver(
+    post_save, sender=models.TaskFollowup, dispatch_uid="taskfollowup_set_task_status"
+)
+def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs):
+    if not created:  # We don't want to notify about updates
+        return
+
+    project = instance.task.project
+    if project.status == "DRAFT" or project.muted:
+        return
+
+    task_status_signals = {
+        models.Task.INPROGRESS: action_inprogress,
+        models.Task.DONE: action_done,
+        models.Task.ALREADY_DONE: action_already_done,
+        models.Task.NOT_INTERESTED: action_not_interested,
+        models.Task.BLOCKED: action_blocked,
+    }
+
+    # Notify about status change
+    if instance.status is not None and instance.status != instance.task.status:
+        instance.task.status = instance.status
+        instance.task.save()
+
+        if instance.status in task_status_signals.keys():
+            signal = task_status_signals[instance.status]
+            signal.send(
+                sender=models.TaskFollowup,
+                task=instance.task,
+                project=instance.task.project,
+                user=instance.who,
+            )
+
+    # Notify about comment
+    if instance.comment != "":
+        action_commented.send(
+            sender=instance,
+            task=instance.task,
+            project=instance.task.project,
+            user=instance.who,
+        )
 
 
 # eof
