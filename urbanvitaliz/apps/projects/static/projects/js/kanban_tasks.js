@@ -33,7 +33,6 @@ function boardTasksApp(projectId) {
 
   const issueFollowup = async (task, status, comment = "") => {
     const body = { comment, status }
-    if (task.status !== status) { body.status = status }
 
     if (body.status === task.status && body.comment === "") return;
 
@@ -73,12 +72,11 @@ function boardTasksApp(projectId) {
       const response = await fetch(tasksUrl(projectId));
       return response.json();
     },
-    async onDrop(task, column, nextTask) {
-      if (column instanceof Array) {
+    async onDrop(task, columnOrStatus, nextTask) {
+      if (columnOrStatus instanceof Array) {
         this.openFeedbackModal(task);
       } else {
-        await issueFollowup(task, column);
-        console.log(nextTask)
+        await issueFollowup(task, columnOrStatus);
         if (nextTask) await moveTask(task.id, nextTask.id);
       }
     },
@@ -89,7 +87,7 @@ function boardTasksApp(projectId) {
       return this.canAdministrate || d.public;
     },
     postProcessData(data) {
-      console.log(data);
+      console.debug(data);
     },
   };
 
@@ -138,6 +136,7 @@ function boardTasksApp(projectId) {
     async loadFollowups(taskId) {
       const response = await fetch(followupsUrl(projectId, taskId));
       this.currentTaskFollowups = await response.json();
+      console.log(this.currentTaskFollowups);
       this.scrollToLastElement();
     },
     async loadNotifications(taskId) {
@@ -151,10 +150,13 @@ function boardTasksApp(projectId) {
         this.scrollToLastElement();
       });
       const cleanup = () => {
-        this.currentTaskId = null;
-        this.currentTaskFollowups = null;
-        this.currentTaskNotifications = null;
-        location.hash = '';
+        this.$nextTick(() => {
+          // FIXME : Race condition when bootstrap unloads modal
+          // this.currentTaskId = null;
+          // this.currentTaskFollowups = null;
+          // this.currentTaskNotifications = [];
+          location.hash = '';
+        })
       }
       element.addEventListener("hidePrevented.bs.modal", cleanup);
       element.addEventListener('hidden.bs.modal', cleanup);
@@ -180,12 +182,12 @@ function boardTasksApp(projectId) {
       await this.getData();
     },
     scrollToLastElement() {
-      const nodes = this.$root.querySelectorAll(".message");
-      if (nodes.length > 0) {
-        this.$nextTick(() => {
+      this.$nextTick(() => {
+        const nodes = document.querySelectorAll(".message");
+        if (nodes.length > 0) {
           nodes[nodes.length - 1].scrollIntoView();
-        });
-      }
+        }
+      })
     },
     async onSetTaskPublic(id, value) {
       await patchTask(id, { public: value });
@@ -210,7 +212,7 @@ function boardTasksApp(projectId) {
     },
     async onSubmitComment() {
       if (!this.currentlyEditing) {
-        await issueFollowup(this.currentTask, this.currentTask.status, this.pendingComment);
+        await issueFollowup(this.currentTask, undefined, this.pendingComment);
         await this.getData()
         await this.loadFollowups(this.currentTask.id);
       } else {
