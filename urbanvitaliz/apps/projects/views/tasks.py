@@ -346,7 +346,7 @@ def followup_task(request, task_id=None):
             followup.task = task
             followup.who = request.user
             # followup.status = task.status
-            followup.status = 0
+            # followup.status = models.Task.STATUS_UNCHANGED
             followup.save()
 
             # Create or reset 6 weeks reminder
