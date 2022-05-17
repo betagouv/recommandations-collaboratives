@@ -89,7 +89,7 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         followup = TaskFollowup(
-            status=validated_data["status"],
+            status=validated_data.get("status", None),
             comment=validated_data["comment"],
         )
         followup.task = validated_data["task_id"]

@@ -1,9 +1,9 @@
 {% load static %}
 
 <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true" x-init="initPreviewModal()"
-	x-data="{ get currentTask() { return this.findById(this.currentTaskId )}}">
+	x-data="{ get currentTask() { return this.findById(this.currentTaskId)}}">
 	<div class="modal-dialog modal-fullscreen">
-		<template x-if="currentTask">
+		<template x-if="currentTaskId && currentTask">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h3 :text="currentTask.intent"></h3>
