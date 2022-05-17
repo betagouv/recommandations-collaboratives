@@ -19,7 +19,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.invites import models as invites_models
@@ -1087,7 +1088,7 @@ def test_user_can_followup_on_personal_task(client):
         client.post(url, data=data)
     followup = models.TaskFollowup.objects.all()[0]
     assert followup.task == task
-    assert followup.status == 0  # to be replaced by task status
+    assert followup.status is None
     assert followup.comment == data["comment"]
     assert followup.who == user
 

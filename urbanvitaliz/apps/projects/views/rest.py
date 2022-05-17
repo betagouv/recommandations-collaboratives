@@ -14,8 +14,12 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from .. import models
-from ..serializers import (ProjectSerializer, TaskFollowupSerializer,
-                           TaskNotificationSerializer, TaskSerializer)
+from ..serializers import (
+    ProjectSerializer,
+    TaskFollowupSerializer,
+    TaskNotificationSerializer,
+    TaskSerializer,
+)
 
 
 ########################################################################
@@ -55,6 +59,21 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
             raise PermissionDenied()
 
         return models.TaskFollowup.objects.filter(task_id=task_id)
+
+    def create(self, request, project_id, task_id):
+        data = request.data
+        data["task_id"] = task_id
+        data["who_id"] = request.user.id
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        followup = serializer.save()
+
+        headers = self.get_success_headers(serializer.data)
+
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -145,9 +164,12 @@ class TaskNotificationViewSet(
 
         return task_actions | followup_actions
 
-    def destroy(self, request, pk=None, **kwargs):
-        """Don't actually destroy, mark as read"""
-        self.get_queryset().get(pk=pk).mark_as_read()
+    @action(
+        methods=["post"],
+        detail=False,
+    )
+    def mark_all_as_read(self, request, project_id, task_id):
+        self.get_queryset().mark_all_as_read(request.user)
         return Response({}, status=status.HTTP_200_OK)
 
     serializer_class = TaskNotificationSerializer
