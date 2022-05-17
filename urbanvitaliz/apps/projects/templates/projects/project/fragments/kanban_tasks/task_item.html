@@ -74,16 +74,10 @@
 					<div class="dropdown">
 						<a class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button"
 							id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-							Aiguillage
+							Éditer
 						</a>
 						<ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-							<li><a class="dropdown-item" :href="editTaskUrl(t.id)">Éditer</a></li>
-							<li>
-								<form method="POST" :action="deleteTaskReminderUrl(t.id)">
-									{% csrf_token %}
-									<button class="dropdown-item">Supprimer le rappel</button>
-								</form>
-							</li>
+							<li><a class="dropdown-item" :href="editTaskUrl(t.id)">Modifier</a></li>
 							<template x-if="t.content !== '' && !t.public">
 								<li><a class="dropdown-item" style="cursor: pointer;" @click="onSetTaskPublic(t.id, true)">Publier</a>
 								</li>
@@ -92,6 +86,13 @@
 								<li><a class="dropdown-item" style="cursor: pointer;" @click="onSetTaskPublic(t.id, false)">Passer en
 										brouillon</a></li>
 							</template>
+              <li>
+								  <form method="POST" :action="deleteTaskReminderUrl(t.id)">
+									    {% csrf_token %}
+									    <button class="dropdown-item">Supprimer le rappel</button>
+								  </form>
+							</li>
+
 						</ul>
 					</div>
 					{% endif %}
