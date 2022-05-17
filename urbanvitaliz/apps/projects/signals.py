@@ -420,7 +420,7 @@ def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs)
     }
 
     # Notify about status change
-    if instance.status and instance.status != instance.task.status:
+    if instance.status is not None and instance.status != instance.task.status:
         instance.task.status = instance.status
         instance.task.save()
 
