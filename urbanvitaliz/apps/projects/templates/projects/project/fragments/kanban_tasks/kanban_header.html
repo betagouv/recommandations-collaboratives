@@ -18,7 +18,8 @@
 			{% for switchtender in project.switchtenders.all %}
 			<img class="rounded-circle d-inline-block ms-1" width="20px" height="20px"
 				src="{% gravatar_url switchtender.email 25 %}" data-bs-toggle="tooltip" data-bs-placement="bottom"
-				title="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }}" tabindex="0" />
+				title="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }} - {{ switchtender.profile.organization.name|default:'Organisation iconnue' }}"
+				tabindex="0" />
 			{% endfor %}
 		</div>
 
