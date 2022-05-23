@@ -13,7 +13,7 @@ from tagging.models import Tag
 from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.projects import models as projects_models
 
-from .utils import get_site_config_or_503
+from .utils import compute_qs_completion
 
 
 class Survey(models.Model):
@@ -345,7 +345,7 @@ class Session(models.Model):
     def completion(self):
         completions = []
         for qs in self.survey.question_sets.all():
-            completions.append(utils.compute_qs_completion(self, qs))
+            completions.append(compute_qs_completion(self, qs))
 
         return math.ceil(statistics.mean(completions))
 
