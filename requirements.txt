@@ -7,7 +7,7 @@ markdown-link-attr-modifier
 git+http://github.com/glibersat/django-magicauth@master#egg=django-magicauth
 
 # Notifications Fork: Sites framework support
-git+https://github.com/glibersat/django-notifications.git@feature/sites-framework#egg=django-notifications
+git+https://github.com/glibersat/django-notifications.git@feature/sites-framework#egg=django-notifications-hq
 
 django-multisite
 git+http://github.com/django-ordered-model/django-ordered-model@master#egg=django-ordered-model
