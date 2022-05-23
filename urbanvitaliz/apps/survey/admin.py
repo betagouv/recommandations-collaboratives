@@ -15,7 +15,7 @@ class SurveyAdmin(admin.ModelAdmin):
 
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
-    list_display = ["answers_count"]
+    list_display = ["answers_count", "survey"]
 
     @admin.display(description="Answers count")
     def answers_count(self, obj):

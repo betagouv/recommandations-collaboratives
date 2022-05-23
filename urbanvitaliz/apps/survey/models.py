@@ -268,11 +268,14 @@ tagging_register(Choice, tag_descriptor_attr="tags")
 class Session(models.Model):
     """A pausable user session with checkpoint for resuming"""
 
+    class Meta:
+        unique_together = ("survey", "project")
+
     survey = models.ForeignKey(
         Survey, related_name="sessions", on_delete=models.CASCADE
     )
 
-    project = models.OneToOneField(
+    project = models.ForeignKey(
         projects_models.Project, related_name="survey_session", on_delete=models.CASCADE
     )
 

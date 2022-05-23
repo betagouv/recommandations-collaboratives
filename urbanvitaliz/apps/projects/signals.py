@@ -15,14 +15,10 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -124,7 +120,7 @@ def log_project_switchtender_leaved(sender, project, **kwargs):
 @receiver(project_switchtender_leaved)
 def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
     project_ct = ContentType.objects.get_for_model(project)
-    notifications_models.Notification.objects.filter(
+    notifications_models.Notification.on_site.filter(
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
         verb="est devenu·e aiguilleur·se sur le projet",
@@ -289,7 +285,7 @@ def delete_activity_on_note_delete(sender, instance, **kwargs):
         return
 
     project_ct = ContentType.objects.get_for_model(instance)
-    notifications_models.Notification.objects.filter(
+    notifications_models.Notification.on_site.filter(
         target_content_type=project_ct.pk, target_object_id=instance.pk
     ).delete()
 
@@ -301,7 +297,7 @@ def delete_activity_on_note_delete(sender, instance, **kwargs):
 )
 def delete_notifications_on_project_delete(sender, instance, **kwargs):
     project_ct = ContentType.objects.get_for_model(instance)
-    notifications_models.Notification.objects.filter(
+    notifications_models.Notification.on_site.filter(
         target_content_type=project_ct.pk, target_object_id=instance.pk
     ).delete()
 
@@ -309,7 +305,7 @@ def delete_notifications_on_project_delete(sender, instance, **kwargs):
 def delete_task_history(task):
     """Remove all logging history and notification is a task is deleted"""
     task_ct = ContentType.objects.get_for_model(task)
-    notifications_models.Notification.objects.filter(
+    notifications_models.Notification.on_site.filter(
         action_object_content_type_id=task_ct.pk, action_object_object_id=task.pk
     ).delete()
 

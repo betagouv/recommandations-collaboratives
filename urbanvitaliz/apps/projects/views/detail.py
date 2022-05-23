@@ -17,16 +17,11 @@ from urbanvitaliz.utils import check_if_switchtender
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    can_manage_or_403,
-    can_manage_project,
-    check_if_national_actor,
-    get_notification_recipients_for_project,
-    is_regional_actor_for_project,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403, can_manage_project,
+                     check_if_national_actor,
+                     get_notification_recipients_for_project,
+                     is_regional_actor_for_project, set_active_project_id)
 
 
 @login_required
@@ -58,13 +53,10 @@ def project_knowledge(request, project_id=None):
     # Set this project as active
     set_active_project_id(request, project.pk)
 
-    try:
-        site_config = get_site_config_or_503(request.site)
-        session, created = survey_models.Session.objects.get_or_create(
-            project=project, survey=site_config.project_survey
-        )
-    except survey_models.Survey.DoesNotExist:
-        session = None
+    site_config = get_site_config_or_503(request.site)
+    session, created = survey_models.Session.objects.get_or_create(
+        project=project, survey=site_config.project_survey
+    )
 
     # Mark some notifications as seen (general ones)
     project_ct = ContentType.objects.get_for_model(project)
@@ -114,30 +106,6 @@ def project_actions(request, project_id=None):
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
     )
-
-    # actions_with_notifications = [
-    #     int(pk)
-    #     for pk in task_notifications.values_list("action_object_object_id", flat=True)
-    # ]
-
-    # task_notifications.mark_all_as_read()
-
-    # # Mark the followup as seen
-    # task_followup_ct = ContentType.objects.get_for_model(models.TaskFollowup)
-    # followup_notifications = request.user.notifications.unread().filter(
-    #     action_object_content_type=task_followup_ct,
-    #     target_content_type=project_ct.pk,
-    #     target_object_id=project.pk,
-    # )
-
-    # followups_with_notifications = [
-    #     int(pk)
-    #     for pk in followup_notifications.values_list(
-    #         "action_object_object_id", flat=True
-    #     )
-    # ]
-
-    # followup_notifications.mark_all_as_read()
 
     return render(request, "projects/project/actions.html", locals())
 
