@@ -2,8 +2,13 @@ django<4.0
 ipython
 django-markdownx
 markdown-link-attr-modifier
-#django-magicauth
+
+# django-magicauth fork: Multiple Auth backend support
 git+http://github.com/glibersat/django-magicauth@master#egg=django-magicauth
+
+# Notifications Fork: Sites framework support
+git+https://github.com/glibersat/django-notifications.git@feature/sites-framework#egg=django-notifications
+
 django-multisite
 git+http://github.com/django-ordered-model/django-ordered-model@master#egg=django-ordered-model
 django_otp
@@ -16,7 +21,6 @@ django-admin-csvexport
 djangorestframework
 rest-framework-generic-relations
 django-filter
-django-notifications-hq==1.7.0
 django-hijack==3.1.4
 django-sesame[ua]==2.4
 django-recaptcha==3.0.0

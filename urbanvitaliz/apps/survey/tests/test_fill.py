@@ -50,12 +50,12 @@ def test_new_survey_session_makes_500_if_no_siteconfiguration(request, client):
     current_site = get_current_site(request)
 
     project = Recipe(projects.Project, sites=[current_site]).make()
-    survey = Recipe(models.Survey, site=current_site).make()
+    Recipe(models.Survey, site=current_site).make()
 
     url = reverse("survey-project-session", args=(project.id,))
     with login(client, is_staff=False):
         with pytest.raises(ImproperlyConfigured):
-            response = client.get(url)
+            client.get(url)
 
 
 @pytest.mark.django_db

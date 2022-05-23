@@ -18,7 +18,6 @@ from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import login
 
 from .. import models
