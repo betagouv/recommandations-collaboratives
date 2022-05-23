@@ -8,8 +8,11 @@ created: 2022-01-24 22:39:27 CEST
 """
 
 
+from django.conf import settings
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
+from multisite import SiteID
 from urbanvitaliz.apps.projects import digests
 from urbanvitaliz.apps.projects import models as project_models
 
@@ -21,15 +24,20 @@ class Command(BaseCommand):
         self.send_email_digests()
 
     def send_email_digests(self):
+        for site in Site.objects.all():
+            with settings.SITE_ID.override(site.pk):
+                print(f"*** Sending digests for site <{site.domain}> ***")
+                self.send_email_digests_for_site(site)
+
+    def send_email_digests_for_site(self, site):
+        # Get all switchtenders
+        sw_group = auth_models.Group.objects.get(name="switchtender")
+
         # Send project collaborators new recommendations
-        # FIXME Handle multisites!
-        for project in project_models.Project.objects.all():
+        for project in project_models.Project.on_site.all():
             for user in auth_models.User.objects.filter(email__in=project.emails):
                 if digests.send_digests_for_new_recommendations_by_user(user):
                     print(f"Sent new reco digests for {user} on {project.name}")
-
-        # Get all switchtenders
-        sw_group = auth_models.Group.objects.get(name="switchtender")
 
         # Digests for non switchtenders
         for user in auth_models.User.objects.exclude(groups__in=[sw_group]):
