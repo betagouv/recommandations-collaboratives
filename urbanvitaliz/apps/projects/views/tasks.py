@@ -342,11 +342,8 @@ def followup_task(request, task_id=None):
             followup.task = task
             followup.who = request.user
             # followup.status = task.status
-            followup.status = 0
+            # followup.status = models.Task.STATUS_UNCHANGED
             followup.save()
-            signals.action_commented.send(
-                sender=followup, task=task, project=task.project, user=request.user
-            )
 
             # Create or reset 6 weeks reminder
             create_reminder(
@@ -393,15 +390,15 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
 
     task = rsvp.task
 
-    rsvp_signals = {
-        models.Task.INPROGRESS: signals.action_inprogress,
-        models.Task.DONE: signals.action_done,
-        models.Task.ALREADY_DONE: signals.action_already_done,
-        models.Task.NOT_INTERESTED: signals.action_not_interested,
-        models.Task.BLOCKED: signals.action_blocked,
-    }
+    rsvp_signals = [
+        models.Task.INPROGRESS,
+        models.Task.DONE,
+        models.Task.ALREADY_DONE,
+        models.Task.NOT_INTERESTED,
+        models.Task.BLOCKED,
+    ]
 
-    if status not in rsvp_signals.keys():
+    if status not in rsvp_signals:
         raise Http404()
 
     if request.method == "POST":
@@ -414,25 +411,6 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
             followup.save()
 
             rsvp.delete()  # we are done with this use only once object
-
-            # Trigger status change notification
-            if task.status != followup.status:
-                task.status = status
-                task.save()
-
-                signal = rsvp_signals[task.status]
-                signal.send(
-                    sender=models.Task,
-                    task=task,
-                    project=task.project,
-                    user=rsvp.user,
-                )
-
-            # Trigger comment notification
-            if comment:
-                signals.action_commented.send(
-                    sender=followup, task=task, project=task.project, user=rsvp.user
-                )
 
             # Reminder update
             if task.status in [models.Task.INPROGRESS, models.Task.BLOCKED]:

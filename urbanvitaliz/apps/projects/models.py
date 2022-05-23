@@ -518,11 +518,12 @@ class TaskFollowup(models.Model):
     who = models.ForeignKey(
         auth_models.User, on_delete=models.CASCADE, related_name="task_followups"
     )
-    status = models.IntegerField(choices=Task.STATUS_CHOICES)
+    status = models.IntegerField(choices=Task.STATUS_CHOICES, blank=True, null=True)
 
     @property
     def status_txt(self):
         return {
+            Task.PROPOSED: "nouveau",
             Task.INPROGRESS: "en cours",
             Task.BLOCKED: "bloquée",
             Task.DONE: "terminée",
