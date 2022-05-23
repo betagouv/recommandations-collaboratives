@@ -9,22 +9,27 @@ import urbanvitaliz.apps.addressbook.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sites', '0002_alter_domain_unique'),
-        ('addressbook', '0004_alter_contact_division'),
+        ("sites", "0002_alter_domain_unique"),
+        ("addressbook", "0004_alter_contact_division"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='contact',
+            name="contact",
             managers=[
-                ('objects', django.db.models.manager.Manager()),
-                ('on_site', urbanvitaliz.apps.addressbook.models.ContactOnSiteManager()),
+                ("objects", django.db.models.manager.Manager()),
+                (
+                    "on_site",
+                    urbanvitaliz.apps.addressbook.models.ContactOnSiteManager(),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='contact',
-            name='site',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='sites.site'),
+            model_name="contact",
+            name="site",
+            field=models.ForeignKey(
+                default=1, on_delete=django.db.models.deletion.CASCADE, to="sites.site"
+            ),
             preserve_default=False,
         ),
     ]
