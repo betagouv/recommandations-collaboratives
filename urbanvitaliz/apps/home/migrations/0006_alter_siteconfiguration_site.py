@@ -7,14 +7,16 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sites', '0002_alter_domain_unique'),
-        ('home', '0005_siteconfiguration'),
+        ("sites", "0002_alter_domain_unique"),
+        ("home", "0005_siteconfiguration"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='site',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='sites.site'),
+            model_name="siteconfiguration",
+            name="site",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to="sites.site"
+            ),
         ),
     ]

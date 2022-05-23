@@ -7,14 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0052_merge_20220523_1203'),
-        ('survey', '0032_alter_session_unique_together'),
+        ("projects", "0052_merge_20220523_1203"),
+        ("survey", "0032_alter_session_unique_together"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='session',
-            name='project',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='survey_session', to='projects.project'),
+            model_name="session",
+            name="project",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="survey_session",
+                to="projects.project",
+            ),
         ),
     ]

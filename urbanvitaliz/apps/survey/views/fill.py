@@ -9,10 +9,8 @@ created: 2021-08-03 14:26:39 CEST
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import DetailView, RedirectView
-from urbanvitaliz.apps.home.models import SiteConfiguration
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import is_staff_or_403
 
