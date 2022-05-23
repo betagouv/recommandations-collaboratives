@@ -12,5 +12,6 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 @admin.register(models.Contact)
 class ContactAdmin(admin.ModelAdmin):
-    search_fields = ["first_name", "last_name"]
-    list_display = ["first_name", "last_name", "email", "phone_no"]
+    search_fields = ["first_name", "last_name", "organization__name"]
+    list_display = ["last_name", "first_name", "email", "phone_no", "organization"]
+    ordering = ["last_name", "first_name"]

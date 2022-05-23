@@ -1203,7 +1203,7 @@ def test_user_can_followup_on_personal_task(request, client):
         client.post(url, data=data)
     followup = models.TaskFollowup.objects.all()[0]
     assert followup.task == task
-    assert followup.status == 0  # to be replaced by task status
+    assert followup.status is None
     assert followup.comment == data["comment"]
     assert followup.who == user
 
