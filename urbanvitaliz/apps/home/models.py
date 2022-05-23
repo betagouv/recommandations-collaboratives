@@ -64,9 +64,12 @@ class UserProfile(models.Model):
 
 
 class SiteConfiguration(models.Model):
-    site = models.ForeignKey(Site, on_delete=models.CASCADE, unique=True)
+    site = models.OneToOneField(Site, on_delete=models.CASCADE)
 
     project_survey = models.ForeignKey("survey.Survey", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"SiteConfiguration for '{self.site}'"
 
 
 @receiver(post_save, sender=auth.User)
