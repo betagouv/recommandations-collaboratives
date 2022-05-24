@@ -168,7 +168,7 @@ def test_logged_in_user_accepts_invite_switchtender_with_mismatched_existing_acc
     assert response.status_code == 403
     invite = models.Invite.objects.get(pk=invite.pk)
     assert invite.accepted_on is None
-    assert user.email not in invite.project.emails
+    assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
 
 

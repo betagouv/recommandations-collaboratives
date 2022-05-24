@@ -9,6 +9,7 @@ created : 2021-05-26 15:56:20 CEST
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from urbanvitaliz import utils
@@ -43,7 +44,14 @@ def access_update(request, project_id):
         if form.is_valid():
             email = form.cleaned_data["email"]
             role = form.cleaned_data["role"]
-            if email not in project.emails:
+
+            # Try to resolve email to a user first
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                user = None
+
+            if user and user not in project.members.all():
                 already_invited = False
                 try:
                     already_invited = invites_models.Invite.objects.filter(
