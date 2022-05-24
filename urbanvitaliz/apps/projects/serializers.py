@@ -156,10 +156,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
         return obj.followups.count()
 
     def get_comments_count(self, obj):
-        return obj.followups.filter(
-            Q(status__in=[Task.NOT_INTERESTED, Task.DONE, Task.ALREADY_DONE])
-            | Q(status=None)
-        ).count()
+        return obj.followups.exclude(comment="").count()
 
     # FIXME : We should not send all the tasks to non switchtender users (filter queryset on current_user)
 
