@@ -117,11 +117,12 @@ def test_logged_user_can_send_message_to_team(mocker, client):
 @pytest.mark.django_db
 def test_project_owner_is_sent_to_action_page_on_login(client):
     url = reverse("login-redirect")
-    with login(client) as user:
-        project = baker.make(
-            projects_models.Project, email=user.email, emails=[user.email]
-        )
+    membership = baker.make(projects_models.ProjectMember, is_owner=True)
+    project = baker.make(projects_models.Project, projectmember_set=[membership])
+
+    with login(client, user=membership.member):
         response = client.get(url)
+
     assert response.status_code == 302
     project_action_url = reverse("projects-project-detail-actions", args=(project.pk,))
     assertRedirects(response, project_action_url)

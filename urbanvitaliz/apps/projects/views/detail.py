@@ -16,15 +16,10 @@ from urbanvitaliz.utils import check_if_switchtender
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm
-from ..utils import (
-    can_administrate_project,
-    can_manage_or_403,
-    can_manage_project,
-    check_if_national_actor,
-    get_notification_recipients_for_project,
-    is_regional_actor_for_project,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_project, can_manage_or_403,
+                     can_manage_project, check_if_national_actor,
+                     get_notification_recipients_for_project,
+                     is_regional_actor_for_project, set_active_project_id)
 
 
 @login_required
@@ -48,7 +43,7 @@ def project_knowledge(request, project_id=None):
     can_administrate = can_administrate_project(project, request.user)
 
     # check user can administrate project (member or switchtender)
-    if request.user.email != project.email:
+    if request.user != project.members.filter(projectmember__is_owner=True).first():
         # bypass if user is switchtender, all are allowed to view at least
         if not check_if_switchtender(request.user):
             can_manage_or_403(project, request.user)
@@ -96,7 +91,7 @@ def project_actions(request, project_id=None):
     can_administrate = can_administrate_project(project, request.user)
 
     # check user can administrate project (member or switchtender)
-    if request.user.email != project.email:
+    if request.user != project.members.filter(projectmember__is_owner=True).first():
         # bypass if user is switchtender, all are allowed to view at least
         if not check_if_switchtender(request.user):
             can_manage_or_403(project, request.user)
@@ -155,7 +150,7 @@ def project_conversations(request, project_id=None):
     can_administrate = can_administrate_project(project, request.user)
 
     # check user can administrate project (member or switchtender)
-    if request.user.email != project.email:
+    if request.user != project.members.filter(projectmember__is_owner=True).first():
         # bypass if user is switchtender, all are allowed to view at least
         if not check_if_switchtender(request.user):
             can_manage_or_403(project, request.user)
@@ -195,7 +190,7 @@ def project_internal_followup(request, project_id=None):
     can_administrate = can_administrate_project(project, request.user)
 
     # check user can administrate project (member or switchtender)
-    if request.user.email != project.email:
+    if request.user != project.members.filter(projectmember__is_owner=True).first():
         # bypass if user is switchtender, all are allowed to view at least
         if not check_if_switchtender(request.user):
             can_manage_or_403(project, request.user)

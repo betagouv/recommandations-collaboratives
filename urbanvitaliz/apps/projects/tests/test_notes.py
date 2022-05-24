@@ -11,6 +11,7 @@ created: 2021-06-01 10:11:56 CEST
 import pytest
 from actstream.models import action_object_stream
 from django.urls import reverse
+from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains
 from urbanvitaliz.utils import login
@@ -45,8 +46,11 @@ def test_create_conversation_message_not_available_for_outsiders(client):
 
 @pytest.mark.django_db
 def test_create_conversation_message_available_for_project_collaborators(client):
-    with login(client) as user:
-        project = Recipe(models.Project, email=user.email, status="READY").make()
+    membership = baker.make(models.ProjectMember)
+    project = Recipe(
+        models.Project, status="READY", projectmember_set=[membership]
+    ).make()
+    with login(client, user=membership.member):
         url = reverse("projects-conversation-create-message", args=[project.id])
         response = client.post(
             url,
@@ -83,16 +87,21 @@ def test_create_note_available_for_switchtender(client):
 
 @pytest.mark.django_db
 def test_create_note_available_for_project_collaborators(client):
-    with login(client) as user:
-        project = Recipe(models.Project, email=user.email).make()
+    membership = baker.make(models.ProjectMember)
+    project = Recipe(
+        models.Project, status="READY", projectmember_set=[membership]
+    ).make()
+
+    with login(client, user=membership.member):
         url = reverse("projects-create-note", args=[project.id])
         response = client.get(url)
+
     assert response.status_code == 200
     assertContains(response, 'form id="form-projects-add-note"')
 
 
 @pytest.mark.django_db
-def test_create_new_note_for_project_and_redirect(client):
+def test_switchtender_creates_new_note_for_project_and_redirect(client):
     project = Recipe(models.Project).make()
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
@@ -107,12 +116,17 @@ def test_create_new_note_for_project_and_redirect(client):
 
 @pytest.mark.django_db
 def test_create_public_note_for_project_collaborator_and_redirect(client):
-    with login(client) as user:
-        project = Recipe(models.Project, email=user.email).make()
+    membership = baker.make(models.ProjectMember)
+    project = Recipe(
+        models.Project, status="READY", projectmember_set=[membership]
+    ).make()
+
+    with login(client, user=membership.member):
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
             data={"content": "this is some content"},
         )
+
     note = models.Note.fetch()[0]
     assert note.project == project
     assert note.public is True
@@ -122,8 +136,12 @@ def test_create_public_note_for_project_collaborator_and_redirect(client):
 
 @pytest.mark.django_db
 def test_create_private_note_not_available_for_project_collaborator(client):
-    with login(client) as user:
-        project = Recipe(models.Project, email=user.email).make()
+    membership = baker.make(models.ProjectMember)
+    project = Recipe(
+        models.Project, status="READY", projectmember_set=[membership]
+    ).make()
+
+    with login(client, user=membership.member):
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
             data={"content": "this is some content", "public": False},
@@ -136,12 +154,12 @@ def test_create_private_note_not_available_for_project_collaborator(client):
 
 @pytest.mark.django_db
 def test_private_note_hidden_from_project_members(client):
-    user_email = "not@admin.here"
-    Recipe(models.Project, status="READY", emails=[user_email]).make()
+    membership = baker.make(models.ProjectMember)
+    Recipe(models.Project, status="READY", projectmember_set=[membership]).make()
 
     note = Recipe(models.Note, content="short note", public=False).make()
 
-    with login(client, username="project_owner", email=user_email, is_staff=False):
+    with login(client, user=membership.member):
         response = client.get(note.get_absolute_url())
 
     assert response.status_code == 403
@@ -149,9 +167,12 @@ def test_private_note_hidden_from_project_members(client):
 
 @pytest.mark.django_db
 def test_public_note_available_to_readers(client):
-    user_email = "not@admin.here"
+    membership = baker.make(models.ProjectMember)
+    project = Recipe(
+        models.Project, status="READY", projectmember_set=[membership]
+    ).make()
     note_content = "this is a public note"
-    project = Recipe(models.Project, emails=[user_email], status="READY").make()
+
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         response = client.post(
@@ -160,7 +181,8 @@ def test_public_note_available_to_readers(client):
         )
 
     note = models.Note.objects.first()
-    with login(client, username="project_owner", email=user_email, is_staff=False):
+
+    with login(client, user=membership.user):
         response = client.get(note.get_absolute_url())
 
     assertContains(response, note_content)
@@ -193,8 +215,9 @@ def test_update_note_available_for_switchtender(client):
 
 @pytest.mark.django_db
 def test_update_public_note_for_project_collaborator_and_redirect(client):
-    with login(client) as user:
-        project = Recipe(models.Project, email=user.email).make()
+    membership = baker.make(models.ProjectMember)
+    project = Recipe(models.Project, projectmember_set=[membership]).make()
+    with login(client, user=membership.member):
         note = Recipe(models.Note, project=project, public=True).make()
         response = client.post(
             reverse("projects-update-note", args=[note.id]),
@@ -208,8 +231,9 @@ def test_update_public_note_for_project_collaborator_and_redirect(client):
 
 @pytest.mark.django_db
 def test_update_private_note_for_project_collaborator(client):
-    with login(client) as user:
-        project = Recipe(models.Project, email=user.email).make()
+    membership = baker.make(models.ProjectMember)
+    project = Recipe(models.Project, projectmember_set=[membership]).make()
+    with login(client, user=membership.member):
         note = Recipe(models.Note, project=project, public=False).make()
         url = reverse("projects-update-note", args=[note.id])
         response = client.get(url)

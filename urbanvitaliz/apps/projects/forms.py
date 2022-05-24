@@ -239,6 +239,8 @@ class OnboardingForm(forms.ModelForm):
     insee = forms.CharField(max_length=5, required=False, label="Code Insee")
     captcha = ReCaptchaField(widget=ReCaptchaV3(api_params={"hl": "fr"}))
 
+    email = forms.CharField(label="Email principal", required=False)
+
     class Meta:
         model = models.Project
         fields = [
