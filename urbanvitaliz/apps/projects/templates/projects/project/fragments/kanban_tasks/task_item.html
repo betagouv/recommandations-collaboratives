@@ -27,7 +27,7 @@
 						style="font-size: 0.7em;">Non applicable</span>
 				</template>
 			</div>
-			<div class="p-2" @click="onPreviewClick(t.id)" style="cursor: pointer">
+			<div class="p-2" @click="onPreviewClick(t.id)" style="cursor: pointer; font-size: 0.9em;">
 				<h6 class=mt-1 mb-0 fw-bold" x-text="t.intent"></h6>
 
 				<div class="rounded bg-light p-2 my-2" :class="canAdministrate && t.content === '' && 'border border-warning'">
@@ -35,7 +35,7 @@
 						<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
 					</template>
 					<template x-if="t.content !== ''">
-						<p x-text="truncate(t.content, 200)" class="mb-2"></p>
+						<p x-text="truncate(t.content, 200)" class="mb-3"></p>
 					</template>
 					<div class="d-flex justify-content-between">
 						<div>
@@ -44,8 +44,11 @@
 								:title="`${t.created_by.first_name} ${t.created_by.last_name}`" style="z-index: 1000;" tabindex="0" />
 							<span class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
 								style="line-height: 20px"></span>
+							<template x-if="t.created_by.profile.organization">
+								<span x-text="t.created_by.profile.organization.name" class="fst-italic text-muted"></span>
+							</template>
+							<span class="ms-2 text-muted" x-text="`le ${formatDate(t.created_on)}`" style="line-height: 20px"></span>
 						</div>
-						<span class="ms-1 text-muted" x-text="formatDate(t.created_on)" style="line-height: 20px"></span>
 					</div>
 				</div>
 			</div>
@@ -56,7 +59,7 @@
 						<svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
 							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat" />
 						</svg>
-						<span x-text="t.followups_count"></span>
+						<span x-text="t.resource_id ? t.comments_count + 1  : t.comments_count"></span>
 					</div>
 				</div>
 
@@ -86,11 +89,11 @@
 								<li><a class="dropdown-item" style="cursor: pointer;" @click="onSetTaskPublic(t.id, false)">Passer en
 										brouillon</a></li>
 							</template>
-              <li>
-								  <form method="POST" :action="deleteTaskReminderUrl(t.id)">
-									    {% csrf_token %}
-									    <button class="dropdown-item">Supprimer le rappel</button>
-								  </form>
+							<li>
+								<form method="POST" :action="deleteTaskReminderUrl(t.id)">
+									{% csrf_token %}
+									<button class="dropdown-item">Supprimer le rappel</button>
+								</form>
 							</li>
 
 						</ul>
