@@ -15,14 +15,10 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -61,13 +57,11 @@ def log_project_validated(sender, moderator, project, **kwargs):
         return
 
     # Notify regional actors of a new project
-    try:
-        owner = auth_models.User.objects.get(email=project.email)
-    except auth_models.User.DoesNotExist:
+    if not project.owner:
         return
 
     notify.send(
-        sender=owner,
+        sender=project.owner,
         recipient=get_regional_actors_for_project(project),
         verb="a déposé le projet",
         action_object=project,
@@ -193,7 +187,7 @@ def notify_action_created(sender, task, project, user, **kwargs):
     )
 
     # assign reminder in six weeks
-    create_reminder(6 * 7, task, project.email, origin=reminders_models.Mail.STAFF)
+    create_reminder(6 * 7, task, project.owner, origin=reminders_models.Mail.STAFF)
 
 
 @receiver(action_visited)

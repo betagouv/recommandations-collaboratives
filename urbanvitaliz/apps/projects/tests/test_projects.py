@@ -1018,11 +1018,12 @@ def test_create_reminder_without_delay_for_task(client):
 @pytest.mark.django_db
 def test_recreate_reminder_after_for_same_task(client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
-    task = Recipe(models.Task, project__email="owner@example.com").make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
+    task = Recipe(models.Task, project__projectmember_set=[membership]).make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
     data2 = {"days": 10}
-    with login(client, email=task.project.email):
+    with login(client, user=membership.member):
         response = client.post(url, data=data)
         response = client.post(url, data=data2)
 
@@ -1037,11 +1038,12 @@ def test_recreate_reminder_after_for_same_task(client):
 @pytest.mark.django_db
 def test_recreate_reminder_before_for_same_task(client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
-    task = Recipe(models.Task, project__email="owner@example.com").make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
+    task = Recipe(models.Task, project__projectmember_set=[membership]).make()
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
     data2 = {"days": 2}
-    with login(client, email=task.project.email):
+    with login(client, user=membership.member):
         response = client.post(url, data=data)
         response = client.post(url, data=data2)
 
@@ -1081,8 +1083,13 @@ def test_user_cannot_followup_on_someone_else_task(client):
 @pytest.mark.django_db
 def test_user_can_followup_on_personal_task(client):
     data = dict(comment="some comment")
-    with login(client) as user:
-        project = baker.make(models.Project, status="READY", email=user.email)
+    membership = baker.make(models.ProjectMember, is_owner=True)
+    task = Recipe(models.Task, project__projectmember_set=[membership]).make()
+
+    with login(client, user=membership.user) as user:
+        project = baker.make(
+            models.Project, status="READY", project__projectmember_set=[membership]
+        )
         task = baker.make(models.Task, project=project)
         url = reverse("projects-followup-task", args=[task.id])
         client.post(url, data=data)
@@ -1163,8 +1170,8 @@ def test_user_cannot_followup_on_rsvp_with_bad_status(client):
 def test_user_can_followup_on_rsvp_using_mail_link(client):
     status = models.Task.INPROGRESS
 
-    user = baker.make(auth.User, email="owner@example.com")
-    project = baker.make(models.Project, status="READY", email=user.email)
+    membership = baker.make(models.ProjectMember)
+    project = baker.make(models.Project, status="READY", projectmember_set=[membership])
     task = baker.make(models.Task, project=project)
     rsvp = baker.make(models.TaskFollowupRsvp, task=task)
     url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
@@ -1180,10 +1187,10 @@ def test_user_can_followup_on_rsvp(client):
     data = dict(comment="some comment")
     status = models.Task.INPROGRESS
 
-    user = baker.make(auth.User, email="owner@example.com")
-    project = baker.make(models.Project, status="READY", email=user.email)
+    membership = baker.make(models.ProjectMember)
+    project = baker.make(models.Project, status="READY", projectmember_set=[membership])
     task = baker.make(models.Task, project=project)
-    rsvp = baker.make(models.TaskFollowupRsvp, task=task, user=user)
+    rsvp = baker.make(models.TaskFollowupRsvp, task=task, user=membership.member)
     url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
     client.post(url, data=data)
 
@@ -1192,7 +1199,7 @@ def test_user_can_followup_on_rsvp(client):
     assert followup.task == task
     assert followup.status == status
     assert followup.comment == data["comment"]
-    assert followup.who == user
+    assert followup.who == membership.member
 
 
 ########################################################################
@@ -1289,7 +1296,7 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(client)
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
 
-    collab = Recipe(auth.User, username="collab", email="collab@example.com").make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
 
     Recipe(
         models.TaskRecommendation,
@@ -1301,8 +1308,7 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(client)
     project = Recipe(
         models.Project,
         status="BLAH",
-        email=collab.email,
-        emails=[collab.email],
+        projectmember_set=[membership],
         commune=commune,
     ).make()
 
@@ -1310,11 +1316,11 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(client)
     leave_url = reverse("projects-project-switchtender-leave", args=[project.id])
     with login(client, groups=["switchtender"]):
         client.post(join_url)
-        assert collab.notifications.count() == 1
+        assert membership.member.notifications.count() == 1
 
         client.post(leave_url)
 
-        assert collab.notifications.count() == 0
+        assert membership.member.notifications.count() == 0
 
 
 #################################################################
