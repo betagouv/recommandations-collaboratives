@@ -127,7 +127,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "resource_id",
             "notifications",
             "followups_count",
-            "comments_count"
+            "comments_count",
         ]
 
     created_by = UserSerializer(read_only=True, many=False)
