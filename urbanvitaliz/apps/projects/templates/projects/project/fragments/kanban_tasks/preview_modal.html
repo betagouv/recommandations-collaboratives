@@ -41,7 +41,7 @@
 											<template x-if="currentTask.content === ''">
 												<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
 											</template>
-											<div class="d-flex justify-content-between" style="font-size: 0.8em;">
+											<div class="d-flex justify-content-between" style="font-size: 0.9em;">
 												<div>
 													<img class="rounded-circle d-inline-block" width="20px" height="20px"
 														:src="generateGravatarUrl(currentTask.created_by)" data-bs-toggle="tooltip"
@@ -51,7 +51,11 @@
 													<span class="ms-1 fst-italic"
 														x-text="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
 														style="line-height: 20px"></span>
-													<span class="ms-1 text-muted" x-text="formatDate(currentTask.created_on)"
+													<template x-if="currentTask.created_by.profile.organization">
+														<span x-text="currentTask.created_by.profile.organization.name"
+															class="fst-italic text-muted"></span>
+													</template>
+													<span class="ms-2 text-muted" x-text="`le ${formatDate(currentTask.created_on)}`"
 														style="line-height: 20px"></span>
 												</div>
 												<template x-if="canAdministrate">
@@ -68,15 +72,19 @@
 													<div class="rounded bg-light p-2 m-3 message"
 														:class="hasNotification(f.id) && 'border border-warning'">
 														<p x-html="renderMarkdown(f.comment)" class="mb-2"></p>
-														<div class="d-flex justify-content-between" style="font-size: 0.8em;">
+														<div class="d-flex justify-content-between" style="font-size: 0.9em;">
 															<div>
 																<img class="rounded-circle d-inline-block" width="20px" height="20px"
 																	:src="generateGravatarUrl(f.who)" data-bs-toggle="tooltip" data-bs-placement="bottom"
 																	:title="`${f.who.first_name} ${f.who.last_name}`" style="z-index: 1000;"
 																	tabindex="0" />
 																<span class="ms-1 fst-italic" x-text="`${f.who.first_name} ${f.who.last_name}`"
-																	style="line-height: 20px"></span>
-																<span class="ms-1 text-muted" x-text="formatDate(f.timestamp)"
+																	style="line-height: 20px">
+																</span>
+																<template x-if="f.who.profile.organization">
+																	<span x-text="f.who.profile.organization.name" class="fst-italic text-muted"></span>
+																</template>
+																<span class="ms-2 text-muted" x-text="`le ${formatDate(f.timestamp)}`"
 																	style="line-height: 20px"></span>
 															</div>
 															<template x-if="f.who.email === userEmail">
@@ -95,7 +103,7 @@
 														<template x-if="f.comment !== ''">
 															<div class="rounded bg-light p-2 m-3 message">
 																<p x-html="renderMarkdown(f.comment)" class="mb-2"></p>
-																<div class="d-flex justify-content-between" style="font-size: 0.8em;">
+																<div class="d-flex justify-content-between" style="font-size: 0.9em;">
 																	<div>
 																		<img class="rounded-circle d-inline-block" width="20px" height="20px"
 																			:src="generateGravatarUrl(f.who)" data-bs-toggle="tooltip"
@@ -103,7 +111,11 @@
 																			style="z-index: 1000;" tabindex="0" />
 																		<span class="ms-1 fst-italic" x-text="`${f.who.first_name} ${f.who.last_name}`"
 																			style="line-height: 20px"></span>
-																		<span class="ms-1 text-muted" x-text="formatDate(f.timestamp)"
+																		<template x-if="f.who.profile.organization">
+																			<span x-text="f.who.profile.organization.name"
+																				class="fst-italic text-muted"></span>
+																		</template>
+																		<span class="ms-2 text-muted" x-text="`le ${formatDate(f.timestamp)}`"
 																			style="line-height: 20px"></span>
 																	</div>
 																	<template x-if="f.who.email === userEmail">
