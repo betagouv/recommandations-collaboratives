@@ -10,6 +10,7 @@ created : 2021-05-26 15:56:20 CEST
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from urbanvitaliz import utils
@@ -29,7 +30,6 @@ from ..utils import can_manage_or_403
 def access_update(request, project_id):
     """Handle ACL for a project"""
     project = get_object_or_404(models.Project, pk=project_id)
-
     can_manage_or_403(project, request.user)
 
     # Fetch pending invites
@@ -47,12 +47,12 @@ def access_update(request, project_id):
 
             # Try to resolve email to a user first
             try:
-                user = User.objects.get(email=email)
+                user = User.objects.get(username=email)
             except User.DoesNotExist:
                 user = None
 
+            already_invited = False
             if user and user not in project.members.all():
-                already_invited = False
                 try:
                     already_invited = invites_models.Invite.objects.filter(
                         project=project, email=email, role=role
@@ -60,19 +60,18 @@ def access_update(request, project_id):
                 except invites_models.Invite.DoesNotExist:
                     pass
 
-                # Already invited, skip
-                if already_invited:
-                    messages.warning(
-                        request,
-                        "Cet usager ({0}) a déjà été invité, aucun courrier n'a été envoyé.".format(
-                            email
-                        ),
-                    )
-                    return render(
-                        request, "projects/project/access_update.html", locals()
-                    )
+            # Already invited, skip
+            if already_invited:
+                messages.warning(
+                    request,
+                    "Cet usager ({0}) a déjà été invité, aucun courrier n'a été envoyé.".format(
+                        email
+                    ),
+                )
+                return render(request, "projects/project/access_update.html", locals())
 
-                # XXX Check if invite does not already exist
+            else:
+                # New invite
                 invite = form.save(commit=False)
                 invite.project = project
                 invite.inviter = request.user
@@ -109,19 +108,25 @@ def access_delete(request, project_id: int, email: str):
     """Delete en email from the project ACL"""
     project = get_object_or_404(models.Project, pk=project_id)
 
+    if project.status == "DRAFT":
+        raise PermissionDenied()
+
+    membership = get_object_or_404(
+        models.ProjectMember, project=project, member__username=email
+    )
+
     can_manage_or_403(project, request.user)
 
     if request.method == "POST":
-        if email == project.email:
+        if membership.is_owner:
             messages.error(
                 request,
                 "Vous ne pouvez pas retirer le propriétaire de son propre projet.",
                 extra_tags=["auth"],
             )
 
-        elif email in project.emails:
-            project.emails.remove(email)
-            project.save()
+        elif membership in project.projectmember_set.exclude(is_owner=True):
+            project.members.remove(membership.member)
             messages.success(
                 request,
                 "{0} a bien été supprimé de la liste des collaborateurs.".format(email),

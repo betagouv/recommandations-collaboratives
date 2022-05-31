@@ -11,10 +11,13 @@ from datetime import datetime
 
 import pytest
 from django.urls import reverse
+from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
+from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
 from . import models
@@ -117,9 +120,13 @@ def test_resource_list_contains_only_resource_with_area(client):
 
     url = reverse("resources-resource-search")
     url = f"{url}?limit_area=true&query=resource"
-    with login(client) as user:
+
+    membership = baker.make(projects_models.ProjectMember)
+    with login(client, user=membership.member) as user:
         Recipe(
-            projects.Project, emails=[user.email], commune__department=departments[1]
+            projects.Project,
+            projectmember_set=[membership],
+            commune__department=departments[1],
         ).make()
         response = client.get(url)
     detail_url = reverse("resources-resource-detail", args=[resource1.id])

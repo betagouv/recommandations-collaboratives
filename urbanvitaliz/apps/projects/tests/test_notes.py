@@ -182,7 +182,7 @@ def test_public_note_available_to_readers(client):
 
     note = models.Note.objects.first()
 
-    with login(client, user=membership.user):
+    with login(client, user=membership.member):
         response = client.get(note.get_absolute_url())
 
     assertContains(response, note_content)

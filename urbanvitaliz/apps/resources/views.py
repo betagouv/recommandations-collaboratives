@@ -81,7 +81,7 @@ def resource_search(request):
         communes = []
         if hasattr(request.user, "email"):
             communes = [
-                p.commune for p in projects.Project.fetch(email=request.user.email)
+                p.commune for p in projects.Project.objects.filter(members=request.user)
             ]
             if not communes:
                 limit_area = None  # does not apply if no projects

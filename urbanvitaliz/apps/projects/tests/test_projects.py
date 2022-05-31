@@ -73,7 +73,8 @@ def test_performing_onboarding_create_a_new_project(client):
     assert project.name == "a project"
     assert project.status == "DRAFT"
     assert len(project.ro_key) == 32
-    assert data["email"] in project.emails
+    assert data["email"] == project.members.first().username
+    assert data["email"] == project.members.first().email
     note = models.Note.objects.all()[0]
     assert note.project == project
     assert note.public
@@ -93,8 +94,8 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(client):
         "impediments": "some impediment",
     }
     response = client.post(reverse("projects-onboarding"), data=data)
-    project = models.Project.fetch()[0]
-    user = auth.User.objects.get(username=project.email)
+    project = models.Project.objects.first()
+    user = project.members.first()
 
     assert user.first_name == data["first_name"]
     assert user.last_name == data["last_name"]
@@ -192,7 +193,7 @@ def test_performing_onboarding_allow_select_on_multiple_communes(client):
         )
 
     assert response.status_code == 302
-    project = models.Project.fetch()[0]
+    project = models.Project.objects.first()
     url = reverse("projects-onboarding-select-commune", args=[project.id])
     assert response.url == (url)
 
@@ -201,8 +202,13 @@ def test_performing_onboarding_allow_select_on_multiple_communes(client):
 def test_selecting_proper_commune_completes_project_creation(client):
     commune = Recipe(geomatics.Commune, postal="12345").make()
     selected = Recipe(geomatics.Commune, postal="12345").make()
-    with login(client) as user:
-        project = Recipe(models.Project, email=user.email, commune=commune).make()
+
+    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
+    project = Recipe(
+        models.Project, projectmember_set=[membership], commune=commune
+    ).make()
+
+    with login(client, user=membership.member):
         response = client.post(
             reverse("projects-onboarding-select-commune", args=[project.id]),
             data={"commune": selected.id},
@@ -222,8 +228,12 @@ def test_proper_commune_selection_contains_all_possible_commmunes(client):
     ]
     unexpected = Recipe(geomatics.Commune, postal="67890").make()
 
-    with login(client) as user:
-        project = Recipe(models.Project, email=user.email, commune=expected[1]).make()
+    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
+    project = Recipe(
+        models.Project, projectmember_set=[membership], commune=expected[1]
+    ).make()
+
+    with login(client, user=membership.member):
         response = client.get(
             reverse("projects-onboarding-select-commune", args=[project.id]),
         )
@@ -275,7 +285,8 @@ def test_create_prefilled_project_creates_a_new_project(client):
     assert project.name == "a project"
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
-    assert data["email"] in project.emails
+
+    assert data["email"] in [member.email for member in project.members.all()]
 
     assert response.status_code == 302
 
@@ -287,10 +298,12 @@ def test_create_prefilled_project_creates_a_new_project(client):
 
 @pytest.mark.django_db
 def test_my_projects_are_stored_in_session_on_login(client):
-    project = Recipe(models.Project, email="my@example.com").make()
-    with login(client, is_staff=False, email="my@example.com"):
+    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
+    project = Recipe(models.Project, projectmember_set=[membership]).make()
+    with login(client, user=membership.member):
         pass
 
+    print(client)
     assert len(client.session["projects"]) == 1
     session_project = client.session["projects"][0]
     assert session_project["id"] == project.id
@@ -298,8 +311,9 @@ def test_my_projects_are_stored_in_session_on_login(client):
 
 @pytest.mark.django_db
 def test_other_projects_are_not_stored_in_session(client):
-    project = Recipe(models.Project, email="other@exmaple.com").make()
-    with login(client, is_staff=False):
+    membership = baker.make(models.ProjectMember, is_owner=True)
+    project = Recipe(models.Project, projectmember_set=[membership]).make()
+    with login(client, user=membership.member):
         pass
     assert {"name": project.name, "id": project.id} not in client.session["projects"]
 
@@ -402,8 +416,10 @@ def test_project_knowledge_not_available_for_non_switchtender(client):
 @pytest.mark.django_db
 def test_project_knowledge_available_for_owner(client):
     # project email is same as test user to be logged in
-    with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, email=user.email).make()
+    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
+    project = Recipe(models.Project, projectmember_set=[membership]).make()
+
+    with login(client, user=membership.member, is_staff=False):
         url = reverse("projects-project-detail-knowledge", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
@@ -442,8 +458,10 @@ def test_project_actions_not_available_for_non_switchtender(client):
 @pytest.mark.django_db
 def test_project_actions_available_for_owner(client):
     # project email is same as test user to be logged in
-    with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, email=user.email).make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
+    project = Recipe(models.Project, projectmember_set=[membership]).make()
+
+    with login(client, user=membership.member, is_staff=False):
         url = reverse("projects-project-detail-actions", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
@@ -481,9 +499,10 @@ def test_project_conversations_not_available_for_non_switchtender(client):
 
 @pytest.mark.django_db
 def test_project_conversations_available_for_owner(client):
-    # project email is same as test user to be logged in
-    with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, email=user.email).make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
+    project = Recipe(models.Project, projectmember_set=[membership]).make()
+
+    with login(client, user=membership.member):
         url = reverse("projects-project-detail-conversations", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
@@ -522,8 +541,10 @@ def test_project_internal_followup_not_available_for_non_switchtender(client):
 @pytest.mark.django_db
 def test_project_internal_followup_available_for_owner(client):
     # project email is same as test user to be logged in
-    with login(client, is_staff=False) as user:
-        project = Recipe(models.Project, email=user.email).make()
+    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
+    project = Recipe(models.Project, projectmember_set=[membership]).make()
+
+    with login(client, user=membership.member):
         url = reverse("projects-project-detail-internal-followup", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
@@ -677,11 +698,16 @@ def test_accept_project_notifies_regional_actors(client):
     commune = Recipe(
         geomatics.Commune, name="Lille", postal="59000", department=dpt_nord
     ).make()
+
     regional_actor = Recipe(auth.User).make()
     regional_actor.groups.add(st_group)
     regional_actor.profile.departments.add(dpt_nord)
 
-    project = Recipe(models.Project, commune=commune, email=regional_actor.email).make()
+    membership = baker.make(models.ProjectMember, member=regional_actor, is_owner=True)
+
+    project = Recipe(
+        models.Project, commune=commune, projectmember_set=[membership]
+    ).make()
 
     with login(client, groups=["switchtender", "project_moderator"]):
         client.post(reverse("projects-project-accept", args=[project.id]))
@@ -703,10 +729,17 @@ def test_accept_project_does_not_notify_non_regional_actors(client):
     non_regional_actor.groups.add(group)
     non_regional_actor.profile.departments.add(dpt_pdc)
 
-    owner = Recipe(auth.User, email="here@project.info").make()
-    project = Recipe(models.Project, commune=commune, email=owner.email).make()
+    nr_membership = baker.make(
+        models.ProjectMember,
+        member=non_regional_actor,
+    )
 
-    with login(client, groups=["switchtender"]):
+    owner_membership = baker.make(models.ProjectMember, is_owner=True)
+    project = Recipe(
+        models.Project, commune=commune, projectmember_set=[owner_membership]
+    ).make()
+
+    with login(client, user=nr_membership.member, groups=["switchtender"]):
         client.post(reverse("projects-project-accept", args=[project.id]))
 
     assert non_regional_actor.notifications.count() == 0
@@ -800,11 +833,14 @@ def test_notifications_are_deleted_on_project_hard_delete():
 
 
 def test_notification_not_sent_when_project_is_draft():
-    user = Recipe(auth.User, username="auser", email="user@example.com").make()
     switchtender = Recipe(
         auth.User, username="switchtender", email="switchtender@example.com"
     ).make()
-    project = baker.make(models.Project, status="DRAFT", emails=[user.email])
+
+    membership = baker.make(
+        models.ProjectMember, member__is_staff=False, is_owner=False
+    )
+    project = baker.make(models.Project, status="DRAFT", projectmember_set=[membership])
 
     # Generate a notification
     signals.action_created.send(
@@ -814,16 +850,18 @@ def test_notification_not_sent_when_project_is_draft():
         user=switchtender,
     )
 
-    assert user.notifications.unsent().count() == 0
+    assert membership.member.notifications.unsent().count() == 0
 
 
 def test_notification_not_sent_when_project_is_muted():
-    user = Recipe(auth.User, username="auser", email="user@example.com").make()
     switchtender = Recipe(
         auth.User, username="switchtender", email="switchtender@example.com"
     ).make()
+    membership = baker.make(
+        models.ProjectMember, member__is_staff=False, is_owner=False
+    )
     project = baker.make(
-        models.Project, status="READY", muted=True, emails=[user.email]
+        models.Project, status="DRAFT", muted=True, projectmember_set=[membership]
     )
 
     # Generate a notification
@@ -834,7 +872,7 @@ def test_notification_not_sent_when_project_is_muted():
         user=switchtender,
     )
 
-    assert user.notifications.unsent().count() == 0
+    assert membership.member.notifications.unsent().count() == 0
 
 
 @pytest.mark.django_db
@@ -850,27 +888,37 @@ def test_non_staff_cannot_add_email_to_project(client):
 
 @pytest.mark.django_db
 def test_switchtender_can_add_email_to_project(client):
-    project = Recipe(models.Project).make()
+    project = baker.make(models.Project, projectmember_set=[])
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "test@example.com", "role": "COLLABORATOR"}
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
-        client.post(url, data=data)
+        response = client.post(url, data=data)
 
+    assert response.status_code == 302
     invite = invites_models.Invite.objects.first()
     assert invite.email == data["email"]
 
 
 @pytest.mark.django_db
 def test_owner_can_add_email_to_project_if_not_draft(client):
-    email = "owner@example.com"
-    project = Recipe(models.Project, email=email, status="READY").make()
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__email="own@er.fr",
+        member__username="own@er.fr",
+    )
+    project = baker.make(models.Project, projectmember_set=[membership], status="READY")
+
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
 
-    with login(client, email=email, is_staff=False):
-        client.post(url, data=data)
+    with login(client, user=membership.member):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
 
     invite = invites_models.Invite.objects.first()
     assert invite.email == data["email"]
@@ -878,12 +926,21 @@ def test_owner_can_add_email_to_project_if_not_draft(client):
 
 @pytest.mark.django_db
 def test_owner_cannot_add_email_to_project_if_draft(client):
-    email = "owner@example.com"
-    project = Recipe(models.Project, email=email, status="DRAFT").make()
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__email="user@staff.fr",
+        member__username="user@staff.fr",
+    )
+    project = Recipe(
+        models.Project, projectmember_set=[membership], status="DRAFT"
+    ).make()
+
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "collaborator@example.com"}
 
-    with login(client, email=email, is_staff=False):
+    with login(client, user=membership.member):
         response = client.post(url, data=data)
 
     assert response.status_code == 403
@@ -891,8 +948,18 @@ def test_owner_cannot_add_email_to_project_if_draft(client):
 
 @pytest.mark.django_db
 def test_non_staff_cannot_delete_email_from_project(client):
-    project = Recipe(models.Project).make()
-    url = reverse("projects-access-delete", args=[project.id, "test@example.com"])
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=False,
+        member__is_staff=False,
+        member__email="user@staff.fr",
+        member__username="user@staff.fr",
+    )
+    project = Recipe(
+        models.Project, projectmember_set=[membership], status="READY"
+    ).make()
+
+    url = reverse("projects-access-delete", args=[project.id, membership.member.email])
 
     with login(client, is_staff=False):
         response = client.post(url)
@@ -902,33 +969,63 @@ def test_non_staff_cannot_delete_email_from_project(client):
 
 @pytest.mark.django_db
 def test_owner_can_remove_email_from_project_if_not_draft(client):
-    email = "owner@example.com"
-    colab_email = "collaborator@example.com"
+    owner_membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__email="owner@ab.fr",
+        member__username="owner@ab.fr",
+    )
+    collab_membership = baker.make(
+        models.ProjectMember,
+        is_owner=False,
+        member__is_staff=False,
+        member__email="coll@ab.fr",
+        member__username="coll@ab.fr",
+    )
     project = Recipe(
-        models.Project, email=email, emails=[email, colab_email], status="READY"
+        models.Project,
+        projectmember_set=[owner_membership, collab_membership],
+        status="READY",
     ).make()
+
     url = reverse(
         "projects-access-delete",
-        args=[project.id, colab_email],
+        args=[project.id, collab_membership.member.email],
     )
 
-    with login(client, email=email, is_staff=False):
+    with login(client, user=owner_membership.member):
         client.post(url)
 
     project = models.Project.objects.get(id=project.id)
-    assert colab_email not in project.emails
+    assert collab_membership.member not in project.members.all()
 
 
 @pytest.mark.django_db
 def test_owner_cannot_remove_email_from_project_if_draft(client):
-    email = "owner@example.com"
-    colab_email = "collaborator@example.com"
+    owner_membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__email="owner@ab.fr",
+    )
+    collab_membership = baker.make(
+        models.ProjectMember,
+        is_owner=False,
+        member__is_staff=False,
+        member__email="coll@ab.fr",
+    )
     project = Recipe(
-        models.Project, email=email, emails=[email, colab_email], status="DRAFT"
+        models.Project,
+        projectmember_set=[owner_membership, collab_membership],
+        status="DRAFT",
     ).make()
-    url = reverse("projects-access-delete", args=[project.id, colab_email])
 
-    with login(client, email=email, is_staff=False):
+    url = reverse(
+        "projects-access-delete", args=[project.id, collab_membership.member.email]
+    )
+
+    with login(client, user=owner_membership.member):
         response = client.post(url)
 
     assert response.status_code == 403
@@ -936,16 +1033,30 @@ def test_owner_cannot_remove_email_from_project_if_draft(client):
 
 @pytest.mark.django_db
 def test_switchtender_can_delete_email_from_project(client):
-    email = "test@example.com"
-    project = Recipe(models.Project, emails=[email]).make()
-    url = reverse("projects-access-delete", args=[project.id, email])
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=False,
+        member__is_staff=False,
+        member__username="coll@ab.fr",
+        member__email="coll@ab.fr",
+    )
+
+    project = baker.make(
+        models.Project,
+        projectmember_set=[membership],
+        status="READY",
+    )
+
+    url = reverse("projects-access-delete", args=[project.id, membership.member.email])
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         response = client.post(url)
 
+    assert response.status_code == 302
+
     project = models.Project.objects.get(id=project.id)
-    assert email not in project.emails
+    assert membership not in project.projectmember_set.all()
 
     update_url = reverse("projects-access-update", args=[project.id])
     assertRedirects(response, update_url)
@@ -953,16 +1064,28 @@ def test_switchtender_can_delete_email_from_project(client):
 
 @pytest.mark.django_db
 def test_owner_cannot_be_removed_from_project_acl(client):
-    email = "test@example.com"
-    project = Recipe(models.Project, email=email, emails=[email]).make()
-    url = reverse("projects-access-delete", args=[project.id, email])
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__username="coll@ab.fr",
+        member__email="coll@ab.fr",
+    )
+
+    project = baker.make(
+        models.Project,
+        projectmember_set=[membership],
+        status="READY",
+    )
+
+    url = reverse("projects-access-delete", args=[project.id, membership.member.email])
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
         response = client.post(url)
 
     project = models.Project.objects.get(id=project.id)
-    assert email in project.emails
+    assert membership in project.projectmember_set.all()
 
     update_url = reverse("projects-access-update", args=[project.id])
     assertRedirects(response, update_url)
@@ -989,16 +1112,25 @@ def test_projects_feed_available_for_all_users(client):
 @pytest.mark.django_db
 def test_create_reminder_for_task(client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
-    project = Recipe(models.Project, email="owner@example.com").make()
-    task = Recipe(models.Task, project=project).make()
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__username="coll@ab.fr",
+        member__email="coll@ab.fr",
+    )
+    project = baker.make(models.Project, projectmember_set=[membership])
+    task = baker.make(models.Task, project=project)
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
-    with login(client, email=project.email):
+
+    with login(client, user=membership.member):
         response = client.post(url, data=data)
+
     assert response.status_code == 302
     reminder = reminders.Mail.to_send.all()[0]
     assert models.TaskFollowupRsvp.objects.count() == 1
-    assert reminder.recipient == project.email
+    assert reminder.recipient == project.members.first().email
     in_fifteen_days = datetime.date.today() + datetime.timedelta(days=data["days"])
     assert reminder.deadline == in_fifteen_days
 
@@ -1006,10 +1138,19 @@ def test_create_reminder_for_task(client):
 @pytest.mark.django_db
 def test_create_reminder_without_delay_for_task(client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
-    task = Recipe(models.Task, project__email="owner@example.com").make()
+    owner_membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__email="owner@ab.fr",
+        member__username="owner@ab.fr",
+    )
+    task = baker.make(models.Task, project__projectmember_set=[owner_membership])
     url = reverse("projects-remind-task", args=[task.id])
-    with login(client, email=task.project.email):
+
+    with login(client, user=owner_membership.member):
         response = client.post(url)
+
     assert response.status_code == 302
     assert reminders.Mail.to_send.count() == 1
     assert models.TaskFollowupRsvp.objects.count() == 1
@@ -1084,15 +1225,14 @@ def test_user_cannot_followup_on_someone_else_task(client):
 def test_user_can_followup_on_personal_task(client):
     data = dict(comment="some comment")
     membership = baker.make(models.ProjectMember, is_owner=True)
-    task = Recipe(models.Task, project__projectmember_set=[membership]).make()
 
-    with login(client, user=membership.user) as user:
-        project = baker.make(
-            models.Project, status="READY", project__projectmember_set=[membership]
-        )
-        task = baker.make(models.Task, project=project)
+    project = baker.make(models.Project, status="READY", projectmember_set=[membership])
+    task = baker.make(models.Task, project=project)
+
+    with login(client, user=membership.member) as user:
         url = reverse("projects-followup-task", args=[task.id])
         client.post(url, data=data)
+
     followup = models.TaskFollowup.objects.all()[0]
     assert followup.task == task
     assert followup.status is None
@@ -1105,18 +1245,16 @@ def test_followup_triggers_notifications(client):
     group = auth.Group.objects.get(name="switchtender")
     switchtender = baker.make(auth.User, groups=[group])
 
-    collab = baker.make(auth.User, email="collab@example.com")
+    owner_membership = baker.make(models.ProjectMember, is_owner=True)
+    collab_membership = baker.make(models.ProjectMember, is_owner=False)
 
     data = dict(comment="some comment")
 
-    owner = None
-    with login(client) as user:
-        owner = user
+    with login(client, user=owner_membership.member):
         project = baker.make(
             models.Project,
             status="READY",
-            email=user.email,
-            emails=[user.email, collab.email],
+            projectmember_set=[owner_membership, collab_membership],
             switchtenders=[switchtender],
         )
         task = baker.make(models.Task, project=project)
@@ -1124,17 +1262,21 @@ def test_followup_triggers_notifications(client):
         client.post(url, data=data)
 
     assert switchtender.notifications.unread().count() == 1
-    assert collab.notifications.unread().count() == 1
-    assert owner.notifications.unread().count() == 0
+    assert collab_membership.member.notifications.unread().count() == 1
+    assert owner_membership.member.notifications.unread().count() == 0
 
 
 @pytest.mark.django_db
 def test_user_is_redirected_after_followup_on_task(client):
-    with login(client) as user:
-        project = baker.make(models.Project, status="READY", email=user.email)
-        task = baker.make(models.Task, project=project)
+    membership = baker.make(models.ProjectMember, is_owner=True)
+
+    project = baker.make(models.Project, status="READY", projectmember_set=[membership])
+    task = baker.make(models.Task, project=project)
+
+    with login(client, user=membership.member):
         url = reverse("projects-followup-task", args=[task.id])
         response = client.post(url)
+
     assert response.status_code == 302
     assert response.url == reverse(
         "projects-project-detail-actions", args=[task.project.id]
