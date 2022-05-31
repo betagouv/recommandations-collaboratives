@@ -8,6 +8,7 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import uuid
+from datetime import datetime
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -17,7 +18,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -28,8 +30,6 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import CastedGenericRelation, check_if_switchtender
 
 from .utils import generate_ro_key
-
-from datetime import datetime
 
 
 class ProjectManager(models.Manager):
@@ -190,26 +190,6 @@ class Project(models.Model):
 
     def get_absolute_url(self):
         return reverse("projects-project-detail", kwargs={"project_id": self.pk})
-
-    @property
-    def files(self):
-        return [
-            { 
-                'id': 'FILEID01',
-                'title': 'Fichier 1',
-                'created_on': datetime.now(),
-                'author': {
-                    'name': 'Aiguilleur',
-                    'email': 'aiguilleur@example.com',
-                    'profile': {
-                        'organisation': {
-                            'name': 'Organisation U'
-                        }
-                    }
-                },
-                'url': 'http://google.com'
-            } for _ in range(10)
-        ]
 
     class Meta:
         verbose_name = "project"
@@ -598,12 +578,18 @@ tagging_register(TaskRecommendation, tag_descriptor_attr="condition_tags")
 class Document(models.Model):
     """Représente un document associé à un project"""
 
-    project = models.ForeignKey("Project", on_delete=models.CASCADE)
-    public = models.BooleanField(default=False, blank=True)
+    project = models.ForeignKey(
+        "Project", on_delete=models.CASCADE, related_name="documents"
+    )
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )
-    tags = models.CharField(max_length=256, blank=True, default="")
+    uploaded_by = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     description = models.CharField(max_length=256, default="", blank=True)
     the_file = models.FileField()
