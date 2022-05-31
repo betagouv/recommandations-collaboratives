@@ -186,6 +186,7 @@ def get_active_project(request):
     else:
         try:
             memberships = models.ProjectMember.objects.filter(
+                Q(project__deleted=None),
                 Q(member=request.user),
                 Q(is_owner=True) | Q(~Q(project__status="DRAFT"), is_owner=False),
             )
@@ -215,6 +216,7 @@ def set_active_project_id(request, project_id: int):
 def refresh_user_projects_in_session(request, user):
     """store the user projects in the session"""
     memberships = models.ProjectMember.objects.filter(
+        Q(project__deleted=None),
         Q(member=user),
         Q(is_owner=True) | Q(~Q(project__status="DRAFT"), is_owner=False),
     )
