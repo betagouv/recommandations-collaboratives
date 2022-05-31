@@ -13,8 +13,7 @@ import pytest
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import models as projects_models
@@ -122,7 +121,7 @@ def test_resource_list_contains_only_resource_with_area(client):
     url = f"{url}?limit_area=true&query=resource"
 
     membership = baker.make(projects_models.ProjectMember)
-    with login(client, user=membership.member) as user:
+    with login(client, user=membership.member):
         Recipe(
             projects.Project,
             projectmember_set=[membership],
