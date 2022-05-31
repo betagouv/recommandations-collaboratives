@@ -11,7 +11,7 @@ created : 2021-05-26 15:54:25 CEST
 from django.urls import path
 
 from . import views
-from .views import detail, feeds, notes, sharing, tasks
+from .views import detail, documents, feeds, notes, sharing, tasks
 
 urlpatterns = [
     path(r"onboarding/", views.onboarding, name="projects-onboarding"),
@@ -162,6 +162,11 @@ urlpatterns = [
         r"project/<int:project_id>/conversation/",
         notes.create_public_note,
         name="projects-conversation-create-message",
+    ),
+    path(
+        r"project/<int:project_id>/conversation/televerser",
+        documents.document_upload,
+        name="projects-conversation-upload-file",
     ),
     path(
         r"project/<int:project_id>/note/",
