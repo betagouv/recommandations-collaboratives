@@ -57,10 +57,11 @@
             <hr/>
 
             <!-- Post message -->
-            <div class="message-form">
-                <form class="form border p-3 d-flex align-items-end flex-column"
+            <div class="message-form border p-3">
+                <form class="form"
                       method="POST"
-                      action="{% url 'projects-conversation-create-message' project.pk %}">
+                      action="{% url 'projects-conversation-create-message' project.pk %}"
+                      id="conversation-form">
                     {% csrf_token %}
 
                     <textarea class="flex-grow-1 border-0 form-control {% if public_note_form.content.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-content" name="{{ public_note_form.content.name }}" value="{{ public_note_form.content.value|default:'' }}" placeholder="Entrez votre message."></textarea>
@@ -69,14 +70,20 @@
                     {% for error in public_note_form.content.errors %}
                     <div class="text-danger text-end">{{ error }}</div>
                     {% endfor %}
-
-                    <button class="btn mt-2 btn-primary flex-align-end" type="submit">Envoyer</button>
                 </form>
+
+                <div class="d-flex justify-content-end mt-2">
+                    <button form="conversation-form" class="btn btn-sm btn-primary" type="submit">Envoyer</button>
+                </div>
 
             </div>
             {% endif %}
         </div>
         <div class="col mx-auto col-lg-4 col-md-12">
+            <div class="mb-4">
+                {% include "projects/project/fragments/file_list.html" %}
+            </div>
+
             <div class="mb-4">
                 {% include "projects/project/fragments/sidebar.html" %}
             </div>
