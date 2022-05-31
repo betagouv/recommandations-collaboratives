@@ -150,3 +150,6 @@ progress::-moz-progress-bar {
 .bg-light-yellow {
     background-color: #FFFBC4;
 }
+
+// Alpine Cloaking
+[x-cloak] { display: none !important; }

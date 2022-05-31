@@ -265,4 +265,10 @@ class SelectCommuneForm(forms.Form):
         )
 
 
+class DocumentUploadForm(forms.ModelForm):
+    class Meta:
+        model = models.Document
+        fields = ["the_file", "description"]
+
+
 # eof
