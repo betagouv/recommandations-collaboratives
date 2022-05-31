@@ -575,8 +575,25 @@ class TaskRecommendation(models.Model):
 tagging_register(TaskRecommendation, tag_descriptor_attr="condition_tags")
 
 
+class DocumentManager(models.Manager):
+    """Manager for active document"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
+class DeletedDocumentManager(models.Manager):
+    """Manager for deleted documents"""
+
+    def get_queryset(self):
+        return super().get_queryset().exclude(deleted=None)
+
+
 class Document(models.Model):
     """Représente un document associé à un project"""
+
+    objects = DocumentManager()
+    objects_deleted = DeletedDocumentManager()
 
     project = models.ForeignKey(
         "Project", on_delete=models.CASCADE, related_name="documents"

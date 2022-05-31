@@ -169,6 +169,11 @@ urlpatterns = [
         name="projects-conversation-upload-file",
     ),
     path(
+        r"project/<int:project_id>/conversation/document/<int:document_id>/delete",
+        documents.document_delete,
+        name="projects-conversation-delete-file",
+    ),
+    path(
         r"project/<int:project_id>/note/",
         notes.create_note,
         name="projects-create-note",
