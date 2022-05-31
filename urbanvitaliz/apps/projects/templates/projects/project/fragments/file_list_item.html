@@ -1,0 +1,36 @@
+{% load static %}
+{% load humanize %}
+
+<div class="rounded bg-light py-2 px-3 mb-2 d-flex align-items-center justify-content-between">
+  <div class="d-flex flex-column">
+    <a href="{{ docmment.the_file.url }}" class="text-decoration-none">
+      <svg class="bi align-baseline" width="14" height="14" fill="currentColor">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
+      </svg>
+      <span>{{ document.description|truncatechars:20 }}</span>
+    </a>
+    <div>
+      <span class="fst-italic" style="font-size: 0.8em;">par {{ document.uploaded_by.get_full_name }} <span class="text-muted">({{ document.uploaded_by.profile.organization.name }})</span></span>
+      &ndash;
+      <span class="fst-italic" style="font-size: 0.8em;">{{ document.created_on|naturalday }}</span>
+    </div>
+  </div>
+  <div class="d-flex">
+    {% if document.uploaded_by == user %}
+    <form class="me-2" method="post" action="{% url 'projects-conversation-delete-file' project.pk document.pk %}">
+      {% csrf_token %}
+
+      <button style="border: 0; background: 0;">
+        <svg class="bi align-baseline" width="20" height="20" fill="currentColor">
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
+        </svg>
+      </button>         
+    </form>
+    {% endif %}
+    <a href="{{ document.the_file.url }}" download>
+      <svg class="bi align-baseline" width="20" height="20" fill="currentColor">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down-circle" />
+      </svg>
+    </a>
+  </div>
+</div>
