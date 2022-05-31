@@ -17,7 +17,9 @@
   </div>
   <div class="d-flex">
     {% if document.uploaded_by == user %}
-    <form class="me-2">
+    <form class="me-2" method="post" action="{% url 'projects-conversation-delete-file' project.pk document.pk %}">
+      {% csrf_token %}
+
       <button style="border: 0; background: 0;">
         <svg class="bi align-baseline" width="20" height="20" fill="currentColor">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
