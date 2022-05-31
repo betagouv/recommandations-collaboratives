@@ -609,7 +609,11 @@ class Document(models.Model):
     )
 
     description = models.CharField(max_length=256, default="", blank=True)
-    the_file = models.FileField()
+
+    def upload_path(self, filename):
+        return "projects/%d/%s" % (self.project.pk, filename)
+
+    the_file = models.FileField(upload_to=upload_path)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
