@@ -390,8 +390,10 @@ def test_create_new_task_for_project_notify_collaborators(mocker, client):
 
 @pytest.mark.django_db
 def test_public_task_update_does_not_trigger_notifications(client):
-    owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
-    project = Recipe(models.Project, status="READY", emails=[owner.email]).make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
+    project = Recipe(
+        models.Project, status="READY", projectmember_set=[membership]
+    ).make()
 
     task = Recipe(
         models.Task, project=project, status=models.Task.PROPOSED, public=True
@@ -405,14 +407,14 @@ def test_public_task_update_does_not_trigger_notifications(client):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
-    assert owner.notifications.count() == 0
+    assert membership.member.notifications.count() == 0
 
 
 @pytest.mark.django_db
 def test_draft_task_update_triggers_notifications(client):
-    owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
     project = Recipe(
-        models.Project, status="READY", email=owner.email, emails=[owner.email]
+        models.Project, status="READY", projectmember_set=[membership]
     ).make()
 
     task = Recipe(
@@ -427,7 +429,7 @@ def test_draft_task_update_triggers_notifications(client):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
-    assert owner.notifications.count() == 1
+    assert membership.member.notifications.count() == 1
 
 
 @pytest.mark.django_db

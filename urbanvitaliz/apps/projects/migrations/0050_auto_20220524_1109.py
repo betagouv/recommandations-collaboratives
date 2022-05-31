@@ -14,7 +14,7 @@ def make_members_from_emails(apps, schema_editor):
     for p in Project.objects.using(db_alias).all():
         # First, add owner
         owner, _ = User.objects.using(db_alias).get_or_create(
-            username=p.email, initial={"email": p.email}
+            username=p.email, defaults={"email": p.email}
         )
         ProjectMember.objects.using(db_alias).create(
             project=p, member_id=owner.id, is_owner=True
@@ -23,7 +23,7 @@ def make_members_from_emails(apps, schema_editor):
         # Then add collaborators
         for email in p.emails:
             user, _ = User.objects.using(db_alias).get_or_create(
-                username=email, initial={"email": p.email}
+                username=email, defaults={"email": email}
             )
             ProjectMember.objects.using(db_alias).get_or_create(
                 project=p, member_id=user.id

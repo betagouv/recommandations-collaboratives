@@ -122,7 +122,7 @@ def test_logged_in_user_accepts_invite_without_existing_account(
     assert response.status_code == 403
     invite = models.Invite.objects.get(pk=invite.pk)
     assert invite.accepted_on is None
-    assert user.email not in invite.project.emails
+    assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
 
 
@@ -144,7 +144,7 @@ def test_logged_in_user_accepts_invite_switchtender_with_matching_existing_accou
     assert response.status_code == 302
     invite = models.Invite.objects.get(pk=invite.pk)
     assert invite.accepted_on is not None
-    assert user.email not in invite.project.emails
+    assert user not in invite.project.members.all()
     assert user in invite.project.switchtenders.all()
 
 
@@ -190,7 +190,7 @@ def test_logged_in_user_accepts_invite_collaborator_with_matching_existing_accou
     assert response.status_code == 302
     invite = models.Invite.objects.get(pk=invite.pk)
     assert invite.accepted_on is not None
-    assert user.email in invite.project.emails
+    assert user in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
 
 
@@ -215,7 +215,7 @@ def test_logged_in_user_accepts_invite_collaborator_with_mismatched_existing_acc
     assert response.status_code == 403
     invite = models.Invite.objects.get(pk=invite.pk)
     assert invite.accepted_on is None
-    assert user.email not in invite.project.emails
+    assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
 
 
@@ -239,7 +239,7 @@ def test_anonymous_accepts_invite_with_existing_account(
     assert response.status_code == 403
     invite = models.Invite.objects.get(pk=invite.pk)
     assert invite.accepted_on is None
-    assert invite.project.emails == []
+    assert invite.project.members.count() == 0
     assert invite.project.switchtenders.count() == 0
 
 
@@ -266,7 +266,7 @@ def test_anonymous_accepts_invite_as_switchtender(
     assert response.status_code == 302
     invite = models.Invite.objects.get(pk=invite.pk)
     assert invite.accepted_on is not None
-    assert invite.project.emails == []
+    assert invite.project.members.count() == 0
     assert invite.project.switchtenders.count() == 1
 
     user = auth_models.User.objects.get(email=invite.email)
