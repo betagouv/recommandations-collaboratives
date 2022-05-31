@@ -12,14 +12,14 @@ from django.shortcuts import get_object_or_404, redirect, reverse
 
 from .. import models
 from ..forms import DocumentUploadForm
-from ..utils import can_administrate_or_403
+from ..utils import can_manage_or_403
 
 
 @login_required
 def document_upload(request, project_id=None):
     """Upload a new document for a project"""
     project = get_object_or_404(models.Project, pk=project_id)
-    can_administrate_or_403(project, request.user)
+    can_manage_or_403(project, request.user)
 
     if request.method == "POST":
         form = DocumentUploadForm(request.POST, request.FILES)
@@ -27,6 +27,7 @@ def document_upload(request, project_id=None):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.project = project
+            instance.uploaded_by = request.user
 
             instance.save()
 
