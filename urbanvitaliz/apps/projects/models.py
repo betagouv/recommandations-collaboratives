@@ -29,6 +29,8 @@ from urbanvitaliz.utils import CastedGenericRelation, check_if_switchtender
 
 from .utils import generate_ro_key
 
+from datetime import datetime
+
 
 class ProjectManager(models.Manager):
     """Manager for projects"""
@@ -188,6 +190,26 @@ class Project(models.Model):
 
     def get_absolute_url(self):
         return reverse("projects-project-detail", kwargs={"project_id": self.pk})
+
+    @property
+    def files(self):
+        return [
+            { 
+                'id': 'FILEID01',
+                'title': 'Fichier 1',
+                'created_on': datetime.now(),
+                'author': {
+                    'name': 'Aiguilleur',
+                    'email': 'aiguilleur@example.com',
+                    'profile': {
+                        'organisation': {
+                            'name': 'Organisation U'
+                        }
+                    }
+                },
+                'url': 'http://google.com'
+            } for _ in range(10)
+        ]
 
     class Meta:
         verbose_name = "project"

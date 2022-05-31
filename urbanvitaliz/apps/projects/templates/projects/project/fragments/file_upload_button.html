@@ -1,0 +1,44 @@
+{% load static %}
+{% load sass_tags %}
+{% load humanize %}
+
+{% block js %}
+<script src="{% static 'projects/js/file_upload.js' %}"></script>
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'projects/css/file_upload.scss' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+<div x-data="fileUpload('{{ type }}')">
+  <button x-ref="button" class="btn btn-sm btn-outline-primary" @click="onButtonClick">Ajouter un fichier</button>
+
+  <div x-cloak x-ref="popover" @click.outside="onOutsideClick" class="rounded bg-white shadow" style="width: 420px;">
+    <form @submit="onSubmitForm" method="post" action="{{ action }}">
+      {% csrf_token %}
+
+      <div class="p-3">
+        <h6 class="text-uppercase" style="font-size: 1em;">Ajouter un fichier</h6>
+        <p class="mb-2 fst-italic">Vous pouvez joindre un fichier à votre <span x-text="getString(`types.${type}`)"></span>, d'un taille maximum de 4Mo</p>
+    
+        <div class="mb-2">
+          <label class="d-block">
+            <span class="mb-1 d-block">Sélectionnez votre fichier</span>
+            <input required x-model="pendingFile" class="form-control form-control-sm" type="file" />
+          </label>
+        </div>
+    
+        <label class="d-block">
+          <span class="mb-1 d-block">Donnez un nom au fichier</span>
+          <input required x-model="pendingTitle" class="form-control form-control-sm" type="text" />
+        </label>
+      </div>
+
+      <div class="border-top border-light p-3 d-flex justify-content-between">
+        <button class="btn btn-sm btn-outline-danger" @click="hide">Annuler</button>
+        <button class="btn btn-sm btn-primary" type="submit">Envoyer</button>
+      </div>
+    </form>
+    <div x-ref="arrow" class="popover-arrow"></div>
+  </div>
+</div>
