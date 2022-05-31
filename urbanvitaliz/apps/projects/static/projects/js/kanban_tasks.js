@@ -243,7 +243,7 @@ function boardTasksApp(projectId) {
     },
     onReminderClick(id) {
       const task = this.findById(id)
-      if (task.reminders.length >= 0)
+      if (task.reminders.length > 0)
         this.pendingReminderDate = task.reminders[0].deadline
       this.currentReminderTaskId = task.id;
       this.openReminderModal();
