@@ -33,6 +33,15 @@ class ProjectTaskTabularInline(OrderedTabularInline):
     extra = 1
 
 
+class ProjectMemberTabularInline(admin.TabularInline):
+    model = models.ProjectMember
+    fields = (
+        "member",
+        "is_owner",
+    )
+    extra = 1
+
+
 @admin.register(models.Project)
 class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     search_fields = ["name"]
@@ -45,7 +54,10 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     ]
     list_display = ["created_on", "name", "location"]
     actions = [csvexport]
-    inlines = (ProjectTaskTabularInline,)
+    inlines = (
+        ProjectMemberTabularInline,
+        ProjectTaskTabularInline,
+    )
 
 
 @admin.register(models.Note)

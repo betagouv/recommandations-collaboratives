@@ -86,7 +86,7 @@ def resource_search(request):
         communes = []
         if hasattr(request.user, "email"):
             communes = [
-                p.commune for p in projects.Project.fetch(email=request.user.email)
+                p.commune for p in projects.Project.objects.filter(members=request.user)
             ]
             if not communes:
                 limit_area = None  # does not apply if no projects
@@ -180,9 +180,8 @@ class BaseResourceDetailView(DetailView):
             not check_if_switchtender(self.request.user)
             and not self.request.user.is_anonymous
         ):
-            user_projects = projects.Project.on_site.filter(
-                emails__contains=self.request.user.email
-            )
+            user_projects = projects.Project.on_site.filter(members=self.request.user)
+
             if user_projects.count():
                 user_depts = (
                     user_projects.exclude(commune=None)

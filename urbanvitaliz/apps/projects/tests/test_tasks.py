@@ -13,6 +13,7 @@ from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
+from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
@@ -186,13 +187,13 @@ def test_task_suggestion_available_with_localized_reco(request, client):
 
 @pytest.mark.django_db
 def test_visit_task_for_project_and_redirect_for_project_owner(request, client):
-    owner_email = "owner@univer.se"
+    owner = Recipe(auth.User).make()
+    member = baker.prepare(models.ProjectMember, member=owner, is_owner=True)
     project = Recipe(
         models.Project,
-        status="READY",
         sites=[get_current_site(request)],
-        email=owner_email,
-        emails=[owner_email],
+        status="READY",
+        projectmember_set=[member],
     ).make()
     task = Recipe(
         models.Task,
@@ -201,7 +202,8 @@ def test_visit_task_for_project_and_redirect_for_project_owner(request, client):
         visited=False,
         resource=None,
     ).make()
-    with login(client, email=owner_email):
+
+    with login(client, user=owner):
         response = client.get(
             reverse("projects-visit-task", args=[task.id]),
         )
@@ -214,25 +216,26 @@ def test_visit_task_for_project_and_redirect_for_project_owner(request, client):
 def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(
     request, client
 ):
-    owner_email = "owner@univer.se"
     resource = resources.Resource()
     resource.save()
 
+    owner = Recipe(auth.User).make()
+    member = baker.prepare(models.ProjectMember, member=owner, is_owner=True)
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
         status="READY",
-        email=owner_email,
-        emails=[owner_email],
+        projectmember_set=[member],
     ).make()
     task = Recipe(
         models.Task,
-        project=project,
         site=get_current_site(request),
+        project=project,
         visited=False,
         resource=resource,
     ).make()
-    with login(client, email=owner_email):
+
+    with login(client, user=owner):
         response = client.get(
             reverse("projects-visit-task", args=[task.id]),
         )
@@ -247,14 +250,14 @@ def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(
 def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(
     request, client
 ):
-    owner_email = "owner@univer.se"
+    membership = baker.make(models.ProjectMember)
     project = Recipe(
         models.Project,
         status="READY",
+        projectmember_set=[membership],
         sites=[get_current_site(request)],
-        email=owner_email,
-        emails=[owner_email],
     ).make()
+
     task = Recipe(
         models.Task,
         status=models.Task.PROPOSED,
@@ -262,7 +265,7 @@ def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(
         visited=True,
         site=get_current_site(request),
     ).make()
-    with login(client, email=owner_email):
+    with login(client, user=membership.member):
         response = client.post(
             reverse("projects-toggle-done-task", args=[task.id]),
         )
@@ -275,14 +278,14 @@ def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(
 def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(
     request, client
 ):
-    owner_email = "owner@univer.se"
+    membership = baker.make(models.ProjectMember)
     project = Recipe(
         models.Project,
         status="READY",
-        email=owner_email,
-        emails=[owner_email],
+        projectmember_set=[membership],
         sites=[get_current_site(request)],
     ).make()
+
     task = Recipe(
         models.Task,
         project=project,
@@ -291,7 +294,7 @@ def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(
         site=get_current_site(request),
     ).make()
 
-    with login(client, email=owner_email):
+    with login(client, user=membership.member):
         response = client.post(
             reverse("projects-toggle-done-task", args=[task.id]),
         )
@@ -303,18 +306,18 @@ def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(
 
 @pytest.mark.django_db
 def test_refuse_task_for_project_and_redirect_for_project_owner(request, client):
-    owner_email = "owner@univer.se"
+    membership = baker.make(models.ProjectMember, is_owner=True)
     project = Recipe(
         models.Project,
         status="READY",
-        email=owner_email,
-        emails=[owner_email],
+        projectmember_set=[membership],
         sites=[get_current_site(request)],
     ).make()
     task = Recipe(
         models.Task, site=get_current_site(request), project=project, visited=False
     ).make()
-    with login(client, email=owner_email):
+
+    with login(client, user=membership.member):
         response = client.post(
             reverse("projects-refuse-task", args=[task.id]),
         )
@@ -324,18 +327,18 @@ def test_refuse_task_for_project_and_redirect_for_project_owner(request, client)
 
 
 def test_already_done_task_for_project_and_redirect_for_project_owner(request, client):
-    owner_email = "owner@univer.se"
+    membership = baker.make(models.ProjectMember, is_owner=True)
     project = Recipe(
         models.Project,
         status="READY",
-        email=owner_email,
-        emails=[owner_email],
+        projectmember_set=[membership],
         sites=[get_current_site(request)],
     ).make()
     task = Recipe(
         models.Task, site=get_current_site(request), project=project, visited=False
     ).make()
-    with login(client, email=owner_email):
+
+    with login(client, user=membership.member):
         response = client.post(
             reverse("projects-already-done-task", args=[task.id]),
         )
@@ -422,14 +425,14 @@ def test_delete_task_from_project_and_redirect(request, client):
 
 @pytest.mark.django_db
 def test_create_new_task_for_project_notify_collaborators(mocker, client, request):
-    owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
-
+    membership = baker.make(models.ProjectMember, is_owner=True)
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
         status="READY",
-        emails=[owner.email],
+        projectmember_set=[membership],
+        sites=[get_current_site(request)],
     ).make()
+
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders.add(user)
 
@@ -443,17 +446,17 @@ def test_create_new_task_for_project_notify_collaborators(mocker, client, reques
             },
         )
 
-    assert owner.notifications.count() == 1
+    assert membership.member.notifications.count() == 1
 
 
 @pytest.mark.django_db
 def test_public_task_update_does_not_trigger_notifications(request, client):
-    owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
         status="READY",
-        emails=[owner.email],
+        projectmember_set=[membership],
+        sites=[get_current_site(request)],
     ).make()
 
     task = Recipe(
@@ -472,18 +475,17 @@ def test_public_task_update_does_not_trigger_notifications(request, client):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
-    assert owner.notifications.count() == 0
+    assert membership.member.notifications.count() == 0
 
 
 @pytest.mark.django_db
 def test_draft_task_update_triggers_notifications(request, client):
-    owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
         status="READY",
-        email=owner.email,
-        emails=[owner.email],
+        projectmember_set=[membership],
+        sites=[get_current_site(request)],
     ).make()
 
     task = Recipe(
@@ -502,7 +504,7 @@ def test_draft_task_update_triggers_notifications(request, client):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
-    assert owner.notifications.count() == 1
+    assert membership.member.notifications.count() == 1
 
 
 @pytest.mark.django_db

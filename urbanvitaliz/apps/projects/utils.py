@@ -11,12 +11,14 @@ created: <2021-09-13 lun. 15:38>
 import uuid
 
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz import utils as uv_utils
-from urbanvitaliz.apps.projects.digests import make_action_digest, make_project_digest
+from urbanvitaliz.apps.projects.digests import (make_action_digest,
+                                                make_project_digest)
 from urbanvitaliz.apps.reminders import api
 
 from . import models
@@ -64,7 +66,7 @@ def can_administrate_or_403(project, user):
 
 def is_member(user, project, allow_draft):
     """return true if user is member of the project"""
-    return ((user.email == project.email) or (user.email in project.emails)) and (
+    return (user in project.members.all()) and (
         (project.status != "DRAFT") or allow_draft
     )  # noqa: F841
 
@@ -150,7 +152,7 @@ def get_switchtenders_for_project(project):
 
 
 def get_collaborators_for_project(project):
-    return auth_models.User.objects.filter(email__in=project.emails).distinct()
+    return project.members.all().distinct()
 
 
 def get_notification_recipients_for_project(project):
@@ -185,14 +187,16 @@ def get_active_project(request):
             pass
     else:
         try:
-            project = (
-                models.Project.on_site.filter(deleted=None)
-                .filter(
-                    Q(email=request.user.email)
-                    | Q(~Q(status="DRAFT"), emails__contains=request.user.email)
-                )
-                .first()
+            memberships = models.ProjectMember.objects.filter(
+                Q(project__sites=get_current_site(request)),
+                Q(project__deleted=None),
+                Q(member=request.user),
+                Q(is_owner=True) | Q(~Q(project__status="DRAFT"), is_owner=False),
             )
+
+            if memberships.first():
+                project = memberships.first().project
+
         except models.Project.DoesNotExist:
             pass
 
@@ -206,9 +210,19 @@ def set_active_project_id(request, project_id: int):
 
 def refresh_user_projects_in_session(request, user):
     """store the user projects in the session"""
-    projects = models.Project.on_site.filter(deleted=None).filter(
-        Q(email=user.email) | Q(~Q(status="DRAFT"), emails__contains=user.email)
+
+    memberships = models.ProjectMember.objects.filter(
+        Q(project__sites=get_current_site(request)),
+        Q(project__deleted=None),
+        Q(member=user),
+        Q(is_owner=True) | Q(~Q(project__status="DRAFT"), is_owner=False),
     )
+
+    projects = [m.project for m in memberships.all()]
+
+    # projects = models.Project.objects.filter(deleted=None).filter(
+    #    Q(members=user) | Q(~Q(status="DRAFT"), members=user)
+    # )
 
     request.session["projects"] = list(
         {
@@ -227,26 +241,21 @@ def make_rsvp_link(rsvp, status):
     )
 
 
-def create_reminder(days, task, recipient, origin):
+def create_reminder(days, task, user, origin):
     """
     Create a reminder using the reminder API and schedule a RSVP to send to the target user
     """
-    target_user = None
-    try:
-        target_user = auth_models.User.objects.get(email=recipient)
-    except auth_models.User.DoesNotExist:
-        return False
+    if user.is_anonymous:
+        return
 
-    rsvp, created = models.TaskFollowupRsvp.objects.get_or_create(
-        task=task, user=target_user
-    )
+    rsvp, created = models.TaskFollowupRsvp.objects.get_or_create(task=task, user=user)
     if not created:
         rsvp.created_on = timezone.now()
         rsvp.save()
 
     template_params = {
-        "project": make_project_digest(task.project, target_user),
-        "reco": make_action_digest(task, target_user),
+        "project": make_project_digest(task.project, user),
+        "reco": make_action_digest(task, user),
         "rsvp": {
             "link_done": make_rsvp_link(rsvp, models.Task.DONE),
             "link_inprogress": make_rsvp_link(rsvp, models.Task.INPROGRESS),
@@ -257,7 +266,7 @@ def create_reminder(days, task, recipient, origin):
     }
 
     api.create_reminder_email(
-        recipient,
+        user.email,
         template_name="rsvp_reco",
         template_params=template_params,
         related=task,

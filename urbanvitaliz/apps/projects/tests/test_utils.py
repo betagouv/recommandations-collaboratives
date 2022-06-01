@@ -19,19 +19,17 @@ from .. import models, utils
 
 @pytest.mark.django_db
 def test_contributor_has_the_same_rights_as_the_owner(client):
-    owner = Recipe(auth.User, username="owner", email="owner@example.com").make()
-    contributor = Recipe(
-        auth.User, username="contributor", email="contributor@example.com"
-    ).make()
+    membership_owner = baker.make(models.ProjectMember, is_owner=True)
+    membership_contrib = baker.make(models.ProjectMember)
+
     project = Recipe(
         models.Project,
-        email=owner.email,
-        emails=[owner.email, contributor.email],
+        projectmember_set=[membership_owner, membership_contrib],
         status="READY",
     ).make()
 
-    assert utils.can_manage_project(project, owner)
-    assert utils.can_manage_project(project, contributor)
+    assert utils.can_manage_project(project, membership_owner.member)
+    assert utils.can_manage_project(project, membership_contrib.member)
 
 
 @pytest.mark.django_db

@@ -38,10 +38,6 @@ class ProjectManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=None)
 
-    def email(self, mail):
-        """Return projects accessible to given email"""
-        return self.filter(emails__contains=mail, deleted=None)
-
     def in_departments(self, departments):
         """Return only project with commune in department scope (empty=full)"""
         result = self.filter(deleted=None).exclude(commune=None)
@@ -70,7 +66,7 @@ class ProjectManager(models.Manager):
 
         # Regular user, only return its own projects
         else:
-            return self.email(user.email)
+            return self.filter(members=user)
 
 
 class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
@@ -120,8 +116,11 @@ class Project(models.Model):
 
     status = models.CharField(max_length=20, choices=PROJECT_STATES, default="DRAFT")
 
-    email = models.CharField(max_length=128)
-    emails = models.JSONField(default=list)  # list of person having access to project
+    members = models.ManyToManyField(auth_models.User, through="ProjectMember")
+
+    @property
+    def owner(self):
+        return self.members.filter(projectmember__is_owner=True).first()
 
     ro_key = models.CharField(
         max_length=32,
@@ -214,12 +213,14 @@ class Project(models.Model):
     def __str__(self):  # pragma: nocover
         return f"{self.name} - {self.location}"
 
-    @classmethod
-    def fetch(cls, email=None):
-        projects = cls.objects.filter(deleted=None)
-        if email:
-            projects = projects.filter(emails__contains=email)
-        return projects
+
+class ProjectMember(models.Model):
+    class Meta:
+        unique_together = ("member", "project")
+
+    member = models.ForeignKey(auth_models.User, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    is_owner = models.BooleanField(default=False)
 
 
 class NoteManager(models.Manager):
@@ -608,18 +609,45 @@ class TaskRecommendation(models.Model):
 tagging_register(TaskRecommendation, tag_descriptor_attr="condition_tags")
 
 
+class DocumentManager(models.Manager):
+    """Manager for active document"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
+class DeletedDocumentManager(models.Manager):
+    """Manager for deleted documents"""
+
+    def get_queryset(self):
+        return super().get_queryset().exclude(deleted=None)
+
+
 class Document(models.Model):
     """Représente un document associé à un project"""
 
-    project = models.ForeignKey("Project", on_delete=models.CASCADE)
-    public = models.BooleanField(default=False, blank=True)
+    objects = DocumentManager()
+    objects_deleted = DeletedDocumentManager()
+
+    project = models.ForeignKey(
+        "Project", on_delete=models.CASCADE, related_name="documents"
+    )
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )
-    tags = models.CharField(max_length=256, blank=True, default="")
+    uploaded_by = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     description = models.CharField(max_length=256, default="", blank=True)
-    the_file = models.FileField()
+
+    def upload_path(self, filename):
+        return "projects/%d/%s" % (self.project.pk, filename)
+
+    the_file = models.FileField(upload_to=upload_path)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
