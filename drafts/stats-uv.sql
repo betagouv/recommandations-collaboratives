@@ -46,9 +46,9 @@ COPY (
         FROM
             projects_project AS p
         LEFT JOIN projects_task AS t ON p.id = t.project_id
-            AND t.status BETWEEN 1 AND 3
     WHERE
         p.exclude_stats = 'f'
+        AND t.status BETWEEN 1 AND 3
     GROUP BY
         p.id,
         p.name)
@@ -120,12 +120,13 @@ UNION (
     RIGHT JOIN projects_taskfollowup AS f ON t.id = f.task_id
 WHERE
     p.exclude_stats = 'f'
+    AND t.status BETWEEN 1 AND 3
     AND f.who_id NOT IN ( -- who pas un switchtender / prendre dans les acteurs
         SELECT
             s.user_id
         FROM projects_project_switchtenders AS s
-    WHERE
-        s.id = p.id)
+        WHERE
+            s.id = p.id)
 GROUP BY
     p.id,
     p.name)) AS stats
