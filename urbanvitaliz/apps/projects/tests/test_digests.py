@@ -26,16 +26,17 @@ from ..digests import NotificationFormatter
 ########################################################################
 
 
-def test_send_digests_for_new_reco(request):
-    user = Recipe(auth.User, username="auser", email="user@example.com").make()
+def test_send_digests_for_new_reco(client, request):
+    membership = baker.make(models.ProjectMember)
     switchtender = Recipe(
         auth.User, username="switchtender", email="switchtender@example.com"
     ).make()
+
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
         status="DONE",
-        emails=[user.email],
+        projectmember_set=[membership],
     )
 
     # Generate a notification
@@ -48,19 +49,19 @@ def test_send_digests_for_new_reco(request):
         user=switchtender,
     )
 
-    digests.send_digests_for_new_recommendations_by_user(user)
+    digests.send_digests_for_new_recommendations_by_user(membership.member)
 
-    assert user.notifications.unsent().count() == 0
+    assert membership.member.notifications.unsent().count() == 0
 
 
 def test_send_digests_for_new_reco_empty(client):
-    user = Recipe(auth.User, username="auser", email="user@example.com").make()
+    membership = baker.make(models.ProjectMember)
 
-    baker.make(models.Project, status="DONE", emails=[user.email])
+    baker.make(models.Project, status="DONE", projectmember_set=[membership])
 
-    digests.send_digests_for_new_recommendations_by_user(user)
+    digests.send_digests_for_new_recommendations_by_user(membership.member)
 
-    assert user.notifications.unsent().count() == 0
+    assert membership.member.notifications.unsent().count() == 0
 
 
 ########################################################################
@@ -93,11 +94,10 @@ def test_send_digests_for_new_sites_by_user():
     # moderator
     moderator = Recipe(auth.User).make()
 
-    user = Recipe(auth.User, username="auser", email="user@example.com").make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
     project = baker.make(
         models.Project,
-        email=user.email,
-        emails=[user.email],
+        projectmember_set=[membership],
         commune=commune,
         status="READY",
     )
@@ -147,11 +147,10 @@ def test_send_digests_for_switchtender_by_user(client):
     non_regional_actor.groups.add(st_group)
     non_regional_actor.profile.departments.add(dpt_npdc)
 
-    user = Recipe(auth.User, username="auser", email="user@example.com").make()
+    membership = baker.make(models.ProjectMember, is_owner=True)
     project = baker.make(
         models.Project,
-        email=user.email,
-        emails=[user.email],
+        projectmember_set=[membership],
         commune=commune,
         status="READY",
     )
@@ -164,7 +163,7 @@ def test_send_digests_for_switchtender_by_user(client):
     )  # shouldn't get her own action notified
     assert regional_actor2.notifications.unsent().count() == 1
     assert non_regional_actor.notifications.unsent().count() == 0
-    assert user.notifications.unsent().count() == 1
+    assert membership.member.notifications.unsent().count() == 1
 
     digests.send_digest_for_switchtender_by_user(regional_actor)
     digests.send_digest_for_switchtender_by_user(regional_actor2)

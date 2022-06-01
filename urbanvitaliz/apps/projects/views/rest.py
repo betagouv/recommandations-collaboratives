@@ -68,7 +68,7 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        followup = serializer.save()
+        serializer.save()
 
         headers = self.get_success_headers(serializer.data)
 

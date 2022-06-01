@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.apps.addressbook import models as addressbook_models
+from urbanvitaliz.apps.projects import models as projects_models
 
 from . import forms, models
 
@@ -65,8 +66,10 @@ def invite_accept(request, invite_id):
                 if user not in project.switchtenders.all():
                     project.switchtenders.add(user)
             else:
-                if user.email not in project.emails:
-                    project.emails.append(user.email)
+                if user not in project.members.all():
+                    projects_models.ProjectMember.objects.create(
+                        project=project, member=user
+                    )
 
             invite.accepted_on = timezone.now()
             invite.save()
