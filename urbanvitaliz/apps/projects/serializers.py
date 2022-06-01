@@ -1,5 +1,6 @@
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from generic_relations.relations import GenericRelatedField
 from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
@@ -126,6 +127,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "resource_id",
             "notifications",
             "followups_count",
+            "comments_count",
         ]
 
     created_by = UserSerializer(read_only=True, many=False)
@@ -133,6 +135,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
 
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
 
     def get_notifications(self, obj):
         request = self.context.get("request")
@@ -151,6 +154,9 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
 
     def get_followups_count(self, obj):
         return obj.followups.count()
+
+    def get_comments_count(self, obj):
+        return obj.followups.exclude(comment="").count()
 
     # FIXME : We should not send all the tasks to non switchtender users (filter queryset on current_user)
 

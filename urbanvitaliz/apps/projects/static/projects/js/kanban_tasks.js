@@ -150,17 +150,16 @@ function boardTasksApp(projectId) {
         this.scrollToLastElement();
       });
       const cleanup = () => {
-        this.$nextTick(() => {
-          // FIXME : Race condition when bootstrap unloads modal
-          // this.currentTaskId = null;
-          // this.currentTaskFollowups = null;
-          // this.currentTaskNotifications = [];
-          location.hash = '';
-        })
+        // FIXME : Race condition when bootstrap unloads modal
+        // this.currentTaskId = null;
+        // this.currentTaskFollowups = null;
+        // this.currentTaskNotifications = [];
+        this.pendingComment = "";
+        this.currentlyEditing = null;
+        location.hash = '';
       }
       element.addEventListener("hidePrevented.bs.modal", cleanup);
       element.addEventListener('hidden.bs.modal', cleanup);
-
       if (this.currentTaskId) this.openPreviewModal();
     },
     async onPreviewClick(id) {
@@ -244,7 +243,7 @@ function boardTasksApp(projectId) {
     },
     onReminderClick(id) {
       const task = this.findById(id)
-      if (task.reminders.length >= 0)
+      if (task.reminders.length > 0)
         this.pendingReminderDate = task.reminders[0].deadline
       this.currentReminderTaskId = task.id;
       this.openReminderModal();

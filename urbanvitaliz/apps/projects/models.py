@@ -8,6 +8,7 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import uuid
+from datetime import datetime
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -17,7 +18,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -574,18 +576,45 @@ class TaskRecommendation(models.Model):
 tagging_register(TaskRecommendation, tag_descriptor_attr="condition_tags")
 
 
+class DocumentManager(models.Manager):
+    """Manager for active document"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
+class DeletedDocumentManager(models.Manager):
+    """Manager for deleted documents"""
+
+    def get_queryset(self):
+        return super().get_queryset().exclude(deleted=None)
+
+
 class Document(models.Model):
     """Représente un document associé à un project"""
 
-    project = models.ForeignKey("Project", on_delete=models.CASCADE)
-    public = models.BooleanField(default=False, blank=True)
+    objects = DocumentManager()
+    objects_deleted = DeletedDocumentManager()
+
+    project = models.ForeignKey(
+        "Project", on_delete=models.CASCADE, related_name="documents"
+    )
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )
-    tags = models.CharField(max_length=256, blank=True, default="")
+    uploaded_by = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     description = models.CharField(max_length=256, default="", blank=True)
-    the_file = models.FileField()
+
+    def upload_path(self, filename):
+        return "projects/%d/%s" % (self.project.pk, filename)
+
+    the_file = models.FileField(upload_to=upload_path)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
