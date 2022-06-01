@@ -1,6 +1,5 @@
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
 from generic_relations.relations import GenericRelatedField
 from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer

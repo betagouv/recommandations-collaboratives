@@ -8,7 +8,6 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import uuid
-from datetime import datetime
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
@@ -18,8 +17,7 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import (OrderedModel, OrderedModelManager,
-                                  OrderedModelQuerySet)
+from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
