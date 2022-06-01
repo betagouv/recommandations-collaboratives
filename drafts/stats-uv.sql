@@ -30,6 +30,7 @@ COPY (
             LEFT JOIN projects_task AS t ON p.id = t.project_id
         WHERE
             p.exclude_stats = 'f'
+            AND p.deleted IS NULL
         GROUP BY
             p.id,
             p.name)
@@ -38,7 +39,7 @@ COPY (
             p.id AS id,
             p.name AS name,
             p.created_on AS created,
-            min(t.created_on) AS first,
+            NULL AS first,
             count(t.id) AS reco,
             0 AS notes,
             0 AS rappels,
@@ -48,6 +49,7 @@ COPY (
         LEFT JOIN projects_task AS t ON p.id = t.project_id
     WHERE
         p.exclude_stats = 'f'
+        AND p.deleted IS NULL
         AND t.status BETWEEN 1 AND 3
     GROUP BY
         p.id,
@@ -75,6 +77,7 @@ UNION (
             s.id = p.id)
     WHERE
         p.exclude_stats = 'f'
+        AND p.deleted IS NULL
     GROUP BY
         p.id,
         p.name)
@@ -101,6 +104,7 @@ UNION (
             s.id = p.id)
     WHERE
         p.exclude_stats = 'f'
+        AND p.deleted IS NULL
     GROUP BY
         p.id,
         p.name)
@@ -120,6 +124,7 @@ UNION (
     RIGHT JOIN projects_taskfollowup AS f ON t.id = f.task_id
 WHERE
     p.exclude_stats = 'f'
+    AND p.deleted IS NULL
     AND t.status BETWEEN 1 AND 3
     AND f.who_id NOT IN ( -- who pas un switchtender / prendre dans les acteurs
         SELECT
