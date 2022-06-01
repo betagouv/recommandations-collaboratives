@@ -9,8 +9,8 @@ COPY (
     SELECT
         id,
         name AS project,
-        created AS creation,
-        max(FIRST) AS premiere_reco,
+        to_char(created, 'dd-mm-YYYY') AS creation,
+        to_char(max(FIRST), 'dd-mm-YYYY') AS premiere_reco,
         sum(reco) AS reco,
         sum(notes) AS notes,
         sum(rappels) AS rappels,
