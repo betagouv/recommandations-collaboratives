@@ -20,6 +20,7 @@ from urbanvitaliz.apps.addressbook.urls import urlpatterns as addressbook_urls
 from urbanvitaliz.apps.geomatics import rest as geomatics_rest
 from urbanvitaliz.apps.home.urls import urlpatterns as home_urls
 from urbanvitaliz.apps.invites.urls import urlpatterns as invites_urls
+from urbanvitaliz.apps.onboarding.urls import urlpatterns as onboarding_urls
 from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
 from urbanvitaliz.apps.projects.views import rest as projects_rest
 from urbanvitaliz.apps.resources import views as resources_views
@@ -65,6 +66,7 @@ urlpatterns = [
 
 urlpatterns.extend(magicauth_urls)
 urlpatterns.extend(home_urls)
+urlpatterns.extend(onboarding_urls)
 urlpatterns.extend(projects_urls)
 urlpatterns.extend(resources_urls)
 urlpatterns.extend(addressbook_urls)

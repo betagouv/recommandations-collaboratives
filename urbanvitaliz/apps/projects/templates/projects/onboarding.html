@@ -43,7 +43,6 @@
         Solliciter l'équipe UrbanVitaliz
     </h2>
 
-
     <div class="bd-callout bd-callout-info mb-5">
         <p class="mt-3">
             <svg class="bi me-1" width="16" height="16">
@@ -64,7 +63,14 @@
 
         {% csrf_token %}
 
+        {{ form }}
+
+        <button type="submit" class="btn btn-primary">
+			      Envoyer ma demande
+		    </button>
+
         {{ form.errors }}
+
 
         <div id="form-leader" class="mb-5">
 
@@ -75,14 +81,13 @@
                 Qui êtes-vous ?
             </h3>
 
-
             <div class="row mb-3">
                 <div class="col">
                     <div class="form-floating">
-                        <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.name }}" placeholder="Camille" value="{{ form.first_name.value }}" required>
-                        <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                        <input type="text" class="form-control {% if form.response_0.errors %}is-invalid{% endif %}" id="{{ form.response_0.id_for_label }}" name="{{ form.response_0.name }}" placeholder="Camille" value="{{ form.response_0.value }}" required>
+                        <label for="{{ form.response_0.id_for_label }}">{{ form.response_0.label }}</label>
 
-                        {% for error in form.first_name.errors %}
+                        {% for error in form.response_0.errors %}
                         <div class="invalid-feedback">{{ error }}</div>
                         {% endfor %}
                     </div>
