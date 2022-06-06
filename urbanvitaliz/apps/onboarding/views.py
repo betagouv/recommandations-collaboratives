@@ -1,8 +1,10 @@
+from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
-from django.shortcuts import render, reverse
+from django.shortcuts import redirect, render, reverse
 from django.views.generic.edit import CreateView
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
+from urbanvitaliz.apps.projects import signals as projects_signals
 from urbanvitaliz.apps.projects.utils import generate_ro_key
 from urbanvitaliz.utils import get_site_config_or_503
 
@@ -26,6 +28,14 @@ def onboarding(request):
             onboarding_response.save()
 
             project = projects.Project()
+
+            project.name = form.cleaned_data.get("name")
+            project.phone = form.cleaned_data.get("phone")
+            project.org_name = form.cleaned_data.get("org_name")
+            project.description = form.cleaned_data.get("description")
+            project.location = form.cleaned_data.get("location")
+            project.postcode = form.cleaned_data.get("postcode")
+
             project.ro_key = generate_ro_key()
             insee = form.cleaned_data.get("insee", None)
             if insee:
@@ -47,22 +57,23 @@ def onboarding(request):
             )
 
             # Make her project owner
-            models.ProjectMember.objects.create(
+            projects.ProjectMember.objects.create(
                 member=user, project=project, is_owner=True
             )
 
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
             # Create initial public note
-            models.Note(
+            # XXX update so optinal fields are written into a note
+            projects.Note(
                 project=project,
                 content=f"# Demande initiale\n\n{project.impediments}",
                 public=True,
             ).save()
 
             # All green, notify
-            signals.project_submitted.send(
-                sender=models.Project, submitter=user, project=project
+            projects_signals.project_submitted.send(
+                sender=projects.Project, submitter=user, project=project
             )
 
             # NOTE check if commune is unique for code postal
@@ -81,24 +92,3 @@ def onboarding(request):
             return response
 
     return render(request, "onboarding/onboarding.html", locals())
-
-
-class OnboardingView(CreateView):
-    model = models.OnboardingResponse
-    fields = ("response",)
-    template_name = "projects/onboarding.html"
-
-    form_model = models.Onboarding
-    form_field = "form"
-    form_pk_url_kwarg = "pk"
-    response_form_fk_field = None
-    response_field = "response"
-
-    def _get_object_containing_form(self, pk):
-        return form
-
-    def form_valid(self, form):
-        action = form.save(commit=False)
-        action.survey = self.form_instance
-        action.save()
-        return super().form_valid(form)
