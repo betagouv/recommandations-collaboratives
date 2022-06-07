@@ -59,7 +59,6 @@ def onboarding(request):
         form = OnboardingForm(request.POST)
         if form.is_valid():
             project = form.save(commit=False)
-            project.emails.append(project.email)
             project.ro_key = generate_ro_key()
             insee = form.cleaned_data.get("insee", None)
             if insee:
@@ -69,22 +68,31 @@ def onboarding(request):
                 project.commune = geomatics.Commune.get_by_postal_code(postcode)
 
             project.save()
+
+            user, _ = auth.User.objects.get_or_create(
+                username=form.cleaned_data.get("email"),
+                defaults={
+                    "email": form.cleaned_data.get("email"),
+                    "first_name": form.cleaned_data.get("first_name"),
+                    "last_name": form.cleaned_data.get("last_name"),
+                },
+            )
+
+            # Make her project owner
+            models.ProjectMember.objects.create(
+                member=user, project=project, is_owner=True
+            )
+
+            log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+            # Create initial public note
             models.Note(
                 project=project,
                 content=f"# Demande initiale\n\n{project.impediments}",
                 public=True,
             ).save()
 
-            user, _ = auth.User.objects.get_or_create(
-                username=project.email,
-                defaults={
-                    "email": project.email,
-                    "first_name": form.cleaned_data.get("first_name"),
-                    "last_name": form.cleaned_data.get("last_name"),
-                },
-            )
-            log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-
+            # All green, notify
             signals.project_submitted.send(
                 sender=models.Project, submitter=user, project=project
             )
@@ -117,7 +125,6 @@ def create_project_prefilled(request):
         if form.is_valid():
             project = form.save(commit=False)
             project.status = "TO_PROCESS"
-            project.emails.append(project.email)
             project.ro_key = generate_ro_key()
             postcode = form.cleaned_data.get("postcode")
             project.commune = geomatics.Commune.get_by_postal_code(postcode)
@@ -125,32 +132,36 @@ def create_project_prefilled(request):
             project.switchtenders.add(request.user)
             project.save()
 
+            user, _ = auth.User.objects.get_or_create(
+                username=form.cleaned_data.get("email"),
+                defaults={
+                    "email": form.cleaned_data.get("email"),
+                    "first_name": form.cleaned_data.get("first_name"),
+                    "last_name": form.cleaned_data.get("last_name"),
+                },
+            )
+
+            models.ProjectMember.objects.create(
+                member=user, project=project, is_owner=True
+            )
+
             models.Note(
                 project=project,
                 content=f"# Demande initiale\n\n{project.impediments}",
                 public=True,
             ).save()
 
-            user, _ = auth.User.objects.get_or_create(
-                username=project.email,
-                defaults={
-                    "email": project.email,
-                    "first_name": form.cleaned_data.get("first_name"),
-                    "last_name": form.cleaned_data.get("last_name"),
-                },
-            )
-
             messages.success(
                 request,
                 "Un courriel d'invitation à rejoindre le projet a été envoyé à {0}.".format(
-                    project.email
+                    user.email
                 ),
                 extra_tags=["email"],
             )
 
             send_email(
                 template_name="sharing invitation",
-                recipients=[{"email": project.email}],
+                recipients=[{"email": user.email}],
                 params={
                     "sender": {"email": request.user.email},
                     "project": digests.make_project_digest(project),
@@ -258,7 +269,7 @@ def project_list_export_csv(request):
                 project.location,
                 project.created_on.date(),
                 f"{project.first_name} {project.last_name}",
-                project.email,
+                [m.email for m in project.members.all()],
                 project.phone,
                 switchtenders_txt,
                 project.status,
@@ -407,7 +418,7 @@ def post_login_set_active_project(sender, user, request, **kwargs):
 
     if not active_project:
         # Try to fetch a project
-        active_project = models.Project.objects.filter(email=user.email).first()
+        active_project = models.Project.objects.filter(members=user).first()
         if active_project:
             set_active_project_id(request, active_project.id)
 

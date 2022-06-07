@@ -33,8 +33,10 @@ def test_upload_document_available_for_project_collaborators(client):
     png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
     data = {"description": "this is some content", "the_file": png}
 
-    with login(client) as user:
-        project = Recipe(models.Project, email=user.email, status="READY").make()
+    membership = baker.make(models.ProjectMember, is_owner=True, member__is_staff=False)
+    project = baker.make(models.Project, projectmember_set=[membership], status="READY")
+
+    with login(client, user=membership.member):
         url = reverse("projects-conversation-upload-file", args=[project.id])
         response = client.post(url, data=data)
 
@@ -43,26 +45,24 @@ def test_upload_document_available_for_project_collaborators(client):
     document = models.Document.objects.all()[0]
     assert document.project == project
     assert document.description == data["description"]
-    assert document.uploaded_by == user
+    assert document.uploaded_by == membership.member
     assert document.the_file is not None
 
 
 @pytest.mark.django_db
 def test_upload_document_triggers_notifications(client):
-    user_target = Recipe(
-        auth.User, username="Bob", first_name="Bobi", last_name="Joe"
-    ).make()
-
     png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
     data = {"description": "this is some content", "the_file": png}
 
-    with login(client) as user:
-        project = Recipe(
-            models.Project,
-            email=user.email,
-            emails=[user.email, user_target.email],
-            status="READY",
-        ).make()
+    membership = baker.make(models.ProjectMember, is_owner=True, member__is_staff=False)
+    other_membership = baker.make(
+        models.ProjectMember, is_owner=False, member__is_staff=False
+    )
+    project = baker.make(
+        models.Project, projectmember_set=[membership, other_membership], status="READY"
+    )
+
+    with login(client, user=membership.member):
         url = reverse("projects-conversation-upload-file", args=[project.id])
         response = client.post(url, data=data)
 
@@ -71,7 +71,8 @@ def test_upload_document_triggers_notifications(client):
     document = models.Document.objects.all()[0]
 
     assert action_object_stream(document).count() == 1
-    assert user_target.notifications.count() == 1
+    assert membership.member.notifications.count() == 0
+    assert other_membership.member.notifications.count() == 1
 
 
 @pytest.mark.django_db
@@ -84,10 +85,13 @@ def test_delete_document_not_available_for_non_logged_users(client):
 
 @pytest.mark.django_db
 def test_delete_document_available_for_owner(client):
-    with login(client) as user:
-        project = baker.make(models.Project, email=user.email, status="READY")
-        document = baker.make(models.Document, uploaded_by=user, project=project)
+    membership = baker.make(models.ProjectMember, is_owner=True, member__is_staff=False)
+    project = baker.make(models.Project, projectmember_set=[membership], status="READY")
+    document = baker.make(
+        models.Document, uploaded_by=membership.member, project=project
+    )
 
+    with login(client, user=membership.member):
         url = reverse(
             "projects-conversation-delete-file", args=[project.id, document.id]
         )
@@ -99,15 +103,16 @@ def test_delete_document_available_for_owner(client):
 
 @pytest.mark.django_db
 def test_delete_document_not_available_for_others(client):
-    with login(client) as user:
-        project = baker.make(models.Project, email=user.email, status="READY")
-        document = baker.make(
-            models.Document,
-            project=project,
-            uploaded_by__username="other",
-            description="Doc description",
-        )
+    membership = baker.make(models.ProjectMember, is_owner=True, member__is_staff=False)
+    project = baker.make(models.Project, projectmember_set=[membership], status="READY")
+    document = baker.make(
+        models.Document,
+        project=project,
+        uploaded_by__username="other",
+        description="Doc description",
+    )
 
+    with login(client, user=membership.member):
         url = reverse(
             "projects-conversation-delete-file", args=[project.id, document.id]
         )
