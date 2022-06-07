@@ -15,14 +15,10 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -358,6 +354,40 @@ def notify_note_created(sender, note, project, user, **kwargs):
         action_object=note,
         target=project,
         private=True,
+    )
+
+
+################################################################
+# File Upload
+################################################################
+@receiver(post_save, sender=models.Document, dispatch_uid="document_uploaded")
+def project_document_uploaded(sender, instance, created, **kwargs):
+    if not created:  # We don't want to notify about updates
+        return
+
+    project = instance.project
+    if project.status == "DRAFT" or project.muted:
+        return
+
+    # Add a trace
+    action.send(
+        instance.uploaded_by,
+        verb="a ajouté un document",
+        action_object=instance,
+        target=project,
+    )
+
+    # Notify other project's people and switchtenders
+    recipients = get_notification_recipients_for_project(project).exclude(
+        id=instance.uploaded_by.id
+    )
+
+    notify.send(
+        sender=instance.uploaded_by,
+        recipient=recipients,
+        verb="a ajouté un document",
+        action_object=instance,
+        target=instance.project,
     )
 
 
