@@ -92,13 +92,19 @@ def build_absolute_url(path, auto_login_user=None):
 
 @contextmanager
 def login(
-    client, is_staff=False, groups=None, username="test", email="test@example.com"
+    client,
+    is_staff=False,
+    user=None,
+    groups=None,
+    username="test",
+    email="test@example.com",
 ):
     """Create a user and sign her into the application"""
     groups = groups or []
-    user = auth.User.objects.create_user(
-        username=username, email=email, is_staff=is_staff
-    )
+    if not user:
+        user = auth.User.objects.create_user(
+            username=username, email=email, is_staff=is_staff
+        )
     for name in groups:
         group = auth.Group.objects.get(name=name)
         group.user_set.add(user)

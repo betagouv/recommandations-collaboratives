@@ -207,12 +207,9 @@ class ProjectForm(forms.ModelForm):
         label="Publication sur cartofriches", disabled=True, required=False
     )
 
-    email = forms.CharField(label="Email principal", disabled=True, required=False)
-
     class Meta:
         model = models.Project
         fields = [
-            "email",
             "first_name",
             "last_name",
             "org_name",
@@ -238,6 +235,8 @@ class OnboardingForm(forms.ModelForm):
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
     insee = forms.CharField(max_length=5, required=False, label="Code Insee")
     captcha = ReCaptchaField(widget=ReCaptchaV3(api_params={"hl": "fr"}))
+
+    email = forms.CharField(label="Email principal", required=False)
 
     class Meta:
         model = models.Project

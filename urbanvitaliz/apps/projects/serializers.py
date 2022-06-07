@@ -1,6 +1,5 @@
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
 from generic_relations.relations import GenericRelatedField
 from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
@@ -8,7 +7,7 @@ from rest_framework import serializers
 from urbanvitaliz.apps.geomatics.serializers import CommuneSerializer
 from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.apps.reminders.serializers import MailSerializer
+from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
 from .models import Project, Task, TaskFollowup
 from .utils import create_reminder
@@ -102,7 +101,7 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
 
         if followup.status not in [Task.ALREADY_DONE, Task.NOT_INTERESTED, Task.DONE]:
             create_reminder(
-                7 * 6, task, followup.who, origin=reminders_models.Mail.UNKNOWN
+                7 * 6, task, followup.who, origin=reminders_models.Reminder.UNKNOWN
             )
 
         return followup
@@ -131,7 +130,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
         ]
 
     created_by = UserSerializer(read_only=True, many=False)
-    reminders = MailSerializer(read_only=True, many=True)
+    reminders = ReminderSerializer(read_only=True, many=True)
 
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()

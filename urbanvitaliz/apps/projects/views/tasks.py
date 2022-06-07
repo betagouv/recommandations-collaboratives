@@ -17,25 +17,16 @@ from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateActionsFromResourcesForm,
-    CreateActionWithoutResourceForm,
-    CreateActionWithResourceForm,
-    PushTypeActionForm,
-    RemindTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskFollowupForm,
-    UpdateTaskForm,
-)
+from ..forms import (CreateActionsFromResourcesForm,
+                     CreateActionWithoutResourceForm,
+                     CreateActionWithResourceForm, PushTypeActionForm,
+                     RemindTaskForm, RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskFollowupForm,
+                     UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -164,7 +155,7 @@ def update_task(request, task_id=None):
             instance.project.updated_on = instance.updated_on
             instance.project.save()
             api.remove_reminder_email(
-                task, recipient=request.user.email, origin=api.models.Mail.STAFF
+                task, recipient=request.user.email, origin=api.models.Reminder.STAFF
             )
 
             # If we are going public, notify
@@ -297,7 +288,9 @@ def delete_task(request, task_id=None):
 def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, pk=task_id)
-    recipient = task.project.email
+    membership = task.project.projectmember_set.filter(is_owner=True).first()
+    if not membership:
+        raise Http404
 
     if request.method == "POST":
         form = RemindTaskForm(request.POST)
@@ -305,7 +298,9 @@ def remind_task(request, task_id=None):
             days = form.cleaned_data.get("days")
             days = days or 6 * 7  # 6 weeks is default
 
-            if create_reminder(days, task, recipient, origin=api.models.Mail.SELF):
+            if create_reminder(
+                days, task, membership.member, origin=api.models.Reminder.SELF
+            ):
                 messages.success(
                     request,
                     "Une alarme a bien été programmée dans {0} jours.".format(days),
@@ -351,7 +346,7 @@ def followup_task(request, task_id=None):
 
             # Create or reset 6 weeks reminder
             create_reminder(
-                7 * 6, task, request.user, origin=reminders_models.Mail.UNKNOWN
+                7 * 6, task, request.user, origin=reminders_models.Reminder.SYSTEM
             )
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
@@ -417,7 +412,7 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
             # Reminder update
             if task.status in [models.Task.INPROGRESS, models.Task.BLOCKED]:
                 create_reminder(
-                    7 * 6, task, request.user, origin=reminders_models.Mail.UNKNOWN
+                    7 * 6, task, request.user, origin=reminders_models.Reminder.SYSTEM
                 )
             else:
                 api.remove_reminder_email(task)

@@ -3,7 +3,6 @@ import datetime
 import django.dispatch
 from actstream import action
 from actstream.models import action_object_stream
-from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
@@ -15,14 +14,10 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -61,13 +56,11 @@ def log_project_validated(sender, moderator, project, **kwargs):
         return
 
     # Notify regional actors of a new project
-    try:
-        owner = auth_models.User.objects.get(email=project.email)
-    except auth_models.User.DoesNotExist:
+    if not project.owner:
         return
 
     notify.send(
-        sender=owner,
+        sender=project.owner,
         recipient=get_regional_actors_for_project(project),
         verb="a déposé le projet",
         action_object=project,
@@ -193,7 +186,7 @@ def notify_action_created(sender, task, project, user, **kwargs):
     )
 
     # assign reminder in six weeks
-    create_reminder(6 * 7, task, project.email, origin=reminders_models.Mail.STAFF)
+    create_reminder(6 * 7, task, project.owner, origin=reminders_models.Reminder.STAFF)
 
 
 @receiver(action_visited)
@@ -358,6 +351,40 @@ def notify_note_created(sender, note, project, user, **kwargs):
         action_object=note,
         target=project,
         private=True,
+    )
+
+
+################################################################
+# File Upload
+################################################################
+@receiver(post_save, sender=models.Document, dispatch_uid="document_uploaded")
+def project_document_uploaded(sender, instance, created, **kwargs):
+    if not created:  # We don't want to notify about updates
+        return
+
+    project = instance.project
+    if project.status == "DRAFT" or project.muted:
+        return
+
+    # Add a trace
+    action.send(
+        instance.uploaded_by,
+        verb="a ajouté un document",
+        action_object=instance,
+        target=project,
+    )
+
+    # Notify other project's people and switchtenders
+    recipients = get_notification_recipients_for_project(project).exclude(
+        id=instance.uploaded_by.id
+    )
+
+    notify.send(
+        sender=instance.uploaded_by,
+        recipient=recipients,
+        verb="a ajouté un document",
+        action_object=instance,
+        target=instance.project,
     )
 
 
