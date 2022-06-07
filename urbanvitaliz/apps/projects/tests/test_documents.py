@@ -15,7 +15,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains
 from urbanvitaliz.utils import login
 
 from .. import models

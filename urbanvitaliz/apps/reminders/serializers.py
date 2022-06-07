@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
-from .models import Mail
+from .models import Reminder
 
 
-class MailSerializer(serializers.HyperlinkedModelSerializer):
+class ReminderSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Mail
+        model = Reminder
         fields = ["id", "deadline", "recipient", "origin"]

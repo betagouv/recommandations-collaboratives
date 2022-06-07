@@ -15,10 +15,14 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (create_reminder, get_collaborators_for_project,
-                    get_notification_recipients_for_project,
-                    get_project_moderators, get_regional_actors_for_project,
-                    get_switchtenders_for_project)
+from .utils import (
+    create_reminder,
+    get_collaborators_for_project,
+    get_notification_recipients_for_project,
+    get_project_moderators,
+    get_regional_actors_for_project,
+    get_switchtenders_for_project,
+)
 
 #####
 # Projects
@@ -189,7 +193,7 @@ def notify_action_created(sender, task, project, user, **kwargs):
     )
 
     # assign reminder in six weeks
-    create_reminder(6 * 7, task, project.email, origin=reminders_models.Mail.STAFF)
+    create_reminder(6 * 7, task, project.email, origin=reminders_models.Reminder.STAFF)
 
 
 @receiver(action_visited)
