@@ -33,15 +33,15 @@
             </div>
 
             <div>
-                <h5 class="mt-4 fs-6">{{ project.emails|length }} Collaborat{{ project.emails|length|pluralize:"eur,eurs" }}</h5>
+                <h5 class="mt-4 fs-6">{{ project.members.all|length }} Collaborat{{ project.members.all|length|pluralize:"eur,eurs" }}</h5>
                 <ul class="list-group">
-                    {% for email in project.emails %}
+                    {% for membership in project.projectmember_set.all %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div class="align-middle">
-                            {{ email }}
+                            {{ membership.member.get_full_name|default:membership.member }}
                         </div>
                         <div>
-                            {% if email != project.email %}
+                            {% if membership.is_owner is False %}
                             <form id="form-projects-access-remove-user" action="{% url 'projects-access-delete' project.pk email %}" method="post">
                                 {% csrf_token %}
                                 <button class="btn btn-outline-danger btn-sm">Supprimer</button>
