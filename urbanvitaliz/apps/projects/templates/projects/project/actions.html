@@ -30,7 +30,7 @@
             {{ can_administrate|json_script:"canAdministrate" }}
             {{ user.email|json_script:"userEmail" }}
 
-            {% if is_switchtender and project.tasks.unpublished_open.count == 0 %}
+            {% if is_switchtender and project.tasks.all.count == 0 %}
             <div class="bg-light p-4 rounded-2">
                 <h3 class="fw-light">Pas encore d'actions recommandées à la collectivité ?</h3>
                 <p class="fst-italic fw-light">
@@ -54,7 +54,7 @@
                     dossier pour l'aiguiller</a>
                 {% endif %}
             </div>
-            {% elif not is_switchtender and projects.tasks.open.count == 0 %}
+            {% elif not is_switchtender and project.tasks.public.count == 0 %}
             <div class="bg-light p-4 rounded-2">
                 <h3 class="fw-light">Vous n'avez pas d'actions en cours</h3>
 

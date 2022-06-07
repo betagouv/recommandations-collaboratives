@@ -315,6 +315,9 @@ class TaskManager(OrderedModelManager):
             .filter(deleted=None)
         )
 
+    def published(self):
+        return self.filter(public=True)
+    
     def unpublished_open(self):
         return self.unpublished_proposed() | self.filter(status=Task.INPROGRESS)
 
