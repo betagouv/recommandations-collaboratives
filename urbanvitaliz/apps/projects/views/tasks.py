@@ -17,25 +17,16 @@ from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateActionsFromResourcesForm,
-    CreateActionWithoutResourceForm,
-    CreateActionWithResourceForm,
-    PushTypeActionForm,
-    RemindTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskFollowupForm,
-    UpdateTaskForm,
-)
+from ..forms import (CreateActionsFromResourcesForm,
+                     CreateActionWithoutResourceForm,
+                     CreateActionWithResourceForm, PushTypeActionForm,
+                     RemindTaskForm, RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskFollowupForm,
+                     UpdateTaskForm)
 from ..utils import can_manage_or_403, create_reminder, get_active_project_id
 
 
@@ -297,7 +288,9 @@ def delete_task(request, task_id=None):
 def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, pk=task_id)
-    recipient = task.project.email
+    membership = task.project.projectmember_set.filter(is_owner=True).first()
+    if not membership:
+        raise Http404
 
     if request.method == "POST":
         form = RemindTaskForm(request.POST)
@@ -305,7 +298,9 @@ def remind_task(request, task_id=None):
             days = form.cleaned_data.get("days")
             days = days or 6 * 7  # 6 weeks is default
 
-            if create_reminder(days, task, recipient, origin=api.models.Reminder.SELF):
+            if create_reminder(
+                days, task, membership.member, origin=api.models.Reminder.SELF
+            ):
                 messages.success(
                     request,
                     "Une alarme a bien été programmée dans {0} jours.".format(days),
