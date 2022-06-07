@@ -10,6 +10,7 @@ created: 2022-05-31 10:11:56 CEST
 
 import pytest
 from actstream.models import action_object_stream
+from django.contrib.auth import models as auth
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery import baker
@@ -45,6 +46,33 @@ def test_upload_document_available_for_project_collaborators(client):
     assert document.description == data["description"]
     assert document.uploaded_by == user
     assert document.the_file is not None
+
+
+@pytest.mark.django_db
+def test_upload_document_triggers_notifications(client):
+    user_target = Recipe(
+        auth.User, username="Bob", first_name="Bobi", last_name="Joe"
+    ).make()
+
+    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+    data = {"description": "this is some content", "the_file": png}
+
+    with login(client) as user:
+        project = Recipe(
+            models.Project,
+            email=user.email,
+            emails=[user.email, user_target.email],
+            status="READY",
+        ).make()
+        url = reverse("projects-conversation-upload-file", args=[project.id])
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    document = models.Document.objects.all()[0]
+
+    assert action_object_stream(document).count() == 1
+    assert user_target.notifications.count() == 1
 
 
 @pytest.mark.django_db
