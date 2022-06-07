@@ -20,7 +20,7 @@ def create_reminder_email(
     template_name,
     template_params,
     related,
-    origin=models.Mail.UNKNOWN,
+    origin=models.Reminder.SYSTEM,
     delay=15,
 ):
     """Prepare an email raw or html to be sent in delay days, inspired by magicauth"""
@@ -33,7 +33,7 @@ def create_reminder_email(
     content_type = ContentType.objects.get_for_model(related)
 
     # Remove old ones
-    models.Mail.to_send.filter(
+    models.Reminder.to_send.filter(
         content_type=content_type, object_id=related.id, recipient=recipient
     ).delete()
 
@@ -44,7 +44,7 @@ def create_reminder_email(
 
     deadline = datetime.date.today() + datetime.timedelta(days=delay)
 
-    models.Mail(
+    models.Reminder(
         recipient=recipient,
         deadline=deadline,
         template=template,
@@ -59,7 +59,7 @@ def remove_reminder_email(related, recipient=None, origin=0):
     if not related:
         return
     content_type = ContentType.objects.get_for_model(related)
-    reminders = models.Mail.to_send.filter(
+    reminders = models.Reminder.to_send.filter(
         content_type=content_type,
         object_id=related.id,
     )

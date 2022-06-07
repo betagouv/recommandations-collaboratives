@@ -164,7 +164,7 @@ def update_task(request, task_id=None):
             instance.project.updated_on = instance.updated_on
             instance.project.save()
             api.remove_reminder_email(
-                task, recipient=request.user.email, origin=api.models.Mail.STAFF
+                task, recipient=request.user.email, origin=api.models.Reminder.STAFF
             )
 
             # If we are going public, notify
@@ -305,7 +305,7 @@ def remind_task(request, task_id=None):
             days = form.cleaned_data.get("days")
             days = days or 6 * 7  # 6 weeks is default
 
-            if create_reminder(days, task, recipient, origin=api.models.Mail.SELF):
+            if create_reminder(days, task, recipient, origin=api.models.Reminder.SELF):
                 messages.success(
                     request,
                     "Une alarme a bien été programmée dans {0} jours.".format(days),
@@ -351,7 +351,7 @@ def followup_task(request, task_id=None):
 
             # Create or reset 6 weeks reminder
             create_reminder(
-                7 * 6, task, request.user, origin=reminders_models.Mail.UNKNOWN
+                7 * 6, task, request.user, origin=reminders_models.Reminder.SYSTEM
             )
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
@@ -417,7 +417,7 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
             # Reminder update
             if task.status in [models.Task.INPROGRESS, models.Task.BLOCKED]:
                 create_reminder(
-                    7 * 6, task, request.user, origin=reminders_models.Mail.UNKNOWN
+                    7 * 6, task, request.user, origin=reminders_models.Reminder.SYSTEM
                 )
             else:
                 api.remove_reminder_email(task)
