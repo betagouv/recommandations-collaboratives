@@ -403,6 +403,7 @@ class NotificationFormatter:
                 "a soumis pour modération le projet": self.format_project_submitted,
                 "a commenté l'action": self.format_action_commented,
                 "a recommandé l'action": self.format_action_recommended,
+                "a ajouté un document": self.format_document_uploaded,
             },
             notification,
         )
@@ -415,6 +416,13 @@ class NotificationFormatter:
         excerpt = self._represent_note_excerpt(notification.action_object)
 
         return FormattedNotification(summary=summary, excerpt=excerpt)
+
+    def format_document_uploaded(self, notification):
+        """A document was uploaded by a user"""
+        subject = self._represent_user(notification.actor)
+        summary = f"{subject} a ajouté un document"
+
+        return FormattedNotification(summary=summary, excerpt=None)
 
     def format_action_recommended(self, notification):
         """An action was recommended by a switchtender"""

@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
     def send_email_reminders(self):
         today = datetime.date.today()
-        reminders = models.Mail.to_send.filter(deadline__lte=today)
+        reminders = models.Reminder.to_send.filter(deadline__lte=today)
         for reminder in reminders:
             if reminder.template:
                 send_email(
@@ -51,7 +51,7 @@ class Command(BaseCommand):
                     template_name=reminder.template.name,
                     template_params=reminder.template_params,
                     related=reminder.related,
-                    origin=models.Mail.UNKNOWN,
+                    origin=models.Reminder.SYSTEM,
                     delay=7 * 6,
                 )
 
