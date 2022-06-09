@@ -23,7 +23,7 @@ class Command(BaseCommand):
     def send_email_digests(self):
         # Send project collaborators new recommendations
         for project in project_models.Project.objects.all():
-            for user in auth_models.User.objects.filter(email__in=project.emails):
+            for user in project.members.all():
                 if digests.send_digests_for_new_recommendations_by_user(user):
                     print(f"Sent new reco digests for {user} on {project.name}")
 
