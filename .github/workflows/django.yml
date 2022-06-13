@@ -63,7 +63,11 @@ jobs:
         env:
           SECRET_KEY: "this-is-not-a-secret-key"
           SENDINBLUE_API_KEY: "this-is-a-fake-api-key"
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: 5432
+          DB_HOST: postgres
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: uv_ci
+          DB_PORT: 5432
+          DB_ENGINE: django.db.backends.postgresql
         run: |
-          pytest
+          pytest --create-db
