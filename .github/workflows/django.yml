@@ -49,8 +49,9 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install wheel
           pip install numpy
-          pip install GDAL==3.5.0
+          pip install GDAL==3.4.3
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
