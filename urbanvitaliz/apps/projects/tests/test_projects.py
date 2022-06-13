@@ -922,6 +922,32 @@ def test_owner_can_add_email_to_project_if_not_draft(client):
     invite = invites_models.Invite.objects.first()
     assert invite.email == data["email"]
 
+@pytest.mark.django_db
+def test_email_cannot_be_added_twice(client):
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__email="own@er.fr",
+        member__username="own@er.fr",
+    )
+    project = baker.make(models.Project, projectmember_set=[membership], status="READY")
+
+    url = reverse("projects-access-update", args=[project.id])
+    data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
+
+    with login(client, user=membership.member):
+        response = client.post(url, data=data)
+        assert response.status_code == 302
+
+        response = client.post(url, data=data)
+        assert response.status_code == 200
+
+    assert invites_models.Invite.objects.count() == 1
+    invite = invites_models.Invite.objects.first()
+    assert invite.email == data["email"]
+
+
 
 @pytest.mark.django_db
 def test_owner_cannot_add_email_to_project_if_draft(client):
