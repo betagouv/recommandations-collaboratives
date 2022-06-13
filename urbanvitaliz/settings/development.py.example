@@ -33,4 +33,13 @@ DATABASES = {
 # EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
+SENDINBLUE_API_KEY = os.environ.get('SENDINBLUE_API_KEY')
+SENDINBLUE_FORCE_DEBUG = True
+
+# Recpatcha
+
+RECAPTCHA_REQUIRED_SCORE = 0
+
 # eof
