@@ -7,10 +7,8 @@ on:
     branches: [ "main", "develop" ]
 
 jobs:
-  container-job:
+  build:
     runs-on: ubuntu-latest
-    # Docker Hub image that `container-job` executes in
-    container: node:10.18-jessie
 
     services:
       # Label used to access the service container
@@ -20,6 +18,8 @@ jobs:
         # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: uv_ci
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -27,11 +27,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-  build:
-
-    runs-on: ubuntu-latest
     strategy:
-      max-parallel: 4
       matrix:
         python-version: [3.9]
 
