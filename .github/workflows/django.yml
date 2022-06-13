@@ -63,7 +63,7 @@ jobs:
         env:
           SECRET_KEY: "this-is-not-a-secret-key"
           SENDINBLUE_API_KEY: "this-is-a-fake-api-key"
-          DB_HOST: postgres
+          DB_HOST: localhost
           DB_USER: postgres
           DB_PASSWORD: postgres
           DB_NAME: uv_ci
