@@ -27,7 +27,6 @@ jobs:
           --health-retries 5
 
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -35,22 +34,22 @@ jobs:
         python-version: [3.9]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r requirements-dev.txt
-    - name: Configure
-      run: |
-        cp urbanvitaliz/settings/development.py.example urbanvitaliz/settings/development.py
-    - name: Run Tests
-      env:
-        POSTGRES_HOST: postgres
-        POSTGRES_PORT: 5432
-      run: |
-        pytest
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+      - name: Configure
+        run: |
+          cp urbanvitaliz/settings/development.py.example urbanvitaliz/settings/development.py
+      - name: Run Tests
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
+        run: |
+          pytest
