@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/actors/actors.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<div class="fr-container">
+    <div class="fr-mt-2v fr-mb-8w fr-pt-6w">
+        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+            <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil
+                d’Ariane</button>
+            <div class="fr-collapse" id="breadcrumb-1">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <a class="fr-breadcrumb__link" href="/">Accueil</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" aria-current="page">Acteurs publics</a>
+                    </li>
+                </ol>
+            </div>
+        </nav>
+        <div class="fr-grid-row">
+            <div class="fr-col-12 fr-col-md-9">
+                <img src="{% static 'home/img/home/background.jpg' %}" width="100%" alt="Image de friche">
+            </div>
+        </div>
+        <div class="fr-grid-row">
+            <div class="fr-col-offset-md-2">
+
+            </div>
+            <div class="fr-col-12 fr-col-md-10 fr-background-default--grey fr-pt-4w fr-p-0w fr-p-md-4w mt-n150px">
+                <h1 class="fr-h1">
+                    Acteurs publics, UrbanVitaliz vous simplifie l’accompagnement et le suivi des projets sur les
+                    friches.
+                </h1>
+                <p class="fr-text--lg fr-my-3w">
+                    Découvrez les questionnements des collectivités et aidez-les pour faire avancer leurs projets.
+                    Retrouvez le détail des dossiers de votre territoire et collaborez dessus avec vos partenaires.
+                </p>
+                <ul class="fr-btns-group fr-btns-group--inline fr-mb-2v">
+                    <li>
+                        <a href="mailto:friches@beta.gouv.fr?subject=Demande d’accès à UrbanVitaliz en tant qu’acteur-conseil" class="fr-btn">
+                            Demander un accès
+                        </a>
+                    </li>
+                </ul>
+                <div>
+                    <p class="fr-text--lg fr-text--bold fr-mb-2w">
+                        Pour qui ?
+                    </p>
+                    <p class="fr-text--lg">
+                        Le service est ouvert aux acteurs publics qui conseillent les collectivités sur les friches, de
+                        manière régulière ou ponctuelle. Selon les territoires et les dossiers : DDT(M), EPF, DREAL,
+                        Conseils départementaux et régionaux etc.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="fr-py-6w" style="background-color:#1B1B35;">
+    <div class="fr-container fr-pt-2w fr-pb-6w">
+        <div class="fr-m-auto">
+            <h3 class="fr-text-inverted--grey text-center fr-pb-6w">Comment fonctionne UrbanVitaliz pour un acteur
+                public ?</h3>
+        </div>
+        <div class="fr-grid-row justify-content-center">
+            <div class="fr-col-12 fr-col-md fr-m-2v">
+                <div class="fr-p-2w fr-background-default--grey" style="height:100%">
+                    <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <img src="{% static 'home/img/home/search.png' %}" width="100%" height="100%"
+                            alt="Icon de recherche">
+                    </div>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">1</span>
+                    <h6>
+                        Une collectivité dépose sa demande d’aide concernant une friche.
+                    </h6>
+                </div>
+            </div>
+            <div class="fr-col-12 fr-col-md fr-m-2v">
+                <div class="fr-p-2w fr-background-default--grey" style="height:100%">
+                    <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <img src="{% static 'home/img/home/form.png' %}" width="100%" height="100%"
+                            alt="Icone d'un fichier">
+                    </div>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">2</span>
+                    <h6>
+                        Les acteurs du territoire sont notifiés et consultent le dossier.
+                    </h6>
+                </div>
+            </div>
+            <div class="fr-col-12 fr-col-md fr-m-2v">
+                <div class="fr-p-2w fr-background-default--grey" style="height:100%">
+                    <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <img src="{% static 'home/img/home/community.png' %}" width="100%" height="100%"
+                            alt="Icone de communauté">
+                    </div>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">3</span>
+                    <h6>
+                        Ils proposent des recommandations via la plateforme.
+                    </h6>
+                </div>
+            </div>
+            <div class="fr-col-12 fr-col-md fr-m-2v">
+                <div class="fr-p-2w fr-background-default--grey" style="height:100%">
+                    <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <img src="{% static 'home/img/home/progress.png' %}" width="100%" height="100%"
+                            alt="Icone de progrès">
+                    </div>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">4</span>
+                    <h6>
+                        La collectivité réagit sur les recommandations d’actions reçues.
+                    </h6>
+                </div>
+            </div>
+            <div class="fr-col-12 fr-col-md fr-m-2v">
+                <div class="fr-p-2w fr-background-default--grey" style="height:100%">
+                    <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <img src="{% static 'home/img/home/form.png' %}" width="100%" height="100%"
+                            alt="Icone d'un fichier">
+                    </div>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">5</span>
+                    <h6>
+                        Le dossier est mis à jour par tous les intervenants au fil de l’eau.
+                    </h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="fr-py-6w">
+    <div class="fr-container fr-pt-2w fr-pb-6w">
+        <div class="fr-m-auto">
+            <h3 class="text-center fr-pb-6w">A quoi les acteurs locaux ont-ils accès ?</h3>
+        </div>
+        <div class="fr-grid-row">
+            <div
+                class="fr-col-12 fr-col-md-7 position-relative custom-carousel-images overflow-hidden d-flex justify-content-center align-items-center ">
+                <img class="position-absolute opacity-100 w-100 min-h-100"
+                    src="{% static 'home/img/actors/item-1.png' %}" alt="Image Descriptif détaillé de la friche et du projet"
+                    aria-labelledby="custom-carousel-item-1">
+                <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-2.png' %}"
+                    alt="Image L’ensemble des dossiers du territoire" aria-labelledby="custom-carousel-item-2">
+                <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-3.png' %}"
+                    alt="Image Recommandations émises par les acteurs-conseil du dossier" aria-labelledby="custom-carousel-item-3">
+                <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-4.png' %}"
+                    alt="Image Suivi sur chaque recommandation" aria-labelledby="custom-carousel-item-4">
+                <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-5.png' %}"
+                    alt="Image Création de recommandation pour la collectivité" aria-labelledby="custom-carousel-item-5">
+                <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-6.png' %}"
+                    alt="Image Espace de conversation avec la collectivité" aria-labelledby="custom-carousel-item-6">
+                <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-7.png' %}"
+                    alt="Image Liste des ressources déjà créées sur UrbanVitaliz" aria-labelledby="custom-carousel-item-7">
+            </div>
+            <div class="fr-col-12 fr-col-md-5 fr-pl-0v fr-pl-md-4v">
+                <ul class="list-group list-group-flush custom-carousel-tabs " id="list-tab" role="tablist">
+                    <li role="button" class="list-group-item list-group-item-action fr-background-alt--grey" id="custom-carousel-item-1" style="border-top: solid 1px #e3e3e3;">
+                        <p class="fr-text--md">Descriptif détaillé de la friche et du projet</p>
+                    </li>
+                    <li role="button" class="list-group-item list-group-item-action"
+                        id="custom-carousel-item-2">
+                        <p class="fr-text--md">L’ensemble des dossiers du territoire</p>
+                    </li>
+                    <li role="button" class="list-group-item list-group-item-action" id="custom-carousel-item-3">
+                        <p class="fr-text--md">Recommandations émises par les acteurs-conseil du dossier</p>
+                    </li>
+                    <li role="button" class="list-group-item list-group-item-action" id="custom-carousel-item-4">
+                        <p class="fr-text--md">Suivi sur chaque recommandation</p>
+                    </li>
+                    <li role="button" class="list-group-item list-group-item-action" id="custom-carousel-item-5">
+                        <p class="fr-text--md">Création de recommandation pour la collectivité</p>
+                    </li>
+                    <li role="button" class="list-group-item list-group-item-action" id="custom-carousel-item-6">
+                        <p class="fr-text--md">Espace de conversation avec la collectivité</p>
+                    </li>
+                    <li role="button" class="list-group-item list-group-item-action"
+                        style="border-bottom: solid 1px #e3e3e3;" id="custom-carousel-item-7">
+                        <p class="fr-text--md">Liste des ressources déjà créées sur UrbanVitaliz</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="fr-background-alt--grey fr-py-4w">
+    <div class="fr-container fr-pt-2w">
+        <div class="fr-grid-row fr-grid-row--gutters">
+            <div class="fr-col-12 fr-col-sm-3 text-center">
+                <img src="{% static 'home/img/home/human_cooperation.png' %}" width="100%" style="max-width: 160px;"
+                    alt="Image coopération humaine">
+            </div>
+            <div class="fr-col-12 fr-col-sm-9 fr-text--lg">
+                <h3>Faire connaître UrbanVitaliz sur votre territoire</h3>
+                <p class="fr-my-2w">Pour avancer, un projet friche doit rassembler toutes les parties prenantes. Faites
+                    connaître UrbanVitaliz à votre écosystème, lors de webinaires ou de rencontres locales !</p>
+                <ul class="fr-btns-group fr-btns-group--inline fr-mb-2v">
+                    <li>
+                        <a href="{% static 'home/img/pdf/plaquette-urbanvitaliz-collectivités.pdf' %}" target="_blank" class="fr-btn fr-btn--secondary">
+                            Télécharger la plaquette
+                        </a>
+                    </li>
+                    <li>
+                        <a href="mailto:friches@beta.gouv.fr?subject=Demande de présentation d’UrbanVitaliz" class="fr-btn fr-btn--secondary">
+                            Faire intervenir l'équipe UrbanVitaliz
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="fr-py-8w border-bottom" style="border-color:#E5E5E5 !important; border-width: 1px !important;">
+    <div class="fr-container">
+        <h3 class="fr-pb-4v">Portage politique, financement et contexte</h3>
+        <div class="fr-mr-0v fr-mr-md-15w">
+            <p class="fr-text--lg">
+                UrbanVitaliz est un service porté par le Cerema, créé selon la méthode beta.gouv.fr. Il est financé par
+                le
+                Cerema, le Ministère de la Transition Ecologique, l’ANCT, la Direction Interministérielle du Numérique
+                (DINUM) et l’EPF Hauts de France.
+            </p>
+            <p class="fr-text--lg fr-mt-6v">
+                Il vise à augmenter le nombre de friches réhabilitées, dans le cadre de la politique ZAN (Zéro
+                Artificialisation Nette), en orientant les collectivités vers les bons acteurs, dispositifs et
+                financements ;
+                et en facilitant le suivi de ces dossiers, dans la durée, par tous les acteurs publics qui
+                interviendront
+                avant la phase opérationnelle.
+            </p>
+        </div>
+    </div>
+</div>
+<div class="fr-container fr-mt-8v">
+    <p class="fr-text--sm fr-mb-1v">Nos partenaires :</p>
+    <div class="fr-mt-2v fr-mb-4w fr-grid-row fr-grid-row--middle" style="justify-content: center;">
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-pr-2v fr-pr-md-4v">
+            <img src="{% static 'img/partners/logo_cerema.png' %}" width="100%" alt="Logo du Cerema">
+        </div>
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-4w">
+            <img src="{% static 'home/img/home/logo_beta_gouv.png' %}" width="100%" alt="Logo de beta.gouv">
+        </div>
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-2w">
+            <img src="{% static 'home/img/home/logo_anct.png' %}" width="100%" alt="Logo de anct">
+        </div>
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-4w">
+            <img src="{% static 'home/img/home/logo_mte.jpg' %}" width="100%" alt="Logo de mte">
+        </div>
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-6w">
+            <img src="{% static 'home/img/home/logo_france_relance.png' %}" width="100%" alt="Logo de france relance">
+        </div>
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-4w">
+            <img src="{% static 'home/img/home/logo_epf.png' %}" width="100%" alt="Logo de epf">
+        </div>
+    </div>
+</div>
+<div class="border-bottom"></div>
+
+<script type="text/javascript">
+    const carouselTabs = document.querySelectorAll('.custom-carousel-tabs li');
+
+    carouselTabs.forEach(function (tab) {
+        tab.addEventListener('click', function (event) {
+            const activeItemId = tab.getAttribute('id');
+
+            //Removing all existing active classes
+            const allImages = document.querySelectorAll('.custom-carousel-images img');
+            allImages.forEach(function (image) {
+                image.classList.remove('opacity-100');
+            })
+            carouselTabs.forEach(function (tab) {
+                tab.classList.remove('fr-background-alt--grey');
+            })
+
+            //Adding active classes
+            tab.classList.add('fr-background-alt--grey');
+            const activeImage = document.querySelector('[aria-labelledby=' + activeItemId + ']')
+            activeImage.classList.add('opacity-100');
+        })
+    })
+</script>
+
+{% endblock %}
