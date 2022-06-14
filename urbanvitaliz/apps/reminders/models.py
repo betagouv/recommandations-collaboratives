@@ -50,20 +50,6 @@ class Reminder(models.Model):
 
     deadline = models.DateField()
 
-    # django method (deprecated)
-    subject = models.TextField(default="", blank=True)
-    text = models.TextField(default="", blank=True)
-    html = models.TextField(default="", blank=True)
-
-    # SendInBlue
-    template = models.ForeignKey(
-        communication_models.EmailTemplate,
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-    )
-    template_params = models.JSONField(null=True, blank=True)
-
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.PositiveIntegerField(default=0)
     related = GenericForeignKey("content_type", "object_id")

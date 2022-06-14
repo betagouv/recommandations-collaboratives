@@ -253,27 +253,8 @@ def create_reminder(days, task, user, origin):
     if user.is_anonymous:
         return
 
-    rsvp, created = models.TaskFollowupRsvp.objects.get_or_create(task=task, user=user)
-    if not created:
-        rsvp.created_on = timezone.now()
-        rsvp.save()
-
-    template_params = {
-        "project": make_project_digest(task.project, user),
-        "reco": make_action_digest(task, user),
-        "rsvp": {
-            "link_done": make_rsvp_link(rsvp, models.Task.DONE),
-            "link_inprogress": make_rsvp_link(rsvp, models.Task.INPROGRESS),
-            "link_blocked": make_rsvp_link(rsvp, models.Task.BLOCKED),
-            "link_notinterested": make_rsvp_link(rsvp, models.Task.NOT_INTERESTED),
-            "link_already_done": make_rsvp_link(rsvp, models.Task.ALREADY_DONE),
-        },
-    }
-
     api.create_reminder_email(
         user.email,
-        template_name="rsvp_reco",
-        template_params=template_params,
         related=task,
         origin=origin,
         delay=days,

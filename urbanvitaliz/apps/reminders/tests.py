@@ -9,12 +9,14 @@ created: 2021-09-28 13:17:53 CEST
 
 import datetime
 
-import django.core.mail
+import mock
 import pytest
 from django.conf import settings
+from django.contrib.auth import models as auth_models
 from django.core.management import call_command
+from django.test import override_settings
 from model_bakery import baker
-from urbanvitaliz.apps.communication import models as communication
+from urbanvitaliz.apps.communication import api as communication_api
 from urbanvitaliz.apps.projects import models as projects
 
 from . import api, models
@@ -28,15 +30,11 @@ from . import api, models
 def test_create_mail_reminder_using_provided_information():
     task = baker.make(projects.Task)
     recipient = "test@example.com"
-    template = baker.make(communication.EmailTemplate)
     related = task
     delay = 14
-    template_params = {"key": "val"}
 
     api.create_reminder_email(
         recipient=recipient,
-        template_name=template.name,
-        template_params=template_params,
         related=related,
         delay=delay,
     )
@@ -44,9 +42,6 @@ def test_create_mail_reminder_using_provided_information():
     reminder = models.Reminder.to_send.all()[0]
 
     assert reminder.recipient == recipient
-    assert reminder.template == template
-    assert reminder.template_params == template_params
-
     assert reminder.deadline == datetime.date.today() + datetime.timedelta(days=delay)
 
 
@@ -54,17 +49,13 @@ def test_create_mail_reminder_using_provided_information():
 def test_create_mail_reminder_replace_existing_ones():
     task = baker.make(projects.Task)
     recipient = "test@example.com"
-    template = baker.make(communication.EmailTemplate)
     related = task
     delay = 14
-    template_params = {"key": "val"}
 
     baker.make(models.Reminder, related=task, recipient=recipient)
 
     api.create_reminder_email(
         recipient=recipient,
-        template_name=template.name,
-        template_params=template_params,
         related=related,
         delay=delay,
     )
@@ -74,9 +65,6 @@ def test_create_mail_reminder_replace_existing_ones():
     reminder = models.Reminder.to_send.all()[0]
 
     assert reminder.recipient == recipient
-    assert reminder.template == template
-    assert reminder.template_params == template_params
-
     assert reminder.deadline == datetime.date.today() + datetime.timedelta(days=delay)
 
 
@@ -86,77 +74,58 @@ def test_create_mail_reminder_replace_existing_ones():
 
 
 @pytest.mark.django_db
+@override_settings(SENDINBLUE_FORCE_DEBUG=True)
 def test_command_send_pending_reminder_with_reached_deadline(mocker):
     today = datetime.date.today()
+    user = baker.make(auth_models.User, email="test@example.org")
+    task = baker.make(projects.Task)
     reminder = baker.make(
-        models.Reminder,
-        recipient="test@example.org",
-        subject="[uv] test",
-        text="body as text",
-        html="<p>body as html</p>",
-        deadline=today,
+        models.Reminder, recipient=user.email, deadline=today, related=task
     )
 
-    mocker.patch("django.core.mail.send_mail")
+    mocker.patch("urbanvitaliz.apps.communication.api.send_debug_email")
 
-    call_command("sendreminders")
+    call_command("senddigests")
 
-    assert models.Reminder.to_send.count() == 0
-    updated = models.Reminder.sent.all()[0]
+    assert models.Reminder.to_send.count() == 1
+    new = models.Reminder.to_send.first()
+    assert new.deadline == today + datetime.timedelta(weeks=6)
+    updated = models.Reminder.sent.first()
     assert updated.id == reminder.id
 
-    django.core.mail.send_mail.assert_called_once_with(
-        subject=reminder.subject,
-        message=reminder.text,
-        html_message=reminder.html,
-        from_email=settings.EMAIL_FROM,
-        recipient_list=[reminder.recipient],
-        fail_silently=False,
-    )
-
 
 @pytest.mark.django_db
-def test_command_send_pending_reminder_with_past_deadline(mocker):
+@override_settings(SENDINBLUE_FORCE_DEBUG=True)
+def test_command_send_pending_task_reminder_with_past_deadline(mocker):
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
-    baker.make(
-        models.Reminder,
-        recipient="test@example.org",
-        subject="[uv] test",
-        text="body as text",
-        html="<p>body as html</p>",
-        deadline=yesterday,
-    )
+    user = baker.make(auth_models.User, email="test@example.org")
+    task = baker.make(projects.Task)
+    baker.make(models.Reminder, recipient=user.email, deadline=yesterday, related=task)
 
-    mocker.patch("django.core.mail.send_mail")
+    call_command("senddigests")
 
-    call_command("sendreminders")
-
-    assert models.Reminder.to_send.count() == 0
+    assert models.Reminder.to_send.count() == 1
     assert models.Reminder.sent.count() == 1
 
-    django.core.mail.send_mail.assert_called_once()
-
 
 @pytest.mark.django_db
+@override_settings(SENDINBLUE_FORCE_DEBUG=True)
 def test_command_do_not_send_pending_reminder_with_future_deadline(mocker):
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     baker.make(
         models.Reminder,
         recipient="test@example.org",
-        subject="[uv] test",
-        text="body as text",
-        html="<p>body as html</p>",
         deadline=tomorrow,
     )
 
-    mocker.patch("django.core.mail.send_mail")
+    mocker.patch("urbanvitaliz.apps.communication.api.send_debug_email")
 
-    call_command("sendreminders")
+    call_command("senddigests")
 
     assert models.Reminder.to_send.count() == 1
     assert models.Reminder.sent.count() == 0
 
-    django.core.mail.send_mail.assert_not_called()
+    communication_api.send_debug_email.assert_not_called()
 
 
 # eof
