@@ -922,6 +922,7 @@ def test_owner_can_add_email_to_project_if_not_draft(client):
     invite = invites_models.Invite.objects.first()
     assert invite.email == data["email"]
 
+
 @pytest.mark.django_db
 def test_email_cannot_be_added_twice(client):
     membership = baker.make(
@@ -946,7 +947,6 @@ def test_email_cannot_be_added_twice(client):
     assert invites_models.Invite.objects.count() == 1
     invite = invites_models.Invite.objects.first()
     assert invite.email == data["email"]
-
 
 
 @pytest.mark.django_db
@@ -1154,7 +1154,7 @@ def test_create_reminder_for_task(client):
 
     assert response.status_code == 302
     reminder = reminders.Reminder.to_send.all()[0]
-    assert models.TaskFollowupRsvp.objects.count() == 1
+    assert models.TaskFollowupRsvp.objects.count() == 0
     assert reminder.recipient == project.members.first().email
     in_fifteen_days = datetime.date.today() + datetime.timedelta(days=data["days"])
     assert reminder.deadline == in_fifteen_days
@@ -1178,7 +1178,7 @@ def test_create_reminder_without_delay_for_task(client):
 
     assert response.status_code == 302
     assert reminders.Reminder.to_send.count() == 1
-    assert models.TaskFollowupRsvp.objects.count() == 1
+    assert models.TaskFollowupRsvp.objects.count() == 0
 
 
 @pytest.mark.django_db
@@ -1198,7 +1198,7 @@ def test_recreate_reminder_after_for_same_task(client):
     assert reminders.Reminder.to_send.count() == 1
     in_ten_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
     assert reminder.deadline == in_ten_days
-    assert models.TaskFollowupRsvp.objects.count() == 1
+    assert models.TaskFollowupRsvp.objects.count() == 0
 
 
 @pytest.mark.django_db
@@ -1218,7 +1218,7 @@ def test_recreate_reminder_before_for_same_task(client):
     reminder = reminders.Reminder.to_send.all()[0]
     in_two_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
     assert reminder.deadline == in_two_days
-    assert models.TaskFollowupRsvp.objects.count() == 1
+    assert models.TaskFollowupRsvp.objects.count() == 0
 
 
 ########################################################################
