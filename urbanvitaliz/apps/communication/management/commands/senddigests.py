@@ -10,7 +10,7 @@ created: 2022-01-24 22:39:27 CEST
 
 from django.contrib.auth import models as auth_models
 from django.core.management.base import BaseCommand
-from urbanvitaliz.apps.projects import digests
+from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.projects import models as project_models
 
 

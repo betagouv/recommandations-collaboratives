@@ -922,6 +922,7 @@ def test_owner_can_add_email_to_project_if_not_draft(client):
     invite = invites_models.Invite.objects.first()
     assert invite.email == data["email"]
 
+
 @pytest.mark.django_db
 def test_email_cannot_be_added_twice(client):
     membership = baker.make(
@@ -946,7 +947,6 @@ def test_email_cannot_be_added_twice(client):
     assert invites_models.Invite.objects.count() == 1
     invite = invites_models.Invite.objects.first()
     assert invite.email == data["email"]
-
 
 
 @pytest.mark.django_db
