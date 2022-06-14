@@ -14,10 +14,14 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (create_reminder, get_collaborators_for_project,
-                    get_notification_recipients_for_project,
-                    get_project_moderators, get_regional_actors_for_project,
-                    get_switchtenders_for_project)
+from .utils import (
+    create_reminder,
+    get_collaborators_for_project,
+    get_notification_recipients_for_project,
+    get_project_moderators,
+    get_regional_actors_for_project,
+    get_switchtenders_for_project,
+)
 
 #####
 # Projects
@@ -216,7 +220,7 @@ def log_action_blocked(sender, task, project, user, **kwargs):
             target=project,
         )
 
-
+        
 @receiver(action_already_done)
 def log_action_already_done(sender, task, project, user, **kwargs):
     if not user.is_staff:
