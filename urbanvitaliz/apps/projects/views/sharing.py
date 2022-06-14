@@ -15,10 +15,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from urbanvitaliz import utils
 from urbanvitaliz.apps.communication.api import send_email
+from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.forms import InviteForm
 
-from .. import digests, models
+from .. import models
 from ..utils import can_manage_or_403
 
 ########################################################################
