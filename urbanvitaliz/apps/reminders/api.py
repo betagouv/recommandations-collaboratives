@@ -17,8 +17,6 @@ from . import models
 
 def create_reminder_email(
     recipient,
-    template_name,
-    template_params,
     related,
     origin=models.Reminder.SYSTEM,
     delay=15,
@@ -37,24 +35,17 @@ def create_reminder_email(
         content_type=content_type, object_id=related.id, recipient=recipient
     ).delete()
 
-    try:
-        template = communication_models.EmailTemplate.objects.get(name=template_name)
-    except communication_models.EmailTemplate.DoesNotExist:
-        return False
-
     deadline = datetime.date.today() + datetime.timedelta(days=delay)
 
     models.Reminder(
         recipient=recipient,
         deadline=deadline,
-        template=template,
-        template_params=template_params,
         related=related,
         origin=origin,
     ).save()
 
 
-def remove_reminder_email(related, recipient=None, origin=0):
+def remove_reminder_email(related, recipient=None, origin=models.Reminder.SYSTEM):
     """Remove reminder if one exist for this object [w/ given recipient, origin]"""
     if not related:
         return

@@ -75,6 +75,7 @@ def send_reminder_digest_by_project_task(user, reminders):
             project = projects_models.Project.objects.get(pk=project_id)
         except projects_models.Project.DoesNotExist:
             for reminder in project_reminders:
+                print(f"[W] Skipping reminder {reminder}")
                 skipped_reminders.append(reminder.pk)
             continue
 
