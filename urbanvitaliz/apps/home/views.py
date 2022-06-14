@@ -43,6 +43,10 @@ class LoginRedirectView(View):
         return redirect("home")
 
 
+class RegionalActorsPageView(TemplateView):
+    template_name = "home/regional_actors.html"
+
+
 class MethodologyPageView(TemplateView):
     template_name = "home/methodology.html"
 
@@ -59,9 +63,9 @@ class StatisticsView(TemplateView):
     template_name = "home/statistics.html"
 
     def get_context_data(self, **kwargs):
-        staff_emails = [user.email for user in auth.User.objects.filter(is_staff=True)]
+        staff_users = auth.User.objects.filter(is_staff=True)
         the_projects = projects.Project.objects.exclude(
-            Q(email__in=staff_emails)
+            Q(members__in=staff_users)
             | Q(status="DRAFT")
             | Q(status="STUCK")
             | Q(exclude_stats=True)
@@ -75,7 +79,7 @@ class StatisticsView(TemplateView):
                 | Q(status=projects.Task.ALREADY_DONE)
             )
             .exclude(
-                Q(project__email__in=staff_emails)
+                Q(project__members__in=staff_users)
                 | Q(project__status="DRAFT")
                 | Q(project__status="STUCK")
                 | Q(project__exclude_stats=True)
