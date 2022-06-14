@@ -4,7 +4,8 @@
 {% load static %}
 
 {% block css %}
-<link href="{% sass_src 'css/home/dsfr.css' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'css/home/home.scss' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
@@ -77,9 +78,9 @@
             <div class="fr-col-12 fr-col-sm-9 fr-text--lg">
                 <h3>Acteurs publics intervenant autour des friches</h3>
                 <p class="fr-my-2w">Suivez les dossiers de votre territoire et orientez-les via UrbanVitaliz</p>
-                <button class="fr-btn fr-btn--secondary">
+                <a href="{% url 'regional-actors' %}" class="fr-btn fr-btn--secondary">
                     En savoir plus
-                </button>
+                </a>
             </div>
         </div>
     </div>
@@ -87,7 +88,7 @@
 <div class="fr-py-6w" style="background-color:#1B1B35;">
     <div class="fr-container fr-pt-2w fr-pb-6w">
         <div class="fr-m-auto">
-            <h3 class="fr-text-inverted--grey text-center fr-pb-3w">Comment fonctionne UrbanVitaliz ?</h3>
+            <h3 class="fr-text-inverted--grey text-center fr-pb-6w">Comment fonctionne UrbanVitaliz ?</h3>
         </div>
         <div class="fr-grid-row fr-grid-row--gutters">
             <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
@@ -96,7 +97,7 @@
                         <img src="{% static 'img/home/search.png' %}" width="100%" height="100%"
                             alt="Image de placeholder">
                     </div>
-                    <span class="fr-display--xl fr-text-label--blue-cumulus">1</span>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">1</span>
                     <h6>
                         La collectivité décrit la friche qu’elle souhaite recycler et ses besoins
                     </h6>
@@ -108,7 +109,7 @@
                         <img src="{% static 'img/home/form.png' %}" width="100%" height="100%"
                             alt="Image de placeholder">
                     </div>
-                    <span class="fr-display--xl fr-text-label--blue-cumulus">2</span>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">2</span>
                     <h6>
                         Les acteurs publics compétents la guident à chaque étape
                     </h6>
@@ -120,7 +121,7 @@
                         <img src="{% static 'img/home/community.png' %}" width="100%" height="100%"
                             alt="Image de placeholder">
                     </div>
-                    <span class="fr-display--xl fr-text-label--blue-cumulus">3</span>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">3</span>
                     <h6>
                         La collectivité fait avancer son projet
                     </h6>
@@ -132,7 +133,7 @@
                         <img src="{% static 'img/home/progress.png' %}" width="100%" height="100%"
                             alt="Image de placeholder">
                     </div>
-                    <span class="fr-display--xl fr-text-label--blue-cumulus">4</span>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">4</span>
                     <h6>
                         Tous alimentent l’évolution du dossier et des besoins
                     </h6>
