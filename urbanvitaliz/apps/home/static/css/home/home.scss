@@ -28,18 +28,18 @@ span.step {
     position: relative;
     line-height: 40px;
 
-    &:after{
+    &:after {
         content: "";
         position: absolute;
         right: -20px;
         top: 0;
         border-top: 20px solid transparent;
         border-bottom: 20px solid transparent;
-        border-left: 20px solid #33475b; 
+        border-left: 20px solid #33475b;
     }
 }
 
-.external-links > a {
+.external-links>a {
     display: inline-block;
     padding-left: 10px;
     padding-right: 10px;
@@ -48,6 +48,6 @@ span.step {
     color: #666;
 }
 
-.user-quote > q {
+.user-quote>q {
     line-height: 1.7em;
 }
