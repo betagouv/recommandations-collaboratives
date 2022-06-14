@@ -50,9 +50,9 @@ class Reminder(models.Model):
     deadline = models.DateField()
 
     # django method (deprecated)
-    subject = models.TextField(default="")
-    text = models.TextField(default="")
-    html = models.TextField(default="")
+    subject = models.TextField(default="", blank=True)
+    text = models.TextField(default="", blank=True)
+    html = models.TextField(default="", blank=True)
 
     # SendInBlue
     template = models.ForeignKey(
