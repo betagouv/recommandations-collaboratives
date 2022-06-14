@@ -24,7 +24,7 @@
 {% block project_detail %}
 <div class="col-12 mx-auto">
     <div class="row">
-        <div class="col">
+        <div class="col" x-data="boardTasksApp({{ project.id }})" x-init="getData(); initTooltips(); loadCanAdministrate(); loadUserId(); processUrl();">
             {% include 'projects/project/fragments/kanban_tasks/kanban_header.html' %}
 
             {{ can_administrate|json_script:"canAdministrate" }}
@@ -69,9 +69,7 @@
                     questionnaire d'exploration</a>
             </div>
             {% else %}
-            <div x-data="boardTasksApp({{ project.id }})"
-                x-init="getData(); initTooltips(); loadCanAdministrate(); loadUserId(); processUrl();"
-                class="d-flex pb-2 align-items-stretch">
+            <div class="d-flex pb-2 align-items-stretch">
                 <template x-for="board in boards">
                     <div class="col px-2">
                         <div class="rounded border-top border-2 drop-column" :class="board.color_class">
