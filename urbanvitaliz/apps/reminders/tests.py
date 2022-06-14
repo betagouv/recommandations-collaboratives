@@ -9,9 +9,7 @@ created: 2021-09-28 13:17:53 CEST
 
 import datetime
 
-import mock
 import pytest
-from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.core.management import call_command
 from django.test import override_settings
