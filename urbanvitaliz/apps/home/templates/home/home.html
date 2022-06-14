@@ -4,9 +4,9 @@
 {% load static %}
 
 {% block css %}
-<link href="{% sass_src 'css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
-<link href="{% sass_src 'css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
-<link href="{% sass_src 'css/home/home.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/home/home.scss' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block content %}
@@ -29,7 +29,7 @@
         </nav>
         <div class="fr-grid-row">
             <div class="fr-col-12 fr-col-md-9">
-                <img src="{% static 'img/home/background.jpg' %}" width="100%" alt="Image de friche">
+                <img src="{% static 'home/img/home/background.jpg' %}" width="100%" alt="Image de friche">
             </div>
         </div>
         <div class="fr-grid-row">
@@ -72,12 +72,12 @@
     <div class="fr-container fr-pt-2w">
         <div class="fr-grid-row fr-grid-row--gutters">
             <div class="fr-col-12 fr-col-sm-3 text-center">
-                <img src="{% static 'img/home/human_cooperation.png' %}" width="100%" style="max-width: 160px;"
-                    alt="Image de placeholder">
+                <img src="{% static 'home/img/home/human_cooperation.png' %}" width="100%" style="max-width: 160px;"
+                    alt="Image de coopération humaine">
             </div>
             <div class="fr-col-12 fr-col-sm-9 fr-text--lg">
                 <h3>Acteurs publics intervenant autour des friches</h3>
-                <p class="fr-my-2w">Suivez les dossiers de votre territoire et orientez-les via UrbanVitaliz</p>
+                <p class="fr-my-2w">Suivez les dossiers de votre territoire et orientez-les via UrbanVitaliz.</p>
                 <a href="{% url 'regional-actors' %}" class="fr-btn fr-btn--secondary">
                     En savoir plus
                 </a>
@@ -94,8 +94,8 @@
             <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
                 <div class="fr-p-2w fr-background-default--grey" style="height:100%">
                     <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
-                        <img src="{% static 'img/home/search.png' %}" width="100%" height="100%"
-                            alt="Image de placeholder">
+                        <img src="{% static 'home/img/home/search.png' %}" width="100%" height="100%"
+                            alt="Icone de recherche">
                     </div>
                     <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">1</span>
                     <h6>
@@ -106,8 +106,8 @@
             <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
                 <div class="fr-p-2w fr-background-default--grey" style="height:100%">
                     <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
-                        <img src="{% static 'img/home/form.png' %}" width="100%" height="100%"
-                            alt="Image de placeholder">
+                        <img src="{% static 'home/img/home/form.png' %}" width="100%" height="100%"
+                            alt="Icone d'un fichier">
                     </div>
                     <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">2</span>
                     <h6>
@@ -118,8 +118,8 @@
             <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
                 <div class="fr-p-2w fr-background-default--grey" style="height:100%">
                     <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
-                        <img src="{% static 'img/home/community.png' %}" width="100%" height="100%"
-                            alt="Image de placeholder">
+                        <img src="{% static 'home/img/home/community.png' %}" width="100%" height="100%"
+                            alt="Icone de communauté">
                     </div>
                     <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">3</span>
                     <h6>
@@ -130,8 +130,8 @@
             <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
                 <div class="fr-p-2w fr-background-default--grey" style="height:100%">
                     <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
-                        <img src="{% static 'img/home/progress.png' %}" width="100%" height="100%"
-                            alt="Image de placeholder">
+                        <img src="{% static 'home/img/home/progress.png' %}" width="100%" height="100%"
+                            alt="Icone de progrès">
                     </div>
                     <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">4</span>
                     <h6>
@@ -159,7 +159,7 @@
                 <div class="fr-background-default--grey fr-border-default-grey border fr-p-2w">
                     <p class="fr-text--xs fr-mb-4v">Nièvre (58), 4.000 hab.</p>
                     <h6 class="fr-mb-1v">
-                        Anciens silo et hangars, pas de projet défini
+                        Anciens silos et hangars, pas de projet défini
                     </h6>
                     <p class="fr-text--sm fr-mb-1v">6 recommandations, dont présentation du CAUE et ses interventions, une étude cofinancée par l’Ademe pour identifier d’éventuelles pollutions, un cahier des charges “à trous” comme base de travail, des dispositifs d’appui en ingénierie
                     </p>
@@ -195,21 +195,22 @@
             <img src="{% static 'img/partners/logo_cerema.png' %}" width="100%" alt="Logo du Cerema">
         </div>
         <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-4w">
-            <img src="{% static 'img/home/logo_beta_gouv.png' %}" width="100%" alt="Logo de beta.gouv">
+            <img src="{% static 'home/img/home/logo_beta_gouv.png' %}" width="100%" alt="Logo de beta.gouv">
         </div>
         <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-2w">
-            <img src="{% static 'img/home/logo_anct.png' %}" width="100%" alt="Logo de anct">
+            <img src="{% static 'home/img/home/logo_anct.png' %}" width="100%" alt="Logo de anct">
         </div>
         <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-4w">
-            <img src="{% static 'img/home/logo_mte.jpg' %}" width="100%" alt="Logo de mte">
+            <img src="{% static 'home/img/home/logo_mte.jpg' %}" width="100%" alt="Logo de mte">
         </div>
         <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-6w">
-            <img src="{% static 'img/home/logo_france_relance.png' %}" width="100%" alt="Logo de france relance">
+            <img src="{% static 'home/img/home/logo_france_relance.png' %}" width="100%" alt="Logo de france relance">
         </div>
         <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-4w">
-            <img src="{% static 'img/home/logo_epf.png' %}" width="100%" alt="Logo de epf">
+            <img src="{% static 'home/img/home/logo_epf.png' %}" width="100%" alt="Logo de epf">
         </div>
     </div>
 </div>
+<div class="border-bottom"></div>
 
 {% endblock %}
