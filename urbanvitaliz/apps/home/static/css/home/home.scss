@@ -1,6 +1,12 @@
 a.fr-btn {
     &:hover {
-        color: white !important;
+        &:not(.fr-btn--secondary) {
+            color: white !important;
+        }
+
+        &.fr-btn--secondary {
+            color: #000091 !important;
+        }
     }
 }
 
