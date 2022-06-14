@@ -17,6 +17,11 @@ urlpatterns = [
     path(r"login-redirect", views.LoginRedirectView.as_view(), name="login-redirect"),
     path(r"stats", views.StatisticsView.as_view(), name="statistics"),
     path(r"methodologie", views.MethodologyPageView.as_view(), name="methodology"),
+    path(
+        r"acteurs-locaux",
+        views.RegionalActorsPageView.as_view(),
+        name="regional-actors",
+    ),
     path(r"qui-sommes-nous", views.WhoWeArePageView.as_view(), name="whoweare"),
     path(r"nous-suivre", views.FollowUsPageView.as_view(), name="followus"),
     path(
