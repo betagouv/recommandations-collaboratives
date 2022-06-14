@@ -8,6 +8,7 @@ updated: 2022-02-03 16:16:37 CET
 """
 
 from dataclasses import asdict, dataclass
+from datetime import timedelta
 from itertools import groupby
 
 from django.contrib.auth import models as auth_models
@@ -34,6 +35,7 @@ def send_digests_for_task_reminders_by_user(user):
 
     now = timezone.now()
 
+    # Fetch all Task Reminders
     reminders = reminders_models.Reminder.to_send.filter(
         recipient=user.email, deadline__lte=now
     ).filter(content_type=task_ct)
@@ -43,8 +45,21 @@ def send_digests_for_task_reminders_by_user(user):
 
     skipped_reminders = send_reminder_digest_by_project_task(user, reminders)
 
-    # Mark them as dispatched
+    # Rearm for the next alarm, in 6 weeks
+    for reminder in reminders.exclude(object_id__in=skipped_reminders):
+        reminders_models.Reminder.objects.create(
+            recipient=reminder.recipient,
+            deadline=now + timedelta(weeks=6),
+            origin=reminders_models.Reminder.SYSTEM,
+            content_type=reminder.content_type,
+            object_id=reminder.object_id,
+        )
+
+    # Mark as dispatched
     reminders.exclude(object_id__in=skipped_reminders).update(sent_on=now)
+
+    # Delete the bogus ones
+    reminders.filter(object_id__in=skipped_reminders).delete()
 
     return reminders.exclude(object_id__in=skipped_reminders).count()
 
