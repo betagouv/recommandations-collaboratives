@@ -220,7 +220,7 @@ def log_action_blocked(sender, task, project, user, **kwargs):
             target=project,
         )
 
-        
+
 @receiver(action_already_done)
 def log_action_already_done(sender, task, project, user, **kwargs):
     if not user.is_staff:
