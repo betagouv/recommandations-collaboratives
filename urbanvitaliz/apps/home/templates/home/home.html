@@ -4,114 +4,212 @@
 {% load static %}
 
 {% block css %}
+<link href="{% sass_src 'css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'css/home/home.scss' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block content %}
 
-<div class="col-12 py-3 g-0 mx-auto">
-    <img src="{% static 'img/home/logo_rp.png' %}" height="150px" alt="Logo république française" class="px-2" />
-    <img src="{% static 'img/partners/logo_cerema.png' %}" width="350px" alt="Logo du Cerema" class="px-2 py-3">
+<div class="fr-container">
+    <div class="fr-mt-2v fr-mb-8w fr-pt-6w">
+        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+            <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil
+                d’Ariane</button>
+            <div class="fr-collapse" id="breadcrumb-1">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <a class="fr-breadcrumb__link" href="/">Accueil</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" aria-current="page">Collectivités</a>
+                    </li>
+                </ol>
+            </div>
+        </nav>
+        <div class="fr-grid-row">
+            <div class="fr-col-12 fr-col-md-9">
+                <img src="{% static 'img/home/background.jpg' %}" width="100%" alt="Image de friche">
+            </div>
+        </div>
+        <div class="fr-grid-row">
+            <div class="fr-col-offset-md-2">
 
-    <div id="headline" class="position-relative overflow-hidden text-center">
-        <div class="headline-content">
-            <div class="col-10 p-lg-5 mx-auto my-5">
-                <h1 class="display-5 fw-bold mb-4">Faites passer votre friche à l'étape suivante avec UrbanVitaliz</h1>
-                <p class="lead fw-normal mb-4">Un service numérique et gratuit qui aiguille les collectivités dans leur projet de réhabilitation de foncier à l’abandon.</p>
-                <a class="btn fs-5 py-3 px-5 btn-primary" href="{% url 'projects-onboarding' %}">Contactez-nous pour un site à revitaliser !</a>
+            </div>
+            <div class="fr-col-12 fr-col-md-10 fr-background-default--grey fr-pt-4w fr-p-0w fr-p-md-4w mt-n150px">
+                <h1 class="fr-h1">
+                    UrbanVitaliz vous guide dans la réhabilitation de vos friches.
+                </h1>
+                <p class="fr-text--lg fr-my-3w">
+                    Collectivités, recevez des conseils personnalisés des acteurs publics compétents.
+                </p>
+                <ul class="fr-btns-group fr-btns-group--inline">
+                    <li>
+                        <a href="{% url 'projects-onboarding' %}" class="fr-btn">
+                            Solliciter UrbanVitaliz
+                        </a>
+                    </li>
+                </ul>
+                <div>
+
+                </div>
+                <div class="fr-mt-2v">
+                    <p class="fr-text--lg">
+                        UrbanVitaliz est un service public gratuit. Il répond aux questions et aux blocages des
+                        collectivités dans le recyclage de leurs fonciers artificialisés (construits, bétonnés, pollués)
+                        qui
+                        ont perdu leur usage. Le suivi des dossiers friche est assuré par les urbanistes de l’équipe
+                        ainsi
+                        que par les acteurs publics locaux (selon les territoires : DDT, DREAL, EPF…).
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="fr-background-alt--grey fr-py-4w">
+    <div class="fr-container fr-pt-2w">
+        <div class="fr-grid-row fr-grid-row--gutters">
+            <div class="fr-col-12 fr-col-sm-3 text-center">
+                <img src="{% static 'img/home/human_cooperation.png' %}" width="100%" style="max-width: 160px;"
+                    alt="Image de placeholder">
+            </div>
+            <div class="fr-col-12 fr-col-sm-9 fr-text--lg">
+                <h3>Acteurs publics intervenant autour des friches</h3>
+                <p class="fr-my-2w">Suivez les dossiers de votre territoire et orientez-les via UrbanVitaliz</p>
+                <a href="{% url 'regional-actors' %}" class="fr-btn fr-btn--secondary">
+                    En savoir plus
+                </a>
             </div>
         </div>
     </div>
 </div>
-
-<div class="col-10 mx-auto">
-
-    <div class="text-center fs-5 mb-5 mt-3">
-        UrbanVitaliz appuie les collectivités pour la revitalisation des
-        terrains imperméabilisés ou pollués qui ont perdu leur usage, que la
-        dynamique de marché ne parvient pas à renouveler sans intervention
-        publique.
-    </div>
-
-
-    <div class="row">
-        <div class="col-xl-3 col-lg-6 px-4">
-            <span class="step">1. Prise de contact</span>
-            <p>
-                La collectivité prend contact avec l'équipe UrbanVitaliz en
-                cliquant sur <a class="href" href="{% url 'projects-onboarding' %}">ce lien</a>
-            </p>
+<div class="fr-py-6w" style="background-color:#1B1B35;">
+    <div class="fr-container fr-pt-2w fr-pb-6w">
+        <div class="fr-m-auto">
+            <h3 class="fr-text-inverted--grey text-center fr-pb-6w">Comment fonctionne UrbanVitaliz ?</h3>
         </div>
-        <div class="col-xl-3 col-lg-6 px-4">
-            <span class="step">2. Approfondissement</span>
-            <p>
-                L'équipe échange avec la collectivité pour clarifier ensemble
-                les besoins
-            </p>
-        </div>
-        <div class="col-xl-3 col-lg-6 px-4">
-            <span class="step">3. Etude</span>
-            <p>
-                L'équipe recherche les acteurs et les solutions existantes pour
-                vous permettre d'avancer
-            </p>
-        </div>
-        <div class="col-xl-3 col-lg-6 px-4">
-            <span class="step">4. Recommandation</span>
-            <p>
-                La collectivité retrouve nos recommandations via l'outil et peut
-                recontacter l'équipe pour plus d'éléments
-            </p>
-        </div>
-    </div>
-
-    <div class="flex-row d-flex justify-content-center external-links text-secondary mt-5">
-
-        <a href="{% url 'statistics' %}">Statistiques d'impact</a> |
-        <a href="{% url 'whoweare' %}">Qui sommes-nous ?</a> |
-        <a href="{% url 'followus' %}">Suivre le projet</a> |
-        <a href="https://github.com/betagouv/urbanvitaliz-django" target="_new">Code Source</a>
-    </div>
-
-    <div class="d-flex flex-wrap fs-5 justify-content-center mt-5 mb-5">
-        <div class="col-8 text-center user-quote mb-5">
-            <q>
-                Je profite de ce mail pour vous remercier de l’aide et l’appui fourni. En effet, Face à une problématique comme la mobilisation d’une friche, une collectivité de petite taille comme la Communauté de Communes Sauldre et Sologne est vite dépassée
-            </q>
-            <p class="text-secondary">
-                – Sylvain GAGEAT, développeur économique
-            </p>
-        </div>
-
-        <div class="col-8 text-center user-quote">
-            <q>
-                Votre étude et vos retours sont très positifs pour eux, et encourageant car ça nous a donné des idées et des pistes de déblocages
-            </q>
-            <p class="text-secondary">
-                – Mr.Sleizak, Maire de Saint-Sernin
-            </p>
+        <div class="fr-grid-row fr-grid-row--gutters">
+            <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
+                <div class="fr-p-2w fr-background-default--grey" style="height:100%">
+                    <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <img src="{% static 'img/home/search.png' %}" width="100%" height="100%"
+                            alt="Image de placeholder">
+                    </div>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">1</span>
+                    <h6>
+                        La collectivité décrit la friche qu’elle souhaite recycler et ses besoins
+                    </h6>
+                </div>
+            </div>
+            <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
+                <div class="fr-p-2w fr-background-default--grey" style="height:100%">
+                    <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <img src="{% static 'img/home/form.png' %}" width="100%" height="100%"
+                            alt="Image de placeholder">
+                    </div>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">2</span>
+                    <h6>
+                        Les acteurs publics compétents la guident à chaque étape
+                    </h6>
+                </div>
+            </div>
+            <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
+                <div class="fr-p-2w fr-background-default--grey" style="height:100%">
+                    <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <img src="{% static 'img/home/community.png' %}" width="100%" height="100%"
+                            alt="Image de placeholder">
+                    </div>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">3</span>
+                    <h6>
+                        La collectivité fait avancer son projet
+                    </h6>
+                </div>
+            </div>
+            <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
+                <div class="fr-p-2w fr-background-default--grey" style="height:100%">
+                    <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <img src="{% static 'img/home/progress.png' %}" width="100%" height="100%"
+                            alt="Image de placeholder">
+                    </div>
+                    <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">4</span>
+                    <h6>
+                        Tous alimentent l’évolution du dossier et des besoins
+                    </h6>
+                </div>
+            </div>
         </div>
     </div>
-
-
-    <div class="row mt-5 mb-5">
-        <div class="offset-1 col-2 px-5 d-flex align-items-center">
-            <img src="{% static 'img/home/logo_beta_gouv.png' %}" class="w-100" />
-        </div>
-        <div class="col-2 px-5 d-flex align-items-center">
-            <img src="{% static 'img/home/logo_anct.png' %}" class="w-100"/>
-        </div>
-        <div class="col-2 px-5 d-flex align-items-center">
-            <img src="{% static 'img/home/logo_mte.jpg' %}" class="w-100"/>
-        </div>
-        <div class="col-2 px-5 d-flex align-items-center">
-            <img src="{% static 'img/home/Logo-France-Relance.png' %}"  class="w-100"/>
-        </div>
-        <div class="col-2 px-5 d-flex align-items-center">
-            <img src="{% static 'img/home/logo_epf.png' %}" class="w-100"/>
+</div>
+<div class="fr-background-alt--grey fr-py-8w">
+    <div class="fr-container">
+        <h3 class="fr-pb-4v">Exemples de recommandations à des collectivités</h3>
+        <div class="fr-grid-row fr-grid-row--gutters">
+            <div class="fr-col-12 fr-col-md-6">
+                <div class="fr-background-default--grey fr-border-default-grey border fr-p-2w">
+                    <p class="fr-text--xs fr-mb-4v">Cher (18), 900 hab.</p>
+                    <h6 class="fr-mb-1v">
+                        Projet culturel dans local abandonné
+                    </h6>
+                    <p class="fr-text--sm fr-mb-1v">9 recommandations dont l’évaluation du prix d’achat par les Domaines, présentation de l’EPF et ses interventions, sélection de financements et de dispositifs d’appui en ingénierie pour projet culturel.</p>
+                </div>
+            </div>
+            <div class="fr-col-12 fr-col-md-6">
+                <div class="fr-background-default--grey fr-border-default-grey border fr-p-2w">
+                    <p class="fr-text--xs fr-mb-4v">Nièvre (58), 4.000 hab.</p>
+                    <h6 class="fr-mb-1v">
+                        Anciens silo et hangars, pas de projet défini
+                    </h6>
+                    <p class="fr-text--sm fr-mb-1v">6 recommandations, dont présentation du CAUE et ses interventions, une étude cofinancée par l’Ademe pour identifier d’éventuelles pollutions, un cahier des charges “à trous” comme base de travail, des dispositifs d’appui en ingénierie
+                    </p>
+                </div>
+            </div>
+            <div class="fr-col-12 fr-col-md-6">
+                <div class="fr-background-default--grey fr-border-default-grey border fr-p-2w">
+                    <p class="fr-text--xs fr-mb-4v">Eure (27), 50.000 hab.</p>
+                    <h6 class="fr-mb-1v">
+                        Ancienne usine polluée, pas de projet défini
+                    </h6>
+                    <p class="fr-text--sm fr-mb-1v">4 recommandations, dont plusieurs prestations d’accompagnement de l’Ademe et des financements de dépollution et d’AMO</p>
+                </div>
+            </div>
+            <div class="fr-col-12 fr-col-md-6">
+                <div class="fr-border-default-grey border fr-p-2w fr-text-inverted--grey"
+                    style="background-color:#1B1B35; height:100%">
+                    <h6 class="fr-mb-13v fr-text-inverted--grey">
+                        Faites vous aussi accompagner
+                    </h6>
+                    <a href="{% url 'projects-onboarding' %}" class="fr-btn fr-btn--tertiary fr-text-inverted--grey fr-btn-custom-hover">
+                        Solliciter UrbanVitaliz
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
-
+</div>
+<div class="fr-container fr-mt-8v">
+    <p class="fr-text--sm fr-mb-1v">Nos partenaires :</p>
+    <div class="fr-mt-2v fr-mb-4w fr-grid-row fr-grid-row--middle" style="justify-content: center;">
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-pr-2v fr-pr-md-4v">
+            <img src="{% static 'img/partners/logo_cerema.png' %}" width="100%" alt="Logo du Cerema">
+        </div>
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-4w">
+            <img src="{% static 'img/home/logo_beta_gouv.png' %}" width="100%" alt="Logo de beta.gouv">
+        </div>
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-2w">
+            <img src="{% static 'img/home/logo_anct.png' %}" width="100%" alt="Logo de anct">
+        </div>
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-4w">
+            <img src="{% static 'img/home/logo_mte.jpg' %}" width="100%" alt="Logo de mte">
+        </div>
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-6w">
+            <img src="{% static 'img/home/logo_france_relance.png' %}" width="100%" alt="Logo de france relance">
+        </div>
+        <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-p-6w fr-p-md-4w">
+            <img src="{% static 'img/home/logo_epf.png' %}" width="100%" alt="Logo de epf">
+        </div>
+    </div>
 </div>
 
 {% endblock %}
