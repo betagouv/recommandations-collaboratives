@@ -165,6 +165,11 @@ function boardTasksApp(projectId) {
       element.addEventListener("hidePrevented.bs.modal", cleanup);
       element.addEventListener('hidden.bs.modal', cleanup);
       if (this.currentTaskId) this.openPreviewModal();
+      window.addEventListener('hashchange', event => { 
+        if (location.hash === '') {
+          this.previewModalHandle.hide();
+        }
+      });
     },
     async onPreviewClick(id) {
       this.currentTaskId = id;
