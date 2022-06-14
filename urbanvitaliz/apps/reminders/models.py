@@ -42,6 +42,7 @@ class Reminder(models.Model):
         (STAFF, "Assigned"),
     )
 
+    objects = models.Manager()
     to_send = ReminderManager()
     sent = SentReminderManager()
 
