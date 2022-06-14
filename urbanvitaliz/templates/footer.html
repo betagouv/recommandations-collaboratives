@@ -1,47 +1,47 @@
 {% load static %}
+<footer class="col-11 py-5">
+    <hr />
+    <div class="row py-5">
 
-<footer class="border-top" style="border-color:#000091 !important; border-width: 2px !important;">
-    <div class="fr-container fr-py-4w">
-        <div class="fr-grid-row fr-grid-row--top">
-            <div class="fr-col-12 fr-col-sm-2 text-center fr-mb-4v fr-mb-sm-0w">
-                <img src="{% static 'img/home/logo_rf.png' %}" width="100%" alt="Logo de la république française" style="max-width: 150px">
-            </div>
-            <div class="fr-col-offset-0 fr-col-offset-sm-2"></div>
-            <div class="fr-col-6 fr-col-sm-4">
-                <h5>UrbanVitaliz</h5>
-                <ul class="list-unstyled text-small">
-                    <li>
-                        <a class="link-secondary" href="{% url 'whoweare' %}">Qui sommes-nous ?</a>
-                    </li>
-                    <li>
-                        <a class="link-secondary" href="{% url 'followus' %}">Suivre le projet</a>
-                    </li>
-                    <li>
-                        <a class="link-secondary"
-                            href="https://betagouv.github.io/urbanvitaliz/recrutement/">Recrutement</a>
-                    </li>
+        <div class="col-6">
+            <img src="{% static 'home/img/home/logo_rf.png' %}" width="150px" alt="Logo république française">
 
-                    <li>
-                        <a class="link-secondary"
-                            href="https://drive.google.com/file/d/1kHMZWR4aT6q_DHZ8hT3LlK2kFTVyYfCI/view?usp=sharing"
-                            target="_new">Plaquette de présentation</a>
-                    </li>
-                    <li>
-                        <a class="link-secondary" href="{% url 'home-contact' %}">Nous contacter</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="fr-col-6 fr-col-sm-4">
-                <h5>Logiciel Libre</h5>
-                <ul class="list-unstyled text-small">
-                    <li>
-                        <a href="https://github.com/betagouv/urbanvitaliz-django" target="_new">Code Source</a>
-                    </li>
-                    <li>
-                        <a class="link-secondary" href="{% url 'statistics' %}">Statistiques d'impact</a>
-                    </li>
-                </ul>
-            </div>
         </div>
+        <div class="col-6 col-md">
+            <h5>UrbanVitaliz</h5>
+            <ul class="list-unstyled text-small">
+                <li>
+                    <a class="link-secondary" href="{% url 'whoweare' %}">Qui sommes-nous ?</a>
+                </li>
+                <li>
+                    <a class="link-secondary" href="{% url 'followus' %}">Suivre le projet</a>
+                </li>
+                <li>
+                    <a class="link-secondary" href="https://betagouv.github.io/urbanvitaliz/recrutement/">Recrutement</a>
+                </li>
+
+                <li>
+                    <a class="link-secondary" href="https://drive.google.com/file/d/1kHMZWR4aT6q_DHZ8hT3LlK2kFTVyYfCI/view?usp=sharing" target="_new">Plaquette de présentation</a>
+                </li>
+                <li>
+                    <a class="link-secondary" href="{% url 'home-contact' %}">Nous contacter</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-6 col-md">
+            <h5>Logiciel Libre</h5>
+            <ul class="list-unstyled text-small">
+                <a href="https://github.com/betagouv/urbanvitaliz-django" target="_new">Code Source</a>
+            </ul>
+        </div>
+        <div class="col-6 col-md">
+            <h5>Ressources</h5>
+            <ul class="list-unstyled text-small">
+                <li>
+                    <a class="link-secondary" href="{% url 'statistics' %}">Statistiques d'impact</a>
+                </li>
+            </ul>
+        </div>
+
     </div>
 </footer>
