@@ -15,9 +15,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from multimethod import multimethod
 from urbanvitaliz import utils
-from urbanvitaliz.apps.communication.api import send_email
+from .api import send_email
 
-from . import models
+from urbanvitaliz.apps.projects import models as projects_models
 
 ########################################################################
 # reco digests
@@ -28,7 +28,7 @@ def send_digests_for_new_recommendations_by_user(user):
     """
     Send a digest email per project with all its new recommendations for given user.
     """
-    project_ct = ContentType.objects.get_for_model(models.Project)
+    project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
     notifications = (
         user.notifications.unsent()
@@ -55,7 +55,7 @@ def send_recommendation_digest_by_project(user, notifications):
     for project_id, project_notifications in groupby(
         notifications, key=lambda x: x.target_object_id
     ):
-        project = models.Project.objects.get(pk=project_id)
+        project = projects_models.Project.objects.get(pk=project_id)
 
         digest = make_digest_of_project_recommendations(
             project, project_notifications, user
@@ -145,7 +145,7 @@ def make_action_digest(action, user):
 
 
 def send_digests_for_new_sites_by_user(user):
-    project_ct = ContentType.objects.get_for_model(models.Project)
+    project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
     notifications = (
         user.notifications.unsent()
@@ -217,7 +217,7 @@ def send_digest_for_non_switchtender_by_user(user):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
-    project_ct = ContentType.objects.get_for_model(models.Project)
+    project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
     queryset = user.notifications.exclude(
         target_content_type=project_ct, verb="a recommandé l'action"
@@ -294,8 +294,8 @@ def make_project_notifications_digest(project_id, notifications, user):
     """Return digest for given project notification"""
     # Ignore deleted projects
     try:
-        project = models.Project.objects.get(pk=project_id)
-    except models.Project.DoesNotExist:
+        project = projects_models.Project.objects.get(pk=project_id)
+    except projects_models.Project.DoesNotExist:
         return None
 
     digest = make_project_digest(project, user)
