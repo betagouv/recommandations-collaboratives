@@ -18,7 +18,7 @@ function boardTasksApp(projectId) {
     },
   }
 
-  const moveTask = async (taskId, nextTaskId) => {
+  const moveTask = async (taskId, otherTaskId, below) => {
     await fetch(moveTaskUrl(projectId, taskId), {
       method: "POST",
       cache: "no-cache",
@@ -27,7 +27,7 @@ function boardTasksApp(projectId) {
       headers: {
         "X-CSRFToken": Cookies.get("csrftoken"),
       },
-      body: new URLSearchParams(`above=${nextTaskId}`),
+      body: new URLSearchParams(`${ below ? 'below' : 'above'}=${otherTaskId}`),
     });
   }
 
@@ -74,7 +74,11 @@ function boardTasksApp(projectId) {
     },
     async onDrop(task, columnOrStatus, nextTask) {
       if (columnOrStatus instanceof Array) {
-        this.openFeedbackModal(task);
+        if (isArchivedStatus(task.status) && nextTask) {
+          await moveTask(task.id, nextTask.id);
+        } else {
+          this.openFeedbackModal(task);
+        }
       } else {
         await issueFollowup(task, columnOrStatus);
         if (nextTask) await moveTask(task.id, nextTask.id);
@@ -289,6 +293,17 @@ function boardTasksApp(projectId) {
       this.feedbackComment = '';
       this.currentFeedbackTask = null;
       this.feedbackModal.hide();
+    },
+
+    // Movement Buttons
+    async moveAbove(task, otherTask) {
+      await moveTask(task.id, otherTask.id);
+      await this.getData();
+    },
+
+    async moveBelow(task, otherTask) {
+      await moveTask(task.id, otherTask.id, true);
+      await this.getData();
     }
   };
 
