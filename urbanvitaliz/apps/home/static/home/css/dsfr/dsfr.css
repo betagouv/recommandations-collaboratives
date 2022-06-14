@@ -1273,14 +1273,14 @@ sup {
   margin: var(--text-spacing);
 }
 
-*,
+/* *,
 *::before,
 *::after {
   box-sizing: inherit;
-}
+} */
 
 body {
-  font-family: "Marianne", arial, sans-serif;
+  /* font-family: "Marianne", arial, sans-serif; 
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1292,7 +1292,7 @@ body {
   background-color: var(--background-default-grey);
   --hover: var(--background-default-grey-hover);
   --active: var(--background-default-grey-active);
-  color: var(--text-default-grey);
+  color: var(--text-default-grey); */
 }
 
 [class^="fr-icon-"], [class*=" fr-icon-"], [class^="fr-fi-"], [class*=" fr-fi-"] {
