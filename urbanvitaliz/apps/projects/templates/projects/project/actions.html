@@ -79,8 +79,8 @@
                                 <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
                             </div>
 
-                            <div class="px-3 py-1 pb-1 bg-light shadow-sm overflow-auto" style="max-height: 70vh;">
-                                <template x-if="column(board.status).length === 0">
+                            <div class="px-3 py-1 pb-1 bg-light shadow-sm overflow-auto" style="max-height: 70vh;" x-data="{ get tasks() { return column(board.status) } }">
+                                <template x-if="tasks.length === 0">
                                     <div class="drag-targetable py-3" @dragover="onDragOver(event, null)"
                                         @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)"
                                         @dragleave="onDragLeave(event)">
@@ -90,8 +90,7 @@
                                         </div>
                                     </div>
                                 </template>
-
-                                <template x-for="(t, i) in column(board.status)" :key="t.id">
+                                <template x-for="(t, i) in tasks" :key="t.id">
                                     {% include 'projects/project/fragments/kanban_tasks/task_item.html' %}
                                 </template>
                             </div>

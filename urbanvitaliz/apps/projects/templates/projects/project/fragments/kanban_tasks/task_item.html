@@ -27,27 +27,47 @@
 						style="font-size: 0.7em;">Non applicable</span>
 				</template>
 			</div>
-			<div class="p-2" @click="onPreviewClick(t.id)" style="cursor: pointer; font-size: 0.9em;">
-				<h6 class=mt-1 mb-0 fw-bold" x-text="t.intent"></h6>
-
-				<div class="rounded bg-light p-2 my-2" :class="canAdministrate && t.content === '' && 'border border-warning'">
-					<template x-if="canAdministrate && t.content === ''">
-						<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
-					</template>
-					<template x-if="t.content !== ''">
-						<p x-text="truncate(t.content, 200)" class="mb-3"></p>
-					</template>
-					<div class="d-flex justify-content-between">
-						<div>
-							<img class="rounded-circle d-inline-block" width="20px" height="20px"
-								:src="generateGravatarUrl(t.created_by)" data-bs-toggle="tooltip" data-bs-placement="bottom"
-								:title="`${t.created_by.first_name} ${t.created_by.last_name}`" style="z-index: 1000;" tabindex="0" />
-							<span class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
-								style="line-height: 20px"></span>
-							<template x-if="t.created_by.profile.organization">
-								<span x-text="t.created_by.profile.organization.name" class="fst-italic text-muted"></span>
+			<div class="p-2">
+				<div class="d-flex flex-row">
+					<div class="mt-1">
+						<template x-if="i > 0">
+							<a class="d-block p-1" @click="moveAbove(t, tasks[i - 1])" style="cursor: pointer;">
+								<svg class="aling-middle bi ms-1" width="12px" height="12px" fill="currentColor">
+									<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
+								</svg>
+							</a>
+						</template>
+						<template x-if="i < tasks.length - 1">
+							<a class="d-block p-1" @click="moveBelow(t, tasks[i + 1])" style="cursor: pointer;">
+								<svg class="aling-middle bi ms-1" width="12px" height="12px" fill="currentColor">
+									<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
+								</svg>
+							</a>
+						</template>
+					</div>
+					<div class="flex-fill mt-1 ms-2" @click="onPreviewClick(t.id)" style="cursor: pointer; font-size: 0.9em;">
+						<h6 class="mb-0 fw-bold" x-text="t.intent"></h6>
+	
+						<div class="rounded bg-light p-2 my-2" :class="canAdministrate && t.content === '' && 'border border-warning'">
+							<template x-if="canAdministrate && t.content === ''">
+								<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
 							</template>
-							<span class="ms-2 text-muted" x-text="`le ${formatDate(t.created_on)}`" style="line-height: 20px"></span>
+							<template x-if="t.content !== ''">
+								<p x-text="truncate(t.content, 200)" class="mb-3"></p>
+							</template>
+							<div class="d-flex justify-content-between">
+								<div>
+									<img class="rounded-circle d-inline-block" width="20px" height="20px"
+										:src="generateGravatarUrl(t.created_by)" data-bs-toggle="tooltip" data-bs-placement="bottom"
+										:title="`${t.created_by.first_name} ${t.created_by.last_name}`" style="z-index: 1000;" tabindex="0" />
+									<span class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
+										style="line-height: 20px"></span>
+									<template x-if="t.created_by.profile.organization">
+										<span x-text="t.created_by.profile.organization.name" class="fst-italic text-muted"></span>
+									</template>
+									<span class="ms-2 text-muted" x-text="`le ${formatDate(t.created_on)}`" style="line-height: 20px"></span>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
