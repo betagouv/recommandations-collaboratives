@@ -120,8 +120,9 @@ class TaskViewSet(viewsets.ModelViewSet):
             models.Project.objects.for_user(self.request.user).values_list(flat=True)
         )
 
-        if project_id not in user_projects:
-            raise PermissionDenied()
+        # FIXME : Disabling authorisation here, we need something to secure the whole api
+        # if project_id not in user_projects:
+        #     raise PermissionDenied()
 
         return models.Task.objects.filter(project_id=project_id).order_by(
             "-created_on", "-updated_on"
