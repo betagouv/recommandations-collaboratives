@@ -6,3 +6,41 @@
         margin-bottom: 55px;
     }
 }
+
+.list-group-item {
+    padding-right: 10px;
+
+    svg {
+        opacity: 0;
+        transform: translate3d(5px, 0, 0);
+        transition: all 0.25s ease;
+    }
+
+    &.active {
+        background-color: #f8794b !important;
+        border-color: #f8794b !important;
+
+        svg {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+
+            * {
+                fill: white;
+            }
+        }
+    }
+
+
+
+    &:hover {
+        &:not(.active) {
+            background-color: #edc3b4 !important;
+            border-color: #edc3b4 !important;
+
+            svg {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+    }
+}

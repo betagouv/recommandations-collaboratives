@@ -11,22 +11,8 @@
 
 {% block content %}
 
-<div class="fr-container">
+<div class="fr-container" style="font-family: 'Marianne', arial, sans-serif;">
     <div class="fr-mt-2v fr-mb-8w fr-pt-6w">
-        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
-            <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil
-                d’Ariane</button>
-            <div class="fr-collapse" id="breadcrumb-1">
-                <ol class="fr-breadcrumb__list">
-                    <li>
-                        <a class="fr-breadcrumb__link" href="/">Accueil</a>
-                    </li>
-                    <li>
-                        <a class="fr-breadcrumb__link" aria-current="page">Acteurs publics</a>
-                    </li>
-                </ol>
-            </div>
-        </nav>
         <div class="fr-grid-row">
             <div class="fr-col-12 fr-col-md-9">
                 <img src="{% static 'home/img/home/background.jpg' %}" width="100%" alt="Image de friche">
@@ -47,7 +33,8 @@
                 </p>
                 <ul class="fr-btns-group fr-btns-group--inline fr-mb-2v">
                     <li>
-                        <a href="mailto:friches@beta.gouv.fr?subject=Demande d’accès à UrbanVitaliz en tant qu’acteur-conseil" class="fr-btn">
+                        <a href="mailto:friches@beta.gouv.fr?subject=Demande d’accès à UrbanVitaliz en tant qu’acteur-conseil"
+                            class="fr-btn fr-text--xl">
                             Demander un accès
                         </a>
                     </li>
@@ -67,7 +54,7 @@
         </div>
     </div>
 </div>
-<div class="fr-py-6w" style="background-color:#1B1B35;">
+<div class="fr-py-6w" style="background-color:#1B1B35; font-family: 'Marianne', arial, sans-serif;">
     <div class="fr-container fr-pt-2w fr-pb-6w">
         <div class="fr-m-auto">
             <h3 class="fr-text-inverted--grey text-center fr-pb-6w">Comment fonctionne UrbanVitaliz pour un acteur
@@ -137,7 +124,7 @@
         </div>
     </div>
 </div>
-<div class="fr-py-6w">
+<div class="fr-py-6w" style="font-family: 'Marianne', arial, sans-serif;">
     <div class="fr-container fr-pt-2w fr-pb-6w">
         <div class="fr-m-auto">
             <h3 class="text-center fr-pb-6w">A quoi les acteurs locaux ont-ils accès ?</h3>
@@ -146,52 +133,106 @@
             <div
                 class="fr-col-12 fr-col-md-7 position-relative custom-carousel-images overflow-hidden d-flex justify-content-center align-items-center ">
                 <img class="position-absolute opacity-100 w-100 min-h-100"
-                    src="{% static 'home/img/actors/item-1.png' %}" alt="Image Descriptif détaillé de la friche et du projet"
-                    aria-labelledby="custom-carousel-item-1">
+                    src="{% static 'home/img/actors/item-1.png' %}"
+                    alt="Image Descriptif détaillé de la friche et du projet" aria-labelledby="custom-carousel-item-1">
                 <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-2.png' %}"
                     alt="Image L’ensemble des dossiers du territoire" aria-labelledby="custom-carousel-item-2">
                 <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-3.png' %}"
-                    alt="Image Recommandations émises par les acteurs-conseil du dossier" aria-labelledby="custom-carousel-item-3">
+                    alt="Image Recommandations émises par les acteurs-conseil du dossier"
+                    aria-labelledby="custom-carousel-item-3">
                 <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-4.png' %}"
                     alt="Image Suivi sur chaque recommandation" aria-labelledby="custom-carousel-item-4">
                 <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-5.png' %}"
-                    alt="Image Création de recommandation pour la collectivité" aria-labelledby="custom-carousel-item-5">
+                    alt="Image Création de recommandation pour la collectivité"
+                    aria-labelledby="custom-carousel-item-5">
                 <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-6.png' %}"
                     alt="Image Espace de conversation avec la collectivité" aria-labelledby="custom-carousel-item-6">
                 <img class="position-absolute opacity-0 w-100 min-h-100" src="{% static 'home/img/actors/item-7.png' %}"
-                    alt="Image Liste des ressources déjà créées sur UrbanVitaliz" aria-labelledby="custom-carousel-item-7">
+                    alt="Image Liste des ressources déjà créées sur UrbanVitaliz"
+                    aria-labelledby="custom-carousel-item-7">
             </div>
             <div class="fr-col-12 fr-col-md-5 fr-pl-0v fr-pl-md-4v">
                 <ul class="list-group list-group-flush custom-carousel-tabs " id="list-tab" role="tablist">
-                    <li role="button" class="list-group-item list-group-item-action fr-background-alt--grey" id="custom-carousel-item-1" style="border-top: solid 1px #e3e3e3;">
+                    <li role="button"
+                        class="list-group-item list-group-item-action active d-flex justify-content-between align-items-center"
+                        id="custom-carousel-item-1" style="border-top: solid 1px #e3e3e3;">
                         <p class="fr-text--md">Descriptif détaillé de la friche et du projet</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 12 12">
+                            <g fill="#241818" class="nc-icon-wrapper">
+                                <path
+                                    d="M11,5H6V1.5a.5.5,0,0,0-.834-.372l-5,4.5a.5.5,0,0,0,0,.744l5,4.5A.5.5,0,0,0,5.5,11a.5.5,0,0,0,.5-.5V7h5a1,1,0,0,0,0-2Z"
+                                    fill="#241818"></path>
+                            </g>
+                        </svg>
                     </li>
-                    <li role="button" class="list-group-item list-group-item-action"
-                        id="custom-carousel-item-2">
-                        <p class="fr-text--md">L’ensemble des dossiers du territoire</p>
+                    <li role="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="custom-carousel-item-2">
+                        <p class="fr-text--md">L’ensemble des dossiers du territoire
+                        </p>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 12 12">
+                            <g fill="#241818" class="nc-icon-wrapper">
+                                <path
+                                    d="M11,5H6V1.5a.5.5,0,0,0-.834-.372l-5,4.5a.5.5,0,0,0,0,.744l5,4.5A.5.5,0,0,0,5.5,11a.5.5,0,0,0,.5-.5V7h5a1,1,0,0,0,0-2Z"
+                                    fill="#241818"></path>
+                            </g>
+                        </svg>
                     </li>
-                    <li role="button" class="list-group-item list-group-item-action" id="custom-carousel-item-3">
+                    <li role="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="custom-carousel-item-3">
                         <p class="fr-text--md">Recommandations émises par les acteurs-conseil du dossier</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 12 12">
+                            <g fill="#241818" class="nc-icon-wrapper">
+                                <path
+                                    d="M11,5H6V1.5a.5.5,0,0,0-.834-.372l-5,4.5a.5.5,0,0,0,0,.744l5,4.5A.5.5,0,0,0,5.5,11a.5.5,0,0,0,.5-.5V7h5a1,1,0,0,0,0-2Z"
+                                    fill="#241818"></path>
+                            </g>
+                        </svg>
                     </li>
-                    <li role="button" class="list-group-item list-group-item-action" id="custom-carousel-item-4">
+                    <li role="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="custom-carousel-item-4">
                         <p class="fr-text--md">Suivi sur chaque recommandation</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 12 12">
+                            <g fill="#241818" class="nc-icon-wrapper">
+                                <path
+                                    d="M11,5H6V1.5a.5.5,0,0,0-.834-.372l-5,4.5a.5.5,0,0,0,0,.744l5,4.5A.5.5,0,0,0,5.5,11a.5.5,0,0,0,.5-.5V7h5a1,1,0,0,0,0-2Z"
+                                    fill="#241818"></path>
+                            </g>
+                        </svg>
                     </li>
-                    <li role="button" class="list-group-item list-group-item-action" id="custom-carousel-item-5">
+                    <li role="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="custom-carousel-item-5">
                         <p class="fr-text--md">Création de recommandation pour la collectivité</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 12 12">
+                            <g fill="#241818" class="nc-icon-wrapper">
+                                <path
+                                    d="M11,5H6V1.5a.5.5,0,0,0-.834-.372l-5,4.5a.5.5,0,0,0,0,.744l5,4.5A.5.5,0,0,0,5.5,11a.5.5,0,0,0,.5-.5V7h5a1,1,0,0,0,0-2Z"
+                                    fill="#241818"></path>
+                            </g>
+                        </svg>
                     </li>
-                    <li role="button" class="list-group-item list-group-item-action" id="custom-carousel-item-6">
+                    <li role="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="custom-carousel-item-6">
                         <p class="fr-text--md">Espace de conversation avec la collectivité</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 12 12">
+                            <g fill="#241818" class="nc-icon-wrapper">
+                                <path
+                                    d="M11,5H6V1.5a.5.5,0,0,0-.834-.372l-5,4.5a.5.5,0,0,0,0,.744l5,4.5A.5.5,0,0,0,5.5,11a.5.5,0,0,0,.5-.5V7h5a1,1,0,0,0,0-2Z"
+                                    fill="#241818"></path>
+                            </g>
+                        </svg>
                     </li>
-                    <li role="button" class="list-group-item list-group-item-action"
+                    <li role="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                         style="border-bottom: solid 1px #e3e3e3;" id="custom-carousel-item-7">
                         <p class="fr-text--md">Liste des ressources déjà créées sur UrbanVitaliz</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="12" width="12" viewBox="0 0 12 12">
+                            <g fill="#241818" class="nc-icon-wrapper">
+                                <path
+                                    d="M11,5H6V1.5a.5.5,0,0,0-.834-.372l-5,4.5a.5.5,0,0,0,0,.744l5,4.5A.5.5,0,0,0,5.5,11a.5.5,0,0,0,.5-.5V7h5a1,1,0,0,0,0-2Z"
+                                    fill="#241818"></path>
+                            </g>
+                        </svg>
                     </li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
-<div class="fr-background-alt--grey fr-py-4w">
+<div class="fr-background-alt--grey fr-py-4w" style="font-family: 'Marianne', arial, sans-serif;">
     <div class="fr-container fr-pt-2w">
         <div class="fr-grid-row fr-grid-row--gutters">
             <div class="fr-col-12 fr-col-sm-3 text-center">
@@ -204,12 +245,14 @@
                     connaître UrbanVitaliz à votre écosystème, lors de webinaires ou de rencontres locales !</p>
                 <ul class="fr-btns-group fr-btns-group--inline fr-mb-2v">
                     <li>
-                        <a href="{% static 'home/img/pdf/plaquette-urbanvitaliz-collectivités.pdf' %}" target="_blank" class="fr-btn fr-btn--secondary">
+                        <a href="{% static 'home/img/pdf/plaquette-urbanvitaliz-collectivités.pdf' %}" target="_blank"
+                            class="fr-btn fr-btn--secondary">
                             Télécharger la plaquette
                         </a>
                     </li>
                     <li>
-                        <a href="mailto:friches@beta.gouv.fr?subject=Demande de présentation d’UrbanVitaliz" class="fr-btn fr-btn--secondary">
+                        <a href="mailto:friches@beta.gouv.fr?subject=Demande de présentation d’UrbanVitaliz"
+                            class="fr-btn fr-btn--secondary">
                             Faire intervenir l'équipe UrbanVitaliz
                         </a>
                     </li>
@@ -218,7 +261,7 @@
         </div>
     </div>
 </div>
-<div class="fr-py-8w border-bottom" style="border-color:#E5E5E5 !important; border-width: 1px !important;">
+<div class="fr-py-8w border-bottom" style="border-color:#E5E5E5 !important; border-width: 1px !important; font-family: 'Marianne', arial, sans-serif;">
     <div class="fr-container">
         <h3 class="fr-pb-4v">Portage politique, financement et contexte</h3>
         <div class="fr-mr-0v fr-mr-md-15w">
@@ -277,11 +320,11 @@
                 image.classList.remove('opacity-100');
             })
             carouselTabs.forEach(function (tab) {
-                tab.classList.remove('fr-background-alt--grey');
+                tab.classList.remove('active');
             })
 
             //Adding active classes
-            tab.classList.add('fr-background-alt--grey');
+            tab.classList.add('active');
             const activeImage = document.querySelector('[aria-labelledby=' + activeItemId + ']')
             activeImage.classList.add('opacity-100');
         })
