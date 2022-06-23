@@ -12,17 +12,17 @@
 {% block content %}
 
 <div class="fr-container" style="font-family: 'Marianne', arial, sans-serif;">
-    <div class="fr-mt-2v fr-pt-6w">
+    <div class="">
         <div class="fr-grid-row">
-            <div class="fr-col-12 fr-col-md-9">
-                <img src="{% static 'home/img/home/background.jpg' %}" width="100%" alt="Image de friche">
+            <div class="fr-col-12">
+                <img src="{% static 'home/img/home/background.png' %}" width="100%" alt="Image de friche">
             </div>
         </div>
         <div class="fr-grid-row">
-            <div class="fr-col-offset-md-2">
+            <div class="fr-col-offset-md-1">
 
             </div>
-            <div class="fr-col-12 fr-col-md-10 fr-background-default--grey fr-pt-4w fr-p-0w fr-p-md-4w mt-n150px">
+            <div class="fr-col-12 fr-col-md-10 fr-background-default--grey fr-pt-4w fr-p-0w fr-p-md-4w custom-background-home">
                 <h1 class="fr-h1">
                     UrbanVitaliz vous guide dans la réhabilitation de vos friches.
                 </h1>
@@ -31,7 +31,7 @@
                 </p>
                 <ul class="fr-btns-group fr-btns-group--inline">
                     <li>
-                        <a href="{% url 'projects-onboarding' %}" class="fr-btn fr-text--xl">
+                        <a href="{% url 'projects-onboarding' %}" class="fr-btn fr-text--xl custom-button">
                             Solliciter UrbanVitaliz
                         </a>
                     </li>

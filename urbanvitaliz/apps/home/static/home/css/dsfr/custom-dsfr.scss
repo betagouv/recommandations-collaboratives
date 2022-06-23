@@ -10,6 +10,38 @@ a.fr-btn {
     }
 }
 
+.custom-button {
+    background : #00BBC3 !important;
+
+    &:hover {
+        background : #479195 !important;
+    }
+}
+
+.custom-background-home {
+    margin-top: -10vw;
+    margin-bottom: 50px;
+}
+
+@media (min-width: 48em) {
+    .custom-background-home {
+        margin-top: -35vw;
+        margin-bottom: 0;
+    }
+}
+
+.custom-background-actors {
+    margin-top: 0;
+    margin-bottom: 50px;
+}
+
+@media (min-width: 48em) {
+    .custom-background-actors {
+        margin-top: -40vw;
+        margin-bottom: 0;
+    }
+}
+
 .mt-n150px {
     margin-top: 0;
 }
