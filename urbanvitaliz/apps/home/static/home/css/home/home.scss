@@ -1,3 +1,31 @@
+.custom-background-home-image {
+    background-image: url('../../img//home/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    padding-top: 250px;
+    margin-bottom: 50px;
+}
+
+@media (min-width: 48em) {
+    .custom-background-home-image {
+        padding-top: 250px;
+        margin-bottom: 150px;
+    }
+}
+
+.custom-background-home {
+    transform: translate3d(0, 0, 0);
+}
+
+@media (min-width: 48em) {
+    .custom-background-home {
+        transform: translate3d(0, 100px, 0);
+
+    }
+}
+
 #headline:before {
     content: ' ';
     display: block;

@@ -1,3 +1,22 @@
+.custom-background-actors-image {
+    background-image: url('../../img//actors/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding-top: 100px;
+}
+
+@media (min-width: 48em) {
+    .custom-background-actors-image {
+        padding-top: 0;
+    }
+}
+
+.custom-background-actors {
+    margin-top: 150px;
+    padding-bottom: 50px;
+}
+
 @media (max-width: 48em) {
     .custom-carousel-images {
         min-height: 300px;
