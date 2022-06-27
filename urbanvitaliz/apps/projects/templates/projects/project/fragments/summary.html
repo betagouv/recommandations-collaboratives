@@ -14,7 +14,7 @@
     <svg class="bi" width="16" height="16" fill="currentColor">
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
     </svg>
-    <a class="d-inline" href="mailto:{{ project.email }}"  data-bs-toggle="tooltip" title="Envoyer un courriel">{{ project.email }}</a>
+    <a class="d-inline" href="mailto:{{ project.owner.email }}"  data-bs-toggle="tooltip" title="Envoyer un courriel">{{ project.owner.email }}</a>
 
     <!-- Phone -->
     {% if project.phone %}

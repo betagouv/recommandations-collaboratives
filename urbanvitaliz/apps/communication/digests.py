@@ -8,16 +8,109 @@ updated: 2022-02-03 16:16:37 CET
 """
 
 from dataclasses import asdict, dataclass
+from datetime import timedelta
 from itertools import groupby
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
+from django.utils import timezone
 from multimethod import multimethod
 from urbanvitaliz import utils
-from urbanvitaliz.apps.communication.api import send_email
+from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.reminders import models as reminders_models
 
-from . import models
+from .api import send_email
+
+########################################################################
+# Reminders
+########################################################################
+
+
+def send_digests_for_task_reminders_by_user(user):
+    """
+    Send a digest email per project with expired reminders
+    """
+    task_ct = ContentType.objects.get_for_model(projects_models.Task)
+
+    now = timezone.now()
+
+    # Fetch all Task Reminders
+    reminders = reminders_models.Reminder.to_send.filter(
+        recipient=user.email, deadline__lte=now
+    ).filter(content_type=task_ct)
+
+    if reminders.count() == 0:
+        return 0
+
+    skipped_reminders = send_reminder_digest_by_project_task(user, reminders)
+
+    # Rearm for the next alarm, in 6 weeks
+    for reminder in reminders.exclude(object_id__in=skipped_reminders):
+        reminders_models.Reminder.objects.create(
+            recipient=reminder.recipient,
+            deadline=now + timedelta(weeks=6),
+            origin=reminders_models.Reminder.SYSTEM,
+            content_type=reminder.content_type,
+            object_id=reminder.object_id,
+        )
+
+    # Mark as dispatched
+    reminders.exclude(object_id__in=skipped_reminders).update(sent_on=now)
+
+    # Delete the bogus ones
+    reminders.filter(object_id__in=skipped_reminders).delete()
+
+    return reminders.exclude(object_id__in=skipped_reminders).count()
+
+
+def send_reminder_digest_by_project_task(user, reminders):
+    """Send an email per project/user containing its reminders."""
+
+    skipped_reminders = []
+    for project_id, project_reminders in groupby(
+        reminders, key=lambda x: x.related.project_id
+    ):
+        try:
+            project = projects_models.Project.objects.get(pk=project_id)
+        except projects_models.Project.DoesNotExist:
+            for reminder in project_reminders:
+                print(f"[W] Skipping reminder {reminder}")
+                skipped_reminders.append(reminder.pk)
+            continue
+
+        digest = make_digest_of_reminders(project, reminders, user)
+
+        send_email(
+            "project_reminders_digest",
+            {"name": normalize_user_name(user), "email": user.email},
+            params=digest,
+        )
+
+    return skipped_reminders
+
+
+def make_digest_of_reminders(project, reminders, user):
+    """Return digest for reminders of a project to be sent to user"""
+    task_digest = make_reminders_task_digest(reminders, user)
+    project_digest = make_project_digest(project, user)
+    return {
+        "notification_count": len(reminders),
+        "project": project_digest,
+        "recos": task_digest,
+    }
+
+
+def make_reminders_task_digest(reminders, user):
+    """Return a digest of all reminders tasks"""
+    tasks = []
+
+    for reminder in reminders:
+        recommendation = make_action_digest(reminder.related, user)
+        tasks.append(recommendation)
+
+    return tasks
+
 
 ########################################################################
 # reco digests
@@ -28,7 +121,7 @@ def send_digests_for_new_recommendations_by_user(user):
     """
     Send a digest email per project with all its new recommendations for given user.
     """
-    project_ct = ContentType.objects.get_for_model(models.Project)
+    project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
     notifications = (
         user.notifications.unsent()
@@ -55,7 +148,7 @@ def send_recommendation_digest_by_project(user, notifications):
     for project_id, project_notifications in groupby(
         notifications, key=lambda x: x.target_object_id
     ):
-        project = models.Project.objects.get(pk=project_id)
+        project = projects_models.Project.objects.get(pk=project_id)
 
         digest = make_digest_of_project_recommendations(
             project, project_notifications, user
@@ -109,10 +202,11 @@ def make_project_digest(project, user=None):
 
 
 def make_action_digest(action, user):
+    """Return digest of action"""
+
     if not action:
         return
 
-    """Return digest of action"""
     action_link = utils.build_absolute_url(
         reverse("projects-project-detail-actions", args=[action.project_id])
         + f"#action-{action.id}",
@@ -145,7 +239,7 @@ def make_action_digest(action, user):
 
 
 def send_digests_for_new_sites_by_user(user):
-    project_ct = ContentType.objects.get_for_model(models.Project)
+    project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
     notifications = (
         user.notifications.unsent()
@@ -217,7 +311,7 @@ def send_digest_for_non_switchtender_by_user(user):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
-    project_ct = ContentType.objects.get_for_model(models.Project)
+    project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
     queryset = user.notifications.exclude(
         target_content_type=project_ct, verb="a recommandé l'action"
@@ -294,8 +388,8 @@ def make_project_notifications_digest(project_id, notifications, user):
     """Return digest for given project notification"""
     # Ignore deleted projects
     try:
-        project = models.Project.objects.get(pk=project_id)
-    except models.Project.DoesNotExist:
+        project = projects_models.Project.objects.get(pk=project_id)
+    except projects_models.Project.DoesNotExist:
         return None
 
     digest = make_project_digest(project, user)

@@ -25,7 +25,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.projects import digests
+from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.utils import (
     build_absolute_url,
     is_staff_or_403,
