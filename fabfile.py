@@ -39,6 +39,7 @@ def upgrade(cnx, site=None):
         "&& venv/bin/pip install --upgrade -r requirements.txt"
     )
 
+
 @task
 def setup(cnx, site=None):
     """Setup a server with the minimum for deploying"""
@@ -46,8 +47,9 @@ def setup(cnx, site=None):
         print("Usage: fab deploy --site={production,development} --hosts=...")
         return
     cnx.run(
-        f"mkdir -p urbanvitaliz-{site}/dist"
-        f"&& virtualenv urbanvitaliz-{site}/venv")
+        f"mkdir -p urbanvitaliz-{site}/dist" f"&& virtualenv urbanvitaliz-{site}/venv"
+    )
+
 
 @task
 def deploy(cnx, site=None):
