@@ -16,6 +16,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
+from rest_framework.test import APIClient
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
@@ -717,3 +718,30 @@ def test_update_task_followup_by_creator(client):
     followup = models.TaskFollowup.objects.get(pk=followup.pk)
     assert followup.comment == data["comment"]
     assert response.status_code == 302
+
+
+###############################################################
+# API
+###############################################################
+def test_unassigned_switchtender_should_see_recommendations():
+    task = Recipe(models.Task).make()
+
+    client = APIClient()
+
+    with login(client, groups=["switchtender"]):
+        url = reverse("project-tasks-list", args=[task.project.id])
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+def test_unassigned_user_should_not_see_recommendations():
+    task = Recipe(models.Task).make()
+
+    client = APIClient()
+
+    with login(client):
+        url = reverse("project-tasks-list", args=[task.project.id])
+        response = client.get(url)
+
+    assert response.status_code == 403
