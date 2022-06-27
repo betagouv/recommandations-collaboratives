@@ -194,15 +194,23 @@
         <ul class="w-100 list-unstyled">
             {% for notification in request.user.notifications.unread.all %}
             <li class="d-flex flex-columns my-3">
+                {% if notification.actor %}
                 <div class="align-middle mx-2 flex-shrink">
                     <img class="rounded-circle" src="{% gravatar_url notification.actor.email size=24 %}" alt="{{notification.actor}}">
                 </div>
+                {% endif %}
                 <div class=" flex-row flex-grow-1">
                     <div class="flex-grow w-100 flex-grow-1">
+                        {% if notification.actor %}
                         <span class="actor">
                             {{ notification.actor.first_name|default:notification.actor.email }}
                             {{ notification.actor.last_name|default:"" }}
                         </span>
+                        {% else %}
+                        <span class="actor">
+                            (compte supprimé)
+                        </span>
+                        {% endif %}
                         <span class="verb">
                             <strong>{{ notification.verb }}</strong> sur
                         </span>
