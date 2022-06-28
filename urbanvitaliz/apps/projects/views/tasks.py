@@ -349,13 +349,15 @@ def followup_task(request, task_id=None):
             followup = form.save(commit=False)
             followup.task = task
             followup.who = request.user
-            # followup.status = task.status
-            # followup.status = models.Task.STATUS_UNCHANGED
+
             followup.save()
 
             # Create or reset 6 weeks reminder
             create_reminder(
-                7 * 6, task, request.user, origin=reminders_models.Reminder.SYSTEM
+                7 * 6,
+                task,
+                task.project.owner,
+                origin=reminders_models.Reminder.SYSTEM,
             )
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))

@@ -18,6 +18,7 @@ from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
 from rest_framework.test import APIClient
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import login
@@ -745,6 +746,25 @@ def test_update_task_followup_by_creator(client):
     followup = models.TaskFollowup.objects.get(pk=followup.pk)
     assert followup.comment == data["comment"]
     assert response.status_code == 302
+
+
+###############################################################
+# Reminders
+###############################################################
+@pytest.mark.django_db
+def test_reminder_is_updated_when_a_followup_issued(client):
+    membership = baker.make(models.ProjectMember, is_owner=True)
+    project = baker.make(models.Project, projectmember_set=[membership])
+    task = baker.make(models.Task, project=project)
+
+    with login(client, groups=["switchtender"]) as user:
+        task.project.switchtenders.add(user)
+        url = reverse("projects-followup-task", args=[task.pk])
+        response = client.post(url)
+
+    reminder = reminders_models.Reminder.objects.first()
+    assert response.status_code == 302
+    assert reminder.recipient == membership.member.email
 
 
 ###############################################################
