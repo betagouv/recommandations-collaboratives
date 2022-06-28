@@ -14,14 +14,10 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project, remove_reminder)
 
 #####
 # Projects
@@ -431,6 +427,10 @@ def log_survey_session_updated(sender, session, request, **kwargs):
 ######################################################################################
 # TaskFollowup / Task Status update
 ######################################################################################
+# TODO: we may need to rearm reminders when a followup was issued, to prevent sending it
+# too soon.
+
+
 @receiver(
     post_save, sender=models.TaskFollowup, dispatch_uid="taskfollowup_set_task_status"
 )
@@ -454,6 +454,17 @@ def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs)
     if instance.status is not None and instance.status != instance.task.status:
         instance.task.status = instance.status
         instance.task.save()
+
+        if instance.task.project.owner:
+            if instance.status not in (models.Task.NOT_INTERESTED, models.Task.BLOCKED):
+                create_reminder(
+                    7 * 6,
+                    instance.task,
+                    instance.task.project.owner,
+                    reminders_models.Reminder.SYSTEM,
+                )
+            else:
+                remove_reminder(instance.task, instance.task.project.owner)
 
         if not muted:
             if instance.status in task_status_signals.keys():
