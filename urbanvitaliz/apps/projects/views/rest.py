@@ -12,6 +12,7 @@ from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from urbanvitaliz.utils import check_if_switchtender
 
 from .. import models
 from ..serializers import (
@@ -56,7 +57,11 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
         )
 
         if project_id not in user_projects:
-            raise PermissionDenied()
+            if not (
+                self.request.method == "GET"
+                and check_if_switchtender(self.request.user)
+            ):
+                raise PermissionDenied()
 
         return models.TaskFollowup.objects.filter(task_id=task_id)
 
@@ -121,7 +126,11 @@ class TaskViewSet(viewsets.ModelViewSet):
         )
 
         if project_id not in user_projects:
-            raise PermissionDenied()
+            if not (
+                self.request.method == "GET"
+                and check_if_switchtender(self.request.user)
+            ):
+                raise PermissionDenied()
 
         return models.Task.objects.filter(project_id=project_id).order_by(
             "-created_on", "-updated_on"

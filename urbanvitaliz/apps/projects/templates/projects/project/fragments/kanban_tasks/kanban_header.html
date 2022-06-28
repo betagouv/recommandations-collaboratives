@@ -14,11 +14,11 @@
 
 	<div class="d-flex align-items-center">
 		<div class="d-flex align-items-center ms-2">
-			<span class="text-muted me-2">Vos aiguilleurs :</span>
+			<span class="text-muted me-2">Vos conseillers locaux :</span>
 			{% for switchtender in project.switchtenders.all %}
 			<img class="rounded-circle d-inline-block ms-1" width="20px" height="20px"
 				src="{% gravatar_url switchtender.email 25 %}" data-bs-toggle="tooltip" data-bs-placement="bottom"
-				title="{{ switchtender.get_full_name|default:'Aiguilleur inconnu' }} - {{ switchtender.profile.organization.name|default:'Organisation iconnue' }}"
+				title="{{ switchtender.get_full_name|default:'Conseiller inconnu' }} - {{ switchtender.profile.organization.name|default:'Organisation iconnue' }}"
 				tabindex="0" />
 			{% endfor %}
 		</div>
@@ -33,5 +33,9 @@
 			</a>
 		</span>
 		{% endif %}
+		<div class="ms-2" style="width: 24px; height: 24px;">
+			<div x-show="isBusy" class="spinner-border spinner-border spinner-border-sm text-primary" role="status">
+			</div>
+		</div>
 	</div>
 </div>
