@@ -703,6 +703,33 @@ def test_update_task_followup_accesible_by_creator(client):
         followup = Recipe(models.TaskFollowup, who=user, status=0).make()
         url = reverse("projects-task-followup-update", args=[followup.id])
         response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_task_status_is_updated_when_a_followup_issued(client):
+    with login(client) as user:
+        followup = Recipe(
+            models.TaskFollowup, who=user, task__project__status="READY", status=1
+        ).make()
+        url = reverse("projects-task-followup-update", args=[followup.id])
+        response = client.get(url)
+
+    assert followup.task.status == followup.status
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_task_status_is_updated_when_a_followup_issued_on_muted_project(client):
+    with login(client) as user:
+        followup = Recipe(
+            models.TaskFollowup, who=user, status=1, task__project__muted=True
+        ).make()
+        url = reverse("projects-task-followup-update", args=[followup.id])
+        response = client.get(url)
+
+    assert followup.task.status == followup.status
     assert response.status_code == 200
 
 

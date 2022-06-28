@@ -14,14 +14,10 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project)
 
 #####
 # Projects
@@ -439,8 +435,6 @@ def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs)
         return
 
     project = instance.task.project
-    if project.status == "DRAFT" or project.muted:
-        return
 
     task_status_signals = {
         models.Task.INPROGRESS: action_inprogress,
@@ -450,28 +444,32 @@ def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs)
         models.Task.BLOCKED: action_blocked,
     }
 
+    muted = (project.status == "DRAFT") or project.muted
+
     # Notify about status change
     if instance.status is not None and instance.status != instance.task.status:
         instance.task.status = instance.status
         instance.task.save()
 
-        if instance.status in task_status_signals.keys():
-            signal = task_status_signals[instance.status]
-            signal.send(
-                sender=models.TaskFollowup,
+        if not muted:
+            if instance.status in task_status_signals.keys():
+                signal = task_status_signals[instance.status]
+                signal.send(
+                    sender=models.TaskFollowup,
+                    task=instance.task,
+                    project=instance.task.project,
+                    user=instance.who,
+                )
+
+    if not muted:
+        # Notify about comment
+        if instance.comment != "":
+            action_commented.send(
+                sender=instance,
                 task=instance.task,
                 project=instance.task.project,
                 user=instance.who,
             )
-
-    # Notify about comment
-    if instance.comment != "":
-        action_commented.send(
-            sender=instance,
-            task=instance.task,
-            project=instance.task.project,
-            user=instance.who,
-        )
 
 
 # eof
