@@ -104,6 +104,18 @@ function boardTasksApp(projectId) {
       { status: [STATUSES.DONE, STATUSES.NOT_INTERESTED, STATUSES.ALREADY_DONE], title: "Archivées", color_class: "border-error" },
     ],
 
+    isSwitchtender: false,
+    loadIsSwitchtender() {
+      const isSwitchtender = document.getElementById("isSwitchtender").textContent;
+      this.isSwitchtender = JSON.parse(isSwitchtender);
+    },
+
+    canManage: false,
+    loadCanManage() {
+      const canManage = document.getElementById("canManage").textContent;
+      this.canManage = JSON.parse(canManage);
+    },
+
     // Administrate
     canAdministrate: false,
     loadCanAdministrate() {
@@ -165,7 +177,7 @@ function boardTasksApp(projectId) {
       element.addEventListener("hidePrevented.bs.modal", cleanup);
       element.addEventListener('hidden.bs.modal', cleanup);
       if (this.currentTaskId) this.openPreviewModal();
-      window.addEventListener('hashchange', event => { 
+      window.addEventListener('hashchange', event => {
         if (location.hash === '') {
           this.previewModalHandle.hide();
         }
@@ -409,6 +421,10 @@ function reminderTooltip(task) {
   } else {
     return "Aucun rappel prévu"
   }
+}
+
+function toArchiveTooltip() {
+  return 'Archiver cette action'
 }
 
 function generateGravatarUrl(person, size = 50) {
