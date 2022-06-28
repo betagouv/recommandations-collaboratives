@@ -87,7 +87,7 @@
 																<span class="ms-2 text-muted" x-text="`le ${formatDate(f.timestamp)}`"
 																	style="line-height: 20px"></span>
 															</div>
-															<template x-if="f.who.email === userEmail">
+															<template x-if="canManage && f.who.email === userEmail">
 																<a class="text-muted" @click="onEditComment(f)">Editer</a>
 															</template>
 														</div>
@@ -118,7 +118,7 @@
 																		<span class="ms-2 text-muted" x-text="`le ${formatDate(f.timestamp)}`"
 																			style="line-height: 20px"></span>
 																	</div>
-																	<template x-if="f.who.email === userEmail">
+																	<template x-if="canManage && f.who.email === userEmail">
 																		<a class="text-muted" style="cursor: pointer;" @click="onEditComment(f)">Editer</a>
 																	</template>
 																</div>
@@ -131,6 +131,7 @@
 									</template>
 								</div>
 							</div>
+							{% if can_manage and not disable_edit %}
 							<div class="p-3 border-top">
 								<template x-if="currentlyEditing">
 									<span>Editer un commentaire</span>
@@ -145,6 +146,7 @@
 									<button type="submit" class="btn btn-primary">Envoyer</button>
 								</form>
 							</div>
+							{% endif %}
 						</div>
 					</div>
 				</div>
