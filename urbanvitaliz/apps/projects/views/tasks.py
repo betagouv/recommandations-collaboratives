@@ -36,7 +36,12 @@ from ..forms import (
     UpdateTaskFollowupForm,
     UpdateTaskForm,
 )
-from ..utils import can_manage_or_403, create_reminder, get_active_project_id
+from ..utils import (
+    can_manage_or_403,
+    create_reminder,
+    get_active_project_id,
+    remove_reminder,
+)
 
 
 @login_required
@@ -352,13 +357,19 @@ def followup_task(request, task_id=None):
 
             followup.save()
 
-            # Create or reset 6 weeks reminder
-            create_reminder(
-                7 * 6,
-                task,
-                task.project.owner,
-                origin=reminders_models.Reminder.SYSTEM,
-            )
+            if followup.status in (
+                models.Task.ALREADY_DONE,
+                models.Task.NOT_INTERESTED,
+            ):
+                remove_reminder(task, task.project.owner)
+            else:
+                # Create or reset 6 weeks reminder
+                create_reminder(
+                    7 * 6,
+                    task,
+                    task.project.owner,
+                    origin=reminders_models.Reminder.SYSTEM,
+                )
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
 
