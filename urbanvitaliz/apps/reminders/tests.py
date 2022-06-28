@@ -41,7 +41,7 @@ def test_create_mail_reminder_using_provided_information():
         delay=delay,
     )
 
-    reminder = models.Mail.to_send.all()[0]
+    reminder = models.Reminder.to_send.all()[0]
 
     assert reminder.recipient == recipient
     assert reminder.template == template
@@ -59,7 +59,7 @@ def test_create_mail_reminder_replace_existing_ones():
     delay = 14
     template_params = {"key": "val"}
 
-    baker.make(models.Mail, related=task, recipient=recipient)
+    baker.make(models.Reminder, related=task, recipient=recipient)
 
     api.create_reminder_email(
         recipient=recipient,
@@ -69,9 +69,9 @@ def test_create_mail_reminder_replace_existing_ones():
         delay=delay,
     )
 
-    assert models.Mail.to_send.count() == 1
+    assert models.Reminder.to_send.count() == 1
 
-    reminder = models.Mail.to_send.all()[0]
+    reminder = models.Reminder.to_send.all()[0]
 
     assert reminder.recipient == recipient
     assert reminder.template == template
@@ -89,7 +89,7 @@ def test_create_mail_reminder_replace_existing_ones():
 def test_command_send_pending_reminder_with_reached_deadline(mocker):
     today = datetime.date.today()
     reminder = baker.make(
-        models.Mail,
+        models.Reminder,
         recipient="test@example.org",
         subject="[uv] test",
         text="body as text",
@@ -101,8 +101,8 @@ def test_command_send_pending_reminder_with_reached_deadline(mocker):
 
     call_command("sendreminders")
 
-    assert models.Mail.to_send.count() == 0
-    updated = models.Mail.sent.all()[0]
+    assert models.Reminder.to_send.count() == 0
+    updated = models.Reminder.sent.all()[0]
     assert updated.id == reminder.id
 
     django.core.mail.send_mail.assert_called_once_with(
@@ -119,7 +119,7 @@ def test_command_send_pending_reminder_with_reached_deadline(mocker):
 def test_command_send_pending_reminder_with_past_deadline(mocker):
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
     baker.make(
-        models.Mail,
+        models.Reminder,
         recipient="test@example.org",
         subject="[uv] test",
         text="body as text",
@@ -131,8 +131,8 @@ def test_command_send_pending_reminder_with_past_deadline(mocker):
 
     call_command("sendreminders")
 
-    assert models.Mail.to_send.count() == 0
-    assert models.Mail.sent.count() == 1
+    assert models.Reminder.to_send.count() == 0
+    assert models.Reminder.sent.count() == 1
 
     django.core.mail.send_mail.assert_called_once()
 
@@ -141,7 +141,7 @@ def test_command_send_pending_reminder_with_past_deadline(mocker):
 def test_command_do_not_send_pending_reminder_with_future_deadline(mocker):
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     baker.make(
-        models.Mail,
+        models.Reminder,
         recipient="test@example.org",
         subject="[uv] test",
         text="body as text",
@@ -153,8 +153,8 @@ def test_command_do_not_send_pending_reminder_with_future_deadline(mocker):
 
     call_command("sendreminders")
 
-    assert models.Mail.to_send.count() == 1
-    assert models.Mail.sent.count() == 0
+    assert models.Reminder.to_send.count() == 1
+    assert models.Reminder.sent.count() == 0
 
     django.core.mail.send_mail.assert_not_called()
 

@@ -15,34 +15,35 @@ from django.utils import timezone
 from urbanvitaliz.apps.communication import models as communication_models
 
 
-class MailManager(models.Manager):
-    """Manager for mails to send"""
+class ReminderManager(models.Manager):
+    """Manager for reminders to send"""
 
     def get_queryset(self):
         return super().get_queryset().filter(sent_on=None)
 
 
-class SentMailManager(models.Manager):
-    """Manager for sent mails"""
+class SentReminderManager(models.Manager):
+    """Manager for sent reminders"""
 
     def get_queryset(self):
         return super().get_queryset().exclude(sent_on=None)
 
 
-class Mail(models.Model):
-    """Represents a mail to be sent on a given date"""
+class Reminder(models.Model):
+    """Represents a reminder to be sent on a given date"""
 
-    UNKNOWN = 0
+    SYSTEM = 0
     SELF = 1
     STAFF = 2
 
     ORIGIN_CHOICES = (
+        (SYSTEM, "Système"),
         (SELF, "Personal"),
         (STAFF, "Assigned"),
     )
 
-    to_send = MailManager()
-    sent = SentMailManager()
+    to_send = ReminderManager()
+    sent = SentReminderManager()
 
     recipient = models.CharField(max_length=128)
 
@@ -71,8 +72,8 @@ class Mail(models.Model):
     sent_on = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name = "mail"
-        verbose_name_plural = "mails"
+        verbose_name = "rappel"
+        verbose_name_plural = "rappels"
 
     def __str__(self):  # pragma: nocover
         return f"{self.recipient} {self.deadline}"

@@ -330,6 +330,9 @@ class TaskManager(OrderedModelManager):
             .filter(deleted=None)
         )
 
+    def published(self):
+        return self.filter(public=True)
+    
     def unpublished_open(self):
         return self.unpublished_proposed() | self.filter(status=Task.INPROGRESS)
 
@@ -486,7 +489,7 @@ class Task(OrderedModel):
 
     deleted = models.DateTimeField(null=True, blank=True)
 
-    reminders = GenericRelation(reminders_models.Mail, related_query_name="tasks")
+    reminders = GenericRelation(reminders_models.Reminder, related_query_name="tasks")
 
     class Meta:
         ordering = []
