@@ -411,6 +411,10 @@ function reminderTooltip(task) {
   }
 }
 
+function toArchiveTooltip() {
+  return 'Archiver cette action'
+}
+
 function generateGravatarUrl(person, size = 50) {
   const hash = md5(person.email);
   let name = `${person.first_name}+${person.last_name}`;
