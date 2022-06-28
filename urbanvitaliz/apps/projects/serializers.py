@@ -101,7 +101,7 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
 
         if followup.status not in [Task.ALREADY_DONE, Task.NOT_INTERESTED, Task.DONE]:
             create_reminder(
-                7 * 6, task, followup.who, origin=reminders_models.Reminder.UNKNOWN
+                7 * 6, task, followup.who, origin=reminders_models.Reminder.SYSTEM
             )
 
         return followup

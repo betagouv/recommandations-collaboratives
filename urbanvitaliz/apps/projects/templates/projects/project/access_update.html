@@ -38,11 +38,12 @@
                     {% for membership in project.projectmember_set.all %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div class="align-middle">
-                            {{ membership.member.get_full_name|default:membership.member }}
+                            <span class="d-block">{{ membership.member.get_full_name|default:membership.member }}</span>
+                            <span class="text-secondary small">{{ membership.member.email }}</span>
                         </div>
                         <div>
                             {% if membership.is_owner is False %}
-                            <form id="form-projects-access-remove-user" action="{% url 'projects-access-delete' project.pk email %}" method="post">
+                            <form id="form-projects-access-remove-user" action="{% url 'projects-access-delete' project.pk membership.member.email %}" method="post">
                                 {% csrf_token %}
                                 <button class="btn btn-outline-danger btn-sm">Supprimer</button>
                             </form>
@@ -61,7 +62,8 @@
                     {% for switchtender in project.switchtenders.all %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div class="align-middle">
-                            {{ switchtender.get_full_name }}
+                            <span class="d-block">{{ switchtender.get_full_name }}</span>
+                            <span class="text-secondary small">{{ switchtender.email }}</span>
                         </div>
                         <div>
                             <div class="fst-italic my-1">Aiguilleur·se</div>
