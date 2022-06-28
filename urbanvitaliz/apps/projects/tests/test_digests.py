@@ -242,6 +242,11 @@ def test_notification_formatter():
             ),
         ),
         (
+            "a ajouté un document",
+            project,
+            ("Bobi Joe (DuckCorp) a ajouté un document", None),
+        ),
+        (
             "action inconnue",
             project,
             ("Bob action inconnue Nice Project - SomeWhere", None),

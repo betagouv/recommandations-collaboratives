@@ -1240,7 +1240,7 @@ def test_create_reminder_for_task(request, client):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
-    reminder = reminders.Mail.to_send.all()[0]
+    reminder = reminders.Reminder.to_send.all()[0]
     assert models.TaskFollowupRsvp.objects.count() == 1
     assert reminder.recipient == project.members.first().email
     in_fifteen_days = datetime.date.today() + datetime.timedelta(days=data["days"])
@@ -1269,7 +1269,7 @@ def test_create_reminder_without_delay_for_task(request, client):
         response = client.post(url)
 
     assert response.status_code == 302
-    assert reminders.Mail.to_send.count() == 1
+    assert reminders.Reminder.to_send.count() == 1
     assert models.TaskFollowupRsvp.objects.count() == 1
 
 
@@ -1292,8 +1292,8 @@ def test_recreate_reminder_after_for_same_task(request, client):
         response = client.post(url, data=data2)
 
     assert response.status_code == 302
-    reminder = reminders.Mail.to_send.all()[0]
-    assert reminders.Mail.to_send.count() == 1
+    reminder = reminders.Reminder.to_send.all()[0]
+    assert reminders.Reminder.to_send.count() == 1
     in_ten_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
     assert reminder.deadline == in_ten_days
     assert models.TaskFollowupRsvp.objects.count() == 1
@@ -1318,8 +1318,8 @@ def test_recreate_reminder_before_for_same_task(request, client):
         response = client.post(url, data=data2)
 
     assert response.status_code == 302
-    assert reminders.Mail.to_send.count() == 1
-    reminder = reminders.Mail.to_send.all()[0]
+    assert reminders.Reminder.to_send.count() == 1
+    reminder = reminders.Reminder.to_send.all()[0]
     in_two_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
     assert reminder.deadline == in_two_days
     assert models.TaskFollowupRsvp.objects.count() == 1
