@@ -169,38 +169,7 @@
 
                 </div>
 
-                <div class="col-12" x-data="citySearch()">
-                    <div class="row g-3">
-                        <div class="col-auto">
-                            <div class="form-floating mb-3">
-                            <input :disabled="isLoading" @change.debounce="fetchCities()" x-model="postal" type="text" class="form-control {% if form.postcode.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.postcode.name }}" placeholder="Code Postal" value="{{ form.postcode.value|default:'' }}" required>
-                        <label for="input-project-address">{{ form.postcode.label }}</label>
-
-                        {% for error in form.postcode.errors %}
-                        <div class="text-danger text-end">{{ error }}</div>
-                        {% endfor %}
-                            </div>
-                        </div>
-
-                        <div class="mb-3 col-auto">
-                            <template x-if="cities">
-                                <select name="insee" class="form-select" :disabled="!cities.length">
-                                    <template x-if="cities && cities.length == 0 && postal">
-                                        <option selected>Aucune commune trouvée, vérifiez le code postal ?</option>
-                                    </template>
-
-                                    <template
-                                        x-for="city in cities"
-                                        :key="city.insee"
-                                    >
-                                        <option :value="city.insee" x-text="city.name"></option>
-                                    </template>
-                                </select>
-                            </template>
-                        </div>
-                    </div>
-                </div>
-
+                {% include "projects/project/fragments/city_select.html" %}
             </div>
 
             <div class="form-floating mb-3">
