@@ -43,6 +43,10 @@ class LoginRedirectView(View):
         return redirect("home")
 
 
+class RegionalActorsPageView(TemplateView):
+    template_name = "home/regional_actors.html"
+
+
 class MethodologyPageView(TemplateView):
     template_name = "home/methodology.html"
 

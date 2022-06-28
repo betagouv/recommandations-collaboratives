@@ -41,6 +41,17 @@ def upgrade(cnx, site=None):
 
 
 @task
+def setup(cnx, site=None):
+    """Setup a server with the minimum for deploying"""
+    if site not in ["production", "development"]:
+        print("Usage: fab deploy --site={production,development} --hosts=...")
+        return
+    cnx.run(
+        f"mkdir -p urbanvitaliz-{site}/dist" f"&& virtualenv urbanvitaliz-{site}/venv"
+    )
+
+
+@task
 def deploy(cnx, site=None):
     """Deploy new version of project to server for site"""
     if site not in ["production", "development"]:

@@ -16,10 +16,12 @@ from notifications import models as notifications_models
 from notifications.signals import notify
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
+from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.projects import signals as projects_signals
 from urbanvitaliz.apps.resources import models as resources_models
 
-from .. import digests, models, signals
-from ..digests import NotificationFormatter
+from . import digests
+from .digests import NotificationFormatter
 
 ########################################################################
 # new reco digests
@@ -27,22 +29,23 @@ from ..digests import NotificationFormatter
 
 
 def test_send_digests_for_new_reco(client, request):
-    membership = baker.make(models.ProjectMember)
+    membership = baker.make(projects_models.ProjectMember)
+
     switchtender = Recipe(
         auth.User, username="switchtender", email="switchtender@example.com"
     ).make()
 
     project = baker.make(
-        models.Project,
+        projects_models.Project,
         sites=[get_current_site(request)],
         status="DONE",
         projectmember_set=[membership],
     )
 
     # Generate a notification
-    signals.action_created.send(
+    projects_signals.action_created.send(
         sender=test_send_digests_for_new_reco,
-        task=models.Task.objects.create(
+        task=projects_models.Task.objects.create(
             project=project, site=get_current_site(request), created_by=switchtender
         ),
         project=project,
@@ -55,9 +58,9 @@ def test_send_digests_for_new_reco(client, request):
 
 
 def test_send_digests_for_new_reco_empty(client):
-    membership = baker.make(models.ProjectMember)
+    membership = baker.make(projects_models.ProjectMember)
 
-    baker.make(models.Project, status="DONE", projectmember_set=[membership])
+    baker.make(projects_models.Project, status="DONE", projectmember_set=[membership])
 
     digests.send_digests_for_new_recommendations_by_user(membership.member)
 
@@ -94,17 +97,17 @@ def test_send_digests_for_new_sites_by_user():
     # moderator
     moderator = Recipe(auth.User).make()
 
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    membership = baker.make(projects_models.ProjectMember, is_owner=True)
     project = baker.make(
-        models.Project,
+        projects_models.Project,
         projectmember_set=[membership],
         commune=commune,
         status="READY",
     )
 
     # Generate a notification
-    signals.project_validated.send(
-        sender=models.Project, moderator=moderator, project=project
+    projects_signals.project_validated.send(
+        sender=projects_models.Project, moderator=moderator, project=project
     )
 
     assert regional_actor.notifications.unsent().count() == 1
@@ -147,16 +150,18 @@ def test_send_digests_for_switchtender_by_user(client):
     non_regional_actor.groups.add(st_group)
     non_regional_actor.profile.departments.add(dpt_npdc)
 
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    membership = baker.make(projects_models.ProjectMember, is_owner=True)
     project = baker.make(
-        models.Project,
+        projects_models.Project,
         projectmember_set=[membership],
         commune=commune,
         status="READY",
     )
 
     # Generate a notification
-    signals.project_switchtender_joined.send(sender=regional_actor, project=project)
+    projects_signals.project_switchtender_joined.send(
+        sender=regional_actor, project=project
+    )
 
     assert (
         regional_actor.notifications.unsent().count() == 0
@@ -184,18 +189,18 @@ def test_notification_formatter():
     recipient = Recipe(auth.User).make()
     resource = Recipe(resources_models.Resource, title="Belle Ressource").make()
     task = Recipe(
-        models.Task,
+        projects_models.Task,
         intent="my intent",
         content="A very nice content",
         resource=resource,
     ).make()
     note = Recipe(
-        models.Note,
+        projects_models.Note,
         content="my content",
     ).make()
-    followup = Recipe(models.TaskFollowup, task=task, comment="Hello!").make()
+    followup = Recipe(projects_models.TaskFollowup, task=task, comment="Hello!").make()
     project = Recipe(
-        models.Project,
+        projects_models.Project,
         name="Nice Project",
         description="Super description",
         location="SomeWhere",

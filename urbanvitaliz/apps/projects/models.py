@@ -332,7 +332,7 @@ class TaskManager(OrderedModelManager):
 
     def published(self):
         return self.filter(public=True)
-    
+
     def unpublished_open(self):
         return self.unpublished_proposed() | self.filter(status=Task.INPROGRESS)
 
