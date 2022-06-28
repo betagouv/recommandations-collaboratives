@@ -71,7 +71,8 @@ def project_knowledge(request, project_id=None):
         | Q(verb="a été validé")
         | Q(verb="a validé le projet")
         | Q(verb="a soumis pour modération le projet")
-        | Q(verb="a mis à jour le questionnaire"),
+        | Q(verb="a mis à jour le questionnaire")
+        | Q(verb="a ajouté un document"),
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
     )
