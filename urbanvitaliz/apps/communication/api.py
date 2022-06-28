@@ -22,6 +22,7 @@ from .sendinblue import SendInBlue
 
 
 def send_in_blue_email(template_name, recipients, params=None, test=False):
+    """Uses sendinblue service to send an email using the given template and params"""
     sib = SendInBlue()
     try:
         template = EmailTemplate.objects.get(name__iexact=template_name)
@@ -35,14 +36,25 @@ def send_in_blue_email(template_name, recipients, params=None, test=False):
 
 
 def send_debug_email(template_name, recipients, params=None, test=False):
+    """As an alternative, use the default django send_mail, mostly used for debugging and
+    displaying email on the terminal"""
     if type(recipients) is not list:
         recipients = [recipients]
+
+    simple_recipients = []
+    for recipient in recipients:
+        if type(recipient) is dict:
+            simple_recipients.append(recipient["email"])
+        else:
+            simple_recipients.append(recipient)
+
+    print(f"Sending to {simple_recipients}")
 
     django_send_mail(
         "SIB Mail",
         f"Message utilisant le template {template_name} avec les paramètres : {params} (TEST MODE: {test})",
         "no-reply@urbanvitaliz.fr",
-        recipients,
+        simple_recipients,
         fail_silently=False,
     )
     return True

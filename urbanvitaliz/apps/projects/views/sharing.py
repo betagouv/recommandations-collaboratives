@@ -15,10 +15,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from urbanvitaliz import utils
 from urbanvitaliz.apps.communication.api import send_email
+from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.forms import InviteForm
 
-from .. import digests, models
+from .. import models
 from ..utils import can_manage_or_403
 
 ########################################################################
@@ -52,7 +53,10 @@ def access_update(request, project_id):
                 user = None
 
             already_invited = False
-            if user and user not in project.members.all():
+            already_member = False
+            if user and user in project.members.all():
+                already_member = True
+            else:
                 try:
                     already_invited = invites_models.Invite.objects.filter(
                         project=project, email=email, role=role
@@ -61,7 +65,7 @@ def access_update(request, project_id):
                     pass
 
             # Already invited, skip
-            if already_invited:
+            if already_member or already_invited:
                 messages.warning(
                     request,
                     "Cet usager ({0}) a déjà été invité, aucun courrier n'a été envoyé.".format(

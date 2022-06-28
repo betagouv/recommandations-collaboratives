@@ -17,17 +17,31 @@ from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    check_if_switchtender,
+    is_staff_or_403,
+    is_switchtender_or_403,
+)
 
 from .. import models, signals
-from ..forms import (CreateActionsFromResourcesForm,
-                     CreateActionWithoutResourceForm,
-                     CreateActionWithResourceForm, PushTypeActionForm,
-                     RemindTaskForm, RsvpTaskFollowupForm, TaskFollowupForm,
-                     TaskRecommendationForm, UpdateTaskFollowupForm,
-                     UpdateTaskForm)
-from ..utils import can_manage_or_403, create_reminder, get_active_project_id
+from ..forms import (
+    CreateActionsFromResourcesForm,
+    CreateActionWithoutResourceForm,
+    CreateActionWithResourceForm,
+    PushTypeActionForm,
+    RemindTaskForm,
+    RsvpTaskFollowupForm,
+    TaskFollowupForm,
+    TaskRecommendationForm,
+    UpdateTaskFollowupForm,
+    UpdateTaskForm,
+)
+from ..utils import (
+    can_manage_or_403,
+    create_reminder,
+    get_active_project_id,
+    remove_reminder,
+)
 
 
 @login_required
@@ -340,14 +354,22 @@ def followup_task(request, task_id=None):
             followup = form.save(commit=False)
             followup.task = task
             followup.who = request.user
-            # followup.status = task.status
-            # followup.status = models.Task.STATUS_UNCHANGED
+
             followup.save()
 
-            # Create or reset 6 weeks reminder
-            create_reminder(
-                7 * 6, task, request.user, origin=reminders_models.Reminder.SYSTEM
-            )
+            if followup.status in (
+                models.Task.ALREADY_DONE,
+                models.Task.NOT_INTERESTED,
+            ):
+                remove_reminder(task, task.project.owner)
+            else:
+                # Create or reset 6 weeks reminder
+                create_reminder(
+                    7 * 6,
+                    task,
+                    task.project.owner,
+                    origin=reminders_models.Reminder.SYSTEM,
+                )
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
 

@@ -24,10 +24,12 @@
 {% block project_detail %}
 <div class="col-12 mx-auto">
     <div class="row">
-        <div class="col">
+        <div class="col" x-data="boardTasksApp({{ project.id }})" x-init="getData(); initTooltips(); loadCanAdministrate(); loadCanManage(); loadIsSwitchtender(); loadUserId(); processUrl();">
             {% include 'projects/project/fragments/kanban_tasks/kanban_header.html' %}
 
             {{ can_administrate|json_script:"canAdministrate" }}
+            {{ can_manage|json_script:"canManage" }}
+            {{ is_switchtender|json_script:"isSwitchtender" }}
             {{ user.email|json_script:"userEmail" }}
 
             {% if is_switchtender and project.tasks.all.count == 0 %}
@@ -69,18 +71,17 @@
                     questionnaire d'exploration</a>
             </div>
             {% else %}
-            <div x-data="boardTasksApp({{ project.id }})"
-                x-init="getData(); initTooltips(); loadCanAdministrate(); loadUserId(); processUrl();"
-                class="d-flex pb-2 align-items-stretch">
+            <div class="d-flex pb-2 align-items-stretch">
                 <template x-for="board in boards">
-                    <div class="col px-2">
+                    <div class="col px-2" x-data="{ get tasks() { return column(board.status) } }">
                         <div class="rounded border-top border-2 drop-column" :class="board.color_class">
-                            <div class="d-flex justify-content-between justify-items-center px-3 py-2 bg-light">
+                            <div class="d-flex align-items-start px-3 py-2 bg-light">
+                                <span x-show="tasks.length > 0" class="me-2 badge rounded-pill text-bg-secondary" x-text="tasks.length">Primary</span>
                                 <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
                             </div>
 
                             <div class="px-3 py-1 pb-1 bg-light shadow-sm overflow-auto" style="max-height: 70vh;">
-                                <template x-if="column(board.status).length === 0">
+                                <template x-if="tasks.length === 0">
                                     <div class="drag-targetable py-3" @dragover="onDragOver(event, null)"
                                         @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)"
                                         @dragleave="onDragLeave(event)">
@@ -90,8 +91,7 @@
                                         </div>
                                     </div>
                                 </template>
-
-                                <template x-for="(t, i) in column(board.status)" :key="t.id">
+                                <template x-for="(t, i) in tasks" :key="t.id">
                                     {% include 'projects/project/fragments/kanban_tasks/task_item.html' %}
                                 </template>
                             </div>

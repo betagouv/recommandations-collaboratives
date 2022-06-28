@@ -18,7 +18,7 @@ function boardTasksApp(projectId) {
     },
   }
 
-  const moveTask = async (taskId, nextTaskId) => {
+  const moveTask = async (taskId, otherTaskId, below) => {
     await fetch(moveTaskUrl(projectId, taskId), {
       method: "POST",
       cache: "no-cache",
@@ -27,7 +27,7 @@ function boardTasksApp(projectId) {
       headers: {
         "X-CSRFToken": Cookies.get("csrftoken"),
       },
-      body: new URLSearchParams(`above=${nextTaskId}`),
+      body: new URLSearchParams(`${ below ? 'below' : 'above'}=${otherTaskId}`),
     });
   }
 
@@ -74,7 +74,11 @@ function boardTasksApp(projectId) {
     },
     async onDrop(task, columnOrStatus, nextTask) {
       if (columnOrStatus instanceof Array) {
-        this.openFeedbackModal(task);
+        if (isArchivedStatus(task.status) && nextTask) {
+          await moveTask(task.id, nextTask.id);
+        } else {
+          this.openFeedbackModal(task);
+        }
       } else {
         await issueFollowup(task, columnOrStatus);
         if (nextTask) await moveTask(task.id, nextTask.id);
@@ -99,6 +103,18 @@ function boardTasksApp(projectId) {
       { status: STATUSES.BLOCKED, title: "En attente", color_class: "border-warning" },
       { status: [STATUSES.DONE, STATUSES.NOT_INTERESTED, STATUSES.ALREADY_DONE], title: "Archivées", color_class: "border-error" },
     ],
+
+    isSwitchtender: false,
+    loadIsSwitchtender() {
+      const isSwitchtender = document.getElementById("isSwitchtender").textContent;
+      this.isSwitchtender = JSON.parse(isSwitchtender);
+    },
+
+    canManage: false,
+    loadCanManage() {
+      const canManage = document.getElementById("canManage").textContent;
+      this.canManage = JSON.parse(canManage);
+    },
 
     // Administrate
     canAdministrate: false,
@@ -161,6 +177,11 @@ function boardTasksApp(projectId) {
       element.addEventListener("hidePrevented.bs.modal", cleanup);
       element.addEventListener('hidden.bs.modal', cleanup);
       if (this.currentTaskId) this.openPreviewModal();
+      window.addEventListener('hashchange', event => {
+        if (location.hash === '') {
+          this.previewModalHandle.hide();
+        }
+      });
     },
     async onPreviewClick(id) {
       this.currentTaskId = id;
@@ -289,6 +310,17 @@ function boardTasksApp(projectId) {
       this.feedbackComment = '';
       this.currentFeedbackTask = null;
       this.feedbackModal.hide();
+    },
+
+    // Movement Buttons
+    async moveAbove(task, otherTask) {
+      await moveTask(task.id, otherTask.id);
+      await this.getData();
+    },
+
+    async moveBelow(task, otherTask) {
+      await moveTask(task.id, otherTask.id, true);
+      await this.getData();
     }
   };
 
@@ -389,6 +421,10 @@ function reminderTooltip(task) {
   } else {
     return "Aucun rappel prévu"
   }
+}
+
+function toArchiveTooltip() {
+  return 'Archiver cette action'
 }
 
 function generateGravatarUrl(person, size = 50) {

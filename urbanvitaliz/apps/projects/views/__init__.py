@@ -23,11 +23,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
+from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.projects import digests
 from urbanvitaliz.utils import (
     build_absolute_url,
+    check_if_switchtender,
     is_staff_or_403,
     is_switchtender_or_403,
 )
@@ -55,6 +56,9 @@ from ..utils import (
 
 def onboarding(request):
     """Return the onboarding page"""
+    if (not request.user.is_staff) and check_if_switchtender(request.user):
+        return redirect("projects-project-prefill")
+
     if request.method == "POST":
         form = OnboardingForm(request.POST)
         if form.is_valid():

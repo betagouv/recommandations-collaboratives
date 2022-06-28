@@ -1,0 +1,35 @@
+a.fr-btn {
+    &:hover {
+        &:not(.fr-btn--secondary) {
+            color: white !important;
+        }
+
+        &.fr-btn--secondary {
+            color: #000091 !important;
+        }
+    }
+}
+
+.custom-button {
+    background: #00BBC3 !important;
+
+    &:hover {
+        background: #479195 !important;
+    }
+}
+
+
+.mt-n150px {
+    margin-top: 0;
+}
+
+@media (min-width: 48em) {
+    .mt-n150px {
+        margin-top: -150px;
+    }
+}
+
+.fr-btn-custom-hover:hover {
+    background-color: #8585F6 !important;
+    box-shadow: 0 0 0 1px #8585F6 !important;
+}
