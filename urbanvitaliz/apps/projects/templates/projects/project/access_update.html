@@ -27,13 +27,13 @@
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard" x-show="!isCopied" />
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-check" x-show="isCopied" />
                         </svg>
-                    </button> 
+                    </button>
                 </div>
 
             </div>
 
             <div>
-                <h5 class="mt-4 fs-6">{{ project.members.all|length }} Collaborat{{ project.members.all|length|pluralize:"eur,eurs" }}</h5>
+                <h5 class="mt-4 fs-6">Collectivité : {{ project.members.all|length }}</h5>
                 <ul class="list-group">
                     {% for membership in project.projectmember_set.all %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -57,7 +57,7 @@
             </div>
 
             <div>
-                <h5 class="mt-4 fs-6">{{ project.switchtenders.all|length }} Aiguilleur·se{{ project.switchtenders|length|pluralize:"·s" }}</h5>
+                <h5 class="mt-4 fs-6">Conseillers Locaux : {{ project.switchtenders.all|length }} </h5>
                 <ul class="list-group">
                     {% for switchtender in project.switchtenders.all %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -66,7 +66,7 @@
                             <span class="text-secondary small">{{ switchtender.email }}</span>
                         </div>
                         <div>
-                            <div class="fst-italic my-1">Aiguilleur·se</div>
+                            <div class="fst-italic my-1">Conseiller local</div>
                         </div>
                     </li>
                     {% endfor %}
@@ -101,9 +101,9 @@
         <section class="mt-5 col-5 bg-light rounded p-3">
             <h3 class="fs-5">Partagez le dossier</h3>
             <p class="mb-4">
-                Profil collaborateur : similaire aux droits du demandeur initial, pour travailler à plusieurs au sein de la collectivité par exemple.
+                Profil collectivité : similaire aux droits du demandeur initial, pour travailler à plusieurs au sein de la collectivité par exemple.
                 <br />
-                Profil aiguilleur : acteur invité à conseiller le dossier aux côté des aiguilleurs déjà présents
+                Profil conseiller local : acteur invité à conseiller le dossier aux côté des aiguilleurs déjà présents
             </p>
             <form class="form" id="form-projects-access-add-user" action="." method="post">
                 <div class="mb-3">
@@ -116,14 +116,14 @@
 
                     <div class="position-relative bg-white border rounded p-3 mb-2">
                         <input name="{{ form.role.html_name }}" type="radio" id="role-switchtender" value="SWITCHTENDER" style="transform: scale(1.2);">
-                        <label for="role-switchtender" class="position-absolute w-100 h-100 top-0 left-0"><span class="visually-hidden">Aiguilleur·se</span></label>
-                        <span class="ms-1">Aiguilleur·se</span>
+                        <label for="role-switchtender" class="position-absolute w-100 h-100 top-0 left-0"><span class="visually-hidden">Conseiller Local</span></label>
+                        <span class="ms-1">Conseiller Local</span>
                     </div>
 
                     <div class="position-relative bg-white border rounded p-3 mb-2">
                         <input name="{{ form.role.html_name }}" type="radio" id="role-collaborator" value="COLLABORATOR" style="transform: scale(1.2);">
-                        <label for="role-collaborator" class="position-absolute w-100 h-100 top-0 left-0"><span class="visually-hidden">Collaborateur·rice</span></label>
-                        <span class="ms-1">Collaborateur·rice</span>
+                        <label for="role-collaborator" class="position-absolute w-100 h-100 top-0 left-0"><span class="visually-hidden">Collectivité</span></label>
+                        <span class="ms-1">Collectivité</span>
                     </div>
                 </div>
 

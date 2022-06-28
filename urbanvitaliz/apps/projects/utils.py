@@ -255,6 +255,18 @@ def create_reminder(days, task, user, origin):
     return True
 
 
+def remove_reminder(task, user, origin=None):
+    """
+    Remove a reminder using the reminder API
+    """
+    if user.is_anonymous:
+        return
+
+    api.remove_reminder_email(related=task, recipient=user.email, origin=origin)
+
+    return True
+
+
 def format_switchtender_identity(user):
     fmt = f"{user.first_name}"
     fmt += f" {user.last_name}"

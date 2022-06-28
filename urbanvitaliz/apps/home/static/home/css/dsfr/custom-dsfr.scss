@@ -10,6 +10,15 @@ a.fr-btn {
     }
 }
 
+.custom-button {
+    background: #00BBC3 !important;
+
+    &:hover {
+        background: #479195 !important;
+    }
+}
+
+
 .mt-n150px {
     margin-top: 0;
 }
