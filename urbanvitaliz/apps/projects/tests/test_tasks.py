@@ -863,9 +863,13 @@ def test_update_task_followup_by_creator(request, client):
 # Reminders
 ###############################################################
 @pytest.mark.django_db
-def test_reminder_is_updated_when_a_followup_issued(client):
+def test_reminder_is_updated_when_a_followup_issued(request, client):
     membership = baker.make(models.ProjectMember, is_owner=True)
-    project = baker.make(models.Project, projectmember_set=[membership])
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+    )
     task = baker.make(models.Task, project=project)
 
     with login(client, groups=["switchtender"]) as user:

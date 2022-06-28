@@ -1021,7 +1021,7 @@ def test_owner_can_add_email_to_project_if_not_draft(request, client):
 
 
 @pytest.mark.django_db
-def test_email_cannot_be_added_twice(client):
+def test_email_cannot_be_added_twice(request, client):
     membership = baker.make(
         models.ProjectMember,
         is_owner=True,
@@ -1029,7 +1029,12 @@ def test_email_cannot_be_added_twice(client):
         member__email="own@er.fr",
         member__username="own@er.fr",
     )
-    project = baker.make(models.Project, projectmember_set=[membership], status="READY")
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+        status="READY",
+    )
 
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
