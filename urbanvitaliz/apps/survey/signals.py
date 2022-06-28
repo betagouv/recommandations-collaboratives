@@ -9,6 +9,9 @@ survey_session_updated = django.dispatch.Signal()
 
 @receiver(survey_session_started)
 def log_survey_started(sender, survey, project, request, **kwargs):
+    if project.status == "DRAFT" or project.muted:
+        return
+
     if not request.user.is_staff:
         action.send(
             request.user,
