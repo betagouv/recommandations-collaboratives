@@ -2,6 +2,11 @@
 
 import django.db.models.deletion
 from django.db import migrations, models
+from urbanvitaliz.apps.onboarding import models as onboarding_models
+
+
+def create_default_onboarding(apps, schema_editor):
+    o, _ = onboarding_models.Onboarding.objects.get_or_create(pk=1, form="{}")
 
 
 class Migration(migrations.Migration):
@@ -12,6 +17,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(create_default_onboarding, lambda x, y: None),
         migrations.AddField(
             model_name="siteconfiguration",
             name="onboarding",
