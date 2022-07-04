@@ -9,11 +9,13 @@
     style="padding:0;"
 >
     <div class="container-fluid me-2">
-        <a href="{% url 'home' %}" class="d-flex align-middle p-2 pe-4">
+        <a href="{% url 'home' %}" class="d-flex align-middle p-2 pe-4 align-items-center">
             {% if user.is_authenticated %}
             <img src="{% static 'img/logo-small.png' %}" height="30px" alt="Logo UrbanVitaliz"/>
             {% else %}
-            <img src="{% static 'img/logo-uv.png' %}" width="180px" alt="Logo UrbanVitaliz"/>
+            <img class="" src="{% static 'home/img/home/logo_rf.png' %}" width="100px" alt="Logo république française">
+            <img class="fr-mx-4w" src="{% static 'img/partners/logo_cerema.png' %}" width="120px" alt="Logo du Cerema">
+            <img class="" src="{% static 'img/logo-uv.png' %}" width="auto" height="50px" alt="Logo UrbanVitaliz"/>
             {% endif %}
         </a>
         <button
