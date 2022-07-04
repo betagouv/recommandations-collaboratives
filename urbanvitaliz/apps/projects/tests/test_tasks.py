@@ -815,10 +815,14 @@ def test_update_task_followup_accesible_by_creator(request, client):
 
 
 @pytest.mark.django_db
-def test_task_status_is_updated_when_a_followup_issued(client):
+def test_task_status_is_updated_when_a_followup_issued(request, client):
     with login(client) as user:
         followup = Recipe(
-            models.TaskFollowup, who=user, task__project__status="READY", status=1
+            models.TaskFollowup,
+            who=user,
+            task__project__status="READY",
+            status=1,
+            task__site=get_current_site(request),
         ).make()
         url = reverse("projects-task-followup-update", args=[followup.id])
         response = client.get(url)
@@ -828,10 +832,16 @@ def test_task_status_is_updated_when_a_followup_issued(client):
 
 
 @pytest.mark.django_db
-def test_task_status_is_updated_when_a_followup_issued_on_muted_project(client):
+def test_task_status_is_updated_when_a_followup_issued_on_muted_project(
+    request, client
+):
     with login(client) as user:
         followup = Recipe(
-            models.TaskFollowup, who=user, status=1, task__project__muted=True
+            models.TaskFollowup,
+            who=user,
+            status=1,
+            task__project__muted=True,
+            task__site=get_current_site(request),
         ).make()
         url = reverse("projects-task-followup-update", args=[followup.id])
         response = client.get(url)
@@ -870,7 +880,7 @@ def test_reminder_is_updated_when_a_followup_issued(request, client):
         sites=[get_current_site(request)],
         projectmember_set=[membership],
     )
-    task = baker.make(models.Task, project=project)
+    task = baker.make(models.Task, site=get_current_site(request), project=project)
 
     with login(client, groups=["switchtender"]) as user:
         task.project.switchtenders.add(user)
