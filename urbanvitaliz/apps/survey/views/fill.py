@@ -12,10 +12,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import DetailView, RedirectView
 from urbanvitaliz.apps.projects import models as projects_models
-from urbanvitaliz.utils import is_staff_or_403
+from urbanvitaliz.utils import get_site_config_or_503, is_staff_or_403
 
 from .. import forms, models, signals
-from ..utils import get_site_config_or_503
 
 #####
 # Session

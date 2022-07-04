@@ -14,7 +14,6 @@ from . import views
 from .views import detail, documents, feeds, notes, sharing, tasks
 
 urlpatterns = [
-    path(r"onboarding/", views.onboarding, name="projects-onboarding"),
     path(
         r"projects/prefill/",
         views.create_project_prefilled,

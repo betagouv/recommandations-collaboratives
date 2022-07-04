@@ -67,6 +67,7 @@ class SiteConfiguration(models.Model):
     site = models.OneToOneField(Site, on_delete=models.CASCADE)
 
     project_survey = models.ForeignKey("survey.Survey", on_delete=models.CASCADE)
+    onboarding = models.ForeignKey("onboarding.Onboarding", on_delete=models.CASCADE)
 
     def __str__(self):
         return f"SiteConfiguration for '{self.site}'"

@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     "csvexport",
     "captcha",
     "ordered_model",
+    "dynamic_forms",
+    "urbanvitaliz.apps.onboarding",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",
@@ -228,5 +230,7 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 # RECAPTCHA, V3
 RECAPTCHA_REQUIRED_SCORE = 0.85
 
+# DYNAMIC FORMS
+DYNAMIC_FORMS_CUSTOM_JS = ""
 
 # eof
