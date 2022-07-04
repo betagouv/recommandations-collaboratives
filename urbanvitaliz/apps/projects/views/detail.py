@@ -12,8 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.apps.survey.utils import get_site_config_or_503
-from urbanvitaliz.utils import check_if_switchtender
+from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm
