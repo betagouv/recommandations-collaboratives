@@ -57,7 +57,7 @@
         <div class="col"></div>
         {% endif %}
         <div id="project-sidebar" class="col-md-3 h-100">
-            {% include "projects/project/fragments/sidebar.html" %}
+            {% include "projects/project/fragments/sidebar.html" with disable_add_recommendation=True %}
         </div>
 
     </div>
