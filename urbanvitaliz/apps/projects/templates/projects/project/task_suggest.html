@@ -9,7 +9,7 @@
     <p class="text-secondary mb-4">Nb de recos : {{ tasks|length }}</p>
     {% for task in tasks %}
     <p class="mb-4">{{ task.intent }}</p>
-    {% include 'projects/project/fragments/action_list_item.html' with hide_comments=True lol=True %}
+    {% include 'projects/project/fragments/action_list_item.html' with hide_comments=True %}
     {% endfor %}
 </div>
 
