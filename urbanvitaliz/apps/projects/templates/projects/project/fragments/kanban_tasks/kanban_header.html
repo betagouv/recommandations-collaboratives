@@ -1,13 +1,18 @@
 {% load static %}
 {% load gravatar %}
 
-<div class="d-flex mt-1 mb-4 mx-2 align-items-center justify-content-between">
+
+{% if is_switchtender or can_administrate %}
+	<div class="d-flex mt-1 mb-0 mx-2 align-items-center justify-content-between">
+{% else %}
+	<div class="d-flex mt-1 mb-4 mx-2 align-items-center justify-content-between">
+{% endif %}
 	{% if is_switchtender %}
 	<h2 class="text-secondary text-uppercase fw-bolder mb-0" style="font-size: 12px;">
 		Actions proposées à la collectivité
 	</h2>
 	{% else %}
-	<h2 class="mt-1 mb-4 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
+	<h2 class="mt-1 mb-0 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
 		Mes actions en cours
 	</h2>
 	{% endif %}
@@ -39,3 +44,11 @@
 		</div>
 	</div>
 </div>
+{% if is_switchtender or can_administrate %}
+<div class="mb-4 mx-2 d-flex flex-column">
+	<a href="{% url 'projects-project-tasks-suggest' project.pk %}">
+		Examiner les actions suggérées automatiquement pour ce dossier
+	</a>
+	<span class="mb-4 ml-4 pl-4 text-muted">Pour éventuellement les proposer à la collectivité</span>
+</div>
+{% endif %}
