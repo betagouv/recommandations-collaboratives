@@ -9,13 +9,15 @@ git+http://github.com/glibersat/django-magicauth@master#egg=django-magicauth
 # Notifications Fork: Sites framework support
 git+https://github.com/glibersat/django-notifications.git@feature/sites-framework#egg=django-notifications-hq
 
+# Actstream fork: sites framework support
+git+https://github.com/glibersat/django-activity-stream.git@main#egg=django-activity-stream
+
 django-multisite
 git+http://github.com/django-ordered-model/django-ordered-model@master#egg=django-ordered-model
 django_otp
 django-tagging
 django-gravatar2
 psycopg2-binary
-django-activity-stream
 django-leaflet
 django-admin-csvexport
 djangorestframework
