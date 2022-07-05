@@ -41,7 +41,9 @@ def test_project_list_includes_project_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-list")
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
         response = client.get(url)
 
     assertContains(response, project.name)

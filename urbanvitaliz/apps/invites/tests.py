@@ -160,7 +160,7 @@ def test_logged_in_user_accepts_invite_switchtender_with_matching_existing_accou
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is not None
     assert user not in invite.project.members.all()
-    assert user in invite.project.switchtenders.all()
+    assert user == invite.project.switchtenders_on_site.first().switchtender
 
 
 @pytest.mark.django_db
@@ -292,7 +292,7 @@ def test_anonymous_accepts_invite_as_switchtender(
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is not None
     assert invite.project.members.count() == 0
-    assert invite.project.switchtenders.count() == 1
+    assert invite.project.switchtenders_on_site.count() == 1
 
     user = auth_models.User.objects.get(email=invite.email)
     assert user.username == invite.email

@@ -16,6 +16,8 @@ def invite_accept(request, invite_id):
     )
     project = invite.project
 
+    current_site = request.site
+
     # Check if this email already exists as an account
     existing_account = None
     try:
@@ -63,8 +65,9 @@ def invite_accept(request, invite_id):
         if user:
             # Now, grant the user her new rights
             if invite.role == "SWITCHTENDER":
-                if user not in project.switchtenders.all():
-                    project.switchtenders.add(user)
+                projects_models.ProjectSwitchtender.objects.get_or_create(
+                    switchtender=user, project=project, site=current_site
+                )
             else:
                 if user not in project.members.all():
                     projects_models.ProjectMember.objects.create(

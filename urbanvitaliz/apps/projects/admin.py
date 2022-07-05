@@ -42,6 +42,15 @@ class ProjectMemberTabularInline(admin.TabularInline):
     extra = 1
 
 
+class ProjectSwitchtenderTabularInline(admin.TabularInline):
+    model = models.ProjectSwitchtender
+    fields = (
+        "switchtender",
+        "site",
+    )
+    extra = 1
+
+
 @admin.register(models.Project)
 class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     search_fields = ["name"]
@@ -56,6 +65,7 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     actions = [csvexport]
     inlines = (
         ProjectMemberTabularInline,
+        ProjectSwitchtenderTabularInline,
         ProjectTaskTabularInline,
     )
 

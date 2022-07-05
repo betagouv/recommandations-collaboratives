@@ -312,7 +312,10 @@ def test_answered_question_triggers_notification(request, client):
 
     st = Recipe(auth_models.User).make()
     with login(client, is_staff=False) as user:
-        session.project.switchtenders.add(st)
+        session.project.switchtenders_on_site.create(
+            switchtender=st, site=get_current_site(request)
+        )
+
         client.post(url, data={"answer": choice.value, "comment": my_comment})
 
     assert user.notifications.unread().count() == 0
@@ -321,7 +324,8 @@ def test_answered_question_triggers_notification(request, client):
 
 @pytest.mark.django_db
 def test_answered_question_debounces_notification(request, client):
-    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=current_site).make()
     session = Recipe(models.Session, survey=survey).make()
 
     qs = Recipe(models.QuestionSet, survey=survey).make()
@@ -336,7 +340,9 @@ def test_answered_question_debounces_notification(request, client):
     st = Recipe(auth_models.User).make()
 
     with login(client, is_staff=False) as user:
-        session.project.switchtenders.add(st)
+        projects.ProjectSwitchtender.objects.create(
+            project=session.project, switchtender=st, site=current_site
+        )
         client.post(url, data={"answer": choice.value, "comment": my_comment})
         client.post(url, data={"answer": choice.value, "comment": my_comment})
 

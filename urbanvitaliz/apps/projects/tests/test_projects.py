@@ -20,8 +20,7 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -336,8 +335,11 @@ def test_create_prefilled_project_creates_a_new_project(client):
         "email": "a@example.com",
         "location": "some place",
         "postal": "59000",
+        "org_name": "my org",
+        "description": "blah",
         "first_name": "john",
         "last_name": "doe",
+        "response_0": "blah",
         "impediment_kinds": ["Autre"],
         "impediments": "some impediment",
     }
@@ -703,7 +705,10 @@ def test_project_detail_contains_actions_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-actions", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.get(url)
     add_task_url = reverse("projects-project-create-action", args=[project.id])
     assertContains(response, add_task_url)
@@ -728,7 +733,10 @@ def test_update_project_available_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-update", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.get(url)
     assert response.status_code == 200
 
@@ -749,7 +757,10 @@ def test_update_project_wo_commune_and_redirect(request, client):
     }
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.post(url, data=data)
 
     project = models.Project.on_site.get(id=project.id)
@@ -768,7 +779,10 @@ def test_update_project_with_commune(request, client):
     url = reverse("projects-project-update", args=[project.id])
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.get(url)
 
     assertContains(response, "<form")
@@ -1040,7 +1054,10 @@ def test_switchtender_can_add_email_to_project(request, client):
     data = {"email": "test@example.com", "role": "COLLABORATOR"}
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -1242,7 +1259,10 @@ def test_switchtender_can_delete_email_from_project(request, client):
     url = reverse("projects-access-delete", args=[project.id, membership.member.email])
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.post(url)
 
     assert response.status_code == 302
@@ -1274,7 +1294,10 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
     url = reverse("projects-access-delete", args=[project.id, membership.member.email])
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.post(url)
 
     project = models.Project.on_site.get(id=project.id)
@@ -1478,7 +1501,9 @@ def test_followup_triggers_notifications(request, client):
             status="READY",
             sites=[get_current_site(request)],
             projectmember_set=[owner_membership, collab_membership],
-            switchtenders=[switchtender],
+        )
+        project.switchtenders_on_site.create(
+            switchtender=switchtender, site=get_current_site(request)
         )
         task = baker.make(models.Task, site=get_current_site(request), project=project)
         url = reverse("projects-followup-task", args=[task.id])
@@ -1598,7 +1623,10 @@ def test_switchtender_create_action_for_resource_push(request, client):
 
     url = reverse("projects-create-resource-action", args=[resource.id])
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         session = client.session
         session["active_project"] = project.id
         session.save()
@@ -1635,8 +1663,8 @@ def test_switchtender_joins_project(request, client):
     project = models.Project.on_site.get(pk=project.pk)
 
     assert response.status_code == 302
-    assert project.switchtenders.count() == 1
-    assert project.switchtenders.first() == user
+    assert project.switchtenders_on_site.count() == 1
+    assert project.switchtenders_on_site.first().switchtender == user
 
 
 @pytest.mark.django_db
@@ -1656,8 +1684,11 @@ def test_switchtender_leaves_project(request, client):
 
     url = reverse("projects-project-switchtender-leave", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
-        assert project.switchtenders.count() == 1
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
+        assert project.switchtenders_on_site.count() == 1
 
         # Then POST to leave projet
         response = client.post(url)
@@ -1721,7 +1752,9 @@ def test_switchtender_exports_csv(request, client):
 
     url = reverse("projects-project-list-export-csv")
     with login(client, groups=["switchtender"]) as user:
-        p1.switchtenders.add(user)
+        p1.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
 
         response = client.get(url)
 
