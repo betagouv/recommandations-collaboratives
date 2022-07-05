@@ -146,8 +146,8 @@ def is_regional_actor_for_project_or_403(project, user, allow_national=False):
 def get_switchtenders_for_project(project):
     """Return all the switchtenders for a given project"""
     return auth_models.User.objects.filter(
-        projects_switchtended__project=project,
-        projects_switchtended__site=get_current_site(request=None),
+        projects_switchtended_on_site__project=project,
+        projects_switchtended_on_site__site=get_current_site(request=None),
     ).distinct()
 
 
