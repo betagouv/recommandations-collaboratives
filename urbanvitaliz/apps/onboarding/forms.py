@@ -10,6 +10,7 @@ created : 2022-06-06 14:16:20 CEST
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV3
 from django import forms
+from django.conf import settings
 
 from . import models
 
@@ -33,6 +34,11 @@ class OnboardingResponseForm(forms.ModelForm):
             "response",
             "captcha",
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if getattr(settings, "RECAPTCHA_REQUIRED_SCORE", 1.0) == 0:
+            self.fields.pop("captcha")
 
     first_name = forms.CharField(label="Prénom du contact", initial="", required=True)
     last_name = forms.CharField(label="Nom du contact", initial="", required=True)

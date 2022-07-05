@@ -7,13 +7,19 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2021-11-15 14:44:55 CET
 """
 
+from actstream.managers import ActionManager
 from django.contrib.auth import models as auth
+from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
+
+
+class SiteActionManager(CurrentSiteManager, ActionManager):
+    pass
 
 
 class UserProfileManager(models.Manager):
