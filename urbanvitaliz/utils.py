@@ -122,7 +122,7 @@ def get_site_config_or_503(site):
         return SiteConfiguration.objects.get(site=site)
     except SiteConfiguration.DoesNotExist:
         raise ImproperlyConfigured(
-            "Please create a SiteConfiguration before using this feature",
+            f"Please create a SiteConfiguration for '{site}' before using this feature.",
         )
 
 

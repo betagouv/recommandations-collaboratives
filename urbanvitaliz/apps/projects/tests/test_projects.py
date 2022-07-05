@@ -20,7 +20,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -33,6 +34,20 @@ from .. import models, signals
 
 # TODO when local authority can see & update her project
 # TODO check that project, note, and task belong to her
+
+
+# Baker addons
+def gen_onboarding_func():
+    return """[{ "type": "text",
+    "required": false,
+    "label": "Text Field",
+    "className": "form-control",
+    "name": "text-1657009260220-0",
+    "subtype": "text" }]"""
+
+
+baker.generators.add("dynamic_forms.models.FormField", gen_onboarding_func)
+
 
 ########################################################################
 # Landing page
@@ -51,7 +66,9 @@ def test_home_page_is_reachable_without_login(client):
 ########################################################################
 
 
-def test_onboarding_page_is_reachable_without_login(client):
+def test_onboarding_page_is_reachable_without_login(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
     url = reverse("projects-onboarding")
     response = client.get(url)
     assert response.status_code == 200
@@ -59,18 +76,25 @@ def test_onboarding_page_is_reachable_without_login(client):
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_create_a_new_project(client):
+def test_performing_onboarding_create_a_new_project(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
     data = {
         "name": "a project",
         "email": "a@example.com",
         "location": "some place",
+        "org_name": "MyOrg",
         "first_name": "john",
         "last_name": "doe",
+        "description": "a description",
         "impediment_kinds": ["Autre"],
+        "response_0": "blah",
         "impediments": "some impediment",
     }
     response = client.post(reverse("projects-onboarding"), data=data)
-    project = models.Project.objects.all()[0]
+
+    project = models.Project.on_site.first()
+    assert project
     assert project.name == "a project"
     assert project.status == "DRAFT"
     assert len(project.ro_key) == 32
@@ -84,31 +108,45 @@ def test_performing_onboarding_create_a_new_project(client):
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_create_a_new_user_and_logs_in(client):
+def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
     data = {
         "name": "a project",
         "email": "a@example.com",
+        "description": "my desc",
+        "postal_code": "59800",
         "location": "some place",
         "first_name": "john",
         "last_name": "doe",
+        "org_name": "MyOrg",
+        "response_0": "blah",
         "impediment_kinds": ["Autre"],
         "impediments": "some impediment",
     }
     response = client.post(reverse("projects-onboarding"), data=data)
-    project = models.Project.objects.first()
+
+    assert response.status_code == 302
+
+    project = models.Project.on_site.first()
+    assert project
     user = project.members.first()
+
+    url = reverse("survey-project-session", args=[project.id])
+    assert response.url == (url + "?first_time=1")
 
     assert user.first_name == data["first_name"]
     assert user.last_name == data["last_name"]
 
     assert user.is_authenticated
-    url = reverse("survey-project-session", args=[project.id])
-    assert response.status_code == 302
-    assert response.url == (url + "?first_time=1")
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_sends_notification_to_project_moderators(client):
+def test_performing_onboarding_sends_notification_to_project_moderators(
+    request, client
+):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
     md_group = Recipe(auth.Group, name="project_moderator").make()
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     moderator = Recipe(
@@ -119,8 +157,11 @@ def test_performing_onboarding_sends_notification_to_project_moderators(client):
         "name": "a project",
         "email": "a@example.com",
         "location": "some place",
+        "org_name": "MyOrg",
+        "description": "my desc",
         "first_name": "john",
         "last_name": "doe",
+        "response_0": "blah",
         "impediment_kinds": ["Autre"],
         "impediments": "some impediment",
     }
@@ -131,7 +172,9 @@ def test_performing_onboarding_sends_notification_to_project_moderators(client):
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_sets_existing_postal_code(client):
+def test_performing_onboarding_sets_existing_postal_code(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
     commune = Recipe(geomatics.Commune, postal="12345").make()
     with login(client):
         response = client.post(
@@ -140,20 +183,26 @@ def test_performing_onboarding_sets_existing_postal_code(client):
                 "name": "a project",
                 "email": "a@example.com",
                 "location": "some place",
+                "org_name": "My Org",
+                "description": "my desc",
                 "first_name": "john",
                 "last_name": "doe",
                 "postcode": commune.postal,
+                "response_0": "blah",
                 "impediment_kinds": ["Autre"],
                 "impediments": "some impediment",
             },
         )
+
     assert response.status_code == 302
     project = models.Project.on_site.all()[0]
     assert project.commune == commune
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_discard_unknown_postal_code(client):
+def test_performing_onboarding_discard_unknown_postal_code(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
     with login(client):
         response = client.post(
             reverse("projects-onboarding"),
@@ -161,8 +210,11 @@ def test_performing_onboarding_discard_unknown_postal_code(client):
                 "name": "a project",
                 "email": "a@example.com",
                 "location": "some place",
+                "org_name": "My Org",
+                "description": "my desc",
                 "first_name": "john",
                 "last_name": "doe",
+                "response_0": "blah",
                 "postcode": "12345",
                 "impediment_kinds": ["Autre"],
                 "impediments": "some impediment",
@@ -175,9 +227,11 @@ def test_performing_onboarding_discard_unknown_postal_code(client):
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_allow_select_on_multiple_communes(client):
-    commune = Recipe(geomatics.Commune, postal="12345").make()
-    Recipe(geomatics.Commune, postal="12345").make()
+def test_performing_onboarding_allow_select_on_multiple_communes(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
+    commune = baker.make(geomatics.Commune, postal="12345")
+    baker.make(geomatics.Commune, postal="12345")
     with login(client):
         response = client.post(
             reverse("projects-onboarding"),
@@ -185,8 +239,11 @@ def test_performing_onboarding_allow_select_on_multiple_communes(client):
                 "name": "a project",
                 "email": "a@example.com",
                 "location": "some place",
+                "org_name": "My Org",
+                "description": "my desc",
                 "first_name": "john",
                 "last_name": "doe",
+                "response_0": "blah",
                 "postcode": commune.postal,
                 "impediment_kinds": ["Autre"],
                 "impediments": "some impediment",
@@ -194,7 +251,7 @@ def test_performing_onboarding_allow_select_on_multiple_communes(client):
         )
 
     assert response.status_code == 302
-    project = models.Project.objects.first()
+    project = models.Project.on_site.first()
     url = reverse("projects-onboarding-select-commune", args=[project.id])
     assert response.url == (url)
 
@@ -430,7 +487,7 @@ def test_project_knowledge_not_available_for_non_switchtender(request, client):
 @pytest.mark.django_db
 def test_project_knowledge_available_for_owner(request, client):
     current_site = get_current_site(request)
-    Recipe(home_models.SiteConfiguration, site=current_site).make()
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     # project email is same as test user to be logged in
     membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
@@ -447,7 +504,7 @@ def test_project_knowledge_available_for_owner(request, client):
 @pytest.mark.django_db
 def test_project_knowledge_available_for_switchtender(request, client):
     current_site = get_current_site(request)
-    Recipe(home_models.SiteConfiguration, site=current_site).make()
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
@@ -459,7 +516,7 @@ def test_project_knowledge_available_for_switchtender(request, client):
 @pytest.mark.django_db
 def test_project_knowledge_available_for_restricted_switchtender(request, client):
     current_site = get_current_site(request)
-    Recipe(home_models.SiteConfiguration, site=current_site).make()
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     other = Recipe(geomatics.Department, code="02").make()
     project = Recipe(
@@ -1190,7 +1247,7 @@ def test_switchtender_can_delete_email_from_project(request, client):
 
     assert response.status_code == 302
 
-    project = models.Project.objects.get(id=project.id)
+    project = models.Project.on_site.get(id=project.id)
     assert membership not in project.projectmember_set.all()
 
     update_url = reverse("projects-access-update", args=[project.id])
