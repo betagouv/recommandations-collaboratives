@@ -7,7 +7,7 @@
       <svg class="bi align-baseline" width="14" height="14" fill="currentColor">
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
       </svg>
-      <span>{{ document.description|truncatechars:20 }}</span>
+      <span>{{ document.description|truncatechars:33 }}</span>
     </a>
     <div>
         <span class="fst-italic" style="font-size: 0.8em;">par {% if document.uploaded_by.get_full_name %}{{ document.uploaded_by.get_full_name }}{% else %}{{ document.uploaded_by.email }}{% endif %}
