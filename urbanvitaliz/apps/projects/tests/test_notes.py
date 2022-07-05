@@ -88,7 +88,10 @@ def test_create_note_available_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-create-note", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-projects-add-note"')
@@ -117,7 +120,10 @@ def test_switchtender_creates_new_note_for_project_and_redirect(request, client)
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.post(
             reverse("projects-create-note", args=[project.id]),
             data={"content": "this is some content"},
@@ -201,7 +207,10 @@ def test_public_note_available_to_readers(request, client):
     note_content = "this is a public note"
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.post(
             reverse("projects-conversation-create-message", args=[project.id]),
             data={"content": note_content, "public": True},
@@ -229,11 +238,14 @@ def test_update_note_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_update_note_available_for_switchtender(client):
+def test_update_note_available_for_switchtender(request, client):
     note = Recipe(models.Note).make()
     url = reverse("projects-update-note", args=[note.id])
     with login(client, groups=["switchtender"]) as user:
-        note.project.switchtenders.add(user)
+        note.project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.get(url)
     assert response.status_code == 200
 
@@ -277,14 +289,17 @@ def test_update_private_note_for_project_collaborator(request, client):
 
 
 @pytest.mark.django_db
-def test_update_note_for_project_and_redirect(client):
+def test_update_note_for_project_and_redirect(request, client):
     note = Recipe(models.Note).make()
     updated_on_before = note.updated_on
     url = reverse("projects-update-note", args=[note.id])
     data = {"content": "this is some content"}
 
     with login(client, groups=["switchtender"]) as user:
-        note.project.switchtenders.add(user)
+        note.project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.post(url, data=data)
 
     note = models.Note.objects.get(id=note.id)
@@ -314,7 +329,10 @@ def test_delete_note_removes_activity(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
     with login(client, username="addman", groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         client.post(
             reverse("projects-create-note", args=[project.id]),
             data={"content": "content", "public": True},

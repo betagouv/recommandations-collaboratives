@@ -189,8 +189,9 @@ class Project(models.Model):
 
     switchtenders = models.ManyToManyField(
         auth_models.User,
-        related_name="projects_managed",
+        related_name="projects_switchtended",
         blank=True,
+        through="ProjectSwitchtender",
         verbose_name="Aiguilleu·r·se·s",
     )
 
@@ -221,6 +222,25 @@ class ProjectMember(models.Model):
     member = models.ForeignKey(auth_models.User, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     is_owner = models.BooleanField(default=False)
+
+
+class ProjectSwitchtenderOnSiteManager(CurrentSiteManager):
+    use_for_related_fields = True
+
+
+class ProjectSwitchtender(models.Model):
+    objects = ProjectSwitchtenderOnSiteManager()
+
+    class Meta:
+        unique_together = ("site", "project", "switchtender")
+
+    switchtender = models.ForeignKey(
+        auth_models.User, on_delete=models.CASCADE, related_name="projects_switchtended"
+    )
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name="switchtenders_on_site"
+    )
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
 
 class NoteManager(models.Manager):

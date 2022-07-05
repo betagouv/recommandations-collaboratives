@@ -367,7 +367,10 @@ def test_update_task_available_for_switchtender(request, client):
     task = Recipe(models.Task, site=get_current_site(request)).make()
     url = reverse("projects-update-task", args=[task.id])
     with login(client, groups=["switchtender"]) as user:
-        task.project.switchtenders.add(user)
+        task.project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.get(url)
     assert response.status_code == 200
     # FIXME rename add-task to edit-task ?
@@ -382,7 +385,10 @@ def test_update_task_for_project_and_redirect(request, client):
     data = {"content": "this is some content"}
 
     with login(client, groups=["switchtender"]) as user:
-        task.project.switchtenders.add(user)
+        task.project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.post(url, data=data)
 
     task = models.Task.on_site.get(id=task.id)
@@ -436,7 +442,9 @@ def test_create_new_task_for_project_notify_collaborators(mocker, client, reques
     ).make()
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
 
         client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -473,7 +481,10 @@ def test_public_task_update_does_not_trigger_notifications(request, client):
 
     data = {"text": "new-text"}
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -502,7 +513,9 @@ def test_draft_task_update_triggers_notifications(request, client):
 
     data = {"content": "new-text", "public": True}
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -569,7 +582,9 @@ def test_create_task_available_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-create-action", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
 
         response = client.get(url)
 
@@ -581,7 +596,9 @@ def test_create_new_action_with_invalid_push_type(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
 
         client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -601,7 +618,9 @@ def test_create_new_action_as_draft(request, client):
     content = "My Content"
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
 
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -624,7 +643,9 @@ def test_create_new_action_without_resource(request, client):
     content = "My Content"
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
 
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -658,7 +679,9 @@ def test_create_new_action_with_single_resource(request, client):
     content = "My Content"
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
 
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -694,7 +717,9 @@ def test_create_new_action_with_multiple_resources(request, client):
     ).make()
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
 
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -724,7 +749,10 @@ def test_sort_action_up(request, client):
     ).make()
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         client.post(reverse("projects-sort-task", args=[taskA.id, "up"]))
 
     taskA = models.Task.on_site.get(pk=taskA.id)
@@ -744,7 +772,10 @@ def test_sort_action_down(request, client):
     ).make()
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         client.post(reverse("projects-sort-task", args=[taskA.id, "down"]))
 
     taskA = models.Task.on_site.get(pk=taskA.id)
@@ -761,7 +792,10 @@ def test_sort_action_down_when_zero(request, client):
     ).make()
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         client.post(reverse("projects-sort-task", args=[taskA.id, "down"]))
 
     taskA = models.Task.on_site.get(pk=taskA.id)
@@ -777,7 +811,10 @@ def test_sort_action_up_when_no_follower(request, client):
     ).make()
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders.add(user)
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         client.post(reverse("projects-sort-task", args=[taskA.id, "up"]))
 
     taskA = models.Task.on_site.get(pk=taskA.id)
@@ -883,7 +920,10 @@ def test_reminder_is_updated_when_a_followup_issued(request, client):
     task = baker.make(models.Task, site=get_current_site(request), project=project)
 
     with login(client, groups=["switchtender"]) as user:
-        task.project.switchtenders.add(user)
+        task.project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
         url = reverse("projects-followup-task", args=[task.pk])
         response = client.post(url)
 

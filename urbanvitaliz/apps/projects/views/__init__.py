@@ -54,73 +54,6 @@ from ..utils import (
 ########################################################################
 
 
-def onboarding(request):
-    """Return the onboarding page"""
-    if (not request.user.is_staff) and check_if_switchtender(request.user):
-        return redirect("projects-project-prefill")
-
-    if request.method == "POST":
-        form = OnboardingForm(request.POST)
-        if form.is_valid():
-            project = form.save(commit=False)
-            project.ro_key = generate_ro_key()
-            insee = form.cleaned_data.get("insee", None)
-            if insee:
-                project.commune = geomatics.Commune.get_by_insee_code(insee)
-            else:
-                postcode = form.cleaned_data.get("postcode")
-                project.commune = geomatics.Commune.get_by_postal_code(postcode)
-
-            project.save()
-            project.sites.add(request.site)
-
-            user, _ = auth.User.objects.get_or_create(
-                username=form.cleaned_data.get("email"),
-                defaults={
-                    "email": form.cleaned_data.get("email"),
-                    "first_name": form.cleaned_data.get("first_name"),
-                    "last_name": form.cleaned_data.get("last_name"),
-                },
-            )
-
-            # Make her project owner
-            models.ProjectMember.objects.create(
-                member=user, project=project, is_owner=True
-            )
-
-            log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-
-            # Create initial public note
-            models.Note(
-                project=project,
-                content=f"# Demande initiale\n\n{project.impediments}",
-                public=True,
-            ).save()
-
-            # All green, notify
-            signals.project_submitted.send(
-                sender=models.Project, submitter=user, project=project
-            )
-
-            # NOTE check if commune is unique for code postal
-            if not insee and project.commune:
-                communes = geomatics.Commune.objects.filter(
-                    postal=project.commune.postal
-                )
-                if communes.count() > 1:
-                    url = reverse(
-                        "projects-onboarding-select-commune", args=[project.id]
-                    )
-                    return redirect(url)
-
-            response = redirect("survey-project-session", project_id=project.id)
-            response["Location"] += "?first_time=1"
-            return response
-    else:
-        form = OnboardingForm()
-    return render(request, "projects/onboarding.html", locals())
-
-
 def create_project_prefilled(request):
     """Create a new project for someone else"""
     is_switchtender_or_403(request.user)
@@ -134,7 +67,6 @@ def create_project_prefilled(request):
             postcode = form.cleaned_data.get("postcode")
             project.commune = geomatics.Commune.get_by_postal_code(postcode)
             project.save()
-            project.switchtenders.add(request.user)
             project.sites.add(request.site)
             project.save()
 
@@ -149,6 +81,11 @@ def create_project_prefilled(request):
 
             models.ProjectMember.objects.create(
                 member=user, project=project, is_owner=True
+            )
+
+            # Add the current user as switchtender
+            project.switchtenders_on_site.create(
+                switchtender=request.user, site=request.site
             )
 
             models.Note(
@@ -372,7 +309,10 @@ def project_switchtender_join(request, project_id=None):
     is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
 
     if request.method == "POST":
-        project.switchtenders.add(request.user)
+        project.switchtenders_on_site.create(
+            switchtender=request.user, site=request.site
+        )
+
         project.updated_on = timezone.now()
         project.save()
 
@@ -389,7 +329,7 @@ def project_switchtender_leave(request, project_id=None):
     is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
 
     if request.method == "POST":
-        project.switchtenders.remove(request.user)
+        project.switchtenders_on_site.filter(switchtender=request.user).delete()
         project.updated_on = timezone.now()
         project.save()
 

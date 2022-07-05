@@ -50,7 +50,7 @@ def can_administrate_project(project, user):
     if user.is_superuser:
         return True
 
-    return user in project.switchtenders.all()
+    return project.switchtenders_on_site.filter(switchtender=user).exists()
 
 
 def can_administrate_or_403(project, user):
@@ -145,7 +145,10 @@ def is_regional_actor_for_project_or_403(project, user, allow_national=False):
 
 def get_switchtenders_for_project(project):
     """Return all the switchtenders for a given project"""
-    return project.switchtenders.all().distinct()
+    return auth_models.User.objects.filter(
+        projects_switchtended__project=project,
+        projects_switchtended__site=get_current_site(request=None),
+    ).distinct()
 
 
 def get_collaborators_for_project(project):

@@ -10,6 +10,7 @@ created: 2022-01-18 10:11:56 CEST
 
 import pytest
 from django.contrib.auth import models as auth
+from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from urbanvitaliz.apps.geomatics import models as geomatics
@@ -33,12 +34,14 @@ def test_contributor_has_the_same_rights_as_the_owner(client):
 
 
 @pytest.mark.django_db
-def test_switchtender_can_manage_project(client):
+def test_switchtender_can_manage_project(request, client):
     switchtender = Recipe(auth.User).make()
     group = auth.Group.objects.get(name="switchtender")
     switchtender.groups.add(group)
     project = Recipe(models.Project, status="READY").make()
-    project.switchtenders.add(switchtender)
+    project.switchtenders_on_site.create(
+        switchtender=switchtender, site=get_current_site(request)
+    )
 
     assert utils.can_manage_project(project, switchtender)
 
