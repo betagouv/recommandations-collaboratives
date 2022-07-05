@@ -19,7 +19,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -235,7 +236,9 @@ class ProjectSwitchtender(models.Model):
         unique_together = ("site", "project", "switchtender")
 
     switchtender = models.ForeignKey(
-        auth_models.User, on_delete=models.CASCADE, related_name="projects_switchtended"
+        auth_models.User,
+        on_delete=models.CASCADE,
+        related_name="projects_switchtended_on_site",
     )
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="switchtenders_on_site"
