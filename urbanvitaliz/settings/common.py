@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "hijack",
     "hijack.contrib.admin",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
     "magicauth",
     "sass_processor",
     "markdownx",
@@ -121,6 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "sesame.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 # SESAME Configuration
@@ -217,5 +221,29 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 
 # RECAPTCHA, V3
 RECAPTCHA_REQUIRED_SCORE = 0.85
+
+# ALLAUTH
+ACCOUNT_ADAPTER = "urbanvitaliz.apps.home.adapters.UVAccountAdapter"
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 20
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+
+ACCOUNT_FORMS = {
+    "login": "urbanvitaliz.apps.home.forms.UVLoginForm",
+    "signup": "urbanvitaliz.apps.home.forms.UVSignupForm",
+    "add_email": "allauth.account.forms.AddEmailForm",
+    "change_password": "allauth.account.forms.ChangePasswordForm",
+    "set_password": "allauth.account.forms.SetPasswordForm",
+    "reset_password": "urbanvitaliz.apps.home.forms.UVResetPasswordForm",
+    "reset_password_from_key": "urbanvitaliz.apps.home.forms.UVResetPasswordKeyForm",
+    "disconnect": "allauth.socialaccount.forms.DisconnectForm",
+}
+
 
 # eof
