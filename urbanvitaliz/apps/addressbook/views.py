@@ -67,6 +67,7 @@ def organization_details(request, organization_id):
     is_switchtender_or_403(request.user)
 
     organization = get_object_or_404(models.Organization, pk=organization_id)
+    contacts = models.Contact.on_site.filter(organization=organization)
     return render(request, "addressbook/organization_details.html", locals())
 
 
