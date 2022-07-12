@@ -235,7 +235,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 
 ACCOUNT_FORMS = {
-    "login": "allauth.account.forms.LoginForm",
+    "login": "urbanvitaliz.apps.home.forms.UVSigninForm",
     "signup": "urbanvitaliz.apps.home.forms.UVSignupForm",
     "add_email": "allauth.account.forms.AddEmailForm",
     "change_password": "allauth.account.forms.ChangePasswordForm",
