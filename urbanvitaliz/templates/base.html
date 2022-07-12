@@ -70,7 +70,11 @@
         {% include "menu-top.html" %}
         {% endif %}
 
-        <main style="padding-top: 80px;">
+        {% if user.is_authenticated %}
+            <main style="padding-top: 80px;">
+        {% else %}
+            <main style="padding-top: 120px;">
+        {% endif %}
             {% if messages %}
             <div id="notification-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
                 {% for message in messages %}
