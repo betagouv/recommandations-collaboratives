@@ -121,7 +121,7 @@ def onboarding(request):
             response["Location"] += "?first_time=1"
             return response
     else:
-        form = OnboardingForm()
+        form = OnboardingWithCaptchaForm()
     return render(request, "projects/onboarding.html", locals())
 
 
