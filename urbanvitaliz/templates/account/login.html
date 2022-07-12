@@ -10,6 +10,7 @@
 {% block css %}
 <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/auth/auth.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block content %}
@@ -50,9 +51,7 @@
       </h4>
       <div class="fr-fieldset__content">
         <div class="fr-input-group">
-          <button class="fr-btn fr-btn--secondary custom-login-button">
-            <a href="{{ signup_url }}">S'incrire</a>
-          </button>
+            <a class="fr-btn fr-btn--secondary custom-login-button" href="{{ signup_url }}">S'incrire</a>
         </div>
       </div>
     </fieldset>
