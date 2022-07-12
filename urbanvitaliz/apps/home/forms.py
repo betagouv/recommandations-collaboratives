@@ -1,4 +1,4 @@
-from allauth.account.forms import SignupForm, LoginForm
+from allauth.account.forms import SignupForm, LoginForm, ResetPasswordForm
 from django import forms
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 
@@ -36,3 +36,7 @@ class UVSigninForm(LoginForm):
         self.fields['login'].widget = forms.TextInput(attrs={'type': 'email', 'class': 'fr-input fr-mt-2v fr-mb-4v'})
         self.fields['password'].widget = forms.PasswordInput(attrs={'class': 'fr-input fr-mt-2v fr-mb-4v'})
 
+class UVResetPasswordForm(ResetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super(UVResetPasswordForm, self).__init__(*args, **kwargs)
+        self.fields['email'].widget = forms.TextInput(attrs={'type': 'email', 'class': 'fr-input fr-mt-2v fr-mb-4v'})
