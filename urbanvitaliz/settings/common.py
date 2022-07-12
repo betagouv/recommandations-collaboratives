@@ -235,13 +235,13 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 
 ACCOUNT_FORMS = {
-    "login": "allauth.account.forms.LoginForm",
+    "login": "urbanvitaliz.apps.home.forms.UVLoginForm",
     "signup": "urbanvitaliz.apps.home.forms.UVSignupForm",
     "add_email": "allauth.account.forms.AddEmailForm",
     "change_password": "allauth.account.forms.ChangePasswordForm",
     "set_password": "allauth.account.forms.SetPasswordForm",
-    "reset_password": "allauth.account.forms.ResetPasswordForm",
-    "reset_password_from_key": "allauth.account.forms.ResetPasswordKeyForm",
+    "reset_password": "urbanvitaliz.apps.home.forms.UVResetPasswordForm",
+    "reset_password_from_key": "urbanvitaliz.apps.home.forms.UVResetPasswordKeyForm",
     "disconnect": "allauth.socialaccount.forms.DisconnectForm",
 }
 
