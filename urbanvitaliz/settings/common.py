@@ -241,7 +241,7 @@ ACCOUNT_FORMS = {
     "change_password": "allauth.account.forms.ChangePasswordForm",
     "set_password": "allauth.account.forms.SetPasswordForm",
     "reset_password": "urbanvitaliz.apps.home.forms.UVResetPasswordForm",
-    "reset_password_from_key": "allauth.account.forms.ResetPasswordKeyForm",
+    "reset_password_from_key": "urbanvitaliz.apps.home.forms.UVResetPasswordKeyForm",
     "disconnect": "allauth.socialaccount.forms.DisconnectForm",
 }
 
