@@ -55,6 +55,7 @@ router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
 
 urlpatterns = [
     path("api/", include(router.urls)),
+    path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
     path("notifications/", include(notifications.urls, namespace="notifications")),
