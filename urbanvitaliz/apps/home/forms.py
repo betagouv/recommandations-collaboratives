@@ -4,9 +4,16 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 
 
 class UVSignupForm(SignupForm):
-    first_name = forms.CharField(max_length=50, required=True, label="Prénom")
-    last_name = forms.CharField(max_length=50, required=True, label="Nom")
-    organization = forms.CharField(max_length=50, required=True, label="Organisation")
+
+    def __init__(self, *args, **kwargs):
+        super(UVSignupForm, self).__init__(*args, **kwargs)
+        self.fields['email'].widget = forms.TextInput(attrs={'type': 'email', 'class': 'fr-input fr-mt-2v fr-mb-4v'})
+        self.fields['password1'].widget = forms.PasswordInput(attrs={'class': 'fr-input fr-mt-2v fr-mb-4v'})
+        self.fields['password2'].widget = forms.PasswordInput(attrs={'class': 'fr-input fr-mt-2v fr-mb-4v'})
+
+    first_name = forms.CharField(max_length=50, required=True, label="Prénom", widget=forms.TextInput(attrs={'class': 'fr-input fr-mt-2v fr-mb-4v'}))
+    last_name = forms.CharField(max_length=50, required=True, label="Nom", widget=forms.TextInput(attrs={'class': 'fr-input fr-mt-2v fr-mb-4v'}))
+    organization = forms.CharField(max_length=50, required=True, label="Organisation", widget=forms.TextInput(attrs={'class': 'fr-input fr-mt-2v fr-mb-4v'}))
 
     def save(self, request):
         # Ensure you call the parent class's save.
