@@ -34,7 +34,12 @@ from urbanvitaliz.utils import (
 )
 
 from .. import models, signals
-from ..forms import OnboardingForm, ProjectForm, SelectCommuneForm
+from ..forms import (
+    OnboardingForm,
+    OnboardingWithCaptchaForm,
+    ProjectForm,
+    SelectCommuneForm,
+)
 from ..utils import (
     can_administrate_or_403,
     can_manage_project,
@@ -60,7 +65,7 @@ def onboarding(request):
         return redirect("projects-project-prefill")
 
     if request.method == "POST":
-        form = OnboardingForm(request.POST)
+        form = OnboardingWithCaptchaForm(request.POST)
         if form.is_valid():
             project = form.save(commit=False)
             project.ro_key = generate_ro_key()
