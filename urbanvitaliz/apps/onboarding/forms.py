@@ -7,10 +7,11 @@ author  : guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created : 2022-06-06 14:16:20 CEST
 """
 
+import os
+
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV3
 from django import forms
-from django.conf import settings
 
 from . import models
 
@@ -32,13 +33,7 @@ class OnboardingResponseForm(forms.ModelForm):
             "insee",
             "description",
             "response",
-            "captcha",
         ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if getattr(settings, "RECAPTCHA_REQUIRED_SCORE", 1.0) == 0:
-            self.fields.pop("captcha")
 
     first_name = forms.CharField(label="Prénom du contact", initial="", required=True)
     last_name = forms.CharField(label="Nom du contact", initial="", required=True)
@@ -56,5 +51,30 @@ class OnboardingResponseForm(forms.ModelForm):
     insee = forms.CharField(max_length=5, required=False, label="Code Insee")
 
     description = forms.CharField(label="Description")
+
+
+class OnboardingResponseWithCaptchaForm(OnboardingResponseForm):
+    class Meta:
+        model = models.OnboardingResponse
+        fields = [
+            "first_name",
+            "last_name",
+            "phone",
+            "org_name",
+            "email",
+            "name",
+            "location",
+            "insee",
+            "description",
+            "response",
+            "captcha",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Prevent tests from failing
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            self.fields.pop("captcha")
 
     captcha = ReCaptchaField(widget=ReCaptchaV3(api_params={"hl": "fr"}))

@@ -20,7 +20,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -334,14 +335,14 @@ def test_create_prefilled_project_creates_a_new_project(client):
         "name": "a project",
         "email": "a@example.com",
         "location": "some place",
+        "phone": "03939382828",
         "postal": "59000",
         "org_name": "my org",
         "description": "blah",
         "first_name": "john",
         "last_name": "doe",
+        "response": "blah",
         "response_0": "blah",
-        "impediment_kinds": ["Autre"],
-        "impediments": "some impediment",
     }
     with login(client, groups=["switchtender"]):
         response = client.post(reverse("projects-project-prefill"), data=data)
@@ -372,7 +373,6 @@ def test_my_projects_are_stored_in_session_on_login(request, client):
     with login(client, user=membership.member):
         pass
 
-    print(client)
     assert len(client.session["projects"]) == 1
     session_project = client.session["projects"][0]
     assert session_project["id"] == project.id

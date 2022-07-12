@@ -1,12 +1,11 @@
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.shortcuts import redirect, render, reverse
-from django.views.generic.edit import CreateView
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import signals as projects_signals
 from urbanvitaliz.apps.projects.utils import generate_ro_key
-from urbanvitaliz.utils import get_site_config_or_503
+from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 
 from . import forms, models
 
@@ -15,8 +14,11 @@ def onboarding(request):
     """Return the onboarding page"""
     site_config = get_site_config_or_503(request.site)
 
+    if (not request.user.is_staff) and check_if_switchtender(request.user):
+        return redirect("projects-project-prefill")
+
     # Fetch the onboarding form associated with the current site
-    form = forms.OnboardingResponseForm(request.POST or None)
+    form = forms.OnboardingResponseWithCaptchaForm(request.POST or None)
     onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
     # Add fields in JSON to dynamic form rendering field.
     form.fields["response"].add_fields(onboarding_instance.form)
