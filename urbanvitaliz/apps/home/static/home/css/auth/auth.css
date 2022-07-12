@@ -1,0 +1,6 @@
+.errorlist {
+    background-color: #daaeae;
+    border-radius: 0.25rem 0.25rem 0 0;
+    list-style: none;
+    padding: 10px;
+}
