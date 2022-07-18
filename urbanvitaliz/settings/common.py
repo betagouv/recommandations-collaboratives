@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "magicauth",
     "sass_processor",
+    "django_vite",
     "markdownx",
     "tagging",
     "leaflet",
@@ -244,6 +245,11 @@ ACCOUNT_FORMS = {
     "reset_password_from_key": "urbanvitaliz.apps.home.forms.UVResetPasswordKeyForm",
     "disconnect": "allauth.socialaccount.forms.DisconnectForm",
 }
+
+# Django vite
+DJANGO_VITE_ASSETS_PATH = BASE_DIR / "static" / "frontend/dist"
+DJANGO_VITE_MANIFEST_PATH = BASE_DIR / "static" / "frontend/dist/manifest.json"
+DJANGO_VITE_STATIC_URL_PREFIX = "dist"
 
 
 # eof
