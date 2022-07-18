@@ -1,0 +1,20 @@
+{
+  "name": "urbanvitaliz",
+  "version": "1.0.0",
+  "description": "urbanvitaliz",
+  "author": "guillaume.libersat@beta.gouv.fr, quentin.danneville@beta.gouv.fr",
+  "private": true,
+  "scripts": {
+    "test": "./node_modules/vitest/vitest.mjs",
+    "dev": "./node_modules/vite/bin/vite.js",
+    "prod": "./node_modules/vite/bin/vite.js build"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.5",
+    "alpinejs": "^3.10.2",
+    "axios": "^0.27.2",
+    "js-cookie": "^3.0.1",
+    "vite": "^2.9.13",
+    "vitest": "^0.16.0"
+  }
+}
