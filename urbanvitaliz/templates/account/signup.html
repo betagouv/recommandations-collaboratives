@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/auth/auth.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<div class="fr-container fr-py-6w" style="font-family: 'Marianne', arial, sans-serif;">
+    <h1 class="fr-mb-6w">
+        <svg class="bi me-2" width="28" height="28">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
+        </svg>
+        Création d'un compte UrbanVitaliz
+    </h1>
+
+    <form class="signup fr-form-group" id="signup_form" method="post" action="{% url 'account_signup' %}">
+        {% csrf_token %}
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        <fieldset class="fr-fieldset">
+            <h4 class="fr-mb-2w d-block">
+                S'inscrire en remplissant les champs suivants
+            </h4>
+            <div class="fr-fieldset__content">
+                {{ form.as_p }}
+                <div class="fr-input-group fr-mt-4v">
+                    <button class="fr-btn custom-login-button" type="submit">
+                        S'inscrire
+                    </button>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+    <hr style="height: 1px;margin-top: 45px;background-color: grey!important; background-image: none;" />
+    <div class="fr-form-group fr-mt-10v">
+        <fieldset class="fr-fieldset">
+            <h4 class="fr-mb-2w d-block ">
+                Vous avez déjà un compte chez nous ?
+            </h4>
+            <div class="fr-fieldset__content">
+                <div class="fr-input-group">
+                    <a class="fr-btn fr-btn--secondary custom-login-button" href="{% url 'account_login' %}">Se
+                        connecter</a>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+
+</div>
+<hr style="height: 1px;margin-bottom: 20px;background-color: grey!important; background-image: none;" />
+
+<!-- <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    <button type="submit">{% trans "Sign Up" %} &raquo;</button>
+</form> -->
+
+{% endblock %}
