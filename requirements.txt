@@ -27,3 +27,4 @@ django-sass-processor
 libsass
 django-compressor==3.1
 multimethod==1.7
+django-vite==2.0.2
