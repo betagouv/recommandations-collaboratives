@@ -1,10 +1,15 @@
 {% load static %}
 {% load sass_tags %}
+{% load django_vite %}
+
 <!doctype html>
 <html lang="fr">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        {% vite_hmr_client %}
+        {% vite_asset 'js/main.js' %}
 
         {% if not debug %}
         <script>
