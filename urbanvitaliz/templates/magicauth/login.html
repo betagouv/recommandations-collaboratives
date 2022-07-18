@@ -1,18 +1,33 @@
 {% extends "base.html" %}
 
+{% load sass_tags %}
 {% load static %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
 
 {% block content %}
 
-<div class="col-9 py-5 mx-auto">
+<div class="fr-container fr-py-6w" style="font-family: 'Marianne', arial, sans-serif;">
 
-    <h2 class="mb-3">
-        <svg class="bi me-2" width="28" height="28">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle"/>
-        </svg>
-        Se connecter ou créer un compte
-    </h2>
 
+    <div class="d-flex justify-content-between align-items-start">
+        <h1 class="fr-mb-6w">
+          <svg class="bi me-2" width="28" height="28">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
+          </svg>
+          Se connecter ou créer un compte
+        </h1>
+        <div class="fr-input-group d-flex justify-content-end flex-column align-items-end">
+          <p>Se connecter avec un mot de passe ?</p>
+          <div class="fr-mt-2v">
+            <a class="fr-btn fr-btn--secondary" href="{% url "account_login" %}">connexion avec mot de passe</a>
+          </div>
+        </div>
+      </div>
+    
     <div class="bd-callout bd-callout-info mb-5">
         <p><strong>2 en 1 : c'est plus simple !</strong></p>
 
@@ -39,8 +54,8 @@
             {% endfor %}
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">
-            <svg class="bi me-2 align-middle" width="20" height="20">
+        <button type="submit" class="fr-btn custom-login-button">
+            <svg class="bi me-2 align-middle" width="20" height="20" style="fill: white;">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
             </svg>
             Recevoir mon lien de connexion

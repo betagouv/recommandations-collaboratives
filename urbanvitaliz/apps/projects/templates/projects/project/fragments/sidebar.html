@@ -2,11 +2,11 @@
 {% load humanize %}
 
 <div class="d-grid gap-2 my-3">
-    {% if can_manage %}
-    <span class="d-inline-block"> 
+    {% if can_manage and not disable_can_share %}
+    <span class="d-inline-block">
         <a href="{% url 'projects-access-update' project.id %}" class="btn btn-primary w-100 btn-sm">
             <svg class="bi" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock"/>
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
             </svg>
             &nbsp;
             Partager
@@ -14,59 +14,64 @@
     </span>
     {% endif %}
     {% if can_administrate %}
-    <span class="d-inline-block"> 
+    {% if not disable_can_edit %}
+    <span class="d-inline-block">
         <a href="{% url 'projects-project-update' project.id %}" class="btn btn-primary w-100 btn-sm">
             <svg class="bi" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil"/>
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil" />
             </svg>
             &nbsp;
             Éditer
         </a>
     </span>
+    {% endif %}
+    {% if not disable_add_recommendation %}
     <span class="d-inline-block">
-        <a class="btn btn-outline-primary w-100 btn-sm"  href="{% url 'projects-project-create-action' project.id %}">
+        <a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'projects-project-create-action' project.id %}">
             <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus"/>
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
             </svg>
             Ajouter une recommandation
         </a>
     </span>
-
+    {% endif %}
+    {% if not disable_toggle_follow %}
     <span class="d-inline-block">
         {% if request.user in project.switchtenders.all %}
-          <form method="POST" action="{% url 'projects-project-switchtender-leave' project.id %}">
-        {% else %}
-          <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
-        {% endif %}
+        <form method="POST" action="{% url 'projects-project-switchtender-leave' project.id %}">
+            {% else %}
+            <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
+                {% endif %}
                 {% csrf_token %}
 
-            {% if request.user not in project.switchtenders.all %}
-            <button class="btn btn-success w-100 btn-sm">
-                <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell"/>
-                </svg>
-                &nbsp;
-                Suivre ce projet
+                {% if request.user not in project.switchtenders.all %}
+                <button class="btn btn-success w-100 btn-sm">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell" />
+                    </svg>
+                    &nbsp;
+                    Suivre ce projet
 
-            </button>
-            {% else %}
-            <button class="btn btn-outline-secondary w-100 btn-sm">
-                <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-slash"/>
-                </svg>
-                &nbsp;
-                Ne plus suivre ce projet
-            </button>
-            {% endif %}
-        </form>
+                </button>
+                {% else %}
+                <button class="btn btn-outline-secondary w-100 btn-sm">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-slash" />
+                    </svg>
+                    &nbsp;
+                    Ne plus suivre ce projet
+                </button>
+                {% endif %}
+            </form>
     </span>
-    {% elif is_regional_actor %}
+    {% endif %}
+    {% elif is_regional_actor and not disable_toggle_follow %}
     <span class="d-inline-block">
         <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
             {% csrf_token %}
             <button class="btn btn-success w-100 btn-sm">
                 <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell"/>
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell" />
                 </svg>
                 &nbsp;
                 Suivre ce projet
@@ -76,4 +81,3 @@
     </span>
     {% endif %}
 </div>
-
