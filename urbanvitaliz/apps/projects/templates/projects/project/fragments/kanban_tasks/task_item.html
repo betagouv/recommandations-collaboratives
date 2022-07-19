@@ -33,27 +33,27 @@
 						{% if can_manage and not disable_edit %}
 							<div>
 								<template x-if="i > 0">
-									<a class="d-block p-1" @click="moveAbove(t, tasks[i - 1])" style="cursor: pointer;">
+									<a class="d-block p-1" @click="moveAbove(t, column(board.status)[i - 1])" style="cursor: pointer;">
 										<svg class="aling-middle bi ms-1" width="12px" height="12px" fill="currentColor">
-											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
+											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
 										</svg>
 									</a>
 								</template>
-								<template x-if="i < tasks.length - 1">
-									<a class="d-block p-1" @click="moveBelow(t, tasks[i + 1])" style="cursor: pointer;">
+								<template x-if="i < column(board.status).length - 1">
+									<a class="d-block p-1" @click="moveBelow(t, column(board.status)[i + 1])" style="cursor: pointer;">
 										<svg class="aling-middle bi ms-1" width="12px" height="12px" fill="currentColor">
-											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
+											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
 										</svg>
 									</a>
 								</template>
 							</div>
-						{% endif %}
-						{% if not is_switchtender %}
+							{% if is_switchtender %}
 								<div class="me-2 text-danger" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="toArchiveTooltip()" @click="openFeedbackModal(t)" style="cursor: pointer;">
 									<svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
-										<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
+										<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
 									</svg>
 								</div>
+							{% endif %}
 						{% endif %}
 					</div>
 					<div class="flex-fill mt-1 ms-2" @click="onPreviewClick(t.id)" style="cursor: pointer; font-size: 0.9em;">
@@ -88,7 +88,7 @@
 				<div class="d-flex align-items-center">
 					<div class="text-primary position-relative" @click="onPreviewClick(t.id)" style="cursor: pointer;">
 						<svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
-							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat" />
+							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat" />
 						</svg>
 						<span x-text="t.resource_id ? t.comments_count + 1  : t.comments_count"></span>
 					</div>
@@ -100,7 +100,7 @@
 						data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(t.id)"
 						style="cursor: pointer;">
 						<svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
-							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
+							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
 						</svg>
 					</div>
 					{% if can_administrate and not disable_edit %}
