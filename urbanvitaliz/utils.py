@@ -40,7 +40,7 @@ def is_switchtender_or_403(user):
 
 
 def check_if_switchtender(user):
-    """Return true if user is a switchtender"""
+    """Return true if user is a global switchtender"""
     return auth.User.objects.filter(pk=user.id, groups__name="switchtender").exists()
 
 
