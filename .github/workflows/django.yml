@@ -43,11 +43,24 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - uses: borales/actions-yarn@v3.0.0
+        with:
+          cmd: install # will run `yarn install` command
+
       - name: Install packages
         run: |
           sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
           sudo apt-get update
           sudo apt-get install gdal-bin libgdal-dev
+
+      - name: Compile JS
+        working-directory: ./frontend
+        run: |
+          yarn build
 
       - name: Install Dependencies
         run: |
