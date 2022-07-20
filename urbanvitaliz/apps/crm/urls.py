@@ -18,4 +18,14 @@ urlpatterns = [
         views.organization_details,
         name="crm-organization-details",
     ),
+    path(
+        r"crm/user/<int:user_id>/",
+        views.user_details,
+        name="crm-user-details",
+    ),
+    path(
+        r"crm/project/<int:project_id>/",
+        views.project_details,
+        name="crm-project-details",
+    ),
 ]
