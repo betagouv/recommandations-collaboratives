@@ -16,8 +16,10 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz import utils as uv_utils
-from urbanvitaliz.apps.communication.digests import (make_action_digest,
-                                                     make_project_digest)
+from urbanvitaliz.apps.communication.digests import (
+    make_action_digest,
+    make_project_digest,
+)
 from urbanvitaliz.apps.reminders import api
 
 from . import models
