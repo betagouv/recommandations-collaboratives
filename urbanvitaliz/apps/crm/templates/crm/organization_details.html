@@ -66,6 +66,18 @@
                     Repudiandae reprehenderit aliquid consectetur.…</p>
                 <div>
                     <p>Timeline</p>
+
+                    <ul>
+                        {% for action in actions %}
+                        <li>
+                            {# Idéalement, détecter une partie des CT pour afficher mieux le contenu #}
+                            {% if action.target %}
+                            [{{ action.target }}] -
+                            {% endif %}
+                            {{ action.actor }} {{ action.verb }} {{ action.object }}
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
