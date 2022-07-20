@@ -15,3 +15,15 @@ def organization_details(request, organization_id):
     unadvised_projects = Project.objects.exclude(switchtenders__in=participants)
 
     return render(request, "crm/organization_details.html", locals())
+
+
+def user_details(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+
+    return render(request, "crm/user_details.html", locals())
+
+
+def project_details(request, project_id):
+    user = get_object_or_404(Project, pk=project_id)
+
+    return render(request, "crm/project_details.html", locals())
