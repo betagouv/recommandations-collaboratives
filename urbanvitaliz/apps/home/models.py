@@ -48,6 +48,7 @@ class UserProfile(models.Model):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
+        related_name="registered_profiles",
     )
 
     organization_position = models.CharField(null=True, blank=True, max_length=200)
