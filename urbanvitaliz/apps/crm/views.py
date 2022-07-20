@@ -28,13 +28,13 @@ def organization_details(request, organization_id):
 
 @staff_member_required
 def user_details(request, user_id):
-    user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id)
 
     return render(request, "crm/user_details.html", locals())
 
 
 @staff_member_required
 def project_details(request, project_id):
-    user = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project, pk=project_id)
 
     return render(request, "crm/project_details.html", locals())
