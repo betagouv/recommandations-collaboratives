@@ -7,7 +7,7 @@
   "scripts": {
     "test": "./node_modules/vitest/vitest.mjs",
     "dev": "./node_modules/vite/bin/vite.js",
-    "prod": "./node_modules/vite/bin/vite.js build"
+    "build": "./node_modules/vite/bin/vite.js build"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.5",
