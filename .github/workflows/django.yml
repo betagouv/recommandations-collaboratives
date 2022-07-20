@@ -51,15 +51,16 @@ jobs:
         with:
           cmd: install # will run `yarn install` command
 
-      - uses: borales/actions-yarn@v3.0.0
-        with:
-          cmd: build # will run `yarn build` command
-
       - name: Install packages
         run: |
           sudo apt-add-repository ppa:ubuntugis/ubuntugis-unstable
           sudo apt-get update
           sudo apt-get install gdal-bin libgdal-dev
+
+      - name: Compile JS
+        working-directory: ./frontend
+        run: |
+          yarn build
 
       - name: Install Dependencies
         run: |
