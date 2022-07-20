@@ -1,9 +1,18 @@
+"""
+Urls for crm application
+
+author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
+created : 2022-07-20 12:27:25 CEST
+"""
+
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project
 
 
+@staff_member_required
 def organization_details(request, organization_id):
     organization = get_object_or_404(Organization, pk=organization_id)
 
@@ -17,12 +26,14 @@ def organization_details(request, organization_id):
     return render(request, "crm/organization_details.html", locals())
 
 
+@staff_member_required
 def user_details(request, user_id):
     user = get_object_or_404(User, pk=user_id)
 
     return render(request, "crm/user_details.html", locals())
 
 
+@staff_member_required
 def project_details(request, project_id):
     user = get_object_or_404(Project, pk=project_id)
 
