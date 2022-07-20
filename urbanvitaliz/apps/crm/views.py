@@ -21,7 +21,12 @@ def organization_details(request, organization_id):
     )
 
     advised_projects = Project.objects.filter(switchtenders__in=participants)
-    unadvised_projects = Project.objects.exclude(switchtenders__in=participants)
+
+    org_departments = organization.departments.all()
+
+    unadvised_projects = Project.objects.filter(
+        commune__department__in=org_departments
+    ).exclude(switchtenders__in=participants)
 
     return render(request, "crm/organization_details.html", locals())
 
