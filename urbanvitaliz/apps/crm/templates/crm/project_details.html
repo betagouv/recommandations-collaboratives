@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+
+<div class="col-12 mx-auto">
+    <div class="row">
+        <div class="breadcrumb d-flex align-items-center">
+            <span>
+                <a href="{% url 'crm-organization-details' 3 %}">CRM</a>
+            </span>
+            <i class="mx-4">/</i>
+            <span>Détails de l'activité d'une personne</span>
+        </div>
+        <div class="col-12 py-5 mx-auto row justify-content-start">
+            <div class="col-4 d-flex flex-column justify-content-start">
+                <div class="">
+                    <h1>Projets suivis</h1>
+                    <ul>
+                        {% for project in advised_projects %}
+                        <li>
+                            <a href="{% url 'crm-project-details' project.pk %}">{{project.name}}</a>
+                        </li>
+                        {% empty %}
+                        <li>Désolé, pas encore de projet</li>
+                        {%endfor%}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-8 d-flex flex-column justify-content-start">
+                <h1>{{user.get_full_name}}</h1>
+                <div>
+                    <p>Timeline</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
