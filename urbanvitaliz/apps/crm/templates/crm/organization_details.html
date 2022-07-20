@@ -1,1 +1,72 @@
-Hello CRM !
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+
+<div class="col-12 mx-auto">
+    <div class="row">
+        <div class="col-12 py-5 mx-auto row">
+            <div class="col-4 d-flex flex-column justify-content-start">
+                <div>
+                    <h1>Participants</h1>
+                    <ul>
+                        {% for participant in participants %}
+                        <li>
+                            - <a href="{% url 'crm-user-details' participant.pk %}">{{participant.get_full_name }}</a>
+                        </li>
+                        {% empty %}
+                        <li>Désolé, personne assigné</li>
+                        {%endfor%}
+                    </ul>
+                </div>
+                <div class="mt-4">
+                    <h1>Projets suivis</h1>
+                    <ul>
+                        {% for project in advised_projects %}
+                        <li>
+                            - <a href="{% url 'crm-project-details' project.pk %}">{{project.name}}</a>
+                        </li>
+                        {% empty %}
+                        <li>Désolé, pas encore de projet</li>
+                        {%endfor%}
+                    </ul>
+                </div>
+                <div class="mt-4">
+                    <h1>Projets orphelins</h1>
+                    <ul>
+                        {% for project in unadvised_projects %}
+                        <li>
+                            - <a href="{% url 'crm-project-details' project.pk %}">{{project.name}}</a>
+                        </li>
+                        {% empty %}
+                        <li>Désolé, pas encore de projet</li>
+                        {%endfor%}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-8 d-flex flex-column justify-content-start">
+                <h1>Organisation</h1>
+                <h2>DDT numéro quelque chose</h2>
+                <p>Consequatur rerum quibusdam dolorem sit sit. Et quaerat sit officiis aliquid reiciendis minima sed.
+                    Repudiandae reprehenderit aliquid consectetur.…</p>
+                <div>
+                    <p>Timeline</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
