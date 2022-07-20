@@ -16,10 +16,8 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz import utils as uv_utils
-from urbanvitaliz.apps.communication.digests import (
-    make_action_digest,
-    make_project_digest,
-)
+from urbanvitaliz.apps.communication.digests import (make_action_digest,
+                                                     make_project_digest)
 from urbanvitaliz.apps.reminders import api
 
 from . import models
@@ -45,8 +43,9 @@ def can_manage_project(project, user, allow_draft=False):
 
 def can_administrate_project(project, user):
     """
-    Check if user is allowed to administrate this project.
-    Administrators are mostly assigned switchtenders
+    Check if user is allowed to administrate the given project.
+    If project is None, check if this user can at least administer one
+    Administrators are mostly switchtenders/advisors
     """
     if user.is_anonymous:
         return False
@@ -54,7 +53,10 @@ def can_administrate_project(project, user):
     if user.is_superuser:
         return True
 
-    return user in project.switchtenders.all()
+    if project:
+        return user in project.switchtenders.all()
+    else:
+        return models.Project.objects.filter(switchtenders=user).count() > 0
 
 
 def can_administrate_or_403(project, user):
