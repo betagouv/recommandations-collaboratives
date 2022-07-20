@@ -17,14 +17,17 @@
 
 <div class="col-12 mx-auto">
     <div class="row">
-        <div class="col-12 py-5 mx-auto row">
+        <div class="breadcrumb">
+            <span>CRM</span>
+        </div>
+        <div class="col-12 py-3 mx-auto row">
             <div class="col-4 d-flex flex-column justify-content-start">
                 <div>
                     <h1>Participants</h1>
                     <ul>
                         {% for participant in participants %}
                         <li>
-                            - <a href="{% url 'crm-user-details' participant.pk %}">{{participant.get_full_name }}</a>
+                            <a href="{% url 'crm-user-details' participant.pk %}">{{participant.get_full_name }}</a>
                         </li>
                         {% empty %}
                         <li>Désolé, personne assigné</li>
@@ -36,7 +39,7 @@
                     <ul>
                         {% for project in advised_projects %}
                         <li>
-                            - <a href="{% url 'crm-project-details' project.pk %}">{{project.name}}</a>
+                            <a href="{% url 'crm-project-details' project.pk %}">{{project.name}}</a>
                         </li>
                         {% empty %}
                         <li>Désolé, pas encore de projet</li>
@@ -48,7 +51,7 @@
                     <ul>
                         {% for project in unadvised_projects %}
                         <li>
-                            - <a href="{% url 'crm-project-details' project.pk %}">{{project.name}}</a>
+                            <a href="{% url 'crm-project-details' project.pk %}">{{project.name}}</a>
                         </li>
                         {% empty %}
                         <li>Désolé, pas encore de projet</li>
