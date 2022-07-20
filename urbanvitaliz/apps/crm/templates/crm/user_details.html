@@ -24,7 +24,7 @@
                 <div class="">
                     <h1>Projets suivis</h1>
                     <ul>
-                        {% for project in advised_projects %}
+                        {% for project in crm_user.projects_managed.all %}
                         <li>
                             <a href="{% url 'crm-project-details' project.pk %}">{{project.name}}</a>
                         </li>
@@ -38,6 +38,16 @@
                 <h1>{{crm_user.get_full_name}}</h1>
                 <div>
                     <p>Timeline</p>
+
+                    {% for action in actions %}
+                    <li>
+                        {# Idéalement, détecter une partie des CT pour afficher mieux le contenu #}
+                        {% if action.target %}
+                        [{{ action.target }}] -
+                        {% endif %}
+                        {{ action.actor }} {{ action.verb }} {{ action.object }}
+                    </li>
+                    {% endfor %}
                 </div>
             </div>
         </div>
