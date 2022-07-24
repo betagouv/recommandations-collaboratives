@@ -1,10 +1,20 @@
-body {
-    background-color: red !important;
+body,
+main {
+    overflow-x: initial !important;
 }
 
-.breadcrumb {
+.crm-sticky {
     position: sticky;
-    margin-top: 26px;
-    padding: 10px 25px;
-    background-color: #d6deff;
+    top: 106px;
+}
+
+.crm-aside {
+    border-right: 1px solid #e1e1e1;
+}
+
+.crm-header {
+    position: sticky;
+    top: 106px;
+    background-color: white;
+    border-bottom: 1px solid #e1e1e1;
 }
