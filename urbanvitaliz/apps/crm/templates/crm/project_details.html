@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 
-{% load gravatar %}
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
@@ -13,21 +12,28 @@
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
-
 {% block content %}
 <div class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
     <aside class="w-25 crm-aside px-4">
         <div class="d-flex flex-column justify-content-start crm-sticky">
             <div class="pt-3">
-                <h1>Participants</h1>
-                <ul class="mt-2 mb-2" style="list-style: none;">
+                <h5>Conseiller·es</h5>
+                <ul class="mt-2 mb-2" class="list-unstyled">
                     {% regroup project.switchtenders.all by profile.organization as grouped_st %}
 
                     {% for group in grouped_st %}
                     <div class="mb-4">
-                        <h4>{{ group.grouper }}</h4>
+                        {% if group.grouper %}
+                        <a class="d-flex align-items-center"
+                            href="{% url 'crm-organization-details' group.grouper.pk %}">
+                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
+                            </svg>
+                            <strong>{{ group.grouper }}</strong>
+                        </a>
+                        {% endif %}
                         {% for switchtender in group.list %}
-                        <ul>
+                        <ul class="list-unstyled">
                             <li>
                                 <a class="d-flex align-items-center"
                                     href="{% url 'crm-user-details' switchtender.pk %}">
@@ -45,71 +51,43 @@
                     {% endfor %}
                 </ul>
             </div>
+            <div>
+                <h5>Collectivité</h5>
+                <ul class="list-unstyled">
+                    {% for member in project.members.all %}
+                    <li>
+                        <a class="d-flex align-items-center" href="{% url 'crm-user-details' member.pk %}">
+                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+                            </svg>
+                            <span>{{member.get_full_name}}</span>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li>
+                        no one
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </aside>
     <div class="w-75 d-flex flex-column justify-content-start">
-        <div class="crm-header px-4 py-3">
-            <h1>{{ project.name}}</h1>
-            <a class="d-flex align-items-center" href="{% url 'crm-organization-details' 4 %}">
+        <div class="crm-header px-4 py-3 pt-4">
+            <h3 class="d-flex align-items-center">
                 <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left" />
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
                 </svg>
-                <span>Revenir aux détails de l'organisation</span>
+                <span>{{ project.name }}</span>
+            </h3>
+            <a class="d-flex align-items-center" href="{{ project.get_absolute_url }}">
+                <span>Voir le projet</span>
             </a>
         </div>
         <div class="px-4 pt-4 mt-3 bg-light">
-            <h3>Timeline</h3>
-            <ul>
-                {% for action in actions %}
-                <li class="d-flex flex-columns my-3">
-                    {% if action.actor %}
-                    <div class="align-middle mx-2 flex-shrink">
-                        <img class="rounded-circle" src="{% gravatar_url action.actor.email size=24 %}"
-                            alt="{{action.actor}}">
-                    </div>
-                    {% endif %}
-                    <div class=" flex-row flex-grow-1">
-                        <div class="flex-grow w-100 flex-grow-1">
-                            {% if action.actor %}
-                            <span class="actor">
-                                {{ action.actor.first_name|default:action.actor.email }}
-                                {{ action.actor.last_name|default:"" }}
-                            </span>
-                            {% else %}
-                            <span class="actor">
-                                (compte supprimé)
-                            </span>
-                            {% endif %}
-                            <span class="verb">
-                                <strong>{{ action.verb }}</strong> sur
-                            </span>
-                            <span class="target">
-                                <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-                            </span>
-                            <span class="ms-1 small text-secondary">il y a {{ action.timestamp|timesince }}</span>
-                        </div>
-
-                        {% if action.action_object.resource %}
-                        <div class="border p-2 rounded bg-white w-100">
-                            {{ action.action_object.resource.title }}
-                        </div>
-                        {% endif %}
-
-                        {% if action.action_object.comment %}
-                        <div class="border p-2 rounded bg-white w-100">
-                            "{{ action.action_object.comment }}" à propos de <a
-                                href=" {{ action.action_object.task.get_absolute_url }}">{{
-                                notification.action_object.task }}</a>
-                        </div>
-                        {% endif %}
-                    </div>
-                </li>
-                {% empty %}
-                <li>Pas encore d'activité pour ce projet</li>
-                {% endfor %}
-            </ul>
+            <h4>Activité</h4>
+            {% include 'crm/timeline.html' %}
         </div>
     </div>
 </div>
-<hr style="height: 1px;margin-bottom: 20px;background-color: grey!important; background-image: none;" />
 {% endblock %}
