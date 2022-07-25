@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% load gravatar %}
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
@@ -9,8 +10,7 @@
 {% endblock %}
 
 {% block css %}
-<link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
-<link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 
@@ -23,8 +23,7 @@
                 <ul class="mt-2" style="list-style: none;">
                     {% for switchtender in project.switchtenders.all %}
                     <li>
-                        <a class="d-flex align-items-center link-dark text-decoration-none"
-                            href="{% url 'crm-user-details' switchtender.pk %}">
+                        <a class="d-flex align-items-center" href="{% url 'crm-user-details' switchtender.pk %}">
                             <svg class="bi me-2" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
                             </svg>
@@ -39,20 +38,64 @@
         </div>
     </aside>
     <div class="w-75 d-flex flex-column justify-content-start">
-        <div class="crm-header px-4 pt-3">
+        <div class="crm-header px-4 py-3">
             <h1>{{ project.name}}</h1>
+            <a class="d-flex align-items-center" href="{% url 'crm-organization-details' 4 %}">
+                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left" />
+                </svg>
+                <span>Revenir aux détails de l'organisation</span>
+            </a>
         </div>
-        <div class="px-4 pt-4 mt-3">
+        <div class="px-4 pt-4 mt-3 bg-light">
             <h3>Timeline</h3>
             <ul>
                 {% for action in actions %}
-                <li style="list-style: none;">
-                    {# Idéalement, détecter une partie des CT pour afficher mieux le contenu #}
-                    {% if action.target %}
-                    [{{ action.target }}] -
+                <li class="d-flex flex-columns my-3">
+                    {% if action.actor %}
+                    <div class="align-middle mx-2 flex-shrink">
+                        <img class="rounded-circle" src="{% gravatar_url action.actor.email size=24 %}"
+                            alt="{{action.actor}}">
+                    </div>
                     {% endif %}
-                    {{ action.actor }} {{ action.verb }} {{ action.object }}
+                    <div class=" flex-row flex-grow-1">
+                        <div class="flex-grow w-100 flex-grow-1">
+                            {% if action.actor %}
+                            <span class="actor">
+                                {{ action.actor.first_name|default:action.actor.email }}
+                                {{ action.actor.last_name|default:"" }}
+                            </span>
+                            {% else %}
+                            <span class="actor">
+                                (compte supprimé)
+                            </span>
+                            {% endif %}
+                            <span class="verb">
+                                <strong>{{ action.verb }}</strong> sur
+                            </span>
+                            <span class="target">
+                                <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                            </span>
+                            <span class="ms-1 small text-secondary">il y a {{ action.timestamp|timesince }}</span>
+                        </div>
+
+                        {% if action.action_object.resource %}
+                        <div class="border p-2 rounded bg-white w-100">
+                            {{ action.action_object.resource.title }}
+                        </div>
+                        {% endif %}
+
+                        {% if action.action_object.comment %}
+                        <div class="border p-2 rounded bg-white w-100">
+                            "{{ action.action_object.comment }}" à propos de <a
+                                href=" {{ action.action_object.task.get_absolute_url }}">{{
+                                notification.action_object.task }}</a>
+                        </div>
+                        {% endif %}
+                    </div>
                 </li>
+                {% empty %}
+                    <li>Pas encore d'activité pour ce projet</li>
                 {% endfor %}
             </ul>
         </div>
