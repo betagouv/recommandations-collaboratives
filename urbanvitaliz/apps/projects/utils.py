@@ -45,8 +45,9 @@ def can_manage_project(project, user, allow_draft=False):
 
 def can_administrate_project(project, user):
     """
-    Check if user is allowed to administrate this project.
-    Administrators are mostly assigned switchtenders
+    Check if user is allowed to administrate the given project.
+    If project is None, check if this user can at least administer one
+    Administrators are mostly switchtenders/advisors
     """
     if user.is_anonymous:
         return False
@@ -54,7 +55,10 @@ def can_administrate_project(project, user):
     if user.is_superuser:
         return True
 
-    return user in project.switchtenders.all()
+    if project:
+        return user in project.switchtenders.all()
+    else:
+        return models.Project.objects.filter(switchtenders=user).count() > 0
 
 
 def can_administrate_or_403(project, user):
