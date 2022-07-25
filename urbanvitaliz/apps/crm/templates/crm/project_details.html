@@ -20,19 +20,29 @@
         <div class="d-flex flex-column justify-content-start crm-sticky">
             <div class="pt-3">
                 <h1>Participants</h1>
-                <ul class="mt-2" style="list-style: none;">
-                    {% for switchtender in project.switchtenders.all %}
-                    <li>
-                        <a class="d-flex align-items-center" href="{% url 'crm-user-details' switchtender.pk %}">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
-                            </svg>
-                            <span>{{switchtender.get_full_name }}</span>
-                        </a>
-                    </li>
+                <ul class="mt-2 mb-2" style="list-style: none;">
+                    {% regroup project.switchtenders.all by profile.organization as grouped_st %}
+
+                    {% for group in grouped_st %}
+                    <div class="mb-4">
+                        <h4>{{ group.grouper }}</h4>
+                        {% for switchtender in group.list %}
+                        <ul>
+                            <li>
+                                <a class="d-flex align-items-center"
+                                    href="{% url 'crm-user-details' switchtender.pk %}">
+                                    <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+                                    </svg>
+                                    <span>{{switchtender.get_full_name }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endfor%}
                     {% empty %}
-                    <li>Désolé, personne assigné</li>
-                    {%endfor%}
+                    Pas de participant !
+                    {% endfor %}
                 </ul>
             </div>
         </div>
@@ -95,7 +105,7 @@
                     </div>
                 </li>
                 {% empty %}
-                    <li>Pas encore d'activité pour ce projet</li>
+                <li>Pas encore d'activité pour ce projet</li>
                 {% endfor %}
             </ul>
         </div>
