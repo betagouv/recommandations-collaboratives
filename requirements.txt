@@ -1,12 +1,12 @@
-django<4.0
+django==3.2.14
 ipython
-django-markdownx
-markdown-link-attr-modifier
+django-markdownx==3.0.1
+markdown-link-attr-modifier==0.2.0
 #django-magicauth
 git+http://github.com/glibersat/django-magicauth@master#egg=django-magicauth
 git+http://github.com/django-ordered-model/django-ordered-model@master#egg=django-ordered-model
 django_otp
-django-tagging
+django-tagging==0.5.0
 django-gravatar2
 psycopg2-binary
 django-activity-stream
@@ -16,7 +16,7 @@ djangorestframework
 rest-framework-generic-relations
 django-filter
 django-notifications-hq==1.7.0
-django-hijack==3.1.4
+django-hijack==3.2.1
 django-sesame[ua]==2.4
 django-recaptcha==3.0.0
 django-allauth==0.51.0
