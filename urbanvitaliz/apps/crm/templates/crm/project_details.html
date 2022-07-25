@@ -14,9 +14,9 @@
 
 {% block content %}
 <div class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    <aside class="w-25 crm-aside px-4">
+    <aside class="w-25 crm-aside">
         <div class="d-flex flex-column justify-content-start crm-sticky">
-            <div class="pt-3">
+            <div class="pt-3 px-4">
                 <h5>Conseiller·es</h5>
                 <ul class="mt-2 mb-2" class="list-unstyled">
                     {% regroup project.switchtenders.all by profile.organization as grouped_st %}
@@ -33,16 +33,8 @@
                         </a>
                         {% endif %}
                         {% for switchtender in group.list %}
-                        <ul class="list-unstyled">
-                            <li>
-                                <a class="d-flex align-items-center"
-                                    href="{% url 'crm-user-details' switchtender.pk %}">
-                                    <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
-                                    </svg>
-                                    <span>{{switchtender.get_full_name }}</span>
-                                </a>
-                            </li>
+                        <ul class="list-unstyled mx-4">
+                            {% include 'crm/user_item.html' with user=switchtender %}
                         </ul>
                     </div>
                     {% endfor%}
@@ -51,18 +43,11 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div>
-                <h5>Collectivité</h5>
+            <div class="px-4">
+                <h5 class="crm-user-decoration">Collectivité</h5>
                 <ul class="list-unstyled">
                     {% for member in project.members.all %}
-                    <li>
-                        <a class="d-flex align-items-center" href="{% url 'crm-user-details' member.pk %}">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
-                            </svg>
-                            <span>{{member.get_full_name}}</span>
-                        </a>
-                    </li>
+                        {% include 'crm/user_item.html' with user=member %}
                     {% empty %}
                     <li>
                         no one
