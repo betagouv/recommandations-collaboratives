@@ -3,7 +3,7 @@ const { resolve } = require('path');
 module.exports = {
     plugins: [],
     root: resolve('./src'),
-    base: '/static/dist/',
+    base: '/static/',
     server: {
         host: 'localhost',
         port: 3000,
