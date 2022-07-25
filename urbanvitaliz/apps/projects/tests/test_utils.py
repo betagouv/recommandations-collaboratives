@@ -93,5 +93,5 @@ def test_check_if_switchtends_any_project(client):
     project = baker.make(models.Project, status="READY")
     project.switchtenders.add(userA)
 
-    assert utils.check_if_user_switchtends_any_project(userA)
-    assert not utils.check_if_user_switchtends_any_project(userB)
+    assert utils.can_administrate_project(project=None, user=userA)
+    assert not utils.can_administrate_project(project=None, user=userB)
