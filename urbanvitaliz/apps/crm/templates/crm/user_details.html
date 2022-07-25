@@ -21,14 +21,7 @@
                 <h5>Projets suivis</h5>
                 <ul class="mt-2 list-unstyled">
                     {% for project in crm_user.projects_managed.all %}
-                    <li>
-                        <a class="d-flex align-items-center" href="{% url 'crm-project-details' project.pk %}">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
-                            </svg>
-                            <span>{{project.name }}</span>
-                        </a>
-                    </li>
+                    {% include 'crm/project_item.html' %}
                     {% empty %}
                     <li>Désolé, pas encore de projet</li>
                     {%endfor%}
@@ -44,13 +37,13 @@
                 </svg>
                 <span>{{ crm_user.get_full_name}}</span>
             </h3>
-            {% if user.profile.organization %}
+            {% if crm_user.profile.organization %}
             <a class="d-flex align-items-center"
-                href="{% url 'crm-organization-details' user.profile.organization.pk %}">
+                href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">
                 <svg class="bi me-2" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left" />
                 </svg>
-                <span>Revenir aux détails de l'organisation : <strong>{{user.profile.organization.name}}</strong></span>
+                <span>Revenir aux détails de l'organisation : <strong>{{crm_user.profile.organization.name}}</strong></span>
             </a>
             {% endif %}
         </div>

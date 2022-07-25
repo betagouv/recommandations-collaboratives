@@ -18,7 +18,7 @@
         <div class="d-flex flex-column justify-content-start crm-sticky">
             <div class="pt-3 px-4">
                 <h5>Conseiller·es</h5>
-                <ul class="mt-2 mb-2" class="list-unstyled">
+                <ul class="mt-2 mb-2 px-0" class="list-unstyled">
                     {% regroup project.switchtenders.all by profile.organization as grouped_st %}
 
                     {% for group in grouped_st %}
@@ -66,6 +66,9 @@
                 <span>{{ project.name }}</span>
             </h3>
             <a class="d-flex align-items-center" href="{{ project.get_absolute_url }}">
+                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#loop" />
+                </svg>
                 <span>Voir le projet</span>
             </a>
         </div>
