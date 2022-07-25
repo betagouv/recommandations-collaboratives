@@ -25,6 +25,7 @@ module.exports = {
         rollupOptions: {
             input: {
                 main: resolve('./src/js/main.js'),
+                crm: resolve('./src/js/apps/crm.js'),
             },
             output: {
                 chunkFileNames: undefined,
