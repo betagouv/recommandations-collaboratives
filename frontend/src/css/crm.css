@@ -1,0 +1,34 @@
+body,
+main {
+    overflow-x: initial !important;
+}
+
+body {
+    background-color: red !important;
+}
+
+.crm-sticky {
+    position: sticky;
+    top: 106px;
+}
+
+.crm-aside {
+    border-right: 1px solid #e1e1e1;
+}
+
+.crm-header {
+    position: sticky;
+    top: 106px;
+    background-color: white;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.crm-region-tag {
+    background-color: #baddff;
+    border-radius: 6px;
+    padding: 5px 10px;
+}
+
+.crm-region-tag strong {
+    color: #2a5075;
+}

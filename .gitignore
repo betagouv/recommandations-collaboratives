@@ -14,3 +14,4 @@ __pycache__
 development.py
 htmlcov
 media
+node_modules/

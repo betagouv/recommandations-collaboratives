@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+
+{% block content %}
+<div class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+    <aside class="w-25 crm-aside px-4">
+        <div class="d-flex flex-column justify-content-start crm-sticky">
+            <div class="pt-3">
+                <h5>Participants</h5>
+                <ul class="mt-2 list-unstyled">
+                    {% for participant in participants %}
+                    <li>
+                        <a class="d-flex align-items-center" href="{% url 'crm-user-details' participant.pk %}">
+                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+                            </svg>
+                            <span>{{participant.get_full_name }}</span>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li>Désolé, aucune personne n'est encore assignée</li>
+                    {%endfor%}
+                </ul>
+            </div>
+            <div class="mt-4">
+                <h5>Projets suivis</h5>
+                <ul class="list-unstyled">
+                    {% for project in advised_projects %}
+                    <li>
+                        <a class="d-flex align-items-center" href="{% url 'crm-project-details' project.pk %}">
+                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
+                            </svg>
+                            <span>{{project.name}}</span>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li>Désolé, pas encore de projet pour cette organisation</li>
+                    {%endfor%}
+                </ul>
+            </div>
+            <div class="mt-4">
+                <h5>Projets orphelins</h5>
+                <ul class="list-unstyled">
+                    {% for project in unadvised_projects %}
+                    <li>
+                        <a class="d-flex align-items-center" href="{% url 'crm-project-details' project.pk %}">
+                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
+                            </svg>
+                            <span>{{project.name}}</span>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li>Aucun projet orphelin</li>
+                    {%endfor%}
+                </ul>
+            </div>
+        </div>
+    </aside>
+    <div class="w-75 d-flex flex-column justify-content-start">
+        <div class="crm-header px-4 py-3 pt-4">
+            <h3 class="d-flex align-items-center">
+                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
+                </svg>
+                <span>{{ organization.name }}</span>
+            </h3>
+            <ul class="d-flex align-items-center list-unstyled" style="padding-left: 0;">
+                {% for department in org_departments %}
+                <li class="me-2 crm-region-tag">
+                    <span class="">{{ department.name }}</span>
+                    <strong>({{ department.code }})</strong>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="px-4 pt-4 mt-3 bg-light">
+            <h4>Activité</h4>
+            {% include 'crm/timeline.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

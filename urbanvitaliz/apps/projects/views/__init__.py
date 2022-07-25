@@ -17,6 +17,7 @@ from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
+from django.core.exceptions import PermissionDenied
 from django.dispatch import receiver
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -42,6 +43,7 @@ from ..forms import (
 )
 from ..utils import (
     can_administrate_or_403,
+    can_administrate_project,
     can_manage_project,
     format_switchtender_identity,
     generate_ro_key,
@@ -296,7 +298,13 @@ def project_list_export_csv(request):
 @ensure_csrf_cookie
 def project_list(request):
     """Return the projects for the switchtender"""
-    is_switchtender_or_403(request.user)
+    if not (
+        check_if_switchtender(request.user)
+        or can_administrate_project(project=None, user=request.user)
+    ):
+        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+
+    # Add exception for non permanent switchtenders
 
     project_moderator = is_project_moderator(request.user)
 
