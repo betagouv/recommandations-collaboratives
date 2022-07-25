@@ -41,11 +41,11 @@
     <div class="w-75 d-flex flex-column justify-content-start">
         <div class="crm-header px-4 py-3">
             <h1>{{ crm_user.get_full_name}}</h1>
-            <a class="d-flex align-items-center" href="{% url 'crm-organization-details' 4 %}">
+            <a class="d-flex align-items-center" href="{% url 'crm-organization-details' user.profile.organization.pk %}">
                 <svg class="bi me-2" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left" />
                 </svg>
-                <span>Revenir aux détails de l'organisation</span>
+                <span>Revenir aux détails de l'organisation : <strong>{{user.profile.organization.name}}</strong></span>
             </a>
         </div>
         <div class="px-4 pt-4 mt-3  bg-light">
