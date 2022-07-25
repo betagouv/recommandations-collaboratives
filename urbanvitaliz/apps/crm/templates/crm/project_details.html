@@ -28,15 +28,21 @@
             <div class="col-4 d-flex flex-column justify-content-start">
                 <div class="">
                     <h1>Participants</h1>
+
+                    {% regroup project.switchtenders.all by profile.organization as grouped_st %}
+
+                    {% for group in grouped_st %}
+                    <h2>{{ group.grouper }}</h2>
+                    {% for switchtender in group.list %}
                     <ul>
-                        {% for switchtender in project.switchtenders.all %}
                         <li>
                             <a href="{% url 'crm-user-details' switchtender.pk %}">{{ switchtender.get_full_name }}</a>
                         </li>
-                        {% empty %}
-                        <li>Désolé, personne assigné</li>
-                        {%endfor%}
                     </ul>
+                    {% endfor%}
+                    {% empty %}
+                    Pas de participant !
+                    {% endfor %}
                 </div>
             </div>
             <div class="col-8 d-flex flex-column justify-content-start">
