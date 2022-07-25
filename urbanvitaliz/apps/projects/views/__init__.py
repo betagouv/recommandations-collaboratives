@@ -27,19 +27,34 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
-                                is_staff_or_403, is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    build_absolute_url,
+    check_if_switchtender,
+    is_staff_or_403,
+    is_switchtender_or_403,
+)
 
 from .. import models, signals
-from ..forms import (OnboardingForm, OnboardingWithCaptchaForm, ProjectForm,
-                     SelectCommuneForm)
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     can_manage_project, format_switchtender_identity,
-                     generate_ro_key, get_active_project,
-                     get_switchtenders_for_project, is_project_moderator,
-                     is_project_moderator_or_403,
-                     is_regional_actor_for_project_or_403,
-                     refresh_user_projects_in_session, set_active_project_id)
+from ..forms import (
+    OnboardingForm,
+    OnboardingWithCaptchaForm,
+    ProjectForm,
+    SelectCommuneForm,
+)
+from ..utils import (
+    can_administrate_or_403,
+    can_administrate_project,
+    can_manage_project,
+    format_switchtender_identity,
+    generate_ro_key,
+    get_active_project,
+    get_switchtenders_for_project,
+    is_project_moderator,
+    is_project_moderator_or_403,
+    is_regional_actor_for_project_or_403,
+    refresh_user_projects_in_session,
+    set_active_project_id,
+)
 
 ########################################################################
 # On boarding

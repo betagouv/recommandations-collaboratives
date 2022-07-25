@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+    <aside class="w-25 crm-aside px-4">
+        <div class="d-flex flex-column justify-content-start crm-sticky">
+            <div class="pt-3">
+                <h5>Conseiller·es</h5>
+                <ul class="mt-2 mb-2" class="list-unstyled">
+                    {% regroup project.switchtenders.all by profile.organization as grouped_st %}
+
+                    {% for group in grouped_st %}
+                    <div class="mb-4">
+                        {% if group.grouper %}
+                        <a class="d-flex align-items-center"
+                            href="{% url 'crm-organization-details' group.grouper.pk %}">
+                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
+                            </svg>
+                            <strong>{{ group.grouper }}</strong>
+                        </a>
+                        {% endif %}
+                        {% for switchtender in group.list %}
+                        <ul class="list-unstyled">
+                            <li>
+                                <a class="d-flex align-items-center"
+                                    href="{% url 'crm-user-details' switchtender.pk %}">
+                                    <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+                                    </svg>
+                                    <span>{{switchtender.get_full_name }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endfor%}
+                    {% empty %}
+                    Pas de participant !
+                    {% endfor %}
+                </ul>
+            </div>
+            <div>
+                <h5>Collectivité</h5>
+                <ul class="list-unstyled">
+                    {% for member in project.members.all %}
+                    <li>
+                        <a class="d-flex align-items-center" href="{% url 'crm-user-details' member.pk %}">
+                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+                            </svg>
+                            <span>{{member.get_full_name}}</span>
+                        </a>
+                    </li>
+                    {% empty %}
+                    <li>
+                        no one
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </aside>
+    <div class="w-75 d-flex flex-column justify-content-start">
+        <div class="crm-header px-4 py-3 pt-4">
+            <h3 class="d-flex align-items-center">
+                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
+                </svg>
+                <span>{{ project.name }}</span>
+            </h3>
+            <a class="d-flex align-items-center" href="{{ project.get_absolute_url }}">
+                <span>Voir le projet</span>
+            </a>
+        </div>
+        <div class="px-4 pt-4 mt-3 bg-light">
+            <h4>Activité</h4>
+            {% include 'crm/timeline.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}
