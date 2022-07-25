@@ -1,0 +1,10 @@
+{% load static %}
+
+<li>
+    <a class="d-flex align-items-center" href="{% url 'crm-project-details' project.pk %}">
+        <svg class="bi me-2" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
+        </svg>
+        <span>{{ project.name }}</span>
+    </a>
+</li>
