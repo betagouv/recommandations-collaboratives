@@ -150,9 +150,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "..", "static")
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 STATICFILES_FINDERS = [
@@ -248,9 +246,7 @@ ACCOUNT_FORMS = {
 }
 
 # Django vite
-DJANGO_VITE_ASSETS_PATH = BASE_DIR / "static" / "frontend/dist"
-DJANGO_VITE_MANIFEST_PATH = BASE_DIR / "static" / "frontend/dist/manifest.json"
-DJANGO_VITE_STATIC_URL_PREFIX = "dist"
-
+DJANGO_VITE_ASSETS_PATH = BASE_DIR / ".." / "frontend/dist"
+STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 
 # eof
