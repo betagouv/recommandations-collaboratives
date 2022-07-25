@@ -299,7 +299,7 @@ def project_list_export_csv(request):
 def project_list(request):
     """Return the projects for the switchtender"""
     if not (
-        check_if_switchtender()
+        check_if_switchtender(request.user)
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
