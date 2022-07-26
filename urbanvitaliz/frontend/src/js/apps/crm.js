@@ -1,4 +1,2 @@
 import '../../css/crm.css'
-
-console.log('CRM ready');
-
+import '../components/Crm'
