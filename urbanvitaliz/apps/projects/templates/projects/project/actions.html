@@ -50,11 +50,11 @@
                 <p class="mt-3">
                     <span class="badge bg-warning">Beta feature</span> <a
                         href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les actions suggérées
-                        automatiquement pour ce dossier</a>
+                        automatiquement pour ce projet</a>
                 </p>
                 {% else %}
                 <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-primary">Rejoindre ce
-                    dossier pour l'aiguiller</a>
+                    projet pour l'aiguiller</a>
                 {% endif %}
             </div>
             {% elif not is_switchtender and project.tasks.public.count == 0 %}
