@@ -47,7 +47,7 @@
 {% if not is_switchtender or can_administrate and not project.tasks.all.count == 0 %}
 <div class="mb-4 mx-2 d-flex flex-column">
 	<a href="{% url 'projects-project-tasks-suggest' project.pk %}">
-		Examiner les actions suggérées automatiquement pour ce dossier
+		Examiner les actions suggérées automatiquement pour ce projet
 	</a>
 	<span class="mb-4 ml-4 pl-4 text-muted">Pour éventuellement les proposer à la collectivité</span>
 </div>
