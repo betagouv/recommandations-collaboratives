@@ -120,6 +120,16 @@ main {
     top: 119px;
 }
 
+.crm-sticky.no-project {
+    position: sticky;
+    top: 50px;
+}
+
+.crm-header.no-project {
+    position: sticky;
+    top: 45px;
+}
+
 .crm-relative {
     position: relative;
     padding-top: 35px;
