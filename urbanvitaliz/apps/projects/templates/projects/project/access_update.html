@@ -107,7 +107,7 @@
             </p>
             <form class="form" id="form-projects-access-add-user" action="." method="post">
                 <div class="mb-3">
-                    <label class="form-label fw-bolder" for="invite-email">Email de votre collaborateur·trice</label>
+                    <label class="form-label fw-bolder" for="invite-email">Email de votre participant·e</label>
                     <input id="invite-email" type="text" name="email" required class="form-control {% if form.email.errors %}is-invalid{% endif %}" placeholder="camille@region-hdf.fr" value="{{ form.email.value|default:'' }}"/>
                 </div>
 
