@@ -7,6 +7,9 @@ from markdownx.utils import markdownify
 
 
 class Note(models.Model):
+    class Meta:
+        unique_together = ("content_type", "object_id")
+
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="Date de création"
     )
