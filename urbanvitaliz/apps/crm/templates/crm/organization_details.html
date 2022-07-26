@@ -16,54 +16,33 @@
 
 {% block content %}
 <div class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    <aside class="w-25 crm-aside px-4">
+    <aside class="w-25 crm-aside">
         <div class="d-flex flex-column justify-content-start crm-sticky">
-            <div class="pt-3">
-                <h5>Participants</h5>
+            <div class="pt-3 px-4">
+                <h5>Participants <strong>({{ participants|length }})</strong></h5>
                 <ul class="mt-2 list-unstyled">
                     {% for participant in participants %}
-                    <li>
-                        <a class="d-flex align-items-center" href="{% url 'crm-user-details' participant.pk %}">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
-                            </svg>
-                            <span>{{participant.get_full_name }}</span>
-                        </a>
-                    </li>
+                        {% include 'crm/user_item.html' with user=participant %}
                     {% empty %}
                     <li>Désolé, aucune personne n'est encore assignée</li>
                     {%endfor%}
                 </ul>
             </div>
-            <div class="mt-4">
-                <h5>Projets suivis</h5>
+            <div class="px-4 mt-4 crm-border">
+                <h5>Projets suivis <strong>({{ advised_projects|length }})</strong></h5>
                 <ul class="list-unstyled">
                     {% for project in advised_projects %}
-                    <li>
-                        <a class="d-flex align-items-center" href="{% url 'crm-project-details' project.pk %}">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
-                            </svg>
-                            <span>{{project.name}}</span>
-                        </a>
-                    </li>
+                        {% include 'crm/project_item.html' %}
                     {% empty %}
                     <li>Désolé, pas encore de projet pour cette organisation</li>
                     {%endfor%}
                 </ul>
             </div>
-            <div class="mt-4">
+            <div class="px-4 mt-4">
                 <h5>Projets orphelins</h5>
                 <ul class="list-unstyled">
                     {% for project in unadvised_projects %}
-                    <li>
-                        <a class="d-flex align-items-center" href="{% url 'crm-project-details' project.pk %}">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
-                            </svg>
-                            <span>{{project.name}}</span>
-                        </a>
-                    </li>
+                        {% include 'crm/project_item.html' %}
                     {% empty %}
                     <li>Aucun projet orphelin</li>
                     {%endfor%}

@@ -246,7 +246,7 @@ ACCOUNT_FORMS = {
 }
 
 # Django vite
-DJANGO_VITE_ASSETS_PATH = BASE_DIR / ".." / "frontend/dist"
+DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
 STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 
 # eof
