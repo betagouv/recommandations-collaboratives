@@ -1,5 +1,11 @@
-from allauth.account.forms import (LoginForm, ResetPasswordForm,
-                                   ResetPasswordKeyForm, SignupForm)
+from allauth.account.forms import (
+    LoginForm,
+    ResetPasswordForm,
+    ResetPasswordKeyForm,
+    SignupForm,
+)
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from phonenumber_field.formfields import PhoneNumberField
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
@@ -7,6 +13,18 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 
 
 class UVSignupForm(SignupForm):
+    field_order = [
+        "first_name",
+        "last_name",
+        "organization",
+        "organization_position",
+        "email",
+        "phone_no",
+        "password1",
+        "password2",
+        "captcha",
+    ]
+
     def __init__(self, *args, **kwargs):
         super(UVSignupForm, self).__init__(*args, **kwargs)
         self.fields["email"].widget = forms.TextInput(
@@ -52,6 +70,8 @@ class UVSignupForm(SignupForm):
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         ),
     )
+
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
     def save(self, request):
         # Ensure you call the parent class's save.
