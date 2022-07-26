@@ -28,7 +28,7 @@
                 </ul>
             </div>
             <div class="px-4 mt-4 crm-border crm-border-bottom pb-2">
-                <h5 class="crm-project-decoration d-inline-block relative">Projets suivis <strong>({{ advised_projects|length }})</strong></h5>
+                <h5 class="crm-project-decoration d-inline-block">Projets suivis <strong>({{ advised_projects|length }})</strong></h5>
                 <ul class="list-unstyled">
                     {% for project in advised_projects %}
                     {% include 'crm/project_item.html' %}
@@ -66,7 +66,14 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="px-4 pt-4 mt-3 bg-light crm-timeline-min-height">
+        <div x-ref="note" class="px-4 pt-4 mt-3 crm-note relative" :class="noteIsOpen ? 'open' : 'closed'">
+            {% if note %}
+            {% include 'crm/note.html' %}
+            <a class="btn btn-secondary crm-note-action-button" href="{% url 'crm-organization-note-update' organization.pk %}">éditer</a>
+            <span x-ref="noteToggleButton" class="crm-note-toggle-button" x-on:click="noteIsOpen = ! noteIsOpen" x-text="noteIsOpen ? '[Voir moins]': '[Voir plus]'"></span>
+            {% else %}<a class="btn btn-secondary crm-note-action-button" href="{% url 'crm-organization-note-create' organization.pk %}">créer</a>{% endif %}
+        </div>
+        <div class="px-4 pt-4 bg-light crm-timeline-min-height">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}
         </div>

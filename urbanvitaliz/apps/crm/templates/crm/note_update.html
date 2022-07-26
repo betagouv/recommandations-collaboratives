@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <section>
+        <form method="post">
+            {% csrf_token %}
+            <h2 class="mb-4 d-flex align-items-center">
+                <svg class="bi me-2" width="20" height="20" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                </svg>
+                <span>CRM</span>
+            </h2>
+            <h4>
+                <svg class="bi " width="32" height="32" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-square" />
+                </svg>&nbsp;
+                Modification d'une note
+            </h4>
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">
+                Enregistrer
+            </button>
+        </form>
+
+        {{ form.media }}
+
+    </section>
+
+</div>
+
+{% endblock %}

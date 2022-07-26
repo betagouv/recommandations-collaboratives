@@ -3,6 +3,80 @@ main {
     overflow-x: initial !important;
 }
 
+.crm-note-tag {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+
+    padding: 5px 10px;
+
+    background-color: white;
+    border-radius: 6px;
+}
+
+.crm-note-toggle-button {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #335B7E;
+}
+
+.crm-note-toggle-button.hidden {
+    display: none;
+}
+
+.crm-note-tag-title {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.crm-note {
+    position: relative;
+    background-color: #fff9d4;
+    border-bottom: 3px dashed lightgrey;
+    padding-bottom: 20px;
+
+    z-index: 10;
+    overflow: hidden;
+}
+
+.crm-note.closed {
+    max-height: 200px;
+}
+
+.crm-note.is-small {
+    max-height: 100% !important;
+}
+
+.crm-note.closed:before {
+    content: '';
+    position: absolute;
+
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: linear-gradient(to top, #fff9d4, #fff9d4a3 50%, #fff9d400 100%);
+}
+
+.crm-note.is-small:before {
+    display: none;
+}
+
+.crm-note-action-button {
+    position: absolute;
+    z-index: 100;
+
+    top: 25px;
+    right: 15px;
+}
+
 .crm-aside {
     border-right: 1px solid #e1e1e1;
 }
@@ -56,6 +130,8 @@ main {
     top: 106px;
     background-color: white;
     border-bottom: 1px solid #e1e1e1;
+
+    z-index: 100;
 }
 
 .crm-region-tag {
