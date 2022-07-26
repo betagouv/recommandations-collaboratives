@@ -440,15 +440,4 @@ def post_login_set_active_project(sender, user, request, **kwargs):
             set_active_project_id(request, active_project.id)
 
 
-@login_required
-def redirect_user_to_project(request):
-    """Redirect user to project page given her context"""
-    active_project = get_active_project(request)
-
-    if active_project:
-        return redirect(reverse("projects-project-detail", args=[active_project.id]))
-    else:
-        return redirect(reverse("home"))
-
-
 # eof

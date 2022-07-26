@@ -56,7 +56,7 @@ jobs:
           sudo apt-get install gdal-bin libgdal-dev
 
       - name: Compile JS
-        working-directory: ./frontend
+        working-directory: ./urbanvitaliz/frontend
         run: |
           yarn install
           yarn build
