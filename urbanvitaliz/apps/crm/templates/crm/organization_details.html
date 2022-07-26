@@ -13,16 +13,15 @@
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
-
 {% block content %}
-<div class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
     <aside class="w-25 crm-aside">
-        <div class="d-flex flex-column justify-content-start crm-sticky">
+        <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
             <div class="pt-3 px-4">
                 <h5>Participants <strong>({{ participants|length }})</strong></h5>
                 <ul class="mt-2 list-unstyled">
                     {% for participant in participants %}
-                        {% include 'crm/user_item.html' with user=participant %}
+                    {% include 'crm/user_item.html' with user=participant %}
                     {% empty %}
                     <li>Désolé, aucune personne n'est encore assignée</li>
                     {%endfor%}
@@ -32,7 +31,7 @@
                 <h5>Projets suivis <strong>({{ advised_projects|length }})</strong></h5>
                 <ul class="list-unstyled">
                     {% for project in advised_projects %}
-                        {% include 'crm/project_item.html' %}
+                    {% include 'crm/project_item.html' %}
                     {% empty %}
                     <li>Désolé, pas encore de projet pour cette organisation</li>
                     {%endfor%}
@@ -42,7 +41,7 @@
                 <h5>Projets orphelins</h5>
                 <ul class="list-unstyled">
                     {% for project in unadvised_projects %}
-                        {% include 'crm/project_item.html' %}
+                    {% include 'crm/project_item.html' %}
                     {% empty %}
                     <li>Aucun projet orphelin</li>
                     {%endfor%}

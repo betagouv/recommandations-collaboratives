@@ -13,9 +13,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
     <aside class="w-25 crm-aside">
-        <div class="d-flex flex-column justify-content-start crm-sticky">
+        <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
             <div class="pt-3 px-4">
                 <h5>Conseiller·es</h5>
                 <ul class="mt-2 mb-2 px-0" class="list-unstyled">
