@@ -15,7 +15,7 @@ class Invite(models.Model):
 
     INVITE_ROLES = (
         ("COLLABORATOR", "Collaborateur·rice"),
-        ("SWITCHTENDER", "Aiguilleur·se"),
+        ("SWITCHTENDER", "Conseiller·e"),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
