@@ -21,7 +21,8 @@ function Crm() {
             const noteToggleButton = this.$refs.noteToggleButton
             if (note.offsetHeight < 200) {
                 note.classList.add('is-small')
-                console.log(noteToggleButton.classList.add('hidden'));
+
+                if (noteToggleButton) noteToggleButton.classList.add('hidden');
             }
         },
     }
