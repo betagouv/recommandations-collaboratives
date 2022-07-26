@@ -59,7 +59,7 @@
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#exclamation-octagon-fill"/>
             </svg>&nbsp;
             <span class="align-middle">
-                Cette fiche-ressource a expiré, les informations ne sont probablement plus à jour  !
+                Cette ressource a expiré, les informations ne sont probablement plus à jour  !
             </span>
         </div>
         {% endif %}
@@ -81,7 +81,7 @@
             <svg class="bi align-middle" width="24" height="24" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hammer"/>
             </svg>&nbsp;
-            Cette fiche-ressource est en cours d'écriture. Pensez à la
+            Cette ressource est en cours d'écriture. Pensez à la
             <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <em>Public</em> si vous souhaitez que les visiteurs puissent la consulter !
         </div>
         {% endif %}
@@ -140,7 +140,7 @@
     {% endfor %}
 
     Nous avons {{ contacts.count }} contact{{ contacts.count|pluralize }} associé{{ contacts.count|pluralize }}
-    à cette fiche. Si vous souhaitez y accéder, veuillez <a href="{% url 'magicauth-login' %}">vous identifier</a>.
+    à cette ressource. Si vous souhaitez y accéder, veuillez <a href="{% url 'magicauth-login' %}">vous identifier</a>.
     {% else %}
 
     <div class="row row-cols-1 row-cols-md-2">
