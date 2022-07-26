@@ -17,9 +17,9 @@
 <div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
     <aside class="w-25 crm-aside">
         <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
-            <div class="pt-3 px-4">
-                <h5>Participants <strong>({{ participants|length }})</strong></h5>
-                <ul class="mt-2 list-unstyled">
+            <div class="pt-3 px-4 crm-border-bottom">
+                <h5 class="crm-user-decoration d-inline-block relative">Participants <strong>({{ participants|length }})</strong></h5>
+                <ul class="list-unstyled">
                     {% for participant in participants %}
                     {% include 'crm/user_item.html' with user=participant %}
                     {% empty %}
@@ -27,8 +27,8 @@
                     {%endfor%}
                 </ul>
             </div>
-            <div class="px-4 mt-4 crm-border">
-                <h5>Projets suivis <strong>({{ advised_projects|length }})</strong></h5>
+            <div class="px-4 mt-4 crm-border crm-border-bottom pb-2">
+                <h5 class="crm-project-decoration d-inline-block relative">Projets suivis <strong>({{ advised_projects|length }})</strong></h5>
                 <ul class="list-unstyled">
                     {% for project in advised_projects %}
                     {% include 'crm/project_item.html' %}
@@ -37,8 +37,8 @@
                     {%endfor%}
                 </ul>
             </div>
-            <div class="px-4 mt-4">
-                <h5>Projets orphelins</h5>
+            <div class="px-4 mt-4 crm-border-bottom pb-2">
+                <h5 class="crm-project-decoration d-inline-block relative">Projets orphelins <strong>({{ unadvised_projects|length }})</strong></h5>
                 <ul class="list-unstyled">
                     {% for project in unadvised_projects %}
                     {% include 'crm/project_item.html' %}
@@ -66,7 +66,7 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="px-4 pt-4 mt-3 bg-light">
+        <div class="px-4 pt-4 mt-3 bg-light crm-timeline-min-height">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}
         </div>

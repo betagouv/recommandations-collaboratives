@@ -7,14 +7,48 @@ main {
     border-right: 1px solid #e1e1e1;
 }
 
+.crm-border-bottom {
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.crm-user-decoration:after {
+    content: '';
+    display: block;
+
+    width: 100%;
+    height: 5px;
+
+    margin-top: 5px;
+
+    background-color: #d8f1f1;
+    border-radius: 0.5rem;
+}
+
+.crm-project-decoration:after {
+    content: '';
+    display: block;
+
+    width: 100%;
+    height: 5px;
+
+    margin-top: 5px;
+
+    background-color: #13b88b;
+    border-radius: 0.5rem;
+}
+
+.crm-timeline-min-height {
+    min-height: 50vh;
+}
+
 .crm-sticky {
     position: sticky;
-    top: 106px;
+    top: 119px;
 }
 
 .crm-relative {
     position: relative;
-    padding-top: 38px;
+    padding-top: 35px;
 }
 
 .crm-header {
