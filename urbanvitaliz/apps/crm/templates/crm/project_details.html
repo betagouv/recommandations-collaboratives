@@ -72,6 +72,13 @@
                 <span>Voir le projet</span>
             </a>
         </div>
+        <div class="px-4 pt-4 mt-3  bg-light">
+            Note:
+            {% if note %}
+            TITLE:{{ note.title }} -> CONTENT:{{ note.content_rendered|safe }}
+            <a href="{% url 'crm-project-note-update' project.pk %}">éditer</a>
+            {% else %}<a href="{% url 'crm-project-note-create' project.pk %}">créer</a>{% endif %}
+        </div>
         <div class="px-4 pt-4 mt-3 bg-light">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}

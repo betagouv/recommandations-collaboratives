@@ -67,6 +67,13 @@
                 {% endfor %}
             </ul>
         </div>
+        <div class="px-4 pt-4 mt-3  bg-light">
+            Note:
+            {% if note %}
+            TITLE:{{ note.title }} -> CONTENT:{{ note.content_rendered|safe }}
+            <a href="{% url 'crm-organization-note-update' organization.pk %}">éditer</a>
+            {% else %}<a href="{% url 'crm-organization-note-create' organization.pk %}">créer</a>{% endif %}
+        </div>
         <div class="px-4 pt-4 mt-3 bg-light">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}

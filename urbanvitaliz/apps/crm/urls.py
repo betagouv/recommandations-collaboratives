@@ -28,4 +28,34 @@ urlpatterns = [
         views.project_details,
         name="crm-project-details",
     ),
+    path(
+        r"crm/org/<int:organization_id>/create-note",
+        views.create_note_for_organization,
+        name="crm-organization-note-create",
+    ),
+    path(
+        r"crm/org/<int:organization_id>/note",
+        views.update_note_for_organization,
+        name="crm-organization-note-update",
+    ),
+    path(
+        r"crm/user/<int:user_id>/create-note",
+        views.create_note_for_user,
+        name="crm-user-note-create",
+    ),
+    path(
+        r"crm/user/<int:user_id>/note",
+        views.update_note_for_user,
+        name="crm-user-note-update",
+    ),
+    path(
+        r"crm/project/<int:project_id>/create-note",
+        views.create_note_for_project,
+        name="crm-project-note-create",
+    ),
+    path(
+        r"crm/project/<int:project_id>/note",
+        views.update_note_for_project,
+        name="crm-project-note-update",
+    ),
 ]
