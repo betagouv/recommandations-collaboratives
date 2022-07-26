@@ -8,13 +8,13 @@ created : 2021-06-01 09:54:36 CEST
 """
 
 import os
-import pytest
-
 from distutils.core import run_setup
+
+import pytest
 from fabric import task
+from invoke import run as local
 
 import urbanvitaliz
-
 
 PACKAGE = f"urbanvitaliz-django-{urbanvitaliz.VERSION}.tar.gz"
 
@@ -57,6 +57,9 @@ def deploy(cnx, site=None):
     if site not in ["production", "development"]:
         print("Usage: fab deploy --site={production,development} --hosts=...")
         return
+
+    local("cd urbanvitaliz/frontend && yarn build")
+
     run_setup("setup.py", script_args=["sdist"])
     cnx.put(
         f"./dist/{PACKAGE}",

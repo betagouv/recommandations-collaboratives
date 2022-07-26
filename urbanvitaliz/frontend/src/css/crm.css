@@ -3,10 +3,6 @@ main {
     overflow-x: initial !important;
 }
 
-body {
-    background-color: red !important;
-}
-
 .crm-sticky {
     position: sticky;
     top: 106px;
