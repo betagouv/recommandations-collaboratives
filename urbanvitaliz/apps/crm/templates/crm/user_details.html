@@ -48,6 +48,13 @@
             {% endif %}
         </div>
         <div class="px-4 pt-4 mt-3  bg-light">
+            Note:
+            {% if note %}
+            TITLE:{{ note.title }} -> CONTENT:{{ note.content_rendered|safe }}
+            <a href="{% url 'crm-user-note-update' crm_user.pk %}">éditer</a>
+            {% else %}<a href="{% url 'crm-user-note-create' crm_user.pk %}">créer</a>{% endif %}
+        </div>
+        <div class="px-4 pt-4 mt-3  bg-light">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}
         </div>
