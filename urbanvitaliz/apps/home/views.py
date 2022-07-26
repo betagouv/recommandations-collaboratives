@@ -24,8 +24,10 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.apps.projects.utils import (can_administrate_project,
-                                              get_active_project)
+from urbanvitaliz.apps.projects.utils import (
+    can_administrate_project,
+    get_active_project,
+)
 from urbanvitaliz.utils import check_if_switchtender
 
 

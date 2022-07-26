@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "csvexport",
     "captcha",
     "ordered_model",
+    "phonenumber_field",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",
@@ -234,6 +235,7 @@ ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/login-redirect"
 
 ACCOUNT_FORMS = {
     "login": "urbanvitaliz.apps.home.forms.UVLoginForm",
@@ -249,5 +251,9 @@ ACCOUNT_FORMS = {
 # Django vite
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
 STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
+
+
+# Phonenumbers
+PHONENUMBER_DEFAULT_REGION = "FR"
 
 # eof
