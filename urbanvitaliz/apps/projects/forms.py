@@ -247,7 +247,6 @@ class OnboardingForm(forms.ModelForm):
             "insee",
             "description",
             "impediments",
-            "publish_to_cartofriches",
         ]
 
 
