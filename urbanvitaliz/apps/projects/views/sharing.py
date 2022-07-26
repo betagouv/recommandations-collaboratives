@@ -133,7 +133,7 @@ def access_delete(request, project_id: int, email: str):
             project.members.remove(membership.member)
             messages.success(
                 request,
-                "{0} a bien été supprimé de la liste des collaborateurs.".format(email),
+                "{0} a bien été supprimé de la liste des participants.".format(email),
                 extra_tags=["auth"],
             )
 
