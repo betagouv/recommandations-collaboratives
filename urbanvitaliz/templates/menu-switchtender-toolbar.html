@@ -22,7 +22,7 @@
     </div>
 </li>
 
-{% if request.user.is_staff or is_switchtender  %}
+
 
 {% if request.user.is_staff  %}
 <!-- Address Book -->
@@ -36,6 +36,7 @@
 </li>
 {% endif %}
 
+{% if is_switchtender or is_administrating_project %}
 <!-- Project List -->
 <li class="nav-item dropdown nav-item-admin me-2">
     <div class="btn-group">
@@ -47,7 +48,6 @@
         </a>
     </div>
 </li>
-
 {% endif %}
 
 {% endwith %}

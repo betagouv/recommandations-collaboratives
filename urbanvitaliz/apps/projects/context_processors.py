@@ -11,6 +11,12 @@ def is_switchtender_processor(request):
     return {"is_switchtender": check_if_switchtender(request.user)}
 
 
+def is_administrating_project(request):
+    return {
+        "is_switchtender": can_administrate_project(project=None, user=request.user)
+    }
+
+
 def active_project_processor(request):
     active_project = get_active_project(request)
     context = {

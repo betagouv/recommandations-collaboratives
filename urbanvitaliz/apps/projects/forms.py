@@ -258,9 +258,7 @@ class OnboardingWithCaptchaForm(OnboardingForm):
         super().__init__(*args, **kwargs)
 
         # Prevent tests from failing
-        print("CAPTCHA")
         if "PYTEST_CURRENT_TEST" in os.environ:
-            print("KILL CAPTCHA")
             self.fields.pop("captcha")
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
