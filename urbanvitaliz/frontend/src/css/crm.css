@@ -62,6 +62,14 @@ main {
     background-color: #baddff;
     border-radius: 6px;
     padding: 5px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+}
+
+.crm-region-tag strong{
+    margin-left: 5px;
 }
 
 .crm-region-tag strong {
