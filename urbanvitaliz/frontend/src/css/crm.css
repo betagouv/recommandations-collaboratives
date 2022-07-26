@@ -3,13 +3,136 @@ main {
     overflow-x: initial !important;
 }
 
-.crm-sticky {
-    position: sticky;
-    top: 106px;
+.crm-note-tag {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+
+    padding: 5px 10px;
+
+    background-color: white;
+    border-radius: 6px;
+}
+
+.crm-note-toggle-button {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #335B7E;
+}
+
+.crm-note-toggle-button.hidden {
+    display: none;
+}
+
+.crm-note-tag-title {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.crm-note {
+    position: relative;
+    background-color: #fff9d4;
+    border-bottom: 3px dashed lightgrey;
+    padding-bottom: 20px;
+
+    z-index: 10;
+    overflow: hidden;
+}
+
+.crm-note.closed {
+    max-height: 200px;
+}
+
+.crm-note.is-small {
+    max-height: 100% !important;
+}
+
+.crm-note.closed:before {
+    content: '';
+    position: absolute;
+
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: linear-gradient(to top, #fff9d4, #fff9d4a3 50%, #fff9d400 100%);
+}
+
+.crm-note.is-small:before {
+    display: none;
+}
+
+.crm-note-action-button {
+    position: absolute;
+    z-index: 100;
+
+    top: 25px;
+    right: 15px;
 }
 
 .crm-aside {
     border-right: 1px solid #e1e1e1;
+}
+
+.crm-border-bottom {
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.crm-user-decoration:after {
+    content: '';
+    display: block;
+
+    width: 100%;
+    height: 5px;
+
+    margin-top: 5px;
+
+    background-color: #d8f1f1;
+    border-radius: 0.5rem;
+}
+
+.crm-project-decoration:after {
+    content: '';
+    display: block;
+
+    width: 100%;
+    height: 5px;
+
+    margin-top: 5px;
+
+    background-color: #13b88b;
+    border-radius: 0.5rem;
+}
+
+.crm-timeline-min-height {
+    min-height: 50vh;
+}
+
+.crm-sticky {
+    position: sticky;
+    top: 119px;
+}
+
+.crm-sticky.no-project {
+    position: sticky;
+    top: 50px;
+}
+
+.crm-header.no-project {
+    position: sticky;
+    top: 45px;
+}
+
+.crm-relative {
+    position: relative;
+    padding-top: 35px;
 }
 
 .crm-header {
@@ -17,12 +140,22 @@ main {
     top: 106px;
     background-color: white;
     border-bottom: 1px solid #e1e1e1;
+
+    z-index: 100;
 }
 
 .crm-region-tag {
     background-color: #baddff;
     border-radius: 6px;
     padding: 5px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+}
+
+.crm-region-tag strong{
+    margin-left: 5px;
 }
 
 .crm-region-tag strong {
