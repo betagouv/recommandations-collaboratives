@@ -4,8 +4,7 @@ from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import check_if_switchtender
 
-from .utils import (can_administrate_project, can_manage_project,
-                    get_active_project)
+from .utils import can_administrate_project, can_manage_project, get_active_project
 
 
 def is_switchtender_processor(request):
