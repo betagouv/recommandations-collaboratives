@@ -14,51 +14,61 @@
 {% endblock %}
 
 
+
 {% block content %}
-<div class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
     <aside class="w-25 crm-aside">
-        <div class="d-flex flex-column justify-content-start crm-sticky">
-            <div class="pt-3 px-4">
-                <h5>Participants <strong>({{ participants|length }})</strong></h5>
-                <ul class="mt-2 list-unstyled">
+        
+            {% if active_project %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
+            {% else %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
+            {% endif %}
+            <div class="pt-3 px-4 crm-border-bottom">
+                <h5 class="crm-user-decoration d-inline-block relative">Participants <strong>({{ participants|length }})</strong></h5>
+                <ul class="list-unstyled">
                     {% for participant in participants %}
-                        {% include 'crm/user_item.html' with user=participant %}
+                    {% include 'crm/user_item.html' with user=participant %}
                     {% empty %}
                     <li>Désolé, aucune personne n'est encore assignée</li>
                     {%endfor%}
                 </ul>
             </div>
-            <div class="px-4 mt-4 crm-border">
-                <h5>Projets suivis <strong>({{ advised_projects|length }})</strong></h5>
+            <div class="px-4 mt-4 crm-border crm-border-bottom pb-2">
+                <h5 class="crm-project-decoration d-inline-block">Projets suivis <strong>({{ advised_projects|length }})</strong></h5>
                 <ul class="list-unstyled">
                     {% for project in advised_projects %}
-                        {% include 'crm/project_item.html' %}
+                    {% include 'crm/project_item.html' %}
                     {% empty %}
                     <li>Désolé, pas encore de projet pour cette organisation</li>
                     {%endfor%}
                 </ul>
             </div>
-            <div class="px-4 mt-4">
-                <h5>Projets orphelins</h5>
+            <div class="px-4 mt-4 crm-border-bottom pb-2">
+                <h5 class="crm-project-decoration d-inline-block relative">Projets régionaux non suivis <strong>({{ unadvised_projects|length }})</strong></h5>
                 <ul class="list-unstyled">
                     {% for project in unadvised_projects %}
-                        {% include 'crm/project_item.html' %}
+                    {% include 'crm/project_item.html' %}
                     {% empty %}
-                    <li>Aucun projet orphelin</li>
+                    <li>Aucun projet régionaux non suivis</li>
                     {%endfor%}
                 </ul>
             </div>
         </div>
     </aside>
     <div class="w-75 d-flex flex-column justify-content-start">
-        <div class="crm-header px-4 py-3 pt-4">
+        {% if active_project %}
+            <div class="crm-header px-4 py-3 pt-4 mb-3">
+        {% else %}
+            <div class="crm-header no-project px-4 py-3 pt-4">
+        {% endif %}
             <h3 class="d-flex align-items-center">
                 <svg class="bi me-2" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
                 </svg>
                 <span>{{ organization.name }}</span>
             </h3>
-            <ul class="d-flex align-items-center list-unstyled" style="padding-left: 0;">
+            <ul class="d-flex align-items-center list-unstyled flex-wrap" style="padding-left: 0;">
                 {% for department in org_departments %}
                 <li class="me-2 crm-region-tag">
                     <span class="">{{ department.name }}</span>
@@ -67,10 +77,16 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="px-4 pt-4 mt-3 bg-light">
+        <div x-ref="note" class="px-4 pt-4 crm-note relative" :class="noteIsOpen ? 'open' : 'closed'">
+            {% if note %}
+            {% include 'crm/note.html' %}
+            <a class="btn btn-secondary crm-note-action-button" href="{% url 'crm-organization-note-update' organization.pk %}">éditer</a>
+            <span x-ref="noteToggleButton" class="crm-note-toggle-button" x-on:click="noteIsOpen = ! noteIsOpen" x-text="noteIsOpen ? '[Voir moins]': '[Voir plus]'"></span>
+            {% else %}<a class="btn btn-secondary" href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>{% endif %}
+        </div>
+        <div class="px-4 pt-4 bg-light crm-timeline-min-height">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}
         </div>
     </div>
-</div>
 {% endblock %}

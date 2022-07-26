@@ -13,12 +13,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
     <aside class="w-25 crm-aside">
-        <div class="d-flex flex-column justify-content-start crm-sticky">
-            <div class="pt-3 px-4">
-                <h5>Conseiller·es</h5>
-                <ul class="mt-2 mb-2 px-0" class="list-unstyled">
+            {% if active_project %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
+            {% else %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
+            {% endif %}
+            <div class="pt-3 mb-4 px-4 crm-border-bottom">
+                <h5 class="crm-user-decoration d-inline-block relative">Conseiller·es <strong>({{ project.switchtenders.all|length }})</strong></h5>
+                <ul class="mb-2 px-0" class="list-unstyled">
                     {% regroup project.switchtenders.all by profile.organization as grouped_st %}
 
                     {% for group in grouped_st %}
@@ -39,12 +43,12 @@
                     </div>
                     {% endfor%}
                     {% empty %}
-                    Pas de participant !
+                    Pas de participant
                     {% endfor %}
                 </ul>
             </div>
-            <div class="px-4">
-                <h5 class="crm-user-decoration">Collectivité</h5>
+            <div class="px-4 crm-border-bottom pb-2">
+                <h5 class="crm-user-decoration d-inline-block relative">Collectivité <strong>({{ project.members.all|length }})</strong></h5>
                 <ul class="list-unstyled">
                     {% for member in project.members.all %}
                         {% include 'crm/user_item.html' with user=member %}
@@ -58,21 +62,29 @@
         </div>
     </aside>
     <div class="w-75 d-flex flex-column justify-content-start">
-        <div class="crm-header px-4 py-3 pt-4">
-            <h3 class="d-flex align-items-center">
+        {% if active_project %}
+            <div class="crm-header px-4 py-4 mb-3 d-flex justify-content-between align-items-center">
+        {% else %}
+            <div class="crm-header no-project px-4 py-4 d-flex justify-content-between align-items-center">
+        {% endif %}
+            <h3 class="d-flex mb-0 align-items-center">
                 <svg class="bi me-2" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
                 </svg>
                 <span>{{ project.name }}</span>
             </h3>
-            <a class="d-flex align-items-center" href="{{ project.get_absolute_url }}">
-                <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#loop" />
-                </svg>
+            <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
                 <span>Voir le projet</span>
             </a>
         </div>
-        <div class="px-4 pt-4 mt-3 bg-light">
+        <div x-ref="note" class="px-4 pt-4 crm-note relative" :class="noteIsOpen ? 'open' : 'closed'">
+            {% if note %}
+            {% include 'crm/note.html' %}
+            <a class="btn btn-secondary crm-note-action-button" href="{% url 'crm-project-note-update' project.pk %}">éditer</a>
+            <span x-ref="noteToggleButton" class="crm-note-toggle-button" x-on:click="noteIsOpen = ! noteIsOpen" x-text="noteIsOpen ? '[Voir moins]': '[Voir plus]'"></span>
+            {% else %}<a class="btn btn-secondary" href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>{% endif %}
+        </div>
+        <div class="px-4 pt-4 bg-light crm-timeline-min-height">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}
         </div>

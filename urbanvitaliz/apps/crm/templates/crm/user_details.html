@@ -12,14 +12,17 @@
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
-
 {% block content %}
-<div class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    <aside class="w-25 crm-aside px-4">
-        <div class="d-flex flex-column justify-content-start crm-sticky">
-            <div class="pt-3">
-                <h5>Projets suivis</h5>
-                <ul class="mt-2 list-unstyled">
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+    <aside class="w-25 crm-aside">
+            {% if active_project %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
+            {% else %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
+            {% endif %}
+            <div class="pt-3 crm-border-bottom pb-2 px-4">
+                <h5 class="crm-project-decoration d-inline-block relative">Projets suivis <strong>({{ crm_user.projects_managed.all|length }})</strong></h5>
+                <ul class="list-unstyled">
                     {% for project in crm_user.projects_managed.all %}
                     {% include 'crm/project_item.html' %}
                     {% empty %}
@@ -30,7 +33,11 @@
         </div>
     </aside>
     <div class="w-75 d-flex flex-column justify-content-start">
-        <div class="crm-header px-4 py-3">
+            {% if active_project %}
+                <div class="crm-header px-4 py-4 mb-3">
+            {% else %}
+                <div class="crm-header no-project px-4 py-4">
+            {% endif %}
             <h3 class="d-flex align-items-center">
                 <svg class="bi me-2" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
@@ -47,7 +54,14 @@
             </a>
             {% endif %}
         </div>
-        <div class="px-4 pt-4 mt-3  bg-light">
+        <div x-ref="note" class="px-4 pt-4 crm-note relative" :class="noteIsOpen ? 'open' : 'closed'">
+            {% if note %}
+            {% include 'crm/note.html' %}
+            <a class="btn btn-secondary crm-note-action-button" href="{% url 'crm-user-note-update' crm_user.pk %}">éditer</a>
+            <span x-ref="noteToggleButton" class="crm-note-toggle-button" x-on:click="noteIsOpen = ! noteIsOpen" x-text="noteIsOpen ? '[Voir moins]': '[Voir plus]'"></span>
+            {% else %}<a class="btn btn-secondary" href="{% url 'crm-user-note-create' crm_user.pk %}">créer une note</a>{% endif %}
+        </div>
+        <div class="px-4 pt-4 bg-light crm-timeline-min-height">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}
         </div>
