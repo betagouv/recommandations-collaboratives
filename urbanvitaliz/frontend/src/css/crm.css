@@ -3,13 +3,18 @@ main {
     overflow-x: initial !important;
 }
 
+.crm-aside {
+    border-right: 1px solid #e1e1e1;
+}
+
 .crm-sticky {
     position: sticky;
     top: 106px;
 }
 
-.crm-aside {
-    border-right: 1px solid #e1e1e1;
+.crm-relative {
+    position: relative;
+    padding-top: 38px;
 }
 
 .crm-header {
