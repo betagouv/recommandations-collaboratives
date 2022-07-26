@@ -132,6 +132,7 @@ AUTHENTICATION_BACKENDS = [
 
 # SESAME Configuration
 SESAME_MAX_AGE = 60 * 60 * 24 * 10
+SESAME_ONE_TIME = False
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
