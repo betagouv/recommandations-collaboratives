@@ -76,3 +76,22 @@ def test_get_regional_actors_for_project(client):
     assert switchtenderA in selected_actors
     assert switchtenderB not in selected_actors
     assert switchtenderC not in selected_actors
+
+
+@pytest.mark.django_db
+def test_check_if_switchtends_any_project(client):
+    group = auth.Group.objects.get(name="switchtender")
+
+    dept62 = baker.make(geomatics.Department, code="62")
+
+    switchtender = baker.make(auth.User, groups=[group])
+    switchtender.profile.departments.set([dept62])
+
+    userA = baker.make(auth.User)
+    userB = baker.make(auth.User)
+
+    project = baker.make(models.Project, status="READY")
+    project.switchtenders.add(userA)
+
+    assert utils.can_administrate_project(project=None, user=userA)
+    assert not utils.can_administrate_project(project=None, user=userB)

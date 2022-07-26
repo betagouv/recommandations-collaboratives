@@ -80,4 +80,14 @@
         </form>
     </span>
     {% endif %}
+    {% if user.is_staff %}
+        <span class="d-inline-block">
+            <a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'crm-project-details' project.pk %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                </svg>
+                CRM
+            </a>
+        </span>
+    {% endif %}
 </div>
