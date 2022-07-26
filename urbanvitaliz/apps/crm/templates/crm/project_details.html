@@ -16,9 +16,9 @@
 <div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
     <aside class="w-25 crm-aside">
         <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
-            <div class="pt-3 px-4">
-                <h5>Conseiller·es</h5>
-                <ul class="mt-2 mb-2 px-0" class="list-unstyled">
+            <div class="pt-3 mb-4 px-4 crm-border-bottom">
+                <h5 class="crm-user-decoration d-inline-block relative">Conseiller·es <strong>({{ project.switchtenders.all|length }})</strong></h5>
+                <ul class="mb-2 px-0" class="list-unstyled">
                     {% regroup project.switchtenders.all by profile.organization as grouped_st %}
 
                     {% for group in grouped_st %}
@@ -43,8 +43,8 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div class="px-4">
-                <h5 class="crm-user-decoration">Collectivité</h5>
+            <div class="px-4 crm-border-bottom pb-2">
+                <h5 class="crm-user-decoration d-inline-block relative">Collectivité <strong>({{ project.members.all|length }})</strong></h5>
                 <ul class="list-unstyled">
                     {% for member in project.members.all %}
                         {% include 'crm/user_item.html' with user=member %}
@@ -58,21 +58,18 @@
         </div>
     </aside>
     <div class="w-75 d-flex flex-column justify-content-start">
-        <div class="crm-header px-4 py-3 pt-4">
+        <div class="crm-header px-4 py-3 pt-4 d-flex justify-content-between align-items-center">
             <h3 class="d-flex align-items-center">
                 <svg class="bi me-2" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
                 </svg>
                 <span>{{ project.name }}</span>
             </h3>
-            <a class="d-flex align-items-center" href="{{ project.get_absolute_url }}">
-                <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#loop" />
-                </svg>
+            <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
                 <span>Voir le projet</span>
             </a>
         </div>
-        <div class="px-4 pt-4 mt-3 bg-light">
+        <div class="px-4 pt-4 mt-3 bg-light crm-timeline-min-height">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}
         </div>

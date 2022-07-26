@@ -14,11 +14,11 @@
 
 {% block content %}
 <div x-data="crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    <aside class="w-25 crm-aside px-4">
+    <aside class="w-25 crm-aside">
         <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
-            <div class="pt-3">
-                <h5>Projets suivis</h5>
-                <ul class="mt-2 list-unstyled">
+            <div class="pt-3 crm-border-bottom pb-2 px-4">
+                <h5 class="crm-project-decoration d-inline-block relative">Projets suivis <strong>({{ crm_user.projects_managed.all|length }})</strong></h5>
+                <ul class="list-unstyled">
                     {% for project in crm_user.projects_managed.all %}
                     {% include 'crm/project_item.html' %}
                     {% empty %}
@@ -46,7 +46,7 @@
             </a>
             {% endif %}
         </div>
-        <div class="px-4 pt-4 mt-3  bg-light">
+        <div class="px-4 pt-4 mt-3 bg-light crm-timeline-min-height">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}
         </div>
