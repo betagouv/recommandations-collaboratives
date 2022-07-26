@@ -38,12 +38,12 @@
                 </ul>
             </div>
             <div class="px-4 mt-4 crm-border-bottom pb-2">
-                <h5 class="crm-project-decoration d-inline-block relative">Projets orphelins <strong>({{ unadvised_projects|length }})</strong></h5>
+                <h5 class="crm-project-decoration d-inline-block relative">Projets régionaux non suivis <strong>({{ unadvised_projects|length }})</strong></h5>
                 <ul class="list-unstyled">
                     {% for project in unadvised_projects %}
                     {% include 'crm/project_item.html' %}
                     {% empty %}
-                    <li>Aucun projet orphelin</li>
+                    <li>Aucun projet régionaux non suivis</li>
                     {%endfor%}
                 </ul>
             </div>
