@@ -20,7 +20,14 @@
                 <svg class="bi " width="32" height="32" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-square" />
                 </svg>&nbsp;
-                Modification d'une note
+                Modification d'une note 
+                <strong>
+                    {% if note.related.name %}
+                        {{note.related.name}}
+                    {% elif note.related.get_full_name %}
+                        {{ note.related.get_full_name }}
+                    {% endif %}
+                </strong>
             </h4>
             {{ form.as_p }}
             <button type="submit" class="btn btn-primary">
