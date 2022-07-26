@@ -62,7 +62,7 @@ def project_knowledge(request, project_id=None):
     # Mark some notifications as seen (general ones)
     project_ct = ContentType.objects.get_for_model(project)
     general_notifications = request.user.notifications.unread().filter(
-        Q(verb="est devenu·e aiguilleur·se sur le projet")
+        Q(verb="est devenu·e conseiller·e sur le projet")
         | Q(verb="a été validé")
         | Q(verb="a validé le projet")
         | Q(verb="a soumis pour modération le projet")
