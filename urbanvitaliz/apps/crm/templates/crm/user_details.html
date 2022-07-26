@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block content %}
-<div x-data="crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
     <aside class="w-25 crm-aside">
         <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
             <div class="pt-3 crm-border-bottom pb-2 px-4">
@@ -46,7 +46,14 @@
             </a>
             {% endif %}
         </div>
-        <div class="px-4 pt-4 mt-3 bg-light crm-timeline-min-height">
+        <div x-ref="note" class="px-4 pt-4 mt-3 crm-note relative" :class="noteIsOpen ? 'open' : 'closed'">
+            {% if note %}
+            {% include 'crm/note.html' %}
+            <a class="btn btn-secondary crm-note-action-button" href="{% url 'crm-user-note-update' crm_user.pk %}">éditer</a>
+            <span x-ref="noteToggleButton" class="crm-note-toggle-button" x-on:click="noteIsOpen = ! noteIsOpen" x-text="noteIsOpen ? '[Voir moins]': '[Voir plus]'"></span>
+            {% else %}<a class="btn btn-secondary" href="{% url 'crm-user-note-create' crm_user.pk %}">créer une note</a>{% endif %}
+        </div>
+        <div class="px-4 pt-4 bg-light crm-timeline-min-height">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}
         </div>

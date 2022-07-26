@@ -69,7 +69,14 @@
                 <span>Voir le projet</span>
             </a>
         </div>
-        <div class="px-4 pt-4 mt-3 bg-light crm-timeline-min-height">
+        <div x-ref="note" class="px-4 pt-4 mt-3 crm-note relative" :class="noteIsOpen ? 'open' : 'closed'">
+            {% if note %}
+            {% include 'crm/note.html' %}
+            <a class="btn btn-secondary crm-note-action-button" href="{% url 'crm-project-note-update' project.pk %}">éditer</a>
+            <span x-ref="noteToggleButton" class="crm-note-toggle-button" x-on:click="noteIsOpen = ! noteIsOpen" x-text="noteIsOpen ? '[Voir moins]': '[Voir plus]'"></span>
+            {% else %}<a class="btn btn-secondary" href="{% url 'crm-project-note-create' project.pk %}">créer</a>{% endif %}
+        </div>
+        <div class="px-4 pt-4 bg-light crm-timeline-min-height">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}
         </div>
