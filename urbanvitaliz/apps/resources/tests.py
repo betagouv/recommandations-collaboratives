@@ -15,7 +15,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import models as projects_models
@@ -113,24 +114,25 @@ def test_resource_list_contains_only_resource_with_category(request, client):
 
 @pytest.mark.django_db
 def test_resource_list_contains_only_resource_with_area(request, client):
+    current_site = get_current_site(request)
     departments = Recipe(geomatics.Department).make(_quantity=3)
     resource1 = Recipe(
         models.Resource,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         title="selected resource",
         status=models.Resource.PUBLISHED,
         departments=departments[1:],
     ).make()
     resource2 = Recipe(
         models.Resource,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         title="unselected resource",
         status=models.Resource.PUBLISHED,
         departments=departments[:1],
     ).make()
     resource_national = Recipe(
         models.Resource,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         title="national resource",
         status=models.Resource.PUBLISHED,
     ).make()
@@ -142,6 +144,7 @@ def test_resource_list_contains_only_resource_with_area(request, client):
     with login(client, user=membership.member):
         Recipe(
             projects.Project,
+            sites=[current_site],
             projectmember_set=[membership],
             commune__department=departments[1],
         ).make()

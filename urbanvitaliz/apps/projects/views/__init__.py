@@ -284,7 +284,7 @@ def project_list(request):
 def project_detail_from_sharing_link(request, project_ro_key):
     """Return a special view of the project using the sharing link"""
     try:
-        project = models.Project.objects.filter(ro_key=project_ro_key)[0]
+        project = models.Project.on_site.filter(ro_key=project_ro_key)[0]
     except Exception:
         raise Http404()
 

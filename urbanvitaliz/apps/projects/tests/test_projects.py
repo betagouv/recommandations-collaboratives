@@ -20,7 +20,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -398,8 +399,9 @@ def test_other_projects_are_not_stored_in_session(client):
 # Sharing link
 ######
 @pytest.mark.django_db
-def test_project_access_proper_sharing_link(client):
-    project = Recipe(models.Project).make()
+def test_project_access_proper_sharing_link(request, client):
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse(
         "projects-project-sharing-link", kwargs={"project_ro_key": project.ro_key}
     )
@@ -409,8 +411,9 @@ def test_project_access_proper_sharing_link(client):
 
 
 @pytest.mark.django_db
-def test_project_fails_unknown_sharing_link(client):
-    Recipe(models.Project).make()
+def test_project_fails_unknown_sharing_link(request, client):
+    current_site = get_current_site(request)
+    Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-sharing-link", kwargs={"project_ro_key": "unkown"})
     response = client.get(url)
     assert response.status_code == 404
