@@ -9,6 +9,7 @@ created: 2021-08-03 14:26:39 CEST
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import DetailView, RedirectView
 from urbanvitaliz.apps.projects import models as projects_models
@@ -21,21 +22,21 @@ from .. import forms, models, signals
 #####
 
 
-class SessionDetailsView(DetailView):
+class SessionDetailsView(LoginRequiredMixin, DetailView):
     model = models.Session
     pk_url_kwarg = "session_id"
     context_object_name = "session"
     template_name = "survey/session_details.html"
 
 
-class SessionResultsView(DetailView):
+class SessionResultsView(LoginRequiredMixin, DetailView):
     model = models.Session
     pk_url_kwarg = "session_id"
     context_object_name = "session"
     template_name = "survey/session_results.html"
 
 
-class SessionDoneView(RedirectView):
+class SessionDoneView(LoginRequiredMixin, RedirectView):
     permanent = False
     query_string = True
     pattern_name = "projects-project-detail"
@@ -51,6 +52,7 @@ class SessionDoneView(RedirectView):
 #####
 
 
+@login_required
 def survey_question_details(request, session_id, question_id):
     """Display a single question and go to next"""
     session = get_object_or_404(
@@ -82,6 +84,7 @@ def survey_question_details(request, session_id, question_id):
     return render(request, "survey/question_details.html", locals())
 
 
+@login_required
 def survey_create_session_for_project(request, project_id):
     """Create a session for the given project if necessary. Redirects to session."""
     project = get_object_or_404(
@@ -103,6 +106,7 @@ def survey_create_session_for_project(request, project_id):
     return redirect(url)
 
 
+@login_required
 def survey_next_question(request, session_id, question_id=None):
     """Redirect to next unanswered/answerable question from survey"""
     session = get_object_or_404(
@@ -127,6 +131,7 @@ def survey_next_question(request, session_id, question_id=None):
     return redirect("survey-session-done", session_id=session.pk)
 
 
+@login_required
 def survey_previous_question(request, session_id, question_id):
     """Redirect to previous unanswered/answerable question from survey"""
     session = get_object_or_404(
