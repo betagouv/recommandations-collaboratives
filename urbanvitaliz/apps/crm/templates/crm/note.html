@@ -1,0 +1,14 @@
+{% load static %}
+
+<div class="d-flex align-items-center mb-4">
+    <span class="crm-note-tag-title">{{ note.title }}</span>
+    <span class="d-flex align-items-center" style="margin-left: 15px; font-size: 0.8rem; color: grey;">
+        <svg class="bi me-1" width="20" height="20" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-history" />
+        </svg>
+        {{note.updated_on}}
+    </span>
+</div>
+<article>
+    {{ note.content_rendered|safe }}
+</article>

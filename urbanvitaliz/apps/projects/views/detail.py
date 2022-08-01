@@ -17,7 +17,6 @@ from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm
 from ..utils import (
-    can_administrate_or_403,
     can_administrate_project,
     can_manage_or_403,
     can_manage_project,

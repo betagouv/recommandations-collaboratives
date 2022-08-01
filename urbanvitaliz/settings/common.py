@@ -40,8 +40,12 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "hijack",
     "hijack.contrib.admin",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
     "magicauth",
     "sass_processor",
+    "django_vite",
     "markdownx",
     "tagging",
     "leaflet",
@@ -56,6 +60,7 @@ INSTALLED_APPS = [
     "ordered_model",
     "dynamic_forms",
     "urbanvitaliz.apps.onboarding",
+    "phonenumber_field",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",
@@ -65,6 +70,7 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.reminders",
     "urbanvitaliz.apps.communication",
     "urbanvitaliz.apps.invites",
+    "urbanvitaliz.apps.crm",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -133,10 +139,12 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "sesame.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 # SESAME Configuration
 SESAME_MAX_AGE = 60 * 60 * 24 * 10
+SESAME_ONE_TIME = False
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -156,9 +164,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "..", "static")
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 STATICFILES_FINDERS = [
@@ -192,7 +198,7 @@ LOGIN_REDIRECT_URL = "login-redirect"
 MAGICAUTH_FROM_EMAIL = EMAIL_FROM
 MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à UrbanVitaliz ici"
 MAGICAUTH_EMAIL_FIELD = "email"
-MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "projects-redirect-user-to-project"
+MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "login-redirect"
 MAGICAUTH_EMAIL_UNKNOWN_CALLBACK = "urbanvitaliz.apps.home.utils.create_user"
 MAGICAUTH_TOKEN_DURATION_SECONDS = 60 * 60 * 24 * 3
 
@@ -232,5 +238,38 @@ RECAPTCHA_REQUIRED_SCORE = 0.85
 
 # DYNAMIC FORMS
 DYNAMIC_FORMS_CUSTOM_JS = ""
+
+# ALLAUTH
+ACCOUNT_ADAPTER = "urbanvitaliz.apps.home.adapters.UVAccountAdapter"
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 20
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/login-redirect"
+
+ACCOUNT_FORMS = {
+    "login": "urbanvitaliz.apps.home.forms.UVLoginForm",
+    "signup": "urbanvitaliz.apps.home.forms.UVSignupForm",
+    "add_email": "allauth.account.forms.AddEmailForm",
+    "change_password": "allauth.account.forms.ChangePasswordForm",
+    "set_password": "allauth.account.forms.SetPasswordForm",
+    "reset_password": "urbanvitaliz.apps.home.forms.UVResetPasswordForm",
+    "reset_password_from_key": "urbanvitaliz.apps.home.forms.UVResetPasswordKeyForm",
+    "disconnect": "allauth.socialaccount.forms.DisconnectForm",
+}
+
+# Django vite
+DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
+STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
+
+
+# Phonenumbers
+PHONENUMBER_DEFAULT_REGION = "FR"
 
 # eof

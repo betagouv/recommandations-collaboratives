@@ -38,12 +38,12 @@
             <li><a class="small  dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>
             <li><hr class="dropdown-divider"></li>
             {% endif %}
-            <li><a class="dropdown-item small " href="{% url 'logout' %}">Déconnexion</a></li>
+            <li><a class="dropdown-item small " href="{% url 'account_logout' %}">Déconnexion</a></li>
         </ul>
     </div>
 
     {% else %}
-    <a href="{% url 'magicauth-login' %}" class="btn">
+    <a href="{% url 'account_login' %}" class="btn">
         <svg class="bi me-2 align-middle" width="16" height="16">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle"/>
         </svg>

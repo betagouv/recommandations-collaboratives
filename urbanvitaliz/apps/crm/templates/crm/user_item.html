@@ -1,0 +1,11 @@
+{% load static %}
+
+<li>
+    <a class="d-flex align-items-center"
+        href="{% url 'crm-user-details' user.pk %}">
+        <svg class="bi me-2" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+        </svg>
+        <span>{{user.get_full_name|default:user.email }}</span>
+    </a>
+</li>
