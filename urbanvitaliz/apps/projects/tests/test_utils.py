@@ -82,7 +82,9 @@ def test_get_regional_actors_for_project(client):
 
 
 @pytest.mark.django_db
-def test_check_if_switchtends_any_project(client):
+def test_check_if_switchtends_any_project(request, client):
+    current_site = get_current_site(request)
+
     group = auth.Group.objects.get(name="switchtender")
 
     dept62 = baker.make(geomatics.Department, code="62")
@@ -93,8 +95,8 @@ def test_check_if_switchtends_any_project(client):
     userA = baker.make(auth.User)
     userB = baker.make(auth.User)
 
-    project = baker.make(models.Project, status="READY")
-    project.switchtenders.add(userA)
+    project = baker.make(models.Project, sites=[current_site], status="READY")
+    project.switchtenders_on_site.create(switchtender=userA, site=current_site)
 
     assert utils.can_administrate_project(project=None, user=userA)
     assert not utils.can_administrate_project(project=None, user=userB)

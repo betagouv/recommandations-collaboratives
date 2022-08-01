@@ -308,20 +308,26 @@ def test_proper_commune_selection_contains_all_possible_commmunes(request, clien
 #################################################################
 # Prefilled projects
 #################################################################
-def test_create_prefilled_project_is_not_reachable_without_login(client):
+def test_create_prefilled_project_is_not_reachable_without_login(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
     url = reverse("projects-project-prefill")
     response = client.get(url)
     assert response.status_code == 403
 
 
-def test_create_prefilled_project_is_not_reachable_with_simple_login(client):
+def test_create_prefilled_project_is_not_reachable_with_simple_login(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
     with login(client):
         response = client.get(reverse("projects-project-prefill"))
 
     assert response.status_code == 403
 
 
-def test_create_prefilled_project_reachable_by_switchtenders(client):
+def test_create_prefilled_project_reachable_by_switchtenders(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
     with login(client, groups=["switchtender"]):
         response = client.get(reverse("projects-project-prefill"))
 
@@ -329,22 +335,24 @@ def test_create_prefilled_project_reachable_by_switchtenders(client):
 
 
 @pytest.mark.django_db
-def test_create_prefilled_project_creates_a_new_project(client):
+def test_create_prefilled_project_creates_a_new_project(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
     data = {
         "name": "a project",
         "email": "a@example.com",
         "location": "some place",
         "phone": "03939382828",
-        "postal": "59000",
+        "postcode": "59000",
         "org_name": "my org",
         "description": "blah",
         "first_name": "john",
         "last_name": "doe",
-        "response": "blah",
         "response_0": "blah",
     }
     with login(client, groups=["switchtender"]):
         response = client.post(reverse("projects-project-prefill"), data=data)
+        print(response.content)
 
     project = models.Project.on_site.all()[0]
     assert project.name == "a project"

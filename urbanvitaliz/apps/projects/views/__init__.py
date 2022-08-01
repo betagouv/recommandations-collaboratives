@@ -13,7 +13,6 @@ import csv
 import datetime
 
 from django.contrib import messages
-from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
@@ -28,9 +27,11 @@ from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
+from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.utils import (
     build_absolute_url,
     check_if_switchtender,
+    get_site_config_or_503,
     is_staff_or_403,
     is_switchtender_or_403,
 )
@@ -59,19 +60,44 @@ from ..utils import (
 
 def create_project_prefilled(request):
     """Create a new project for someone else"""
+    site_config = get_site_config_or_503(request.site)
+
     is_switchtender_or_403(request.user)
 
+    form = onboarding_forms.OnboardingResponseForm(request.POST or None)
+    onboarding_instance = onboarding_models.Onboarding.objects.get(
+        pk=site_config.onboarding.pk
+    )
+
+    # Add fields in JSON to dynamic form rendering field.
+    form.fields["response"].add_fields(onboarding_instance.form)
+
     if request.method == "POST":
-        form = onboarding_forms.OnboardingResponseForm(request.POST)
         if form.is_valid():
-            project = form.save(commit=False)
-            project.status = "TO_PROCESS"
+            onboarding_response = form.save(commit=False)
+            onboarding_response.onboarding = onboarding_instance
+            onboarding_response.save()
+
+            project = models.Project()
+
+            project.name = form.cleaned_data.get("name")
+            project.phone = form.cleaned_data.get("phone")
+            project.org_name = form.cleaned_data.get("org_name")
+            project.description = form.cleaned_data.get("description")
+            project.location = form.cleaned_data.get("location")
+            project.postcode = form.cleaned_data.get("postcode")
             project.ro_key = generate_ro_key()
-            postcode = form.cleaned_data.get("postcode")
-            project.commune = geomatics.Commune.get_by_postal_code(postcode)
+            project.status = "TO_PROCESS"
+
+            insee = form.cleaned_data.get("insee", None)
+            if insee:
+                project.commune = geomatics.Commune.get_by_insee_code(insee)
+            else:
+                postcode = form.cleaned_data.get("postcode")
+                project.commune = geomatics.Commune.get_by_postal_code(postcode)
+
             project.save()
             project.sites.add(request.site)
-            project.save()
 
             user, _ = auth.User.objects.get_or_create(
                 username=form.cleaned_data.get("email"),
