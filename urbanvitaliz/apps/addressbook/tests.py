@@ -174,7 +174,7 @@ def test_contact_create_and_redirect(client):
         data = {"first_name": "my contact"}
         response = client.post(url, data=data)
 
-    contact = models.Contact.objects.all()[0]
+    contact = models.Contact.on_site.all()[0]
     assert contact.first_name == data["first_name"]
 
     new_url = reverse("addressbook-organization-details", args=[organization.id])
