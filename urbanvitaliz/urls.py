@@ -17,6 +17,7 @@ from magicauth.urls import urlpatterns as magicauth_urls
 from rest_framework import routers
 
 from urbanvitaliz.apps.addressbook.urls import urlpatterns as addressbook_urls
+from urbanvitaliz.apps.crm.urls import urlpatterns as crm_urls
 from urbanvitaliz.apps.geomatics import rest as geomatics_rest
 from urbanvitaliz.apps.home.urls import urlpatterns as home_urls
 from urbanvitaliz.apps.invites.urls import urlpatterns as invites_urls
@@ -56,6 +57,7 @@ router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
 
 urlpatterns = [
     path("api/", include(router.urls)),
+    path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
     path("notifications/", include(notifications.urls, namespace="notifications")),
@@ -72,6 +74,7 @@ urlpatterns.extend(resources_urls)
 urlpatterns.extend(addressbook_urls)
 urlpatterns.extend(survey_urls)
 urlpatterns.extend(invites_urls)
+urlpatterns.extend(crm_urls)
 
 if settings.DEBUG:
     import debug_toolbar

@@ -24,11 +24,6 @@ urlpatterns = [
         views.select_commune,
         name="projects-onboarding-select-commune",
     ),
-    path(
-        r"login_redirect/",
-        views.redirect_user_to_project,
-        name="projects-redirect-user-to-project",
-    ),
     # projects for switchtenders
     path(r"projects/", views.project_list, name="projects-project-list"),
     path(

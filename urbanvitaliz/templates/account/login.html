@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/auth/auth.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<div class="fr-container fr-py-6w max-width-800" style="font-family: 'Marianne', arial, sans-serif;">
+  <div class="d-flex justify-content-between align-items-start">
+    <h1 class="fr-mb-6w">
+      <svg class="bi me-2" width="28" height="28">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
+      </svg>
+      Connexion à UrbanVitaliz
+    </h1>
+  </div>
+  <form class="login fr-form-group" method="POST" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    <fieldset class="fr-fieldset">
+      <h4 class="fr-mb-2w d-block">
+        Se connecter avec son mot de passe
+      </h4>
+
+      <div class="fr-fieldset__content">
+        {{ form.as_p }}
+        <div class="d-flex justify-content-between align-items-start fr-mt-10v">
+          <div class="d-flex flex-column align-items-start">
+            <a class="button secondary Action  d-block fr-link" style="text-decoration: underline;"
+              href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+            <div class="fr-input-group fr-mt-4v">
+              <button class="fr-btn custom-login-button" type="submit">
+                Se connecter
+              </button>
+            </div>
+          </div>
+          <div class="fr-input-group d-flex justify-content-end flex-column align-items-end">
+            <p>Se connecter avec un simple mail ?</p>
+            <div class="fr-mt-4v">
+              <a class="fr-btn fr-btn--secondary" href="/login/">Connexion avec mail</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </fieldset>
+  </form>
+  <hr style="height: 1px;margin-top: 45px;background-color: grey!important; background-image: none;" />
+  <div class="d-flex justify-content-center align-items-center fr-mt-14v">
+    <div class="fr-form-group text-center">
+      <fieldset class="fr-fieldset">
+        <h4 class="fr-mb-2w d-block ">
+          Vous n'avez pas de compte ?
+        </h4>
+        <div class="fr-fieldset__content">
+          <div class="fr-input-group">
+            <a class="fr-btn fr-btn--secondary custom-login-button" href="{{ signup_url }}">S'inscrire</a>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+</div>
+<hr style="height: 1px;margin-bottom: 20px;background-color: grey!important; background-image: none;" />
+
+
+{% endblock %}

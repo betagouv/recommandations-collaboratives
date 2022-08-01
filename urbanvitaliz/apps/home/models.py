@@ -14,6 +14,7 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from phonenumber_field.modelfields import PhoneNumberField
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 
@@ -55,7 +56,10 @@ class UserProfile(models.Model):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
+        related_name="registered_profiles",
     )
+
+    phone_no = PhoneNumberField(blank=True)
 
     organization_position = models.CharField(null=True, blank=True, max_length=200)
 

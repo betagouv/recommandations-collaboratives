@@ -54,6 +54,16 @@
                     Ajouter un contact
                 </a>
             </div>
+            {% if user.is_staff %}
+            <div class="d-grid gap-2 mb-3">
+                <a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'crm-organization-details' organization.pk %}">
+                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                    </svg>
+                    CRM
+                </a>
+            </div>
+            {% endif %}
         </div>
     </div>
 

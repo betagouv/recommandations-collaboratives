@@ -226,30 +226,6 @@ class ProjectForm(forms.ModelForm):
         ]
 
 
-class OnboardingForm(forms.ModelForm):
-    """Form for onboarding a new local authority"""
-
-    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
-    insee = forms.CharField(max_length=5, required=False, label="Code Insee")
-
-    email = forms.CharField(label="Email principal", required=False)
-
-    class Meta:
-        model = models.Project
-        fields = [
-            "email",
-            "first_name",
-            "last_name",
-            "phone",
-            "org_name",
-            "name",
-            "location",
-            "insee",
-            "description",
-            "impediments",
-        ]
-
-
 class SelectCommuneForm(forms.Form):
     def __init__(self, communes, *args, **kwargs):
         super().__init__(*args, **kwargs)
