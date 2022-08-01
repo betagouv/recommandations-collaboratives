@@ -54,7 +54,7 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
         task_id = int(self.kwargs["task_id"])
 
         user_projects = list(
-            models.Project.objects.for_user(self.request.user).values_list(flat=True)
+            models.Project.on_site.for_user(self.request.user).values_list(flat=True)
         )
 
         if project_id not in user_projects:

@@ -10,7 +10,7 @@ created : 2022-06-06 14:16:20 CEST
 import os
 
 from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV3
+from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 
 from . import models
@@ -77,4 +77,4 @@ class OnboardingResponseWithCaptchaForm(OnboardingResponseForm):
         if "PYTEST_CURRENT_TEST" in os.environ:
             self.fields.pop("captcha")
 
-    captcha = ReCaptchaField(widget=ReCaptchaV3(api_params={"hl": "fr"}))
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
