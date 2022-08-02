@@ -155,8 +155,6 @@ action_done = django.dispatch.Signal()
 action_undone = django.dispatch.Signal()
 action_commented = django.dispatch.Signal()
 
-# TODO refactor arguements as project is know to task -> f(sender, task , user, **kwargs)
-
 
 @receiver(action_created)
 def log_action_created(sender, task, project, user, **kwargs):
