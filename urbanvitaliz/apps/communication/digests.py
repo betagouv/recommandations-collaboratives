@@ -171,7 +171,7 @@ def send_recommendation_digest_by_project(user, notifications):
 def make_digest_of_project_recommendations(project, project_notifications, user):
     """Return digest for project recommendations to be sent to user"""
     recommendations = make_recommendations_digest(project_notifications, user)
-    project_digest = make_project_digest(project, user)
+    project_digest = make_project_digest(project, user, url_name="actions")
     return {
         "notification_count": len(recommendations),
         "project": project_digest,
@@ -191,10 +191,10 @@ def make_recommendations_digest(project_notifications, user):
     return recommendations
 
 
-def make_project_digest(project, user=None):
+def make_project_digest(project, user=None, url_name="detail"):
     """Return base information digest for project"""
     project_link = utils.build_absolute_url(
-        reverse("projects-project-detail", args=[project.id]), auto_login_user=user
+        reverse(f"projects-project-{url_name}", args=[project.id]), auto_login_user=user
     )
     return {
         "name": project.name,
@@ -339,12 +339,21 @@ def send_digest_for_switchtender_by_user(user):
         .unsent()
     )
 
+    context = {
+        "dashboard_url": utils.build_absolute_url(
+            reverse("projects-project-list"), auto_login_user=user
+        )
+    }
+
     return send_digest_by_user(
-        user, template_name="digest_for_switchtender", queryset=queryset
+        user,
+        template_name="digest_for_switchtender",
+        queryset=queryset,
+        extra_context=context,
     )
 
 
-def send_digest_by_user(user, template_name, queryset=None):
+def send_digest_by_user(user, template_name, queryset=None, extra_context=None):
     """
     Should be run at the end, to collect remaining notifications
     """
@@ -364,6 +373,9 @@ def send_digest_by_user(user, template_name, queryset=None):
         "projects": projects_digest,
         "notification_count": notifications.count(),
     }
+
+    if extra_context:
+        digest.update(extra_context)
 
     if len(digest) > 0:
         send_email(
