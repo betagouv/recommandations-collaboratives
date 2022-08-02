@@ -1,14 +1,29 @@
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.db import models
 from django.utils import timezone
 from markdownx.utils import markdownify
 
 
+class NoteManager(models.Manager):
+    pass
+
+
+class NoteOnSiteManager(CurrentSiteManager, NoteManager):
+    pass
+
+
 class Note(models.Model):
     class Meta:
         unique_together = ("content_type", "object_id")
+
+    objects = NoteManager()
+    on_site = NoteOnSiteManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="Date de création"

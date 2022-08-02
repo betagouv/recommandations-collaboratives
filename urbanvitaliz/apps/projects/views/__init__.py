@@ -281,18 +281,6 @@ def project_list(request):
     return render(request, "projects/project/list.html", locals())
 
 
-def project_detail_from_sharing_link(request, project_ro_key):
-    """Return a special view of the project using the sharing link"""
-    try:
-        project = models.Project.on_site.filter(ro_key=project_ro_key)[0]
-    except Exception:
-        raise Http404()
-
-    can_manage = can_manage_project(project, request.user)
-
-    return render(request, "projects/project/detail-ro.html", locals())
-
-
 @login_required
 def project_update(request, project_id=None):
     """Update the base information of a project"""

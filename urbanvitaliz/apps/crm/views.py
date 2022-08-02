@@ -24,11 +24,11 @@ def organization_details(request, organization_id):
         profile__in=organization.registered_profiles.all()
     )
 
-    advised_projects = Project.objects.filter(switchtenders__in=participants)
+    advised_projects = Project.on_site.filter(switchtenders__in=participants)
 
     org_departments = organization.departments.all()
 
-    unadvised_projects = Project.objects.filter(
+    unadvised_projects = Project.on_site.filter(
         commune__department__in=org_departments
     ).exclude(switchtenders__in=participants)
 
@@ -37,13 +37,14 @@ def organization_details(request, organization_id):
     user_ct = ContentType.objects.get_for_model(User)
 
     actions = Action.objects.filter(
+        site=request.site,
         actor_content_type=user_ct,
         actor_object_id__in=participant_ids,
     )
 
     organization_ct = ContentType.objects.get_for_model(Organization)
     try:
-        note = models.Note.objects.get(
+        note = models.Note.on_site.get(
             object_id=organization.pk, content_type=organization_ct
         )
     except models.Note.DoesNotExist:
@@ -60,7 +61,7 @@ def user_details(request, user_id):
 
     user_ct = ContentType.objects.get_for_model(User)
     try:
-        note = models.Note.objects.get(object_id=crm_user.pk, content_type=user_ct)
+        note = models.Note.on_site.get(object_id=crm_user.pk, content_type=user_ct)
     except models.Note.DoesNotExist:
         note = None
 
@@ -75,7 +76,7 @@ def project_details(request, project_id):
 
     project_ct = ContentType.objects.get_for_model(Project)
     try:
-        note = models.Note.objects.get(object_id=project.pk, content_type=project_ct)
+        note = models.Note.on_site.get(object_id=project.pk, content_type=project_ct)
     except models.Note.DoesNotExist:
         note = None
 
@@ -88,7 +89,7 @@ def handle_create_note_for_object(
     # If a note already exists, redirect
     user_ct = ContentType.objects.get_for_model(the_object)
     try:
-        existing_note = models.Note.objects.get(
+        existing_note = models.Note.on_site.get(
             object_id=the_object.pk, content_type=user_ct
         )
         return redirect(reverse(return_update_view_name, args=(existing_note.pk,)))
@@ -101,6 +102,7 @@ def handle_create_note_for_object(
             note = form.save(commit=False)
             note.related = the_object
             note.created_by = request.user
+            note.site = request.site
             note.save()
             return redirect(reverse(return_view_name, args=(the_object.pk,)))
 
@@ -156,7 +158,9 @@ def update_note_for_object(request, note, return_view_name):
 def update_note_for_user(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     user_ct = ContentType.objects.get_for_model(user)
-    note = get_object_or_404(models.Note, object_id=user_id, content_type=user_ct)
+    note = get_object_or_404(
+        models.Note, site=request.site, object_id=user_id, content_type=user_ct
+    )
 
     return update_note_for_object(request, note, "crm-user-details")
 
@@ -165,7 +169,9 @@ def update_note_for_user(request, user_id):
 def update_note_for_project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     project_ct = ContentType.objects.get_for_model(project)
-    note = get_object_or_404(models.Note, object_id=project_id, content_type=project_ct)
+    note = get_object_or_404(
+        models.Note, site=request.site, object_id=project_id, content_type=project_ct
+    )
 
     return update_note_for_object(request, note, "crm-project-details")
 
@@ -175,7 +181,10 @@ def update_note_for_organization(request, organization_id):
     organization = get_object_or_404(Organization, pk=organization_id)
     organization_ct = ContentType.objects.get_for_model(organization)
     note = get_object_or_404(
-        models.Note, object_id=organization_id, content_type=organization_ct
+        models.Note,
+        site=request.site,
+        object_id=organization_id,
+        content_type=organization_ct,
     )
 
     return update_note_for_object(request, note, "crm-organization-details")
