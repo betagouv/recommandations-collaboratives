@@ -14,13 +14,9 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from urbanvitaliz.utils import check_if_switchtender
 
-from .. import models
-from ..serializers import (
-    ProjectSerializer,
-    TaskFollowupSerializer,
-    TaskNotificationSerializer,
-    TaskSerializer,
-)
+from .. import models, signals
+from ..serializers import (ProjectSerializer, TaskFollowupSerializer,
+                           TaskNotificationSerializer, TaskSerializer)
 
 
 ########################################################################
@@ -86,6 +82,18 @@ class TaskViewSet(viewsets.ModelViewSet):
     """
     API endpoint for project tasks
     """
+
+    def perform_update(self, serializer):
+        original_object = self.get_object()
+        updated_object = serializer.save()
+
+        if original_object.public is False and updated_object.public is True:
+            signals.action_created.send(
+                sender=self,
+                task=updated_object,
+                project=updated_object.project,
+                user=self.request.user,
+            )
 
     @action(
         methods=["post"],
