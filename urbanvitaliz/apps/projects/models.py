@@ -57,18 +57,12 @@ class ProjectManager(models.Manager):
         # Regional actors can see projects of their area
         if check_if_switchtender(user):
             actor_departments = user.profile.departments.all()
-            # XXX We may be missing arbitrary assigned projects as switchtender
-            # (outside of area)
             results = self.in_departments(actor_departments)
         # Regular user, only return its own projects
         else:
             results = self.filter(members=user)
 
-        results = results | self.filter(switchtenders=user)
-
-        print(results)
-
-        return results
+        return (results | self.filter(switchtenders=user)).distinct()
 
 
 class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
