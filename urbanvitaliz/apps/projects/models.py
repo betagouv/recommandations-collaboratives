@@ -19,7 +19,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -59,14 +60,15 @@ class ProjectManager(models.Manager):
             # XXX We may be missing arbitrary assigned projects as switchtender
             # (outside of area)
             results = self.in_departments(actor_departments)
-
-            results = results | self.filter(switchtenders=user)
-
-            return results.distinct()
-
         # Regular user, only return its own projects
         else:
-            return self.filter(members=user)
+            results = self.filter(members=user)
+
+        results = results | self.filter(switchtenders=user)
+
+        print(results)
+
+        return results
 
 
 class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
