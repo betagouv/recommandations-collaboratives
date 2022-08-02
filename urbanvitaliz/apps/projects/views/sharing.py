@@ -145,7 +145,7 @@ def access_delete(request, project_id: int, email: str):
 def project_detail_from_sharing_link(request, project_ro_key):
     """Return a special view of the project using the sharing link"""
     try:
-        project = models.Project.on_site.filter(ro_key=project_ro_key).first()
+        project = models.Project.on_site.get(ro_key=project_ro_key)
     except Exception:
         raise Http404()
 
