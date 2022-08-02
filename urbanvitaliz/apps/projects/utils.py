@@ -54,7 +54,7 @@ def can_administrate_project(project, user):
     if project:
         return project.switchtenders_on_site.filter(switchtender=user).exists()
     else:
-        return models.Project.on_site.filter(switchtenders=user).count() > 0
+        return models.Project.on_site.filter(switchtenders=user).exists()
 
 
 def can_administrate_or_403(project, user):
