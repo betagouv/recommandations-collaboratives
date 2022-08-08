@@ -125,7 +125,7 @@ class CreateActionWithoutResourceForm(forms.ModelForm):
 
 class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
     resource = forms.ModelChoiceField(
-        queryset=resources_models.Resource.objects.exclude(
+        queryset=resources_models.Resource.on_site.exclude(
             status=resources_models.Resource.DRAFT
         ),
         required=True,
@@ -138,7 +138,7 @@ class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
 
 class CreateActionsFromResourcesForm(forms.ModelForm):
     resources = forms.ModelMultipleChoiceField(
-        queryset=resources_models.Resource.objects.exclude(
+        queryset=resources_models.Resource.on_site.exclude(
             status=resources_models.Resource.DRAFT
         ),
         required=True,
@@ -223,65 +223,6 @@ class ProjectForm(forms.ModelForm):
             "switchtenders",
             "publish_to_cartofriches",
             "muted",
-        ]
-
-
-class OnboardingForm(forms.ModelForm):
-    """Form for onboarding a new local authority"""
-
-    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
-    insee = forms.CharField(max_length=5, required=False, label="Code Insee")
-
-    email = forms.CharField(label="Email principal", required=False)
-
-    class Meta:
-        model = models.Project
-        fields = [
-            "email",
-            "first_name",
-            "last_name",
-            "phone",
-            "org_name",
-            "name",
-            "location",
-            "insee",
-            "description",
-            "impediments",
-            "publish_to_cartofriches",
-        ]
-
-
-class OnboardingWithCaptchaForm(OnboardingForm):
-    """Form for onboarding a new local authority"""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Prevent tests from failing
-        if "PYTEST_CURRENT_TEST" in os.environ:
-            self.fields.pop("captcha")
-
-    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
-    insee = forms.CharField(max_length=5, required=False, label="Code Insee")
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
-
-    email = forms.CharField(label="Email principal", required=False)
-
-    class Meta:
-        model = models.Project
-        fields = [
-            "email",
-            "first_name",
-            "last_name",
-            "phone",
-            "org_name",
-            "name",
-            "location",
-            "insee",
-            "description",
-            "impediments",
-            "publish_to_cartofriches",
-            "captcha",
         ]
 
 

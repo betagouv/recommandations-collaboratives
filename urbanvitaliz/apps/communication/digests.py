@@ -124,7 +124,8 @@ def send_digests_for_new_recommendations_by_user(user):
     project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
     notifications = (
-        user.notifications.unsent()
+        user.notifications(manager="on_site")
+        .unsent()
         .filter(target_content_type=project_ct, verb="a recommandé l'action")
         .order_by("target_object_id")
     )
@@ -148,7 +149,11 @@ def send_recommendation_digest_by_project(user, notifications):
     for project_id, project_notifications in groupby(
         notifications, key=lambda x: x.target_object_id
     ):
-        project = projects_models.Project.objects.get(pk=project_id)
+        try:
+            project = models.Project.on_site.get(pk=project_id)
+        except models.Project.DoesNotExist:
+            # Probably a deleted project?
+            continue
 
         digest = make_digest_of_project_recommendations(
             project, project_notifications, user
@@ -166,7 +171,7 @@ def send_recommendation_digest_by_project(user, notifications):
 def make_digest_of_project_recommendations(project, project_notifications, user):
     """Return digest for project recommendations to be sent to user"""
     recommendations = make_recommendations_digest(project_notifications, user)
-    project_digest = make_project_digest(project, user)
+    project_digest = make_project_digest(project, user, url_name="actions")
     return {
         "notification_count": len(recommendations),
         "project": project_digest,
@@ -186,10 +191,10 @@ def make_recommendations_digest(project_notifications, user):
     return recommendations
 
 
-def make_project_digest(project, user=None):
+def make_project_digest(project, user=None, url_name="detail"):
     """Return base information digest for project"""
     project_link = utils.build_absolute_url(
-        reverse("projects-project-detail", args=[project.id]), auto_login_user=user
+        reverse(f"projects-project-{url_name}", args=[project.id]), auto_login_user=user
     )
     return {
         "name": project.name,
@@ -242,7 +247,8 @@ def send_digests_for_new_sites_by_user(user):
     project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
     notifications = (
-        user.notifications.unsent()
+        user.notifications(manager="on_site")
+        .unsent()
         .filter(target_content_type=project_ct, verb="a déposé le projet")
         .order_by("target_object_id")
     )
@@ -263,7 +269,6 @@ def send_new_site_digest_by_user(user, notifications):
     """Send digest of new site by user"""
 
     for notification in notifications:
-
         digest = make_digest_for_new_site(notification, user)
         if digest:
             send_email(
@@ -313,9 +318,11 @@ def send_digest_for_non_switchtender_by_user(user):
     """
     project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
-    queryset = user.notifications.exclude(
-        target_content_type=project_ct, verb="a recommandé l'action"
-    ).unsent()
+    queryset = (
+        user.notifications(manager="on_site")
+        .exclude(target_content_type=project_ct, verb="a recommandé l'action")
+        .unsent()
+    )
 
     return send_digest_by_user(
         user, template_name="digest_for_non_switchtender", queryset=queryset
@@ -326,19 +333,32 @@ def send_digest_for_switchtender_by_user(user):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
-    queryset = user.notifications.exclude(verb="a recommandé l'action").unsent()
+    queryset = (
+        user.notifications(manager="on_site")
+        .exclude(verb="a recommandé l'action")
+        .unsent()
+    )
+
+    context = {
+        "dashboard_url": utils.build_absolute_url(
+            reverse("projects-project-list"), auto_login_user=user
+        )
+    }
 
     return send_digest_by_user(
-        user, template_name="digest_for_switchtender", queryset=queryset
+        user,
+        template_name="digest_for_switchtender",
+        queryset=queryset,
+        extra_context=context,
     )
 
 
-def send_digest_by_user(user, template_name, queryset=None):
+def send_digest_by_user(user, template_name, queryset=None, extra_context=None):
     """
     Should be run at the end, to collect remaining notifications
     """
     if not queryset:
-        notifications = user.notifications.unsent()
+        notifications = user.notifications(manager="on_site").unsent()
     else:
         notifications = queryset
 
@@ -353,6 +373,9 @@ def send_digest_by_user(user, template_name, queryset=None):
         "projects": projects_digest,
         "notification_count": notifications.count(),
     }
+
+    if extra_context:
+        digest.update(extra_context)
 
     if len(digest) > 0:
         send_email(
@@ -388,7 +411,7 @@ def make_project_notifications_digest(project_id, notifications, user):
     """Return digest for given project notification"""
     # Ignore deleted projects
     try:
-        project = projects_models.Project.objects.get(pk=project_id)
+        project = projects_models.Project.on_site.get(pk=project_id)
     except projects_models.Project.DoesNotExist:
         return None
 

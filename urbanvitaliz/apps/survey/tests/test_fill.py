@@ -9,10 +9,13 @@ created: 2021-06-27 12:06:10 CEST
 
 import pytest
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
+from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import login
 
@@ -24,9 +27,13 @@ from .. import models
 
 
 @pytest.mark.django_db
-def test_new_survey_session_is_created(client):
-    project = Recipe(projects.Project).make()
-    survey = Recipe(models.Survey, id=1).make()  # hard coded
+def test_new_survey_session_is_created(request, client):
+    current_site = get_current_site(request)
+    project = Recipe(projects.Project, sites=[current_site]).make()
+    survey = Recipe(models.Survey, site=current_site).make()
+    Recipe(
+        home_models.SiteConfiguration, site=current_site, project_survey=survey
+    ).make()
 
     url = reverse("survey-project-session", args=(project.id,))
     with login(client, is_staff=False):
@@ -39,9 +46,26 @@ def test_new_survey_session_is_created(client):
 
 
 @pytest.mark.django_db
-def test_existing_survey_session_is_reused(client):
-    project = Recipe(projects.Project).make()
-    survey = Recipe(models.Survey, id=1).make()  # hard coded
+def test_new_survey_session_makes_500_if_no_siteconfiguration(request, client):
+    current_site = get_current_site(request)
+
+    project = Recipe(projects.Project, sites=[current_site]).make()
+    Recipe(models.Survey, site=current_site).make()
+
+    url = reverse("survey-project-session", args=(project.id,))
+    with login(client, is_staff=False):
+        with pytest.raises(ImproperlyConfigured):
+            client.get(url)
+
+
+@pytest.mark.django_db
+def test_existing_survey_session_is_reused(request, client):
+    current_site = get_current_site(request)
+    project = Recipe(projects.Project, sites=[current_site]).make()
+    survey = Recipe(models.Survey, site=current_site).make()
+    Recipe(
+        home_models.SiteConfiguration, site=current_site, project_survey=survey
+    ).make()
     session = Recipe(models.Session, project=project, survey=survey).make()
 
     url = reverse("survey-project-session", args=(project.id,))
@@ -67,9 +91,12 @@ def test_on_survey_creation_signal_is_sent(client):
 
 
 @pytest.mark.django_db
-def test_answered_question_with_comment_only_is_saved_to_session(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_answered_question_with_comment_only_is_saved_to_session(request, client):
+    current_site = get_current_site(request)
+    project = Recipe(projects.Project, sites=[current_site]).make()
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(models.Session, survey=survey, project=project).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()
@@ -85,9 +112,13 @@ def test_answered_question_with_comment_only_is_saved_to_session(client):
 
 
 @pytest.mark.django_db
-def test_answered_question_with_upload_has_attachment_saved(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_answered_question_with_upload_has_attachment_saved(request, client):
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
+
     the_file = SimpleUploadedFile("test.pdf", b"Some content.")
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs, upload_title="The upload").make()
@@ -103,9 +134,9 @@ def test_answered_question_with_upload_has_attachment_saved(client):
 
 
 @pytest.mark.django_db
-def test_answered_question_with_single_choice_is_saved_to_session(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_answered_question_with_single_choice_is_saved_to_session(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(models.Session, survey=survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()
@@ -124,9 +155,13 @@ def test_answered_question_with_single_choice_is_saved_to_session(client):
 
 
 @pytest.mark.django_db
-def test_answered_question_with_multiple_choice_is_saved_to_session(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_answered_question_with_multiple_choice_is_saved_to_session(request, client):
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, is_multiple=True, question_set=qs).make()
     choice = Recipe(models.Choice, question=q1, value="a").make()
@@ -145,8 +180,8 @@ def test_answered_question_with_multiple_choice_is_saved_to_session(client):
 
 @pytest.mark.django_db
 def test_question_with_comment_only_make_comment_field_mandatory(client):
-    session = Recipe(models.Session).make()
     survey = Recipe(models.Survey).make()
+    session = Recipe(models.Session, survey=survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()
@@ -160,9 +195,13 @@ def test_question_with_comment_only_make_comment_field_mandatory(client):
 
 
 @pytest.mark.django_db
-def test_question_with_single_choice_signals_are_copied_over_answer(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_question_with_single_choice_signals_are_copied_over_answer(request, client):
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()
@@ -180,9 +219,11 @@ def test_question_with_single_choice_signals_are_copied_over_answer(client):
 
 
 @pytest.mark.django_db
-def test_question_with_single_multiple_signals_are_copied_over_answer(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_question_with_single_multiple_signals_are_copied_over_answer(request, client):
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(models.Session, survey=survey).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, is_multiple=True, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()
@@ -201,10 +242,14 @@ def test_question_with_single_multiple_signals_are_copied_over_answer(client):
 
 
 @pytest.mark.django_db
-def test_answered_question_is_updated_to_session(client):
+def test_answered_question_is_updated_to_session(request, client):
     """Make sure we update and don't duplicate Answer when answering again"""
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()
@@ -232,9 +277,13 @@ def test_answered_question_is_updated_to_session(client):
 
 
 @pytest.mark.django_db
-def test_question_redirects_to_next_question(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_question_redirects_to_next_question(request, client):
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     choice = Recipe(models.Choice, question=q1, value="yep").make()
@@ -248,9 +297,10 @@ def test_question_redirects_to_next_question(client):
 
 
 @pytest.mark.django_db
-def test_answered_question_triggers_notification(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_answered_question_triggers_notification(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(models.Session, survey=survey).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()
@@ -262,7 +312,10 @@ def test_answered_question_triggers_notification(client):
 
     st = Recipe(auth_models.User).make()
     with login(client, is_staff=False) as user:
-        session.project.switchtenders.add(st)
+        session.project.switchtenders_on_site.create(
+            switchtender=st, site=get_current_site(request)
+        )
+
         client.post(url, data={"answer": choice.value, "comment": my_comment})
 
     assert user.notifications.unread().count() == 0
@@ -270,9 +323,11 @@ def test_answered_question_triggers_notification(client):
 
 
 @pytest.mark.django_db
-def test_answered_question_debounces_notification(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_answered_question_debounces_notification(request, client):
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(models.Session, survey=survey).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()
@@ -285,7 +340,9 @@ def test_answered_question_debounces_notification(client):
     st = Recipe(auth_models.User).make()
 
     with login(client, is_staff=False) as user:
-        session.project.switchtenders.add(st)
+        projects.ProjectSwitchtender.objects.create(
+            project=session.project, switchtender=st, site=current_site
+        )
         client.post(url, data={"answer": choice.value, "comment": my_comment})
         client.post(url, data={"answer": choice.value, "comment": my_comment})
 
@@ -299,9 +356,10 @@ def test_answered_question_debounces_notification(client):
 
 
 @pytest.mark.django_db
-def test_next_question_redirects_to_next_available_question(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_next_question_redirects_to_next_available_question(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(models.Session, survey=survey).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     q2 = Recipe(models.Question, question_set=qs).make()
@@ -315,9 +373,10 @@ def test_next_question_redirects_to_next_available_question(client):
 
 
 @pytest.mark.django_db
-def test_next_question_redirects_to_done_when_no_more_questions(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_next_question_redirects_to_done_when_no_more_questions(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(models.Session, survey=survey).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
 
@@ -329,9 +388,9 @@ def test_next_question_redirects_to_done_when_no_more_questions(client):
 
 
 @pytest.mark.django_db
-def test_next_question_redirects_to_next_question_set(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_next_question_redirects_to_next_question_set(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(models.Session, survey=survey).make()
     qs1 = Recipe(models.QuestionSet, survey=survey, priority=30).make()
     q1 = Recipe(models.Question, question_set=qs1).make()
 
@@ -350,9 +409,9 @@ def test_next_question_redirects_to_next_question_set(client):
 
 
 @pytest.mark.django_db
-def test_previous_question_redirects_to_previous_available_question(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_previous_question_redirects_to_previous_available_question(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(models.Session, survey=survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     q2 = Recipe(models.Question, question_set=qs).make()
@@ -366,9 +425,9 @@ def test_previous_question_redirects_to_previous_available_question(client):
 
 
 @pytest.mark.django_db
-def test_previous_question_redirects_to_previous_question_set(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_previous_question_redirects_to_previous_question_set(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(models.Session, survey=survey).make()
     qs1 = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs1).make()
 
@@ -384,9 +443,9 @@ def test_previous_question_redirects_to_previous_question_set(client):
 
 
 @pytest.mark.django_db
-def test_previous_question_redirects_to_survey_when_not_more_questions(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_previous_question_redirects_to_survey_when_not_more_questions(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(models.Session, survey=survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
 
@@ -414,9 +473,10 @@ def test_refresh_signals_only_for_staff(client):
 
 
 @pytest.mark.django_db
-def test_refresh_signals(client):
-    session = Recipe(models.Session).make()
-    survey = Recipe(models.Survey).make()
+def test_refresh_signals(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(models.Session, survey=survey).make()
+
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()

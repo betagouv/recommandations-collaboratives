@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
@@ -173,7 +174,7 @@ def test_contact_create_and_redirect(client):
         data = {"first_name": "my contact"}
         response = client.post(url, data=data)
 
-    contact = models.Contact.objects.all()[0]
+    contact = models.Contact.on_site.all()[0]
     assert contact.first_name == data["first_name"]
 
     new_url = reverse("addressbook-organization-details", args=[organization.id])
@@ -194,8 +195,8 @@ def test_update_contact_not_available_for_non_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_update_contact_available_for_switchtender(client):
-    contact = Recipe(models.Contact).make()
+def test_update_contact_available_for_switchtender(request, client):
+    contact = Recipe(models.Contact, site=get_current_site(request)).make()
     url = reverse("addressbook-organization-contact-update", args=[contact.id])
     with login(client, groups=["switchtender"]):
         response = client.get(url)
@@ -204,8 +205,8 @@ def test_update_contact_available_for_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_contact_update_and_redirect(client):
-    contact = Recipe(models.Contact).make()
+def test_contact_update_and_redirect(request, client):
+    contact = Recipe(models.Contact, site=get_current_site(request)).make()
     url = reverse("addressbook-organization-contact-update", args=[contact.id])
 
     with login(client, groups=["switchtender"]):

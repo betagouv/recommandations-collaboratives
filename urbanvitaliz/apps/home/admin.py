@@ -5,6 +5,11 @@ from django.contrib.auth.admin import UserAdmin
 from . import models
 
 
+@admin.register(models.SiteConfiguration)
+class SiteConfigurationAdmin(admin.ModelAdmin):
+    list_display = ("site", "project_survey")
+
+
 class ProfileInline(admin.StackedInline):
     model = models.UserProfile
     can_delete = False
