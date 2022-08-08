@@ -42,7 +42,7 @@
                 <svg class="bi me-2" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
                 </svg>
-                <span>{{ crm_user.get_full_name}}</span>
+                <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
             </h3>
             {% if crm_user.profile.organization %}
             <a class="d-flex align-items-center"
