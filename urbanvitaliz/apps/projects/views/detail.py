@@ -12,12 +12,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import check_if_switchtender
+from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm
-from ..utils import (can_administrate_project, can_manage_or_403,
-                     can_manage_project, check_if_national_actor,
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403, can_manage_project,
+                     check_if_national_actor,
                      get_notification_recipients_for_project,
                      is_regional_actor_for_project, set_active_project_id)
 
@@ -31,7 +32,7 @@ def project_detail(request, project_id=None):
 @login_required
 def project_knowledge(request, project_id=None):
     """Return the details of given project for switchtender"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     # compute permissions
     can_manage = can_manage_project(project, request.user)
@@ -51,13 +52,10 @@ def project_knowledge(request, project_id=None):
     # Set this project as active
     set_active_project_id(request, project.pk)
 
-    try:
-        survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
-        session, created = survey_models.Session.objects.get_or_create(
-            project=project, survey=survey
-        )
-    except survey_models.Survey.DoesNotExist:
-        session = None
+    site_config = get_site_config_or_503(request.site)
+    session, created = survey_models.Session.objects.get_or_create(
+        project=project, survey=site_config.project_survey
+    )
 
     # Mark some notifications as seen (general ones)
     project_ct = ContentType.objects.get_for_model(project)
@@ -67,7 +65,8 @@ def project_knowledge(request, project_id=None):
         | Q(verb="a validé le projet")
         | Q(verb="a soumis pour modération le projet")
         | Q(verb="a mis à jour le questionnaire")
-        | Q(verb="a ajouté un document"),
+        | Q(verb="a ajouté un document")
+        | Q(verb="a envoyé un message"),
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
     )
@@ -80,7 +79,7 @@ def project_knowledge(request, project_id=None):
 @login_required
 def project_actions(request, project_id=None):
     """Action page for given project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     # compute permissions
     can_manage = can_manage_project(project, request.user)
@@ -115,7 +114,7 @@ def project_actions(request, project_id=None):
 @login_required
 def project_conversations(request, project_id=None):
     """Action page for given project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     # compute permissions
     can_manage = can_manage_project(project, request.user)
@@ -155,7 +154,9 @@ def project_conversations(request, project_id=None):
 @login_required
 def project_internal_followup(request, project_id=None):
     """Action page for given project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    can_administrate_or_403(project, request.user)
 
     # compute permissions
     can_manage = can_manage_project(project, request.user)
@@ -165,12 +166,6 @@ def project_internal_followup(request, project_id=None):
     )
     is_national_actor = check_if_national_actor(request.user)
     can_administrate = can_administrate_project(project, request.user)
-
-    # check user can administrate project (member or switchtender)
-    if request.user != project.members.filter(projectmember__is_owner=True).first():
-        # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_switchtender(request.user):
-            can_manage_or_403(project, request.user)
 
     # Set this project as active
     set_active_project_id(request, project.pk)

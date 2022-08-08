@@ -7,10 +7,16 @@ author  : raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created : 2021-12-21 12:40:54 CEST
 """
 
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.db import models
 
 
 class EmailTemplate(models.Model):
+    objects = models.Manager()
+    on_site = CurrentSiteManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     name = models.CharField(max_length=40, unique=True)
     sib_id = models.IntegerField()
 

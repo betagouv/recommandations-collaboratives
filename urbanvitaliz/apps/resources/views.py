@@ -10,6 +10,7 @@ import datetime
 
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
@@ -20,6 +21,7 @@ from django.utils import timezone
 from django.views.generic.detail import DetailView
 from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
+from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import (
@@ -84,7 +86,7 @@ def resource_search(request):
         communes = []
         if hasattr(request.user, "email"):
             communes = [
-                p.commune for p in projects.Project.objects.filter(members=request.user)
+                p.commune for p in projects.Project.on_site.filter(members=request.user)
             ]
             if not communes:
                 limit_area = None  # does not apply if no projects
@@ -123,7 +125,7 @@ class SearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.the_categories = models.Category.fetch()
+        self.the_categories = models.Category.on_site.all()
         # add one field per category defined in the database
         for category in self.the_categories:
             name = category.form_label
@@ -167,7 +169,7 @@ class BaseResourceDetailView(DetailView):
         resource = self.object
 
         if self.request.user.is_authenticated:
-            context["bookmark"] = models.Bookmark.objects.filter(
+            context["bookmark"] = models.Bookmark.on_site.filter(
                 resource=resource, created_by=self.request.user
             ).first()
 
@@ -178,7 +180,8 @@ class BaseResourceDetailView(DetailView):
             not check_if_switchtender(self.request.user)
             and not self.request.user.is_anonymous
         ):
-            user_projects = projects.Project.objects.filter(members=self.request.user)
+            user_projects = projects.Project.on_site.filter(members=self.request.user)
+
             if user_projects.count():
                 user_depts = (
                     user_projects.exclude(commune=None)
@@ -204,7 +207,7 @@ class ResourceDetailView(BaseResourceDetailView):
 
         if check_if_switchtender(self.request.user):
             context["projects_used_by"] = (
-                projects.Project.objects.filter(tasks__resource_id=resource.pk)
+                projects.Project.on_site.filter(tasks__resource_id=resource.pk)
                 .order_by("name")
                 .distinct()
             )
@@ -249,6 +252,7 @@ def resource_create(request):
             resource = form.save(commit=False)
             resource.created_by = request.user
             resource.save()
+            resource.sites.add(request.site)
             form.save_m2m()
             next_url = reverse("resources-resource-detail", args=[resource.id])
             return redirect(next_url)
@@ -262,6 +266,18 @@ class EditResourceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Queryset needs to be here since on_site is dynamic and form is read too soon
+        self.fields["category"] = forms.ModelChoiceField(
+            queryset=models.Category.on_site.all(),
+            empty_label="(Aucune)",
+            required=False,
+        )
+
+        self.fields["contacts"] = forms.ModelMultipleChoiceField(
+            queryset=addressbook_models.Contact.on_site.all(),
+            required=False,
+        )
 
         # Try to load the Markdown template into 'content' field
         try:
@@ -322,7 +338,7 @@ class LatestResourcesFeed(Feed):
     description = "Derniers ajouts de ressources"
 
     def items(self):
-        return models.Resource.objects.order_by("-created_on")[:5]
+        return models.Resource.on_site.order_by("-created_on")[:5]
 
     def item_title(self, item):
         return item.title
@@ -348,18 +364,19 @@ def create_bookmark(request, resource_id=None):
     resource = get_object_or_404(models.Resource, pk=resource_id)
     try:
         # look if bookmark exists and is deleted
-        bookmark = models.Bookmark.deleted_objects.get(
+        bookmark = models.Bookmark.deleted_on_site.get(
             resource=resource, created_by=request.user
         )
     except models.Bookmark.DoesNotExist:
-        bookmark, _ = models.Bookmark.objects.get_or_create(
-            resource=resource, created_by=request.user
+        bookmark, _ = models.Bookmark.on_site.get_or_create(
+            resource=resource, created_by=request.user, site=get_current_site(request)
         )
     if request.method == "POST":
         form = BookmarkForm(request.POST, instance=bookmark)
         if form.is_valid():
             # save bookmark with comments
             instance = form.save(commit=False)
+            instance.site = request.site
             instance.deleted = None
             instance.save()
             next_url = reverse("resources-resource-detail", args=[resource.id])
@@ -382,7 +399,7 @@ def delete_bookmark(request, resource_id=None):
     """Delete (soft) user bookmark associated to resource if exists"""
     if request.method == "POST":
         try:
-            bookmark = models.Bookmark.objects.get(
+            bookmark = models.Bookmark.on_site.get(
                 resource_id=resource_id, created_by=request.user
             )
             bookmark.deleted = timezone.now()
@@ -402,7 +419,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
-        return models.Resource.objects.exclude(status=models.Resource.DRAFT).order_by(
+        return models.Resource.on_site.exclude(status=models.Resource.DRAFT).order_by(
             "-created_on", "-updated_on"
         )
 

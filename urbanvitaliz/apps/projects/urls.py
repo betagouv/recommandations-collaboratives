@@ -14,7 +14,6 @@ from . import views
 from .views import detail, documents, feeds, notes, sharing, tasks
 
 urlpatterns = [
-    path(r"onboarding/", views.onboarding, name="projects-onboarding"),
     path(
         r"projects/prefill/",
         views.create_project_prefilled,
@@ -80,7 +79,7 @@ urlpatterns = [
     ),
     path(
         r"project/partage/<str:project_ro_key>/",
-        views.project_detail_from_sharing_link,
+        sharing.project_detail_from_sharing_link,
         name="projects-project-sharing-link",
     ),
     path(

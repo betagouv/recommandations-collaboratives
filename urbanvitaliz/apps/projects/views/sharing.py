@@ -6,21 +6,22 @@ Views for projects application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from urbanvitaliz import utils
-from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.communication import digests
+from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.forms import InviteForm
+from urbanvitaliz.apps.survey import models as survey_models
 
 from .. import models
-from ..utils import can_manage_or_403
+from ..utils import can_manage_or_403, can_manage_project
 
 ########################################################################
 # Access
@@ -30,12 +31,12 @@ from ..utils import can_manage_or_403
 @login_required
 def access_update(request, project_id):
     """Handle ACL for a project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     can_manage_or_403(project, request.user)
 
     # Fetch pending invites
     pending_invites = []
-    for invite in invites_models.Invite.objects.filter(
+    for invite in invites_models.Invite.on_site.filter(
         project=project, accepted_on=None
     ):
         pending_invites.append(invite)
@@ -58,7 +59,7 @@ def access_update(request, project_id):
                 already_member = True
             else:
                 try:
-                    already_invited = invites_models.Invite.objects.filter(
+                    already_invited = invites_models.Invite.on_site.filter(
                         project=project, email=email, role=role
                     ).exists()
                 except invites_models.Invite.DoesNotExist:
@@ -79,6 +80,7 @@ def access_update(request, project_id):
                 invite = form.save(commit=False)
                 invite.project = project
                 invite.inviter = request.user
+                invite.site = request.site
                 invite.save()
 
                 send_email(
@@ -110,7 +112,7 @@ def access_update(request, project_id):
 @login_required
 def access_delete(request, project_id: int, email: str):
     """Delete en email from the project ACL"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     if project.status == "DRAFT":
         raise PermissionDenied()
@@ -138,6 +140,26 @@ def access_delete(request, project_id: int, email: str):
             )
 
     return redirect(reverse("projects-access-update", args=[project_id]))
+
+
+def project_detail_from_sharing_link(request, project_ro_key):
+    """Return a special view of the project using the sharing link"""
+    try:
+        project = models.Project.on_site.get(ro_key=project_ro_key)
+    except Exception:
+        raise Http404()
+
+    try:
+        site_config = utils.get_site_config_or_503(request.site)
+        session, created = survey_models.Session.objects.get_or_create(
+            project=project, survey=site_config.project_survey
+        )
+    except Exception:
+        pass
+
+    can_manage = can_manage_project(project, request.user)
+
+    return render(request, "projects/project/detail-ro.html", locals())
 
 
 # eof

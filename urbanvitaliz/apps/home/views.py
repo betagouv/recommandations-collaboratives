@@ -71,7 +71,7 @@ class StatisticsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         staff_users = auth.User.objects.filter(is_staff=True)
-        the_projects = projects.Project.objects.exclude(
+        the_projects = projects.Project.on_site.exclude(
             Q(members__in=staff_users)
             | Q(status="DRAFT")
             | Q(status="STUCK")
@@ -200,7 +200,7 @@ class SwitchtenderDashboardView(LoginRequiredMixin, UserPassesTestMixin, Templat
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["projects_waiting"] = projects.Project.objects.filter(
+        context["projects_waiting"] = projects.Project.on_site.filter(
             status="DRAFT"
         ).count()
         context["project_model"] = projects.Project

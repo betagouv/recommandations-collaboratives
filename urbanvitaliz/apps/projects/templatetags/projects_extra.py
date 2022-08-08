@@ -19,7 +19,7 @@ def current_project(session):
     """Return current project contained in session"""
     try:
         project_id = session.get("project_id")
-        return models.Project.objects.get(id=project_id)
+        return models.Project.on_site.get(id=project_id)
     except Exception:  # pragma: nocover noqa
         return
 

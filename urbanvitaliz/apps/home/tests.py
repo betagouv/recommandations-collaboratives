@@ -12,6 +12,7 @@ import pytest
 from django import forms
 from django.conf import settings
 from django.contrib.auth import models as auth
+from django.contrib.sites.shortcuts import get_current_site
 from django.db.utils import IntegrityError
 from django.urls import reverse
 from model_bakery import baker
@@ -115,10 +116,14 @@ def test_logged_user_can_send_message_to_team(mocker, client):
 # Login routing based on user profile
 ########################################################################
 @pytest.mark.django_db
-def test_project_owner_is_sent_to_action_page_on_login(client):
+def test_project_owner_is_sent_to_action_page_on_login(request, client):
     url = reverse("login-redirect")
     membership = baker.make(projects_models.ProjectMember, is_owner=True)
-    project = baker.make(projects_models.Project, projectmember_set=[membership])
+    project = baker.make(
+        projects_models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+    )
 
     with login(client, user=membership.member):
         response = client.get(url)
