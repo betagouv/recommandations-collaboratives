@@ -1,6 +1,8 @@
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render, reverse
+from django.utils.http import urlencode
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import signals as projects_signals
@@ -27,7 +29,6 @@ def onboarding(request):
         if form.is_valid():
             onboarding_response = form.save(commit=False)
             onboarding_response.onboarding = onboarding_instance
-            onboarding_response.save()
 
             project = projects.Project()
 
@@ -46,17 +47,31 @@ def onboarding(request):
                 postcode = form.cleaned_data.get("postcode")
                 project.commune = geomatics.Commune.get_by_postal_code(postcode)
 
-            project.save()
-            project.sites.add(request.site)
-
-            user, _ = auth.User.objects.get_or_create(
+            # User handling
+            user, created = auth.User.objects.get_or_create(
                 username=form.cleaned_data.get("email"),
                 defaults={
+                    "username": form.cleaned_data.get("email"),
                     "email": form.cleaned_data.get("email"),
                     "first_name": form.cleaned_data.get("first_name"),
                     "last_name": form.cleaned_data.get("last_name"),
                 },
             )
+
+            if not created:
+                if request.user.username != user.username:
+                    # account exists, redirect to login
+                    login_url = reverse("account_login")
+                    next_args = urlencode({"next": reverse("projects-onboarding")})
+                    return redirect(f"{login_url}?{next_args}")
+
+            # save project
+            project.save()
+            project.sites.add(request.site)
+
+            # Save onboarding
+            onboarding_response.project = project
+            onboarding_response.save()
 
             # Make her project owner
             projects.ProjectMember.objects.create(
@@ -66,7 +81,7 @@ def onboarding(request):
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
             # Create initial public note
-            # XXX update so optinal fields are written into a note
+            # XXX update so optional fields are written into a note
             projects.Note(
                 project=project,
                 content=f"# Demande initiale\n\n{project.impediments}",
@@ -89,8 +104,16 @@ def onboarding(request):
                     )
                     return redirect(url)
 
-            response = redirect("survey-project-session", project_id=project.id)
-            response["Location"] += "?first_time=1"
-            return response
+            if created:
+                next_url = (
+                    reverse("survey-project-session", args=(project.id,))
+                    + "?first_time=1"
+                )
+                next_args = urlencode({"next": next_url})
+                return redirect(f"{reverse('home-user-setup-password')}?{next_args}")
+            else:
+                response = redirect("survey-project-session", project_id=project.id)
+                response["Location"] += "?first_time=1"
+                return response
 
     return render(request, "onboarding/onboarding.html", locals())
