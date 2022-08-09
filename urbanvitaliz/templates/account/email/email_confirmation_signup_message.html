@@ -306,10 +306,9 @@
                         <p>Bonjour,</p>
                         {% autoescape off %}
                             {% user_display user as user_display %}
-                            {% blocktrans with site_name=current_site.name site_domain=current_site.domain %}
-                                You're receiving this e-mail because user {{ user_display }} has given your e-mail address to register an account on {{ site_domain }}. To confirm this is correct, go to {{ activate_url }}
-                            {% endblocktrans %}
+                            <p class="mb-6 align-center">Vous recevez cet e-mail parce que l'utilistateur·rice {{ user_display }} a donné ce mail pour l'enregistrement du compte sur {{ current_site.domain }}. Pour confirmer, cliquez sur le bouton suivant.</p>
                         {% endautoescape %}
+                        </br>
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
                             <tr>
