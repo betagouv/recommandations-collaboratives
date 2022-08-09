@@ -11,10 +11,8 @@
 {% block project_detail %}
 
 <div class="col-12 mx-auto">
-
-
+    {% include 'projects/project/navigation.html' with conversation=True %}
     <div class="row">
-
         <div class="col-12 col-lg-8">
             {% regroup project.notes.public by created_on.date as notes_by_day %}
 

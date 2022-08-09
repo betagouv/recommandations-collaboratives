@@ -26,6 +26,7 @@
 <div class="col-12 mx-auto">
     <div class="row">
         <div class="col" x-data="KanbanTasks({{ project.id }})" x-init="getData(); initTooltips(); loadCanAdministrate(); loadCanManage(); loadIsSwitchtender(); loadUserId(); processUrl();">
+            {% include 'projects/project/navigation.html' with recommandations=True %}
             {% include 'projects/project/fragments/kanban_tasks/kanban_header.html' %}
 
             {{ can_administrate|json_script:"canAdministrate" }}
