@@ -15,7 +15,9 @@ from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, F, Q
@@ -24,11 +26,11 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.apps.projects.utils import (
-    can_administrate_project,
-    get_active_project,
-)
+from urbanvitaliz.apps.projects.utils import (can_administrate_project,
+                                              get_active_project)
 from urbanvitaliz.utils import check_if_switchtender
+
+from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 
 
 class HomePageView(TemplateView):
@@ -133,25 +135,6 @@ def contact(request):
     return render(request, "home/contact.html", locals())
 
 
-class ContactForm(forms.Form):
-    subject = forms.CharField(max_length=256)
-    content = forms.CharField(max_length=2048, widget=forms.Textarea)
-    name = forms.CharField(max_length=128)
-    email = forms.CharField(max_length=128)
-
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
-
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if user.is_authenticated:
-            del self.fields["name"]
-            del self.fields["email"]
-
-        # Prevent tests from failing
-        if "PYTEST_CURRENT_TEST" in os.environ:
-            self.fields.pop("captcha")
-
-
 def send_message_to_team(request, data):
     """Send message as email to the team"""
     subject = data.get("subject")
@@ -185,6 +168,34 @@ def notify_user_of_sending(request, status):
             "Vous pouvez réessayer "
             "ou utiliser l'adresse depuis votre logiciel de messagerie",
         )
+
+
+@login_required
+def setup_password(request):
+    """A simple view that request a password for a user that doesn't have one yet"""
+    next_url = request.GET.get("next", "/")
+
+    # We have a password, redirect!
+    if request.user.password:
+        return redirect(next_url)
+
+    if request.method == "POST":
+        form = UserPasswordFirstTimeSetupForm(request.POST)
+        next_url = request.POST.get("next", "/")
+        if form.is_valid():
+            request.user.set_password(form.cleaned_data.get("password1"))
+            request.user.save()
+            log_user(
+                request,
+                request.user,
+                backend="django.contrib.auth.backends.ModelBackend",
+            )
+
+            return redirect(next_url)
+    else:
+        form = UserPasswordFirstTimeSetupForm(initial={"next": next_url})
+
+    return render(request, "home/user_setup_password.html", locals())
 
 
 ######

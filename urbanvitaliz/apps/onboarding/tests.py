@@ -2,6 +2,7 @@ import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.utils.http import urlencode
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains
@@ -95,8 +96,11 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
     assert project
     user = project.members.first()
 
-    url = reverse("survey-project-session", args=[project.id])
-    assert response.url == (url + "?first_time=1")
+    next_url = urlencode(
+        {"next": reverse("survey-project-session", args=[project.id]) + "?first_time=1"}
+    )
+    url = reverse("home-user-setup-password")
+    assert response.url == (f"{url}?{next_url}")
 
     assert user.first_name == data["first_name"]
     assert user.last_name == data["last_name"]

@@ -1,5 +1,6 @@
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render, reverse
 from django.utils.http import urlencode
 from urbanvitaliz.apps.geomatics import models as geomatics
@@ -62,7 +63,6 @@ def onboarding(request):
                     # account exists, redirect to login
                     login_url = reverse("account_login")
                     next_args = urlencode({"next": reverse("projects-onboarding")})
-                    print("GO AWAY")
                     return redirect(f"{login_url}?{next_args}")
 
             # save project
@@ -104,8 +104,16 @@ def onboarding(request):
                     )
                     return redirect(url)
 
-            response = redirect("survey-project-session", project_id=project.id)
-            response["Location"] += "?first_time=1"
-            return response
+            if created:
+                next_url = (
+                    reverse("survey-project-session", args=(project.id,))
+                    + "?first_time=1"
+                )
+                next_args = urlencode({"next": next_url})
+                return redirect(f"{reverse('home-user-setup-password')}?{next_args}")
+            else:
+                response = redirect("survey-project-session", project_id=project.id)
+                response["Location"] += "?first_time=1"
+                return response
 
     return render(request, "onboarding/onboarding.html", locals())
