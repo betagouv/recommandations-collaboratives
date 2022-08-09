@@ -1,6 +1,7 @@
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.shortcuts import redirect, render, reverse
+from django.utils.http import urlencode
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import signals as projects_signals
@@ -45,6 +46,25 @@ def onboarding(request):
                 postcode = form.cleaned_data.get("postcode")
                 project.commune = geomatics.Commune.get_by_postal_code(postcode)
 
+            # User handling
+            user, created = auth.User.objects.get_or_create(
+                username=form.cleaned_data.get("email"),
+                defaults={
+                    "username": form.cleaned_data.get("email"),
+                    "email": form.cleaned_data.get("email"),
+                    "first_name": form.cleaned_data.get("first_name"),
+                    "last_name": form.cleaned_data.get("last_name"),
+                },
+            )
+
+            if not created:
+                if request.user.username != user.username:
+                    # account exists, redirect to login
+                    login_url = reverse("account_login")
+                    next_args = urlencode({"next": reverse("projects-onboarding")})
+                    print("GO AWAY")
+                    return redirect(f"{login_url}?{next_args}")
+
             # save project
             project.save()
             project.sites.add(request.site)
@@ -52,15 +72,6 @@ def onboarding(request):
             # Save onboarding
             onboarding_response.project = project
             onboarding_response.save()
-
-            user, _ = auth.User.objects.get_or_create(
-                username=form.cleaned_data.get("email"),
-                defaults={
-                    "email": form.cleaned_data.get("email"),
-                    "first_name": form.cleaned_data.get("first_name"),
-                    "last_name": form.cleaned_data.get("last_name"),
-                },
-            )
 
             # Make her project owner
             projects.ProjectMember.objects.create(
@@ -70,7 +81,7 @@ def onboarding(request):
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
             # Create initial public note
-            # XXX update so optinal fields are written into a note
+            # XXX update so optional fields are written into a note
             projects.Note(
                 project=project,
                 content=f"# Demande initiale\n\n{project.impediments}",
