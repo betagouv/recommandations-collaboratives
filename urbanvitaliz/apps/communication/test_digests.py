@@ -166,7 +166,7 @@ def test_send_digests_for_switchtender_by_user(client):
     assert (
         regional_actor.notifications.unsent().count() == 0
     )  # shouldn't get her own action notified
-    assert regional_actor2.notifications.unsent().count() == 1
+    assert regional_actor2.notifications.unsent().count() == 0
     assert non_regional_actor.notifications.unsent().count() == 0
     assert membership.member.notifications.unsent().count() == 1
 
