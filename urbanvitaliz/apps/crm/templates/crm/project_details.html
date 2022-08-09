@@ -28,22 +28,22 @@
                     {% for group in grouped_st %}
                     <div class="mb-4">
                         {% if group.grouper %}
-                        <a class="d-flex align-items-center"
-                            href="{% url 'crm-organization-details' group.grouper.pk %}">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
-                            </svg>
-                            <strong>{{ group.grouper }}</strong>
-                        </a>
+                            <a class="d-flex align-items-center"
+                                href="{% url 'crm-organization-details' group.grouper.pk %}">
+                                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
+                                </svg>
+                                <strong>{{ group.grouper }}</strong>
+                            </a>
                         {% endif %}
-                        {% for switchtender in group.list %}
-                        <ul class="list-unstyled mx-4">
-                            {% include 'crm/user_item.html' with user=switchtender %}
+                        <ul class="list-unstyled mx-4 mb-4">
+                            {% for switchtender in group.list %}
+                                    {% include 'crm/user_item.html' with user=switchtender %}
+                            {% endfor %}
                         </ul>
-                    </div>
-                    {% endfor%}
                     {% empty %}
-                    Pas de participant
+                        Pas de participant
+                    </div>
                     {% endfor %}
                 </ul>
             </div>
