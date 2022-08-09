@@ -1,0 +1,90 @@
+{% load static %}
+
+<ul class="list-unstyled mb-0 d-flex justify-content-center align-items-center" style="padding-left: 15px;">
+
+    <!-- Dashboard -->
+    {% if is_switchtender %}
+        <li class="nav-item dropdown nav-item-admin" style="margin-right: 35px">
+            <div class="btn-group">
+                <a href="{% url 'projects-project-list' %}" class="nav-link link-dark {% if url_name == 'projects-project-list' %}active{% endif %}">
+                    <span class="ms-1 align-middle">Tableau de Bord</span>
+                </a>
+            </div>
+        </li>
+    {% endif %}
+
+    <!-- Projects -->
+    {% if is_administrating_project %}
+    <li style="margin-right: 35px">
+        <div id="project-selector" class="nav-item">
+                <div class="btn-group">
+                    <span class="ms-1 align-middle">Projets</span>
+
+                    {% if request.session.projects|length > 1 %}
+                    <button type="button" class="border-0 btn py-0 dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" style="transform: translate3d(0, 2px,0);">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+
+                    <ul class="dropdown-menu py-0" style="width: 20vw;">
+                        <li class="list-group-item px-4 py-1 list-group-item-action dropdown-item border-0 border-bottom" style="background-color: #e4ecea;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-break text-truncate">
+                                    <a class="stretched-link text-reset text-decoration-none" href="{% url 'projects-project-detail' active_project.pk %}">{{ active_project.name|truncatechars:12|capfirst }}</a>
+                                </span>
+                                {% if active_project.muted %} 
+                                    <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi bg-warning rounded-circle" width="20px" height="20px" fill="currentColor" style="padding: 3px;">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#volume-mute"/>
+                                    </svg>
+                                {% endif %}
+                            </div>
+                            <span class="text-secondary small text-break text-truncate">{{ active_project.commune.name }} ({{ active_project.commune.department.code }})</span>
+                        </li>
+                        {% for project in request.session.projects %}
+                        <li class="list-group-item px-4 py-1 list-group-item-action dropdown-item border-0 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-break text-truncate">
+                                    <a class="stretched-link text-reset text-decoration-none" href="{% url "projects-project-detail" project.id %}">{{ project.name|truncatechars:12|capfirst }}</a>
+                                </span>
+                                {% if project.actions_open > 0 %}
+                                <div>
+                                    <span class="align-middle badge bg-primary rounded-pill">
+                                        {{ project.actions_open }}
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <span class="text-secondary small text-break text-truncate">{{ project.location|truncatechars:20|capfirst }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+    </li>
+    {% endif %}
+    <!-- Methodology -->
+    <li style="margin-right: 35px">
+        <div class="btn-group">
+            <a href="{% url 'methodology' %}" class="nav-link link-dark">
+                <span class="me-2 ms-1 align-middle">Méthodologie</span>
+            </a>
+        </div>
+    </li>
+    <!-- Ressources -->
+    <li style="margin-right: 35px">
+        <div class="btn-group">
+            <a href="{% url 'resources-resource-search' %}" class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">
+                <span class="ms-1 align-middle">Ressources</span>
+            </a>
+        </div>
+    </li>
+    <!-- Address Book -->
+    {% if request.user.is_staff %}
+    <li style="margin-right: 35px">
+        <a href="{% url 'addressbook-organization-list' %}" class="nav-link link-dark {% if url_name == 'addressbook-organization-list' %}active{% endif %}">
+            <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
+        </a>
+    </li>
+    {% endif %}
+</ul>
+
