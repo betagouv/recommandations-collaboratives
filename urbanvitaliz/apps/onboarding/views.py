@@ -27,7 +27,6 @@ def onboarding(request):
         if form.is_valid():
             onboarding_response = form.save(commit=False)
             onboarding_response.onboarding = onboarding_instance
-            onboarding_response.save()
 
             project = projects.Project()
 
@@ -46,8 +45,13 @@ def onboarding(request):
                 postcode = form.cleaned_data.get("postcode")
                 project.commune = geomatics.Commune.get_by_postal_code(postcode)
 
+            # save project
             project.save()
             project.sites.add(request.site)
+
+            # Save onboarding
+            onboarding_response.project = project
+            onboarding_response.save()
 
             user, _ = auth.User.objects.get_or_create(
                 username=form.cleaned_data.get("email"),
