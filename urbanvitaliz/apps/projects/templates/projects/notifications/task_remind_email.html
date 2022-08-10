@@ -1,7 +1,7 @@
 Bonjour,<br>
 
 <p>
-    {{ task.created_by.get_full_name }} vous a recommandé cette action il y a {{ delay }} jours
+    {{ task.created_by.get_full_name }} vous a proposé cette recommandation il y a {{ delay }} jours
     dans le cadre de votre projet "{{ task.project.name }}" :
 </p>
 
@@ -14,21 +14,21 @@ Bonjour,<br>
 </p>
 
 <p>
-    Où en êtes-vous depuis que vous avez pris connaissance de cette proposition d'action ?
+    Où en êtes-vous depuis que vous avez pris connaissance de cette proposition de recommandation ?
 </p>
 
 <p>
     <ul>
         <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 3 %}">C'est fait !</a></li>
         <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 1 %}">C'est en cours</a></li>
-        <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 2 %}">Je rencontre un blocage sur cette action</a></li>
+        <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 2 %}">Je rencontre un blocage sur cette recommandation</a></li>
         <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 5 %}">Me le rappeler plus tard</a></li>
         <li><a href="{{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 4 %}">Finalement, ça ne m'intéresse pas</a></li>
     </ul>
 </p>
 
 <p>
-    Vous pouvez retrouver cette action en cliquant ou en copiant le lien ci dessous :<br>
+    Vous pouvez retrouver cette recommandation en cliquant ou en copiant le lien ci dessous :<br>
     <a href="{{ request.scheme }}://{{ site.domain }}{{ task.project.get_absolute_url }}#action-{{ task.pk }}">
         {{ request.scheme }}://{{ site.domain }}{{ task.project.get_absolute_url }}#action-{{ task.pk }}
     </a>

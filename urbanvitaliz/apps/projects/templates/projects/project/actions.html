@@ -19,13 +19,14 @@
 {% endblock %}
 
 {% block title %}
-{{ block.super }} > Actions
+{{ block.super }} > Recommandation
 {% endblock %}
 
 {% block project_detail %}
 <div class="col-12 mx-auto">
     <div class="row">
         <div class="col" x-data="KanbanTasks({{ project.id }})" x-init="getData(); initTooltips(); loadCanAdministrate(); loadCanManage(); loadIsSwitchtender(); loadUserId(); processUrl();">
+            {% include 'projects/project/navigation.html' with recommandations=True %}
             {% include 'projects/project/fragments/kanban_tasks/kanban_header.html' %}
 
             {{ can_administrate|json_script:"canAdministrate" }}
@@ -35,9 +36,9 @@
 
             {% if is_switchtender and project.tasks.all.count == 0 %}
             <div class="bg-light p-4 rounded-2">
-                <h3 class="fw-light">Pas encore d'actions recommandées à la collectivité ?</h3>
+                <h3 class="fw-light">Pas encore de recommandations à la collectivité ?</h3>
                 <p class="fst-italic fw-light">
-                    Soyez la première personne à proposer des actions ou des ressources à la collectivité !
+                    Soyez la première personne à proposer des recommandations ou des ressources à la collectivité !
                 </p>
 
                 {% if can_administrate %}
@@ -49,20 +50,20 @@
 
                 <p class="mt-3">
                     <span class="badge bg-warning">Beta feature</span> <a
-                        href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les actions suggérées
-                        automatiquement pour ce dossier</a>
+                        href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les recommandation suggérées
+                        automatiquement pour ce projet</a>
                 </p>
                 {% else %}
                 <a href="{% url 'projects-project-switchtender-join' project.id %}" class="btn btn-primary">Rejoindre ce
-                    dossier pour l'aiguiller</a>
+                    projet pour l'aiguiller</a>
                 {% endif %}
             </div>
             {% elif not is_switchtender and project.tasks.public.count == 0 %}
             <div class="bg-light p-4 rounded-2">
-                <h3 class="fw-light">Vous n'avez pas d'actions en cours</h3>
+                <h3 class="fw-light">Vous n'avez pas de recommandations en cours</h3>
 
                 <p class="fst-italic fw-light">
-                    Des actions vous seront proposées par notre équipe dès que possible.
+                    Des recommandations vous seront proposées par notre équipe dès que possible.
                 </p>
                 <p class="fst-italic fw-light">
                     Vous pouvez accélerer les recommandations <span class="fw-bolder">en complétant le questionnaire

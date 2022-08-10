@@ -69,17 +69,9 @@
 
         <h1 class="visually-hidden">UrbanVitaliz</h1>
 
-        {% if is_switchtender or is_administrating_project %}
-        {% include "menu-top-switchtender.html" %}
-        {% else %}
         {% include "menu-top.html" %}
-        {% endif %}
 
-        {% if user.is_authenticated %}
-            <main style="padding-top: 80px;">
-        {% else %}
-            <main style="padding-top: 120px;">
-        {% endif %}
+        <main style="padding-top: 180px;">
             {% if messages %}
             <div id="notification-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
                 {% for message in messages %}
