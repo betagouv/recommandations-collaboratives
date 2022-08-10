@@ -27,6 +27,8 @@ project_validated = django.dispatch.Signal()
 project_switchtender_joined = django.dispatch.Signal()
 project_switchtender_leaved = django.dispatch.Signal()
 
+project_member_joined = django.dispatch.Signal()
+
 
 @receiver(project_submitted)
 def log_project_submitted(sender, submitter, project, **kwargs):
@@ -116,6 +118,39 @@ def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
         verb="est devenu·e aiguilleur·se sur le projet",
         timestamp__gte=timezone.now() - datetime.timedelta(hours=12),
     ).delete()
+
+
+#####
+# Project Members
+#####
+
+
+@receiver(project_member_joined)
+def log_project_member_joined(sender, project, **kwargs):
+    action.send(
+        sender,
+        verb="a rejoint l'équipe sur le projet",
+        action_object=project,
+        target=project,
+    )
+
+
+@receiver(project_member_joined)
+def notify_project_member_joined(sender, project, **kwargs):
+    if project.status == "DRAFT" or project.muted:
+        return
+
+    recipients = get_collaborators_for_project(project).exclude(id=sender.id)
+
+    # Notify regional actors
+    notify.send(
+        sender=sender,
+        recipient=recipients,
+        verb="a rejoint l'équipe sur le projet",
+        action_object=project,
+        target=project,
+        private=True,
+    )
 
 
 #####

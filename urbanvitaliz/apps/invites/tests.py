@@ -12,8 +12,10 @@ import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertNotContains
+from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
 from . import models
@@ -116,6 +118,64 @@ def test_accept_invite_matches_existing_account(request, client):
     assert response.status_code == 302
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is not None
+
+
+@pytest.mark.django_db
+def test_accept_invite_as_switchtender_triggers_notification(request, client):
+    current_site = get_current_site(request)
+
+    membership = baker.make(
+        projects_models.ProjectMember, member__is_staff=False, is_owner=True
+    )
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        projectmember_set=[membership],
+        status="READY",
+    )
+
+    with login(client) as user:
+        invite = Recipe(
+            models.Invite,
+            project=project,
+            site=current_site,
+            email=user.email,
+            role="SWITCHTENDER",
+        ).make()
+        url = reverse("invites-invite-accept", args=[invite.pk])
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert membership.member.notifications.count() == 1
+
+
+@pytest.mark.django_db
+def test_accept_invite_as_team_member_triggers_notification(request, client):
+    current_site = get_current_site(request)
+
+    membership = baker.make(
+        projects_models.ProjectMember, member__is_staff=False, is_owner=True
+    )
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        projectmember_set=[membership],
+        status="READY",
+    )
+
+    with login(client) as user:
+        invite = Recipe(
+            models.Invite,
+            project=project,
+            site=current_site,
+            email=user.email,
+            role="COLLABORATOR",
+        ).make()
+        url = reverse("invites-invite-accept", args=[invite.pk])
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert membership.member.notifications.count() == 1
 
 
 @pytest.mark.django_db
