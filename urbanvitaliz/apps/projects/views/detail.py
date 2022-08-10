@@ -28,6 +28,7 @@ def project_detail(request, project_id=None):
     """Set as active project, then redirect to overview page"""
     return redirect(reverse("projects-project-detail-overview", args=[project_id]))
 
+
 @login_required
 def project_overview(request, project_id=None):
     """Return the details of given project for switchtender"""
@@ -51,21 +52,17 @@ def project_overview(request, project_id=None):
     # Set this project as active
     set_active_project_id(request, project.pk)
 
-    site_config = get_site_config_or_503(request.site)
-    session, created = survey_models.Session.objects.get_or_create(
-        project=project, survey=site_config.project_survey
-    )
-
     # Mark some notifications as seen (general ones)
     project_ct = ContentType.objects.get_for_model(project)
     general_notifications = request.user.notifications.unread().filter(
-        Q(verb="est devenu·e conseiller·e sur le projet")
+        Q(verb="est devenu·e aiguilleur·se sur le projet")
         | Q(verb="a été validé")
         | Q(verb="a validé le projet")
         | Q(verb="a soumis pour modération le projet")
         | Q(verb="a mis à jour le questionnaire")
         | Q(verb="a ajouté un document")
-        | Q(verb="a envoyé un message"),
+        | Q(verb="a envoyé un message")
+        | Q(verb="a rejoint l'équipe sur le projet"),
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
     )
@@ -73,6 +70,7 @@ def project_overview(request, project_id=None):
     general_notifications.mark_all_as_read()
 
     return render(request, "projects/project/overview.html", locals())
+
 
 @login_required
 def project_knowledge(request, project_id=None):
@@ -101,23 +99,6 @@ def project_knowledge(request, project_id=None):
     session, created = survey_models.Session.objects.get_or_create(
         project=project, survey=site_config.project_survey
     )
-
-    # Mark some notifications as seen (general ones)
-    project_ct = ContentType.objects.get_for_model(project)
-    general_notifications = request.user.notifications.unread().filter(
-        Q(verb="est devenu·e aiguilleur·se sur le projet")
-        | Q(verb="a été validé")
-        | Q(verb="a validé le projet")
-        | Q(verb="a soumis pour modération le projet")
-        | Q(verb="a mis à jour le questionnaire")
-        | Q(verb="a ajouté un document")
-        | Q(verb="a envoyé un message")
-        | Q(verb="a rejoint l'équipe sur le projet"),
-        target_content_type=project_ct.pk,
-        target_object_id=project.pk,
-    )
-
-    general_notifications.mark_all_as_read()
 
     return render(request, "projects/project/knowledge.html", locals())
 
