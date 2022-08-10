@@ -124,14 +124,14 @@
             <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}" class="flex-grow-1 d-flex">
                 {% csrf_token %}
                 {% if task.closed %}
-                <button title="Remettre l'action en cours" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
+                <button title="Remettre la recommandation en cours" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
                     <svg class="bi align-middle" width="24" height="24" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-counterclockwise"/>
                     </svg>
 
                 </button>
                 {% else %}
-                <button title="Marquer l'action comme terminée" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
+                <button title="Marquer la recommandation comme terminée" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
                     <svg class="bi align-middle text-success" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-lg"/>
                     </svg>
@@ -233,7 +233,7 @@
                         </svg>
                         &nbsp;
                         <span class="align-middle text-secondary">
-                            Action indiquée comme <strong>{{ followup.status_txt }}</strong>
+                            Recommandation indiquée comme <strong>{{ followup.status_txt }}</strong>
                         </span>
                         <span class="align-middle">&#8212;&nbsp;</span>
                         <small class="align-middle text-muted">{{ followup.timestamp|naturalday }}</small>

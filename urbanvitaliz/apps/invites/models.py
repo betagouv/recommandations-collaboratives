@@ -24,8 +24,8 @@ class Invite(models.Model):
         unique_together = ("email", "project", "role")
 
     INVITE_ROLES = (
-        ("COLLABORATOR", "Collaborateur·rice"),
-        ("SWITCHTENDER", "Aiguilleur·se"),
+        ("COLLABORATOR", "Participant·e"),
+        ("SWITCHTENDER", "Conseiller·e"),
     )
 
     objects = InviteManager()
