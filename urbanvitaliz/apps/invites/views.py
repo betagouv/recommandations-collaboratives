@@ -107,7 +107,7 @@ def invite_details(request, invite_id):
     else:
         if existing_account:  # An account already exists, go to login first
             return redirect(
-                reverse("magicauth-login")
+                reverse("account_login")
                 + "?next="
                 + reverse("invites-invite-details", args=(invite.pk,))
             )
