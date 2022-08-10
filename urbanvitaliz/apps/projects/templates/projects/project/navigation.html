@@ -1,10 +1,9 @@
 {% load static %}
-{% load django_vite %}
 {% load sass_tags %}
 
 {% block css %}
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
-{% vite_asset 'css/project-navigation.css' %}
+<link href="{% sass_src 'projects/css/project_navigation.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 <ul class="project-navigation d-flex align-items-center"

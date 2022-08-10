@@ -27,7 +27,6 @@ module.exports = {
                 main: resolve('./src/js/main.js'),
                 crm: resolve('./src/js/apps/crm.js'),
                 project: resolve('./src/js/apps/project.js'),
-                projectNavigationCss: resolve('./src/css/project-navigation.css'),
             },
             output: {
                 chunkFileNames: undefined,
