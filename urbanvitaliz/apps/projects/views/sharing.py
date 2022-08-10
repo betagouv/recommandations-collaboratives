@@ -88,6 +88,7 @@ def access_update(request, project_id):
                     recipients=[{"email": email}],
                     params={
                         "sender": {"email": request.user.email},
+                        "message": invite.message,
                         "invite_url": utils.build_absolute_url(
                             invite.get_absolute_url()
                         ),

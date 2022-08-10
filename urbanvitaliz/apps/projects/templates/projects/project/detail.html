@@ -9,6 +9,7 @@
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block title %}
@@ -39,7 +40,8 @@
         {% endif %}
     </div>
 
-    <div class="row">
+    <div class="row" style="font-family: 'Marianne', arial, sans-serif;">
+        {% include 'projects/project/header.html' %}
         {% block project_detail %}{% endblock %}
     </div>
 

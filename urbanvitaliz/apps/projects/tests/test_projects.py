@@ -20,8 +20,7 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -277,6 +276,45 @@ def test_project_list_excludes_project_not_in_switchtender_departments(request, 
 ########################################################################
 # Project details
 ########################################################################
+
+# Overview
+@pytest.mark.django_db
+def test_project_overview_not_available_for_non_switchtender(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    url = reverse("projects-project-detail-overview", args=[project.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_overview_available_for_owner(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    # project email is same as test user to be logged in
+    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
+    project = Recipe(
+        models.Project, sites=[current_site], projectmember_set=[membership]
+    ).make()
+
+    with login(client, user=membership.member, is_staff=False):
+        url = reverse("projects-project-detail-overview", args=[project.id])
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_overview_available_for_switchtender(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    project = Recipe(models.Project, sites=[current_site]).make()
+    url = reverse("projects-project-detail-overview", args=[project.id])
+    with login(client, groups=["switchtender"]):
+        response = client.get(url)
+    assert response.status_code == 200
+
 
 # Knowledge
 @pytest.mark.django_db
@@ -717,7 +755,7 @@ def test_delete_project_and_redirect(request, client):
 
 
 @pytest.mark.django_db
-def test_general_notifications_are_consumed_on_project_knowledge(request, client):
+def test_general_notifications_are_consumed_on_project_overview(request, client):
     current_site = get_current_site(request)
     Recipe(home_models.SiteConfiguration, site=current_site).make()
     project = Recipe(
@@ -744,7 +782,7 @@ def test_general_notifications_are_consumed_on_project_knowledge(request, client
 
         assert user.notifications.unread().count() == 2
 
-        url = reverse("projects-project-detail-knowledge", args=[project.id])
+        url = reverse("projects-project-detail-overview", args=[project.id])
 
         response = client.get(url)
         assert response.status_code == 200
