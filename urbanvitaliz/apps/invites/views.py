@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.projects import signals as projects_signals
 
 from . import forms, models
 
@@ -68,11 +69,17 @@ def invite_accept(request, invite_id):
                 projects_models.ProjectSwitchtender.objects.get_or_create(
                     switchtender=user, project=project, site=current_site
                 )
+                projects_signals.project_switchtender_joined.send(
+                    sender=request.user, project=project
+                )
             else:
                 if user not in project.members.all():
                     projects_models.ProjectMember.objects.create(
                         project=project, member=user
                     )
+                projects_signals.project_member_joined.send(
+                    sender=request.user, project=project
+                )
 
             invite.accepted_on = timezone.now()
             invite.save()
