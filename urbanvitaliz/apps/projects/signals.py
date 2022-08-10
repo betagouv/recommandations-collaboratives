@@ -75,7 +75,7 @@ def log_project_validated(sender, moderator, project, **kwargs):
 def log_project_switchtender_joined(sender, project, **kwargs):
     action.send(
         sender,
-        verb="est devenu·e conseiller·e sur le projet",
+        verb="est devenu·e aiguilleur·se sur le projet",
         action_object=project,
         target=project,
     )
@@ -92,7 +92,7 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     notify.send(
         sender=sender,
         recipient=recipients,
-        verb="est devenu·e conseiller·e sur le projet",
+        verb="est devenu·e aiguilleur·se sur le projet",
         action_object=project,
         target=project,
         private=True,
@@ -115,7 +115,7 @@ def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
     notifications_models.Notification.on_site.filter(
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
-        verb="est devenu·e conseiller·e sur le projet",
+        verb="est devenu·e aiguilleur·se sur le projet",
         timestamp__gte=timezone.now() - datetime.timedelta(hours=12),
     ).delete()
 
