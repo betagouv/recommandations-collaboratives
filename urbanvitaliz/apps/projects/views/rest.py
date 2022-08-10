@@ -15,8 +15,12 @@ from rest_framework.response import Response
 from urbanvitaliz.utils import check_if_switchtender
 
 from .. import models, signals
-from ..serializers import (ProjectSerializer, TaskFollowupSerializer,
-                           TaskNotificationSerializer, TaskSerializer)
+from ..serializers import (
+    ProjectSerializer,
+    TaskFollowupSerializer,
+    TaskNotificationSerializer,
+    TaskSerializer,
+)
 
 
 ########################################################################
