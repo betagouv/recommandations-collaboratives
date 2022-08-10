@@ -731,7 +731,7 @@ def test_general_notifications_are_consumed_on_project_knowledge(request, client
         notify.send(
             sender=user,
             recipient=user,
-            verb="est devenu·e conseiller·e sur le projet",
+            verb="est devenu·e aiguilleur·se sur le projet",
             target=project,
         )
 
