@@ -1,7 +1,11 @@
 import os
 
-from allauth.account.forms import (LoginForm, ResetPasswordForm,
-                                   ResetPasswordKeyForm, SignupForm)
+from allauth.account.forms import (
+    LoginForm,
+    ResetPasswordForm,
+    ResetPasswordKeyForm,
+    SignupForm,
+)
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms

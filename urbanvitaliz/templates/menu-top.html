@@ -1,124 +1,33 @@
 {% load static %}
 {% load gravatar %}
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
 
 {% load projects_extra %}
 
-<nav
-    class="navbar navbar-expand-lg fixed-top navbar-light bg-white shadow-sm"
-    aria-label="Main navigation"
-    style="padding:0;"
->
+<nav class="navbar navbar-expand-lg fixed-top navbar-light bg-white shadow-sm flex-column" aria-label="Main navigation"
+    style="font-family: 'Marianne', arial, sans-serif; padding: 0;">
+    <!-- main navbar container -->
     <div class="container-fluid me-2">
-        <a href="{% url 'home' %}" class="d-flex align-middle p-2 pe-4 align-items-center">
-            {% if user.is_authenticated %}
-            <img src="{% static 'img/logo-small.png' %}" height="30px" alt="Logo UrbanVitaliz"/>
-            {% else %}
-            <img class="" src="{% static 'home/img/home/logo_rf.png' %}" width="100px" alt="Logo république française">
-            <img class="mx-4" src="{% static 'img/partners/logo_cerema.png' %}" width="120px" alt="Logo du Cerema">
-            <img class="" src="{% static 'img/logo-uv.png' %}" width="auto" height="50px" alt="Logo UrbanVitaliz"/>
-            {% endif %}
-        </a>
-        <button
-            class="navbar-toggler p-0 border-0"
-            type="button"
-            data-bs-toggle="offcanvas"
-            aria-label="Toggle navigation"
-        >
+        <!-- main navbar left side -->
+        {% include './header/menu-top-logo.html' %}
+        <!-- Burger button displayed in responsive mode -->
+        <button class="navbar-toggler p-0 border-0" type="button" data-bs-toggle="offcanvas"
+            aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-
-        <div
-            class="navbar-collapse offcanvas-collapse bg-white"
-        >
-            <!-- Project selector -->
-            {% if user.is_authenticated and active_project %}
-            <div id="project-selector" class="nav-item border-start border-end ps-2 pe-2">
-
-                <div class="btn-group">
-                    <a href="{% url 'projects-project-detail' active_project.pk %}" class="nav-link link-dark project-name-box">
-                        <span class="fw-bold">{{ active_project.name|truncatechars:30 }}</span>
-                        {% if active_project.muted %} <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi bg-warning rounded-circle" width="20px" height="20px" fill="currentColor" style="padding: 3px;">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#volume-mute"/>
-                        </svg>
-                        {% endif %}
-
-                        <br/>
-                        <span class="text-primary small">Aller à la page du projet&nbsp;&rarr;</span>
-                    </a>
-
-                    {% if request.session.projects|length > 1 %}
-                    <button type="button" class="border-0 p-1 ps-4 pe-4 btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="visually-hidden">Toggle Dropdown</span>
-                    </button>
-
-                    <ul class="dropdown-menu" style="width: 20vw">
-                        {% for project in request.session.projects %}
-                        <li class="list-group-item list-group-item-action dropdown-item border-0 border-bottom">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-break text-truncate">
-                                    <a class="stretched-link text-reset text-decoration-none" href="{% url "projects-project-detail" project.id %}">{{ project.name|truncatechars:12|capfirst }}</a>
-                                </span>
-                                {% if project.actions_open > 0 %}
-                                <div>
-                                    <span class="align-middle badge bg-primary rounded-pill">
-                                        {{ project.actions_open }}
-                                    </span>
-                                </div>
-                                {% endif %}
-                            </div>
-                            <span class="text-secondary small text-break text-truncate">{{ project.location|truncatechars:20|capfirst }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </div>
-                {% endif %}
+        <!-- main navbar right side -->
+        <div>
+            <div class="navbar-collapse offcanvas-collapse bg-white">
+                {% include './header/menu-top-user-tools.html' %}
             </div>
-
-            <!-- tool bars -->
-            <ul class="main-menu navbar-nav me-auto ms-4">
-                {% if not active_project %}
-                <li class="nav-item fw-bold me-2">
-                    <a href="{% url 'projects-onboarding' %}" class="nav-link text-primary ">
-                        <svg class="bi align-middle" width="16" height="16">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus"/>
-                        </svg>
-                        <span class="align-middle">Déposer un projet</span>
-                    </a>
-                </li>
-
-                <li class="nav-item dropdown me-2">
-                    <div class="btn-group">
-                        <a href="{% url 'resources-resource-search' %}" class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">
-                            <svg class="bi align-middle" width="16" height="16">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bookshelf"/>
-                            </svg>
-                            <span class="ms-1 align-middle">Ressources</span>
-                        </a>
-                    </div>
-                </li>
-
-
-                <li class="nav-item">
-                    <a href="{% url 'methodology' %}" class="nav-link link-dark">
-                        <svg class="bi align-middle" width="16" height="16">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#grid"/>
-                        </svg>
-                        <span class="me-2 ms-1 align-middle">Méthodologie</span>
-                    </a>
-                </li>
-
-                {% else %}
-
-                {% include 'menu-project-toolbar.html' with project=active_project %}
-
-                {% endif %}
-
-            </ul>
-
-            <!-- User -->
-            {% include 'menu-top-user-tools.html' %}
         </div>
     </div>
+    <!-- secondary navbar container -->
+    <div class="container-fluid me-2 navbar-border-top navbar-shadow py-4 pt-3">
+        {% include "./header/menu-top-secondary.html" %}
+    </div>
 </nav>
-
