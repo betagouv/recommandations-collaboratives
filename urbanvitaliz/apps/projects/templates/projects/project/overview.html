@@ -50,11 +50,22 @@
         {% else %}
         <div class="col"></div>
         {% endif %}
-
     </div>
 
-    {% include 'projects/project/navigation.html' with state_of_play=True %}
-    {% include 'projects/project/fragments/survey_grid.html' %}
+    {% include 'projects/project/navigation.html' with overview=True %}
+    <div class="row">
+        <div class="col-8">
+            <h4>Reformulation du besoin </h4>
+            {% if project.impediments %}
+                    <span class="small-markdown">
+                        {{ project.impediments_rendered|safe|truncatewords_html:30 }}
+                    </span>
+            {% endif %}
+        </div>
+        <div class="col-4">
+            {% include "projects/project/fragments/sidebar.html" with disable_add_recommendation=True disable_add_recommendation=True %}
+        </div>
+    </div>
 
 </div>
 {% endblock %}
