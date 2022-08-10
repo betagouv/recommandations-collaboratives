@@ -10,12 +10,12 @@
 <ul class="project-navigation d-flex align-items-center"
     style="font-family: 'Marianne', arial, sans-serif; padding: 0;">
     <li>
-        <a class="{% if presentation %} active {% endif %}" href="{% url 'projects-project-detail-knowledge' project.pk %}">
+        <a class="{% if overview %} active {% endif %}" href="{% url 'projects-project-detail-overview' project.pk %}">
             Présentation
         </a>
     </li>
     <li>
-        <a class="{% if state_of_play or presentation %} active {% endif %}" href="{% url 'projects-project-detail-knowledge' project.pk %}">
+        <a class="{% if state_of_play %} active {% endif %}" href="{% url 'projects-project-detail-knowledge' project.pk %}">
             État des lieux
         </a>
     </li>
