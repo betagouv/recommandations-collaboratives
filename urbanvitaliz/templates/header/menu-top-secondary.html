@@ -3,7 +3,7 @@
 <ul class="list-unstyled mb-0 d-flex justify-content-center align-items-center" style="padding-left: 15px;">
 
     <!-- Dashboard -->
-    {% if is_switchtender %}
+    {% if is_switchtender or is_administrating_project %}
         <li class="nav-item dropdown nav-item-admin" style="margin-right: 35px">
             <div class="btn-group">
                 <a href="{% url 'projects-project-list' %}" class="nav-link link-dark {% if url_name == 'projects-project-list' %}active{% endif %}">
@@ -14,7 +14,7 @@
     {% endif %}
 
     <!-- Projects -->
-    {% if is_administrating_project %}
+    {% if active_project %}
     <li style="margin-right: 35px">
         <div id="project-selector" class="nav-item">
                 <div class="btn-group">
