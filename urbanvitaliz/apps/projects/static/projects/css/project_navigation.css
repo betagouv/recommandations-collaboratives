@@ -4,6 +4,11 @@
     margin-bottom: 50px;
 }
 
+.dropdown-menu.show {
+    top: 100%;
+    margin-top: 10px;
+}
+
 .project-navigation a {
     display: flex;
     padding: 10px 30px;
