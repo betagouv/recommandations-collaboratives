@@ -22,7 +22,7 @@
 
                     {% if request.session.projects|length > 0 %}
                     <button x-on:click="open = !open" type="button" class="border-0 btn py-0 px-1">
-                        <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi" width="20px" height="20px" fill="currentColor" style="padding: 3px;">
+                        <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi" width="20px" height="20px" fill="currentColor" stroke="currentColor" style="padding: 3px;">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down"/>
                         </svg>
                     </button>
@@ -79,7 +79,7 @@
             </a>
             {% if user.is_staff %}
             <button x-on:click="open = !open" type="button" class="border-0 btn py-0 px-1">
-                <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi" width="20px" height="20px" fill="currentColor" style="padding: 3px;">
+                <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi" width="20px" height="20px" fill="currentColor" stroke="currentColor" style="padding: 3px;">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down"/>
                 </svg>
             </button>
