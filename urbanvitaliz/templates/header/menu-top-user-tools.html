@@ -4,8 +4,8 @@
 <!-- User -->
 <div id="user-info" class="pe-2 ps-2 ms-2 me-2">
     {% if user.is_authenticated %}
-    <div class="dropdown">
-        <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+    <div x-data="{ open: false }" x-on:click.outside="open = false" class="dropdown">
+        <a x-on:click="open = !open" href="#" class="lol d-flex align-items-center link-dark text-decoration-none">
             <img
                 src="{% gravatar_url user.email 16 %}"
                 alt="{{ user.get_full_name }}"
@@ -13,10 +13,14 @@
                 style="width: 16px; height: 16px;"
             />
 
-            <span class=" small d-none d-lg-none d-xl-block">{{ user.get_full_name|default:user.email }}</span>
-
+            <span style="color: #0063CB;" class="small d-none d-lg-none d-xl-block">{{ user.get_full_name|default:user.email }}</span>
+            <button  type="button" class="border-0 btn py-0 px-1">
+                <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi" width="20px" height="20px" fill="#0063CB" stroke="#0063CB" style="padding: 3px;">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down"/>
+                </svg>
+            </button>
         </a>
-        <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+        <ul x-show="open" :class="{'show':open}" class="dropdown-menu text-small shadow mt-2 top-100">
             {% if user.is_staff %}
             <li><a class="dropdown-item small " href="{% url 'switchtender-dashboard' %}">CECPP&trade;</a></li>
             <li><hr class="dropdown-divider"></li>
