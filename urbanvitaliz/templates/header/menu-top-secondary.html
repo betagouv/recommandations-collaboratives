@@ -20,7 +20,7 @@
                 <div class="btn-group">
                     <span class="ms-1 align-middle">Projets</span>
 
-                    {% if request.session.projects|length > 1 %}
+                    {% if request.session.projects|length > 0 %}
                     <button type="button" class="border-0 btn py-0 dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" style="transform: translate3d(0, 2px,0);">
                         <span class="visually-hidden">Toggle Dropdown</span>
                     </button>
