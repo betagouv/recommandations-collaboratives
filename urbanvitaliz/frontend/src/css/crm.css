@@ -117,7 +117,7 @@ main {
 
 .crm-sticky {
     position: sticky;
-    top: 119px;
+    top: 190px;
 }
 
 .crm-sticky.no-project {
@@ -137,11 +137,12 @@ main {
 
 .crm-header {
     position: sticky;
-    top: 106px;
+    top: 180px;
     background-color: white;
     border-bottom: 1px solid #e1e1e1;
 
     z-index: 100;
+    margin-bottom: 0 !important;
 }
 
 .crm-region-tag {
