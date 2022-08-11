@@ -14,20 +14,15 @@
     <div class="container-fluid me-2">
         <!-- main navbar left side -->
         {% include './menu-top-logo.html' %}
-        <!-- Burger button displayed in responsive mode -->
-        <button class="navbar-toggler p-0 border-0" type="button" data-bs-toggle="offcanvas"
-            aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
         <!-- main navbar right side -->
         <div>
-            <div class="navbar-collapse offcanvas-collapse bg-white">
+            <div class="bg-white">
                 {% include './menu-top-user-tools.html' %}
             </div>
         </div>
     </div>
     <!-- secondary navbar container -->
-    <div class="container-fluid me-2 navbar-border-top navbar-shadow py-4 pt-3">
+    <div class="secondary-navbar container-fluid me-2 navbar-border-top navbar-shadow py-4 pt-3">
         {% include "./menu-top-secondary.html" %}
     </div>
 </nav>
