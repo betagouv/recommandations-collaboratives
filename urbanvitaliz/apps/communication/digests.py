@@ -191,10 +191,11 @@ def make_recommendations_digest(project_notifications, user):
     return recommendations
 
 
-def make_project_digest(project, user=None, url_name="detail"):
+def make_project_digest(project, user=None, url_name="overview"):
     """Return base information digest for project"""
     project_link = utils.build_absolute_url(
-        reverse(f"projects-project-{url_name}", args=[project.id]), auto_login_user=user
+        reverse(f"projects-project-detail-{url_name}", args=[project.id]),
+        auto_login_user=user,
     )
     return {
         "name": project.name,
