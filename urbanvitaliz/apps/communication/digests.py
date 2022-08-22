@@ -150,8 +150,8 @@ def send_recommendation_digest_by_project(user, notifications):
         notifications, key=lambda x: x.target_object_id
     ):
         try:
-            project = models.Project.on_site.get(pk=project_id)
-        except models.Project.DoesNotExist:
+            project = projects_models.Project.on_site.get(pk=project_id)
+        except projects_models.Project.DoesNotExist:
             # Probably a deleted project?
             continue
 
