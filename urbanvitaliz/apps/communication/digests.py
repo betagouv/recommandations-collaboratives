@@ -93,7 +93,7 @@ def send_reminder_digest_by_project_task(user, reminders):
 def make_digest_of_reminders(project, reminders, user):
     """Return digest for reminders of a project to be sent to user"""
     task_digest = make_reminders_task_digest(reminders, user)
-    project_digest = make_project_digest(project, user)
+    project_digest = make_project_digest(project, user, url_name="actions")
     return {
         "notification_count": len(reminders),
         "project": project_digest,
