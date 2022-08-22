@@ -64,6 +64,7 @@
     </li>
     {% endif %}
     <!-- Methodology -->
+    {% if not user.is_authenticated %}
     <li style="margin-right: 35px">
         <div class="btn-group">
             <a href="{% url 'methodology' %}" class="nav-link link-dark">
@@ -71,6 +72,7 @@
             </a>
         </div>
     </li>
+    {% endif %}
     <!-- Ressources -->
     <li style="margin-right: 35px">
         <div x-data="{ open: false }" x-on:click.outside="open = false" class="btn-group d-flex justify-content-center align-items-center">
