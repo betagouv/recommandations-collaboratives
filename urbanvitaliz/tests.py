@@ -28,3 +28,23 @@ def test_build_absolute_url_with_empty_auto_login():
     assert url.startswith("https://")
     assert "/somewhere" in url
     assert "?sesame=" not in url
+
+
+def test_build_absolute_url_keeps_anchor():
+    url = utils.build_absolute_url("somewhere#around-the-rainbow")
+
+    assert url.startswith("https://")
+    assert "/somewhere" in url
+    assert "#around" in url
+    assert "?sesame=" not in url
+
+
+def test_build_absolute_url_with_auto_login_url_keeps_anchor():
+    user = Recipe(auth.User, username="owner", email="owner@example.com").make()
+
+    url = utils.build_absolute_url("somewhere#around-the-rainbow", user)
+
+    assert url.startswith("https://")
+    assert "/somewhere" in url
+    assert "#around" in url
+    assert "?sesame=" in url
