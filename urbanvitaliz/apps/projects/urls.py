@@ -38,6 +38,11 @@ urlpatterns = [
         name="projects-project-detail",
     ),
     path(
+        r"project/<int:project_id>/synopsis",
+        detail.project_synopsis,
+        name="projects-project-synopsis",
+    ),
+    path(
         r"project/<int:project_id>/presentation",
         detail.project_overview,
         name="projects-project-detail-overview",
