@@ -8,12 +8,11 @@ from .utils import can_administrate_project, can_manage_project, get_active_proj
 
 
 def is_switchtender_processor(request):
-    return {"is_switchtender": check_if_switchtender(request.user)}
-
-
-def is_administrating_project(request):
     return {
-        "is_switchtender": can_administrate_project(project=None, user=request.user)
+        "is_switchtender": check_if_switchtender(request.user),
+        "is_administrating_project": can_administrate_project(
+            project=None, user=request.user
+        ),
     }
 
 
@@ -25,7 +24,7 @@ def active_project_processor(request):
 
     if active_project:
         try:
-            survey = survey_models.Survey.objects.get(pk=1)  # XXX Hardcoded survey ID
+            survey = survey_models.Survey.on_site.get(pk=1)  # XXX Hardcoded survey ID
             session, created = survey_models.Session.objects.get_or_create(
                 project=active_project, survey=survey
             )

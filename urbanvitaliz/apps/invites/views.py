@@ -6,13 +6,18 @@ from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.projects import signals as projects_signals
 
 from . import forms, models
 
 
 def invite_accept(request, invite_id):
-    invite = get_object_or_404(models.Invite, pk=invite_id, accepted_on=None)
+    invite = get_object_or_404(
+        models.Invite, pk=invite_id, site=request.site, accepted_on=None
+    )
     project = invite.project
+
+    current_site = request.site
 
     # Check if this email already exists as an account
     existing_account = None
@@ -61,13 +66,20 @@ def invite_accept(request, invite_id):
         if user:
             # Now, grant the user her new rights
             if invite.role == "SWITCHTENDER":
-                if user not in project.switchtenders.all():
-                    project.switchtenders.add(user)
+                projects_models.ProjectSwitchtender.objects.get_or_create(
+                    switchtender=user, project=project, site=current_site
+                )
+                projects_signals.project_switchtender_joined.send(
+                    sender=request.user, project=project
+                )
             else:
                 if user not in project.members.all():
                     projects_models.ProjectMember.objects.create(
                         project=project, member=user
                     )
+                projects_signals.project_member_joined.send(
+                    sender=request.user, project=project
+                )
 
             invite.accepted_on = timezone.now()
             invite.save()
@@ -79,7 +91,9 @@ def invite_accept(request, invite_id):
 
 
 def invite_details(request, invite_id):
-    invite = get_object_or_404(models.Invite, pk=invite_id, accepted_on=None)
+    invite = get_object_or_404(
+        models.Invite, site=request.site, pk=invite_id, accepted_on=None
+    )
 
     # Check if this email already exists as an account
     existing_account = None
@@ -100,7 +114,7 @@ def invite_details(request, invite_id):
     else:
         if existing_account:  # An account already exists, go to login first
             return redirect(
-                reverse("magicauth-login")
+                reverse("account_login")
                 + "?next="
                 + reverse("invites-invite-details", args=(invite.pk,))
             )

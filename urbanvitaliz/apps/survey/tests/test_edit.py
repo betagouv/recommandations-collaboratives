@@ -8,6 +8,7 @@ created: 2021-08-02 16:24:35 CEST
 """
 
 import pytest
+from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
@@ -21,8 +22,8 @@ from .. import models
 
 
 @pytest.mark.django_db
-def test_survey_detail_contains_question_set_links(client):
-    qs = Recipe(models.QuestionSet).make()
+def test_survey_detail_contains_question_set_links(request, client):
+    qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     url = reverse("survey-editor-survey-details", args=[qs.survey_id])
     with login(client, is_staff=True):
         response = client.get(url)
@@ -38,8 +39,8 @@ def test_survey_detail_contains_question_set_links(client):
 
 
 @pytest.mark.django_db
-def test_question_set_detail_contains_update_links(client):
-    qs = Recipe(models.QuestionSet).make()
+def test_question_set_detail_contains_update_links(request, client):
+    qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     url = reverse("survey-editor-question-set-details", args=[qs.id])
     with login(client, is_staff=True):
         response = client.get(url)
@@ -52,8 +53,8 @@ def test_question_set_detail_contains_update_links(client):
 
 
 @pytest.mark.django_db
-def test_question_set_create_and_redirect(client):
-    survey = Recipe(models.Survey).make()
+def test_question_set_create_and_redirect(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
     url = reverse("survey-editor-question-set-create", args=[survey.id])
     data = {
         "priority": 10,
@@ -74,8 +75,8 @@ def test_question_set_create_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_question_set_create_error(client):
-    survey = Recipe(models.Survey).make()
+def test_question_set_create_error(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
     url = reverse("survey-editor-question-set-create", args=[survey.id])
     data = {}
 
@@ -91,8 +92,8 @@ def test_question_set_create_error(client):
 
 
 @pytest.mark.django_db
-def test_question_set_update_and_redirect(client):
-    qs = Recipe(models.QuestionSet).make()
+def test_question_set_update_and_redirect(request, client):
+    qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     url = reverse("survey-editor-question-set-update", args=[qs.id])
     data = {
         "priority": 10,
@@ -113,8 +114,8 @@ def test_question_set_update_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_question_set_update_error(client):
-    qs = Recipe(models.QuestionSet).make()
+def test_question_set_update_error(request, client):
+    qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     url = reverse("survey-editor-question-set-update", args=[qs.id])
     data = {}
 
@@ -132,8 +133,8 @@ def test_question_set_update_error(client):
 
 
 @pytest.mark.django_db
-def test_question_set_delete_and_redirect(client):
-    qs = Recipe(models.QuestionSet).make()
+def test_question_set_delete_and_redirect(request, client):
+    qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     url = reverse("survey-editor-question-set-delete", args=[qs.id])
 
     with login(client, is_staff=True):
@@ -152,8 +153,8 @@ def test_question_set_delete_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_question_set_detail_contains_question_links(client):
-    qs = Recipe(models.QuestionSet).make()
+def test_question_set_detail_contains_question_links(request, client):
+    qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     question = Recipe(models.Question, question_set=qs).make()
     url = reverse("survey-editor-question-set-details", args=[qs.id])
     with login(client, is_staff=True):
@@ -169,8 +170,8 @@ def test_question_set_detail_contains_question_links(client):
 
 
 @pytest.mark.django_db
-def test_question_create_and_redirect(client):
-    qs = Recipe(models.QuestionSet).make()
+def test_question_create_and_redirect(request, client):
+    qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     url = reverse("survey-editor-question-create", args=[qs.id])
     data = {
         "text_short": "short version",
@@ -191,8 +192,8 @@ def test_question_create_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_question_create_error(client):
-    qs = Recipe(models.QuestionSet).make()
+def test_question_create_error(request, client):
+    qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     url = reverse("survey-editor-question-create", args=[qs.id])
     data = {"text": ""}
 
@@ -208,8 +209,10 @@ def test_question_create_error(client):
 
 
 @pytest.mark.django_db
-def test_question_update_and_redirect(client):
-    question = Recipe(models.Question).make()
+def test_question_update_and_redirect(request, client):
+    question = Recipe(
+        models.Question, question_set__survey__site=get_current_site(request)
+    ).make()
     url = reverse("survey-editor-question-update", args=[question.id])
     data = {
         "text_short": "short version",
@@ -230,8 +233,10 @@ def test_question_update_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_question_update_error(client):
-    question = Recipe(models.Question).make()
+def test_question_update_error(request, client):
+    question = Recipe(
+        models.Question, question_set__survey__site=get_current_site(request)
+    ).make()
     url = reverse("survey-editor-question-update", args=[question.id])
     data = {"text": ""}
 
@@ -249,8 +254,10 @@ def test_question_update_error(client):
 
 
 @pytest.mark.django_db
-def test_question_delete_and_redirect(client):
-    question = Recipe(models.Question).make()
+def test_question_delete_and_redirect(request, client):
+    question = Recipe(
+        models.Question, question_set__survey__site=get_current_site(request)
+    ).make()
     url = reverse("survey-editor-question-delete", args=[question.id])
 
     with login(client, is_staff=True):
@@ -271,8 +278,8 @@ def test_question_delete_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_question_set_detail_contains_choice_links(client):
-    qs = Recipe(models.QuestionSet).make()
+def test_question_set_detail_contains_choice_links(request, client):
+    qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     question = Recipe(models.Question, question_set=qs).make()
     choice = Recipe(models.Choice, question=question).make()
     url = reverse("survey-editor-question-set-details", args=[qs.id])
@@ -289,8 +296,10 @@ def test_question_set_detail_contains_choice_links(client):
 
 
 @pytest.mark.django_db
-def test_choice_create_and_redirect(client):
-    question = Recipe(models.Question).make()
+def test_choice_create_and_redirect(request, client):
+    question = Recipe(
+        models.Question, question_set__survey__site=get_current_site(request)
+    ).make()
     url = reverse("survey-editor-choice-create", args=[question.id])
     data = {"value": "some value", "text": "the text of the choice"}
 
@@ -308,8 +317,10 @@ def test_choice_create_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_choice_set_create_error(client):
-    question = Recipe(models.Question).make()
+def test_choice_set_create_error(request, client):
+    question = Recipe(
+        models.Question, question_set__survey__site=get_current_site(request)
+    ).make()
     url = reverse("survey-editor-choice-create", args=[question.id])
     data = {"value": "", "text": "some text"}
 
@@ -325,8 +336,10 @@ def test_choice_set_create_error(client):
 
 
 @pytest.mark.django_db
-def test_choice_update_and_redirect(client):
-    choice = Recipe(models.Choice).make()
+def test_choice_update_and_redirect(request, client):
+    choice = Recipe(
+        models.Choice, question__question_set__survey__site=get_current_site(request)
+    ).make()
     url = reverse("survey-editor-choice-update", args=[choice.id])
     data = {"value": "some value", "text": "the text of the choice"}
 
@@ -344,8 +357,11 @@ def test_choice_update_and_redirect(client):
 
 
 @pytest.mark.django_db
-def test_choice_update_error(client):
-    choice = Recipe(models.Choice).make()
+def test_choice_update_error(request, client):
+    choice = Recipe(
+        models.Choice,
+        question__question_set__survey__site=get_current_site(request),
+    ).make()
     url = reverse("survey-editor-choice-update", args=[choice.id])
     data = {"value": "", "text": "some text"}
 
@@ -363,8 +379,11 @@ def test_choice_update_error(client):
 
 
 @pytest.mark.django_db
-def test_choice_delete_and_redirect(client):
-    choice = Recipe(models.Choice).make()
+def test_choice_delete_and_redirect(request, client):
+    choice = Recipe(
+        models.Choice,
+        question__question_set__survey__site=get_current_site(request),
+    ).make()
     url = reverse("survey-editor-choice-delete", args=[choice.id])
 
     with login(client, is_staff=True):

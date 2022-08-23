@@ -3,6 +3,8 @@ import statistics
 from datetime import timedelta
 
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.db import models
 from django.utils import timezone
 from markdownx.utils import markdownify
@@ -11,11 +13,16 @@ from tagging.models import Tag
 from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.projects import models as projects_models
 
-from . import utils
+from .utils import compute_qs_completion
 
 
 class Survey(models.Model):
+    objects = models.Manager()
+    on_site = CurrentSiteManager()
+
     name = models.CharField(max_length=80)
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     def __str__(self):  # pragma: nocover
         return f"Survey: {self.name}"
@@ -261,11 +268,14 @@ tagging_register(Choice, tag_descriptor_attr="tags")
 class Session(models.Model):
     """A pausable user session with checkpoint for resuming"""
 
+    class Meta:
+        unique_together = ("survey", "project")
+
     survey = models.ForeignKey(
         Survey, related_name="sessions", on_delete=models.CASCADE
     )
 
-    project = models.OneToOneField(
+    project = models.ForeignKey(
         projects_models.Project, related_name="survey_session", on_delete=models.CASCADE
     )
 
@@ -338,7 +348,7 @@ class Session(models.Model):
     def completion(self):
         completions = []
         for qs in self.survey.question_sets.all():
-            completions.append(utils.compute_qs_completion(self, qs))
+            completions.append(compute_qs_completion(self, qs))
 
         return math.ceil(statistics.mean(completions))
 

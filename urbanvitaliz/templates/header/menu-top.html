@@ -1,0 +1,28 @@
+{% load static %}
+{% load gravatar %}
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% load projects_extra %}
+
+<nav class="navbar navbar-expand-lg fixed-top navbar-light bg-white shadow-sm flex-column" aria-label="Main navigation"
+    style="font-family: 'Marianne', arial, sans-serif; padding: 0;">
+    <!-- main navbar container -->
+    <div class="container-fluid me-2">
+        <!-- main navbar left side -->
+        {% include './menu-top-logo.html' %}
+        <!-- main navbar right side -->
+        <div>
+            <div class="bg-white">
+                {% include './menu-top-user-tools.html' %}
+            </div>
+        </div>
+    </div>
+    <!-- secondary navbar container -->
+    <div class="secondary-navbar container-fluid me-2 navbar-border-top navbar-shadow pt-3">
+        {% include "./menu-top-secondary.html" %}
+    </div>
+</nav>
