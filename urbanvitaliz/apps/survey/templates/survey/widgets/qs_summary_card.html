@@ -9,31 +9,17 @@
 
 {% question_set_completion session.pk question_set as completion %}
 
-<div class="survey-card card text-black rounded-3">
+<div class="survey-card text-black rounded-3">
     <div class="card-body m-1">
         <div>
-            <div class="mb-0 mb-2">
-                {% if question_set.icon %}
-                <svg class="bi d-inline align-middle me-1" width="18px" height="18px">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ question_set.icon }}"/>
-                </svg>
-                {% endif %}
-                <h5 class="fw-bolder align-middle d-inline card-title text-uppercase mb-0" style="line-height: 120%; letter-spacing: 0.2em;">{{ question_set.heading }}</h5>
+            <div class="mb-0 mb-2 d-flex justify-content-between align-items-start"
+                style="color: {{ question_set.color|default:'black' }}"
+            >
+                <h5   class="card-title align-middle d-inline mb-0">{{ question_set.heading }}</h5>
+                <span class="card-completion">{{completion}}%</span>
             </div>
 
-            <div class="q-progress d-flex justify-content-between w-75 mb-1">
-                {% for q in question_set.questions.all %}
-                {% if forloop.counter <= answers|length %}
-                <span class="rounded-3 ms-1 done flex-grow-1" style="background-color: {{ question_set.color|default:'black' }} !important;">&nbsp;</span>
-                {% else %}
-                {% if completion < 100 %}
-                <span class="rounded-3 ms-1 todo flex-grow-1">&nbsp;</span>
-                {% endif %}
-                {% endif %}
-                {% endfor %}
-            </div>
-
-            <h6 style="color: {{ question_set.color|default:'black' }};" class="text-uppercase fw-bolder small">
+            <!-- <h6 style="color: {{ question_set.color|default:'black' }};" class="text-uppercase fw-bolder small">
                 {% if completion < 100 %}
 
                 {% if answers %}
@@ -50,7 +36,7 @@
                 terminé
                 {% endif %}
 
-            </h6>
+            </h6> -->
 
             <p class="card-text">
                 <ul class="list-unstyled">
