@@ -9,7 +9,7 @@
 {% endif %}
 	{% if is_switchtender %}
 	<h2 class="text-secondary text-uppercase fw-bolder mb-0" style="font-size: 12px;">
-		Recommandation proposées à la collectivité
+		Recommandations proposées à la collectivité
 	</h2>
 	{% else %}
 	<h2 class="mt-1 mb-0 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
@@ -44,7 +44,7 @@
 		</div>
 	</div>
 </div>
-{% if not is_switchtender or can_administrate and not project.tasks.all.count == 0 %}
+{% if not is_switchtender and not project.tasks.all.count == 0 %}
 <div class="mb-4 mx-2 d-flex flex-column">
 	<a href="{% url 'projects-project-tasks-suggest' project.pk %}">
 		Examiner les recommandations suggérées automatiquement pour ce projet
