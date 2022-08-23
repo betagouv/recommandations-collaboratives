@@ -16,16 +16,11 @@ from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    can_manage_or_403,
-    can_manage_project,
-    check_if_national_actor,
-    get_notification_recipients_for_project,
-    is_regional_actor_for_project,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403, can_manage_project,
+                     check_if_national_actor,
+                     get_notification_recipients_for_project,
+                     is_regional_actor_for_project, set_active_project_id)
 
 
 @login_required
@@ -99,6 +94,11 @@ def project_knowledge(request, project_id=None):
 
     # Set this project as active
     set_active_project_id(request, project.pk)
+
+    if project.onboarding:
+        onboarding_response = dict(project.onboarding.response)
+    else:
+        onboarding_response = None
 
     site_config = get_site_config_or_503(request.site)
     session, created = survey_models.Session.objects.get_or_create(
