@@ -516,7 +516,7 @@ class NotificationFormatter:
         return self._format_or_default(
             {
                 "a créé une note de suivi": self.format_note_created,
-                "est devenu·e conseiller·e sur le projet": self.format_action_became_switchtender,
+                "est devenu·e aiguilleur·se sur le projet": self.format_action_became_switchtender,
                 "a déposé le projet": self.format_new_project_available,
                 "a soumis pour modération le projet": self.format_project_submitted,
                 "a commenté l'action": self.format_action_commented,
