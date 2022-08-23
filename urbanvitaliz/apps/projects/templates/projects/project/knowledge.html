@@ -16,45 +16,47 @@
     <div class="row">
 
         {% if not is_switchtender %}
-             {% if can_manage_draft and session and session.next_question and session.completion < 80 %}
-            <div class="col box-heading d-flex justify-content-between mb-4 mt-4">
+        {% if can_manage_draft and session and session.next_question and session.completion < 80 %} <div
+            class="col box-heading d-flex justify-content-between mb-4 mt-4">
 
-                <div class="flex-grow-1">
+            <div class="flex-grow-1">
 
-                    <h3>Complétez l'exploration du site !</h3>
-                    {% if session.completion > 0 %}
-                    🔎 Zoomer sur les bonnes questions à se poser pour démarrer
-                    <br/>
-                    🚀 Obtenir des recommandations plus efficaces !
-                    {% else %}
-                    🔎 Laissez-vous guider vers <strong>les bonnes questions à se poser pour démarrer</strong> un projet de revitalisation.
-                    <br/>
-                    🚀 En prime, <strong>UrbanVitaliz sera plus efficace</strong> pour vous conseiller !
-                    {% endif %}
-                </div>
-                <div class="flex-shrink-1">
-                    {% if session.completion > 0 %}
-                    <a href="{% url 'survey-session-start' session.id %}" class="btn btn-primary fw-bold p-2 m-4">
-                        <span class="align-middle">Continuer le parcours</span><span class="align-middle"> &#8594;</span>
-                    </a>
-                    {% else %}
-                    <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary fw-bold p-2 m-4">
-                        <span class="align-middle">Démarrer le parcours</span><span class="align-middle"> &#8594;</span>
-                    </a>
-                    {% endif %}
-                </div>
+                <h3>Complétez l'exploration du site !</h3>
+                {% if session.completion > 0 %}
+                🔎 Zoomer sur les bonnes questions à se poser pour démarrer
+                <br />
+                🚀 Obtenir des recommandations plus efficaces !
+                {% else %}
+                🔎 Laissez-vous guider vers <strong>les bonnes questions à se poser pour démarrer</strong> un projet de
+                revitalisation.
+                <br />
+                🚀 En prime, <strong>UrbanVitaliz sera plus efficace</strong> pour vous conseiller !
+                {% endif %}
             </div>
-            {% else %}
-            <div class="col"></div>
-            {% endif %}
-        {% else %}
-        <div class="col"></div>
-        {% endif %}
-
+            <div class="flex-shrink-1">
+                {% if session.completion > 0 %}
+                <a href="{% url 'survey-session-start' session.id %}" class="btn btn-primary fw-bold p-2 m-4">
+                    <span class="align-middle">Continuer le parcours</span><span class="align-middle"> &#8594;</span>
+                </a>
+                {% else %}
+                <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary fw-bold p-2 m-4">
+                    <span class="align-middle">Démarrer le parcours</span><span class="align-middle"> &#8594;</span>
+                </a>
+                {% endif %}
+            </div>
     </div>
+    {% else %}
+    <div class="col"></div>
+    {% endif %}
+    {% else %}
+    <div class="col"></div>
+    {% endif %}
 
-    {% include 'projects/project/navigation.html' with state_of_play=True %}
-    {% include 'projects/project/fragments/survey_grid.html' %}
+</div>
+
+{% include 'projects/project/navigation.html' with state_of_play=True %}
+
+{% include 'projects/project/fragments/survey_grid.html' %}
 
 </div>
 {% endblock %}

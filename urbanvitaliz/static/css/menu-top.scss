@@ -28,6 +28,10 @@
 
 @media (max-width: 991.98px) {
 
+    #user-info .dropdown-menu {
+        transform: translate3d(-100px,0,0);
+    }
+
     .offcanvas-collapse .nav-item-admin span {
         display: inline-block;
     }
@@ -52,6 +56,26 @@
     .offcanvas-collapse.open {
         visibility: visible;
         transform: translateX(-100%);
+    }
+}
+
+@media (max-width: 625px) {
+    .logo-rf, .logo-cerema{
+        display: none;
+    }
+
+    .secondary-navbar ul{
+        flex-direction: column !important;
+        justify-content: start !important;
+        align-items: flex-start !important;
+    }
+
+    .secondary-navbar li{
+        margin: 5px 0;
+    }
+
+    main {
+        padding-top: 280px !important;
     }
 }
 
