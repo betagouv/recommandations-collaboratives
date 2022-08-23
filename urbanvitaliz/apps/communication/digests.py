@@ -93,7 +93,7 @@ def send_reminder_digest_by_project_task(user, reminders):
 def make_digest_of_reminders(project, reminders, user):
     """Return digest for reminders of a project to be sent to user"""
     task_digest = make_reminders_task_digest(reminders, user)
-    project_digest = make_project_digest(project, user)
+    project_digest = make_project_digest(project, user, url_name="actions")
     return {
         "notification_count": len(reminders),
         "project": project_digest,
@@ -150,8 +150,8 @@ def send_recommendation_digest_by_project(user, notifications):
         notifications, key=lambda x: x.target_object_id
     ):
         try:
-            project = models.Project.on_site.get(pk=project_id)
-        except models.Project.DoesNotExist:
+            project = projects_models.Project.on_site.get(pk=project_id)
+        except projects_models.Project.DoesNotExist:
             # Probably a deleted project?
             continue
 
@@ -191,10 +191,11 @@ def make_recommendations_digest(project_notifications, user):
     return recommendations
 
 
-def make_project_digest(project, user=None, url_name="detail"):
+def make_project_digest(project, user=None, url_name="overview"):
     """Return base information digest for project"""
     project_link = utils.build_absolute_url(
-        reverse(f"projects-project-{url_name}", args=[project.id]), auto_login_user=user
+        reverse(f"projects-project-detail-{url_name}", args=[project.id]),
+        auto_login_user=user,
     )
     return {
         "name": project.name,

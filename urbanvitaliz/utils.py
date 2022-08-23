@@ -82,7 +82,8 @@ def build_absolute_url(path, auto_login_user=None):
     url = urljoin(base, path)
 
     if auto_login_user:
-        url = urljoin(url, get_query_string(auto_login_user))
+        sesame_qstring = get_query_string(auto_login_user)
+        url = f"{url}{sesame_qstring}"
 
     return url
 
