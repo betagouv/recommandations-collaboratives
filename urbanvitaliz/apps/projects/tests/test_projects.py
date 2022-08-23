@@ -20,7 +20,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -1605,6 +1606,30 @@ def test_switchtender_exports_csv(request, client):
     body.pop(0)
 
     assert len(body) == 1
+
+
+#################################################################
+# Synopsis
+#################################################################
+@pytest.mark.django_db
+def test_switchtender_writes_synopsis_for_project(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
+        response = client.post(
+            reverse("projects-project-synopsis", args=[project.id]),
+            data={"synopsis": "this is some content"},
+        )
+
+    assert response.status_code == 302
+    project = models.Project.objects.all()[0]
+    assert project.synopsis is not None
+    assert project.synopsis_on is not None
+    assert project.synopsis_by == user
 
 
 # eof
