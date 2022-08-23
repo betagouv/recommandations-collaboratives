@@ -27,6 +27,9 @@ class CustomUserAdmin(UserAdmin):
         "is_staff",
         "organization",
     )
+
+    list_filter = ("date_joined", "is_staff", "is_superuser", "is_active", "groups")
+
     list_select_related = ("profile",)
 
     def organization(self, instance):
