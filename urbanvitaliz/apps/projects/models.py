@@ -11,13 +11,16 @@ import uuid
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -54,17 +57,16 @@ class ProjectManager(models.Manager):
         # Regional actors can see projects of their area
         if check_if_switchtender(user):
             actor_departments = user.profile.departments.all()
-            # XXX We may be missing arbitrary assigned projects as switchtender
-            # (outside of area)
             results = self.in_departments(actor_departments)
-
-            results = results | self.filter(switchtenders=user)
-
-            return results.distinct()
-
         # Regular user, only return its own projects
         else:
-            return self.filter(members=user)
+            results = self.filter(members=user)
+
+        return (results | self.filter(switchtenders=user)).distinct()
+
+
+class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
+    pass
 
 
 class DeletedProjectManager(models.Manager):
@@ -72,6 +74,10 @@ class DeletedProjectManager(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().exclude(deleted=None)
+
+
+class DeletedProjectOnSiteManager(CurrentSiteManager, DeletedProjectManager):
+    pass
 
 
 class Project(models.Model):
@@ -91,6 +97,11 @@ class Project(models.Model):
 
     objects = ProjectManager()
     objects_deleted = DeletedProjectManager()
+
+    on_site = ProjectOnSiteManager()
+    deleted_on_site = DeletedProjectOnSiteManager()
+
+    sites = models.ManyToManyField(Site)
 
     notifications_as_target = CastedGenericRelation(
         notifications_models.Notification,
@@ -158,6 +169,20 @@ class Project(models.Model):
         max_length=16, default="", blank=True, verbose_name="Téléphone"
     )
     description = models.TextField(verbose_name="Description", default="", blank=True)
+
+    # Synopsis (needs rephrased by an advisor)
+    synopsis = models.TextField(
+        verbose_name="Reformulation du besoin", default="", blank=True, null=True
+    )
+    synopsis_on = models.DateTimeField(verbose_name="Reformulé le", null=True)
+    synopsis_by = models.ForeignKey(
+        auth_models.User,
+        verbose_name="Reformulé par",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="synopses",
+    )
+
     location = models.CharField(max_length=256, verbose_name="Localisation")
     commune = models.ForeignKey(
         geomatics_models.Commune,
@@ -174,8 +199,9 @@ class Project(models.Model):
 
     switchtenders = models.ManyToManyField(
         auth_models.User,
-        related_name="projects_managed",
+        related_name="projects_switchtended",
         blank=True,
+        through="ProjectSwitchtender",
         verbose_name="Aiguilleu·r·se·s",
     )
 
@@ -206,6 +232,27 @@ class ProjectMember(models.Model):
     member = models.ForeignKey(auth_models.User, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     is_owner = models.BooleanField(default=False)
+
+
+class ProjectSwitchtenderOnSiteManager(CurrentSiteManager):
+    use_for_related_fields = True
+
+
+class ProjectSwitchtender(models.Model):
+    objects = ProjectSwitchtenderOnSiteManager()
+
+    class Meta:
+        unique_together = ("site", "project", "switchtender")
+
+    switchtender = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.CASCADE,
+        related_name="projects_switchtended_on_site",
+    )
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name="switchtenders_on_site"
+    )
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
 
 class NoteManager(models.Manager):
@@ -350,11 +397,19 @@ class TaskManager(OrderedModelManager):
         )
 
 
+class TaskOnSiteManager(CurrentSiteManager, TaskManager):
+    pass
+
+
 class DeletedTaskManager(models.Manager):
     """Manager for deleted tasks"""
 
     def get_queryset(self):
         return super().get_queryset().exclude(deleted=None)
+
+
+class DeletedTaskOnSiteManager(CurrentSiteManager, DeletedTaskManager):
+    pass
 
 
 class Task(OrderedModel):
@@ -363,7 +418,10 @@ class Task(OrderedModel):
     objects = TaskManager()
     deleted_objects = DeletedTaskManager()
 
-    order_with_respect_to = "project"
+    on_site = TaskOnSiteManager()
+    deleted_on_site = DeletedTaskOnSiteManager()
+
+    order_with_respect_to = ("site", "project")
 
     PROPOSED = 0
     INPROGRESS = 1
@@ -380,6 +438,8 @@ class Task(OrderedModel):
         (NOT_INTERESTED, "pas intéressé·e"),
         (ALREADY_DONE, "déjà fait"),
     )
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     @property
     def closed(self):
@@ -543,10 +603,17 @@ class TaskRecommendationManager(models.Manager):
         return super().get_queryset().order_by("resource__title")
 
 
+class TaskRecommendationOnSiteManager(CurrentSiteManager, TaskRecommendationManager):
+    pass
+
+
 class TaskRecommendation(models.Model):
     """Recommendation mechanisms for Tasks"""
 
     objects = TaskRecommendationManager()
+    on_site = TaskRecommendationOnSiteManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     condition = TagField(verbose_name="Condition", blank=True, null=True)
     resource = models.ForeignKey(

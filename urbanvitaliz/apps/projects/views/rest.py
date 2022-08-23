@@ -14,7 +14,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from urbanvitaliz.utils import check_if_switchtender
 
-from .. import models
+from .. import models, signals
 from ..serializers import (
     ProjectSerializer,
     TaskFollowupSerializer,
@@ -32,10 +32,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
-        return models.Project.objects.for_user(self.request.user).order_by(
+        return self.queryset.for_user(self.request.user).order_by(
             "-created_on", "-updated_on"
         )
 
+    queryset = models.Project.on_site
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -53,7 +54,7 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
         task_id = int(self.kwargs["task_id"])
 
         user_projects = list(
-            models.Project.objects.for_user(self.request.user).values_list(flat=True)
+            models.Project.on_site.for_user(self.request.user).values_list(flat=True)
         )
 
         if project_id not in user_projects:
@@ -86,6 +87,18 @@ class TaskViewSet(viewsets.ModelViewSet):
     API endpoint for project tasks
     """
 
+    def perform_update(self, serializer):
+        original_object = self.get_object()
+        updated_object = serializer.save()
+
+        if original_object.public is False and updated_object.public is True:
+            signals.action_created.send(
+                sender=self,
+                task=updated_object,
+                project=updated_object.project,
+                user=self.request.user,
+            )
+
     @action(
         methods=["post"],
         detail=True,
@@ -102,9 +115,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             other_pk = below_id
 
         try:
-            other_task = models.Task.objects.get(
-                project_id=task.project_id, pk=other_pk
-            )
+            other_task = self.queryset.get(project_id=task.project_id, pk=other_pk)
         except models.Task.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -122,7 +133,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         project_id = int(self.kwargs["project_id"])
 
         user_projects = list(
-            models.Project.objects.for_user(self.request.user).values_list(flat=True)
+            models.Project.on_site.for_user(self.request.user).values_list(flat=True)
         )
 
         if project_id not in user_projects:
@@ -132,10 +143,11 @@ class TaskViewSet(viewsets.ModelViewSet):
             ):
                 raise PermissionDenied()
 
-        return models.Task.objects.filter(project_id=project_id).order_by(
+        return self.queryset.filter(project_id=project_id).order_by(
             "-created_on", "-updated_on"
         )
 
+    queryset = models.Task.on_site.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 

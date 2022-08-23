@@ -132,7 +132,7 @@
                                                         <div class="drag-placeholder"></div>
                                                     </div>
                                                 </template>
-                                             
+
                                                 <!-- Task Template -->
                                                 <template x-for="(t, taskIndex) in column(board.code)" :key="t.id">
                                                     <div :id="t.id" class="drag-targetable py-2 my-2" @dragover="onDragOver(event)" @drop="onDrop(event, board.code, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)" >

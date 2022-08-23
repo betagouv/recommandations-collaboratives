@@ -1,6 +1,6 @@
 Bonjour,
 
-{{ task.created_by.get_full_name }} vous a recommandé cette action il y a {{ delay }} jours
+{{ task.created_by.get_full_name }} vous a proposé cette recommandation il y a {{ delay }} jours
     dans le cadre de votre projet "{{ task.project.name }}" :
 
 {% if task.resource %}
@@ -9,7 +9,7 @@ Bonjour,
     {{ task.intent }}
 {% endif %}
 
-Où en êtes-vous depuis que vous avez pris connaissance de cette proposition d'action ?
+Où en êtes-vous depuis que vous avez pris connaissance de cette proposition de recommandation ?
 
 C'est fait !
 {{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 3 %}
@@ -17,7 +17,7 @@ C'est fait !
 C'est en cours
 {{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 1 %}
 
-Je rencontre un blocage sur cette action
+Je rencontre un blocage sur cette recommandation
 {{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 2 %}
 
 Me le rappeler plus tard
@@ -27,7 +27,7 @@ Finalement, ça ne m'intéresse pas
 {{ request.scheme }}://{{ site.domain }}{% url 'projects-rsvp-followup-task' rsvp.uuid 4 %}
 
 
-Vous pouvez retrouver cette action en cliquant ou en copiant le lien ci dessous :
+Vous pouvez retrouver cette recommandation en cliquant ou en copiant le lien ci dessous :
 {{ request.scheme }}://{{ site.domain }}{{ task.project.get_absolute_url }}#action-{{ task.pk }}
 
 Envie de nous reparler ? Demandez-le nous via notre page de contact : {{ request.scheme }}://{{ site.domain }}{% url 'home-contact' %}

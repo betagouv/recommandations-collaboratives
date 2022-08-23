@@ -25,7 +25,7 @@ def send_in_blue_email(template_name, recipients, params=None, test=False):
     """Uses sendinblue service to send an email using the given template and params"""
     sib = SendInBlue()
     try:
-        template = EmailTemplate.objects.get(name__iexact=template_name)
+        template = EmailTemplate.on_site.get(name__iexact=template_name)
     except EmailTemplate.DoesNotExist:
         mail_admins(
             subject="Unable to send email", message=f"{template_name} was not found !"
