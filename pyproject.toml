@@ -3,3 +3,11 @@
 extension = "html"
 indent = "\t" # change indentation level
 exclude = ".venv,venv,.eggs" # override the default set of excluded paths
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "urbanvitaliz.settings.development"
+addopts = "--cov=urbanvitaliz --cov=test --cov-report=xml --reuse-db --tb=short -p no:warnings -n auto --maxprocesses 4"
+testpaths = [
+    "urbanvitaliz"
+]
+python_files = "tests.py test_*.py *_test.py *_tests.py"

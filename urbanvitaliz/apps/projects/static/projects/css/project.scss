@@ -10,6 +10,38 @@
 }
 
 
+.rephrase-update label {
+    margin-bottom: 15px;
+    display: none;
+}
+
+.rephrase-update p {
+        display: flex !important;
+        flex-direction: column !important;
+}
+
+.project-card-details {
+    background-color: #f6f6f6;
+    min-width: 200px;
+
+    article {
+        color: #3A3A3A;
+        font-weight: 400;
+        font-size: 1rem;
+    }
+}
+
+.project-card-details {
+    background-color: #f6f6f6;
+
+    article {
+        color: #3A3A3A;
+        font-weight: 400;
+        font-size: 1rem;
+    }
+}
+
+
 .small-markdown {
     h1 {
         font-size: 18px;

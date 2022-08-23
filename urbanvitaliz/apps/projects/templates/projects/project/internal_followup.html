@@ -16,8 +16,8 @@
 {% block project_detail %}
 
 <div class="col-12 mx-auto">
+    {% include 'projects/project/navigation.html' with internal_followup=True %}
     <div class="row">
-
     <div class="col-8">
         {% activity_stream "target" project %}
         {% regroup stream by timestamp.date as stream_by_day %}

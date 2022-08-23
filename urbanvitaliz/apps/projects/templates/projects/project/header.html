@@ -1,0 +1,16 @@
+
+<div class="col-12 d-flex justify-content-between align-items-start">
+    <div class=" d-flex flex-column mb-4">
+        <h2>{{ project.name|title }}</h2>
+        <div class="d-flex">
+            <p class="text-secondary">
+            {{ project.location }}
+            {% if project.commune %}
+                {{ project.commune.name }} —   {{ project.commune.postal }}, {{ project.commune.department }} - {{ project.commune.department.region }} - INSEE: {{ project.commune.insee }} </p>
+            {% endif %}
+        </div>
+    </div>
+    <div>
+        <a class="button" href="{% url 'projects-access-update' project.id %}">Partager le détail du projet</a>
+    </div>
+</div>

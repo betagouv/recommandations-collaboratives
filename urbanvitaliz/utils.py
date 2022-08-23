@@ -15,12 +15,14 @@ from django.contrib.auth import models as auth
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.mail import send_mail
 from django.db import models as db_models
 from django.db.models.functions import Cast
 from django.template import loader
 from sesame.utils import get_query_string
+
+from urbanvitaliz.apps.home.models import SiteConfiguration
 
 ########################################################################
 # View helpers
@@ -80,7 +82,8 @@ def build_absolute_url(path, auto_login_user=None):
     url = urljoin(base, path)
 
     if auto_login_user:
-        url = urljoin(url, get_query_string(auto_login_user))
+        sesame_qstring = get_query_string(auto_login_user)
+        url = f"{url}{sesame_qstring}"
 
     return url
 
@@ -110,6 +113,18 @@ def login(
         group.user_set.add(user)
     client.force_login(user)
     yield user
+
+
+################################################################
+# Site configuration
+################################################################
+def get_site_config_or_503(site):
+    try:
+        return SiteConfiguration.objects.get(site=site)
+    except SiteConfiguration.DoesNotExist:
+        raise ImproperlyConfigured(
+            f"Please create a SiteConfiguration for '{site}' before using this feature.",
+        )
 
 
 #######################################################################

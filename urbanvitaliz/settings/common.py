@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+from multisite import SiteID
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "multisite",
     "django.contrib.admin",
     "hijack",
     "hijack.contrib.admin",
@@ -55,6 +58,8 @@ INSTALLED_APPS = [
     "csvexport",
     "captcha",
     "ordered_model",
+    "dynamic_forms",
+    "urbanvitaliz.apps.onboarding",
     "phonenumber_field",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
@@ -68,12 +73,19 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.crm",
 ]
 
-SITE_ID = 1
+SITE_ID = SiteID(default=1)
+
+SILENCED_SYSTEM_CHECKS = [
+    "sites.E101"  # Check to ensure SITE_ID is an int - ours is an object
+]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "multisite.middleware.DynamicSiteMiddleware",
+    "django.contrib.sites.middleware.CurrentSiteMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "sesame.middleware.AuthenticationMiddleware",
@@ -223,6 +235,9 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 
 # RECAPTCHA, V3
 RECAPTCHA_REQUIRED_SCORE = 0.85
+
+# DYNAMIC FORMS
+DYNAMIC_FORMS_CUSTOM_JS = ""
 
 # ALLAUTH
 ACCOUNT_ADAPTER = "urbanvitaliz.apps.home.adapters.UVAccountAdapter"

@@ -13,7 +13,6 @@ import csv
 import datetime
 
 from django.contrib import messages
-from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
@@ -27,20 +26,18 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.onboarding import forms as onboarding_forms
+from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.utils import (
     build_absolute_url,
     check_if_switchtender,
+    get_site_config_or_503,
     is_staff_or_403,
     is_switchtender_or_403,
 )
 
 from .. import models, signals
-from ..forms import (
-    OnboardingForm,
-    OnboardingWithCaptchaForm,
-    ProjectForm,
-    SelectCommuneForm,
-)
+from ..forms import ProjectForm, SelectCommuneForm
 from ..utils import (
     can_administrate_or_403,
     can_administrate_project,
@@ -61,16 +58,36 @@ from ..utils import (
 ########################################################################
 
 
-def onboarding(request):
-    """Return the onboarding page"""
-    if (not request.user.is_staff) and check_if_switchtender(request.user):
-        return redirect("projects-project-prefill")
+def create_project_prefilled(request):
+    """Create a new project for someone else"""
+    site_config = get_site_config_or_503(request.site)
+
+    is_switchtender_or_403(request.user)
+
+    form = onboarding_forms.OnboardingResponseForm(request.POST or None)
+    onboarding_instance = onboarding_models.Onboarding.objects.get(
+        pk=site_config.onboarding.pk
+    )
+
+    # Add fields in JSON to dynamic form rendering field.
+    form.fields["response"].add_fields(onboarding_instance.form)
 
     if request.method == "POST":
-        form = OnboardingWithCaptchaForm(request.POST)
         if form.is_valid():
-            project = form.save(commit=False)
+            onboarding_response = form.save(commit=False)
+            onboarding_response.onboarding = onboarding_instance
+
+            project = models.Project()
+
+            project.name = form.cleaned_data.get("name")
+            project.phone = form.cleaned_data.get("phone")
+            project.org_name = form.cleaned_data.get("org_name")
+            project.description = form.cleaned_data.get("description")
+            project.location = form.cleaned_data.get("location")
+            project.postcode = form.cleaned_data.get("postcode")
             project.ro_key = generate_ro_key()
+            project.status = "TO_PROCESS"
+
             insee = form.cleaned_data.get("insee", None)
             if insee:
                 project.commune = geomatics.Commune.get_by_insee_code(insee)
@@ -79,69 +96,10 @@ def onboarding(request):
                 project.commune = geomatics.Commune.get_by_postal_code(postcode)
 
             project.save()
+            project.sites.add(request.site)
 
-            user, _ = auth.User.objects.get_or_create(
-                username=form.cleaned_data.get("email"),
-                defaults={
-                    "email": form.cleaned_data.get("email"),
-                    "first_name": form.cleaned_data.get("first_name"),
-                    "last_name": form.cleaned_data.get("last_name"),
-                },
-            )
-
-            # Make her project owner
-            models.ProjectMember.objects.create(
-                member=user, project=project, is_owner=True
-            )
-
-            log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-
-            # Create initial public note
-            models.Note(
-                project=project,
-                content=f"# Demande initiale\n\n{project.impediments}",
-                public=True,
-            ).save()
-
-            # All green, notify
-            signals.project_submitted.send(
-                sender=models.Project, submitter=user, project=project
-            )
-
-            # NOTE check if commune is unique for code postal
-            if not insee and project.commune:
-                communes = geomatics.Commune.objects.filter(
-                    postal=project.commune.postal
-                )
-                if communes.count() > 1:
-                    url = reverse(
-                        "projects-onboarding-select-commune", args=[project.id]
-                    )
-                    return redirect(url)
-
-            response = redirect("survey-project-session", project_id=project.id)
-            response["Location"] += "?first_time=1"
-            return response
-    else:
-        form = OnboardingWithCaptchaForm()
-    return render(request, "projects/onboarding.html", locals())
-
-
-def create_project_prefilled(request):
-    """Create a new project for someone else"""
-    is_switchtender_or_403(request.user)
-
-    if request.method == "POST":
-        form = OnboardingForm(request.POST)
-        if form.is_valid():
-            project = form.save(commit=False)
-            project.status = "TO_PROCESS"
-            project.ro_key = generate_ro_key()
-            postcode = form.cleaned_data.get("postcode")
-            project.commune = geomatics.Commune.get_by_postal_code(postcode)
-            project.save()
-            project.switchtenders.add(request.user)
-            project.save()
+            onboarding_response.project = project
+            onboarding_response.save()
 
             user, _ = auth.User.objects.get_or_create(
                 username=form.cleaned_data.get("email"),
@@ -154,6 +112,11 @@ def create_project_prefilled(request):
 
             models.ProjectMember.objects.create(
                 member=user, project=project, is_owner=True
+            )
+
+            # Add the current user as switchtender
+            project.switchtenders_on_site.create(
+                switchtender=request.user, site=request.site
             )
 
             models.Note(
@@ -196,16 +159,13 @@ def create_project_prefilled(request):
 
             return redirect("projects-project-detail-knowledge", project_id=project.id)
 
-    else:
-        form = OnboardingForm()
-
     return render(request, "projects/project/create_prefilled.html", locals())
 
 
 @login_required
 def select_commune(request, project_id=None):
     """Intermediate screen to select proper insee number of commune"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     response = redirect("survey-project-session", project_id=project.id)
     response["Location"] += "?first_time=1"
     if not project.commune:
@@ -234,7 +194,7 @@ def project_list_export_csv(request):
     is_switchtender_or_403(request.user)
 
     projects = (
-        models.Project.objects.for_user(request.user)
+        models.Project.on_site.for_user(request.user)
         .exclude(status="DRAFT")
         .order_by("-created_on")
     )
@@ -248,7 +208,7 @@ def project_list_export_csv(request):
         },
     )
 
-    writer = csv.writer(response)
+    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
     writer.writerow(
         [
             "departement",
@@ -311,7 +271,7 @@ def project_list(request):
     draft_projects = []
     if is_project_moderator:
         draft_projects = (
-            models.Project.objects.in_departments(
+            models.Project.on_site.in_departments(
                 request.user.profile.departments.all()
             )
             .filter(status="DRAFT")
@@ -320,22 +280,10 @@ def project_list(request):
     return render(request, "projects/project/list.html", locals())
 
 
-def project_detail_from_sharing_link(request, project_ro_key):
-    """Return a special view of the project using the sharing link"""
-    try:
-        project = models.Project.objects.filter(ro_key=project_ro_key)[0]
-    except Exception:
-        raise Http404()
-
-    can_manage = can_manage_project(project, request.user)
-
-    return render(request, "projects/project/detail-ro.html", locals())
-
-
 @login_required
 def project_update(request, project_id=None):
     """Update the base information of a project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     can_administrate_or_403(project, request.user)
 
     if request.method == "POST":
@@ -383,7 +331,10 @@ def project_switchtender_join(request, project_id=None):
     is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
 
     if request.method == "POST":
-        project.switchtenders.add(request.user)
+        project.switchtenders_on_site.create(
+            switchtender=request.user, site=request.site
+        )
+
         project.updated_on = timezone.now()
         project.save()
 
@@ -400,7 +351,7 @@ def project_switchtender_leave(request, project_id=None):
     is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
 
     if request.method == "POST":
-        project.switchtenders.remove(request.user)
+        project.switchtenders_on_site.filter(switchtender=request.user).delete()
         project.updated_on = timezone.now()
         project.save()
 
@@ -435,7 +386,7 @@ def post_login_set_active_project(sender, user, request, **kwargs):
 
     if not active_project:
         # Try to fetch a project
-        active_project = models.Project.objects.filter(members=user).first()
+        active_project = models.Project.on_site.filter(members=user).first()
         if active_project:
             set_active_project_id(request, active_project.id)
 

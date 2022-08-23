@@ -11,15 +11,11 @@ created: <2021-09-13 lun. 15:38>
 import uuid
 
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.urls import reverse
-from django.utils import timezone
 from urbanvitaliz import utils as uv_utils
-from urbanvitaliz.apps.communication.digests import (
-    make_action_digest,
-    make_project_digest,
-)
 from urbanvitaliz.apps.reminders import api
 
 from . import models
@@ -56,9 +52,9 @@ def can_administrate_project(project, user):
         return True
 
     if project:
-        return user in project.switchtenders.all()
+        return project.switchtenders_on_site.filter(switchtender=user).exists()
     else:
-        return models.Project.objects.filter(switchtenders=user).count() > 0
+        return models.Project.on_site.filter(switchtenders=user).exists()
 
 
 def can_administrate_or_403(project, user):
@@ -153,7 +149,10 @@ def is_regional_actor_for_project_or_403(project, user, allow_national=False):
 
 def get_switchtenders_for_project(project):
     """Return all the switchtenders for a given project"""
-    return project.switchtenders.all().distinct()
+    return auth_models.User.objects.filter(
+        projects_switchtended_on_site__project=project,
+        projects_switchtended_on_site__site=get_current_site(request=None),
+    ).distinct()
 
 
 def get_collaborators_for_project(project):
@@ -187,12 +186,13 @@ def get_active_project(request):
 
     if project_id:
         try:
-            project = models.Project.objects.get(id=project_id)
+            project = models.Project.on_site.get(id=project_id)
         except models.Project.DoesNotExist:
             pass
     else:
         try:
             memberships = models.ProjectMember.objects.filter(
+                Q(project__sites=get_current_site(request)),
                 Q(project__deleted=None),
                 Q(member=request.user),
                 Q(is_owner=True) | Q(~Q(project__status="DRAFT"), is_owner=False),
@@ -201,14 +201,6 @@ def get_active_project(request):
             if memberships.first():
                 project = memberships.first().project
 
-            # project = (
-            #     models.Project.objects.filter(deleted=None)
-            #     .filter(
-            #         Q(email=request.user.email)
-            #         | Q(~Q(status="DRAFT"), emails__contains=request.user.email)
-            #     )
-            #     .first()
-            # )
         except models.Project.DoesNotExist:
             pass
 
@@ -222,11 +214,14 @@ def set_active_project_id(request, project_id: int):
 
 def refresh_user_projects_in_session(request, user):
     """store the user projects in the session"""
+
     memberships = models.ProjectMember.objects.filter(
+        Q(project__sites=get_current_site(request)),
         Q(project__deleted=None),
         Q(member=user),
         Q(is_owner=True) | Q(~Q(project__status="DRAFT"), is_owner=False),
     )
+
     projects = [m.project for m in memberships.all()]
 
     # projects = models.Project.objects.filter(deleted=None).filter(

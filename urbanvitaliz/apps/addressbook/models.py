@@ -6,6 +6,8 @@ Views for addressbook application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-07-20 15:56:20 CEST
 """
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.functions import Lower
 from urbanvitaliz.apps.geomatics import models as geomatics_models
@@ -35,8 +37,15 @@ class ContactManager(models.Manager):
         return super().get_queryset().order_by(Lower("last_name"), Lower("first_name"))
 
 
+class ContactOnSiteManager(CurrentSiteManager, models.Manager):
+    pass
+
+
 class Contact(models.Model):
     objects = ContactManager()
+    on_site = ContactOnSiteManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     first_name = models.CharField(max_length=50, blank=True, verbose_name="Prénom")
     last_name = models.CharField(

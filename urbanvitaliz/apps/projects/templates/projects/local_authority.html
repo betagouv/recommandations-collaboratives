@@ -90,11 +90,11 @@
                         {{ project.tasks.open.count }}
                     </span>
                     <br/>
-                    <span class="small text-secondary">Proposition{{ project.tasks.open.count|pluralize }} d'action à prendre</span>
+                    <span class="small text-secondary">Proposition{{ project.tasks.open.count|pluralize }} de recommandations à prendre</span>
                 </div>
                 {% else %}
                 <span class="text-secondary small text-center">
-                    Aucune action à prendre,<br/>
+                    Aucune recommandation à prendre,<br/>
                     vous êtes à jour !
                     <svg class="bi align-middle text-success" width="24" height="24" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
