@@ -168,6 +168,20 @@ class Project(models.Model):
         max_length=16, default="", blank=True, verbose_name="Téléphone"
     )
     description = models.TextField(verbose_name="Description", default="", blank=True)
+
+    # Synopsis (needs rephrased by an advisor)
+    synopsis = models.TextField(
+        verbose_name="Reformulation du besoin", default="", blank=True, null=True
+    )
+    synopsis_on = models.DateTimeField(verbose_name="Reformulé le", null=True)
+    synopsis_by = models.ForeignKey(
+        auth_models.User,
+        verbose_name="Reformulé par",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="synopses",
+    )
+
     location = models.CharField(max_length=256, verbose_name="Localisation")
     commune = models.ForeignKey(
         geomatics_models.Commune,
