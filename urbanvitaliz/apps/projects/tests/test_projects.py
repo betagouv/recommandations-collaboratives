@@ -20,7 +20,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -144,7 +145,6 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     }
     with login(client, groups=["switchtender"]):
         response = client.post(reverse("projects-project-prefill"), data=data)
-        print(response.content)
 
     project = models.Project.on_site.all()[0]
     assert project.name == "a project"
