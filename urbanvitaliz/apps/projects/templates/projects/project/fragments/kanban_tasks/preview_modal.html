@@ -64,6 +64,17 @@
 											</div>
 										</div>
 									</template>
+									<template x-if="!currentTask.resource_id">
+										<div class="my-3">
+											<div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
+												<span class="ms-1 fst-italic" x-text="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
+													style="line-height: 20px"></span> a créé cette recommandation sans ressource <span
+													class="fw-bold" x-text="statusText(f.status)"></span>
+													<span class="ms-1 text-muted" x-text="`le ${formatDate(currentTask.created_on)}`"
+																style="line-height: 20px"></span>
+											</div>
+										</div>
+									</template>
 									<template x-if="currentTaskFollowups">
 										<template x-for="f in currentTaskFollowups" x-key="f.timestamp"
 											x-effect="currentTaskFollowups && scrollToLastElement">
