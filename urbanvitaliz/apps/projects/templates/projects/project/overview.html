@@ -148,15 +148,16 @@
                     {% endif %}
                     {% endfor %}
                 {% elif project.impediments %}
-                <div class="pe-4">
-                    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Contexte</h6>
+                <div class="pe-4 w-50">
+                    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Difficultés rencontrées</h6>
                     <div class="project-card-details p-3">
                         <article>
-                            {{project.description}}
+                            {{project.impediments}}
                         </article>
                         <footer class="d-flex mt-4 justify-content-between items-center">
-                            <div>
-                                <span class="me-2">
+                            <div class="d-flex align-items-center">
+                                <span class="me-2 d-flex align-items-center justify-content-center">
+                                    <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
                                     <strong>
                                         {{project.first_name}}
                                         {{project.last_name}}
@@ -165,7 +166,7 @@
                                 <span style="color:#929292">{{project.org_name}}</span>
                             </div>
                             <div>
-                                <span style="color:#929292; text-align: right;"
+                                <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px;text-align: right;"
                                     class="font-italic d-flex">{{project.updated_on}}</span>
                             </div>
                         </footer>
