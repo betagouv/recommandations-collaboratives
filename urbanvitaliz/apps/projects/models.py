@@ -19,7 +19,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
