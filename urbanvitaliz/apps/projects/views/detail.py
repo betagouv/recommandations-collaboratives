@@ -12,6 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
+from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 
@@ -44,9 +45,9 @@ def project_overview(request, project_id=None):
     )
     can_administrate = can_administrate_project(project, request.user)
 
-    if project.onboarding:
+    try:
         onboarding_response = dict(project.onboarding.response)
-    else:
+    except models.Project.onboarding.RelatedObjectDoesNotExist:
         onboarding_response = None
 
     # check user can administrate project (member or switchtender)
