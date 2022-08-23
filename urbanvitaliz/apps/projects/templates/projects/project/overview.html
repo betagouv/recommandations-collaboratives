@@ -91,6 +91,89 @@
                 {% endif %}
             </div>
         {%endif %}
+        <div class="mt-4 pt-4">
+            <div class="d-flex w-full">
+                <div class="pe-4 w-50">
+                    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Contexte</h6>
+                    <div class="project-card-details p-3">
+                        <article>
+                            {{ project.description }}
+                        </article>
+                        <footer class="d-flex flex-column mt-4 justify-content-between items-center">
+                            <div class="d-flex align-items-center justify-content-start">
+                                <span class="me-2 d-flex align-items-center justify-content-center">
+                                    <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
+                                    <strong>
+                                        {{ project.first_name }}
+                                        {{ project.last_name }}
+                                    </strong>
+                                </span>
+                                <span style="color:#929292">{{project.org_name}}</span>
+                            </div>
+                            <div class="ms-4 ps-2">
+                                <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px;"
+                                    class="font-italic d-flex">{{project.updated_on}}</span>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+        
+                {% if onboarding_response %}
+                    {% for title, content in onboarding_response.items %}
+                    {% if content %}
+                    <div class="pe-4 w-50">
+                        <h6 style="font-size: 14px;" class="text-uppercase fw-bold">{{ title }}</h6>
+                        <div class="project-card-details p-3">
+                            <article>
+                                {{ content }}
+                            </article>
+                            <footer class="d-flex flex-column mt-4 justify-content-between items-center">
+                                <div class="d-flex align-items-center justify-content-start">
+                                    <span class="me-2 d-flex align-items-center justify-content-center">
+                                        <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
+                                        <strong>
+                                            {{project.first_name}}
+                                            {{project.last_name}}
+                                        </strong>
+                                    </span>
+                                    <span style="color:#929292">{{project.org_name}}</span>
+                                </div>
+                                <div class="ms-4 ps-2">
+                                    <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px;"
+                                        class="font-italic d-flex">{{project.updated_on}}</span>
+                                </div>
+                            </footer>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                {% elif project.impediments %}
+                <div class="pe-4">
+                    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Contexte</h6>
+                    <div class="project-card-details p-3">
+                        <article>
+                            {{project.description}}
+                        </article>
+                        <footer class="d-flex mt-4 justify-content-between items-center">
+                            <div>
+                                <span class="me-2">
+                                    <strong>
+                                        {{project.first_name}}
+                                        {{project.last_name}}
+                                    </strong>
+                                </span>
+                                <span style="color:#929292">{{project.org_name}}</span>
+                            </div>
+                            <div>
+                                <span style="color:#929292; text-align: right;"
+                                    class="font-italic d-flex">{{project.updated_on}}</span>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
     <div class="col-4">
         <!-- {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True %} -->
@@ -148,9 +231,6 @@
             </ul>
         </div>
     </div>
-</div>
-<div class="row">
-    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Dernières activités</h6>
 </div>
 
 </div>
