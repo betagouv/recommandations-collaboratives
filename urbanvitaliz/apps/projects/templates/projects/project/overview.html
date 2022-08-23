@@ -56,6 +56,9 @@
     <div class="row">
         <div class="col-8">
             <h4>Reformulation du besoin </h4>
+
+            {{ project.synopsis }}
+
             {% if project.impediments %}
                     <span class="small-markdown">
                         {{ project.impediments_rendered|safe|truncatewords_html:30 }}

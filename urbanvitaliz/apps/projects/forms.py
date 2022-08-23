@@ -240,4 +240,14 @@ class DocumentUploadForm(forms.ModelForm):
         fields = ["the_file", "description"]
 
 
+class SynopsisForm(forms.ModelForm):
+    """Form for synopsis creation/update"""
+
+    class Meta:
+        model = models.Project
+        fields = [
+            "synopsis",
+        ]
+
+
 # eof
