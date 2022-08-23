@@ -1,3 +1,5 @@
+import os
+
 from allauth.account.forms import (
     LoginForm,
     ResetPasswordForm,
@@ -7,6 +9,7 @@ from allauth.account.forms import (
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
+from django.core.exceptions import ValidationError
 from phonenumber_field.formfields import PhoneNumberField
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from urbanvitaliz.apps.addressbook import models as addressbook_models
@@ -120,3 +123,38 @@ class UVResetPasswordKeyForm(ResetPasswordKeyForm):
         self.fields["password2"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
+
+
+class ContactForm(forms.Form):
+    subject = forms.CharField(max_length=256)
+    content = forms.CharField(max_length=2048, widget=forms.Textarea)
+    name = forms.CharField(max_length=128)
+    email = forms.CharField(max_length=128)
+
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user.is_authenticated:
+            del self.fields["name"]
+            del self.fields["email"]
+
+        # Prevent tests from failing
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            self.fields.pop("captcha")
+
+
+class UserPasswordFirstTimeSetupForm(forms.Form):
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}))
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}))
+    next = forms.CharField(widget=forms.HiddenInput())
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+
+        if password1 and password2:
+            if password1 != password2:
+                raise ValidationError("Les mots de passe ne correspondent pas.")

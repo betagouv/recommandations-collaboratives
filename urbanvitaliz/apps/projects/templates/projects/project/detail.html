@@ -2,6 +2,7 @@
 
 {% load humanize %}
 {% load static %}
+{% load django_vite %}
 
 {% load sass_tags %}
 
@@ -9,6 +10,11 @@
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block js %}
+    {% vite_asset 'js/apps/projectDetails.js' %}
 {% endblock %}
 
 {% block title %}
@@ -32,15 +38,15 @@
 
                     <span class="align-middle fs-4">Un peu de patience, on vérifie que vous n'êtes pas un pirate du web ;)</span>
                     <br/>
-                    <span class="align-middle text-secondary">Dès que l'équipe UrbanVitaliz aura validé votre dossier, vous pourrez faire plus de choses sur votre dossier ! Par exemple, le partager à des collaborateur·rice·s.</span>
-
+                    <span class="align-middle text-secondary">Dès que l'équipe UrbanVitaliz aura validé votre projet, vous pourrez faire plus de choses sur votre projet ! Par exemple, le partager à des participant·e·s.</span>
                 </p>
             </div>
         </div>
         {% endif %}
     </div>
 
-    <div class="row">
+    <div class="row" style="font-family: 'Marianne', arial, sans-serif;">
+        {% include 'projects/project/header.html' %}
         {% block project_detail %}{% endblock %}
     </div>
 

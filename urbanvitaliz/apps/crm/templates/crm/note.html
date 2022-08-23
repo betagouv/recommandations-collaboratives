@@ -3,8 +3,14 @@
 <div class="d-flex align-items-center mb-4">
     <span class="crm-note-tag-title">{{ note.title }}</span>
     <span class="d-flex align-items-center" style="margin-left: 15px; font-size: 0.8rem; color: grey;">
-        <svg class="bi me-1" width="20" height="20" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-history" />
+        <svg class="bi me-1" width="15" height="15" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
+        </svg>
+        {{note.created_by.get_full_name|default:note.created_by.email}}
+    </span>
+    <span class="d-flex align-items-center" style="margin-left: 15px; font-size: 0.8rem; color: grey;">
+        <svg class="bi me-1" width="15" height="15" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-fill" />
         </svg>
         {{note.updated_on}}
     </span>

@@ -76,7 +76,7 @@
                 </li>
                 {% endfor %}
             </ul>
-        </div>
+            </div>
         <div x-ref="note" class="px-4 pt-4 crm-note relative" :class="noteIsOpen ? 'open' : 'closed'">
             {% if note %}
             {% include 'crm/note.html' %}
@@ -89,4 +89,5 @@
             {% include 'crm/timeline.html' %}
         </div>
     </div>
+</div> 
 {% endblock %}

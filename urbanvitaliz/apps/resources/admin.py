@@ -16,21 +16,21 @@ from . import models
 @admin.register(models.Category)
 class CategoryAdmin(admin.ModelAdmin):
     search_fields = ["name", "icon"]
-    list_filter = []
+    list_filter = ["sites"]
     list_display = ["name", "icon", "color"]
 
 
 @admin.register(models.Resource)
 class ResourceAdmin(admin.ModelAdmin):
     search_fields = ["title", "content"]
-    list_filter = ["updated_on"]
-    list_display = ["updated_on", "title"]
+    list_filter = ["sites", "updated_on"]
+    list_display = ["title", "status", "category", "updated_on"]
 
 
 @admin.register(models.Bookmark)
 class BookmarkAdmin(admin.ModelAdmin):
     search_fields = ["resource__title", "comments"]
-    list_filter = []
+    list_filter = ["site"]
     list_display = ["resource", "created_by"]
 
 

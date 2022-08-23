@@ -4,7 +4,7 @@
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill"/>
     </svg>
 
-    Référent&middot;e : {{ project.first_name }} {{ project.last_name }}
+    Référent&middot;e : {{ project.owner }}
     {% if project.org_name %}
     <span class="text-secondary">({{ project.org_name|title }})</span>
     {% endif %}

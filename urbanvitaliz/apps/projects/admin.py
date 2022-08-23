@@ -18,13 +18,14 @@ from . import models
 class ProjectTaskTabularInline(OrderedTabularInline):
     model = models.Task
     fields = (
+        "site",
         "intent",
         "content",
         "resource",
         "order",
         "move_up_down_links",
     )
-    ordering = ("order",)
+    ordering = ("order", "site")
     readonly_fields = (
         "order",
         "move_up_down_links",
@@ -41,14 +42,30 @@ class ProjectMemberTabularInline(admin.TabularInline):
     extra = 1
 
 
+class ProjectSwitchtenderTabularInline(admin.TabularInline):
+    model = models.ProjectSwitchtender
+    fields = (
+        "switchtender",
+        "site",
+    )
+    extra = 1
+
+
 @admin.register(models.Project)
 class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     search_fields = ["name"]
-    list_filter = ["created_on", "exclude_stats", "publish_to_cartofriches", "status"]
+    list_filter = [
+        "sites",
+        "created_on",
+        "exclude_stats",
+        "publish_to_cartofriches",
+        "status",
+    ]
     list_display = ["created_on", "name", "location"]
     actions = [csvexport]
     inlines = (
         ProjectMemberTabularInline,
+        ProjectSwitchtenderTabularInline,
         ProjectTaskTabularInline,
     )
 
@@ -66,7 +83,7 @@ class NoteAdmin(admin.ModelAdmin):
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
     search_fields = ["content", "tags"]
-    list_filter = ["deadline", "tags"]
+    list_filter = ["site", "deadline", "tags"]
     list_display = ["created_on", "deadline", "project_name", "tags"]
 
     def project_name(self, o):

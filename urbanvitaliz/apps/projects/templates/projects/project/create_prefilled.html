@@ -38,7 +38,7 @@
         <svg class="bi me-2" width="32" height="32">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#megaphone"/>
         </svg>
-        Pré-remplir un dossier
+        Pré-remplir un projet
     </h2>
 
 	  <form id="form-projects-onboarding"
@@ -57,7 +57,7 @@
                 <svg class="bi me-2" width="28" height="28">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
                 </svg>
-                Pour qui remplissez-vous ce dossier ?
+                Pour qui remplissez-vous ce projet ?
             </h3>
 
 
@@ -164,35 +164,15 @@
                 {% endfor %}
             </div>
 
-            <h3 class="mb-3 mt-5">
-                <svg class="bi me-2" width="28" height="28">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#life-preserver"/>
-                </svg>
-                Quel est le besoin ?
-            </h3>
-
-            <div class="mb-3">
-                <!-- Impediments -->
-                <textarea class="form-control {% if form.impediments.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-impediments" name="{{ form.impediments.name }}" value="{{ form.impediments.value|default:'' }}" placeholder="N'hésitez pas à préciser le besoin en quelques mots" required></textarea>
-                <label class="visually-hidden" for="input-project-impediments">{{ form.impediments.label }}</label>
-
-                {% for error in form.impediments.errors %}
-                <div class="text-danger text-end">{{ error }}</div>
-                {% endfor %}
-
-                <!-- Cartofriches -->
-                <div class="mt-2">
-                    <input class="form-check-input" type="checkbox" name="publish_to_cartofriches" id="input-project-publish-cartofriches" checked>
-                    <label for="input-project-publish-cartofriches">Je souhaite ajouter cette friche à la <a href="https://cartofriches.cerema.fr" target="_new">cartographie publique des friches</a> - ce qui me permet de faire connaître ce site à des porteurs de projet potentiels !</label>
-                </div>
-
+            <div class="mt-5">
+                {{ form.response }}
             </div>
 
         </div>
 
         {{ form.captcha }}
 		    <button type="submit" class="btn btn-primary">
-            Ajouter cette friche et rejoindre l'équipe de suivi
+            Ajouter ce projet et rejoindre l'équipe de suivi
 		    </button>
 	</form>
 

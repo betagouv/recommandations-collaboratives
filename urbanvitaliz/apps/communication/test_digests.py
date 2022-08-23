@@ -6,8 +6,10 @@ tests for digesting emails
 authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2022-02-03 16:14:54 CET
 """
+import test  # noqa
 
 from django.contrib.auth import models as auth
+from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import models as notifications_models
@@ -26,21 +28,25 @@ from .digests import NotificationFormatter
 ########################################################################
 
 
-def test_send_digests_for_new_reco(client):
+def test_send_digests_for_new_reco(client, request):
     membership = baker.make(projects_models.ProjectMember)
+
     switchtender = Recipe(
         auth.User, username="switchtender", email="switchtender@example.com"
     ).make()
 
     project = baker.make(
-        projects_models.Project, status="DONE", projectmember_set=[membership]
+        projects_models.Project,
+        sites=[get_current_site(request)],
+        status="DONE",
+        projectmember_set=[membership],
     )
 
     # Generate a notification
     projects_signals.action_created.send(
         sender=test_send_digests_for_new_reco,
         task=projects_models.Task.objects.create(
-            project=project, created_by=switchtender
+            project=project, site=get_current_site(request), created_by=switchtender
         ),
         project=project,
         user=switchtender,
@@ -160,7 +166,7 @@ def test_send_digests_for_switchtender_by_user(client):
     assert (
         regional_actor.notifications.unsent().count() == 0
     )  # shouldn't get her own action notified
-    assert regional_actor2.notifications.unsent().count() == 1
+    assert regional_actor2.notifications.unsent().count() == 0
     assert non_regional_actor.notifications.unsent().count() == 0
     assert membership.member.notifications.unsent().count() == 1
 

@@ -16,7 +16,7 @@ from urbanvitaliz.apps.communication.models import EmailTemplate
 
 
 class Command(BaseCommand):
-    help = "Send pending notifications as email digests"
+    help = "Test pending notifications as email digests"
 
     def handle(self, *args, **options):
         self.send_test_digest(*args, **options)

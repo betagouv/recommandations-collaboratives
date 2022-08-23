@@ -30,6 +30,7 @@ urlpatterns = [
         name="switchtender-dashboard",
     ),
     path(r"contact/", views.contact, name="home-contact"),
+    path(r"setup-password/", views.setup_password, name="home-user-setup-password"),
 ]
 
 # eof

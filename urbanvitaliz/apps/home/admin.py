@@ -5,6 +5,11 @@ from django.contrib.auth.admin import UserAdmin
 from . import models
 
 
+@admin.register(models.SiteConfiguration)
+class SiteConfigurationAdmin(admin.ModelAdmin):
+    list_display = ("site", "project_survey")
+
+
 class ProfileInline(admin.StackedInline):
     model = models.UserProfile
     can_delete = False
@@ -22,6 +27,9 @@ class CustomUserAdmin(UserAdmin):
         "is_staff",
         "organization",
     )
+
+    list_filter = ("date_joined", "is_staff", "is_superuser", "is_active", "groups")
+
     list_select_related = ("profile",)
 
     def organization(self, instance):

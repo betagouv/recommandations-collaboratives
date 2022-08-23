@@ -15,7 +15,9 @@ from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, F, Q
@@ -29,6 +31,8 @@ from urbanvitaliz.apps.projects.utils import (
     get_active_project,
 )
 from urbanvitaliz.utils import check_if_switchtender
+
+from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 
 
 class HomePageView(TemplateView):
@@ -71,7 +75,7 @@ class StatisticsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         staff_users = auth.User.objects.filter(is_staff=True)
-        the_projects = projects.Project.objects.exclude(
+        the_projects = projects.Project.on_site.exclude(
             Q(members__in=staff_users)
             | Q(status="DRAFT")
             | Q(status="STUCK")
@@ -133,25 +137,6 @@ def contact(request):
     return render(request, "home/contact.html", locals())
 
 
-class ContactForm(forms.Form):
-    subject = forms.CharField(max_length=256)
-    content = forms.CharField(max_length=2048, widget=forms.Textarea)
-    name = forms.CharField(max_length=128)
-    email = forms.CharField(max_length=128)
-
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
-
-    def __init__(self, user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if user.is_authenticated:
-            del self.fields["name"]
-            del self.fields["email"]
-
-        # Prevent tests from failing
-        if "PYTEST_CURRENT_TEST" in os.environ:
-            self.fields.pop("captcha")
-
-
 def send_message_to_team(request, data):
     """Send message as email to the team"""
     subject = data.get("subject")
@@ -187,6 +172,34 @@ def notify_user_of_sending(request, status):
         )
 
 
+@login_required
+def setup_password(request):
+    """A simple view that request a password for a user that doesn't have one yet"""
+    next_url = request.GET.get("next", "/")
+
+    # We have a password, redirect!
+    if request.user.password:
+        return redirect(next_url)
+
+    if request.method == "POST":
+        form = UserPasswordFirstTimeSetupForm(request.POST)
+        next_url = request.POST.get("next", "/")
+        if form.is_valid():
+            request.user.set_password(form.cleaned_data.get("password1"))
+            request.user.save()
+            log_user(
+                request,
+                request.user,
+                backend="django.contrib.auth.backends.ModelBackend",
+            )
+
+            return redirect(next_url)
+    else:
+        form = UserPasswordFirstTimeSetupForm(initial={"next": next_url})
+
+    return render(request, "home/user_setup_password.html", locals())
+
+
 ######
 # ADMIN VIEWS
 ######
@@ -200,7 +213,7 @@ class SwitchtenderDashboardView(LoginRequiredMixin, UserPassesTestMixin, Templat
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["projects_waiting"] = projects.Project.objects.filter(
+        context["projects_waiting"] = projects.Project.on_site.filter(
             status="DRAFT"
         ).count()
         context["project_model"] = projects.Project

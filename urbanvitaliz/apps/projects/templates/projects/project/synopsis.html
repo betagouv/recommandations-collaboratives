@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load humanize %}
+
+{% load sass_tags %}
+
+{% block css %}
+    <link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <section>
+        <form method="post">
+            {% csrf_token %}
+            <h2 class="mb-4 d-flex align-items-center">
+                <span style="font-weight: 300;">
+                    Projet 
+                    <strong style="font-weight: 500;">
+                        {{project.org_name}}
+                    </strong>
+                </span>
+            </h2>
+            <h4 class="d-block mb-3">
+                <svg class="bi " width="32" height="32" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-square" />
+                </svg>&nbsp;
+                Reformulation du besoin
+            </h4>
+            <div class="rephrase-update">
+            {{ form.as_p }}
+            </div>
+            <button type="submit" class="btn btn-primary">
+                Enregistrer
+            </button>
+        </form>
+
+        {{ form.media }}
+
+    </section>
+
+</div>
+
+{% endblock %}

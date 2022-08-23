@@ -1,0 +1,17 @@
+.survey-card {
+    padding: 20px;
+
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.16), 0px 1px 0px -2px rgba(0, 0, 0, 0.16), 0px 1px 4px rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+    border-top: 1px solid #EEEEEE;
+}
+
+.survey-card .card-title {
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 28px;
+}
+
+.survey-card .card-completion {
+    font-weight: 500;
+}
