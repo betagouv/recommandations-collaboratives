@@ -1,0 +1,34 @@
+{% load gravatar %}
+
+<div class="pe-4 pt-4 {% if full_width %}w-100{% else %}w-50{% endif %}">
+    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">{% if checkbox %} Cartofriche ✅ {% elif title != "None" %} {{title}} {% else %} Demande initiale {% endif %}</h6>
+    <div class="project-card-details p-3">
+        <article>
+            {% if checkbox %}
+                Ce projet est visible sur cartofriche
+            {% else %}
+                {{ description }}
+            {% endif %}
+        </article>
+        <footer class="d-flex mt-4 justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %}">
+            <div class="d-flex align-items-center">
+                <span class="me-2 d-flex align-items-center">
+                    <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}"
+                        alt="{{action.actor}}">
+                    <strong>
+                        {{ card_user.first_name }}
+                        {{ card_user.last_name }}
+                    </strong>
+                </span>
+                <span style="color:#929292">{{ project.org_name }}</span>
+            </div>
+            {% if can_administrate and is_editable %}
+            <a href="{% url "projects-project-synopsis" project.id %}">éditer</a>
+            {% endif %}
+            <div class="mt-2">
+                <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px; text-align: right;"
+                    class="font-italic d-flex">{{ updated_on }}</span>
+            </div>
+        </footer>
+    </div>
+</div>
