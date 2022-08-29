@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "sass_processor",
     "django_vite",
     "markdownx",
+    "dbtemplates",
     "tagging",
     "leaflet",
     "django_gravatar",
@@ -100,7 +101,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
+        "APP_DIRS": False,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -110,6 +111,11 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "urbanvitaliz.apps.projects.context_processors.is_switchtender_processor",
                 "urbanvitaliz.apps.projects.context_processors.active_project_processor",
+            ],
+            "loaders": [
+                "dbtemplates.loader.Loader",
+                "django.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
             ],
         },
     },

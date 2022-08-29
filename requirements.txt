@@ -14,6 +14,9 @@ git+https://github.com/glibersat/django-activity-stream.git@main#egg=django-acti
 
 django-multisite
 git+http://github.com/django-ordered-model/django-ordered-model@master#egg=django-ordered-model
+
+git+https://github.com/jazzband/django-dbtemplates.git@master#egg=django-dbtemplates
+
 django_otp
 django-tagging==0.5.0
 django-gravatar2
