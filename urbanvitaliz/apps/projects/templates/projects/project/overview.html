@@ -54,46 +54,40 @@
 {% include 'projects/project/navigation.html' with overview=True %}
 <div class="row">
     <div class="col-8">
-        {% if project.synopsis %}
-            {% include 'projects/project/fragments/information_card.html' with full_width=True project=project is_editable=True title="Reformulation du besoin" description=project.synopsis updated_on=project.synopsis_on card_user=project.synopsis_by %}
-        {% else %}
-            <div class="project-card-details me-4 py-4 d-flex flex-column align-items-center justify-content-center">
-                <span style="color:#929292; font-size: 14px;" class="text-uppercase">Aucune reformulation n'a été faite pour le moment</span>
-                {% if can_administrate %}
-                    <a class="button mt-3" href="{% url "projects-project-synopsis" project.id %}">Reformuler le besoin de la collectivité</a>
-                {% endif %}
+        {% if can_administrate %}
+            {% if project.synopsis %}
+                {% include 'projects/project/fragments/information_card.html' with full_width=True project=project is_editable=True title="Reformulation du besoin" description=project.synopsis updated_on=project.synopsis_on card_user=project.synopsis_by org_name=project.synopsis_by.profile.organization.name %}
+            {% else %}
+                <div class="project-card-details me-4 py-4 d-flex flex-column align-items-center justify-content-center">
+                    <span style="color:#929292; font-size: 14px;" class="text-uppercase">Aucune reformulation n'a été faite pour le moment</span>
+                    {% if can_administrate %}
+                        <a class="button mt-3" href="{% url "projects-project-synopsis" project.id %}">Reformuler le besoin de la collectivité</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+            <div class="mt-4">
+                <div class="d-flex w-full flex-wrap">
+                    {% include 'projects/project/fragments/information_card.html' with project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
+                    {% if onboarding_response %}
+                        {% include 'projects/project/fragments/information_card.html' with project=project title=title description=content updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
+                    {% elif project.impediments %}
+                        {% include 'projects/project/fragments/information_card.html' with project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
+                    {% endif %}
+                </div>
             </div>
         {% endif %}
-        <div class="mt-4">
-            <div class="d-flex w-full flex-wrap">
-                {% include 'projects/project/fragments/information_card.html' with project=project title="Contexte" description=project.description updated_on=project.updated_on card_user=project.owner %}
-                {% if onboarding_response %}
-                    {% for title, content in onboarding_response.items %}
-                    {% if content %}
-                        {% if title != "Checkbox Group" %}
-                            {% include 'projects/project/fragments/information_card.html' with project=project title=title description=content updated_on=project.updated_on card_user=project.owner %}
-                        {% else %}
-                             {% include 'projects/project/fragments/information_card.html' with checkbox=True project=project title=title description=content updated_on=project.updated_on card_user=project.owner %}    
-                        {% endif %}
-                    {% endif %}
-                    {% endfor %}
-                {% elif project.impediments %}
-                    {% include 'projects/project/fragments/information_card.html' with project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.updated_on card_user=project.owner %}
-                {% endif %}
-            </div>
-        </div>
     </div>
     <div class="col-4">
         <!-- {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True %} -->
         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Informations générales</h6>
         <div class="d-flex flex-column">
-            <span style="font-size: 16px; color:#666666; font-weight: 300;" class="d-block mb-2">Référent collectivité</span>
+            <span style="font-size: 14px; color:#666666; font-weight: 300;" class="d-block mb-2">Référent collectivité</span>
             <div class="d-flex align-items-center mb-2">
                 {% if project.owner %}
                 {% if project.owner.first_name %}
                 <span class="me-2 d-flex align-items-center">
                     <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                    <strong>
+                    <strong class="text-nowrap">
                         {{ project.owner.first_name }}
                         {{ project.owner.last_name }}
                     </strong>
@@ -107,7 +101,7 @@
                     </strong>
                 </span>
                 {% endif %}
-                <span style="color: #666666; font-style: italic; font-weight: 300;">{% if project.owner.profile.organization.name %}{{project.owner.profile.organization.name}} {% else %} {{ project.org_name }}{% endif %}</span>
+                <span style="color: #666666; font-style: italic; font-weight: 300;">{{project.owner.profile.organization.name|truncatechars:20}}</span>
             </div>
             <a class="d-flex align-items-center mb-1" style="font-size: 14px; color: #0063CB; text-decoration: none;"
                 href="mailto:({project.owner.email})">
@@ -130,7 +124,7 @@
             {% endif %}
         </div>
         <div class="my-4">
-            <span style="font-size: 16px; color:#666666;font-weight: 300;" class="d-block mb-3">Participants</span>
+            <span style="font-size: 14px; color:#666666;font-weight: 300;" class="d-block mb-3">Participants</span>
             <a class="button" href="{% url 'projects-access-update' project.id %}">Inviter un
                 participant</a>
             <ul class="d-flex flex-column list-unstyled mt-4">
@@ -139,26 +133,26 @@
                         <li class="d-flex align-items-center mb-2">
                             <span class="me-2 d-flex align-items-center">
                                 <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                                {% if project.first_name %}
-                                <strong>
-                                    {{ project.first_name }}
-                                    {{ project.last_name }}
-                                </strong>
-                                {% elif project.owner %}
-                                <strong>
+                                {% if project.owner %}
+                                <strong class="text-nowrap">
                                     {{ project.owner.first_name }}
                                     {{ project.owner.last_name }}
                                 </strong>
+                                {% elif project.first_name %}
+                                <strong class="text-nowrap">
+                                    {{ project.first_name }}
+                                    {{ project.last_name }}
+                                </strong>
                                 {% endif %}
                             </span>
-                            <span style="color: #666666; font-style: italic; font-weight: 300;">{{project.org_name}}</span>
+                            <span style="color: #666666; font-style: italic; font-weight: 300;">{% if project.owner.profile.organization.name %} {{project.owner.profile.organization.name|truncatechars:20}}{% else %}{{project.org_name|truncatechars:20}}{% endif %}</span>
                         </li>
                     {% else %}
                         <li class="d-flex align-items-center mb-2">
                             {% if member.first_name %}
                             <span class="me-2 d-flex align-items-center">
                                 <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                                <strong>
+                                <strong class="text-nowrap">
                                     {{ member.first_name }}
                                     {{ member.last_name }}
                                 </strong>
@@ -166,7 +160,7 @@
                             {% else %}
                             <span class="me-2"><strong>{{member}}</strong></span>
                             {% endif %}
-                            <span style="color: #666666; font-style: italic; font-weight: 300;">{{member.profile.organization.name}}</span>
+                            <span style="color: #666666; font-style: italic; font-weight: 300;">{{member.profile.organization.name|truncatechars:20}}</span>
                         </li>
                     {% endif %}
                 {% endfor %}
