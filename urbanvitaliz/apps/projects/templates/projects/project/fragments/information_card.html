@@ -15,10 +15,17 @@
                 <span class="me-2 d-flex align-items-center">
                     <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}"
                         alt="{{action.actor}}">
+                    {% if card_user.first_name %}
                     <strong>
                         {{ card_user.first_name }}
                         {{ card_user.last_name }}
                     </strong>
+                    {% else %}
+                    <strong>
+                        {{ project.first_name }}
+                        {{ project.last_name }}
+                    </strong>
+                    {% endif %}
                 </span>
                 <span style="color:#929292">{{ project.org_name }}</span>
             </div>
