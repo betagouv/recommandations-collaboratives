@@ -21,7 +21,7 @@
       <svg class="bi me-2" width="28" height="28">
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
       </svg>
-      Connexion à UrbanVitaliz
+      Connexion à {{ site.name }}
     </h1>
   </div>
   <form class="login fr-form-group" method="POST" action="{% url 'account_login' %}">
