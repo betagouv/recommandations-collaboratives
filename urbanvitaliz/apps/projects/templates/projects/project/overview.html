@@ -56,7 +56,7 @@
     <div class="col-8">
         {% if can_administrate %}
             {% if project.synopsis %}
-                {% include 'projects/project/fragments/information_card.html' with full_width=True project=project is_editable=True title="Reformulation du besoin" description=project.synopsis updated_on=project.synopsis_on card_user=project.synopsis_by org_name=project.synopsis_by.profile.organization.name %}
+                {% include 'projects/project/fragments/information_card_urbanvitaliz.html' with full_width=True project=project is_editable=True title="Reformulation du besoin" description=project.synopsis updated_on=project.synopsis_on card_user=project.synopsis_by org_name=project.synopsis_by.profile.organization.name %}
             {% else %}
                 <div class="project-card-details me-4 py-4 d-flex flex-column align-items-center justify-content-center">
                     <span style="color:#929292; font-size: 14px;" class="text-uppercase">Aucune reformulation n'a été faite pour le moment</span>
@@ -67,11 +67,11 @@
             {% endif %}
             <div class="mt-4">
                 <div class="d-flex w-full flex-wrap">
-                    {% include 'projects/project/fragments/information_card.html' with project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
+                    {% include 'projects/project/fragments/information_card_urbanvitaliz.html' with project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
                     {% if onboarding_response %}
-                        {% include 'projects/project/fragments/information_card.html' with project=project title=title description=content updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
+                        {% include 'projects/project/fragments/information_card_urbanvitaliz.html' with project=project onboarding_information=True updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
                     {% elif project.impediments %}
-                        {% include 'projects/project/fragments/information_card.html' with project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
+                        {% include 'projects/project/fragments/information_card_urbanvitaliz.html' with project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
                     {% endif %}
                 </div>
             </div>
@@ -87,7 +87,7 @@
                 {% if project.owner.first_name %}
                 <span class="me-2 d-flex align-items-center">
                     <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                    <strong class="text-nowrap">
+                    <strong class="text-nowrap text-capitalize">
                         {{ project.owner.first_name }}
                         {{ project.owner.last_name }}
                     </strong>
@@ -95,7 +95,7 @@
                 {% else %}
                 <span class="me-2 d-flex align-items-center">
                     <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                    <strong>
+                    <strong class="text-capitalize">
                         {{ project.first_name }}
                         {{ project.last_name }}
                     </strong>
@@ -134,12 +134,12 @@
                             <span class="me-2 d-flex align-items-center">
                                 <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
                                 {% if project.owner %}
-                                <strong class="text-nowrap">
+                                <strong class="text-nowrap text-capitalize">
                                     {{ project.owner.first_name }}
                                     {{ project.owner.last_name }}
                                 </strong>
                                 {% elif project.first_name %}
-                                <strong class="text-nowrap">
+                                <strong class="text-nowrap text-capitalize">
                                     {{ project.first_name }}
                                     {{ project.last_name }}
                                 </strong>
@@ -152,7 +152,7 @@
                             {% if member.first_name %}
                             <span class="me-2 d-flex align-items-center">
                                 <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                                <strong class="text-nowrap">
+                                <strong class="text-nowrap text-capitalize">
                                     {{ member.first_name }}
                                     {{ member.last_name }}
                                 </strong>
