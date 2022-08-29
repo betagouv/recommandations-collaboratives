@@ -98,8 +98,16 @@
                         {{ project.owner.last_name }}
                     </strong>
                 </span>
+                {% else %}
+                <span class="me-2 d-flex align-items-center">
+                    <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
+                    <strong>
+                        {{ project.first_name }}
+                        {{ project.last_name }}
+                    </strong>
+                </span>
                 {% endif %}
-                <span style="color: #666666; font-style: italic; font-weight: 300;">{{project.owner.profile.organization.name}}</span>
+                <span style="color: #666666; font-style: italic; font-weight: 300;">{% if project.owner.profile.organization.name %}{{project.owner.profile.organization.name}} {% else %} {{ project.org_name }}{% endif %}</span>
             </div>
             <a class="d-flex align-items-center mb-1" style="font-size: 14px; color: #0063CB; text-decoration: none;"
                 href="mailto:({project.owner.email})">
@@ -108,12 +116,16 @@
                 </svg>&nbsp;
                 {{ project.owner.email }}
             </a>
-            {% if project.owner.profile.phone_no %}
+            {% if project.owner.profile.phone_no or project.phone %}
             <span style="font-size: 14px; color: #0063CB;" class="d-flex align-items-center">
                 <svg class="bi align-middle" width="15" height="15" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone" />
                 </svg>&nbsp;
-                {{project.owner.profile.phone_no}}</span>
+                {% if project.owner.profile.phone_no %}
+                    {{project.owner.profile.phone_no}}</span>   
+                {% else %}
+                    {{project.phone}}</span>   
+                {% endif %}
             {% endif %}
             {% endif %}
         </div>
@@ -121,21 +133,43 @@
             <span style="font-size: 16px; color:#666666;font-weight: 300;" class="d-block mb-3">Participants</span>
             <a class="button" href="{% url 'projects-access-update' project.id %}">Inviter un
                 participant</a>
-            <ul class="d-flex flex-column list-unstyled mt-3">
+            <ul class="d-flex flex-column list-unstyled mt-4">
                 {% for member in project.members.all %}
-                <li class="d-flex align-items-center mb-2">
-                    {% if member.first_name %}
-                    <span class="me-2 d-flex align-items-center">
-                        <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                        {{ member.first_name }}
-                        {{ member.last_name }}
-                    </span>
+                    {% if forloop.counter0 == 0 %}
+                        <li class="d-flex align-items-center mb-2">
+                            <span class="me-2 d-flex align-items-center">
+                                <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
+                                {% if project.first_name %}
+                                <strong>
+                                    {{ project.first_name }}
+                                    {{ project.last_name }}
+                                </strong>
+                                {% elif project.owner %}
+                                <strong>
+                                    {{ project.owner.first_name }}
+                                    {{ project.owner.last_name }}
+                                </strong>
+                                {% endif %}
+                            </span>
+                            <span style="color: #666666; font-style: italic; font-weight: 300;">{{project.org_name}}</span>
+                        </li>
                     {% else %}
-                    <span class="me-2">{{member}}</span>
+                        <li class="d-flex align-items-center mb-2">
+                            {% if member.first_name %}
+                            <span class="me-2 d-flex align-items-center">
+                                <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
+                                <strong>
+                                    {{ member.first_name }}
+                                    {{ member.last_name }}
+                                </strong>
+                            </span>
+                            {% else %}
+                            <span class="me-2"><strong>{{member}}</strong></span>
+                            {% endif %}
+                            <span style="color: #666666; font-style: italic; font-weight: 300;">{{member.profile.organization.name}}</span>
+                        </li>
                     {% endif %}
-                    <span style="color: #666666; font-style: italic; font-weight: 300;">{{member.profile.organization.name}}</span>
-                    {% endfor %}
-                </li>
+                {% endfor %}
             </ul>
         </div>
     </div>
