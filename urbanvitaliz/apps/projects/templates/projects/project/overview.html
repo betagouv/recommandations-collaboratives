@@ -4,7 +4,6 @@
 {% load static %}
 {% load gravatar %}
 
-
 {% block title %}
 {{ block.super }} > Connaissance
 {% endblock %}
@@ -56,122 +55,30 @@
 <div class="row">
     <div class="col-8">
         {% if project.synopsis %}
-            <div class="pe-4">
-                <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Reformulation du besoin </h6>
-                <div class="project-card-details p-3">
-                    <article>
-                        {{project.synopsis}}
-                    </article>
-                    <footer class="d-flex mt-4 justify-content-between items-center">
-                        <div class="d-flex align-items-center">
-                            <span class="me-2 d-flex align-items-center">
-                                <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                                <strong>
-                                    {{project.synopsis_by.first_name}}
-                                    {{project.synopsis_by.last_name}}
-                                </strong>
-                            </span>
-                            <span style="color:#929292">{{project.org_name}}</span>
-                        </div>
-                        {% if can_administrate %}
-                        <a  href="{% url "projects-project-synopsis" project.id %}">éditer</a>
-                        {% endif %}
-                        <div>
-                            <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px; text-align: right;"
-                                class="font-italic d-flex">{{project.synopsis_on}}</span>
-                        </div>
-                    </footer>
-            </div>
-        </div>
+            {% include 'projects/project/fragments/information_card.html' with full_width=True project=project is_editable=True title="Reformulation du besoin" description=project.synopsis updated_on=project.synopsis_on card_user=project.synopsis_by %}
         {% else %}
-            <div class="project-card-details py-4 d-flex flex-column align-items-center justify-content-center">
+            <div class="project-card-details me-4 py-4 d-flex flex-column align-items-center justify-content-center">
                 <span style="color:#929292; font-size: 14px;" class="text-uppercase">Aucune reformulation n'a été faite pour le moment</span>
                 {% if can_administrate %}
                     <a class="button mt-3" href="{% url "projects-project-synopsis" project.id %}">Reformuler le besoin de la collectivité</a>
                 {% endif %}
             </div>
-        {%endif %}
-        <div class="mt-4 pt-4">
-            <div class="d-flex w-full">
-                <div class="pe-4 w-50">
-                    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Contexte</h6>
-                    <div class="project-card-details p-3">
-                        <article>
-                            {{ project.description }}
-                        </article>
-                        <footer class="d-flex flex-column mt-4 justify-content-between items-center">
-                            <div class="d-flex align-items-center justify-content-start">
-                                <span class="me-2 d-flex align-items-center justify-content-center">
-                                    <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                                    <strong>
-                                        {{ project.first_name }}
-                                        {{ project.last_name }}
-                                    </strong>
-                                </span>
-                                <span style="color:#929292">{{project.org_name}}</span>
-                            </div>
-                            <div class="ms-4 ps-2">
-                                <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px;"
-                                    class="font-italic d-flex">{{project.updated_on}}</span>
-                            </div>
-                        </footer>
-                    </div>
-                </div>
-        
+        {% endif %}
+        <div class="mt-4">
+            <div class="d-flex w-full flex-wrap">
+                {% include 'projects/project/fragments/information_card.html' with project=project title="Contexte" description=project.description updated_on=project.updated_on card_user=project.owner %}
                 {% if onboarding_response %}
                     {% for title, content in onboarding_response.items %}
                     {% if content %}
-                    <div class="pe-4 w-50">
-                        <h6 style="font-size: 14px;" class="text-uppercase fw-bold">{{ title }}</h6>
-                        <div class="project-card-details p-3">
-                            <article>
-                                {{ content }}
-                            </article>
-                            <footer class="d-flex flex-column mt-4 justify-content-between items-center">
-                                <div class="d-flex align-items-center justify-content-start">
-                                    <span class="me-2 d-flex align-items-center justify-content-center">
-                                        <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                                        <strong>
-                                            {{project.first_name}}
-                                            {{project.last_name}}
-                                        </strong>
-                                    </span>
-                                    <span style="color:#929292">{{project.org_name}}</span>
-                                </div>
-                                <div class="ms-4 ps-2">
-                                    <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px;"
-                                        class="font-italic d-flex">{{project.updated_on}}</span>
-                                </div>
-                            </footer>
-                        </div>
-                    </div>
+                        {% if title != "Checkbox Group" %}
+                            {% include 'projects/project/fragments/information_card.html' with project=project title=title description=content updated_on=project.updated_on card_user=project.owner %}
+                        {% else %}
+                             {% include 'projects/project/fragments/information_card.html' with checkbox=True project=project title=title description=content updated_on=project.updated_on card_user=project.owner %}    
+                        {% endif %}
                     {% endif %}
                     {% endfor %}
                 {% elif project.impediments %}
-                <div class="pe-4 w-50">
-                    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Difficultés rencontrées</h6>
-                    <div class="project-card-details p-3">
-                        <article>
-                            {{project.impediments}}
-                        </article>
-                        <footer class="d-flex mt-4 justify-content-between items-center">
-                            <div class="d-flex align-items-center">
-                                <span class="me-2 d-flex align-items-center justify-content-center">
-                                    <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                                    <strong>
-                                        {{project.first_name}}
-                                        {{project.last_name}}
-                                    </strong>
-                                </span>
-                                <span style="color:#929292">{{project.org_name}}</span>
-                            </div>
-                            <div>
-                                <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px;text-align: right;"
-                                    class="font-italic d-flex">{{project.updated_on}}</span>
-                            </div>
-                        </footer>
-                    </div>
-                </div>
+                    {% include 'projects/project/fragments/information_card.html' with project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.updated_on card_user=project.owner %}
                 {% endif %}
             </div>
         </div>
