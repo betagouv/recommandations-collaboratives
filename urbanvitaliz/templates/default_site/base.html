@@ -38,9 +38,9 @@
         <meta name="description" content="{% block description %}Aiguiller les collectivités dans leurs projets de réhabilitation de friches et autres fonciers à l’abandon - un service gratuit du Cerema{% endblock %}">
         <meta name="robots" content="index, archive" />
 
-        <meta property="og:title" content="UrbanVitaliz{% block og_title %}, réhabilitez vos friches plus sereinement{% endblock %}" />
+        <meta property="og:title" content="{{ site.name }}{% block og_title %}, réhabilitez vos friches plus sereinement{% endblock %}" />
         <meta property="og:locale" content="fr" />
-        <meta property="og:site_name" content="UrbanVitaliz" />
+        <meta property="og:site_name" content="{{ site.name }}" />
         <meta property="og:description" content="{% block og_description %}Aiguiller les collectivités dans leurs projets de réhabilitation de friches et autres fonciers à l’abandon - un service gratuit du Cerema{% endblock %}" />
 
 
@@ -67,9 +67,9 @@
     </head>
     <body class="bg-light">
 
-        <h1 class="visually-hidden">UrbanVitaliz</h1>
+        <h1 class="visually-hidden">{{ site.name }}</h1>
 
-        {% include "./header/menu-top.html" %}
+        {% include "header/menu-top.html" %}
 
         <main style="padding-top: 150px;">
             {% if messages %}
