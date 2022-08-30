@@ -1,0 +1,63 @@
+{% load gravatar %}
+
+<div class="pe-4 pt-4 {% if full_width %}w-100{% else %}w-50{% endif %}">
+    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">
+        {% if onboarding_information %}
+            {% if title %} {{title}} {% else %} Compléments {% endif %}
+        {% else %}
+            {{ title }}
+        {% endif %}
+    </h6>
+    <div class="project-card-details p-4">
+        <article>
+            {% if onboarding_information %}
+                {% for title, content in onboarding_response.items %}
+                    {% if content %}
+                        {% if title == "Checkbox Group" %}
+                            <div class="d-flex flex-column">
+                                <span class="fw-bolder mb-2">Cartofriche ✅</span>
+                                <p>Ce projet peut être versé sur cartofriche</p>
+                            </div>
+                        {% else %}
+                            <div class="d-flex flex-column">
+                                <span class="fw-bolder mb-2">{% if title == "None" %}Pourquoi nous sollicitez-vous ?{% else %} {{ title }} {% endif %}</span>
+                                <p>{{ content }}</p>
+                            </div>
+                        {% endif %}
+                        {% if forloop.counter != onboarding_response.items|length %}
+                            <hr/>
+                        {% endif %}
+                    {% endif %}
+                {% endfor%}
+            {% else %}
+                {{ description }}
+            {% endif %}
+        </article>
+        <footer class="d-flex mt-4 justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %} overflow-hidden">
+            <div class="d-flex align-items-center">
+                <span class="me-2 d-flex align-items-center">
+                    <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}"
+                        alt="{{action.actor}}">
+                    {% if card_user.first_name %}
+                    <strong class="text-nowrap text-capitalize">
+                        {{ card_user.first_name }}
+                        {{ card_user.last_name }}
+                    </strong>
+                    {% else %}
+                    <strong class="text-nowrap text-capitalize">
+                        {{ project.first_name }}
+                        {{ project.last_name }}
+                    </strong>
+                    {% endif %}
+                </span>
+            </div>
+            {% if can_administrate and is_editable %}
+            <a href="{% url "projects-project-synopsis" project.id %}">éditer</a>
+            {% endif %}
+            <div class="mt-2">
+                <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px; text-align: right;"
+                    class="font-italic d-flex">{{ updated_on }}</span>
+            </div>
+        </footer>
+    </div>
+</div>
