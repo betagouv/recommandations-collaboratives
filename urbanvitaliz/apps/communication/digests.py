@@ -13,6 +13,7 @@ from itertools import groupby
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils import timezone
 from multimethod import multimethod
@@ -27,7 +28,7 @@ from .api import send_email
 ########################################################################
 
 
-def send_digests_for_task_reminders_by_user(user):
+def send_digests_for_task_reminders_by_user(user, dry_run=False):
     """
     Send a digest email per project with expired reminders
     """
@@ -35,36 +36,40 @@ def send_digests_for_task_reminders_by_user(user):
 
     now = timezone.now()
 
+    # Filter out reminders attached to non current site tasks
+    current_site = Site.objects.get_current()
+
     # Fetch all Task Reminders
     reminders = reminders_models.Reminder.to_send.filter(
         recipient=user.email, deadline__lte=now
-    ).filter(content_type=task_ct)
+    ).filter(content_type=task_ct, tasks__site=current_site)
 
     if reminders.count() == 0:
         return 0
 
-    skipped_reminders = send_reminder_digest_by_project_task(user, reminders)
+    skipped_reminders = send_reminder_digest_by_project_task(user, reminders, dry_run)
 
-    # Rearm for the next alarm, in 6 weeks
-    for reminder in reminders.exclude(object_id__in=skipped_reminders):
-        reminders_models.Reminder.objects.create(
-            recipient=reminder.recipient,
-            deadline=now + timedelta(weeks=6),
-            origin=reminders_models.Reminder.SYSTEM,
-            content_type=reminder.content_type,
-            object_id=reminder.object_id,
-        )
+    if not dry_run:
+        # Rearm for the next alarm, in 6 weeks
+        for reminder in reminders.exclude(object_id__in=skipped_reminders):
+            reminders_models.Reminder.objects.create(
+                recipient=reminder.recipient,
+                deadline=now + timedelta(weeks=6),
+                origin=reminders_models.Reminder.SYSTEM,
+                content_type=reminder.content_type,
+                object_id=reminder.object_id,
+            )
 
-    # Mark as dispatched
-    reminders.exclude(object_id__in=skipped_reminders).update(sent_on=now)
+        # Mark as dispatched
+        reminders.exclude(object_id__in=skipped_reminders).update(sent_on=now)
 
-    # Delete the bogus ones
-    reminders.filter(object_id__in=skipped_reminders).delete()
+        # Delete the bogus ones
+        reminders.filter(object_id__in=skipped_reminders).delete()
 
     return reminders.exclude(object_id__in=skipped_reminders).count()
 
 
-def send_reminder_digest_by_project_task(user, reminders):
+def send_reminder_digest_by_project_task(user, reminders, dry_run):
     """Send an email per project/user containing its reminders."""
 
     skipped_reminders = []
@@ -72,7 +77,7 @@ def send_reminder_digest_by_project_task(user, reminders):
         reminders, key=lambda x: x.related.project_id
     ):
         try:
-            project = projects_models.Project.on_site.get(pk=project_id)
+            project = projects_models.Project.objects.get(pk=project_id)
         except projects_models.Project.DoesNotExist:
             for reminder in project_reminders:
                 print(f"[W] Skipping reminder {reminder}")
@@ -80,12 +85,15 @@ def send_reminder_digest_by_project_task(user, reminders):
             continue
 
         digest = make_digest_of_reminders(project, reminders, user)
-
-        send_email(
-            "project_reminders_digest",
-            {"name": normalize_user_name(user), "email": user.email},
-            params=digest,
-        )
+        if digest:
+            if dry_run:
+                print(f"[ID] Would have sent {len(digest)} digests to {user}.")
+            else:
+                send_email(
+                    "project_reminders_digest",
+                    {"name": normalize_user_name(user), "email": user.email},
+                    params=digest,
+                )
 
     return skipped_reminders
 
@@ -93,6 +101,9 @@ def send_reminder_digest_by_project_task(user, reminders):
 def make_digest_of_reminders(project, reminders, user):
     """Return digest for reminders of a project to be sent to user"""
     task_digest = make_reminders_task_digest(reminders, user)
+    if len(task_digest) == 0:
+        return None
+
     project_digest = make_project_digest(project, user, url_name="actions")
     return {
         "notification_count": len(reminders),
@@ -117,7 +128,7 @@ def make_reminders_task_digest(reminders, user):
 ########################################################################
 
 
-def send_digests_for_new_recommendations_by_user(user):
+def send_digests_for_new_recommendations_by_user(user, dry_run):
     """
     Send a digest email per project with all its new recommendations for given user.
     """
@@ -133,16 +144,18 @@ def send_digests_for_new_recommendations_by_user(user):
     if notifications.count() == 0:
         return 0
 
-    skipped_projects = send_recommendation_digest_by_project(user, notifications)
+    skipped_projects = send_recommendation_digest_by_project(
+        user, notifications, dry_run
+    )
 
-    # Mark them as dispatched
-    # NOTE it would mean more db request but could be more lean in inner function
-    notifications.exclude(target_object_id__in=skipped_projects).mark_as_sent()
+    if not dry_run:
+        # Mark them as dispatched
+        notifications.exclude(target_object_id__in=skipped_projects).mark_as_sent()
 
     return notifications.exclude(target_object_id__in=skipped_projects).count()
 
 
-def send_recommendation_digest_by_project(user, notifications):
+def send_recommendation_digest_by_project(user, notifications, dry_run):
     """Send an email per project containing its notifications."""
 
     skipped_projects = []
@@ -150,7 +163,7 @@ def send_recommendation_digest_by_project(user, notifications):
         notifications, key=lambda x: x.target_object_id
     ):
         try:
-            project = projects_models.Project.on_site.get(pk=project_id)
+            project = projects_models.Project.objects.get(pk=project_id)
         except projects_models.Project.DoesNotExist:
             # Probably a deleted project?
             continue
@@ -159,11 +172,14 @@ def send_recommendation_digest_by_project(user, notifications):
             project, project_notifications, user
         )
 
-        send_email(
-            "new_recommendations_digest",
-            {"name": normalize_user_name(user), "email": user.email},
-            params=digest,
-        )
+        if not dry_run:
+            send_email(
+                "new_recommendations_digest",
+                {"name": normalize_user_name(user), "email": user.email},
+                params=digest,
+            )
+        else:
+            print(f"[DI] Would have sent {len(digest)} notifications for {user}.")
 
     return skipped_projects
 
@@ -244,7 +260,7 @@ def make_action_digest(action, user):
 ########################################################################
 
 
-def send_digests_for_new_sites_by_user(user):
+def send_digests_for_new_sites_by_user(user, dry_run=False):
     project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
     notifications = (
@@ -257,26 +273,29 @@ def send_digests_for_new_sites_by_user(user):
     if notifications.count() == 0:
         return 0
 
-    send_new_site_digest_by_user(user, notifications)
+    send_new_site_digest_by_user(user, notifications, dry_run=dry_run)
 
-    # Mark them as dispatched
-    # NOTE it would mean more db request but could be more lean in inner function
-    notifications.mark_as_sent()
+    if not dry_run:
+        # Mark them as dispatched
+        notifications.mark_as_sent()
 
     return notifications.count()
 
 
-def send_new_site_digest_by_user(user, notifications):
+def send_new_site_digest_by_user(user, notifications, dry_run):
     """Send digest of new site by user"""
 
     for notification in notifications:
         digest = make_digest_for_new_site(notification, user)
         if digest:
-            send_email(
-                "new_site_for_switchtender",
-                {"name": normalize_user_name(user), "email": user.email},
-                params=digest,
-            )
+            if dry_run:
+                print(f"[DI] Would have sent {len(digest)} notifications for {user}.")
+            else:
+                send_email(
+                    "new_site_for_switchtender",
+                    {"name": normalize_user_name(user), "email": user.email},
+                    params=digest,
+                )
 
 
 def make_digest_for_new_site(notification, user):
@@ -313,7 +332,7 @@ def make_digest_for_new_site(notification, user):
 ########################################################################
 
 
-def send_digest_for_non_switchtender_by_user(user):
+def send_digest_for_non_switchtender_by_user(user, dry_run=False):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
@@ -330,7 +349,7 @@ def send_digest_for_non_switchtender_by_user(user):
     )
 
 
-def send_digest_for_switchtender_by_user(user):
+def send_digest_for_switchtender_by_user(user, dry_run=False):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
@@ -351,10 +370,13 @@ def send_digest_for_switchtender_by_user(user):
         template_name="digest_for_switchtender",
         queryset=queryset,
         extra_context=context,
+        dry_run=dry_run,
     )
 
 
-def send_digest_by_user(user, template_name, queryset=None, extra_context=None):
+def send_digest_by_user(
+    user, template_name, queryset=None, extra_context=None, dry_run=False
+):
     """
     Should be run at the end, to collect remaining notifications
     """
@@ -379,15 +401,18 @@ def send_digest_by_user(user, template_name, queryset=None, extra_context=None):
         digest.update(extra_context)
 
     if len(digest) > 0:
-        send_email(
-            template_name,
-            {"name": normalize_user_name(user), "email": user.email},
-            params=digest,
-        )
+        if not dry_run:
+            send_email(
+                template_name,
+                {"name": normalize_user_name(user), "email": user.email},
+                params=digest,
+            )
+        else:
+            print(f"[ID] Would have sent {len(digest)} notifications to {user}.")
 
-    # Mark them as dispatched
-    # NOTE it would mean more db request but could be more lean in inner function
-    notifications.mark_as_sent()
+    if not dry_run:
+        # Mark them as dispatched
+        notifications.mark_as_sent()
 
     return notifications.count()
 
@@ -412,7 +437,7 @@ def make_project_notifications_digest(project_id, notifications, user):
     """Return digest for given project notification"""
     # Ignore deleted projects
     try:
-        project = projects_models.Project.on_site.get(pk=project_id)
+        project = projects_models.Project.objects.get(pk=project_id)
     except projects_models.Project.DoesNotExist:
         return None
 

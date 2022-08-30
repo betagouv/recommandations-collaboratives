@@ -145,8 +145,12 @@ class ContactForm(forms.Form):
 
 
 class UserPasswordFirstTimeSetupForm(forms.Form):
-    password1 = forms.CharField(widget=forms.PasswordInput(attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}))
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}))
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "fr-input fr-mt-2v fr-mb-4v"})
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "fr-input fr-mt-2v fr-mb-4v"})
+    )
     next = forms.CharField(widget=forms.HiddenInput())
 
     def clean(self):
