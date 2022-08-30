@@ -56,7 +56,7 @@
             <span class="ms-2">Conversation</span>
         </a>
     </li>
-    
+    {% if active_project_can_administrate %}
     <li>
         <a class="{% if internal_followup %} active {% endif %} {% if not active_project_can_administrate %} disabled {% endif %}align-items-center" href="{% url 'projects-project-detail-internal-followup' project.pk %}">
             {% if not active_project_can_administrate %}
@@ -67,5 +67,5 @@
             <span class="text-nowrap">Suivi interne</span>
         </a>
     </li>
-    
+    {% endif %}
 </ul>
