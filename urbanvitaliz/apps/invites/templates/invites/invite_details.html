@@ -29,7 +29,7 @@
     <div class="row">
         <div class="col-7">
             {% if not existing_account %}
-            <h5>Créez votre compte UrbanVitaliz</h5>
+            <h5>Créez votre compte {{ site.name }}</h5>
             {% endif %}
             <form class="form mt-4" action="{% url 'invites-invite-accept' invite.pk %}" method="POST">
                 {% csrf_token %}
@@ -64,7 +64,7 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="my-2">
-                            <label class="form-label" for="input-organization">Orgniztaion</label>
+                            <label class="form-label" for="input-organization">Organisation</label>
                             <input type="text" class="form-control {% if form.organization.errors %}is-invalid{% endif %}" id="input-organization" name="{{ form.organization.name }}" placeholder="DEFR59" value="{{ form.organization.value|default:'' }}" required>
 
                             {% for error in form.organization.errors %}

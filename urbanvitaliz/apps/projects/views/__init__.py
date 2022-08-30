@@ -23,35 +23,25 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
+from notifications import models as notifications_models
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
-from urbanvitaliz.utils import (
-    build_absolute_url,
-    check_if_switchtender,
-    get_site_config_or_503,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
+                                get_site_config_or_503, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    can_manage_project,
-    format_switchtender_identity,
-    generate_ro_key,
-    get_active_project,
-    get_switchtenders_for_project,
-    is_project_moderator,
-    is_project_moderator_or_403,
-    is_regional_actor_for_project_or_403,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_project, format_switchtender_identity,
+                     generate_ro_key, get_active_project,
+                     get_switchtenders_for_project, is_project_moderator,
+                     is_project_moderator_or_403,
+                     is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -264,8 +254,6 @@ def project_list(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
-    # Add exception for non permanent switchtenders
-
     project_moderator = is_project_moderator(request.user)
 
     draft_projects = []
@@ -277,6 +265,11 @@ def project_list(request):
             .filter(status="DRAFT")
             .order_by("-created_on")
         )
+
+    unread_notifications = notifications_models.Notification.on_site.unread().filter(
+        recipient=request.user
+    )
+
     return render(request, "projects/project/list.html", locals())
 
 

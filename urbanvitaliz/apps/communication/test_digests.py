@@ -52,7 +52,9 @@ def test_send_digests_for_new_reco(client, request):
         user=switchtender,
     )
 
-    digests.send_digests_for_new_recommendations_by_user(membership.member)
+    digests.send_digests_for_new_recommendations_by_user(
+        membership.member, dry_run=False
+    )
 
     assert membership.member.notifications.unsent().count() == 0
 
@@ -62,7 +64,9 @@ def test_send_digests_for_new_reco_empty(client):
 
     baker.make(projects_models.Project, status="DONE", projectmember_set=[membership])
 
-    digests.send_digests_for_new_recommendations_by_user(membership.member)
+    digests.send_digests_for_new_recommendations_by_user(
+        membership.member, dry_run=False
+    )
 
     assert membership.member.notifications.unsent().count() == 0
 

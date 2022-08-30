@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "sass_processor",
     "django_vite",
     "markdownx",
+    "dbtemplates",
     "tagging",
     "leaflet",
     "django_gravatar",
@@ -99,8 +100,8 @@ ROOT_URLCONF = "urbanvitaliz.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
+        "DIRS": [BASE_DIR / "templates", BASE_DIR / ".." / "multisites" / "templates"],
+        "APP_DIRS": False,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -111,10 +112,16 @@ TEMPLATES = [
                 "urbanvitaliz.apps.projects.context_processors.is_switchtender_processor",
                 "urbanvitaliz.apps.projects.context_processors.active_project_processor",
             ],
+            "loaders": [
+                "dbtemplates.loader.Loader",
+                "multisite.template.loaders.filesystem.Loader",
+                "django.template.loaders.app_directories.Loader",
+            ],
         },
     },
 ]
 
+MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
 
 WSGI_APPLICATION = "urbanvitaliz.wsgi.application"
 
@@ -164,7 +171,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "..", "static")
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "static", BASE_DIR / ".." / "multisites" / "static"]
 
 
 STATICFILES_FINDERS = [
