@@ -82,27 +82,7 @@
         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Informations générales</h6>
         <div class="d-flex flex-column">
             <span style="font-size: 14px; color:#666666; font-weight: 300;" class="d-block mb-2">Référent collectivité</span>
-            <div class="d-flex flex-column align-items-start mb-2">
-                {% if project.owner %}
-                {% if project.owner.first_name %}
-                <span class="me-2 d-flex align-items-center">
-                    <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                    <strong class="text-nowrap text-capitalize">
-                        {{ project.owner.first_name }}
-                        {{ project.owner.last_name }}
-                    </strong>
-                </span>
-                {% else %}
-                <span class="me-2 d-flex align-items-center">
-                    <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                    <strong class="text-capitalize">
-                        {{ project.first_name }}
-                        {{ project.last_name }}
-                    </strong>
-                </span>
-                {% endif %}
-                <span style="color: #666666; font-style: italic; font-weight: 300;">{% if project.owner.profile.organization.name %} {{project.owner.profile.organization.name}} {% else %} {{project.org_name }}{% endif %}</span>
-            </div>
+            {% include 'projects/project/fragments/user.html' with project=project %}
             <a class="d-flex align-items-center mb-1" style="font-size: 14px; color: #0063CB; text-decoration: none;"
                 href="mailto:({project.owner.email})">
                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
@@ -121,46 +101,25 @@
                     {{project.phone}}</span>   
                 {% endif %}
             {% endif %}
-            {% endif %}
         </div>
         <div class="my-4">
             <span style="font-size: 14px; color:#666666;font-weight: 300;" class="d-block mb-3">Participants</span>
             <a class="button" href="{% url 'projects-access-update' project.id %}">Inviter un
                 participant</a>
             <ul class="d-flex flex-column list-unstyled mt-4">
+                {% for switchtender in project.switchtenders.all %}
+                        <li>
+                            {% include 'projects/project/fragments/user.html' with member=switchtender project=project %}
+                        </li>
+                {% endfor %}
                 {% for member in project.members.all %}
                     {% if forloop.counter0 == 0 %}
-                        <li class="d-flex flex-column align-items-start mb-2">
-                            <span class="me-2 d-flex align-items-center">
-                                <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                                {% if project.owner %}
-                                <strong class="text-nowrap text-capitalize">
-                                    {{ project.owner.first_name }}
-                                    {{ project.owner.last_name }}
-                                </strong>
-                                {% elif project.first_name %}
-                                <strong class="text-nowrap text-capitalize">
-                                    {{ project.first_name }}
-                                    {{ project.last_name }}
-                                </strong>
-                                {% endif %}
-                            </span>
-                            <span style="color: #666666; font-style: italic; font-weight: 300;">{% if project.owner.profile.organization.name %} {{project.owner.profile.organization.name}}{% else %}{{project.org_name}}{% endif %}</span>
+                        <li>
+                            {% include 'projects/project/fragments/user.html' with member=False project=project %}
                         </li>
                     {% else %}
-                        <li class="d-flex flex-column align-items-start mb-2">
-                            {% if member.first_name %}
-                            <span class="me-2 d-flex align-items-center">
-                                <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                                <strong class="text-nowrap text-capitalize">
-                                    {{ member.first_name }}
-                                    {{ member.last_name }}
-                                </strong>
-                            </span>
-                            {% else %}
-                            <span class="me-2"><strong>{{member}}</strong></span>
-                            {% endif %}
-                            <span style="color: #666666; font-style: italic; font-weight: 300;">{{member.profile.organization.name}}</span>
+                        <li>
+                            {% include 'projects/project/fragments/user.html' with member=member project=project %}
                         </li>
                     {% endif %}
                 {% endfor %}
