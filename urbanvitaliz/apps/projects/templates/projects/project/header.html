@@ -10,7 +10,9 @@
             {% endif %}
         </div>
     </div>
+    {% if can_administrate %}
     <div class="flex-shrink-0 ps-2">
         <a class="button" href="{% url 'projects-access-update' project.id %}">Partager le détail du projet</a>
     </div>
+    {% endif %}
 </div>
