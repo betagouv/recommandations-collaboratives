@@ -69,9 +69,7 @@
                     -
                     {% endif %}
 
-                    {% notifications_unread as unread_count %}
-                
-                    {% if unread_count %}
+                    {% if unread_notifications.count %}
                     <div class="d-inline">
                         <svg class="align-middle text-danger bi" width="16px" height="16px" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-fill" />
@@ -181,7 +179,7 @@
         </div>
     </div>
 
-    {% if unread_count %}
+    {% if unread_notifications.count %}
     <div class="col-12 bg-light p-2 border-top">
         <h4>
             <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
@@ -192,7 +190,7 @@
             </span>
         </h4>
         <ul class="w-100 list-unstyled">
-            {% for notification in request.user.notifications.unread.all %}
+            {% for notification in unread_notifications.all %}
             <li class="d-flex flex-columns my-3">
                 {% if notification.actor %}
                 <div class="align-middle mx-2 flex-shrink">

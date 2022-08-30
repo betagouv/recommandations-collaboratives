@@ -1,7 +1,7 @@
 .project-navigation {
     border-bottom: 1px solid #E5E5E5;
     list-style: none;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
 }
 
 .project-navigation a {
@@ -42,5 +42,6 @@
     pointer-events: none;
 
     color: #929292;
+    border-top: solid 1px #EEEEEE;
     border-bottom: solid 1px #EEEEEE;
 }

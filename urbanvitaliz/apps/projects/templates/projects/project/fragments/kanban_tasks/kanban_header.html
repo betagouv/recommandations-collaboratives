@@ -11,10 +11,6 @@
 	<h2 class="text-secondary text-uppercase fw-bolder mb-0" style="font-size: 12px;">
 		Recommandations proposées à la collectivité
 	</h2>
-	{% else %}
-	<h2 class="mt-1 mb-0 text-secondary text-uppercase fw-bolder" style="font-size: 12px;">
-		Mes recommandations en cours
-	</h2>
 	{% endif %}
 
 	<div class="d-flex align-items-center">
@@ -44,7 +40,7 @@
 		</div>
 	</div>
 </div>
-{% if not is_switchtender and not project.tasks.all.count == 0 %}
+{% if can_administrate %}
 <div class="mb-4 mx-2 d-flex flex-column">
 	<a href="{% url 'projects-project-tasks-suggest' project.pk %}">
 		Examiner les recommandations suggérées automatiquement pour ce projet

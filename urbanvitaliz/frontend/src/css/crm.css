@@ -117,7 +117,7 @@ main {
 
 .crm-sticky {
     position: sticky;
-    top: 190px;
+    top: 160px;
 }
 
 .crm-sticky.no-project {
@@ -137,7 +137,7 @@ main {
 
 .crm-header {
     position: sticky;
-    top: 180px;
+    top: 150px;
     background-color: white;
     border-bottom: 1px solid #e1e1e1;
 

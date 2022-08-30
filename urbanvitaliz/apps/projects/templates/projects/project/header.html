@@ -1,3 +1,4 @@
+{% load static %}
 
 <div class="col-12 d-flex justify-content-between align-items-start">
     <div class=" d-flex flex-column mb-4">
@@ -10,7 +11,14 @@
             {% endif %}
         </div>
     </div>
-    <div>
-        <a class="button" href="{% url 'projects-access-update' project.id %}">Partager le détail du projet</a>
+    <div class="flex-shrink-0 ps-2">
+        <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex align-items-center" href="{% url 'projects-access-update' project.id %}">
+            {% if project.status == 'DRAFT' %}
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
+                </svg>&nbsp;
+            {% endif %}
+                <span>Partager le détail du projet</span>
+        </a>
     </div>
 </div>
