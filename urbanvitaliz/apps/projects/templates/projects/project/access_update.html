@@ -66,7 +66,7 @@
                             <span class="text-secondary small">{{ switchtender.email }}</span>
                         </div>
                         <div>
-                            <div class="fst-italic my-1">Conseiller local</div>
+                            <div class="fst-italic my-1">Conseiller</div>
                         </div>
                     </li>
                     {% endfor %}
@@ -103,7 +103,7 @@
             <p class="mb-4">
                 Profil collectivité : similaire aux droits du demandeur initial, pour travailler à plusieurs au sein de la collectivité par exemple.
                 <br />
-                Profil conseiller : personne invité à conseiller le projet aux côté des conseillers déjà présents
+                Profil conseiller : personne invitée à conseiller le projet aux côtés des conseillers déjà présents
             </p>
             <form class="form" id="form-projects-access-add-user" action="." method="post">
                 <div class="mb-3">
@@ -116,8 +116,8 @@
 
                     <div class="position-relative bg-white border rounded p-3 mb-2">
                         <input name="{{ form.role.html_name }}" type="radio" id="role-switchtender" value="SWITCHTENDER" style="transform: scale(1.2);">
-                        <label for="role-switchtender" class="position-absolute w-100 h-100 top-0 left-0"><span class="visually-hidden">Conseiller Local</span></label>
-                        <span class="ms-1">Conseiller Local</span>
+                        <label for="role-switchtender" class="position-absolute w-100 h-100 top-0 left-0"><span class="visually-hidden">Conseiller</span></label>
+                        <span class="ms-1">Conseiller</span>
                     </div>
 
                     <div class="position-relative bg-white border rounded p-3 mb-2">
