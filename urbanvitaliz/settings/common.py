@@ -100,7 +100,7 @@ ROOT_URLCONF = "urbanvitaliz.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [BASE_DIR / "templates", BASE_DIR / ".." / "multisites"],
         "APP_DIRS": False,
         "OPTIONS": {
             "context_processors": [
@@ -114,13 +114,14 @@ TEMPLATES = [
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
-                "django.template.loaders.filesystem.Loader",
+                "multisite.template.loaders.filesystem.Loader",
                 "django.template.loaders.app_directories.Loader",
             ],
         },
     },
 ]
 
+MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
 
 WSGI_APPLICATION = "urbanvitaliz.wsgi.application"
 

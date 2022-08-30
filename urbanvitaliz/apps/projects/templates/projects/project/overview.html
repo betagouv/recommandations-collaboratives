@@ -78,7 +78,6 @@
             </div>
     </div>
     <div class="col-4">
-        <!-- {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True %} -->
         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Informations générales</h6>
         <div class="d-flex flex-column">
             <span style="font-size: 14px; color:#666666; font-weight: 300;" class="d-block mb-2">Référent collectivité</span>
@@ -133,6 +132,7 @@
                 {% endfor %}
             </ul>
         </div>
+        {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True %}
     </div>
 </div>
 

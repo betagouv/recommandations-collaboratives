@@ -2,5 +2,5 @@
 
 {% block content %}{% endblock %}
 
-L'équipe UrbanVitaliz
+L'équipe {{ request.site.name }}
 {% endautoescape %}
