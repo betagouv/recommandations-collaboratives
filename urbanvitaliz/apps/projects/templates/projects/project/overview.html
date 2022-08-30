@@ -71,7 +71,7 @@
                                     {{project.synopsis_by.last_name}}
                                 </strong>
                             </span>
-                            <span style="color:#929292">{{project.org_name}}</span>
+                            <span style="color:#929292;font-size: 14px;">{{project.org_name}}</span>
                         </div>
                         {% if can_administrate %}
                         <a  href="{% url "projects-project-synopsis" project.id %}">éditer</a>
@@ -108,9 +108,9 @@
                                         {{ project.last_name }}
                                     </strong>
                                 </span>
-                                <span style="color:#929292">{{project.org_name}}</span>
+                                <span style="color:#929292; font-size: 14px;">{{project.org_name}}</span>
                             </div>
-                            <div class="ms-4 ps-2">
+                            <div class="ms-4 ps-2 pt-2">
                                 <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px;"
                                     class="font-italic d-flex">{{project.updated_on}}</span>
                             </div>
@@ -136,9 +136,9 @@
                                             {{project.last_name}}
                                         </strong>
                                     </span>
-                                    <span style="color:#929292">{{project.org_name}}</span>
+                                    <span style="color:#929292; font-size: 14px;">{{project.org_name}}</span>
                                 </div>
-                                <div class="ms-4 ps-2">
+                                <div class="ms-4 ps-2 pt-2">
                                     <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px;"
                                         class="font-italic d-flex">{{project.updated_on}}</span>
                                 </div>
@@ -154,8 +154,8 @@
                         <article>
                             {{project.impediments}}
                         </article>
-                        <footer class="d-flex mt-4 justify-content-between items-center">
-                            <div class="d-flex align-items-center">
+                        <footer class="d-flex flex-column mt-4 justify-content-between items-center">
+                            <div class="d-flex align-items-center justify-content-start">
                                 <span class="me-2 d-flex align-items-center justify-content-center">
                                     <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
                                     <strong>
@@ -163,9 +163,9 @@
                                         {{project.last_name}}
                                     </strong>
                                 </span>
-                                <span style="color:#929292">{{project.org_name}}</span>
+                                <span style="color:#929292; font-size: 14px;">{{project.org_name}}</span>
                             </div>
-                            <div>
+                            <div class="ms-4 ps-2 pt-2">
                                 <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px;text-align: right;"
                                     class="font-italic d-flex">{{project.updated_on}}</span>
                             </div>
@@ -177,7 +177,6 @@
         </div>
     </div>
     <div class="col-4">
-        <!-- {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True %} -->
         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Informations générales</h6>
         <div class="d-flex flex-column">
             <span style="font-size: 16px; color:#666666; font-weight: 300;" class="d-block mb-2">Référent collectivité</span>
@@ -231,6 +230,7 @@
                 </li>
             </ul>
         </div>
+        {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True %}
     </div>
 </div>
 
