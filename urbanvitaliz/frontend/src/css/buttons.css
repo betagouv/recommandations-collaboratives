@@ -11,6 +11,16 @@
     transition: background 0.25s ease;
 }
 
+.button.disabled{
+    background-color: #EEEEEE;
+    cursor: not-allowed;
+    user-select: none;
+    pointer-events: none;
+
+    color: #929292;
+    border: solid 1px #EEEEEE;
+}
+
 .button:hover{
     background-color: #e2effc;
 }
