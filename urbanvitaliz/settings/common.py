@@ -100,7 +100,7 @@ ROOT_URLCONF = "urbanvitaliz.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates", BASE_DIR / ".." / "multisites" / "templates"],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": False,
         "OPTIONS": {
             "context_processors": [
@@ -171,7 +171,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "..", "static")
 
-STATICFILES_DIRS = [BASE_DIR / "static", BASE_DIR / ".." / "multisites" / "static"]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 STATICFILES_FINDERS = [
