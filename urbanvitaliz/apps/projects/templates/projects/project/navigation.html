@@ -19,7 +19,7 @@
         </a>
     </li>
     <li>
-        <a class="{% if recommandations %} active {% endif %}" href="{% url 'projects-project-detail-actions' project.pk %}">
+        <a class="{% if not active_project_can_administrate %} disabled {% endif %} {% if recommandations %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-actions' project.pk %}">
             {% if active_project_action_notification_count %}
                 {% if project.tasks.proposed.count %}
                 <span class="position-absolute  bg-info badge rounded-circle m-0" style="font-size: 8px;  top:5px; left:10px; width: 15px; height:15px"">
@@ -38,11 +38,16 @@
                 </span>
                 {% endif %}
             {% endif %}
+            {% if not active_project_can_administrate %}
+            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
+            </svg>&nbsp;
+            {% endif %}
             <span>Recommandations</span>
         </a>
     </li>
     <li>
-        <a class="{% if conversation %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-conversations' project.pk %}">
+        <a class="{% if not active_project_can_administrate %} disabled {% endif %} {% if conversation %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-conversations' project.pk %}">
             {% if active_project_conversations_notification_count %}
             <span class="position-absolute bg-danger badge rounded-circle m-0"
                 style="font-size: 8px; top:5px; right:5px">
@@ -53,7 +58,12 @@
                     conversations</span>
             </span>
             {% endif %}
-            <span class="ms-2">Conversation</span>
+            {% if not active_project_can_administrate %}
+            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
+            </svg>&nbsp;
+            {% endif %}
+            <span class="">Conversation</span>
         </a>
     </li>
     {% if active_project_can_administrate %}

@@ -102,11 +102,15 @@
                 {% endif %}
             {% endif %}
         </div>
-        <div class="my-4">
-            <span style="font-size: 14px; color:#666666;font-weight: 300;" class="d-block mb-3">Participants</span>
-            <a class="button" href="{% url 'projects-access-update' project.id %}">Inviter un
-                participant</a>
-            <ul class="d-flex flex-column list-unstyled mt-4">
+        <div class="d-flex flex-column my-4">
+            <span style="font-size: 14px; color:#666666;font-weight: 300;" class="d-block mb-2">Participants</span>
+            {% if can_administrate %}
+            <div class="d-block mt-2">
+                <a class="button" href="{% url 'projects-access-update' project.id %}">Inviter un
+                    participant</a>
+            </div>
+            {% endif %}
+            <ul class="d-flex flex-column list-unstyled {% if can_administrate %}mt-4{% endif %}">
                 {% for switchtender in project.switchtenders.all %}
                         <li>
                             {% include 'projects/project/fragments/user.html' with member=switchtender project=project %}
