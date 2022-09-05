@@ -146,11 +146,14 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
         response = client.post(reverse("projects-project-prefill"), data=data)
 
     project = models.Project.on_site.all()[0]
-    assert project.name == "a project"
+    assert project.name == data["name"]
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
     assert data["email"] in [member.email for member in project.members.all()]
+
+    invite = invites_models.Invite.objects.first()
+    assert invite.project == project
 
     assert response.status_code == 302
 

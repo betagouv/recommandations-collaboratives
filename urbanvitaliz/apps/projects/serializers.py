@@ -42,7 +42,10 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_notifications(self, obj):
         request = self.context.get("request")
-        notifications = request.user.notifications
+
+        notifications = notifications_models.Notification.on_site.filter(
+            recipient=request.user
+        )
 
         project_ct = ContentType.objects.get_for_model(obj)
 
@@ -50,7 +53,6 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         switchtenders = switchtender_group.user_set.values_list("id", flat=True)
         switchtenders = [int(switchtender) for switchtender in switchtenders]
 
-        # XXX Filter notification for this site
         unread_notifications = notifications.filter(
             target_content_type=project_ct.pk, target_object_id=obj.pk
         ).unread()
@@ -144,11 +146,14 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
 
         followup_ids = list(obj.followups.all().values_list("id", flat=True))
 
-        # XXX Should use the current site
-        unread_notifications = request.user.notifications.filter(
-            action_object_content_type=followup_ct.pk,
-            action_object_object_id__in=followup_ids,
-        ).unread()
+        unread_notifications = (
+            notifications_models.Notification.on_site.filter(recipient=request.user)
+            .filter(
+                action_object_content_type=followup_ct.pk,
+                action_object_object_id__in=followup_ids,
+            )
+            .unread()
+        )
 
         return {
             "count": unread_notifications.count(),
