@@ -200,7 +200,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 EMAIL_FROM = "UrbanVitaliz <no-reply@urbanvitaliz.fr>"
 
 # MagicAuth configuration
-LOGIN_URL = "/login/"
+LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "login-redirect"
 MAGICAUTH_FROM_EMAIL = EMAIL_FROM
 MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à UrbanVitaliz ici"
