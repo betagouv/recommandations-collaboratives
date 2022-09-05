@@ -50,6 +50,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         switchtenders = switchtender_group.user_set.values_list("id", flat=True)
         switchtenders = [int(switchtender) for switchtender in switchtenders]
 
+        # XXX Filter notification for this site
         unread_notifications = notifications.filter(
             target_content_type=project_ct.pk, target_object_id=obj.pk
         ).unread()
@@ -142,6 +143,8 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
         followup_ct = ContentType.objects.get_for_model(TaskFollowup)
 
         followup_ids = list(obj.followups.all().values_list("id", flat=True))
+
+        # XXX Should use the current site
         unread_notifications = request.user.notifications.filter(
             action_object_content_type=followup_ct.pk,
             action_object_object_id__in=followup_ids,
