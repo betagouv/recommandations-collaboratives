@@ -9,18 +9,27 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('projects', '0058_auto_20220823_1423'),
+        ("projects", "0058_auto_20220823_1423"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='project',
-            name='synopsis_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='synopses', to=settings.AUTH_USER_MODEL, verbose_name='Reformulé par'),
+            model_name="project",
+            name="synopsis_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="synopses",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Reformulé par",
+            ),
         ),
         migrations.AlterField(
-            model_name='project',
-            name='synopsis_on',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Reformulé le'),
+            model_name="project",
+            name="synopsis_on",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Reformulé le"
+            ),
         ),
     ]

@@ -147,7 +147,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             "-created_on", "-updated_on"
         )
 
-    queryset = models.Task.on_site.all()
+    queryset = models.Task.on_site
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 

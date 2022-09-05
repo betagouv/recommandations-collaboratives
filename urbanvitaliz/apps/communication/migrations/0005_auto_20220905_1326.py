@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sites', '0002_alter_domain_unique'),
-        ('communication', '0004_auto_20220506_0957'),
+        ("sites", "0002_alter_domain_unique"),
+        ("communication", "0004_auto_20220506_0957"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='emailtemplate',
-            name='name',
+            model_name="emailtemplate",
+            name="name",
             field=models.CharField(max_length=40),
         ),
         migrations.AlterUniqueTogether(
-            name='emailtemplate',
-            unique_together={('site', 'name')},
+            name="emailtemplate",
+            unique_together={("site", "name")},
         ),
     ]
