@@ -19,7 +19,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -173,11 +174,14 @@ class Project(models.Model):
     synopsis = models.TextField(
         verbose_name="Reformulation du besoin", default="", blank=True, null=True
     )
-    synopsis_on = models.DateTimeField(verbose_name="Reformulé le", null=True)
+    synopsis_on = models.DateTimeField(
+        verbose_name="Reformulé le", null=True, blank=True
+    )
     synopsis_by = models.ForeignKey(
         auth_models.User,
         verbose_name="Reformulé par",
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="synopses",
     )
