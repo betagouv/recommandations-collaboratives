@@ -36,5 +36,6 @@ module.exports = {
     },
     test: {
         globals: true,
+        environment: "happy-dom"
     },
 };
