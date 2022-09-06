@@ -67,7 +67,7 @@ def test_performing_onboarding_create_a_new_project(request, client):
     note = projects_models.Note.objects.all()[0]
     assert note.project == project
     assert note.public
-    assert note.content == f"# Demande initiale\n\n{project.impediments}"
+    assert note.content == f"# Demande initiale\n\n{project.description}\n\n\n"
     assert response.status_code == 302
 
 
