@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import FormView
+from notifications import models as notifications_models
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project
 from urbanvitaliz.utils import check_if_switchtender
@@ -101,6 +101,17 @@ def user_details(request, user_id):
         note = None
 
     return render(request, "crm/user_details.html", locals())
+
+
+@staff_member_required
+def user_notifications(request, user_id):
+    crm_user = get_object_or_404(User, pk=user_id)
+
+    notifications = notifications_models.Notification.on_site.filter(
+        recipient=crm_user, emailed=True
+    )[:100]
+
+    return render(request, "crm/user_notifications.html", locals())
 
 
 @staff_member_required

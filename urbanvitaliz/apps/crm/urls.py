@@ -34,6 +34,11 @@ urlpatterns = [
         name="crm-user-details",
     ),
     path(
+        r"crm/user/<int:user_id>/notifications",
+        views.user_notifications,
+        name="crm-user-notifications",
+    ),
+    path(
         r"crm/project/<int:project_id>/",
         views.project_details,
         name="crm-project-details",
