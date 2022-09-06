@@ -14,6 +14,11 @@ from . import views
 
 urlpatterns = [
     path(
+        r"crm/",
+        views.CRMSiteDashboardView.as_view(),
+        name="crm-site-dashboard",
+    ),
+    path(
         r"crm/org/<int:organization_id>/",
         views.organization_details,
         name="crm-organization-details",
