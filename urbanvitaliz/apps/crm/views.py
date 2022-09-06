@@ -12,9 +12,11 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import FormView
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project
 from urbanvitaliz.utils import check_if_switchtender
+from watson import search as watson
 
 from . import forms, models
 
@@ -27,10 +29,26 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        context["search_form"] = forms.CRMSearchForm()
         context["projects_waiting"] = Project.on_site.filter(status="DRAFT").count()
         context["project_model"] = Project
         context["user_model"] = User
         return context
+
+
+@staff_member_required
+def crm_search(request):
+    if request.method == "POST":
+        form = forms.CRMSearchForm(request.POST)
+
+        if form.is_valid():
+            query = form.cleaned_data["query"]
+            search_results = watson.search(query)
+
+    else:
+        form = forms.CRMSearchForm()
+
+    return render(request, "crm/search_results.html", locals())
 
 
 @staff_member_required
