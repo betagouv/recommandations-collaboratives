@@ -33,9 +33,5 @@ module.exports = {
                 chunkFileNames: undefined,
             },
         },
-    },
-    test: {
-        globals: true,
-        environment: "happy-dom"
-    },
+    }
 };
