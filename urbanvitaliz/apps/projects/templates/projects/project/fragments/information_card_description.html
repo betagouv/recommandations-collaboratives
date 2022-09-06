@@ -1,0 +1,12 @@
+{% if onboarding_information %}
+    {% for title, content in onboarding_response.items %}
+        {% if content %}
+            {% include 'projects/project/fragments/information_card_description_details.html' %}
+            {% if forloop.counter != onboarding_response.items|length %}
+                <hr/>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% else %}
+    {{ description }}
+{% endif %}

@@ -20,6 +20,7 @@ from django.core.exceptions import PermissionDenied
 from django.dispatch import receiver
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -27,6 +28,7 @@ from notifications import models as notifications_models
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
@@ -91,7 +93,7 @@ def create_project_prefilled(request):
             onboarding_response.project = project
             onboarding_response.save()
 
-            user, _ = auth.User.objects.get_or_create(
+            user, created = auth.User.objects.get_or_create(
                 username=form.cleaned_data.get("email"),
                 defaults={
                     "email": form.cleaned_data.get("email"),
@@ -109,11 +111,42 @@ def create_project_prefilled(request):
                 switchtender=request.user, site=request.site
             )
 
+            markdown_content = render_to_string(
+                "projects/project/onboarding_initial_note.md",
+                {
+                    "onboarding_response": onboarding_response,
+                    "project": project,
+                },
+            )
+
             models.Note(
                 project=project,
-                content=f"# Demande initiale\n\n{project.impediments}",
+                content=f"# Demande initiale\n\n{project.description}\n\n{ markdown_content }",
                 public=True,
             ).save()
+
+            invite, _ = invites_models.Invite.objects.get_or_create(
+                project=project,
+                inviter=request.user,
+                site=request.site,
+                email=user.email,
+                defaults={
+                    "message": "Je viens de déposer votre projet sur la plateforme de manière à faciliter nos échanges."
+                },
+            )
+            send_email(
+                template_name="sharing invitation",
+                recipients=[{"email": user.email}],
+                params={
+                    "sender": {"email": request.user.email},
+                    "message": invite.message,
+                    "invite_url": build_absolute_url(
+                        invite.get_absolute_url(),
+                        auto_login_user=user if not created else None,
+                    ),
+                    "project": digests.make_project_digest(project),
+                },
+            )
 
             messages.success(
                 request,
@@ -121,15 +154,6 @@ def create_project_prefilled(request):
                     user.email
                 ),
                 extra_tags=["email"],
-            )
-
-            send_email(
-                template_name="sharing invitation",
-                recipients=[{"email": user.email}],
-                params={
-                    "sender": {"email": request.user.email},
-                    "project": digests.make_project_digest(project),
-                },
             )
 
             signals.project_submitted.send(

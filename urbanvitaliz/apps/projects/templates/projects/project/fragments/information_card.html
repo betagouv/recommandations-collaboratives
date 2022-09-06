@@ -10,28 +10,7 @@
     </h6>
     <div class="project-card-details p-4">
         <article>
-            {% if onboarding_information %}
-                {% for title, content in onboarding_response.items %}
-                    {% if content %}
-                        {% if title == "Checkbox Group" %}
-                            <div class="d-flex flex-column">
-                                <span class="fw-bolder mb-2">Cartofriche ✅</span>
-                                <p>Ce projet peut être versé sur cartofriche</p>
-                            </div>
-                        {% else %}
-                            <div class="d-flex flex-column">
-                                <span class="fw-bolder mb-2">{% if title == "None" %}Pourquoi nous sollicitez-vous ?{% else %} {{ title }} {% endif %}</span>
-                                <p>{{ content }}</p>
-                            </div>
-                        {% endif %}
-                        {% if forloop.counter != onboarding_response.items|length %}
-                            <hr/>
-                        {% endif %}
-                    {% endif %}
-                {% endfor%}
-            {% else %}
-                {{ description }}
-            {% endif %}
+            {% include 'projects/project/fragments/information_card_description.html' %}
         </article>
         <footer class="d-flex mt-4 justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %} overflow-hidden">
             <div class="d-flex align-items-center">
