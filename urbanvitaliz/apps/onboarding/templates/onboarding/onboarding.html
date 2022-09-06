@@ -14,6 +14,9 @@
          isLoading: false,
          postal: null,
          cities: null,
+         getPostcode(postcode) {
+            this.postal = postcode;
+         },
          fetchCities() {
              if (this.postal == "")
                  return
@@ -31,7 +34,6 @@
 </script>
 
 {% endblock %}
-
 
 {% block content %}
 
@@ -63,7 +65,11 @@
 
         {% csrf_token %}
 
-        {{ form.errors }}
+        {% if form.errors %}
+            <div class="border border-danger rounded mb-3 pt-3 text-danger">
+                {{ form.errors }}
+            </div>
+        {% endif %}
 
         <div id="form-leader" class="mb-5">
 
@@ -188,6 +194,9 @@
         </div>
 
         {{ form.captcha }}
+        {% for error in form.captcha.errors %}
+                <div class="text-danger text-start mb-2">{{ error }}</div>
+        {% endfor %}
 
         <button type="submit" class="btn btn-primary">
 			      Envoyer ma demande
