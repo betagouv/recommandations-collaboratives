@@ -50,6 +50,12 @@
 {% block content %}
 <div class="col-10 py-5 mx-auto">
 
+    <form method="POST" action="{% url 'crm-search' %}">
+        {% csrf_token %}
+        {{ search_form.as_p }}
+        <button type="submit">Rechercher</button>
+    </form>
+
     <span class="fs-3">
         <img
             src="{% gravatar_url user.email 40 %}"

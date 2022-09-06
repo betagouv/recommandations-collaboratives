@@ -19,6 +19,11 @@ urlpatterns = [
         name="crm-site-dashboard",
     ),
     path(
+        r"crm/search",
+        views.crm_search,
+        name="crm-search",
+    ),
+    path(
         r"crm/org/<int:organization_id>/",
         views.organization_details,
         name="crm-organization-details",
