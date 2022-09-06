@@ -109,6 +109,35 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
 
 
 @pytest.mark.django_db
+def test_performing_onboarding_stores_initial_info(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "description": "my desc",
+        "postal_code": "59800",
+        "location": "some place",
+        "first_name": "john",
+        "last_name": "doe",
+        "org_name": "MyOrg",
+        "response_0": "blah",
+        "impediment_kinds": ["Autre"],
+        "impediments": "some impediment",
+    }
+    response = client.post(reverse("projects-onboarding"), data=data)
+
+    assert response.status_code == 302
+
+    project = projects_models.Project.on_site.first()
+    assert project
+
+    note = projects_models.Note.objects.first()
+    assert data["description"] in note.content
+    assert note.public is True
+
+
+@pytest.mark.django_db
 def test_performing_onboarding_does_not_allow_account_stealing(request, client):
     user = baker.make(auth.User, username="existing@example.com")
 
