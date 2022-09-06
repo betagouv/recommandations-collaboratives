@@ -20,6 +20,7 @@ from django.core.exceptions import PermissionDenied
 from django.dispatch import receiver
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -30,30 +31,19 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
-from urbanvitaliz.utils import (
-    build_absolute_url,
-    check_if_switchtender,
-    get_site_config_or_503,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
+                                get_site_config_or_503, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    can_manage_project,
-    format_switchtender_identity,
-    generate_ro_key,
-    get_active_project,
-    get_switchtenders_for_project,
-    is_project_moderator,
-    is_project_moderator_or_403,
-    is_regional_actor_for_project_or_403,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_project, format_switchtender_identity,
+                     generate_ro_key, get_active_project,
+                     get_switchtenders_for_project, is_project_moderator,
+                     is_project_moderator_or_403,
+                     is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -121,9 +111,17 @@ def create_project_prefilled(request):
                 switchtender=request.user, site=request.site
             )
 
+            markdown_content = render_to_string(
+                "projects/project/onboarding_initial_note.md",
+                {
+                    "onboarding_response": onboarding_response,
+                    "project": project,
+                },
+            )
+
             models.Note(
                 project=project,
-                content=f"# Demande initiale\n\n{project.impediments}",
+                content=f"# Demande initiale\n\n{project.description}\n\n{ markdown_content }",
                 public=True,
             ).save()
 
