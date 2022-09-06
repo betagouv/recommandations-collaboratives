@@ -42,7 +42,10 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_notifications(self, obj):
         request = self.context.get("request")
-        notifications = request.user.notifications
+
+        notifications = notifications_models.Notification.on_site.filter(
+            recipient=request.user
+        )
 
         project_ct = ContentType.objects.get_for_model(obj)
 
@@ -142,10 +145,15 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
         followup_ct = ContentType.objects.get_for_model(TaskFollowup)
 
         followup_ids = list(obj.followups.all().values_list("id", flat=True))
-        unread_notifications = request.user.notifications.filter(
-            action_object_content_type=followup_ct.pk,
-            action_object_object_id__in=followup_ids,
-        ).unread()
+
+        unread_notifications = (
+            notifications_models.Notification.on_site.filter(recipient=request.user)
+            .filter(
+                action_object_content_type=followup_ct.pk,
+                action_object_object_id__in=followup_ids,
+            )
+            .unread()
+        )
 
         return {
             "count": unread_notifications.count(),
