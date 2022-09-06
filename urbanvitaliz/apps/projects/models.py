@@ -173,11 +173,14 @@ class Project(models.Model):
     synopsis = models.TextField(
         verbose_name="Reformulation du besoin", default="", blank=True, null=True
     )
-    synopsis_on = models.DateTimeField(verbose_name="Reformulé le", null=True)
+    synopsis_on = models.DateTimeField(
+        verbose_name="Reformulé le", null=True, blank=True
+    )
     synopsis_by = models.ForeignKey(
         auth_models.User,
         verbose_name="Reformulé par",
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="synopses",
     )

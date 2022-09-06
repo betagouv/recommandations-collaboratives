@@ -1,7 +1,7 @@
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render, reverse
+from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
@@ -80,11 +80,18 @@ def onboarding(request):
 
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
-            # Create initial public note
-            # XXX update so optional fields are written into a note
+            markdown_content = render_to_string(
+                "projects/project/onboarding_initial_note.md",
+                {
+                    "onboarding_response": onboarding_response,
+                    "project": project,
+                },
+            )
+
+            # Create initial note
             projects.Note(
                 project=project,
-                content=f"# Demande initiale\n\n{project.impediments}",
+                content=f"# Demande initiale\n\n{project.description}\n\n{ markdown_content }",
                 public=True,
             ).save()
 

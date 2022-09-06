@@ -10,4 +10,4 @@ class OnboardingAdmin(admin.ModelAdmin):
 
 @admin.register(models.OnboardingResponse)
 class OnboardingResponseAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["pk", "project", "response"]
