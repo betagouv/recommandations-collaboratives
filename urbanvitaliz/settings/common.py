@@ -121,6 +121,8 @@ TEMPLATES = [
     },
 ]
 
+DBTEMPLATES_USE_CODEMIRROR = True
+
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
 
 WSGI_APPLICATION = "urbanvitaliz.wsgi.application"
