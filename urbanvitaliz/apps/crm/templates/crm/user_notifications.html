@@ -20,28 +20,8 @@
             {% else %}
                 <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
             {% endif %}
-            <div class="pt-3 crm-border-bottom pb-2 px-4">
-                <h5 class="crm-project-decoration d-inline-block relative">Projets conseillés <strong>({{ crm_user.projects_switchtended_on_site.all|length }})</strong></h5>
-                <ul class="list-unstyled">
-                    {% for switchtending in crm_user.projects_switchtended_on_site.all %}
-                    {% include 'crm/project_item.html' with project=switchtending.project %}
-                    {% empty %}
-                    - aucun -
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <div class="pt-3 crm-border-bottom pb-2 px-4">
-                <h5 class="crm-project-decoration d-inline-block relative">Participe aux projets <strong>({{ crm_user.projectmember_set.all|length }})</strong></h5>
-                <ul class="list-unstyled">
-                    {% for membership in crm_user.projectmember_set.all %}
-                    {% include 'crm/project_item.html' with project=membership.project %}
-                    {% empty %}
-                    - aucun -
-                    {% endfor %}
-                </ul>
-            </div>
-
+            {% include 'crm/back_button.html' %}
+            {% include 'crm/search.html' %}
         </div>
     </aside>
     <div class="w-75 d-flex flex-column justify-content-start">

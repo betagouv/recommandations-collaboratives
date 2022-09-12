@@ -7,8 +7,11 @@
 {% load gravatar %}
 {% load leaflet_tags %}
 {% load l10n %}
+{% load django_vite %}
 
 {% block js %}
+
+{% vite_asset 'js/apps/crm.js' %}
 {% leaflet_js %}
 
 <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
@@ -48,42 +51,63 @@
 
 
 {% block content %}
-<div class="col-10 py-5 mx-auto">
 
-    <form method="POST" action="{% url 'crm-search' %}">
-        {% csrf_token %}
-        {{ search_form.as_p }}
-        <button type="submit">Rechercher</button>
-    </form>
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+    <aside class="w-25 crm-aside">
 
-    <span class="fs-3">
-        <img
-            src="{% gravatar_url user.email 40 %}"
-            alt="{{ user.get_full_name }}"
-            class="me-2 rounded-circle align-middle"
-            style="width: 40px; height: 40px;"
-        />
-        <span class="align-middle">Salut, {{ request.user.first_name|default:request.user.username }} !</span>
-    </span>
+            {% if active_project %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
+            {% else %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
+            {% endif %}
 
-    {% if projects_waiting %}
-    <div class="bd-callout bd-callout-info">
-        <svg class="align-middle bi me-2" width="20px" height="20px" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#box-seam"/>
-        </svg>
-        <span class="align-middle">
-            Il y a <a href="{% url 'projects-project-list' %}">{{ projects_waiting }} projet{{ projects_waiting|pluralize }}</a> en attendant de validation.
-        </span>
-    </div>
-    {% endif %}
+            {% include 'crm/back_button.html' %}
+            {% include 'crm/search.html' %}
 
-    <div class="row">
-        <div class="col-8">
+            <div class="pt-3 px-4 crm-border-bottom pb-4">
+                <h5 class="d-inline-block relative">
+                    <svg class="bi align-middle" width="24" height="24">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                    </svg>
+                    <span>Mes projets aiguillés</span>
+                </h5>
+                <div class="border-top border-left border-right">
+                    {% leaflet_map "friches" callback="window.map_init" %}
+                </div>
+    
+                {% regroup request.user.tasks_created.all by project as project_list %}
+                <ul class="list-group">
+                    {% for project in project_list|slice:":30" %}
+                    <li class="list-group-item"><a href="{{project.grouper.get_absolute_url }}">{{ project.grouper }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </aside>
+    <div class="w-75 d-flex flex-column justify-content-start">
+        {% if active_project %}
+            <div class="crm-header px-4 py-3 pt-4 mb-3">
+        {% else %}
+            <div class="crm-header no-project px-4 py-3 pt-4">
+        {% endif %}
+            <h3 class="d-flex align-items-center">
+                <span class="fs-3">
+                    <img
+                        src="{% gravatar_url user.email 40 %}"
+                        alt="{{ user.get_full_name }}"
+                        class="me-2 rounded-circle align-middle"
+                        style="width: 40px; height: 40px;"
+                    />
+                    <span class="align-middle">Salut, {{ request.user.first_name|default:request.user.username }} ! Bienvenue sur le dashboard CRM</span>
+                </span>
+            </h3>
+            </div>
+        <div class="px-4 pt-4 bg-light crm-timeline-min-height">
             <h3 class="mt-3">
                 <svg class="bi align-middle" width="24" height="24">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightning-fill"/>
                 </svg>
-                <span class="align-middle">Activité sur les projets</span>
+                <span class="align-middle">Activité sur les différents projets</span>
             </h3>
             {% activity_stream "model_actions" project_model %}
             <ul class="list-group">
@@ -126,41 +150,18 @@
                 {% endfor %}
             </ul>
 
-        </div>
-        <div class="col-4">
-            <h3 class="mt-3">
-                <svg class="bi align-middle" width="24" height="24">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
-                </svg>
-                <span class="align-middle">Mes projets aiguillés</span>
-            </h3>
-
-            <div class="border-top border-left border-right">
-                {% leaflet_map "friches" callback="window.map_init" %}
-            </div>
-
-            {% regroup request.user.tasks_created.all by project as project_list %}
-            <ul class="list-group">
-                {% for project in project_list|slice:":30" %}
-                <li class="list-group-item"><a href="{{project.grouper.get_absolute_url }}">{{ project.grouper }}</a></li>
-                {% endfor %}
-            </ul>
-
-
-            <h3 class="mt-3">
+            <h3 class="mt-3 d-inline-block">
                 <svg class="bi align-middle" width="24" height="24">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-check"/>
                 </svg>
                 <span class="align-middle">Mes dernières actions</span>
             </h3>
-            <ul>
+            <ul class="list-group">
                 {% for task in request.user.tasks_created.all|slice:":30" %}
-                <li><a href="{{ task.get_absolute_url }}">{{ task }}</a> ({{ task.project }})</li>
+                <li class="list-group-item"><a href="{{ task.get_absolute_url }}">{{ task }}</a> ({{ task.project }})</li>
                 {% endfor %}
             </ul>
         </div>
     </div>
-
-</div>
-
+</div> 
 {% endblock %}

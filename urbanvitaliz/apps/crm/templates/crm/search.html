@@ -1,0 +1,10 @@
+{% load static %}
+<div class="crm-search pb-4">
+    <form method="POST" action="{% url 'crm-search' %}" class="crm-form-search">
+        {% csrf_token %}
+        {{ search_form.as_p }}
+        <button type="submit" class="button"><svg class="bi align-middle" width="24" height="24">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-right-square"/>
+        </svg></button>
+    </form>
+</div>
