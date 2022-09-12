@@ -7,13 +7,48 @@ created : 2022-07-20 12:27:25 CEST
 
 from actstream.models import Action, actor_stream, target_stream
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.views.generic.base import TemplateView
+from notifications import models as notifications_models
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project
+from urbanvitaliz.utils import check_if_switchtender
+from watson import search as watson
 
 from . import forms, models
+
+
+class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = "crm/site_dashboard.html"
+
+    def test_func(self):
+        return check_if_switchtender(self.request.user)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["search_form"] = forms.CRMSearchForm()
+        context["projects_waiting"] = Project.on_site.filter(status="DRAFT").count()
+        context["project_model"] = Project
+        context["user_model"] = User
+        return context
+
+
+@staff_member_required
+def crm_search(request):
+    if request.method == "POST":
+        form = forms.CRMSearchForm(request.POST)
+
+        if form.is_valid():
+            query = form.cleaned_data["query"]
+            search_results = watson.search(query)
+
+    else:
+        form = forms.CRMSearchForm()
+
+    return render(request, "crm/search_results.html", locals())
 
 
 @staff_member_required
@@ -66,6 +101,17 @@ def user_details(request, user_id):
         note = None
 
     return render(request, "crm/user_details.html", locals())
+
+
+@staff_member_required
+def user_notifications(request, user_id):
+    crm_user = get_object_or_404(User, pk=user_id)
+
+    notifications = notifications_models.Notification.on_site.filter(
+        recipient=crm_user, emailed=True
+    )[:100]
+
+    return render(request, "crm/user_notifications.html", locals())
 
 
 @staff_member_required

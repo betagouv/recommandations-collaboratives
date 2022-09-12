@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "captcha",
     "ordered_model",
     "dynamic_forms",
+    "watson",
     "urbanvitaliz.apps.onboarding",
     "phonenumber_field",
     "urbanvitaliz.apps.home",
@@ -92,6 +93,7 @@ MIDDLEWARE = [
     "sesame.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
 ]
 

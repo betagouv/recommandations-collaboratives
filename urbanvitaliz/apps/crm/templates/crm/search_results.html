@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+{% load watson %}
+
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+
+
+{% block content %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+    <h2 class="d-block">Résultats de recherche pour "{{ query }}"</h2>
+    <div>
+        <ul>
+            {% for result in search_results %}
+            <li>
+                {% search_result_item result %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

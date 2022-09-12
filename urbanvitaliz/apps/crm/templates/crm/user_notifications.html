@@ -55,8 +55,6 @@
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
                 </svg>
                 <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
-
-                <a href="{% url 'crm-user-notifications' crm_user.pk %}">VOIR LES NOTIFICATIONS ENVOYÉES</a>
             </h3>
             {% if crm_user.profile.organization %}
             <a class="d-flex align-items-center"
@@ -68,16 +66,13 @@
             </a>
             {% endif %}
         </div>
-        <div x-ref="note" class="px-4 pt-4 crm-note relative" :class="noteIsOpen ? 'open' : 'closed'">
-            {% if note %}
-            {% include 'crm/note.html' %}
-            <a class="btn btn-secondary crm-note-action-button" href="{% url 'crm-user-note-update' crm_user.pk %}">éditer</a>
-            <span x-ref="noteToggleButton" class="crm-note-toggle-button" x-on:click="noteIsOpen = ! noteIsOpen" x-text="noteIsOpen ? '[Voir moins]': '[Voir plus]'"></span>
-            {% else %}<a class="btn btn-secondary" href="{% url 'crm-user-note-create' crm_user.pk %}">créer une note</a>{% endif %}
-        </div>
         <div class="px-4 pt-4 bg-light crm-timeline-min-height">
-            <h4>Activité</h4>
-            {% include 'crm/timeline.html' %}
+            <h4>Notifications envoyées par email</h4>
+            {% for notification in notifications %}
+            <ul>
+                <li>{{ notification }}</li>
+            </ul>
+            {% endfor %}
         </div>
     </div>
 </div>
