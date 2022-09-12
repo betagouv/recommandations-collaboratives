@@ -56,8 +56,27 @@ describe('I can create a project as a collectivity', () => {
 
     cy.wait(500)
 
-    cy.contains('Envoyer ma demande').click({force:true});
+    cy.contains('Envoyer ma demande').click({ force: true });
 
-    cy.url().should('include', '/accounts/login/')
-  })
+    cy.url().should('include', '/setup-password/')
+
+    cy.get('#id_password1')
+      .type('derpderp', { force: true })
+      .should('have.value', 'derpderp')
+
+
+    cy.get('#id_password2')
+      .type('derpderp', { force: true })
+      .should('have.value', 'derpderp')
+
+    cy.get("[type=submit]").click({ force: true });
+
+    cy.url().should('include', '/projects/survey/')
+
+    cy.get(".introjs-skipbutton").click({ force: true });
+
+    cy.contains('fake project name').click({ force: true });
+
+    cy.contains("Un peu de patience, on vérifie que vous n'êtes pas un pirate du web ;)")
+})
 })
