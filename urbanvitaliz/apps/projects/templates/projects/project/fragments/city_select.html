@@ -1,4 +1,5 @@
-<div class="col-12" x-data="citySearch()" x-init="{% if form.postcode.value %}getPostcode({{form.postcode.value}}) {% endif %}">
+<div class="col-12" x-data="citySearch()" 
+    x-init="{% if form.postcode.value and form.insee.value %}getPostcode({{form.postcode.value}},{{form.insee.value}}) {% endif %}">
     <div class="row g-3">
         <div class="col-auto">
             <div class="form-floating mb-3">
@@ -12,7 +13,7 @@
         </div>
 
         <div class="mb-3 col-auto" x-show="cities">
-                <select name="insee" class="form-select" :disabled="cities && !cities.length">
+                <select x-ref="insee" name="insee" class="form-select" :disabled="cities && !cities.length">
                     <template x-if="cities && cities.length == 0 && postal">
                         <option selected>Aucune commune trouvée, vérifiez le code postal ?</option>
                     </template>
