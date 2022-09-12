@@ -14,15 +14,10 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-    remove_reminder,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project, remove_reminder)
 
 #####
 # Projects
@@ -192,9 +187,17 @@ action_commented = django.dispatch.Signal()
 @receiver(action_created)
 def log_action_created(sender, task, project, user, **kwargs):
     if task.public is False:
-        return
-
-    action.send(user, verb="a recommandé l'action", action_object=task, target=project)
+        action.send(
+            user,
+            verb="a créé un brouillon de recommandation",
+            action_object=task,
+            target=project,
+            public=False,
+        )
+    else:
+        action.send(
+            user, verb="a recommandé l'action", action_object=task, target=project
+        )
 
 
 @receiver(action_created)
