@@ -39,14 +39,14 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
 @staff_member_required
 def crm_search(request):
     if request.method == "POST":
-        form = forms.CRMSearchForm(request.POST)
+        search_form = forms.CRMSearchForm(request.POST)
 
-        if form.is_valid():
-            query = form.cleaned_data["query"]
+        if search_form.is_valid():
+            query = search_form.cleaned_data["query"]
             search_results = watson.search(query)
 
     else:
-        form = forms.CRMSearchForm()
+        search_form = forms.CRMSearchForm()
 
     return render(request, "crm/search_results.html", locals())
 
@@ -85,6 +85,8 @@ def organization_details(request, organization_id):
     except models.Note.DoesNotExist:
         note = None
 
+    search_form = forms.CRMSearchForm()
+
     return render(request, "crm/organization_details.html", locals())
 
 
@@ -100,12 +102,16 @@ def user_details(request, user_id):
     except models.Note.DoesNotExist:
         note = None
 
+    search_form = forms.CRMSearchForm()
+
     return render(request, "crm/user_details.html", locals())
 
 
 @staff_member_required
 def user_notifications(request, user_id):
     crm_user = get_object_or_404(User, pk=user_id)
+
+    search_form = forms.CRMSearchForm()
 
     notifications = notifications_models.Notification.on_site.filter(
         recipient=crm_user, emailed=True
@@ -125,6 +131,8 @@ def project_details(request, project_id):
         note = models.Note.on_site.get(object_id=project.pk, content_type=project_ct)
     except models.Note.DoesNotExist:
         note = None
+
+    search_form = forms.CRMSearchForm()
 
     return render(request, "crm/project_details.html", locals())
 
