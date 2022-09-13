@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "captcha",
     "ordered_model",
     "dynamic_forms",
+    "watson",
     "urbanvitaliz.apps.onboarding",
     "phonenumber_field",
     "urbanvitaliz.apps.home",
@@ -92,6 +93,7 @@ MIDDLEWARE = [
     "sesame.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
 ]
 
@@ -205,6 +207,7 @@ EMAIL_FROM = "UrbanVitaliz <no-reply@urbanvitaliz.fr>"
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "login-redirect"
 MAGICAUTH_FROM_EMAIL = EMAIL_FROM
+MAGICAUTH_ADAPTER = "urbanvitaliz.apps.home.adapters.UVMagicauthAdapter"
 MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à UrbanVitaliz ici"
 MAGICAUTH_EMAIL_FIELD = "email"
 MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "login-redirect"

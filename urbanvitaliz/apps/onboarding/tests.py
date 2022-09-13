@@ -69,6 +69,7 @@ def test_performing_onboarding_create_a_new_project(request, client):
     assert note.public
     assert note.content == f"# Demande initiale\n\n{project.description}\n\n\n"
     assert response.status_code == 302
+    assert response["Location"].startswith(reverse("home-user-setup-password"))
 
 
 @pytest.mark.django_db

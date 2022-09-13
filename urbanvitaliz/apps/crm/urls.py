@@ -14,6 +14,16 @@ from . import views
 
 urlpatterns = [
     path(
+        r"crm/",
+        views.CRMSiteDashboardView.as_view(),
+        name="crm-site-dashboard",
+    ),
+    path(
+        r"crm/search",
+        views.crm_search,
+        name="crm-search",
+    ),
+    path(
         r"crm/org/<int:organization_id>/",
         views.organization_details,
         name="crm-organization-details",
@@ -22,6 +32,11 @@ urlpatterns = [
         r"crm/user/<int:user_id>/",
         views.user_details,
         name="crm-user-details",
+    ),
+    path(
+        r"crm/user/<int:user_id>/notifications",
+        views.user_notifications,
+        name="crm-user-notifications",
     ),
     path(
         r"crm/project/<int:project_id>/",

@@ -7,31 +7,21 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
-import os
 
 import django.core.mail
-from actstream.models import Action
-from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV2Checkbox
-from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
-from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count, F, Q
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.apps.projects.utils import (
-    can_administrate_project,
-    get_active_project,
-)
+from urbanvitaliz.apps.projects.utils import (can_administrate_project,
+                                              get_active_project)
 from urbanvitaliz.utils import check_if_switchtender
 
 from .forms import ContactForm, UserPasswordFirstTimeSetupForm
@@ -200,35 +190,6 @@ def setup_password(request):
         form = UserPasswordFirstTimeSetupForm(initial={"next": next_url})
 
     return render(request, "home/user_setup_password.html", locals())
-
-
-######
-# ADMIN VIEWS
-######
-
-
-class SwitchtenderDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
-    template_name = "staff/dashboard.html"
-
-    def test_func(self):
-        return check_if_switchtender(self.request.user)
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context["projects_waiting"] = projects.Project.on_site.filter(
-            status="DRAFT"
-        ).count()
-        context["project_model"] = projects.Project
-        context["user_model"] = auth.User
-
-        ctype = ContentType.objects.get_for_model(projects.Project)
-        context["projects_stream"] = Action.objects.filter(
-            Q(target_content_type=ctype)
-            | Q(action_object_content_type=ctype)
-            | Q(actor_content_type=ctype)
-        )
-
-        return context
 
 
 # eof

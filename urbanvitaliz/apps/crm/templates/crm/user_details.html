@@ -20,6 +20,10 @@
             {% else %}
                 <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
             {% endif %}
+
+            {% include 'crm/back_button.html' %}
+            {% include 'crm/search.html' %}
+            
             <div class="pt-3 crm-border-bottom pb-2 px-4">
                 <h5 class="crm-project-decoration d-inline-block relative">Projets conseillés <strong>({{ crm_user.projects_switchtended_on_site.all|length }})</strong></h5>
                 <ul class="list-unstyled">
@@ -50,12 +54,20 @@
             {% else %}
                 <div class="crm-header no-project px-4 py-4">
             {% endif %}
-            <h3 class="d-flex align-items-center">
-                <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
-                </svg>
-                <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
-            </h3>
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="d-flex align-items-center">
+                    <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+                    </svg>
+                    <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
+                </h3>
+                <div class="d-flex align-items-center">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-fill" />
+                    </svg>
+                    <a class="ms-2" style="font-size: 1rem;" href="{% url 'crm-user-notifications' crm_user.pk %}">Voir les notifications envoyées</a>
+                </div>
+            </div>
             {% if crm_user.profile.organization %}
             <a class="d-flex align-items-center"
                 href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">

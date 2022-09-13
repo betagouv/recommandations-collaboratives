@@ -1,0 +1,33 @@
+{% load static %}
+
+<div class="d-flex align-items-center">
+    <svg class="bi me-2" width="16" height="16" fill="currentColor">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+    </svg>
+    <span class="d-flex align-items-center">
+        <a href="{% url 'crm-user-details' obj.pk %}">{{ obj.get_full_name|default:obj.username }}</a>
+        {% if obj.profile.organization.name %}
+            <span class="ms-2 me-2">|</span>
+            <svg class="bi" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
+            </svg>  
+            <a href="{% url 'crm-organization-details' obj.profile.organization.pk %}">
+                {{obj.profile.organization.name}}
+            </a>
+        {% endif %}
+        {% if obj.profile.phone_no %}
+            <span class="ms-2 me-2 d-block">|</span>
+            <svg class="bi" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-fill" />
+            </svg>  
+            {{obj.profile.phone_no}}
+        {% endif %}
+        {% if obj.email %}
+            <span class="ms-2 me-2">|</span>
+            <svg class="bi" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope-fill" />
+            </svg>  
+            {{obj.email}}
+        {% endif %}
+    </span>
+</div>
