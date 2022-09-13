@@ -1,0 +1,3 @@
+[{
+    'type': 'header', 
+    'subtype': 'h3', 'label': 'Pourquoi nous sollicitez-vous ?<br>'}, {'type': 'textarea', 'required': True, 'label': '<h3 class="mb-3 mt-5"><br></h3>', 'placeholder': "N'hésitez pas à préciser votre demande en quelques mots", 'className': 'form-control', 'name': 'textarea-1659372614809-0', 'subtype': 'textarea'}, {'type': 'checkbox-group', 'required': False, 'label': '<br>', 'toggle': True, 'className': 'list-unstyled form-input', 'name': 'checkbox-group-1659372634741-0', 'values': [{'label': 'Je souhaite ajouter cette friche à la cartographie publique des friches - ce qui me permet de faire connaître ce site à des porteurs de projet potentiels !', 'value': 'cartofriches', 'selected': True}]}]
