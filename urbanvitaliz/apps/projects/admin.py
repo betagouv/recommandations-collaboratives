@@ -10,7 +10,8 @@ created : 2021-05-26 13:55:23 CEST
 
 from csvexport.actions import csvexport
 from django.contrib import admin
-from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
+from ordered_model.admin import (OrderedInlineModelAdminMixin,
+                                 OrderedTabularInline)
 
 from . import models
 
@@ -85,6 +86,8 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ["content", "tags"]
     list_filter = ["site", "deadline", "tags"]
     list_display = ["created_on", "deadline", "project_name", "tags"]
+
+    actions = [csvexport]
 
     def project_name(self, o):
         return o.project.name
