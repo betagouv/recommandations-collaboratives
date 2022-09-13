@@ -2,6 +2,7 @@ recursive-include urbanvitaliz/static *.*
 recursive-include urbanvitaliz/frontend/dist/ *.*
 recursive-include urbanvitaliz/apps/home/static *.*
 recursive-include urbanvitaliz/apps/projects *.txt
+recursive-include urbanvitaliz/apps/projects *.md
 recursive-include urbanvitaliz/apps/projects/static *.*
 recursive-include urbanvitaliz/apps/resources/static *.*
 recursive-include urbanvitaliz/apps/survey/static *.*
