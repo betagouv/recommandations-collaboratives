@@ -9,7 +9,6 @@
     }
 }
 
-
 .rephrase-update label {
     margin-bottom: 15px;
     display: none;
@@ -54,4 +53,14 @@
     }
 
     font-size: 14Px;
+}
+
+.project-sidebar {
+    background-color: #F6F6F6;
+    border-radius: 2px;
+
+    .button {
+        background: white;
+        text-align: center;
+    }
 }

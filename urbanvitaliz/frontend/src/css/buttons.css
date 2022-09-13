@@ -6,9 +6,30 @@
     text-transform: uppercase;
     font-size: 0.85rem;
     color: #0063CB;
+    font-weight: 500;
     text-decoration: none;
 
     transition: background 0.25s ease;
+}
+
+.button.green {
+    border-color: #18753C;
+    color: #18753C;
+}
+
+.button.green:hover {
+    background-color: #d6fce5;
+    color: #18753C !important;
+}
+
+.button.red {
+    border-color: #CE0500;
+    color: #CE0500;
+}
+
+.button.red:hover {
+    background-color: #f8cfce;
+    color: #CE0500 !important;
 }
 
 .button.disabled{
