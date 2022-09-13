@@ -1,0 +1,10 @@
+{% load static %}
+
+<div class="d-flex ps-4 p-1" style="background-color: #8cb0fa;">
+    <a x-data="Crm" @click="goBack" class="my-2" style="cursor: pointer; color: #222;">
+        <svg class="bi me-2" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-return-left" />
+        </svg>
+        <span>revenir en arrière</span>
+    </a>
+</div>

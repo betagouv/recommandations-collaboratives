@@ -153,3 +153,17 @@ progress::-moz-progress-bar {
 
 // Alpine Cloaking
 [x-cloak] { display: none !important; }
+
+.modal {
+    z-index: 9889089;
+}
+
+.modal-xl {
+    .modal-content {
+        overflow: hidden;
+    }
+
+    iframe {
+        height: 85vh;
+    }
+}
