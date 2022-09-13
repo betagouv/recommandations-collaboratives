@@ -74,10 +74,14 @@ class UserProfile(models.Model):
 
 
 class SiteConfiguration(models.Model):
-    site = models.OneToOneField(Site, on_delete=models.CASCADE)
+    site = models.OneToOneField(
+        Site, on_delete=models.CASCADE, related_name="configuration"
+    )
 
     project_survey = models.ForeignKey("survey.Survey", on_delete=models.CASCADE)
     onboarding = models.ForeignKey("onboarding.Onboarding", on_delete=models.CASCADE)
+    sender_email = models.EmailField()
+    sender_name = models.CharField(max_length=30)
 
     def __str__(self):
         return f"SiteConfiguration for '{self.site}'"
