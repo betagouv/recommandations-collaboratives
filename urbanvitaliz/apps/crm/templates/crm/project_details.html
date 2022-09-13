@@ -20,6 +20,10 @@
             {% else %}
                 <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
             {% endif %}
+            
+            {% include 'crm/back_button.html' %}
+            {% include 'crm/search.html' %}
+
             <div class="pt-3 mb-4 px-4 crm-border-bottom">
                 <h5 class="crm-user-decoration d-inline-block relative">Conseiller·es <strong>({{ project.switchtenders.all|length }})</strong></h5>
                 <ul class="mb-2 px-0" class="list-unstyled">
@@ -41,9 +45,9 @@
                                     {% include 'crm/user_item.html' with user=switchtender %}
                             {% endfor %}
                         </ul>
+                    </div>
                     {% empty %}
                         Pas de participant
-                    </div>
                     {% endfor %}
                 </ul>
             </div>

@@ -1,8 +1,8 @@
 {% load gravatar %}
 
-<ul>
+<ul class="list-group">
     {% for action in actions %}
-    <li class="d-flex flex-columns my-3">
+    <li class="d-flex flex-columns list-group-item">
         {% if action.actor %}
         <div class="align-middle mx-2 flex-shrink">
             <img class="rounded-circle" src="{% gravatar_url action.actor.email size=24 %}" alt="{{action.actor}}">
