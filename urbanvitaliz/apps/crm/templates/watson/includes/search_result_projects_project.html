@@ -1,0 +1,13 @@
+{% load static %}
+
+<div class="d-flex align-items-center">
+    <svg class="bi me-2" width="16" height="16" fill="currentColor">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
+    </svg>
+    <div class="d-flex align-items-center">
+        <a href="{% url 'crm-project-details' obj.pk %}">{{ obj.name }}</a> 
+        <span class="me-2 ms-2">|</span>
+        <svg class="bi me-2" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#geo-alt-fill" />
+        </svg> {{ obj.commune }} ({{ obj.commune.postal }})</div>
+</div>

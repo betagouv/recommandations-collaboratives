@@ -19,11 +19,15 @@ function Crm() {
             // Note behavior
             const note = this.$refs.note;
             const noteToggleButton = this.$refs.noteToggleButton
-            if (note.offsetHeight < 200) {
+            if (note && note.offsetHeight < 200) {
                 note.classList.add('is-small')
 
                 if (noteToggleButton) noteToggleButton.classList.add('hidden');
             }
         },
+        goBack() {
+            console.log('go back');
+            window.history.back();
+        }
     }
 }

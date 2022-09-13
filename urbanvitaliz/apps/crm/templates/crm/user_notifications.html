@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+    <aside class="w-25 crm-aside">
+            {% if active_project %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
+            {% else %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
+            {% endif %}
+            {% include 'crm/back_button.html' %}
+            {% include 'crm/search.html' %}
+        </div>
+    </aside>
+    <div class="w-75 d-flex flex-column justify-content-start">
+            {% if active_project %}
+                <div class="crm-header px-4 py-4 mb-3">
+            {% else %}
+                <div class="crm-header no-project px-4 py-4">
+            {% endif %}
+            <h3 class="d-flex align-items-center">
+                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+                </svg>
+                <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
+            </h3>
+            {% if crm_user.profile.organization %}
+            <a class="d-flex align-items-center"
+                href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">
+                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left" />
+                </svg>
+                <span>Revenir aux détails de l'organisation : <strong>{{crm_user.profile.organization.name}}</strong></span>
+            </a>
+            {% endif %}
+        </div>
+        <div class="px-4 pt-4 bg-light crm-timeline-min-height">
+            <h4>Notifications envoyées par email</h4>
+            {% for notification in notifications %}
+            <ul>
+                <li>{{ notification }}</li>
+            </ul>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
