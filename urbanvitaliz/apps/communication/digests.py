@@ -311,6 +311,9 @@ def make_digest_for_new_site(notification, user):
     # the same for all ? so make_project_digest could be used in all
     # places?
     return {
+        "dashboard_url": utils.build_absolute_url(
+            reverse("projects-project-list"), auto_login_user=user
+        ),
         "project": {
             "name": project.name,
             "org_name": project.org_name,

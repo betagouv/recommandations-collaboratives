@@ -1,4 +1,4 @@
-<div class="col-12" x-data="citySearch()">
+<div class="col-12" x-data="citySearch()" x-init="{% if form.postcode.value %}getPostcode({{form.postcode.value}}) {% endif %}">
     <div class="row g-3">
         <div class="col-auto">
             <div class="form-floating mb-3">

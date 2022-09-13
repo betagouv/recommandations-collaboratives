@@ -79,9 +79,8 @@
                 </svg>
                 <span class="align-middle">Activité sur les projets</span>
             </h3>
-            {% activity_stream "model_actions" project_model %}
             <ul class="list-group">
-                {% for action in stream|slice:":50" %}
+                {% for action in projects_stream|slice:":50" %}
                 <li class="list-group-item">
 
                     <span class="text-secondary">{{ action.timestamp|naturalday|capfirst }}</span> -

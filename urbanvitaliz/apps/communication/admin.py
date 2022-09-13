@@ -17,7 +17,7 @@ class EmailTemplateForm(forms.ModelForm):
 
     class Meta:
         model = models.EmailTemplate
-        fields = ["name", "sib_id"]
+        fields = ["site", "name", "sib_id"]
 
 
 @admin.register(models.EmailTemplate)

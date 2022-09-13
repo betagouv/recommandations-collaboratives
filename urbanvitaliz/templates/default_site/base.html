@@ -34,15 +34,7 @@
         {% endif %}
 
 
-        <title>{{ request.site.name }}{% block title %}, réhabilitez vos friches plus sereinement{% endblock %}</title>
-        <meta name="description" content="{% block description %}Aiguiller les collectivités dans leurs projets de réhabilitation de friches et autres fonciers à l’abandon - un service gratuit du Cerema{% endblock %}">
-        <meta name="robots" content="index, archive" />
-
-        <meta property="og:title" content="{{ site.name }}{% block og_title %}, réhabilitez vos friches plus sereinement{% endblock %}" />
-        <meta property="og:locale" content="fr" />
-        <meta property="og:site_name" content="{{ site.name }}" />
-        <meta property="og:description" content="{% block og_description %}Aiguiller les collectivités dans leurs projets de réhabilitation de friches et autres fonciers à l’abandon - un service gratuit du Cerema{% endblock %}" />
-
+        {% include 'seo.html' %}
 
         <!-- Bootstrap core CSS -->
         {% if debug %}
@@ -150,7 +142,7 @@
         {% endif %}
 
         <script src="{% static 'js/text.js' %}"></script>
-        <script src="{% static 'js/sidebars.js' %}"></script>
+        <script src="{% static 'js/tooltip.js' %}"></script>
 
 
         <!-- bs5 notifications  -->

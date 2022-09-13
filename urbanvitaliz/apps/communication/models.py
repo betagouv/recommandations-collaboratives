@@ -13,11 +13,14 @@ from django.db import models
 
 
 class EmailTemplate(models.Model):
+    class Meta:
+        unique_together = ("site", "name")
+
     objects = models.Manager()
     on_site = CurrentSiteManager()
 
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
-    name = models.CharField(max_length=40, unique=True)
+    name = models.CharField(max_length=40)
     sib_id = models.IntegerField()
 
     def __str__(self):

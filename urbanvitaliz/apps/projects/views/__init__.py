@@ -18,8 +18,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
 from django.core.exceptions import PermissionDenied
 from django.dispatch import receiver
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -27,21 +28,33 @@ from notifications import models as notifications_models
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
-from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
-                                get_site_config_or_503, is_staff_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.apps.reminders import models as reminders_models
+from urbanvitaliz.utils import (
+    build_absolute_url,
+    check_if_switchtender,
+    get_site_config_or_503,
+    is_staff_or_403,
+    is_switchtender_or_403,
+)
 
 from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     can_manage_project, format_switchtender_identity,
-                     generate_ro_key, get_active_project,
-                     get_switchtenders_for_project, is_project_moderator,
-                     is_project_moderator_or_403,
-                     is_regional_actor_for_project_or_403,
-                     refresh_user_projects_in_session, set_active_project_id)
+from ..utils import (
+    can_administrate_or_403,
+    can_administrate_project,
+    format_switchtender_identity,
+    generate_ro_key,
+    get_active_project,
+    get_switchtenders_for_project,
+    is_project_moderator,
+    is_project_moderator_or_403,
+    is_regional_actor_for_project_or_403,
+    refresh_user_projects_in_session,
+    set_active_project_id,
+)
 
 ########################################################################
 # On boarding
@@ -91,7 +104,7 @@ def create_project_prefilled(request):
             onboarding_response.project = project
             onboarding_response.save()
 
-            user, _ = auth.User.objects.get_or_create(
+            user, created = auth.User.objects.get_or_create(
                 username=form.cleaned_data.get("email"),
                 defaults={
                     "email": form.cleaned_data.get("email"),
@@ -109,11 +122,42 @@ def create_project_prefilled(request):
                 switchtender=request.user, site=request.site
             )
 
+            markdown_content = render_to_string(
+                "projects/project/onboarding_initial_note.md",
+                {
+                    "onboarding_response": onboarding_response,
+                    "project": project,
+                },
+            )
+
             models.Note(
                 project=project,
-                content=f"# Demande initiale\n\n{project.impediments}",
+                content=f"# Demande initiale\n\n{project.description}\n\n{ markdown_content }",
                 public=True,
             ).save()
+
+            invite, _ = invites_models.Invite.objects.get_or_create(
+                project=project,
+                inviter=request.user,
+                site=request.site,
+                email=user.email,
+                defaults={
+                    "message": "Je viens de déposer votre projet sur la plateforme de manière à faciliter nos échanges."
+                },
+            )
+            send_email(
+                template_name="sharing invitation",
+                recipients=[{"email": user.email}],
+                params={
+                    "sender": {"email": request.user.email},
+                    "message": invite.message,
+                    "invite_url": build_absolute_url(
+                        invite.get_absolute_url(),
+                        auto_login_user=user if not created else None,
+                    ),
+                    "project": digests.make_project_digest(project),
+                },
+            )
 
             messages.success(
                 request,
@@ -121,15 +165,6 @@ def create_project_prefilled(request):
                     user.email
                 ),
                 extra_tags=["email"],
-            )
-
-            send_email(
-                template_name="sharing invitation",
-                recipients=[{"email": user.email}],
-                params={
-                    "sender": {"email": request.user.email},
-                    "project": digests.make_project_digest(project),
-                },
             )
 
             signals.project_submitted.send(
@@ -212,6 +247,10 @@ def project_list_export_csv(request):
             "conseillers",
             "statut_conseil",
             "nb_reco",
+            "nb_reco_actives",
+            "nb_interactions_reco",
+            "nb_commentaires_recos",
+            "nb_rappels",
             "lien_projet",
         ]
     )
@@ -221,6 +260,11 @@ def project_list_export_csv(request):
         switchtenders_txt = ", ".join(
             [format_switchtender_identity(u) for u in switchtenders]
         )
+
+        followups = models.TaskFollowup.objects.filter(
+            task__project=project,
+            task__site=request.site,
+        ).exclude(who__in=switchtenders)
 
         writer.writerow(
             [
@@ -235,6 +279,22 @@ def project_list_export_csv(request):
                 switchtenders_txt,
                 project.status,
                 project.tasks.exclude(public=False).count(),
+                project.tasks.filter(
+                    status__in=(
+                        models.Task.INPROGRESS,
+                        models.Task.BLOCKED,
+                        models.Task.DONE,
+                    )
+                )
+                .exclude(public=False)
+                .count(),
+                followups.exclude(status=None).count(),
+                followups.exclude(comment="").count(),
+                reminders_models.Reminder.objects.filter(
+                    tasks__site=request.site,
+                    tasks__project=project,
+                    origin=reminders_models.Reminder.SELF,
+                ).count(),
                 build_absolute_url(
                     reverse("projects-project-detail", args=[project.id])
                 ),

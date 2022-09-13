@@ -146,13 +146,47 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
         response = client.post(reverse("projects-project-prefill"), data=data)
 
     project = models.Project.on_site.all()[0]
-    assert project.name == "a project"
+    assert project.name == data["name"]
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
     assert data["email"] in [member.email for member in project.members.all()]
 
+    invite = invites_models.Invite.objects.first()
+    assert invite.project == project
+
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_created_prefilled_project_stores_initial_info(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "description": "my desc",
+        "postal_code": "59800",
+        "location": "some place",
+        "first_name": "john",
+        "last_name": "doe",
+        "org_name": "MyOrg",
+        "response_0": "blah",
+        "impediment_kinds": ["Autre"],
+        "impediments": "some impediment",
+    }
+
+    with login(client, groups=["switchtender"]):
+        response = client.post(reverse("projects-project-prefill"), data=data)
+
+    assert response.status_code == 302
+
+    project = models.Project.on_site.first()
+    assert project
+
+    note = models.Note.objects.first()
+    assert data["description"] in note.content
+    assert note.public is True
 
 
 ########################################################################
@@ -1588,6 +1622,9 @@ def test_switchtender_exports_csv(request, client):
 
     # Project that should not appear
     Recipe(models.Project, name="Projet 2").make()
+
+    # Make a task
+    Recipe(models.Task, public=True, project=p1).make()
 
     url = reverse("projects-project-list-export-csv")
     with login(client, groups=["switchtender"]) as user:
