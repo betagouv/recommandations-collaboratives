@@ -16,11 +16,23 @@ class EmailTemplate(models.Model):
     class Meta:
         unique_together = ("site", "name")
 
+    NAME_CHOICES = (
+        ("project_reminders_digest", "Résumé des rappels"),
+        ("digest_for_non_switchtender", "Résumé quotidien général de notifications"),
+        ("digest_for_switchtender", "Résumé quotidien des conseillers"),
+        ("new_recommendations_digest", "Résumé des nouvelles recommandations"),
+        (
+            "new_site_for_switchtender",
+            "Alerte conseillers d'un nouveau projet sur le territoire",
+        ),
+        ("sharing invitation", "Invitation à rejoindre un projet"),
+    )
+
     objects = models.Manager()
     on_site = CurrentSiteManager()
 
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
-    name = models.CharField(max_length=40)
+    name = models.CharField(max_length=40, choices=NAME_CHOICES)
     sib_id = models.IntegerField()
 
     def __str__(self):
