@@ -78,5 +78,5 @@ describe('I can create a project as a collectivity', () => {
     cy.contains('fake project name').click({ force: true });
 
     cy.contains("Un peu de patience, on vérifie que vous n'êtes pas un pirate du web ;)")
-})
+  })
 })

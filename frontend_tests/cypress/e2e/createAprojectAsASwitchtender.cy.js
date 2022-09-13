@@ -15,7 +15,7 @@ describe('I can create a project as a switchtender', () => {
 
         cy.get("[type=submit]").click({ force: true });
 
-        cy.contains("Connexion avec switchtender@email.com réussie.")
+        cy.contains("Connexion avec switchtender réussie.")
 
         cy.contains("Ajouter un projet").click({ force: true })
 
@@ -66,18 +66,40 @@ describe('I can create a project as a switchtender', () => {
 
         cy.contains("Ajouter ce projet et rejoindre l'équipe de suivi").click({ force: true });
 
-        cy.visit('/nimda')
+        cy.url().should('include', '/project/')
+        cy.url().should('include', '/connaissance')
+        cy.contains("Fake Project Name")
+        cy.contains("Présentation").click({force:true});
 
-        cy.get('#id_username')
-            .type('qdan', { force: true })
-            .should('have.value', 'qdan')
+        cy.url().should('include', '/project/')
+        cy.url().should('include', '/presentation')
 
-        cy.get('#id_password')
-            .type('derpderp', { force: true })
-            .should('have.value', 'derpderp')
+        //Checking Contexte & Compléments
+        cy.contains("Contexte")
+        cy.contains("Fake project description")
+
+        cy.contains("Pourquoi nous sollicitez-vous ?")
+        cy.contains("Fake project description precision")
+
+        cy.contains("Cartofriche")
+        cy.contains("Ce projet peut être versé sur cartofriche")
+
+        cy.contains("Conversation").click({force:true});
+
+        cy.url().should('include', '/project/')
+        cy.url().should('include', '/conversations')
+
+        //Checking demande initiale
+        cy.contains("Demande initiale")
+        cy.contains("Fake project description")
+
+        cy.contains("Pourquoi nous sollicitez-vous ?")
+        cy.contains("Fake project description precision")
+
+        cy.contains("Cartofriche")
+        cy.contains("Ce projet peut être versé sur cartofriche")
 
 
-        cy.contains("Connexion").click({ force: true });
     })
 
 })
