@@ -15,10 +15,6 @@
     "axios": "^0.27.2",
     "js-cookie": "^3.0.1",
     "vite": "^2.9.13",
-    "vitest": "^0.23.1"
-  },
-  "devDependencies": {
-    "@vitest/ui": "^0.23.1",
-    "happy-dom": "^6.0.4"
+    "vitest": "^0.16.0"
   }
 }
