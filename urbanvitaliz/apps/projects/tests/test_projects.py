@@ -20,8 +20,7 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -1623,6 +1622,9 @@ def test_switchtender_exports_csv(request, client):
 
     # Project that should not appear
     Recipe(models.Project, name="Projet 2").make()
+
+    # Make a task
+    Recipe(models.Task, public=True, project=p1).make()
 
     url = reverse("projects-project-list-export-csv")
     with login(client, groups=["switchtender"]) as user:
