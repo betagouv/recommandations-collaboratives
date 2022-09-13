@@ -10,6 +10,7 @@ created: 2021-08-16 15:40:08 CEST
 import os
 
 import django.core.mail
+from actstream.models import Action
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
@@ -20,6 +21,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count, F, Q
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
@@ -218,6 +220,14 @@ class SwitchtenderDashboardView(LoginRequiredMixin, UserPassesTestMixin, Templat
         ).count()
         context["project_model"] = projects.Project
         context["user_model"] = auth.User
+
+        ctype = ContentType.objects.get_for_model(projects.Project)
+        context["projects_stream"] = Action.objects.filter(
+            Q(target_content_type=ctype)
+            | Q(action_object_content_type=ctype)
+            | Q(actor_content_type=ctype)
+        )
+
         return context
 
 

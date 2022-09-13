@@ -192,9 +192,17 @@ action_commented = django.dispatch.Signal()
 @receiver(action_created)
 def log_action_created(sender, task, project, user, **kwargs):
     if task.public is False:
-        return
-
-    action.send(user, verb="a recommandé l'action", action_object=task, target=project)
+        action.send(
+            user,
+            verb="a créé un brouillon de recommandation",
+            action_object=task,
+            target=project,
+            public=False,
+        )
+    else:
+        action.send(
+            user, verb="a recommandé l'action", action_object=task, target=project
+        )
 
 
 @receiver(action_created)
