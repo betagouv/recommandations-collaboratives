@@ -33,5 +33,8 @@ module.exports = {
                 chunkFileNames: undefined,
             },
         },
-    }
+    },
+    test: {
+        globals: true,
+    },
 };
