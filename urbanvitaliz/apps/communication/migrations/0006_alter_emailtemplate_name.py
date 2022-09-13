@@ -6,13 +6,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('communication', '0005_auto_20220905_1326'),
+        ("communication", "0005_auto_20220905_1326"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='emailtemplate',
-            name='name',
-            field=models.CharField(choices=[('project_reminders_digest', 'Résumé des rappels'), ('digest_for_non_switchtender', 'Résumé quotidien général de notifications'), ('digest_for_switchtender', 'Résumé quotidien des conseillers'), ('new_recommendations_digest', 'Résumé des nouvelles recommandations'), ('new_site_for_switchtender', "Alerte conseillers d'un nouveau projet sur le territoire"), ('sharing invitation', 'Invitation à rejoindre un projet')], max_length=40),
+            model_name="emailtemplate",
+            name="name",
+            field=models.CharField(
+                choices=[
+                    ("project_reminders_digest", "Résumé des rappels"),
+                    (
+                        "digest_for_non_switchtender",
+                        "Résumé quotidien général de notifications",
+                    ),
+                    ("digest_for_switchtender", "Résumé quotidien des conseillers"),
+                    (
+                        "new_recommendations_digest",
+                        "Résumé des nouvelles recommandations",
+                    ),
+                    (
+                        "new_site_for_switchtender",
+                        "Alerte conseillers d'un nouveau projet sur le territoire",
+                    ),
+                    ("sharing invitation", "Invitation à rejoindre un projet"),
+                ],
+                max_length=40,
+            ),
         ),
     ]
