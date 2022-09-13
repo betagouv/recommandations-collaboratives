@@ -205,6 +205,7 @@ EMAIL_FROM = "UrbanVitaliz <no-reply@urbanvitaliz.fr>"
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "login-redirect"
 MAGICAUTH_FROM_EMAIL = EMAIL_FROM
+MAGICAUTH_ADAPTER = "urbanvitaliz.apps.home.adapters.UVMagicauthAdapter"
 MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à UrbanVitaliz ici"
 MAGICAUTH_EMAIL_FIELD = "email"
 MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "login-redirect"
