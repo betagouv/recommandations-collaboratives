@@ -20,7 +20,26 @@ from pytest_django.asserts import assertRedirects
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
-from . import utils
+from . import models, utils
+
+
+####
+# utils
+####
+def test_get_current_site_sender_with_configuration(request):
+    current_site = get_current_site(request)
+    site_config = baker.make(models.SiteConfiguration, site=current_site)
+
+    sender = utils.get_current_site_sender()
+
+    assert site_config.sender_email in sender
+    assert site_config.sender_name in sender
+
+
+def test_get_current_site_sender_without_configuration(request):
+    sender = utils.get_current_site_sender()
+    assert sender == settings.DEFAULT_FROM_EMAIL
+
 
 #
 # create new user hook for magicauth
