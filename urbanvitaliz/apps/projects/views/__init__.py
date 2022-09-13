@@ -242,6 +242,7 @@ def project_list_export_csv(request):
             "nb_commentaires_recos",
             "nb_rappels",
             "lien_projet",
+            "exclude_stats",
         ]
     )
 
@@ -289,6 +290,7 @@ def project_list_export_csv(request):
                 build_absolute_url(
                     reverse("projects-project-detail", args=[project.id])
                 ),
+                project.exclude_stats,
             ]
         )
 
