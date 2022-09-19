@@ -15,7 +15,7 @@ describe('I can create a project as a switchtender', () => {
 
         cy.get("[type=submit]").click({ force: true });
 
-        cy.contains("Connexion avec switchtender réussie.")
+        cy.contains("Connexion avec switchtender@email.com réussie.")
 
         cy.contains("Ajouter un projet").click({ force: true })
 
@@ -30,8 +30,8 @@ describe('I can create a project as a switchtender', () => {
             .should('have.value', 'fakelastname')
 
         cy.get('#id_email')
-            .type('fake@email.com', { force: true })
-            .should('have.value', 'fake@email.com')
+            .type('switchtender@email.com', { force: true })
+            .should('have.value', 'switchtender@email.com')
 
         cy.get('#id_phone')
             .type('010101010101', { force: true })
@@ -98,8 +98,6 @@ describe('I can create a project as a switchtender', () => {
 
         cy.contains("Cartofriche")
         cy.contains("Ce projet peut être versé sur cartofriche")
-
-
     })
 
 })
