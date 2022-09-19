@@ -51,10 +51,23 @@
                     {% if action.verb == 'a rédigé une note interne' %}
                     <div class="p-2 mb-2 bg-light">
                         {{ action.action_object.content_rendered|safe }}
-                        {% if can_administrate %}
-                        <br/>
-                        <span><a href="{% url 'projects-update-note' action.action_object.pk %}">éditer</a></span>
-                        {% endif %}
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <div class="d-flex align-items-center">
+                                <p class="mb-0 me-1 small text-secondary">{{action.actor.get_full_name|capfirst|default:action.actor}}</p>
+                                <p class="mb-0 small text-secondary">- {{action.action_object.updated_on}}</p>
+                            </div>
+                            {% if can_administrate %}
+                            <br/>
+                            <span class="ms-2">
+                                <a class="d-flex align-items-center" href="{% url 'projects-update-note' action.action_object.pk %}"> 
+                                    <svg class="align-middle bi me-1" width="15px" height="15px" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
+                                    </svg>
+                                    éditer
+                                </a>
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
                     {% endif %}
 
