@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+{% load watson %}
+
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+    <aside class="w-25 crm-aside">
+
+            {% if active_project %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
+            {% else %}
+                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
+            {% endif %}
+
+            {% include 'crm/back_button.html' %}
+            {% include 'crm/search.html' %}
+        </div>
+    </aside>
+    <div class="w-75 d-flex flex-column justify-content-start">
+        {% if active_project %}
+            <div class="crm-header px-4 py-3 pt-4 mb-3">
+        {% else %}
+            <div class="crm-header no-project px-4 py-3 pt-4">
+        {% endif %}
+            <h3 class="d-flex align-items-center">
+                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
+                </svg>
+                <span>Résultats de recherche pour "{{ query }}"</span>
+            </h3>
+            </div>
+        <div class="px-4 pt-4 bg-light crm-timeline-min-height crm-results">
+            <h4>Résultats :</h4>
+            <ul class="list-group">
+                {% for result in search_results %}
+                <li class="list-group-item">
+                    {% search_result_item result %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div> 
+{% endblock %}
