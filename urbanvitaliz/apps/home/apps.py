@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 from django.db import models
+from watson import search as watson
 
 
 class HomeConfig(AppConfig):
@@ -12,3 +13,4 @@ class HomeConfig(AppConfig):
         from django.contrib.auth.models import User
 
         registry.register(User)
+        watson.register(User)

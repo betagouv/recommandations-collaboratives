@@ -1,0 +1,20 @@
+{% load static %}
+
+<div class="d-flex">
+    <div>
+        <svg class="bi me-2" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
+        </svg>
+        <a href="{% url 'crm-organization-details' obj.pk %}">{{ obj.name }}</a>
+        {% if obj.departments.all %}
+        <div class="list-unstyled d-flex pt-2 align-items-center flex-wrap" style="font-size: 0.95rem;">
+        {% for dpt in  obj.departments.all%}
+            <span class="me-1 crm-region-tag">
+                <span class="">{{ dpt.name }}</span>
+                <strong>({{ dpt.code }})</strong>
+            </span>
+        {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>

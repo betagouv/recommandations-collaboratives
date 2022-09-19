@@ -117,7 +117,7 @@ main {
 
 .crm-sticky {
     position: sticky;
-    top: 160px;
+    top: 150px;
 }
 
 .crm-sticky.no-project {
@@ -132,7 +132,7 @@ main {
 
 .crm-relative {
     position: relative;
-    padding-top: 15px;
+    padding-top: 0px;
 }
 
 .crm-header {
@@ -162,3 +162,57 @@ main {
 .crm-region-tag strong {
     color: #2a5075;
 }
+
+.crm-search {
+    background-color: #b8d8fb;
+    padding: 20px;
+    top: 151px;
+    z-index: 100;
+    border-bottom: solid 1px #f2F2F2;
+}
+
+.crm-form-search {
+    display: flex;
+    align-items: center;
+}
+
+
+.crm-form-search .button {
+    padding: 6px;
+}
+
+.crm-form-search p {
+    display: flex;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.crm-form-search label {
+    display: none;
+}
+
+.crm-form-search input {
+    flex-grow: 1;
+    padding: 5px 10px;
+}
+
+.crm-results .crm-sticky {
+    background-color: white;
+    border-bottom: solid 2px #0063CB;
+    padding: 15px 0;
+    top: 150px;
+}
+/* .crm-results ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.crm-results ul li{
+    border-bottom: 1px solid #f2f2f2;
+    padding: 10px;
+}
+
+.crm-results ul li:hover {
+    background-color: #f2f2f2;
+} */

@@ -24,11 +24,6 @@ urlpatterns = [
     ),
     path(r"qui-sommes-nous", views.WhoWeArePageView.as_view(), name="whoweare"),
     path(r"nous-suivre", views.FollowUsPageView.as_view(), name="followus"),
-    path(
-        r"staff/dashboard",
-        views.SwitchtenderDashboardView.as_view(),
-        name="switchtender-dashboard",
-    ),
     path(r"contact/", views.contact, name="home-contact"),
     path(r"setup-password/", views.setup_password, name="home-user-setup-password"),
 ]

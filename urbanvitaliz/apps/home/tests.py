@@ -171,27 +171,6 @@ def test_switchtender_is_sent_to_project_list_on_login(client):
 
 
 ########################################################################
-# Dashboard
-########################################################################
-
-
-@pytest.mark.django_db
-def test_dashboard_not_available_for_non_switchtender_users(client):
-    url = reverse("switchtender-dashboard")
-    with login(client):
-        response = client.get(url)
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_dashboard_available_for_switchtender_users(client):
-    url = reverse("switchtender-dashboard")
-    with login(client, groups=["switchtender"]):
-        response = client.get(url)
-    assert response.status_code == 200
-
-
-########################################################################
 # Statistics
 ########################################################################
 
