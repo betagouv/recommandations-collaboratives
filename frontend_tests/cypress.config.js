@@ -10,5 +10,6 @@ module.exports = defineConfig({
     },
     chromeWebSecurity: false,
     baseUrl: 'http://localhost:8000/',
+    video:false,
   },
 })
