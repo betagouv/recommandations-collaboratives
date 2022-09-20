@@ -1,0 +1,36 @@
+<div @issue-followup="handleIssueFollowup($event)"> 
+    <h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
+        Où en êtes-vous ?
+    </h2>
+    <ul x-data="StatusSwitcher($refs.commentTextRef, $refs.commentTextFormRef)" class="d-flex align-items-center status-switcher list-unstyled m-3">
+        <li x-bind:style="activeStatus(currentTask, STATUSES.PROPOSED) && { pointerEvents: 'none' }">
+            <a @click="handleStatusClick(currentTask, STATUSES.PROPOSED)"
+                :class="activeStatus(currentTask, STATUSES.PROPOSED)">
+                Nouveau
+            </a>
+        </li>
+        <li x-bind:style="activeStatus(currentTask, STATUSES.INPROGRESS) && { pointerEvents: 'none' }">
+            <a @click="handleStatusClick(currentTask, STATUSES.INPROGRESS)"
+                :class="activeStatus(currentTask, STATUSES.INPROGRESS)">
+                En cours</a>
+        </li>
+        <li x-bind:style="activeStatus(currentTask, STATUSES.BLOCKED) && { pointerEvents: 'none' }">
+            <a @click="handleStatusClick(currentTask, STATUSES.BLOCKED)"
+                :class="activeStatus(currentTask, STATUSES.BLOCKED)">
+                En Attente
+            </a>
+        </li>
+        <li x-bind:style="activeStatus(currentTask, STATUSES.DONE) && { pointerEvents: 'none' }">
+            <a @click="handleStatusWithCommentClick(currentTask, STATUSES.DONE)"
+                :class="activeStatus(currentTask, STATUSES.DONE) || activeStatus(currentTask, STATUSES.ALREADY_DONE)">
+                Fait
+            </a>
+        </li>
+        <li x-bind:style="activeStatus(currentTask, STATUSES.NOT_INTERESTED) && { pointerEvents: 'none' }">
+            <a @click="handleStatusWithCommentClick(currentTask, STATUSES.NOT_INTERESTED)"
+                :class="activeStatus(currentTask, STATUSES.NOT_INTERESTED)">
+                Non applicable
+            </a>
+        </li>
+    </ul>
+</div>
