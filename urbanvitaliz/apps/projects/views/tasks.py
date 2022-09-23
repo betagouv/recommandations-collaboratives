@@ -17,38 +17,27 @@ from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, has_perm_or_403,
+                                is_staff_or_403, is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateActionsFromResourcesForm,
-    CreateActionWithoutResourceForm,
-    CreateActionWithResourceForm,
-    PushTypeActionForm,
-    RemindTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskFollowupForm,
-    UpdateTaskForm,
-)
-from ..utils import (
-    can_manage_or_403,
-    create_reminder,
-    get_active_project_id,
-    remove_reminder,
-)
+from ..forms import (CreateActionsFromResourcesForm,
+                     CreateActionWithoutResourceForm,
+                     CreateActionWithResourceForm, PushTypeActionForm,
+                     RemindTaskForm, RsvpTaskFollowupForm, TaskFollowupForm,
+                     TaskRecommendationForm, UpdateTaskFollowupForm,
+                     UpdateTaskForm)
+from ..utils import (can_manage_or_403, create_reminder, get_active_project_id,
+                     remove_reminder)
 
 
 @login_required
 def visit_task(request, task_id):
     """Visit the content of a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user, allow_draft=True)
+
+    has_perm_or_403(request.user, "projects.view_tasks", task.project)
+
     is_switchtender = check_if_switchtender(request.user)
 
     if not task.visited and not is_switchtender:
@@ -69,7 +58,8 @@ def visit_task(request, task_id):
 def toggle_done_task(request, task_id):
     """Mark task as done for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     if request.method == "POST":
         if task.open:
@@ -101,7 +91,8 @@ def toggle_done_task(request, task_id):
 def refuse_task(request, task_id):
     """Mark task refused for a project (user not interested)"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     if request.method == "POST":
         task.status = models.Task.NOT_INTERESTED
@@ -118,7 +109,8 @@ def refuse_task(request, task_id):
 def already_done_task(request, task_id):
     """Mark task refused for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     if request.method == "POST":
         task.status = models.Task.ALREADY_DONE
@@ -135,7 +127,8 @@ def already_done_task(request, task_id):
 def sort_task(request, task_id, order):
     """Update an existing task for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     if order == "up":
         task.up()
@@ -156,7 +149,8 @@ def sort_task(request, task_id, order):
 def update_task(request, task_id=None):
     """Update an existing task for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.manage_tasks", task.project)
 
     was_public = task.public
 
@@ -353,7 +347,9 @@ def remind_task_delete(request, task_id=None):
 def followup_task(request, task_id=None):
     """Create a new followup for task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
+
     if request.method == "POST":
         form = TaskFollowupForm(request.POST)
         if form.is_valid():
@@ -463,7 +459,7 @@ def create_action(request, project_id=None):
     """Create action for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    can_manage_or_403(project, request.user)
+    has_perm_or_403(request.user, "projects.manage_tasks", task.project)
 
     if request.method == "POST":
         # Pick a different form for better data handling based
@@ -533,10 +529,11 @@ def create_action(request, project_id=None):
 @login_required
 def create_resource_action_for_current_project(request, resource_id=None):
     """Create action for given resource to project stored in session"""
-    is_switchtender_or_403(request.user)
     project_id = get_active_project_id(request)
     resource = get_object_or_404(resources.Resource, sites=request.site, pk=resource_id)
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    has_perm_or_403(request.user, "projects.manage_tasks", project)
 
     next_url = reverse("projects-project-create-action", args=[project.id])
     next_url += f"?resource={resource.id}"

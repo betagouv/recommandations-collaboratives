@@ -224,6 +224,10 @@ class Project(models.Model):
             # Notes
             ("use_private_notes", "Can use the private notes"),
             ("use_public_notes", "Can use the public notes"),
+            # Tasks/Recommandations
+            ("view_tasks", "Can view and list tasks"),
+            ("use_tasks", "Can use tasks"),
+            ("manage_tasks", "Can manage tasks"),
         )
 
     def __str__(self):  # pragma: nocover

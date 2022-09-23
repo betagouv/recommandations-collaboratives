@@ -26,6 +26,8 @@ from . import models
 def assign_collaborator(user, project):
     """Make someone becomes a project collaborator"""
     assign_perm("projects.use_public_notes", user, project)
+    assign_perm("projects.view_tasks", user, project)
+    assign_perm("projects.use_tasks", user, project)
     models.ProjectMember.objects.get_or_create(project=project, member=user)
 
 
@@ -33,6 +35,8 @@ def assign_advisor(user, project):
     """Make someone becomes a project advisor"""
     assign_perm("projects.use_public_notes", user, project)
     assign_perm("projects.use_private_notes", user, project)
+    assign_perm("projects.view_tasks", user, project)
+    assign_perm("projects.manage_tasks", user, project)
 
     models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,
