@@ -11,14 +11,38 @@ created: <2021-09-13 lun. 15:38>
 import uuid
 
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 from urbanvitaliz import utils as uv_utils
 from urbanvitaliz.apps.reminders import api
 
 from . import models
+
+
+def assign_collaborator(user, project):
+    """Make someone becomes a project collaborator"""
+    assign_perm("projects.use_public_notes", user, project)
+    models.ProjectMember.objects.get_or_create(project=project, member=user)
+
+
+def assign_advisor(user, project):
+    """Make someone becomes a project advisor"""
+    assign_perm("projects.use_public_notes", user, project)
+    assign_perm("projects.use_private_notes", user, project)
+
+    models.ProjectSwitchtender.objects.get_or_create(
+        switchtender=user,
+        site=get_current_site(Site.objects.get_current()),
+        project=project,
+    )
+
+
+def assign_follower(user, project):
+    pass
 
 
 def can_manage_project(project, user, allow_draft=False):

@@ -221,7 +221,9 @@ class Project(models.Model):
         verbose_name = "project"
         verbose_name_plural = "projects"
         permissions = (
-            ("can_administrate_project", ("Aiguilleuse > Peut administrer un projet")),
+            # Notes
+            ("use_private_notes", "Can use the private notes"),
+            ("use_public_notes", "Can use the public notes"),
         )
 
     def __str__(self):  # pragma: nocover
@@ -339,19 +341,6 @@ class Note(models.Model):
     deleted = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        permissions = [
-            # Private
-            ("add_private_note", "Can add a private note"),
-            ("change_private_note", "Can change a private note"),
-            ("delete_private_note", "Can delete a private note"),
-            ("view_private_note", "Can view a private note"),
-            # Public
-            ("add_public_note", "Can add a public note"),
-            ("change_public_note", "Can change a public note"),
-            ("delete_public_note", "Can delete a public note"),
-            ("view_public_note", "Can view a public note"),
-        ]
-
         ordering = []
         verbose_name = "note"
         verbose_name_plural = "notes"
