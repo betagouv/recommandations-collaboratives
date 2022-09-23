@@ -15,14 +15,21 @@ from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
 
 from .. import models, signals
 from ..forms import NoteForm, PublicNoteForm, StaffNoteForm
-from ..utils import can_administrate_or_403, can_administrate_project, can_manage_or_403
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403)
 
 
 @login_required
 def create_public_note(request, project_id=None):
     """Create a new note for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
     can_manage_or_403(project, request.user)
+
+    user = request.user
+
+    if not user.has_perm("projects.create_public_note"):
+        pass
 
     if request.method == "POST":
         form = PublicNoteForm(request.POST)

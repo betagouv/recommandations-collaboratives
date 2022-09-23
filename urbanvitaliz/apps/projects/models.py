@@ -19,7 +19,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -338,6 +339,19 @@ class Note(models.Model):
     deleted = models.DateTimeField(null=True, blank=True)
 
     class Meta:
+        permissions = [
+            # Private
+            ("add_private_note", "Can add a private note"),
+            ("change_private_note", "Can change a private note"),
+            ("delete_private_note", "Can delete a private note"),
+            ("view_private_note", "Can view a private note"),
+            # Public
+            ("add_public_note", "Can add a public note"),
+            ("change_public_note", "Can change a public note"),
+            ("delete_public_note", "Can delete a public note"),
+            ("view_public_note", "Can view a public note"),
+        ]
+
         ordering = []
         verbose_name = "note"
         verbose_name_plural = "notes"

@@ -11,10 +11,12 @@ import django.core.mail
 import pytest
 from django import forms
 from django.conf import settings
-from django.contrib.auth import models as auth
+from django.contrib.auth import models as auth_models
+from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.utils import IntegrityError
 from django.urls import reverse
+from guardian.shortcuts import assign_perm, remove_perm
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 from urbanvitaliz.apps.projects import models as projects_models
@@ -64,7 +66,7 @@ def test_create_user_fails_with_missing_email():
 @pytest.mark.django_db
 def test_create_user_fails_for_known_email():
     email = "known.user@example.com"
-    baker.make(auth.User, username=email)
+    baker.make(auth_models.User, username=email)
     with pytest.raises(IntegrityError):
         utils.create_user(email)
 
@@ -203,6 +205,182 @@ def test_user_can_access_followus(client):
     url = reverse("followus")
     response = client.get(url)
     assert response.status_code == 200
+
+
+################################################################
+# guardian
+################################################################
+
+
+def test_guardian_supports_assign_for_user_with_site_framework(client, request):
+    """Test usage of assign_perm for User"""
+    user = baker.make(auth_models.User)
+    project = baker.make(projects_models.Project)
+
+    site1 = baker.make(Site, pk=1)
+    site2 = baker.make(Site, pk=2)
+
+    with settings.SITE_ID.override(site1.pk):
+        perm = assign_perm("add_project", user, project)
+        assert perm.site == get_current_site(request)
+
+        user_has_perm = user.has_perm("projects.add_project", project)
+        assert user_has_perm is True
+
+    with settings.SITE_ID.override(site2.pk):
+        user_has_perm = user.has_perm("projects.add_project", project)
+        assert user_has_perm is False
+
+
+def test_guardian_supports_assign_for_group_with_site_framework(client, request):
+    """Test usage of assign_perm for Group"""
+    group = baker.make(auth_models.Group)
+    user = baker.make(auth_models.User, groups=[group])
+    project = baker.make(projects_models.Project)
+
+    site1 = baker.make(Site, pk=1)
+    site2 = baker.make(Site, pk=2)
+
+    with settings.SITE_ID.override(site1.pk):
+        group_perm = assign_perm("add_project", group, project)
+        assert group_perm.site == get_current_site(request)
+
+        user_has_perm = user.has_perm("projects.add_project", project)
+        assert user_has_perm is True
+
+    with settings.SITE_ID.override(site2.pk):
+        user_has_perm = user.has_perm("projects.add_project", project)
+        assert user_has_perm is False
+
+
+def test_guardian_supports_bulk_assign_users_with_site_framework(client, request):
+    baker.make(auth_models.User)
+    baker.make(auth_models.User)
+    project = baker.make(projects_models.Project)
+
+    users = auth_models.User.objects.all()
+    site1 = baker.make(Site, pk=1)
+    site2 = baker.make(Site, pk=2)
+
+    with settings.SITE_ID.override(site1.pk):
+        perms = assign_perm("add_project", users, project)
+        for perm in perms:
+            assert perm.site == get_current_site(request)
+
+        for user in users.all():
+            assert user.has_perm("projects.add_project", project)
+
+    with settings.SITE_ID.override(site2.pk):
+        for user in users.all():
+            assert not user.has_perm("projects.add_project", project)
+
+
+def test_guardian_supports_bulk_assign_groups_with_site_framework(client, request):
+    baker.make(auth_models.Group)
+    baker.make(auth_models.Group)
+
+    project = baker.make(projects_models.Project)
+
+    groups = auth_models.Group.objects.all()
+
+    site1 = baker.make(Site, pk=1)
+
+    with settings.SITE_ID.override(site1.pk):
+        perms = assign_perm("add_project", groups, project)
+        for perm in perms:
+            assert perm.site == get_current_site(request)
+
+
+def test_guardian_supports_assigning_perms_to_two_different_sites(client, request):
+    user = baker.make(auth_models.User)
+    project = baker.make(projects_models.Project)
+
+    site1 = baker.make(Site, pk=1)
+    site2 = baker.make(Site, pk=2)
+
+    with settings.SITE_ID.override(site1.pk):
+        assign_perm("add_project", user, project)
+
+    with settings.SITE_ID.override(site2.pk):
+        assign_perm("add_project", user, project)
+
+
+def test_guardian_supports_remove_perm_with_site_framework(client, request):
+    user = baker.make(auth_models.User)
+    project = baker.make(projects_models.Project)
+
+    site1 = baker.make(Site, pk=1)
+    site2 = baker.make(Site, pk=2)
+
+    with settings.SITE_ID.override(site1.pk):
+        assign_perm("add_project", user, project)
+
+    with settings.SITE_ID.override(site2.pk):
+        assign_perm("add_project", user, project)
+
+    with settings.SITE_ID.override(site1.pk):
+        remove_perm("add_project", user, project)
+        assert not user.has_perm("add_project", project)
+
+    with settings.SITE_ID.override(site2.pk):
+        assert user.has_perm("add_project", project)
+
+
+def test_guardian_supports_remove_bulk_perm_for_user_with_site_framework(
+    client, request
+):
+    user = baker.make(auth_models.User)
+    baker.make(projects_models.Project)
+    baker.make(projects_models.Project)
+
+    site1 = baker.make(Site, pk=1)
+    site2 = baker.make(Site, pk=2)
+
+    projects = projects_models.Project.objects.all()
+
+    with settings.SITE_ID.override(site1.pk):
+        assign_perm("add_project", user, projects)
+
+    with settings.SITE_ID.override(site2.pk):
+        assign_perm("add_project", user, projects)
+
+    with settings.SITE_ID.override(site1.pk):
+        remove_perm("add_project", user, projects)
+        for project in projects:
+            assert not user.has_perm("add_project", project)
+
+    with settings.SITE_ID.override(site2.pk):
+        for project in projects:
+            assert user.has_perm("add_project", project)
+
+
+def test_guardian_supports_remove_bulk_perm_for_group_with_site_framework(
+    client, request
+):
+    group = baker.make(auth_models.Group)
+    user = baker.make(auth_models.User, groups=[group])
+    baker.make(projects_models.Project)
+    baker.make(projects_models.Project)
+
+    site1 = baker.make(Site, pk=1)
+    site2 = baker.make(Site, pk=2)
+
+    projects = projects_models.Project.objects.all()
+
+    with settings.SITE_ID.override(site1.pk):
+        assign_perm("add_project", group, projects)
+
+    with settings.SITE_ID.override(site2.pk):
+        assign_perm("add_project", group, projects)
+
+    with settings.SITE_ID.override(site1.pk):
+        remove_perm("add_project", group, projects)
+        for project in projects:
+            assert not user.has_perm("add_project", project)
+
+    with settings.SITE_ID.override(site2.pk):
+        for project in projects:
+            assert user.has_perm("add_project", project)
 
 
 # eof
