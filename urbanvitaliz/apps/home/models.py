@@ -110,15 +110,14 @@ class BaseObjectPermissionManagerOnSite(
     def get_or_create(self, defaults=None, **kwargs):
         if "site" not in kwargs.keys():
             kwargs["site"] = Site.objects.get_current()
-            print(f"Making it site {kwargs['site'].pk}")
 
+        # XXX Not sure if needed
         if defaults and "site" not in defaults.keys:
             kwargs["site"] = Site.objects.get_current()
 
         return super().get_or_create(defaults, **kwargs)
 
     def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
-        print(objs)
         for obj in objs:
             if not getattr(obj, "site", None):
                 obj.site = Site.objects.get_current()
