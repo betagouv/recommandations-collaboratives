@@ -14,6 +14,8 @@
     "alpinejs": "^3.10.2",
     "axios": "^0.27.2",
     "js-cookie": "^3.0.1",
+    "leaflet": "^1.9.1",
+    "leaflet-control-geocoder": "^2.4.0",
     "vite": "^2.9.13",
     "vitest": "^0.16.0"
   }
