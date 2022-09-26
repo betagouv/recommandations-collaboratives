@@ -23,12 +23,14 @@ from urbanvitaliz.apps.reminders import api
 from . import models
 
 
-def assign_collaborator(user, project):
+def assign_collaborator(user, project, is_owner=False):
     """Make someone becomes a project collaborator"""
     assign_perm("projects.use_public_notes", user, project)
     assign_perm("projects.view_tasks", user, project)
     assign_perm("projects.use_tasks", user, project)
-    models.ProjectMember.objects.get_or_create(project=project, member=user)
+    models.ProjectMember.objects.get_or_create(
+        project=project, member=user, is_owner=is_owner
+    )
 
 
 def assign_advisor(user, project):
@@ -37,6 +39,7 @@ def assign_advisor(user, project):
     assign_perm("projects.use_private_notes", user, project)
     assign_perm("projects.view_tasks", user, project)
     assign_perm("projects.manage_tasks", user, project)
+    assign_perm("projects.use_tasks", user, project)
 
     models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,

@@ -20,7 +20,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -29,7 +30,7 @@ from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
 
-from .. import models, signals
+from .. import models, signals, utils
 
 # TODO when local authority can see & update her project
 # TODO check that project, note, and task belong to her
@@ -365,12 +366,13 @@ def test_project_knowledge_available_for_owner(request, client):
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     # project email is same as test user to be logged in
-    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
-    project = Recipe(
-        models.Project, sites=[current_site], projectmember_set=[membership]
-    ).make()
+    owner = baker.make(auth.User, is_staff=False)
 
-    with login(client, user=membership.member, is_staff=False):
+    project = Recipe(models.Project, sites=[current_site]).make()
+
+    utils.assign_collaborator(owner, project, is_owner=True)
+
+    with login(client, user=owner, is_staff=False):
         url = reverse("projects-project-detail-knowledge", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
@@ -1337,17 +1339,18 @@ def test_user_cannot_followup_on_someone_else_task(request, client):
 def test_user_can_followup_on_personal_task(request, client):
     data = dict(comment="some comment")
 
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    owner = baker.make(auth.User)
 
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
         status="READY",
-        projectmember_set=[membership],
     )
     task = baker.make(models.Task, site=get_current_site(request), project=project)
 
-    with login(client, user=membership.member) as user:
+    utils.assign_collaborator(owner, project, is_owner=True)
+
+    with login(client, user=owner) as user:
         url = reverse("projects-followup-task", args=[task.id])
         client.post(url, data=data)
 
@@ -1360,46 +1363,47 @@ def test_user_can_followup_on_personal_task(request, client):
 
 @pytest.mark.django_db
 def test_followup_triggers_notifications(request, client):
-    group = auth.Group.objects.get(name="switchtender")
-    switchtender = baker.make(auth.User, groups=[group])
+    owner = baker.make(auth.User)
+    collab = baker.make(auth.User)
+    advisor = baker.make(auth.User)
 
-    owner_membership = baker.make(models.ProjectMember, is_owner=True)
-    collab_membership = baker.make(models.ProjectMember, is_owner=False)
+    project = baker.make(
+        models.Project,
+        status="READY",
+        sites=[get_current_site(request)],
+    )
+
+    utils.assign_collaborator(owner, project, is_owner=True)
+    utils.assign_collaborator(collab, project)
+    utils.assign_advisor(advisor, project)
 
     data = dict(comment="some comment")
 
-    with login(client, user=owner_membership.member):
-        project = baker.make(
-            models.Project,
-            status="READY",
-            sites=[get_current_site(request)],
-            projectmember_set=[owner_membership, collab_membership],
-        )
-        project.switchtenders_on_site.create(
-            switchtender=switchtender, site=get_current_site(request)
-        )
+    with login(client, user=owner):
         task = baker.make(models.Task, site=get_current_site(request), project=project)
         url = reverse("projects-followup-task", args=[task.id])
         client.post(url, data=data)
 
-    assert switchtender.notifications.unread().count() == 1
-    assert collab_membership.member.notifications.unread().count() == 1
-    assert owner_membership.member.notifications.unread().count() == 0
+    assert advisor.notifications.unread().count() == 1
+    assert collab.notifications.unread().count() == 1
+    assert owner.notifications.unread().count() == 0
 
 
 @pytest.mark.django_db
 def test_user_is_redirected_after_followup_on_task(request, client):
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    owner = baker.make(auth.User)
 
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
         status="READY",
-        projectmember_set=[membership],
     )
+
+    utils.assign_collaborator(owner, project, is_owner=True)
+
     task = baker.make(models.Task, site=get_current_site(request), project=project)
 
-    with login(client, user=membership.member):
+    with login(client, user=owner):
         url = reverse("projects-followup-task", args=[task.id])
         response = client.post(url)
 
@@ -1495,10 +1499,8 @@ def test_switchtender_create_action_for_resource_push(request, client):
     ).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         session = client.session
         session["active_project"] = project.id

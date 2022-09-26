@@ -459,7 +459,7 @@ def create_action(request, project_id=None):
     """Create action for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    has_perm_or_403(request.user, "projects.manage_tasks", task.project)
+    has_perm_or_403(request.user, "projects.manage_tasks", project)
 
     if request.method == "POST":
         # Pick a different form for better data handling based
