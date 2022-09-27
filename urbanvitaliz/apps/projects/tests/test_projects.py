@@ -17,6 +17,7 @@ import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
@@ -928,10 +929,8 @@ def test_switchtender_can_add_email_to_project(request, client):
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "test@example.com", "role": "COLLABORATOR"}
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         response = client.post(url, data=data)
 
@@ -942,24 +941,24 @@ def test_switchtender_can_add_email_to_project(request, client):
 
 @pytest.mark.django_db
 def test_owner_can_add_email_to_project_if_not_draft(request, client):
-    membership = baker.make(
-        models.ProjectMember,
-        is_owner=True,
-        member__is_staff=False,
-        member__email="own@er.fr",
-        member__username="own@er.fr",
+    owner = baker.make(
+        auth.User,
+        is_staff=False,
+        email="own@er.fr",
+        username="own@er.fr",
     )
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
         status="READY",
     )
+
+    utils.assign_collaborator(owner, project, is_owner=True)
 
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
 
-    with login(client, user=membership.member):
+    with login(client, user=owner):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -970,24 +969,25 @@ def test_owner_can_add_email_to_project_if_not_draft(request, client):
 
 @pytest.mark.django_db
 def test_email_cannot_be_added_twice(request, client):
-    membership = baker.make(
-        models.ProjectMember,
-        is_owner=True,
-        member__is_staff=False,
-        member__email="own@er.fr",
-        member__username="own@er.fr",
+    owner = baker.make(
+        auth.User,
+        is_staff=False,
+        email="own@er.fr",
+        username="own@er.fr",
     )
+
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
         status="READY",
     )
+
+    utils.assign_collaborator(owner, project, is_owner=True)
 
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
 
-    with login(client, user=membership.member):
+    with login(client, user=owner):
         response = client.post(url, data=data)
         assert response.status_code == 302
 
@@ -1001,24 +1001,24 @@ def test_email_cannot_be_added_twice(request, client):
 
 @pytest.mark.django_db
 def test_owner_cannot_add_email_to_project_if_draft(request, client):
-    membership = baker.make(
-        models.ProjectMember,
-        is_owner=True,
-        member__is_staff=False,
-        member__email="user@staff.fr",
-        member__username="user@staff.fr",
+    user = baker.make(
+        auth.User,
+        is_staff=False,
+        email="user@staff.fr",
+        username="user@staff.fr",
     )
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
         status="DRAFT",
     ).make()
+
+    utils.assign_collaborator(user, project, is_owner=True)
 
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "collaborator@example.com"}
 
-    with login(client, user=membership.member):
+    with login(client, user=user):
         response = client.post(url, data=data)
 
     assert response.status_code == 403
@@ -1026,21 +1026,21 @@ def test_owner_cannot_add_email_to_project_if_draft(request, client):
 
 @pytest.mark.django_db
 def test_non_staff_cannot_delete_email_from_project(request, client):
-    membership = baker.make(
-        models.ProjectMember,
-        is_owner=False,
-        member__is_staff=False,
-        member__email="user@staff.fr",
-        member__username="user@staff.fr",
+    user = baker.make(
+        auth.User,
+        is_staff=False,
+        email="user@staff.fr",
+        username="user@staff.fr",
     )
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
         status="READY",
     ).make()
 
-    url = reverse("projects-access-delete", args=[project.id, membership.member.email])
+    utils.assign_collaborator(user, project)
+
+    url = reverse("projects-access-delete", args=[project.id, user.email])
 
     with login(client, is_staff=False):
         response = client.post(url)
@@ -1049,101 +1049,99 @@ def test_non_staff_cannot_delete_email_from_project(request, client):
 
 
 @pytest.mark.django_db
-def test_owner_can_remove_email_from_project_if_not_draft(request, client):
-    owner_membership = baker.make(
-        models.ProjectMember,
-        is_owner=True,
-        member__is_staff=False,
-        member__email="owner@ab.fr",
-        member__username="owner@ab.fr",
+def test_owner_cannot_remove_email_from_project_if_not_draft(request, client):
+    owner = baker.make(
+        auth.User,
+        is_staff=False,
+        email="owner@ab.fr",
+        username="owner@ab.fr",
     )
-    collab_membership = baker.make(
-        models.ProjectMember,
-        is_owner=False,
-        member__is_staff=False,
-        member__email="coll@ab.fr",
-        member__username="coll@ab.fr",
+    collab = baker.make(
+        auth.User,
+        is_staff=False,
+        email="coll@ab.fr",
+        username="coll@ab.fr",
     )
     project = Recipe(
         models.Project,
-        projectmember_set=[owner_membership, collab_membership],
         sites=[get_current_site(request)],
         status="READY",
     ).make()
 
+    utils.assign_collaborator(owner, project, is_owner=True)
+    utils.assign_collaborator(collab, project)
+
     url = reverse(
         "projects-access-delete",
-        args=[project.id, collab_membership.member.email],
+        args=[project.id, collab.email],
     )
 
-    with login(client, user=owner_membership.member):
+    with login(client, user=owner):
         client.post(url)
 
     project = models.Project.on_site.get(id=project.id)
-    assert collab_membership.member not in project.members.all()
+    assert collab in project.members.all()
 
 
 @pytest.mark.django_db
 def test_owner_cannot_remove_email_from_project_if_draft(request, client):
-    owner_membership = baker.make(
-        models.ProjectMember,
-        is_owner=True,
-        member__is_staff=False,
-        member__email="owner@ab.fr",
+    owner = baker.make(
+        auth.User,
+        is_staff=False,
+        email="owner@ab.fr",
+        username="owner@ab.fr",
     )
-    collab_membership = baker.make(
-        models.ProjectMember,
-        is_owner=False,
-        member__is_staff=False,
-        member__email="coll@ab.fr",
+    collab = baker.make(
+        auth.User,
+        is_staff=False,
+        email="coll@ab.fr",
+        username="coll@ab.fr",
     )
     project = Recipe(
         models.Project,
-        projectmember_set=[owner_membership, collab_membership],
         sites=[get_current_site(request)],
         status="DRAFT",
     ).make()
 
-    url = reverse(
-        "projects-access-delete", args=[project.id, collab_membership.member.email]
-    )
+    utils.assign_collaborator(owner, project, is_owner=True)
+    utils.assign_collaborator(collab, project)
 
-    with login(client, user=owner_membership.member):
+    url = reverse("projects-access-delete", args=[project.id, collab.email])
+
+    with login(client, user=owner):
         response = client.post(url)
 
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_switchtender_can_delete_email_from_project(request, client):
-    membership = baker.make(
-        models.ProjectMember,
-        is_owner=False,
-        member__is_staff=False,
-        member__username="coll@ab.fr",
-        member__email="coll@ab.fr",
+def test_staff_can_delete_email_from_project(request, client):
+    user = baker.make(
+        auth.User,
+        is_staff=True,
+        username="coll@ab.fr",
+        email="coll@ab.fr",
     )
 
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
         status="READY",
     )
 
-    url = reverse("projects-access-delete", args=[project.id, membership.member.email])
+    utils.assign_collaborator(user, project)
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    url = reverse("projects-access-delete", args=[project.id, user.email])
+
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         response = client.post(url)
 
     assert response.status_code == 302
 
     project = models.Project.on_site.get(id=project.id)
-    assert membership not in project.projectmember_set.all()
+    assert user not in project.projectmember_set.all()
 
     update_url = reverse("projects-access-update", args=[project.id])
     assertRedirects(response, update_url)
@@ -1151,32 +1149,30 @@ def test_switchtender_can_delete_email_from_project(request, client):
 
 @pytest.mark.django_db
 def test_owner_cannot_be_removed_from_project_acl(request, client):
-    membership = baker.make(
-        models.ProjectMember,
-        is_owner=True,
-        member__is_staff=False,
-        member__username="coll@ab.fr",
-        member__email="coll@ab.fr",
+    owner = baker.make(
+        auth.User,
+        is_staff=False,
+        username="owner@ab.fr",
+        email="owner@ab.fr",
     )
 
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
         status="READY",
     )
 
-    url = reverse("projects-access-delete", args=[project.id, membership.member.email])
+    utils.assign_collaborator(owner, project, is_owner=True)
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    url = reverse("projects-access-delete", args=[project.id, owner.email])
+
+    with login(client) as user:
+        assign_perm("projects.manage_members", user, project)
 
         response = client.post(url)
 
     project = models.Project.on_site.get(id=project.id)
-    assert membership in project.projectmember_set.all()
+    assert owner in project.members.all()
 
     update_url = reverse("projects-access-update", args=[project.id])
     assertRedirects(response, update_url)
@@ -1653,10 +1649,8 @@ def test_switchtender_exports_csv(request, client):
 def test_switchtender_writes_synopsis_for_project(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         response = client.post(
             reverse("projects-project-synopsis", args=[project.id]),

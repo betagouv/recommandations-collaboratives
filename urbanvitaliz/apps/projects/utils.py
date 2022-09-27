@@ -28,6 +28,10 @@ def assign_collaborator(user, project, is_owner=False):
     assign_perm("projects.use_public_notes", user, project)
     assign_perm("projects.view_tasks", user, project)
     assign_perm("projects.use_tasks", user, project)
+
+    if project.status != "DRAFT":
+        assign_perm("projects.can_invite", user, project)
+
     models.ProjectMember.objects.get_or_create(
         project=project, member=user, is_owner=is_owner
     )
@@ -40,6 +44,8 @@ def assign_advisor(user, project):
     assign_perm("projects.view_tasks", user, project)
     assign_perm("projects.manage_tasks", user, project)
     assign_perm("projects.use_tasks", user, project)
+    assign_perm("projects.can_invite", user, project)
+    assign_perm("projects.change_synopsis", user, project)
 
     models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,
