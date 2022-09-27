@@ -1,6 +1,7 @@
 import Alpine from "alpinejs";
-import 'leaflet';
+import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
+import 'leaflet-providers'
 
 import data from '../utils/map.data.json';
 
@@ -12,10 +13,12 @@ function Map() {
         init() {
             const map = L.map('map').setView([48.51, 2.20], 5);
 
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
+            L.tileLayer.provider('OpenStreetMap.France').addTo(map);
+
+            const frosm = L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+                maxZoom: 20,
+                attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            });
 
             L.Control.geocoder({
                 geocoder: L.Control.Geocoder.nominatim()
@@ -24,15 +27,49 @@ function Map() {
             console.log('data :', data);
             console.log('friche 1 lat', data[0]);
 
-            //We filter here : 
-            // Project not excluded
-            // Project with a known lat & long
-            data.filter(project => project.exclude_stats == 'False' && project['commune.latitude'] && project['commune.longitude']).map((project) => {
-                const marker = L.marker([project['commune.latitude'], project['commune.longitude']]).addTo(map);
+            var myIcon = L.divIcon({ className: 'my-div-icon' });
 
-                return marker.bindPopup(`<div><a href="/project/${project.id}/presentation">${project.name}</a><br/><strong>${project.org_name}</strong></div>`).openPopup();
+            const status = extractAllStatus(data);
+
+            let projectsByStatus = {}
+
+            status.forEach(status => {
+                let filteredProjects = []
+
+                data.forEach(project => {
+                    if (project.status === status) {
+
+                        let marker = L.marker([project['commune.latitude'], project['commune.longitude']], { icon: myIcon }).addTo(map)
+                        marker.bindPopup(`<div><a href="/project/${project.id}/presentation">${project.name}</a><br/><strong>${project.org_name}</strong></div>`).openPopup();
+
+                        filteredProjects.push(marker);
+                    }
+                })
+
+                projectsByStatus[status] = L.layerGroup(filteredProjects)
+                // projectsByStatus.push(layerGroup)
             })
 
+            // L.control.layers(frosm, projectsByStatus).addTo(map);
+            const layerControl = L.control.layers(null, projectsByStatus).addTo(map);
+            console.log('project by status : ', projectsByStatus);
+
+            // layerControl.addOverlay(projectsByStatus);
         }
     }
+}
+
+function extractAllStatus(data) {
+
+    let status = []
+    let flags = []
+
+    data.forEach(project => {
+        if (!flags[project.status]) {
+            flags[project.status] = true;
+            status.push(project.status);
+        }
+    });
+
+    return status
 }
