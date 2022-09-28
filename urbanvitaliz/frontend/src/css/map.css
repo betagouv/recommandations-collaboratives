@@ -1,3 +1,67 @@
 #map { 
     height: calc(100vh - 150px) ; 
 }
+
+.my-div-icon {
+    /* background-color: white; */
+    border-radius: 50%;
+    box-sizing:content-box;
+
+    transition: all 0.25s ease;
+
+    z-index: 100;
+}
+
+.my-div-icon:after {
+    content: '';
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    background-color: white;
+    border: solid 2px #222;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+
+    transform: scale(2);
+    transition: all 0.25s ease;
+
+    z-index: 10;
+}
+
+.my-div-icon:before {
+    content: '';
+
+    position: absolute;
+
+    top: 90%;
+    left: calc(50% - 5px);
+
+    background-color: #222;
+
+    width: 10px;
+    height: 10px;
+
+    transform: rotate(45deg);
+
+    z-index: 10;
+}
+
+
+/* .my-div-icon:hover {
+    z-index: 1000000;
+} */
+
+/* .my-div-icon:hover:after {
+    transform: scale(4);
+    z-index: 100101010;
+    border: solid 1px #222;
+} */
+
+/* .my-div-icon:hover:before {
+    z-index: 100101010;
+    opacity: 0;
+} */
