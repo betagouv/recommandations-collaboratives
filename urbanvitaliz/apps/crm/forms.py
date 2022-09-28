@@ -5,7 +5,11 @@ from . import models
 
 
 class CRMSearchForm(forms.Form):
-    query = forms.CharField(max_length=200, required=True,widget=forms.TextInput(attrs={'placeholder': 'Rechercher dans le CRM'}))
+    query = forms.CharField(
+        max_length=200,
+        required=True,
+        widget=forms.TextInput(attrs={"placeholder": "Rechercher dans le CRM"}),
+    )
 
 
 class CRMNoteForm(forms.ModelForm):
