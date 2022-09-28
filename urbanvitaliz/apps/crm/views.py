@@ -275,10 +275,7 @@ class LatestNotesFeed(Feed):
         return item.content
 
     def item_link(self, item):
-        try:
-            return item.related.get_absolute_url()
-        except:
-            return reverse("crm-site-dashboard")
+        return item.get_absolute_url()
 
     def item_pubdate(self, item):
         return item.created_on
