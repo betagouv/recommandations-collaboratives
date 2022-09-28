@@ -8,7 +8,7 @@ created: 2021-06-29 09:16:14 CEST
 """
 
 from contextlib import contextmanager
-from urllib.parse import urljoin
+from urllib.parse import urldefrag, urljoin
 
 from django.conf import settings
 from django.contrib.auth import models as auth
@@ -82,8 +82,11 @@ def build_absolute_url(path, auto_login_user=None):
     url = urljoin(base, path)
 
     if auto_login_user:
+        parsed_url = urldefrag(url)
         sesame_qstring = get_query_string(auto_login_user)
-        url = f"{url}{sesame_qstring}"
+        url = f"{parsed_url.url}{sesame_qstring}"
+        if parsed_url.fragment:
+            url = f"{url}#{parsed_url.fragment}"
 
     return url
 
