@@ -32,18 +32,29 @@ from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
-                                get_site_config_or_503, is_staff_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    build_absolute_url,
+    check_if_switchtender,
+    get_site_config_or_503,
+    is_staff_or_403,
+    is_switchtender_or_403,
+)
 
 from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     format_switchtender_identity, generate_ro_key,
-                     get_active_project, get_switchtenders_for_project,
-                     is_project_moderator, is_project_moderator_or_403,
-                     is_regional_actor_for_project_or_403,
-                     refresh_user_projects_in_session, set_active_project_id)
+from ..utils import (
+    can_administrate_or_403,
+    can_administrate_project,
+    format_switchtender_identity,
+    generate_ro_key,
+    get_active_project,
+    get_switchtenders_for_project,
+    is_project_moderator,
+    is_project_moderator_or_403,
+    is_regional_actor_for_project_or_403,
+    refresh_user_projects_in_session,
+    set_active_project_id,
+)
 
 ########################################################################
 # On boarding
@@ -240,7 +251,11 @@ def project_list_export_csv(request):
             "nb_reco_actives",
             "nb_interactions_reco",
             "nb_commentaires_recos",
+            "nb_commentaires_recos_nonstaff",
             "nb_rappels",
+            "nb_messages_conversations_nonstaff",
+            "nb_messages_suivis_int_nonstaff",
+            "nb_nonstaff",
             "lien_projet",
             "exclude_stats",
         ]
@@ -255,7 +270,13 @@ def project_list_export_csv(request):
         followups = models.TaskFollowup.objects.filter(
             task__project=project,
             task__site=request.site,
-        ).exclude(who__in=switchtenders)
+        )
+
+        notes = models.Note.objects.filter(
+            project=project,
+            created_by__in=switchtenders,
+            created_by__is_staff=False,
+        )
 
         published_tasks = project.tasks.filter(site=request.site).exclude(public=False)
 
@@ -280,13 +301,21 @@ def project_list_export_csv(request):
                         models.Task.DONE,
                     )
                 ).count(),
-                followups.exclude(status=None).count(),
-                followups.exclude(comment="").count(),
+                followups.exclude(status=None).exclude(who__in=switchtenders).count(),
+                followups.exclude(comment="").exclude(who__in=switchtenders).count(),
+                (
+                    followups.exclude(comment="")
+                    .filter(who__in=switchtenders, who__is_staff=False)
+                    .count()
+                ),
                 reminders_models.Reminder.objects.filter(
                     tasks__site=request.site,
                     tasks__project=project,
                     origin=reminders_models.Reminder.SELF,
                 ).count(),
+                notes.filter(public=True).count(),
+                notes.filter(public=False).count(),
+                switchtenders.exclude(is_staff=True).count(),
                 build_absolute_url(
                     reverse("projects-project-detail", args=[project.id])
                 ),
