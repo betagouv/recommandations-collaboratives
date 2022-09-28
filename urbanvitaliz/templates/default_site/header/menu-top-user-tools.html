@@ -30,12 +30,12 @@
                 </svg>
                 <a  href="{% url 'projects-task-recommendation-list' %}">Pré-fléchage</a>
             </li>
-            {% if request.site.siteconfiguration.project_survey %}
+            {% if request.site.configuration.project_survey %}
             <li class="small  dropdown-item border-0 d-inline-block position-relative">
                 <svg class="bi me-2 d-inline" width="16" height="16">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle"/>
                 </svg>
-                <a href="{% url 'survey-editor-survey-details' request.site.siteconfiguration.project_survey_id %}">Questionnaire</a>
+                <a href="{% url 'survey-editor-survey-details' request.site.configuration.project_survey_id %}">Questionnaire</a>
             </li>
             {% endif %}
             <li><hr class="dropdown-divider"></li>
