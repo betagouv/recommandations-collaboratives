@@ -32,29 +32,18 @@ from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.utils import (
-    build_absolute_url,
-    check_if_switchtender,
-    get_site_config_or_503,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
+                                get_site_config_or_503, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    format_switchtender_identity,
-    generate_ro_key,
-    get_active_project,
-    get_switchtenders_for_project,
-    is_project_moderator,
-    is_project_moderator_or_403,
-    is_regional_actor_for_project_or_403,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     format_switchtender_identity, generate_ro_key,
+                     get_active_project, get_switchtenders_for_project,
+                     is_project_moderator, is_project_moderator_or_403,
+                     is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -246,7 +235,6 @@ def project_list_export_csv(request):
             "tel",
             "conseillers",
             "statut_conseil",
-            "nb_msg_collect_conversation",
             "nb_reco",
             "nb_reco_nonstaff",
             "nb_reco_actives",
@@ -257,7 +245,7 @@ def project_list_export_csv(request):
             "nb_messages_conversation_conseillers_nonstaff",
             "nb_messages_conversation_collectivite",
             "nb_messages_suivis_int_nonstaff",
-            "nb_nonstaff",
+            "nb_conseillers_nonstaff",
             "lien_projet",
             "exclude_stats",
         ]
@@ -316,13 +304,15 @@ def project_list_export_csv(request):
                     tasks__site=request.site,
                     tasks__project=project,
                     origin=reminders_models.Reminder.SELF,
-                ).count(),
+                ).count(),  # Reminders
                 notes.filter(public=True).count(),  # conversations conseillers
                 conversations.exclude(
                     created_by__in=switchtenders
-                ),  # conversations collectivite
+                ).count(),  # conversations collectivite
                 notes.filter(public=False).count(),  # suivi interne conseillers
-                switchtenders.exclude(is_staff=True).count(),
+                switchtenders.exclude(
+                    is_staff=True
+                ).count(),  # non staff switchtender count
                 build_absolute_url(
                     reverse("projects-project-detail", args=[project.id])
                 ),
