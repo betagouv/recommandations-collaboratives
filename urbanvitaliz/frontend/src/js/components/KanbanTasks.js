@@ -34,6 +34,11 @@ function boardTasksApp(projectId) {
     }
 
     const app = {
+        //Event listener dispatched by another component
+        async handleIssueFollowup(e) {
+            await issueFollowup(e.detail.task, e.detail.status)
+            await this.getData()
+        },
         data: [],
         get isBusy() {
             return this.$store.app.isLoading
@@ -195,10 +200,18 @@ function boardTasksApp(projectId) {
                 // this.currentTaskId = null;
                 // this.currentTaskFollowups = null;
                 // this.currentTaskNotifications = [];
+
+                //Cleaning status changes behaviour
+                this.$refs.commentTextRef.classList.remove('textarea-highlight');
+                this.$refs.commentTextFormRef.classList.remove('tooltip-highlight');
+                this.$refs.commentTextRef.placeholder="Votre message";
+
                 this.pendingComment = "";
                 this.currentlyEditing = null;
                 location.hash = '';
             }
+
+
             element.addEventListener("hidePrevented.bs.modal", cleanup);
             element.addEventListener('hidden.bs.modal', cleanup);
             if (this.currentTaskId) this.openPreviewModal();
