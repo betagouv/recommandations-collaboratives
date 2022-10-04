@@ -20,9 +20,6 @@ class NoteOnSiteManager(CurrentSiteManager, NoteManager):
 
 
 class Note(models.Model):
-    class Meta:
-        unique_together = ("content_type", "object_id")
-
     objects = NoteManager()
     on_site = NoteOnSiteManager()
 
@@ -34,6 +31,8 @@ class Note(models.Model):
     updated_on = models.DateTimeField(
         default=timezone.now, verbose_name="Dernière mise à jour"
     )
+
+    sticky = models.BooleanField(default=False, verbose_name="Épingler")
 
     created_by = models.ForeignKey(
         auth_models.User, on_delete=models.CASCADE, related_name="crm_notes_created"
