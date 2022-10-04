@@ -91,6 +91,10 @@ def build_absolute_url(path, auto_login_user=None):
     return url
 
 
+def get_site_administrators(site):
+    return auth.User.objects.filter(is_staff=True, is_active=True)
+
+
 ########################################################################
 # Test helpers
 ########################################################################
