@@ -73,4 +73,5 @@ urlpatterns = [
         views.update_note_for_project,
         name="crm-project-note-update",
     ),
+    path("crm/feed/", views.LatestNotesFeed(), name="crm-feed"),
 ]

@@ -240,7 +240,12 @@ def project_list_export_csv(request):
             "nb_reco_actives",
             "nb_interactions_reco",
             "nb_commentaires_recos",
+            "nb_commentaires_recos_nonstaff",
             "nb_rappels",
+            "nb_messages_conversation_conseillers_nonstaff",
+            "nb_messages_conversation_collectivite",
+            "nb_messages_suivis_int_nonstaff",
+            "nb_conseillers_nonstaff",
             "lien_projet",
             "exclude_stats",
         ]
@@ -255,7 +260,15 @@ def project_list_export_csv(request):
         followups = models.TaskFollowup.objects.filter(
             task__project=project,
             task__site=request.site,
-        ).exclude(who__in=switchtenders)
+        )
+
+        notes = models.Note.objects.filter(
+            project=project,
+            created_by__in=switchtenders,
+            created_by__is_staff=False,
+        )
+
+        conversations = models.Note.objects.filter(project=project).filter(public=True)
 
         published_tasks = project.tasks.filter(site=request.site).exclude(public=False)
 
@@ -280,13 +293,26 @@ def project_list_export_csv(request):
                         models.Task.DONE,
                     )
                 ).count(),
-                followups.exclude(status=None).count(),
-                followups.exclude(comment="").count(),
+                followups.exclude(status=None).exclude(who__in=switchtenders).count(),
+                followups.exclude(comment="").exclude(who__in=switchtenders).count(),
+                (
+                    followups.exclude(comment="")
+                    .filter(who__in=switchtenders, who__is_staff=False)
+                    .count()
+                ),
                 reminders_models.Reminder.objects.filter(
                     tasks__site=request.site,
                     tasks__project=project,
                     origin=reminders_models.Reminder.SELF,
-                ).count(),
+                ).count(),  # Reminders
+                notes.filter(public=True).count(),  # conversations conseillers
+                conversations.exclude(
+                    created_by__in=switchtenders
+                ).count(),  # conversations collectivite
+                notes.filter(public=False).count(),  # suivi interne conseillers
+                switchtenders.exclude(
+                    is_staff=True
+                ).count(),  # non staff switchtender count
                 build_absolute_url(
                     reverse("projects-project-detail", args=[project.id])
                 ),

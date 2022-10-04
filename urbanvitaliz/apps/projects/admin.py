@@ -86,6 +86,8 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = ["site", "deadline", "tags"]
     list_display = ["created_on", "deadline", "project_name", "tags"]
 
+    actions = [csvexport]
+
     def project_name(self, o):
         return o.project.name
 

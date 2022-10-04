@@ -1,3 +1,4 @@
+from csvexport.actions import csvexport
 from django.contrib import admin
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.admin import UserAdmin
@@ -27,6 +28,8 @@ class CustomUserAdmin(UserAdmin):
         "is_staff",
         "organization",
     )
+
+    actions = [csvexport]
 
     list_filter = ("date_joined", "is_staff", "is_superuser", "is_active", "groups")
 

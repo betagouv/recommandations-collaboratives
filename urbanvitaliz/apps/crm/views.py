@@ -10,8 +10,10 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.syndication.views import Feed
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.urls import reverse
 from django.views.generic.base import TemplateView
 from notifications import models as notifications_models
 from urbanvitaliz.apps.addressbook.models import Organization
@@ -251,3 +253,35 @@ def update_note_for_organization(request, organization_id):
     )
 
     return update_note_for_object(request, note, "crm-organization-details")
+
+
+########################################################################
+# RSS Feeds
+########################################################################
+
+
+class LatestNotesFeed(Feed):
+    title = "Dernières notes de CRM"
+    link = "/crm/feed"
+    description = "Dernières notes"
+
+    def items(self):
+        return models.Note.on_site.order_by("-created_on", "-updated_on")[:20]
+
+    def item_title(self, item):
+        return item.title
+
+    def item_description(self, item):
+        return item.content
+
+    def item_link(self, item):
+        return item.get_absolute_url()
+
+    def item_pubdate(self, item):
+        return item.created_on
+
+    def item_updateddate(self, item):
+        return item.updated_on
+
+
+# eof
