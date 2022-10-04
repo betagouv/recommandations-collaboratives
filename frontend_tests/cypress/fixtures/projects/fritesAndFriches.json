@@ -1,0 +1,32 @@
+[
+    {
+        "model": "projects.project",
+        "pk": 1,
+        "fields": {
+            "status": "STUCK",
+            "ro_key": "af408518b67048a9bef11802765d08c0",
+            "last_name": "John",
+            "first_name": "Doe",
+            "publish_to_cartofriches": false,
+            "exclude_stats": true,
+            "muted": false,
+            "org_name": "Frichti",
+            "created_on": "2022-03-29T14:31:39Z",
+            "updated_on": "2022-09-19T13:08:07.795Z",
+            "tags": "",
+            "name": "[Test] Frites & Friches 🍟",
+            "phone": "",
+            "description": "🍟🍟🍟🍟",
+            "synopsis": "Quels financements existent pour ouvrir une friterie traditionnelle mais dans un food truck, le tout sur une ancienne usine de draperie ?\r\nedit de PR@beta",
+            "synopsis_on": "2022-08-29T14:51:12Z",
+            "synopsis_by": 1,
+            "location": "861 chemin rural 53",
+            "commune": 42,
+            "impediments": "🍟🍟🍟🍟",
+            "deleted": null,
+            "sites": [
+                1
+            ]
+        }
+    }
+]

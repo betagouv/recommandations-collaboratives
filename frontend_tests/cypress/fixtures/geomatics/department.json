@@ -1,0 +1,10 @@
+[
+    {
+        "fields": {
+            "name": "Département de test",
+            "region": "42"
+        },
+        "model": "geomatics.department",
+        "pk": "42"
+    }
+]
