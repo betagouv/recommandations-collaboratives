@@ -89,12 +89,12 @@ def organization_details(request, organization_id):
     )
 
     organization_ct = ContentType.objects.get_for_model(Organization)
-    try:
-        note = models.Note.on_site.get(
-            object_id=organization.pk, content_type=organization_ct
-        )
-    except models.Note.DoesNotExist:
-        note = None
+    all_notes = models.Note.on_site.filter(
+        object_id=organization.pk,
+        content_type=organization_ct,
+    ).order_by("-updated_on")
+    sticky_notes = all_notes.filter(sticky=True)
+    notes = all_notes.exclude(sticky=True)
 
     search_form = forms.CRMSearchForm()
 
@@ -108,10 +108,12 @@ def user_details(request, user_id):
     actions = actor_stream(crm_user)
 
     user_ct = ContentType.objects.get_for_model(User)
-    try:
-        note = models.Note.on_site.get(object_id=crm_user.pk, content_type=user_ct)
-    except models.Note.DoesNotExist:
-        note = None
+
+    all_notes = models.Note.on_site.filter(
+        object_id=crm_user.pk, content_type=user_ct
+    ).order_by("-updated_on")
+    sticky_notes = all_notes.filter(sticky=True)
+    notes = all_notes.exclude(sticky=True)
 
     search_form = forms.CRMSearchForm()
 
@@ -138,10 +140,12 @@ def project_details(request, project_id):
     actions = target_stream(project)
 
     project_ct = ContentType.objects.get_for_model(Project)
-    try:
-        note = models.Note.on_site.get(object_id=project.pk, content_type=project_ct)
-    except models.Note.DoesNotExist:
-        note = None
+
+    all_notes = models.Note.on_site.filter(
+        object_id=project.pk, content_type=project_ct
+    ).order_by("-updated_on")
+    sticky_notes = all_notes.filter(sticky=True)
+    notes = all_notes.exclude(sticky=True)
 
     search_form = forms.CRMSearchForm()
 
@@ -151,16 +155,6 @@ def project_details(request, project_id):
 def handle_create_note_for_object(
     request, the_object, return_view_name, return_update_view_name
 ):
-    # If a note already exists, redirect
-    user_ct = ContentType.objects.get_for_model(the_object)
-    try:
-        existing_note = models.Note.on_site.get(
-            object_id=the_object.pk, content_type=user_ct
-        )
-        return redirect(reverse(return_update_view_name, args=(existing_note.pk,)))
-    except models.Note.DoesNotExist:
-        pass
-
     if request.method == "POST":
         form = forms.CRMNoteForm(request.POST)
         if form.is_valid():
@@ -220,29 +214,37 @@ def update_note_for_object(request, note, return_view_name):
 
 
 @staff_member_required
-def update_note_for_user(request, user_id):
+def update_note_for_user(request, user_id, note_id):
     user = get_object_or_404(User, pk=user_id)
     user_ct = ContentType.objects.get_for_model(user)
     note = get_object_or_404(
-        models.Note, site=request.site, object_id=user_id, content_type=user_ct
+        models.Note,
+        site=request.site,
+        object_id=user_id,
+        content_type=user_ct,
+        pk=note_id,
     )
 
     return update_note_for_object(request, note, "crm-user-details")
 
 
 @staff_member_required
-def update_note_for_project(request, project_id):
+def update_note_for_project(request, project_id, note_id):
     project = get_object_or_404(Project, pk=project_id)
     project_ct = ContentType.objects.get_for_model(project)
     note = get_object_or_404(
-        models.Note, site=request.site, object_id=project_id, content_type=project_ct
+        models.Note,
+        site=request.site,
+        object_id=project_id,
+        content_type=project_ct,
+        pk=note_id,
     )
 
     return update_note_for_object(request, note, "crm-project-details")
 
 
 @staff_member_required
-def update_note_for_organization(request, organization_id):
+def update_note_for_organization(request, organization_id, note_id):
     organization = get_object_or_404(Organization, pk=organization_id)
     organization_ct = ContentType.objects.get_for_model(organization)
     note = get_object_or_404(
@@ -250,6 +252,7 @@ def update_note_for_organization(request, organization_id):
         site=request.site,
         object_id=organization_id,
         content_type=organization_ct,
+        pk=note_id,
     )
 
     return update_note_for_object(request, note, "crm-organization-details")
@@ -266,7 +269,7 @@ class LatestNotesFeed(Feed):
     description = "Dernières notes"
 
     def items(self):
-        return models.Note.on_site.order_by("-created_on", "-updated_on")[:20]
+        return models.Note.on_site.order_by("-updated_on", "-created_on")[:20]
 
     def item_title(self, item):
         return item.title
