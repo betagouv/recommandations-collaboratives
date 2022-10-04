@@ -191,19 +191,6 @@ class RemindTaskForm(forms.Form):
 class ProjectForm(forms.ModelForm):
     """Form for updating the base information of a project"""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        try:
-            st_group = auth_models.Group.objects.get(name="switchtender")
-            self.fields["switchtenders"].queryset = (
-                self.fields["switchtenders"]
-                .queryset.filter(groups=st_group)
-                .order_by("username")
-            )
-        except auth_models.Group.DoesNotExist:
-            pass
-
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
     publish_to_cartofriches = forms.BooleanField(
         label="Publication sur cartofriches", disabled=True, required=False
@@ -212,15 +199,12 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = models.Project
         fields = [
-            "first_name",
-            "last_name",
             "org_name",
             "phone",
             "name",
             "postcode",
             "location",
             "description",
-            "switchtenders",
             "publish_to_cartofriches",
             "muted",
         ]
