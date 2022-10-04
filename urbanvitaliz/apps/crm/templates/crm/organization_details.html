@@ -81,6 +81,24 @@
                 {% endfor %}
             </ul>
             </div>
+            {% if unread_notifications %}
+            <div class="px-4 py-4 bg-light">
+                <h4>
+                    <svg class="align-middle bi text-warning" width="20px" height="20px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell"/>
+                    </svg>
+                    {{ unread_notifications.count }} Notification(s)
+                </h4>
+                <ul class="list-group">
+                    {% for notification in unread_notifications %}
+                    <li class="d-flex flex-columns list-group-item">
+                        {{ notification }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
             <div class="px-4 pt-4 crm-note relative">
                 <a class="btn btn-secondary" href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>
 
@@ -97,6 +115,7 @@
                 {% endfor %}
 
             </div>
+
         <div class="px-4 pt-4 bg-light crm-timeline-min-height">
             <h4>Activité</h4>
             {% include 'crm/timeline.html' %}

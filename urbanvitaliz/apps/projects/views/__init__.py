@@ -346,7 +346,7 @@ def project_list(request):
         )
 
     unread_notifications = notifications_models.Notification.on_site.unread().filter(
-        recipient=request.user
+        recipient=request.user, public=True
     )
 
     return render(request, "projects/project/list.html", locals())

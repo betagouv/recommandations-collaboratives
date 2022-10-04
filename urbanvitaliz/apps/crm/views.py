@@ -1,5 +1,5 @@
 """
-Urls for crm application
+Views for crm application
 
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2022-07-20 12:27:25 CEST
@@ -13,12 +13,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
-from django.urls import reverse
 from django.views.generic.base import TemplateView
 from notifications import models as notifications_models
+from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project
-from urbanvitaliz.utils import check_if_switchtender
+from urbanvitaliz.utils import check_if_switchtender, get_site_administrators
 from watson import search as watson
 
 from . import forms, models
@@ -89,6 +89,13 @@ def organization_details(request, organization_id):
     )
 
     organization_ct = ContentType.objects.get_for_model(Organization)
+
+    unread_notifications = (
+        notifications_models.Notification.on_site.unread()
+        .filter(recipient=request.user, public=False)
+        .filter(target_content_type=organization_ct, target_object_id=organization.pk)
+    )
+
     all_notes = models.Note.on_site.filter(
         object_id=organization.pk,
         content_type=organization_ct,
@@ -108,6 +115,13 @@ def user_details(request, user_id):
     actions = actor_stream(crm_user)
 
     user_ct = ContentType.objects.get_for_model(User)
+
+    # Burn notification for this viewed user
+    notifications_models.Notification.on_site.unread().filter(
+        recipient=request.user, public=False
+    ).filter(
+        action_object_content_type=user_ct, action_object_object_id=crm_user.pk
+    ).mark_all_as_read()
 
     all_notes = models.Note.on_site.filter(
         object_id=crm_user.pk, content_type=user_ct
@@ -163,42 +177,62 @@ def handle_create_note_for_object(
             note.created_by = request.user
             note.site = request.site
             note.save()
-            return redirect(reverse(return_view_name, args=(the_object.pk,)))
+            return True, redirect(reverse(return_view_name, args=(the_object.pk,)))
 
     else:
         form = forms.CRMNoteForm()
 
-    return render(request, "crm/note_create.html", locals())
+    return False, render(request, "crm/note_create.html", locals())
 
 
 @staff_member_required
 def create_note_for_user(request, user_id):
     user = get_object_or_404(User, pk=user_id)
 
-    return handle_create_note_for_object(
+    created, response = handle_create_note_for_object(
         request, user, "crm-user-details", "crm-user-note-update"
     )
+
+    if created and user.profile and user.profile.organization:
+        administrators = get_site_administrators(request.site).exclude(
+            pk=request.user.pk
+        )  # XXX Should be replaced by crm users once new permissions are merged
+        notify.send(
+            sender=request.user,
+            recipient=administrators,
+            verb="a créé une note de CRM",
+            action_object=user,
+            target=user.profile.organization,
+            public=False,
+            crm=True,
+        )
+
+    return response
 
 
 @staff_member_required
 def create_note_for_project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
 
-    return handle_create_note_for_object(
+    _, response = handle_create_note_for_object(
         request, project, "crm-project-details", "crm-project-note-update"
     )
+
+    return response
 
 
 @staff_member_required
 def create_note_for_organization(request, organization_id):
     organization = get_object_or_404(Organization, pk=organization_id)
 
-    return handle_create_note_for_object(
+    _, response = handle_create_note_for_object(
         request,
         organization,
         "crm-organization-details",
         "crm-organization-note-update",
     )
+
+    return response
 
 
 def update_note_for_object(request, note, return_view_name):
