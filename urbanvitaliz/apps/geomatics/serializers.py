@@ -14,6 +14,6 @@ class CommuneSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Commune
 
-        fields = ["name", "insee", "postal", "department"]
+        fields = ["name", "insee", "postal", "department", "latitude", "longitude"]
 
     department = DepartmentSerializer(read_only=True)

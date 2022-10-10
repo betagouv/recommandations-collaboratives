@@ -5,15 +5,26 @@ import 'leaflet-providers'
 
 import { statusToText, statusToColorClass } from '../utils/statusToText'
 
-//Replace with an API CALL
-import data from '../utils/map.data.json';
-
+import api from '../utils/api'
 Alpine.data("Map", Map)
 
 function Map() {
     return {
-        isLoaded: false,
-        init() {
+        data: [],
+
+        get isBusy() {
+            return this.$store.app.isLoading
+        },
+
+        async getData() {
+            const json = await api.get('/api/projects/');
+
+            this.data = json.data
+        },
+
+        async init() {
+
+            await this.getData();
 
             // Map base layer 
             L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
@@ -38,20 +49,20 @@ function Map() {
             })
 
             // Map data layer project layer group
-            const status = extractAllStatus(data);
+            const status = extractAllStatus(this.data);
 
             let projectsByStatus = {}
 
             status.forEach(status => {
                 let filteredProjects = []
 
-                data.filter(project => project.exclude_stats == 'False').forEach(project => {
+                this.data.forEach(project => {
 
                     if (project.status === status) {
 
                         const myIcon = L.divIcon({ className: 'map-marker ' + statusToColorClass(project.status) });
-                        let marker = L.marker([project['commune.latitude'], project['commune.longitude']], { icon: myIcon }).addTo(map)
-                        marker.bindPopup(markerPopupTemplate(project)).openPopup();
+                        let marker = L.marker([project.commune.latitude, project.commune.longitude], { icon: myIcon }).addTo(map)
+                        marker.bindPopup(markerPopupTemplate(project))
 
                         filteredProjects.push(marker);
                     }

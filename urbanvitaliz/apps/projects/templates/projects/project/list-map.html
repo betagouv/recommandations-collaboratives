@@ -1,0 +1,49 @@
+{% extends "projects/project/list.html" %}
+
+{% load static %}
+
+{% block title %}
+| Carte intéractive
+{% endblock %}
+
+{% block project_list_content %}
+<div x-data="Map">
+    <div class="topbar d-flex justify-content-between bg-light border-bottom p-2">
+        <span class="fs-5 flex-grow-1">
+            {% if project_moderator %}
+            <svg class="align-middle bi" width="24px" height="24px" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#binoculars" />
+            </svg>
+
+            <span class="align-middle">
+                {% if draft_projects.count %}
+                <a href="#draft-projects">{{ draft_projects.count }} projet{{ draft_projects|pluralize }}</a> en attente d'acceptation
+                {% endif %}
+            </span>
+            -
+            {% endif %}
+
+            {% if unread_notifications.count %}
+            <div class="d-inline">
+                <svg class="align-middle text-danger bi" width="16px" height="16px" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-fill" />
+                </svg>
+                <span class="badge live_notify_badge bg-secondary">{{ unread_notifications.count }}</span>
+            </div>
+            {% endif %}
+        </span>
+
+        <div x-show="isBusy" x-transition class="mx-5 justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        {% include 'projects/project/fragments/list-toolbars.html' %}
+    </div>
+
+    <div x-cloak class="p-0">
+        <div x-ref="map" id="map"></div>
+    </div>
+</div>
+{% endblock %}
