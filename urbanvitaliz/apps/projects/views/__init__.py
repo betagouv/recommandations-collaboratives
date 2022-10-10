@@ -349,7 +349,36 @@ def project_list(request):
         recipient=request.user, public=True
     )
 
-    return render(request, "projects/project/list.html", locals())
+    return render(request, "projects/project/list-kanban.html", locals())
+
+
+@login_required
+@ensure_csrf_cookie
+def project_maplist(request):
+    """Return the projects for the switchtender as a map"""
+    if not (
+        check_if_switchtender(request.user)
+        or can_administrate_project(project=None, user=request.user)
+    ):
+        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+
+    project_moderator = is_project_moderator(request.user)
+
+    draft_projects = []
+    if is_project_moderator:
+        draft_projects = (
+            models.Project.on_site.in_departments(
+                request.user.profile.departments.all()
+            )
+            .filter(status="DRAFT")
+            .order_by("-created_on")
+        )
+
+    unread_notifications = notifications_models.Notification.on_site.unread().filter(
+        recipient=request.user, public=True
+    )
+
+    return render(request, "projects/project/list-map.html", locals())
 
 
 @login_required

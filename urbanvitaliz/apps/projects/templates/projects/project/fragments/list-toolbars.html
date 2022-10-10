@@ -1,0 +1,43 @@
+{% load static %}
+
+{% with request.resolver_match.url_name as url_name %}
+<div class="btn-group mx-1" role="group" aria-label="Type de vues">
+    <a class="btn btn-secondary btn-sm {% if not 'map' in url_name %}active{% endif %}" href="{% url 'projects-project-list' %}" role="button">
+        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#columns-gap" />
+        </svg>
+        <span class="align-middle">
+            Tableau
+        </span>
+    </a>
+
+    <a class="btn btn-secondary btn-sm {% if 'map' in url_name %}active{% endif %}" href="{% url 'projects-project-list-map' %}" role="button">
+        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#map"/>
+        </svg>
+        <span class="align-middle">
+            Carte
+        </span>
+    </a>
+</div>
+{% endwith %}
+
+<div class="btn-group" role="group" aria-label="Admin actions">
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'projects-project-prefill' %}" role="button">
+        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle" />
+        </svg>
+        <span class="align-middle">
+            Ajouter un projet
+        </span>
+    </a>
+
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'projects-project-list-export-csv' %}" role="button">
+        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#filetype-csv"/>
+        </svg>
+        <span class="align-middle">
+            Export CSV
+        </span>
+    </a>
+</div>
