@@ -7,7 +7,10 @@ function Auth() {
             const forgotPasswordButton = document.getElementById("forgot-password");
 
             loginInput.addEventListener("change", (e) => {
-                forgotPasswordButton.href = forgotPasswordButton.href + `#${e.target.value}`
+
+                const newUrlwithHash = forgotPasswordButton.href + '#' + e.target.value;
+
+                forgotPasswordButton.href = newUrlwithHash
             })
         },
         initResetPassword() {
