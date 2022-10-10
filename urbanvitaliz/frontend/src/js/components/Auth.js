@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs'
+import { escapeHtml } from '../utils/escapeHTML'
 
 function Auth() {
     return {
@@ -8,14 +9,14 @@ function Auth() {
 
             loginInput.addEventListener("change", (e) => {
 
-                const newUrlwithHash = forgotPasswordButton.href + '#' + e.target.value;
+                const newUrlwithHash = forgotPasswordButton.href + "#" + e.target.value;
 
-                forgotPasswordButton.href = newUrlwithHash
+                forgotPasswordButton.href = escapeHtml(newUrlwithHash)
             })
         },
         initResetPassword() {
             const url = new URL(window.location.href);
-            const urlHash = url.hash.replace('#','');
+            const urlHash = url.hash.replace('#', '');
 
             const loginInput = document.getElementById("id_email");
 
