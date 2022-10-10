@@ -9,7 +9,7 @@ function Auth() {
 
             loginInput.addEventListener("change", e => {
 
-                const newUrlwithHash = forgotPasswordButton.href + "#" + e.target.value;
+                const newUrlwithHash = forgotPasswordButton.getAttribute("href") + "#" + e.target.value;
 
                 forgotPasswordButton.addEventListener("click", e => {
                     e.preventDefault();
