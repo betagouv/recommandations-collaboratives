@@ -7,15 +7,22 @@ function Auth() {
             const loginInput = document.getElementById("id_login");
             const forgotPasswordButton = document.getElementById("forgot-password");
 
-            loginInput.addEventListener("change", (e) => {
+            loginInput.addEventListener("change", e => {
 
                 const newUrlwithHash = forgotPasswordButton.href + "#" + e.target.value;
 
-                forgotPasswordButton.setAttribute("href", escapeHtml(newUrlwithHash))
+                forgotPasswordButton.addEventListener("click", e => {
+                    e.preventDefault();
+
+                    location.href = escapeHtml(newUrlwithHash)
+                })
             })
         },
         initResetPassword() {
+            console.log("lol");
             const url = new URL(window.location.href);
+
+            console.log(url);
             const urlHash = url.hash.replace('#', '');
 
             const loginInput = document.getElementById("id_email");
