@@ -28,6 +28,7 @@ module.exports = {
                 crm: resolve('./src/js/apps/crm.js'),
                 project: resolve('./src/js/apps/project.js'),
                 projectDetails : resolve('./src/js/apps/projectDetails.js'),
+                map: resolve('./src/js/apps/map.js'),
             },
             output: {
                 chunkFileNames: undefined,
