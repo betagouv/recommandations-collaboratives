@@ -11,7 +11,7 @@ function Auth() {
 
                 const newUrlwithHash = forgotPasswordButton.href + "#" + e.target.value;
 
-                forgotPasswordButton.href = escapeHtml(newUrlwithHash)
+                forgotPasswordButton.setAttribute("href", escapeHtml(newUrlwithHash))
             })
         },
         initResetPassword() {
