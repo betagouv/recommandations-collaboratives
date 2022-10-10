@@ -19,10 +19,7 @@ function Auth() {
             })
         },
         initResetPassword() {
-            console.log("lol");
             const url = new URL(window.location.href);
-
-            console.log(url);
             const urlHash = url.hash.replace('#', '');
 
             const loginInput = document.getElementById("id_email");
