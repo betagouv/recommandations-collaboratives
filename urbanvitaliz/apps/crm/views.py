@@ -18,6 +18,7 @@ from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project
+from urbanvitaliz.apps.resources.models import Resource
 from urbanvitaliz.utils import check_if_switchtender, get_site_administrators
 from watson import search as watson
 
@@ -54,7 +55,7 @@ def crm_search(request):
 
         if search_form.is_valid():
             query = search_form.cleaned_data["query"]
-            search_results = watson.search(query)
+            search_results = watson.search(query, exclude=(Resource,))
 
     else:
         search_form = forms.CRMSearchForm()
