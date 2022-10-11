@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "markdownx",
     "dbtemplates",
     "tagging",
+    "taggit",
     "leaflet",
     "django_gravatar",
     "actstream",
@@ -230,6 +231,7 @@ MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
 
 # Tagging
 FORCE_LOWERCASE_TAGS = True
+TAGGIT_CASE_INSENSITIVE = True
 
 # Session Settings
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False

@@ -15,6 +15,7 @@ class ProjectConfig(AppConfig):
             Project,
             fields=(
                 "name",
+                "tags",
                 "commune__name",
             ),
         )

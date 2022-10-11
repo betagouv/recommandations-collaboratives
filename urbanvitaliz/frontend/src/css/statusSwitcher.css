@@ -97,3 +97,19 @@
         opacity: 1;
     }
 }
+
+@media (min-width: 576px) {
+    .status-switcher {
+        flex-direction: column;
+    }
+
+    .status-switcher li{
+        width: 100%;
+        border-right: 0;
+        border-bottom: solid 1px #14A2F1;
+    }
+
+    .status-switcher li:last-child {
+        border-bottom: 0;
+    }
+}

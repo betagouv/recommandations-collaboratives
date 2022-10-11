@@ -1,0 +1,114 @@
+#map { 
+    height: calc(100vh - 150px) ; 
+}
+
+.map-marker {
+    /* background-color: white; */
+    border-radius: 50%;
+    box-sizing:content-box;
+
+    transition: all 0.25s ease;
+
+    z-index: 100;
+}
+
+.map-marker:after {
+    content: '';
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    background-color: white;
+    border: solid 2px #222;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+
+    transform: scale(1.4);
+    transition: all 0.25s ease;
+
+    z-index: 10;
+}
+
+.leaflet-popup-content-wrapper, .leaflet-popup-content-wrapper {
+    padding: 0;
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+
+.marker-popup header {
+    min-height: auto;
+    padding: 15px 25px;
+    background-color: #bfd9ff;
+}
+
+.marker-popup main {
+    min-height: auto;
+    padding: 15px 25px;
+}
+
+.marker-popup main hr{
+    margin: 0.5rem 0;
+}
+
+.marker-popup footer {
+    min-height: auto;
+    padding: 15px 25px;
+}
+
+
+.marker-popup header a{
+    color: #222;
+}
+
+.leaflet-top.leaflet-right {
+    position: absolute;
+    top: 0;
+    left: 40%;
+}
+
+.leaflet-control-geocoder {
+    position: absolute;
+    left: 0;
+}
+
+.leaflet-control-geocoder {
+    position: absolute;
+    left: 0;
+}
+
+.map-marker.bg-secondary:after {
+    background-color: #6c757d;
+}
+
+.map-marker.bg-info:after {
+    background-color: #0dcaf0;
+}
+
+.map-marker.bg-warning:after {
+    background-color: #ffc107;
+}
+
+.map-marker.bg-primary:after {
+    background-color: #0d6efd;
+}
+
+.map-marker.bg-warning:after {
+    background-color: #ffc107;
+}
+
+.map-marker.bg-success:after {
+    background-color: #198754;
+}
+
+.map-marker.bg-dark:after {
+    background-color: #212529;
+}
