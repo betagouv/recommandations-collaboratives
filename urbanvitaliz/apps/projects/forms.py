@@ -206,7 +206,6 @@ class ProjectForm(forms.ModelForm):
             "location",
             "description",
             "publish_to_cartofriches",
-            "tags",
             "muted",
         ]
 
@@ -230,9 +229,7 @@ class SynopsisForm(forms.ModelForm):
 
     class Meta:
         model = models.Project
-        fields = [
-            "synopsis",
-        ]
+        fields = ["synopsis", "tags"]
 
 
 # eof

@@ -17,16 +17,11 @@ from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm, SynopsisForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    can_manage_or_403,
-    can_manage_project,
-    check_if_national_actor,
-    get_notification_recipients_for_project,
-    is_regional_actor_for_project,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403, can_manage_project,
+                     check_if_national_actor,
+                     get_notification_recipients_for_project,
+                     is_regional_actor_for_project, set_active_project_id)
 
 
 @login_required
@@ -237,6 +232,7 @@ def project_synopsis(request, project_id=None):
             project.synopsis_on = timezone.now()
             project.synopsis_by = request.user
             project.save()
+            form.save_m2m()
 
             return redirect(
                 reverse("projects-project-detail-overview", args=[project.pk])
