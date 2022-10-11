@@ -56,17 +56,14 @@ function initMapLayers(map, projects) {
 
     //Creates markers with icon
     //Add thoses markers to a global object - projectsByStatus
-    projects.filter(project => project.status !== "DRAFT").forEach(project => {
+    projects.forEach(project => {
         if (project?.commune?.latitude && project?.commune?.longitude) {
             let marker = L.marker([project.commune.latitude, project.commune.longitude], { icon: createMarkerIcon(project) }).addTo(map)
             marker.bindPopup(markerPopupTemplate(project))
 
-            if (projectsByStatus[statusToText(project.status)]) {
-                projectsByStatus[statusToText(project.status)].push(marker)
-            } else {
-                projectsByStatus[statusToText(project.status)] = []
-                projectsByStatus[statusToText(project.status)].push(marker)
-            }
+            if (!projectsByStatus[statusToText(project.status)]) projectsByStatus[statusToText(project.status)] = []
+
+            projectsByStatus[statusToText(project.status)].push(marker)
         }
     })
 
