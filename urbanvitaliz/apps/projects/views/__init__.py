@@ -246,6 +246,7 @@ def project_list_export_csv(request):
             "nb_messages_conversation_collectivite",
             "nb_messages_suivis_int_nonstaff",
             "nb_conseillers_nonstaff",
+            "tags",
             "lien_projet",
             "exclude_stats",
         ]
@@ -313,6 +314,7 @@ def project_list_export_csv(request):
                 switchtenders.exclude(
                     is_staff=True
                 ).count(),  # non staff switchtender count
+                [tag for tag in project.tags.names()],
                 build_absolute_url(
                     reverse("projects-project-detail", args=[project.id])
                 ),
