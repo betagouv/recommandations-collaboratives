@@ -26,72 +26,73 @@ function Map() {
 
             await this.getData();
 
-            // Map base layer 
-            L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
-                maxZoom: 20,
-                attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            });
+            const Map = initMap();
+            initMapController(Map);
+            initMapLayers(Map, this.data)
 
-            const map = L.map('map').setView([48.51, 10.20], 5);
-
-            L.tileLayer.provider('OpenStreetMap.France').addTo(map);
-
-            // Map controller 
-            L.Control.geocoder({
-                geocoder: L.Control.Geocoder.nominatim()
-            }).addTo(map);
-
-            const controller = document.getElementsByClassName('leaflet-control-geocoder');
-            controller[0].classList.add('leaflet-control-geocoder-expanded');
-            const inputController = controller[0].querySelector('input')
-            inputController.addEventListener('blur', (e) => {
-                controller[0].classList.add('leaflet-control-geocoder-expanded');
-            })
-
-            // Map data layer project layer group
-            const status = extractAllStatus(this.data);
-
-            let projectsByStatus = {}
-
-            status.forEach(status => {
-                let filteredProjects = []
-
-                this.data.forEach(project => {
-
-                    if (project.status === status) {
-
-                        const myIcon = L.divIcon({ className: 'map-marker ' + statusToColorClass(project.status) });
-                        let marker = L.marker([project.commune.latitude, project.commune.longitude], { icon: myIcon }).addTo(map)
-                        marker.bindPopup(markerPopupTemplate(project))
-
-                        filteredProjects.push(marker);
-                    }
-                })
-                
-                projectsByStatus[statusToText(status)] = L.layerGroup(filteredProjects)
-            })
-
-            L.control.layers(null, projectsByStatus).addTo(map);
-
-            //Center map
-            map.panTo(new L.LatLng(46.51, 1.20));
+            //Center Map
+            Map.panTo(new L.LatLng(46.51, 1.20));
         }
     }
 }
 
-function extractAllStatus(data) {
-
-    let status = []
-    let flags = []
-
-    data.filter(project => project.status !== "DRAFT").forEach(project => {
-        if (!flags[project.status]) {
-            flags[project.status] = true;
-            status.push(project.status);
-        }
+// Map base layer 
+function initMap() {
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+        maxZoom: 20,
+        attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
 
-    return status
+    const map = L.map('map').setView([48.51, 10.20], 5);
+
+    L.tileLayer.provider('OpenStreetMap.France').addTo(map);
+
+    return map
+}
+
+// Crete layers composed with markers
+function initMapLayers(map, projects) {
+    let projectsByStatus = {}
+
+    //Creates markers with icon
+    //Add thoses markers to a global object - projectsByStatus
+    projects.filter(project => project.status !== "DRAFT").forEach(project => {
+        if (project?.commune?.latitude && project?.commune?.longitude) {
+            let marker = L.marker([project.commune.latitude, project.commune.longitude], { icon: createMarkerIcon(project) }).addTo(map)
+            marker.bindPopup(markerPopupTemplate(project))
+
+            if (projectsByStatus[statusToText(project.status)]) {
+                projectsByStatus[statusToText(project.status)].push(marker)
+            } else {
+                projectsByStatus[statusToText(project.status)] = []
+                projectsByStatus[statusToText(project.status)].push(marker)
+            }
+        }
+    })
+
+    // For each status, we create a layerGroup composed with markers
+    Object.entries(projectsByStatus).forEach(([key, value]) => {
+        projectsByStatus[key] = L.layerGroup(value)
+    })
+
+    L.control.layers(null, projectsByStatus).addTo(map);
+}
+
+function initMapController(map) {
+    L.Control.geocoder({
+        geocoder: L.Control.Geocoder.nominatim()
+    }).addTo(map);
+
+    const controller = document.getElementsByClassName('leaflet-control-geocoder');
+    controller[0].classList.add('leaflet-control-geocoder-expanded');
+    const inputController = controller[0].querySelector('input')
+    inputController.addEventListener('blur', (e) => {
+        controller[0].classList.add('leaflet-control-geocoder-expanded');
+    })
+}
+
+function createMarkerIcon(project) {
+    return L.divIcon({ className: 'map-marker ' + statusToColorClass(project.status) });
 }
 
 function markerPopupTemplate(project) {
