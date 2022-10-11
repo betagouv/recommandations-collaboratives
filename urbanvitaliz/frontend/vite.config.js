@@ -29,6 +29,8 @@ module.exports = {
                 project: resolve('./src/js/apps/project.js'),
                 projectDetails: resolve('./src/js/apps/projectDetails.js'),
                 auth: resolve('./src/js/apps/auth.js'),
+                projectDetails : resolve('./src/js/apps/projectDetails.js'),
+                map: resolve('./src/js/apps/map.js'),
             },
             output: {
                 chunkFileNames: undefined,

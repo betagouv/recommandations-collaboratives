@@ -59,6 +59,7 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
         "created_on",
         "exclude_stats",
         "publish_to_cartofriches",
+        "tags",
         "status",
     ]
     list_display = ["created_on", "name", "location"]

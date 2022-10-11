@@ -206,6 +206,7 @@ class ProjectForm(forms.ModelForm):
             "location",
             "description",
             "publish_to_cartofriches",
+            "tags",
             "muted",
         ]
 
