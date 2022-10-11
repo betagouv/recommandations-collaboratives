@@ -5,12 +5,12 @@
         "fields": {
             "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
             "last_login": "2022-10-13T06:48:52.078Z",
-            "is_superuser": true,
+            "is_superuser": false,
             "username": "switchtender@test.fr",
             "first_name": "Switch",
             "last_name": "Tender",
             "email": "switchtender@test.fr",
-            "is_staff": true,
+            "is_staff": false,
             "is_active": true,
             "date_joined": "2021-10-11T07:59:45Z",
             "groups": [
