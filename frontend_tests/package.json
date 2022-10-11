@@ -6,7 +6,7 @@
   "scripts": {
     "test_ui": "./node_modules/cypress/bin/cypress open",
     "test": "./node_modules/cypress/bin/cypress run",
-    "db:test:init": "DJANGO_SETTINGS_MODULE=urbanvitaliz.settings.frontend_tests ../manage.py testserver ./cypress/fixtures/authGroup.json ./cypress/fixtures/users/switchtender.json ./cypress/fixtures/geomatics/region.json ./cypress/fixtures/geomatics/department.json ./cypress/fixtures/geomatics/commune.json ./cypress/fixtures/projects/fritesAndFriches.json --noinput"
+    "db:test:init": "DJANGO_SETTINGS_MODULE=urbanvitaliz.settings.frontend_tests ../manage.py testserver ./cypress/fixtures/authGroup.json ./cypress/fixtures/users/switchtender.json ./cypress/fixtures/users/collectivity.json ./cypress/fixtures/geomatics/region.json ./cypress/fixtures/geomatics/department.json ./cypress/fixtures/geomatics/commune.json ./cypress/fixtures/projects/fritesAndFriches.json ./cypress/fixtures/projects/projectsMembers.json --noinput"
   },
   "author": "",
   "license": "ISC",

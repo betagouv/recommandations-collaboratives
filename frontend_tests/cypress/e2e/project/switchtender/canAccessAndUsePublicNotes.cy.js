@@ -1,10 +1,10 @@
-describe('I can access and use privates notes', () => {
+describe('I can access and use public notes', () => {
 
     beforeEach(() => {
         cy.login("switchtender");
     })
 
-    it('goes to privates notes', () => {
+    it('goes to public notes', () => {
 
         cy.visit('/projects')
 

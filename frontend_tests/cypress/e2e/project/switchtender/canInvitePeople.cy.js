@@ -1,10 +1,10 @@
-describe('I can see and update a project synopsis', () => {
+describe('I can invite people', () => {
 
     beforeEach(() => {
         cy.login("switchtender");
     })
 
-    it('goes to project overview', () => {
+    it('goes to share a project page', () => {
 
         cy.visit('/projects')
 
@@ -15,8 +15,8 @@ describe('I can see and update a project synopsis', () => {
         cy.url().should('include', '/access/')
 
         cy.get('#invite-email')
-            .type('ddt@email.com', { force: true })
-            .should('have.value', 'ddt@email.com')
+            .type('collectivity@test.fr', { force: true })
+            .should('have.value', 'collectivity@test.fr')
 
         cy.get('#role-collaborator').click({ force: true })
 
@@ -26,6 +26,6 @@ describe('I can see and update a project synopsis', () => {
 
         cy.contains("Envoyer l'invitation").click({ force: true })
 
-        cy.contains("Un courriel d'invitation à rejoindre le projet a été envoyé à ddt@email.com.");
+        cy.contains("Un courriel d'invitation à rejoindre le projet a été envoyé à collectivity@test.fr.");
     })
 })

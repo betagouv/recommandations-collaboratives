@@ -1,11 +1,10 @@
 //Must be dore after `addARecommandationAsASwitchtender.cy.js`
-
-describe('I can create a recommandation with no resource as a switcthender', () => {
+describe('I can comment & interact with a recommandation', () => {
     beforeEach(() => {
         cy.login("switchtender");
     })
 
-    it('creates a reco', () => {
+    it('goes to recommandation page', () => {
 
         cy.visit('/projects')
 
