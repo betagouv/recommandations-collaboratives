@@ -164,7 +164,7 @@ class Project(models.Model):
         default=timezone.now, verbose_name="Dernière mise à jour"
     )
 
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     name = models.CharField(max_length=128, verbose_name="Nom du projet")
     phone = models.CharField(
