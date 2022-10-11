@@ -19,10 +19,12 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
+from taggit.managers import TaggableManager
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
@@ -161,7 +163,8 @@ class Project(models.Model):
     updated_on = models.DateTimeField(
         default=timezone.now, verbose_name="Dernière mise à jour"
     )
-    tags = models.CharField(max_length=256, blank=True, default="")
+
+    tags = TaggableManager()
 
     name = models.CharField(max_length=128, verbose_name="Nom du projet")
     phone = models.CharField(
