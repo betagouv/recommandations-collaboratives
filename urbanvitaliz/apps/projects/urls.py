@@ -26,6 +26,7 @@ urlpatterns = [
     ),
     # projects for switchtenders
     path(r"projects/", views.project_list, name="projects-project-list"),
+    path(r"projects/map", views.project_maplist, name="projects-project-list-map"),
     path(
         r"projects/csv",
         views.project_list_export_csv,

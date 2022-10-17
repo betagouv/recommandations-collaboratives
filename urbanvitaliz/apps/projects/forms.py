@@ -229,9 +229,7 @@ class SynopsisForm(forms.ModelForm):
 
     class Meta:
         model = models.Project
-        fields = [
-            "synopsis",
-        ]
+        fields = ["synopsis", "tags"]
 
 
 # eof

@@ -32,18 +32,29 @@ from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
-                                get_site_config_or_503, is_staff_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    build_absolute_url,
+    check_if_switchtender,
+    get_site_config_or_503,
+    is_staff_or_403,
+    is_switchtender_or_403,
+)
 
 from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     format_switchtender_identity, generate_ro_key,
-                     get_active_project, get_switchtenders_for_project,
-                     is_project_moderator, is_project_moderator_or_403,
-                     is_regional_actor_for_project_or_403,
-                     refresh_user_projects_in_session, set_active_project_id)
+from ..utils import (
+    can_administrate_or_403,
+    can_administrate_project,
+    format_switchtender_identity,
+    generate_ro_key,
+    get_active_project,
+    get_switchtenders_for_project,
+    is_project_moderator,
+    is_project_moderator_or_403,
+    is_regional_actor_for_project_or_403,
+    refresh_user_projects_in_session,
+    set_active_project_id,
+)
 
 ########################################################################
 # On boarding
@@ -246,6 +257,7 @@ def project_list_export_csv(request):
             "nb_messages_conversation_collectivite",
             "nb_messages_suivis_int_nonstaff",
             "nb_conseillers_nonstaff",
+            "tags",
             "lien_projet",
             "exclude_stats",
         ]
@@ -313,6 +325,7 @@ def project_list_export_csv(request):
                 switchtenders.exclude(
                     is_staff=True
                 ).count(),  # non staff switchtender count
+                [tag for tag in project.tags.names()],
                 build_absolute_url(
                     reverse("projects-project-detail", args=[project.id])
                 ),
@@ -346,10 +359,39 @@ def project_list(request):
         )
 
     unread_notifications = notifications_models.Notification.on_site.unread().filter(
-        recipient=request.user
+        recipient=request.user, public=True
     )
 
-    return render(request, "projects/project/list.html", locals())
+    return render(request, "projects/project/list-kanban.html", locals())
+
+
+@login_required
+@ensure_csrf_cookie
+def project_maplist(request):
+    """Return the projects for the switchtender as a map"""
+    if not (
+        check_if_switchtender(request.user)
+        or can_administrate_project(project=None, user=request.user)
+    ):
+        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+
+    project_moderator = is_project_moderator(request.user)
+
+    draft_projects = []
+    if is_project_moderator:
+        draft_projects = (
+            models.Project.on_site.in_departments(
+                request.user.profile.departments.all()
+            )
+            .filter(status="DRAFT")
+            .order_by("-created_on")
+        )
+
+    unread_notifications = notifications_models.Notification.on_site.unread().filter(
+        recipient=request.user, public=True
+    )
+
+    return render(request, "projects/project/list-map.html", locals())
 
 
 @login_required
