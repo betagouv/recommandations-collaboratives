@@ -13,7 +13,7 @@
         </a>
     </span>
     {% endif %}
-    {% if can_administrate %}
+    {% if can_administrate and not is_switchtender %}
     {% if not disable_can_edit %}
     <span class="d-inline-block">
         <a href="{% url 'projects-project-update' project.id %}" class="btn btn-primary w-100 btn-sm">
