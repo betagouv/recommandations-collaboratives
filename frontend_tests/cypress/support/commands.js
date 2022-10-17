@@ -1,5 +1,6 @@
 import switchtender from '../fixtures/users/switchtender.json'
 import collectivity from '../fixtures/users/collectivity.json'
+import staff from '../fixtures/users/staff.json'
 
 Cypress.Commands.add("login", (role) => {
 
@@ -9,8 +10,19 @@ Cypress.Commands.add("login", (role) => {
         case "switchtender":
             username = switchtender[0].fields.username
             break;
+        case "switchtender2":
+            username = switchtender[1].fields.username
+            break;
+        case "switchtender3":
+            username = switchtender[2].fields.username
+            break;
         case "collectivity":
             username = collectivity[0].fields.username
+            break;
+        case "staff":
+            username = staff[0].fields.username
+            break;
+        default:
             break;
     }
 
