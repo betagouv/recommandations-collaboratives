@@ -8,7 +8,7 @@ describe('I can see and update a project synopsis', () => {
 
         cy.visit('/projects')
 
-        cy.contains('[Test] Frites & Friches 🍟').click({ force: true });
+        cy.contains('Friche numéro 1').click({force:true});
 
         cy.contains("Reformulation du besoin")
 

@@ -8,7 +8,7 @@ describe('I can comment & interact with a recommandation', () => {
 
         cy.visit('/projects')
 
-        cy.contains('[Test] Frites & Friches 🍟').click({force:true});
+        cy.contains('Friche numéro 1').click({force:true});
 
         cy.contains("Recommandations").click({ force: true })
 
@@ -24,7 +24,7 @@ describe('I can comment & interact with a recommandation', () => {
 
         cy.contains("Envoyer").click({ force: true })
 
-        cy.contains("test : Thu Oct 06 2022 10:56:50 GMT+0200 (heure d’été d’Europe centrale)")
+        cy.contains(`test : ${now}`)
 
         cy.get('a').contains("En cours").click({ force: true });
 

@@ -7,7 +7,7 @@ describe('I can create a recommandation with no resource as a switcthender', () 
 
         cy.visit('/projects')
 
-        cy.contains('[Test] Frites & Friches 🍟').click({force:true});
+        cy.contains('Friche numéro 1').click({force:true});
 
         cy.contains("Recommandations").click({ force: true })
 

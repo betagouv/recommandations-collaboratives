@@ -1,10 +1,10 @@
-describe('I can follow a project', () => {
+describe('I can fill a survey', () => {
 
     beforeEach(() => {
         cy.login("collectivity");
     })
 
-    it('goes to the homepage and create a project with the main CTA', () => {
+    it('create a projet a fill up the survey', () => {
 
         cy.visit('/')
 

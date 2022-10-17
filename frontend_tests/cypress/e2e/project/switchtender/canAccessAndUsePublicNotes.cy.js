@@ -8,7 +8,7 @@ describe('I can access and use public notes', () => {
 
         cy.visit('/projects')
 
-        cy.contains('[Test] Frites & Friches 🍟').click({force:true});
+        cy.contains('Friche numéro 1').click({force:true});
 
         cy.contains("Conversation").click({ force: true })
 

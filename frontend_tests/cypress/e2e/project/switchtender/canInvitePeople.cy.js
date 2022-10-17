@@ -8,15 +8,15 @@ describe('I can invite people', () => {
 
         cy.visit('/projects')
 
-        cy.contains('[Test] Frites & Friches 🍟').click({ force: true });
+        cy.contains('Friche numéro 1').click({force:true});
 
         cy.contains("Partager le détail du projet").click({ force: true })
 
         cy.url().should('include', '/access/')
 
         cy.get('#invite-email')
-            .type('collectivity@test.fr', { force: true })
-            .should('have.value', 'collectivity@test.fr')
+            .type('collectivity3@test.fr', { force: true })
+            .should('have.value', 'collectivity3@test.fr')
 
         cy.get('#role-collaborator').click({ force: true })
 
@@ -26,6 +26,6 @@ describe('I can invite people', () => {
 
         cy.contains("Envoyer l'invitation").click({ force: true })
 
-        cy.contains("Un courriel d'invitation à rejoindre le projet a été envoyé à collectivity@test.fr.");
+        cy.contains("Un courriel d'invitation à rejoindre le projet a été envoyé à collectivity3@test.fr.");
     })
 })

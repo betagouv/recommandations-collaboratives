@@ -8,7 +8,7 @@ describe('I can access and use private notes', () => {
 
         cy.visit('/projects')
 
-        cy.contains('[Test] Frites & Friches 🍟').click({force:true});
+        cy.contains('Friche numéro 1').click({force:true});
 
         cy.contains("Suivi interne").click({ force: true })
 
