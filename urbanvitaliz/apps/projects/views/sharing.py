@@ -83,17 +83,27 @@ def access_update(request, project_id):
                 invite.site = request.site
                 invite.save()
 
+                params = {
+                    "sender": {
+                        "first_name": request.user.first_name,
+                        "last_name": request.user.last_name,
+                        "email": request.user.email,
+                    },
+                    "message": invite.message,
+                    "invite_url": utils.build_absolute_url(invite.get_absolute_url()),
+                    "project": digests.make_project_digest(project),
+                }
+
+                if request.user.profile:
+                    if request.user.profile.organization:
+                        params["sender"][
+                            "organization"
+                        ] = request.user.profile.organization.name
+
                 send_email(
                     template_name="sharing invitation",
                     recipients=[{"email": email}],
-                    params={
-                        "sender": {"email": request.user.email},
-                        "message": invite.message,
-                        "invite_url": utils.build_absolute_url(
-                            invite.get_absolute_url()
-                        ),
-                        "project": digests.make_project_digest(project),
-                    },
+                    params=params,
                 )
 
                 messages.success(
