@@ -3,7 +3,7 @@
         "model": "projects.projectmember",
         "pk": 1,
         "fields": {
-            "member": 2,
+            "member": 1,
             "project": 1,
             "is_owner": false
         }

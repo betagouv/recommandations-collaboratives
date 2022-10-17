@@ -1,0 +1,44 @@
+[
+    {
+        "model": "home.userprofile",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "organization": 1,
+            "phone_no": "0101010101",
+            "organization_position": null,
+            "deleted": null,
+            "departments": [
+                42
+            ]
+        }
+    },
+    {
+        "model": "home.userprofile",
+        "pk": 2,
+        "fields": {
+            "user": 2,
+            "organization": 2,
+            "phone_no": "0101010101",
+            "organization_position": null,
+            "deleted": null,
+            "departments": [
+                42
+            ]
+        }
+    },
+    {
+        "model": "home.userprofile",
+        "pk": 3,
+        "fields": {
+            "user": 3,
+            "organization": 1,
+            "phone_no": "0101010101",
+            "organization_position": null,
+            "deleted": null,
+            "departments": [
+                42
+            ]
+        }
+    }
+]
