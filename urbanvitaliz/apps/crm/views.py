@@ -13,6 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.utils import timezone
 from django.views.generic.base import TemplateView
 from notifications import models as notifications_models
 from notifications import notify
@@ -240,7 +241,10 @@ def update_note_for_object(request, note, return_view_name):
     if request.method == "POST":
         form = forms.CRMNoteForm(request.POST, instance=note)
         if form.is_valid():
-            note = form.save()
+            note = form.save(commit=False)
+            note.updated_on = timezone.now()
+            note.save()
+            form.save_m2m()
             return redirect(reverse(return_view_name, args=(note.related.pk,)))
     else:
         form = forms.CRMNoteForm(instance=note)

@@ -1,6 +1,6 @@
 {% load static %}
 
-<div class="d-flex align-items-center mb-4">
+<div class="d-flex align-items-center mb-2">
     {% if pinned %}
     <span>
         <svg class="bi me-1" width="15" height="15" fill="currentColor">
@@ -21,7 +21,11 @@
         <svg class="bi me-1" width="15" height="15" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-fill" />
         </svg>
-        {{note.updated_on}}
+        {% if note.updated_on|date != note.created_on|date %}
+        {{note.updated_on}}&nbsp;|&nbsp;{{note.created_on|date:"n"}} {{note.created_on|date:"N"}}
+        {% else %}
+        {{note.created_on}}
+        {% endif %}
     </span>
     <span class="d-flex align-items-center"  style="margin-left: 15px; font-size: 0.8rem; color: grey;">
         <svg class="bi me-1" width="15" height="15" fill="currentColor">
@@ -31,6 +35,11 @@
             éditer
         </a>
     </span>
+</div>
+<div class="d-flex mb-2">
+    {% for tag in note.tags.all %}
+    <span class="mx-1 badge rounded-pill bg-dark">{{ tag }}</span>
+    {% endfor %}
 </div>
 <article>
     {{ note.content_rendered|safe }}

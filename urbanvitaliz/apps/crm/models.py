@@ -7,6 +7,7 @@ from django.db import models
 from django.shortcuts import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
+from taggit.managers import TaggableManager
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
 
@@ -38,8 +39,12 @@ class Note(models.Model):
         auth_models.User, on_delete=models.CASCADE, related_name="crm_notes_created"
     )
 
-    title = models.CharField(max_length=128, verbose_name="Titre de la note")
+    title = models.CharField(
+        max_length=128, verbose_name="Titre de la note", blank=True, null=True
+    )
     content = models.TextField(default="")
+
+    tags = TaggableManager(blank=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
