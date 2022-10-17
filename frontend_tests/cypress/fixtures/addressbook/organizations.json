@@ -13,7 +13,7 @@
         "model": "addressbook.organization",
         "pk": 2,
         "fields": {
-            "name": "DDT Test",
+            "name": "Organisation de test",
             "departments": [
                 "42"
             ]

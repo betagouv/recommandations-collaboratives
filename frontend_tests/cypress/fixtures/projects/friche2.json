@@ -1,7 +1,7 @@
 [
     {
         "model": "projects.project",
-        "pk": 2,
+        "pk": 3,
         "fields": {
             "status": "STUCK",
             "ro_key": "af408518b67048a9bef11802765d08c1",
@@ -10,19 +10,19 @@
             "publish_to_cartofriches": false,
             "exclude_stats": true,
             "muted": false,
-            "org_name": "DDT Test",
+            "org_name": "Collectivité 2",
             "created_on": "2022-03-29T14:31:39Z",
             "updated_on": "2022-09-19T13:08:07.795Z",
             "tags": "",
-            "name": "Friche numéro 1 de la DDT Test",
+            "name": "Friche numéro 2",
             "phone": "01 01 01 01 01",
-            "description": "La toute première friche de la DDT Test",
+            "description": "La toute première friche",
             "synopsis": "Eos non sit quis repudiandae in nesciunt sed. Error modi quia ipsam temporibus. Dolorum nesciunt eveniet voluptate suscipit. Maiores voluptatum voluptatem cum et id quod incidunt. Dolor consequuntur itaque minima. Expedita earum id doloribus numquam est quaerat quo architecto.",
             "synopsis_on": "2022-08-29T14:51:12Z",
-            "synopsis_by": 1,
+            "synopsis_by": 4,
             "location": "861 chemin rural 53",
             "commune": 42,
-            "impediments": "La toute première friche de la DDT Test",
+            "impediments": "La seconde friche",
             "deleted": null,
             "sites": [
                 1

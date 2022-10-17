@@ -1,0 +1,23 @@
+[
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
+            "last_login": "2022-09-01T08:58:56.513Z",
+            "is_superuser": true,
+            "username": "admin@admin.fr",
+            "first_name": "admin",
+            "last_name": "admin",
+            "email": "admin@admin.fr",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2021-07-09T09:29:47.252Z",
+            "groups": [
+                1,
+                3
+            ],
+            "user_permissions": []
+        }
+    }
+]

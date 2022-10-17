@@ -16,5 +16,23 @@
             "groups": [],
             "user_permissions": []
         }
+    },
+    {
+        "model": "auth.user",
+        "pk": 3,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
+            "last_login": "2022-09-01T08:58:56.513Z",
+            "is_superuser": false,
+            "username": "collectivity2@test.fr",
+            "first_name": "Collectivity2",
+            "last_name": "Test",
+            "email": "collectivity2@test.fr",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2021-07-09T09:29:47.252Z",
+            "groups": [],
+            "user_permissions": []
+        }
     }
 ]

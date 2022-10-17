@@ -3,9 +3,27 @@
         "model": "projects.projectmember",
         "pk": 1,
         "fields": {
-            "member": 1,
-            "project": 1,
+            "member": 3,
+            "project": 2,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 2,
+        "fields": {
+            "member": 4,
+            "project": 2,
             "is_owner": false
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 1,
+        "fields": {
+            "switchtender": 2,
+            "project": 2,
+            "site": 1
         }
     }
 ]
