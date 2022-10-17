@@ -17,6 +17,6 @@ class CRMNoteForm(forms.ModelForm):
 
     class Meta:
         model = models.Note
-        fields = ["title", "content", "tags", "sticky"]
+        fields = ["kind", "title", "content", "tags", "sticky"]
 
     content = MarkdownxFormField()

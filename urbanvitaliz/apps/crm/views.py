@@ -98,12 +98,18 @@ def organization_details(request, organization_id):
         .filter(target_content_type=organization_ct, target_object_id=organization.pk)
     )
 
-    all_notes = models.Note.on_site.filter(
+    org_notes = models.Note.on_site.filter(
         object_id=organization.pk,
         content_type=organization_ct,
     ).order_by("-updated_on")
-    sticky_notes = all_notes.filter(sticky=True)
-    notes = all_notes.exclude(sticky=True)
+
+    participant_notes = models.Note.on_site.filter(
+        object_id__in=participant_ids,
+        content_type=user_ct,
+    ).order_by("-updated_on")
+
+    sticky_notes = org_notes.filter(sticky=True)
+    notes = org_notes.exclude(sticky=True) | participant_notes
 
     search_form = forms.CRMSearchForm()
 

@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('crm', '0005_alter_note_unique_together'),
+        ("crm", "0005_alter_note_unique_together"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='note',
-            name='title',
-            field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Titre de la note'),
+            model_name="note",
+            name="title",
+            field=models.CharField(
+                blank=True, max_length=128, null=True, verbose_name="Titre de la note"
+            ),
         ),
     ]

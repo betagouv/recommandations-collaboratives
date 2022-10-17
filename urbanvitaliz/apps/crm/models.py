@@ -21,8 +21,25 @@ class NoteOnSiteManager(CurrentSiteManager, NoteManager):
 
 
 class Note(models.Model):
+
+    PHONE_CALL = 0
+    EMAIL = 1
+    USER_TEST = 2
+
+    KIND_CHOICES = (
+        (PHONE_CALL, "Appel Téléphonique"),
+        (EMAIL, "Email"),
+        (USER_TEST, "Test utilisateur"),
+    )
     objects = NoteManager()
     on_site = NoteOnSiteManager()
+
+    kind = models.IntegerField(
+        choices=KIND_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Type de contact",
+    )
 
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
