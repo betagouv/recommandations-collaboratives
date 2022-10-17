@@ -103,7 +103,7 @@ function markerPopupTemplate(project) {
                 <p class="m-0 fs-7">${project.org_name}</p>
                 <hr/>
                 <p class="m-0 mb-2 fs-6 fw-bold">Lieu</p>
-                <p class="m-0 fs-7">${project.location}</p>
+                <p class="m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>
                 <hr/>
                 <p class="m-0 mb-2 fs-6 fw-bold">Date de dépot</p>
                 <p class="m-0 fs-7">${date}</p>
