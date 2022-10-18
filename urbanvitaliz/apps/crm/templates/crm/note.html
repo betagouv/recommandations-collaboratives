@@ -1,5 +1,6 @@
 {% load static %}
 
+<div x-data="Note" x-ref="note" class="relative crm-note" :class="isOpen ? 'open' : 'closed'">
 <div class="d-flex align-items-center mb-2">
     {% if pinned %}
     <span>
@@ -46,7 +47,7 @@
         {{note.created_on}}
         {% endif %}
     </span>
-    <span class="d-flex align-items-center"  style="margin-left: 15px; font-size: 0.8rem; color: grey;">
+    <span class="d-flex align-items-center position-relative"  style="margin-left: 15px; font-size: 0.8rem; color: grey;">
         <svg class="bi me-1" width="15" height="15" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
         </svg>
@@ -62,7 +63,7 @@
 </div>
 <article>
     {{ note.content_rendered|safe }}
-    <span x-ref="noteToggleButton" class="crm-note-toggle-buttonDISABLED" x-on:click="isOpen = ! isOpen" x-text="isOpen ? '[Voir moins]': '[Voir plus]'"></span>
+    <span x-ref="noteToggleButton" class="crm-note-toggle-button" x-on:click="isOpen = ! isOpen" x-text="isOpen ? '[Voir moins]': '[Voir plus]'"></span>
 </article>
 
-<hr/>
+</div>
