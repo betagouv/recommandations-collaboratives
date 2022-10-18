@@ -13,13 +13,13 @@
     </p>
     <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
         {% csrf_token %}
-        <button class="button green d-flex justify-content-center align-items-center my-2">
+        <button class="button green d-flex justify-content-center align-items-center my-2 w-100">
             <span>Conseiller le projet</span>
         </button>
     </form>
     <form method="POST" action="{% url 'projects-project-switchtender-leave' project.id %}">
         {% csrf_token %}
-        <button class="button red d-flex justify-content-center align-items-center my-2">
+        <button class="button red d-flex justify-content-center align-items-center my-2 w-100">
             <span>Ne plus observer le projet</span>
         </button>
     </form>
@@ -37,13 +37,13 @@
     </p>
     <form method="POST" action="{% url 'projects-project-observer-join' project.id %}">
         {% csrf_token %}
-        <button class="button d-flex justify-content-center align-items-center my-2">
+        <button class="button d-flex justify-content-center align-items-center my-2 w-100">
             <span>Observer le projet</span>
         </button>
     </form>
     <form class="d-flex" method="POST" action="{% url 'projects-project-switchtender-leave' project.id %}">
         {% csrf_token %}
-        <button class="button red justify-content-center align-items-center my-2">
+        <button class="button red justify-content-center align-items-center my-2 w-100">
             <span>Ne plus conseiller le projet</span>
         </button>
     </form>
@@ -55,7 +55,7 @@
 
     <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
         {% csrf_token %}
-        <button class="button green d-flex justify-content-center align-items-center my-2">
+        <button class="button green d-flex justify-content-center align-items-center my-2 w-100">
             <span>Conseiller le projet</span>
         </button>
     </form>
@@ -65,7 +65,7 @@
     </p>
     <form method="POST" action="{% url 'projects-project-observer-join' project.id %}">
         {% csrf_token %}
-        <button class="button d-flex justify-content-center align-items-center my-2">
+        <button class="button d-flex justify-content-center align-items-center my-2 w-100">
             <span>Observer le projet</span>
         </button>
     </form>
