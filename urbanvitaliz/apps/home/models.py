@@ -14,6 +14,13 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from guardian.core import ObjectPermissionChecker
+from guardian.managers import BaseObjectPermissionManager
+from guardian.models import (BaseGenericObjectPermission,
+                             GroupObjectPermissionAbstract,
+                             GroupObjectPermissionBase,
+                             UserObjectPermissionAbstract,
+                             UserObjectPermissionBase)
 from phonenumber_field.modelfields import PhoneNumberField
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
@@ -92,6 +99,108 @@ def create_user_profile(sender, instance, created, **kwargs):
     """register user profile creation when a user is created"""
     if created:
         UserProfile.objects.get_or_create(user=instance)
+
+
+#################################################################
+# Django Guardian
+#################################################################
+class BaseObjectPermissionManagerOnSite(
+    CurrentSiteManager, BaseObjectPermissionManager
+):
+    def get_or_create(self, defaults=None, **kwargs):
+        if "site" not in kwargs.keys():
+            kwargs["site"] = Site.objects.get_current()
+
+        # XXX Not sure if needed
+        if defaults and "site" not in defaults.keys:
+            kwargs["site"] = Site.objects.get_current()
+
+        return super().get_or_create(defaults, **kwargs)
+
+    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
+        for obj in objs:
+            if not getattr(obj, "site", None):
+                obj.site = Site.objects.get_current()
+
+        return super().bulk_create(objs, batch_size, ignore_conflicts)
+
+
+class UserObjectPermissionManagerOnSite(BaseObjectPermissionManagerOnSite):
+    pass
+
+
+class UserObjectPermissionOnSite(UserObjectPermissionBase, BaseGenericObjectPermission):
+    """Override default model to take the current site into account"""
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+    objects = UserObjectPermissionManagerOnSite()
+
+    class Meta(UserObjectPermissionBase.Meta, BaseGenericObjectPermission.Meta):
+        abstract = False
+        indexes = [
+            *UserObjectPermissionAbstract.Meta.indexes,
+            models.Index(fields=["content_type", "object_pk", "user", "site"]),
+        ]
+        unique_together = ["user", "permission", "object_pk", "site"]
+
+
+class GroupObjectPermissionManagerOnSite(BaseObjectPermissionManagerOnSite):
+    pass
+
+
+class GroupObjectPermissionOnSite(
+    GroupObjectPermissionBase, BaseGenericObjectPermission
+):
+    """Override default model to take the current site into account"""
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+    objects = GroupObjectPermissionManagerOnSite()
+
+    class Meta(GroupObjectPermissionBase.Meta, BaseGenericObjectPermission.Meta):
+        abstract = False
+        indexes = [
+            *GroupObjectPermissionAbstract.Meta.indexes,
+            models.Index(fields=["content_type", "object_pk", "group", "site"]),
+        ]
+        unique_together = ["group", "permission", "object_pk", "site"]
+
+
+### Monkey patch guardian behaviour so it returns current site permission
+
+# Users
+def get_user_filters_with_sites(self, obj):
+    """Monkey patched method to force filtering by current site.
+    Should be removed as soon as guardian supports the site framework
+    """
+    filters = ObjectPermissionChecker.original_get_user_filters(self, obj)
+    # Force filtering by current_site
+    filters["userobjectpermissiononsite__site"] = Site.objects.get_current()
+    return filters
+
+
+ObjectPermissionChecker.original_get_user_filters = (
+    ObjectPermissionChecker.get_user_filters
+)
+ObjectPermissionChecker.get_user_filters = get_user_filters_with_sites
+
+
+# Groups
+def get_group_filters_with_sites(self, obj):
+    """Monkey patched method to force filtering by current site.
+    Should be removed as soon as guardian supports the site framework
+    """
+    filters = ObjectPermissionChecker.original_get_group_filters(self, obj)
+    # Force filtering by current_site
+    filters["groupobjectpermissiononsite__site"] = Site.objects.get_current()
+    return filters
+
+
+ObjectPermissionChecker.original_get_group_filters = (
+    ObjectPermissionChecker.get_group_filters
+)
+ObjectPermissionChecker.get_group_filters = get_group_filters_with_sites
 
 
 # eof

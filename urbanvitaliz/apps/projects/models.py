@@ -19,7 +19,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -222,7 +223,22 @@ class Project(models.Model):
         verbose_name = "project"
         verbose_name_plural = "projects"
         permissions = (
-            ("can_administrate_project", ("Aiguilleuse > Peut administrer un projet")),
+            # Synopsis
+            ("view_synopsis", "Can view the synopsis"),
+            ("change_synopsis", "Can change the synopsis"),
+            # Notes
+            ("use_private_notes", "Can use the private notes (internal)"),
+            ("use_public_notes", "Can use the public notes (conversations)"),
+            ("view_public_notes", "Can read the public notes (conversations)"),
+            ("view_private_notes", "Can read the private notes (internal)"),
+            # Tasks/Recommandations
+            ("view_tasks", "Can view and list tasks"),
+            ("view_draft_tasks", "Can view and list draft tasks"),
+            ("use_tasks", "Can use tasks"),
+            ("manage_tasks", "Can manage tasks"),
+            # Invitation/sharing/members
+            ("can_invite", "Can invite collaborators"),
+            ("manage_members", "Can manage collaborators"),
         )
 
     def __str__(self):  # pragma: nocover

@@ -13,7 +13,8 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
+from urbanvitaliz.utils import (check_if_switchtender, get_site_config_or_503,
+                                has_perm_or_403)
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm, SynopsisForm
@@ -223,7 +224,7 @@ def project_synopsis(request, project_id=None):
     """Delete a task from a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    can_administrate_or_403(project, request.user)
+    has_perm_or_403(request.user, "projects.change_synopsis", project)
 
     if request.method == "POST":
         form = SynopsisForm(request.POST, instance=project)

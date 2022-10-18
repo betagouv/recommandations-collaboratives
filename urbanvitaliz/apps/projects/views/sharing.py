@@ -19,6 +19,7 @@ from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
+from urbanvitaliz.utils import has_perm_or_403
 
 from .. import models
 from ..utils import can_manage_or_403, can_manage_project
@@ -32,7 +33,8 @@ from ..utils import can_manage_or_403, can_manage_project
 def access_update(request, project_id):
     """Handle ACL for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    can_manage_or_403(project, request.user)
+
+    has_perm_or_403(request.user, "projects.can_invite", project)
 
     # Fetch pending invites
     pending_invites = []
@@ -115,8 +117,7 @@ def access_delete(request, project_id: int, email: str):
     """Delete en email from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    if project.status == "DRAFT":
-        raise PermissionDenied()
+    has_perm_or_403(request.user, "projects.manage_members", project)
 
     membership = get_object_or_404(
         models.ProjectMember, project=project, member__username=email
