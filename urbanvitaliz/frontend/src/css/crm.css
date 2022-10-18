@@ -3,6 +3,10 @@ main {
     overflow-x: initial !important;
 }
 
+.crm-notes-wrapper {
+    background-color: #fff9d4;
+}
+
 .crm-note-tag {
     position: absolute;
     right: 15px;
@@ -36,9 +40,9 @@ main {
 
 .crm-note {
     position: relative;
-    background-color: #fff9d4;
     border-bottom: 3px dashed lightgrey;
-    padding-bottom: 20px;
+    padding-bottom: 25px;
+    margin-top: 25px;
 
     z-index: 10;
     overflow: hidden;
