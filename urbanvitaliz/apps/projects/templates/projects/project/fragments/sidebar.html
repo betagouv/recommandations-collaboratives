@@ -35,49 +35,6 @@
         </a>
     </span>
     {% endif %}
-    {% if not disable_toggle_follow %}
-    <span class="d-inline-block">
-        {% if request.user in project.switchtenders.all %}
-        <form method="POST" action="{% url 'projects-project-switchtender-leave' project.id %}">
-            {% else %}
-            <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
-                {% endif %}
-                {% csrf_token %}
-
-                {% if request.user not in project.switchtenders.all %}
-                <button class="btn btn-success w-100 btn-sm">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell" />
-                    </svg>
-                    &nbsp;
-                    Conseiller ce projet
-                </button>
-                {% else %}
-                <button class="btn btn-outline-secondary w-100 btn-sm">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-slash" />
-                    </svg>
-                    &nbsp;
-                    Ne plus conseiller ce projet
-                </button>
-                {% endif %}
-            </form>
-    </span>
-    {% endif %}
-    {% elif is_regional_actor and not disable_toggle_follow %}
-    <span class="d-inline-block">
-        <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
-            {% csrf_token %}
-            <button class="btn btn-success w-100 btn-sm">
-                <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell" />
-                </svg>
-                &nbsp;
-                Conseiller ce projet
-
-            </button>
-        </form>
-    </span>
     {% endif %}
     {% if user.is_staff %}
         <span class="d-inline-block">

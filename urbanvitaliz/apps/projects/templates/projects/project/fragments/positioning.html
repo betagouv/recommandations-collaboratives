@@ -1,42 +1,5 @@
-<div class="mt-3 pt-3 p-3" style="background-color: #f6f6f6">
-    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Etes-vous disponible pour ce projet ?</h6>
-
-    <a class="button green d-flex justify-content-center align-items-center my-2" href="">
-        <span>Conseiller le projet</span>
-    </a>
-    <p class="mb-0" style="font-size: 14px; color:#666666;font-weight: 400;">
-        En vous déclarant conseiller.e, vous indiquez aux autres participants du projet que vous êtes un interlocuteur
-        disponible. Vous pouvez émettre des recommandations directement sur UrbanVitaliz.
-    </p>
-    <a class="button d-flex justify-content-center align-items-center my-2" href="">
-        <span>Observer le projet</span>
-    </a>
-    <p class="mb-0" style="font-size: 14px; color:#666666;font-weight: 400;">
-        En tant qu’observateur, vous recevez des notifications email quand le projet évolue et pouvez le consulter en
-        intégralité, mais vous ne pouvez pas intervenir (ni conversations ni recommandations).
-    </p>
-    <a class="button red d-flex justify-content-center align-items-center my-2" href="">
-        <span>Refuser le projet</span>
-    </a>
-</div>
-
-<div class="mt-3 pt-3 p-3" style="background-color: #f6f6f6">
-    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Vous êtes conseiller sur ce projet</h6>
-    <p class="mb-0" style="font-size: 14px; color:#666666;font-weight: 400;">
-        En tant que conseiller d’une collectivité, vous avez accès à toutes les informations et communications avec la collectivité. Vous serez aussi amenés à aiguiller la collectivté avec des recommandations d’actions ou de contacts à prendre pour avancer leurs projets.
-    </p>
-    
-    <p class="mb-0" style="font-size: 14px; color:#666666;font-weight: 400;">
-        En tant qu’observateur, vous recevez des notifications email quand le projet évolue et pouvez le consulter en
-        intégralité, mais vous ne pouvez pas intervenir (ni conversations ni recommandations).
-    </p>
-    <a class="button d-flex justify-content-center align-items-center my-2" href="">
-        <span>Observer le projet</span>
-    </a>
-    <a class="button red d-flex justify-content-center align-items-center my-2" href="">
-        <span>Rejeter le projet</span>
-    </a>
-</div>
+{% if switchtending %}
+{% if switchtending.is_observer %}
 
 <div class="mt-3 pt-3 p-3" style="background-color: #f6f6f6">
     <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Vous êtes observateur sur ce projet</h6>
@@ -48,10 +11,67 @@
         En tant qu’observateur, vous recevez des notifications email quand le projet évolue et pouvez le consulter en
         intégralité, mais vous ne pouvez pas intervenir (ni conversations ni recommandations).
     </p>
-    <a class="button green d-flex justify-content-center align-items-center my-2" href="">
-        <span>Conseiller le projet</span>
-    </a>
-    <a class="button red d-flex justify-content-center align-items-center my-2" href="">
-        <span>Rejeter le projet</span>
-    </a>
+    <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
+        {% csrf_token %}
+        <button class="button green d-flex justify-content-center align-items-center my-2">
+            <span>Conseiller le projet</span>
+        </button>
+    </form>
+    <form method="POST" action="{% url 'projects-project-switchtender-leave' project.id %}">
+        {% csrf_token %}
+        <button class="button red d-flex justify-content-center align-items-center my-2">
+            <span>Ne plus observer le projet</span>
+        </button>
+    </form>
 </div>
+{% else %}
+<div class="mt-3 pt-3 p-3" style="background-color: #f6f6f6">
+    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Vous êtes conseiller sur ce projet</h6>
+    <p class="mb-0" style="font-size: 14px; color:#666666;font-weight: 400;">
+        En tant que conseiller d’une collectivité, vous avez accès à toutes les informations et communications avec la collectivité. Vous serez aussi amenés à aiguiller la collectivté avec des recommandations d’actions ou de contacts à prendre pour avancer leurs projets.
+    </p>
+    
+    <p class="mb-0" style="font-size: 14px; color:#666666;font-weight: 400;">
+        En tant qu’observateur, vous recevez des notifications email quand le projet évolue et pouvez le consulter en
+        intégralité, mais vous ne pouvez pas intervenir (ni conversations ni recommandations).
+    </p>
+    <form method="POST" action="{% url 'projects-project-observer-join' project.id %}">
+        {% csrf_token %}
+        <button class="button d-flex justify-content-center align-items-center my-2">
+            <span>Observer le projet</span>
+        </button>
+    </form>
+    <form class="d-flex" method="POST" action="{% url 'projects-project-switchtender-leave' project.id %}">
+        {% csrf_token %}
+        <button class="button red justify-content-center align-items-center my-2">
+            <span>Ne plus conseiller le projet</span>
+        </button>
+    </form>
+</div>
+{% endif %}
+{% else %}
+<div class="mt-3 pt-3 p-3" style="background-color: #f6f6f6">
+    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Etes-vous disponible pour ce projet ?</h6>
+
+    <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
+        {% csrf_token %}
+        <button class="button green d-flex justify-content-center align-items-center my-2">
+            <span>Conseiller le projet</span>
+        </button>
+    </form>
+    <p class="mb-0" style="font-size: 14px; color:#666666;font-weight: 400;">
+        En vous déclarant conseiller.e, vous indiquez aux autres participants du projet que vous êtes un interlocuteur
+        disponible. Vous pouvez émettre des recommandations directement sur UrbanVitaliz.
+    </p>
+    <form method="POST" action="{% url 'projects-project-observer-join' project.id %}">
+        {% csrf_token %}
+        <button class="button d-flex justify-content-center align-items-center my-2">
+            <span>Observer le projet</span>
+        </button>
+    </form>
+    <p class="mb-0" style="font-size: 14px; color:#666666;font-weight: 400;">
+        En tant qu’observateur, vous recevez des notifications email quand le projet évolue et pouvez le consulter en
+        intégralité, mais vous ne pouvez pas intervenir (ni conversations ni recommandations).
+    </p>
+</div>
+{% endif %}

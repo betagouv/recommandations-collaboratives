@@ -15,7 +15,7 @@
 
 	<div class="d-flex align-items-center">
 		<div class="d-flex align-items-center ms-2">
-			<span class="text-muted me-2">Vos conseillers locaux :</span>
+			<span class="text-muted me-2">Équipe de suivi :</span>
 			{% for switchtender in project.switchtenders.all %}
 			<img class="rounded-circle d-inline-block ms-1" width="20px" height="20px"
 				src="{% gravatar_url switchtender.email 25 %}" data-bs-toggle="tooltip" data-bs-placement="bottom"

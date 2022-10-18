@@ -155,6 +155,16 @@ def get_switchtenders_for_project(project):
     ).distinct()
 
 
+def get_switchtender_for_project(user, project):
+    """Return a switchtending position for the given user on the given project"""
+    try:
+        return models.ProjectSwitchtender.objects.get(
+            switchtender=user, project=project
+        )
+    except models.ProjectSwitchtender.DoesNotExist:
+        return None
+
+
 def get_collaborators_for_project(project):
     return project.members.all().distinct()
 

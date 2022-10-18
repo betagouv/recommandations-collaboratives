@@ -32,29 +32,18 @@ from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.utils import (
-    build_absolute_url,
-    check_if_switchtender,
-    get_site_config_or_503,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
+                                get_site_config_or_503, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    format_switchtender_identity,
-    generate_ro_key,
-    get_active_project,
-    get_switchtenders_for_project,
-    is_project_moderator,
-    is_project_moderator_or_403,
-    is_regional_actor_for_project_or_403,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     format_switchtender_identity, generate_ro_key,
+                     get_active_project, get_switchtenders_for_project,
+                     is_project_moderator, is_project_moderator_or_403,
+                     is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -439,20 +428,49 @@ def project_accept(request, project_id=None):
 
 @login_required
 def project_switchtender_join(request, project_id=None):
-    """Join switchtender"""
+    """Join as switchtender"""
     is_switchtender_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
 
     if request.method == "POST":
-        project.switchtenders_on_site.create(
-            switchtender=request.user, site=request.site
+        switchtending, created = project.switchtenders_on_site.get_or_create(
+            switchtender=request.user,
+            site=request.site,
+            defaults={"is_observer": False},
         )
+        if not created:
+            switchtending.is_observer = False
+            switchtending.save()
 
         project.updated_on = timezone.now()
         project.save()
 
         signals.project_switchtender_joined.send(sender=request.user, project=project)
+
+    return redirect(reverse("projects-project-detail", args=[project_id]))
+
+
+@login_required
+def project_observer_join(request, project_id=None):
+    """Join as observer"""
+    is_switchtender_or_403(request.user)
+
+    project = get_object_or_404(models.Project, pk=project_id)
+    is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+
+    if request.method == "POST":
+        switchtending, created = project.switchtenders_on_site.get_or_create(
+            switchtender=request.user, site=request.site, defaults={"is_observer": True}
+        )
+        if not created:
+            switchtending.is_observer = True
+            switchtending.save()
+
+        project.updated_on = timezone.now()
+        project.save()
+
+        signals.project_observer_joined.send(sender=request.user, project=project)
 
     return redirect(reverse("projects-project-detail", args=[project_id]))
 
