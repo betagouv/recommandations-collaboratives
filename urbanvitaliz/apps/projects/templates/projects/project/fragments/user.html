@@ -2,7 +2,10 @@
 
 <div class="d-flex flex-column align-items-start mb-2">
         <!-- member -->
-        {% if member %}
+    {% if member %}
+    {% if member.is_observer %}
+    OBSERVER
+    {% endif %}
             {% if member.first_name %}
             <span class="me-2 d-flex align-items-center">
                 <img class="rounded-circle me-2" src="{% gravatar_url member.email size=24 %}" alt="{{action.actor}}">
@@ -15,8 +18,8 @@
             <span class="me-2"><strong>{{member}}</strong></span>
             {% endif %}
             <span style="color: #666666; font-style: italic; font-weight: 300;">{{member.profile.organization.name}}</span>
-        <!-- owner -->
-        {% elif project.owner and project.owner.first_name %}
+            <!-- owner -->
+            {% elif project.owner and project.owner.first_name %}
             <span class="me-2 d-flex align-items-center">
                 <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
                 <strong class="text-nowrap text-capitalize">

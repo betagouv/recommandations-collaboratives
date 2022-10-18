@@ -21,6 +21,7 @@ from ..utils import (can_administrate_or_403, can_administrate_project,
                      can_manage_or_403, can_manage_project,
                      check_if_national_actor,
                      get_notification_recipients_for_project,
+                     get_switchtender_for_project,
                      is_regional_actor_for_project, set_active_project_id)
 
 
@@ -43,6 +44,7 @@ def project_overview(request, project_id=None):
         project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
+    switchtending = get_switchtender_for_project(request.user, project)
 
     try:
         onboarding_response = dict(project.onboarding.response)
@@ -50,7 +52,7 @@ def project_overview(request, project_id=None):
         onboarding_response = None
 
     # check user can administrate project (member or switchtender)
-    if request.user != project.members.filter(projectmember__is_owner=True).first():
+    if request.user != project.owner:
         # bypass if user is switchtender, all are allowed to view at least
         if not check_if_switchtender(request.user):
             can_manage_or_403(project, request.user)
