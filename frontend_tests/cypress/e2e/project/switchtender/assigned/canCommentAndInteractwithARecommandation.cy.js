@@ -1,7 +1,7 @@
 //Must be dore after `addARecommandationAsASwitchtender.cy.js`
 describe('I can comment & interact with a recommandation', () => {
     beforeEach(() => {
-        cy.login("switchtender");
+        cy.login("jean");
     })
 
     it('goes to recommandation page', () => {
@@ -14,7 +14,7 @@ describe('I can comment & interact with a recommandation', () => {
 
         cy.url().should('include', '/actions')
 
-        cy.contains('fake recommandation with no resource').parent().click({force:true});
+        cy.contains('Ma ressource sans recommandation').parent().click({force:true});
 
         const now = new Date();
 
@@ -29,5 +29,10 @@ describe('I can comment & interact with a recommandation', () => {
         cy.get('a').contains("En cours").click({ force: true });
 
         cy.get('[aria-label="Close"]').click({force:true})
+
+        cy.wait(500)
+
+        cy.contains('Ma ressource sans recommandation').parent().click({force:true});
+        cy.contains(`test : ${now}`);
     })
 })

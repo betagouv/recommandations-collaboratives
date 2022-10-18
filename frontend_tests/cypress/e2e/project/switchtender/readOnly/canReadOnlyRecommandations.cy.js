@@ -1,7 +1,7 @@
 describe('I can read only recommandations', () => {
 
     beforeEach(() => {
-        cy.login("switchtender2");
+        cy.login("jeanne");
     })
 
     it('goes to recommandations and read only content', () => {
@@ -15,5 +15,6 @@ describe('I can read only recommandations', () => {
         cy.url().should('include', '/actions')
 
         cy.contains("Ajouter une recommandation").should('not.exist')
+        cy.contains("Ma ressource sans recommandation")
     })
 })

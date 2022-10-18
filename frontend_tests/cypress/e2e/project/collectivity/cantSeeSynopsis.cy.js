@@ -1,7 +1,7 @@
 describe("I can access overview page and can't see the synopsis", () => {
 
     beforeEach(() => {
-        cy.login("collectivity");
+        cy.login("bob");
     })
 
     it("goes to overview page and can't see synopsis", () => {

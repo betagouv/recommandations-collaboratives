@@ -1,7 +1,7 @@
 describe('I can read only project state', () => {
 
     beforeEach(() => {
-        cy.login("switchtender2");
+        cy.login("jeanne");
     })
 
     it('goes to project state and read only content', () => {

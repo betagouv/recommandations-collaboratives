@@ -1,7 +1,7 @@
 describe('I can advice a project', () => {
 
     beforeEach(() => {
-        cy.login("switchtender2");
+        cy.login("jeanne");
     })
 
     it('goes to overview page and advise the project', () => {
@@ -15,5 +15,6 @@ describe('I can advice a project', () => {
         cy.contains("Conseiller ce projet").click({ force: true })
         cy.wait(500);
         cy.contains("Ne plus conseiller ce projet")
+        cy.contains("Jeanne Conseille")
     })
 })

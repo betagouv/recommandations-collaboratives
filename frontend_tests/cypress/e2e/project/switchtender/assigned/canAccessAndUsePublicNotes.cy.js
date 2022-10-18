@@ -1,18 +1,18 @@
-describe('I can access and use private notes', () => {
+describe('I can access and use public notes', () => {
 
     beforeEach(() => {
-        cy.login("switchtender");
+        cy.login("jean");
     })
 
-    it('goes to private notes', () => {
+    it('goes to public notes', () => {
 
         cy.visit('/projects')
 
         cy.contains('Friche numéro 1').click({force:true});
 
-        cy.contains("Suivi interne").click({ force: true })
+        cy.contains("Conversation").click({ force: true })
 
-        cy.url().should('include', '/suivi')
+        cy.url().should('include', '/conversations')
 
         const now = new Date();
 

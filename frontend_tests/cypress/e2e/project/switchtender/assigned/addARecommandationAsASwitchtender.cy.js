@@ -1,6 +1,6 @@
 describe('I can create a recommandation with no resource as a switcthender', () => {
     beforeEach(() => {
-        cy.login("switchtender");
+        cy.login("jean");
     })
 
     it('creates a reco', () => {
@@ -29,6 +29,6 @@ describe('I can create a recommandation with no resource as a switcthender', () 
 
         cy.get("[type=submit]").click({ force: true });
 
-        // cy.url().should('include', '/actions#action-')
+        cy.url().should('include', '/actions#action-')
     })
 })

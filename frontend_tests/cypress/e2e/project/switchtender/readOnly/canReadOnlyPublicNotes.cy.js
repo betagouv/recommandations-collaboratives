@@ -1,7 +1,7 @@
 describe('I can read only public notes', () => {
 
     beforeEach(() => {
-        cy.login("switchtender2");
+        cy.login("jeanne");
     })
 
     it('goes to public notes and read only content', () => {
@@ -14,6 +14,6 @@ describe('I can read only public notes', () => {
 
         cy.url().should('include', '/conversations')
 
-        cy.contains("Envoyer").should('not.exist')
+        cy.get('textarea').should('not.exist')
     })
 })

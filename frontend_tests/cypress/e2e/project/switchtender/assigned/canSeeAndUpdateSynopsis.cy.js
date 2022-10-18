@@ -1,7 +1,7 @@
 describe('I can see and update a project synopsis', () => {
 
     beforeEach(() => {
-        cy.login("switchtender");
+        cy.login("jean");
     })
 
     it('goes to project overview', () => {

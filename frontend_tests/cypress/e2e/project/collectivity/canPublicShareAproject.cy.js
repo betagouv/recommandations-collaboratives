@@ -1,12 +1,12 @@
 describe('I can have a public url to share', () => {
 
     beforeEach(() => {
-        cy.login("collectivity");
+        cy.login("boba");
     })
 
     it('goes to share a project page', () => {
 
-        cy.visit('/project/2/')
+        cy.visit('/project/3/')
 
         cy.contains("Partager le détail du projet").click({ force: true })
 

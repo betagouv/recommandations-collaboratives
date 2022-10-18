@@ -1,7 +1,7 @@
 describe('I can access and use public notes', () => {
 
     beforeEach(() => {
-        cy.login("collectivity");
+        cy.login("bob");
     })
 
     it('goes to public notes', () => {
