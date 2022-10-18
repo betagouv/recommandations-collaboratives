@@ -88,5 +88,65 @@
                 1
             ]
         }
+    },
+    {
+        "model": "projects.project",
+        "pk": 4,
+        "fields": {
+            "status": "TO_PROCESS",
+            "ro_key": "af408518b67048a9bef11802765d08c2",
+            "last_name": "Johnna",
+            "first_name": "Doa",
+            "publish_to_cartofriches": false,
+            "exclude_stats": true,
+            "muted": false,
+            "org_name": "Org name de la région 1",
+            "created_on": "2022-03-29T14:31:39Z",
+            "updated_on": "2022-09-19T13:08:07.795Z",
+            "tags": "",
+            "name": "Friche numéro 3",
+            "phone": "01 01 01 01 01",
+            "description": "Friche d'une autre région",
+            "synopsis": "Eos non sit quis repudiandae in nesciunt sed. Error modi quia ipsam temporibus. Dolorum nesciunt eveniet voluptate suscipit. Maiores voluptatum voluptatem cum et id quod incidunt. Dolor consequuntur itaque minima. Expedita earum id doloribus numquam est quaerat quo architecto.",
+            "synopsis_on": "2022-08-29T14:51:12Z",
+            "synopsis_by": 1,
+            "location": "861 chemin rural 53",
+            "commune": 1,
+            "impediments": "La seconde friche",
+            "deleted": null,
+            "sites": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "projects.project",
+        "pk": 5,
+        "fields": {
+            "status": "DRAFT",
+            "ro_key": "af408518b67048a9bef11802765d08c2",
+            "last_name": "Johnna",
+            "first_name": "Doa",
+            "publish_to_cartofriches": false,
+            "exclude_stats": true,
+            "muted": false,
+            "org_name": "Fake org",
+            "created_on": "2022-03-29T14:31:39Z",
+            "updated_on": "2022-09-19T13:08:07.795Z",
+            "tags": "",
+            "name": "Friche numéro 4",
+            "phone": "01 01 01 01 01",
+            "description": "Friche en attente d'être approuvé ou refusé",
+            "synopsis": "Eos non sit quis repudiandae in nesciunt sed. Error modi quia ipsam temporibus. Dolorum nesciunt eveniet voluptate suscipit. Maiores voluptatum voluptatem cum et id quod incidunt. Dolor consequuntur itaque minima. Expedita earum id doloribus numquam est quaerat quo architecto.",
+            "synopsis_on": "2022-08-29T14:51:12Z",
+            "synopsis_by": 4,
+            "location": "861 chemin rural 53",
+            "commune": 1,
+            "impediments": "La seconde friche",
+            "deleted": null,
+            "sites": [
+                1
+            ]
+        }
     }
 ]
