@@ -1,0 +1,20 @@
+[
+    {
+        "model": "auth.group",
+        "pk": 1,
+        "fields": {
+            "name": "switchtender",
+            "permissions": [
+                149
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 3,
+        "fields": {
+            "name": "project_moderator",
+            "permissions": []
+        }
+    }
+]

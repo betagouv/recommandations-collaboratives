@@ -1,0 +1,16 @@
+[
+    {
+       "fields" : {
+          "name" : "Région de test"
+       },
+       "model" : "geomatics.region",
+       "pk" : "42"
+    },
+    {
+      "fields" : {
+         "name" : "Région de test numéro 2"
+      },
+      "model" : "geomatics.region",
+      "pk" : "1"
+   }
+]

@@ -1,0 +1,119 @@
+[
+    {
+        "model": "sites.site",
+        "pk": 1,
+        "fields": {
+            "domain": "urbanvitaliz.localhost",
+            "name": "UrbanVitaliz"
+        }
+    },
+    {
+        "model": "multisite.alias",
+        "pk": 1,
+        "fields": {
+            "domain": "urbanvitaliz.localhost",
+            "site": 1,
+            "is_canonical": true,
+            "redirect_to_canonical": true
+        }
+    },
+    {
+        "model": "onboarding.onboarding",
+        "pk": 1,
+        "fields": {
+            "form": [
+                {
+                    "type": "header",
+                    "subtype": "h3",
+                    "label": "Pourquoi nous sollicitez-vous ?"
+                },
+                {
+                    "type": "textarea",
+                    "required": "True",
+                    "label": "Demande initiale",
+                    "placeholder": "N'hésitez pas à préciser votre demande en quelques mots",
+                    "className": "form-control",
+                    "name": "textarea-1663073840671-0",
+                    "subtype": "textarea"
+                },
+                {
+                    "type": "checkbox-group",
+                    "required": "False",
+                    "label": "Cartofriche",
+                    "toggle": "True",
+                    "className": "list-unstyled form-input",
+                    "name": "checkbox-group-1663073888038-0",
+                    "values": [
+                        {
+                            "label": "Je souhaite ajouter cette friche à la cartographie publique des friches - ce qui me permet de faire connaître ce site à des porteurs de projet potentiels !",
+                            "value": "cartofriches",
+                            "selected": "True"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "model": "survey.survey",
+        "pk": 1,
+        "fields": {
+            "name": "Exploration",
+            "site": 1
+        }
+    },
+    {
+        "model": "survey.questionset",
+        "pk": 1,
+        "fields": {
+            "survey": 1,
+            "heading": "Propriété du site",
+            "icon": "key",
+            "color": "#895cf2",
+            "subheading": "",
+            "priority": 1000,
+            "deleted": null
+        }
+    },
+    {
+        "model": "survey.question",
+        "pk": 1,
+        "fields": {
+            "precondition": "",
+            "priority": 500,
+            "question_set": 1,
+            "text": "Qui possède les sols et les bâtiments de la friche ?",
+            "text_short": "Propriétaire(s)",
+            "how": "- Sur le registre de propriété du territoire de la collectivité. ﻿\r\n- En faisant une demande écrite au Service des Propriétés Foncières (données disponibles : nom des propriétaires successifs, historique des prix de vente...).\r\n- En consultant les données Fichiers fonciers (dites MAJIC). Ces données permettent d’avoir le nom et le contact du propriétaire qui paie (théoriquement) la taxe foncière. Ecrivez-nous si vous avez besoin d'un contact MAJIC.\r\n- En tentant de déposer un courrier dans la boîte aux lettres, si le courrier semble relevé.\r\n- Savoir si le propriétaire paie sa taxe foncière : la commune peut obtenir l’information auprès de la direction locale des finances publiques.",
+            "why": "Selon le type de propriétaire, les procédures, financements et acteurs à solliciter ne seront pas les mêmes pour renouveler le site.\r\n\r\nIl est généralement nécessaire de maîtriser le terrain d’une façon ou d’une autre pour permettre son renouvellement selon un scénario d’usage acceptable pour la collectivité :\r\n\r\n- soit en achetant le site (parfois pour un euro symbolique)\r\n- soit en le laissant en propriété privée mais en cadrant ses usages nouveaux (avec des documents d’urbanisme et de la négociation avec les propriétaires, par exemple)",
+            "is_multiple": false,
+            "deleted": null,
+            "upload_title": "",
+            "comment_title": "Précisions éventuelles (propriétaire qui ne paie pas sa taxe foncière, complexités, droits d’usage etc.)"
+        }
+    },
+    {
+        "model": "survey.choice",
+        "pk": 1,
+        "fields": {
+            "value": "Propriété collectivité",
+            "signals": "propriete_ville_epci",
+            "text": "La ville ou l’EPCI",
+            "conclusion": "Propriété collectivité",
+            "priority": 0,
+            "deleted": null,
+            "question": 1
+        }
+    },
+    {
+        "model": "home.siteconfiguration",
+        "pk": 1,
+        "fields": {
+            "site": 1,
+            "project_survey": 1,
+            "onboarding": 1,
+            "sender_email": "noreply@recoconseil.fr",
+            "sender_name": "Recoconseil"
+        }
+    }
+]
