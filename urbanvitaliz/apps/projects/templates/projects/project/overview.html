@@ -84,7 +84,7 @@
         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Informations générales</h6>
         <div class="d-flex flex-column">
             <span style="font-size: 14px; color:#666666; font-weight: 300;" class="d-block mb-2">Référent collectivité</span>
-            {% include 'projects/project/fragments/user.html' with project=project %}
+            {% include 'projects/project/fragments/project_owner.html' with project=project %}
             <a class="d-flex align-items-center mb-1" style="font-size: 14px; color: #0063CB; text-decoration: none;"
                 href="mailto:{{project.owner.email}}">
                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
@@ -111,12 +111,12 @@
         <div class="d-flex flex-column my-4">
             <!-- Collectivity -->
             <div>
-                <span style="font-size: 14px; color:#666666;font-weight: 300;" class="d-block my-1">Membres de la collectivité</span>
-                <ul class="flex-column list-unstyled">
+                <span style="font-size: 14px; color:#666666;font-weight: 300;" class="d-block my-1 mb-2">Membres de la collectivité</span>
+                <ul class="flex-column list-unstyled mb-0">
                     {% for member in project.members.all %}
                     {% if forloop.counter0 == 0 %}
                         <li>
-                            {% include 'projects/project/fragments/user.html' with member=False project=project %}
+                            {% include 'projects/project/fragments/project_owner.html' with project=project %}
                         </li>
                         {% else %}
                         <li>
@@ -126,7 +126,7 @@
                         {% endfor %}
                 </ul>
                 <div class="d-block mb-2">
-                    <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex" href="{% url 'projects-access-update' project.id %}">
+                    <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex justify-content-center w-100" href="{% url 'projects-access-update' project.id %}">
                         {% if project.status == 'DRAFT' %}
                         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
@@ -139,8 +139,8 @@
 
             <!-- Advisors -->
             <div class="mt-2">
-                <span style="font-size: 14px; color:#666666;font-weight: 300;" class="d-block">Équipe de suvi</span>
-                <ul class="d-flex flex-column list-unstyled">
+                <span style="font-size: 14px; color:#666666;font-weight: 300;" class="d-block mb-2">Équipe de suvi</span>
+                <ul class="d-flex flex-column list-unstyled mb-0">
                     {% for advisor in project.switchtenders_on_site.all %}
                     <li>
                         {% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}
@@ -148,7 +148,7 @@
                     {% endfor %}
                 </ul>
                 <div class="d-block mb-2">
-                    <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex" href="{% url 'projects-access-update' project.id %}">
+                    <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex justify-content-center w-100" href="{% url 'projects-access-update' project.id %}">
                         {% if project.status == 'DRAFT' %}
                         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
