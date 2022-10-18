@@ -11,6 +11,26 @@
     transition: background 0.25s ease;
 }
 
+.button.red {
+    border-color: #CE0500;
+    color: #CE0500;
+}
+
+.button.red:hover {
+    background-color: #ffe7e7;
+    color: #CE0500 !important;
+}
+
+.button.green {
+    border-color: #18753C;
+    color: #18753C;
+}
+
+.button.green:hover {
+    background-color: #e0f9ea;
+    color: #18753C !important;
+}
+
 .button.disabled{
     background-color: #EEEEEE;
     cursor: not-allowed;
