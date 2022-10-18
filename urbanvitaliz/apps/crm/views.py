@@ -13,6 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.utils import timezone
 from django.views.generic.base import TemplateView
 from notifications import models as notifications_models
 from notifications import notify
@@ -97,12 +98,18 @@ def organization_details(request, organization_id):
         .filter(target_content_type=organization_ct, target_object_id=organization.pk)
     )
 
-    all_notes = models.Note.on_site.filter(
+    org_notes = models.Note.on_site.filter(
         object_id=organization.pk,
         content_type=organization_ct,
     ).order_by("-updated_on")
-    sticky_notes = all_notes.filter(sticky=True)
-    notes = all_notes.exclude(sticky=True)
+
+    participant_notes = models.Note.on_site.filter(
+        object_id__in=participant_ids,
+        content_type=user_ct,
+    ).order_by("-updated_on")
+
+    sticky_notes = org_notes.filter(sticky=True)
+    notes = org_notes.exclude(sticky=True) | participant_notes
 
     search_form = forms.CRMSearchForm()
 
@@ -240,7 +247,10 @@ def update_note_for_object(request, note, return_view_name):
     if request.method == "POST":
         form = forms.CRMNoteForm(request.POST, instance=note)
         if form.is_valid():
-            note = form.save()
+            note = form.save(commit=False)
+            note.updated_on = timezone.now()
+            note.save()
+            form.save_m2m()
             return redirect(reverse(return_view_name, args=(note.related.pk,)))
     else:
         form = forms.CRMNoteForm(instance=note)
