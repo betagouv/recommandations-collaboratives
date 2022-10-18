@@ -1,7 +1,7 @@
-describe('I can read only recommandations', () => {
+describe('I can read only overview page', () => {
 
     beforeEach(() => {
-        cy.login("switchtender3");
+        cy.login("jeannot");
     })
 
     it('goes to recommandations and read only content', () => {

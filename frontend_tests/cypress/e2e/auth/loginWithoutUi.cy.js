@@ -1,6 +1,6 @@
 describe('I can access the Dashboard Page with a non UI login', () => {
   beforeEach(() => {
-    cy.login("switchtender");
+    cy.login("jean");
   })
 
   it("should access the dashboard", () => {

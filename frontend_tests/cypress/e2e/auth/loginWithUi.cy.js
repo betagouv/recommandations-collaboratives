@@ -1,4 +1,4 @@
-import switchtender from '../../fixtures/users/switchtender.json'
+import users from '../../fixtures/users/users.json'
 
 
 describe('The Login Page', () => {
@@ -6,9 +6,7 @@ describe('The Login Page', () => {
     let currentUser = {}
 
     beforeEach(() => {
-        //Logging user for debug purposes
-        console.log('switchtender : ', switchtender)
-        currentUser = switchtender[0].fields
+        currentUser = users[1].fields
     })
 
     it('sets auth cookie when logging in via form submission', function () {
