@@ -3,7 +3,7 @@
         "model": "projects.projectmember",
         "pk": 1,
         "fields": {
-            "member": 3,
+            "member": 5,
             "project": 2,
             "is_owner": true
         }
@@ -12,9 +12,36 @@
         "model": "projects.projectmember",
         "pk": 2,
         "fields": {
-            "member": 4,
+            "member": 6,
             "project": 2,
             "is_owner": false
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 3,
+        "fields": {
+            "member": 6,
+            "project": 3,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 4,
+        "fields": {
+            "member": 5,
+            "project": 4,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 5,
+        "fields": {
+            "member": 7,
+            "project": 5,
+            "is_owner": true
         }
     },
     {
@@ -23,6 +50,33 @@
         "fields": {
             "switchtender": 2,
             "project": 2,
+            "site": 1
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 2,
+        "fields": {
+            "switchtender": 2,
+            "project": 4,
+            "site": 1
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 3,
+        "fields": {
+            "switchtender": 3,
+            "project": 4,
+            "site": 1
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 4,
+        "fields": {
+            "switchtender": 4,
+            "project": 5,
             "site": 1
         }
     }

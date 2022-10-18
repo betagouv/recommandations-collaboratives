@@ -82,13 +82,13 @@
     },
     {
         "model": "auth.user",
-        "pk": 4,
+        "pk": 5,
         "fields": {
             "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
             "last_login": "2022-09-01T08:58:56.513Z",
             "is_superuser": false,
-            "username": "bob",
-            "first_name": "bob@test.fr",
+            "username": "bob@test.fr",
+            "first_name": "Bob",
             "last_name": "Collectivité",
             "email": "bob@test.fr",
             "is_staff": false,
@@ -100,7 +100,7 @@
     },
     {
         "model": "auth.user",
-        "pk": 5,
+        "pk": 6,
         "fields": {
             "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
             "last_login": "2022-09-01T08:58:56.513Z",
@@ -118,7 +118,7 @@
     },
     {
         "model": "auth.user",
-        "pk": 5,
+        "pk": 7,
         "fields": {
             "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
             "last_login": "2022-09-01T08:58:56.513Z",

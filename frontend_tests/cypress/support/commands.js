@@ -1,26 +1,32 @@
-import switchtender from '../fixtures/users/switchtender.json'
-import collectivity from '../fixtures/users/collectivity.json'
-import staff from '../fixtures/users/staff.json'
+import users from '../fixtures/users/users.json'
+
+console.log('users : ', users[4].fields.username);
 
 Cypress.Commands.add("login", (role) => {
 
     let username = ""
 
     switch (role) {
-        case "switchtender":
-            username = switchtender[0].fields.username
+        case "jean":
+            username = users[1].fields.username
             break;
-        case "switchtender2":
-            username = switchtender[1].fields.username
+        case "jeanne":
+            username = users[2].fields.username
             break;
-        case "switchtender3":
-            username = switchtender[2].fields.username
+        case "jeannot":
+            username = users[3].fields.username
             break;
-        case "collectivity":
-            username = collectivity[0].fields.username
+        case "bob":
+            username = users[4].fields.username
+            break;
+        case "boba":
+            username = users[5].fields.username
+            break;
+        case "bobette":
+            username = users[6].fields.username
             break;
         case "staff":
-            username = staff[0].fields.username
+            username = users[0].fields.username
             break;
         default:
             break;
