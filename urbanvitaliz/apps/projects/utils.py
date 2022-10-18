@@ -16,7 +16,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.urls import reverse
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 from urbanvitaliz import utils as uv_utils
 from urbanvitaliz.apps.reminders import api
 
@@ -25,27 +25,45 @@ from . import models
 
 def assign_collaborator(user, project, is_owner=False):
     """Make someone becomes a project collaborator"""
-    assign_perm("projects.use_public_notes", user, project)
-    assign_perm("projects.view_tasks", user, project)
-    assign_perm("projects.use_tasks", user, project)
+    assign_perm("use_public_notes", user, project)
+    assign_perm("view_tasks", user, project)
+    assign_perm("use_tasks", user, project)
 
     if project.status != "DRAFT":
-        assign_perm("projects.can_invite", user, project)
+        assign_perm("can_invite", user, project)
 
     models.ProjectMember.objects.get_or_create(
         project=project, member=user, is_owner=is_owner
     )
 
 
+ADVISOR_PERMISSIONS = [
+    "use_public_notes",
+    "use_private_notes",
+    "view_tasks",
+    "manage_tasks",
+    "user_tasks",
+    "can_invite",
+    "change_synopsis",
+]
+
+
 def assign_advisor(user, project):
     """Make someone becomes a project advisor"""
-    assign_perm("projects.use_public_notes", user, project)
-    assign_perm("projects.use_private_notes", user, project)
-    assign_perm("projects.view_tasks", user, project)
-    assign_perm("projects.manage_tasks", user, project)
-    assign_perm("projects.use_tasks", user, project)
-    assign_perm("projects.can_invite", user, project)
-    assign_perm("projects.change_synopsis", user, project)
+    for perm in ADVISOR_PERMISSIONS:
+        assign_perm(perm, user, project)
+
+    models.ProjectSwitchtender.objects.get_or_create(
+        switchtender=user,
+        site=get_current_site(Site.objects.get_current()),
+        project=project,
+    )
+
+
+def unassign_advisor(user, project):
+    """Remove someone from being a project advisor"""
+    for perm in ADVISOR_PERMISSIONS:
+        remove_perm(perm, user, project)
 
     models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,
