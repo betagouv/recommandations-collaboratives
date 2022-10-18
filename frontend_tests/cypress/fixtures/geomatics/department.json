@@ -1,0 +1,18 @@
+[
+    {
+        "fields": {
+            "name": "Département de test",
+            "region": "42"
+        },
+        "model": "geomatics.department",
+        "pk": "42"
+    },
+    {
+        "fields": {
+            "name": "Département de test numéro 2",
+            "region": "1"
+        },
+        "model": "geomatics.department",
+        "pk": "1"
+    }
+]

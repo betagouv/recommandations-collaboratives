@@ -1,0 +1,26 @@
+[
+    {
+        "fields": {
+            "department": "42",
+            "insee": "42424",
+            "latitude": 48.9884059966,
+            "longitude": 6.64577215725,
+            "name": "commune de test",
+            "postal": "42424"
+        },
+        "model": "geomatics.commune",
+        "pk": 42
+    },
+    {
+        "fields": {
+            "department": "42",
+            "insee": "30130",
+            "latitude": 48.9884059966,
+            "longitude": 6.64577215725,
+            "name": "commune de test",
+            "postal": "30130"
+        },
+        "model": "geomatics.commune",
+        "pk": 1
+    }
+]

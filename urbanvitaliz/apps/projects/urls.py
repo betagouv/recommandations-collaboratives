@@ -79,6 +79,11 @@ urlpatterns = [
         name="projects-project-switchtender-join",
     ),
     path(
+        r"project/<int:project_id>/observer/join",
+        views.project_observer_join,
+        name="projects-project-observer-join",
+    ),
+    path(
         r"project/<int:project_id>/switchtender/leave",
         views.project_switchtender_leave,
         name="projects-project-switchtender-leave",

@@ -1,6 +1,7 @@
 {% load static %}
 
-<div class="d-flex align-items-center mb-4">
+<div x-data="Note" x-ref="note" class="relative crm-note" :class="isOpen ? 'open' : 'closed'">
+<div class="d-flex align-items-center mb-2">
     {% if pinned %}
     <span>
         <svg class="bi me-1" width="15" height="15" fill="currentColor">
@@ -10,7 +11,26 @@
         &nbsp;
     </span>
     {% endif %}
-    <span class="crm-note-tag-title">{{ note.title }}</span>
+    <span class="crm-note-tag-title">
+        {% if note.kind == 0 %}
+        <svg class="bi me-1" width="18" height="18" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-outbound" />
+        </svg>
+        {% else %}
+        {% if note.kind == 1 %}
+        <svg class="bi me-1" width="18" height="18" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope-paper-heart" />
+        </svg>
+        {% else %}
+        {% if note.kind == 2 %}
+        <svg class="bi me-1" width="18" height="18" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-workspace" />
+        </svg>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {{ note.title }}
+    </span>
     <span class="d-flex align-items-center" style="margin-left: 15px; font-size: 0.8rem; color: grey;">
         <svg class="bi me-1" width="15" height="15" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
@@ -21,9 +41,13 @@
         <svg class="bi me-1" width="15" height="15" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-fill" />
         </svg>
-        {{note.updated_on}}
+        {% if note.updated_on|date != note.created_on|date %}
+        {{note.updated_on}}&nbsp;|&nbsp;{{note.created_on|date:"n"}} {{note.created_on|date:"N"}}
+        {% else %}
+        {{note.created_on}}
+        {% endif %}
     </span>
-    <span class="d-flex align-items-center"  style="margin-left: 15px; font-size: 0.8rem; color: grey;">
+    <span class="d-flex align-items-center position-relative"  style="margin-left: 15px; font-size: 0.8rem; color: grey;">
         <svg class="bi me-1" width="15" height="15" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
         </svg>
@@ -32,9 +56,14 @@
         </a>
     </span>
 </div>
+<div class="d-flex mb-2">
+    {% for tag in note.tags.all %}
+    <span class="mx-1 badge rounded-pill bg-dark">{{ tag }}</span>
+    {% endfor %}
+</div>
 <article>
     {{ note.content_rendered|safe }}
-    <span x-ref="noteToggleButton" class="crm-note-toggle-buttonDISABLED" x-on:click="isOpen = ! isOpen" x-text="isOpen ? '[Voir moins]': '[Voir plus]'"></span>
+    <span x-ref="noteToggleButton" class="crm-note-toggle-button" x-on:click="isOpen = ! isOpen" x-text="isOpen ? '[Voir moins]': '[Voir plus]'"></span>
 </article>
 
-<hr/>
+</div>

@@ -1,0 +1,22 @@
+[
+    {
+        "model": "addressbook.organization",
+        "pk": 1,
+        "fields": {
+            "name": "UrbanVitaliz",
+            "departments": [
+                "42"
+            ]
+        }
+    },
+    {
+        "model": "addressbook.organization",
+        "pk": 2,
+        "fields": {
+            "name": "Organisation de test",
+            "departments": [
+                "42"
+            ]
+        }
+    }
+]
