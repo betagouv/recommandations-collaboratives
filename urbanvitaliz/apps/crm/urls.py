@@ -49,7 +49,7 @@ urlpatterns = [
         name="crm-organization-note-create",
     ),
     path(
-        r"crm/org/<int:organization_id>/note",
+        r"crm/org/<int:organization_id>/note/<int:note_id>",
         views.update_note_for_organization,
         name="crm-organization-note-update",
     ),
@@ -59,7 +59,7 @@ urlpatterns = [
         name="crm-user-note-create",
     ),
     path(
-        r"crm/user/<int:user_id>/note",
+        r"crm/user/<int:user_id>/note/<int:note_id>",
         views.update_note_for_user,
         name="crm-user-note-update",
     ),
@@ -69,8 +69,9 @@ urlpatterns = [
         name="crm-project-note-create",
     ),
     path(
-        r"crm/project/<int:project_id>/note",
+        r"crm/project/<int:project_id>/note/<int:note_id>",
         views.update_note_for_project,
         name="crm-project-note-update",
     ),
+    path("crm/feed/", views.LatestNotesFeed(), name="crm-feed"),
 ]

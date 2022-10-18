@@ -19,6 +19,7 @@ git+https://github.com/jazzband/django-dbtemplates.git@master#egg=django-dbtempl
 
 django_otp
 django-tagging==0.5.0
+django-taggit==3.0.0
 django-gravatar2
 psycopg2-binary
 django-leaflet

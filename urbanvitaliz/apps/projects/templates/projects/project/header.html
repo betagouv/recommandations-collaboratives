@@ -5,11 +5,18 @@
         <h2>{{ project.name|title }}</h2>
         <div class="d-flex">
             <p class="text-secondary">
-            {{ project.location }}
-            {% if project.commune %}
+                {{ project.location }}
+                {% if project.commune %}
                 {{ project.commune.name }} —   {{ project.commune.postal }}, {{ project.commune.department }} - {{ project.commune.department.region }} - INSEE: {{ project.commune.insee }} </p>
             {% endif %}
         </div>
+        {% if user.is_staff %}
+        <div class="d-flex">
+            {% for tag in project.tags.all %}
+            <span class="mx-1 badge rounded-pill bg-dark">{{ tag }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
     <div class="flex-shrink-0 ps-2">
         <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex align-items-center" href="{% url 'projects-access-update' project.id %}">
@@ -20,5 +27,6 @@
             {% endif %}
                 <span>Partager le détail du projet</span>
         </a>
+        {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True %}
     </div>
 </div>

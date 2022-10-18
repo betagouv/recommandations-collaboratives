@@ -9,5 +9,12 @@
         <span class="me-2 ms-2">|</span>
         <svg class="bi me-2" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#geo-alt-fill" />
-        </svg> {{ obj.commune }} ({{ obj.commune.postal }})</div>
+        </svg> {{ obj.commune }} ({{ obj.commune.postal }})
+    </div>
 </div>
+<div class="mt-1 d-flex small">
+    {% for tag in obj.tags.all %}
+    <span class="mx-1 badge rounded-pill bg-dark">{{ tag }}</span>
+    {% endfor %}
+</div>
+

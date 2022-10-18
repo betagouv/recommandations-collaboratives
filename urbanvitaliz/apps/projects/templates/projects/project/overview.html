@@ -103,16 +103,6 @@
         </div>
         <div class="d-flex flex-column my-4">
             <span style="font-size: 14px; color:#666666;font-weight: 300;" class="d-block mb-2">Participants</span>
-            <div class="d-block mb-2">
-                <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex" href="{% url 'projects-access-update' project.id %}">
-                    {% if project.status == 'DRAFT' %}
-                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
-                        </svg>&nbsp;
-                    {% endif %}
-                        <span>Inviter un participant</span>
-                </a>
-            </div>
             <ul class="d-flex flex-column list-unstyled">
                 {% for switchtender in project.switchtenders.all %}
                         <li>
@@ -131,8 +121,17 @@
                     {% endif %}
                 {% endfor %}
             </ul>
+            <div class="d-block mb-2">
+                <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex" href="{% url 'projects-access-update' project.id %}">
+                    {% if project.status == 'DRAFT' %}
+                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
+                        </svg>&nbsp;
+                    {% endif %}
+                        <span>Inviter d'autres participants</span>
+                </a>
+            </div>
         </div>
-        {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True %}
     </div>
 </div>
 

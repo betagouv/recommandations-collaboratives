@@ -1,0 +1,115 @@
+.status-switcher {
+    border: solid 1px #14A2F1;
+    justify-content: space-between;
+}
+
+.status-switcher li {
+    display: flex;
+    flex-grow: 1;
+    border-right: solid 1px #14A2F1;
+    cursor: pointer;
+}
+
+.status-switcher a {
+    display: flex;
+    padding: 10px 3px;
+
+    color: #14A2F1;
+    font-weight: 600;
+    font-size: 0.75rem;
+
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+
+    text-decoration: none;
+}
+
+.status-switcher li:last-child {
+    border-right: 0;
+}
+
+
+.status-switcher a.active{
+    background-color: #14A2F1;
+    color: white;
+}
+
+.textarea-highlight {
+    border:solid 3px #14A2F1 !important;
+}
+
+.tooltip-highlight::before {
+    content: 'Pouvez-vous nous en dire plus ?';
+    position: absolute;
+    top: -42px;
+    left: 0;
+
+    padding: 8px 10px;
+    background-color: #222;
+    border-radius: 2px;
+
+    color: white;
+    font-size: 1rem;
+
+    z-index: 11;
+
+    animation: appear 0.25s ease-in forwards;
+    opacity: 0;
+}
+
+
+.tooltip-highlight::after {
+    content: '';
+    position: absolute;
+
+    width: 15px;
+    height: 15px;
+
+    top: -14px;
+    left: 10px;
+
+    transform: rotate(45deg);
+    background-color: #222;
+    z-index: 10;
+
+    animation: appear-opa 0.25s ease-in forwards;
+    opacity: 0;
+    animation-delay: 0.10s;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translate3d(0,-10px,0);
+    } 
+    to {
+        opacity: 1;
+        transform: translate3d(0,0,0);
+    }
+}
+
+@keyframes appear-opa {
+    from {
+        opacity: 0;
+    } 
+    to {
+        opacity: 1;
+    }
+}
+
+@media (min-width: 576px) {
+    .status-switcher {
+        flex-direction: column;
+    }
+
+    .status-switcher li{
+        width: 100%;
+        border-right: 0;
+        border-bottom: solid 1px #14A2F1;
+    }
+
+    .status-switcher li:last-child {
+        border-bottom: 0;
+    }
+}

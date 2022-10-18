@@ -37,6 +37,18 @@
             {% endif %}
         </h1>
 
+        <!-- Tags -->
+        {% if user.is_staff %}
+        <div class="mb-2 d-flex small">
+            {% for tag in resource.tags.all %}
+            <a href="{% url 'resources-resource-search' %}?query={{ tag.name }}">
+                <span class="mx-1 badge rounded-pill bg-dark">{{ tag }}</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
         <!-- Area -->
         {% if resource.departments.count %}
         <div class="d-inline text-secondary">

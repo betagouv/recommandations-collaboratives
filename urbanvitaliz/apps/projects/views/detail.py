@@ -233,6 +233,7 @@ def project_synopsis(request, project_id=None):
             project.synopsis_on = timezone.now()
             project.synopsis_by = request.user
             project.save()
+            form.save_m2m()
 
             return redirect(
                 reverse("projects-project-detail-overview", args=[project.pk])

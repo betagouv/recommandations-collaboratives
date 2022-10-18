@@ -106,7 +106,7 @@ def make_digest_of_reminders(project, reminders, user):
 
     project_digest = make_project_digest(project, user, url_name="actions")
     return {
-        "notification_count": len(reminders),
+        "notification_count": len(reminders),  # XXX buggy?
         "project": project_digest,
         "recos": task_digest,
     }
@@ -343,6 +343,7 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
 
     queryset = (
         user.notifications(manager="on_site")
+        .filter(target_content_type=project_ct)
         .exclude(target_content_type=project_ct, verb="a recommandé l'action")
         .unsent()
     )
@@ -356,8 +357,11 @@ def send_digest_for_switchtender_by_user(user, dry_run=False):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
+    project_ct = ContentType.objects.get_for_model(projects_models.Project)
+
     queryset = (
         user.notifications(manager="on_site")
+        .filter(target_content_type=project_ct)
         .exclude(verb="a recommandé l'action")
         .unsent()
     )
@@ -383,8 +387,14 @@ def send_digest_by_user(
     """
     Should be run at the end, to collect remaining notifications
     """
+    project_ct = ContentType.objects.get_for_model(projects_models.Project)
+
     if not queryset:
-        notifications = user.notifications(manager="on_site").unsent()
+        notifications = (
+            user.notifications(manager="on_site")
+            .filter(target_content_type=project_ct)
+            .unsent()
+        )
     else:
         notifications = queryset
 
@@ -394,10 +404,12 @@ def send_digest_by_user(
         return 0
 
     projects_digest = make_remaining_notifications_digest(notifications, user)
-
+    notification_count = sum(
+        [project["notification_count"] for project in projects_digest]
+    )
     digest = {
         "projects": projects_digest,
-        "notification_count": notifications.count(),
+        "notification_count": notification_count,
     }
 
     if extra_context:

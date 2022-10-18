@@ -16,8 +16,10 @@ from django.db.models.functions import Lower
 from django.shortcuts import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
+from taggit.managers import TaggableManager
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
+from watson import search as watson
 
 
 class CategoryManager(models.Manager):
@@ -145,7 +147,6 @@ class Resource(models.Model):
         null=True,
     )
 
-    @property
     def get_absolute_url(self):
         return reverse("resources-resource-detail", kwargs={"resource_id": self.pk})
 
@@ -158,22 +159,7 @@ class Resource(models.Model):
     def expired(self):
         return self.expires_on > datetime.date.today()
 
-    tags = models.CharField(max_length=256, blank=True, default="")
-
-    def tags_as_list(self):
-        """
-        Needed since django doesn't provide a split template tag
-        XXX: Temp Duplicated before introducing a Tag manager
-        """
-        tags = []
-
-        words = self.tags.split(" ")
-        for word in words:
-            tag = word.strip(" ")
-            if tag != "":
-                tags.append(tag)
-
-        return tags
+    tags = TaggableManager(blank=True)
 
     category = models.ForeignKey(
         "Category", null=True, blank=True, on_delete=models.CASCADE
@@ -220,15 +206,8 @@ class Resource(models.Model):
             resources = resources.filter(
                 models.Q(category__in=categories) | models.Q(category=None)
             )
-        for word in query.split():
-            resources = resources.filter(
-                models.Q(title__icontains=word)
-                | models.Q(subtitle__icontains=word)
-                | models.Q(content__icontains=word)
-                | models.Q(summary__icontains=word)
-                | models.Q(tags__icontains=word)
-            )
-        return resources
+
+        return watson.filter(resources, query)
 
 
 class BookmarkManager(models.Manager):
