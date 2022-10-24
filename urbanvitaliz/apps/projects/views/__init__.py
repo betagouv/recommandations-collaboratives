@@ -446,6 +446,16 @@ def project_switchtender_join(request, project_id=None):
             switchtending.is_observer = False
             switchtending.save()
 
+        personal_status, created = models.UserProjectStatus.objects.get_or_create(
+            site=request.site,
+            user=request.user,
+            project=project,
+            defaults={"status": "FOLLOWED"},
+        )
+        if not created:
+            personal_status.status = "FOLLOWED"
+            personal_status.save()
+
         project.updated_on = timezone.now()
         project.save()
 
@@ -470,6 +480,16 @@ def project_observer_join(request, project_id=None):
             switchtending.is_observer = True
             switchtending.save()
 
+        personal_status, created = models.UserProjectStatus.objects.get_or_create(
+            site=request.site,
+            user=request.user,
+            project=project,
+            defaults={"status": "FOLLOWED"},
+        )
+        if not created:
+            personal_status.status = "FOLLOWED"
+            personal_status.save()
+
         project.updated_on = timezone.now()
         project.save()
 
@@ -489,6 +509,16 @@ def project_switchtender_leave(request, project_id=None):
         project.switchtenders_on_site.filter(switchtender=request.user).delete()
         project.updated_on = timezone.now()
         project.save()
+
+        personal_status, created = models.UserProjectStatus.objects.get_or_create(
+            site=request.site,
+            user=request.user,
+            project=project,
+            defaults={"status": "NOT_INTERESTED"},
+        )
+        if not created:
+            personal_status.status = "NOT_INTERESTED"
+            personal_status.save()
 
         signals.project_switchtender_leaved.send(sender=request.user, project=project)
 

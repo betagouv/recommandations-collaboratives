@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block content %}
+
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+    <aside class="w-25 crm-aside">
+        {% if active_project %}
+        <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
+        {% else %}
+        <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
+        {% endif %}
+
+        {% include 'crm/back_button.html' %}
+        {% include 'crm/search.html' %}
+
+        <div class="pt-3 crm-border-bottom pb-2 px-4">
+            <h5 class="crm-project-decoration d-inline-block relative">Projets conseillés <strong>({{ crm_user.projects_switchtended_on_site.all|length }})</strong></h5>
+            <ul class="list-unstyled">
+                {% for switchtending in crm_user.projects_switchtended_on_site.all %}
+                {% include 'crm/project_item.html' with project=switchtending.project %}
+                {% empty %}
+                    - aucun -
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="pt-3 crm-border-bottom pb-2 px-4">
+            <h5 class="crm-project-decoration d-inline-block relative">Participe aux projets <strong>({{ crm_user.projectmember_set.all|length }})</strong></h5>
+            <ul class="list-unstyled">
+                {% for membership in crm_user.projectmember_set.all %}
+                {% include 'crm/project_item.html' with project=membership.project %}
+                {% empty %}
+                - aucun -
+                {% endfor %}
+            </ul>
+        </div>
+        </div>
+    </aside>
+    <div class="w-75 d-flex flex-column justify-content-start">
+        <div class="crm-header px-4 py-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center justify-content-center">
+                    <h3 class="d-flex align-items-center mb-0">
+                        <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+                        </svg>
+                        <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
+                    </h3>
+                </div>
+            </div>
+            
+            <table class="table">
+                <tr>
+                    <th>Projet</th>
+                    <th>Intéret?</th>
+                </tr>
+                {% for status in statuses %}
+                <tr>
+                    <td>{{ status.project }}</td>
+                    {% if status.status == "NOT_INTERESTED" %}
+                    <td class="text-danger">{{ status.get_status_display }}</td>
+                    {% else %}
+                    <td class="text-success">{{ status.get_status_display }}</td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td>-- Pas encore de positionnement sur les projets --</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+        </div>
+{% endblock %}
