@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('resources', '0028_migrate_tagging'),
+        ("resources", "0028_migrate_tagging"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='resource',
-            name='old_tags',
+            model_name="resource",
+            name="old_tags",
         ),
     ]

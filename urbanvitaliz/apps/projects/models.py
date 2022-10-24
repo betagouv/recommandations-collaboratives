@@ -19,8 +19,7 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import (OrderedModel, OrderedModelManager,
-                                  OrderedModelQuerySet)
+from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -237,6 +236,31 @@ class ProjectMember(models.Model):
     member = models.ForeignKey(auth_models.User, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     is_owner = models.BooleanField(default=False)
+
+
+class UserProjectStatusOnSiteManager(CurrentSiteManager):
+    use_for_related_fields = True
+
+
+class UserProjectStatus(models.Model):
+    objects = UserProjectStatusOnSiteManager()
+
+    USERPROJECT_STATES = (
+        ("FOLLOWED", "Suivi"),
+        ("NOT_INTERESTED", "Pas d'intérêt"),
+    )
+
+    class Meta:
+        unique_together = ("site", "user", "project")
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        auth_models.User, on_delete=models.CASCADE, related_name="project_states"
+    )
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name="user_project_states"
+    )
+    status = models.CharField(max_length=20, choices=USERPROJECT_STATES)
 
 
 class ProjectSwitchtenderOnSiteManager(CurrentSiteManager):
