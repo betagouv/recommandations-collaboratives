@@ -8,10 +8,10 @@
         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-0">Inviter un conseiller</h6>
       </div>
       <div class="modal-body">
-        <form class="form" id="form-projects-access-add-user" action="." method="post">
+          <form class="form" id="form-projects-access-add-user" action="{% url 'projects-access-update' project.pk %}" method="post">
           <div class="mb-3">
               <label class="form-label" style="font-size: 16px; color: #666666;" for="invite-email">Saisissez l'adresse email de la personne à inviter</label>
-              <input id="invite-email" type="text" name="email" required class="form-control" placeholder="camille@region-hdf.fr"/>
+              <input id="invite-email" type="email" name="email" required class="form-control" placeholder="camille@region-hdf.fr"/>
           </div>
 
           <input type="hidden" name="{{ invite_form.role.html_name }}" id="role-switchtender" value="SWITCHTENDER">

@@ -12,6 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
+from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 
@@ -76,6 +77,8 @@ def project_overview(request, project_id=None):
     )
 
     general_notifications.mark_all_as_read()
+
+    invite_form = InviteForm()
 
     return render(request, "projects/project/overview.html", locals())
 
