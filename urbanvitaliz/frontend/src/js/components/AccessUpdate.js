@@ -7,7 +7,7 @@ function AccessUpdate(url) {
         isCopied: false,
         selectText: function () {
             this.$refs.input.select();
-            appStore.notification.message = "L'adresse de la page a bien été copiée ✅"
+            appStore.notification.message = "L'adresse de la page a bien été copiée"
             appStore.notification.isOpen = true
         },
         clipboardCopy: function() {
