@@ -23,12 +23,12 @@
         {% regroup stream by timestamp.date as stream_by_day %}
 
         {% if can_administrate %}
-        <form class="form border p-3 d-flex align-items-end flex-column"
+        <form class="form d-flex align-items-end flex-column"
               method="POST"
               action="{% url 'projects-create-note' project.pk %}">
             {% csrf_token %}
 
-            <textarea class="flex-grow-1 border-0 form-control {% if private_note_form.content.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-content" name="{{ private_note_form.content.name }}" value="{{ private_note_form.content.value|default:'' }}" placeholder="Écrivez une communication interne. Seuls les conseillers locaux pourront la voir."></textarea>
+            {% include 'tools/editor.html' with input_name=private_note_form.content.name input_value=private_note_form.content.value|default:'' input_required=True %}
             <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
 
             {% for error in private_note_form.content.errors %}
