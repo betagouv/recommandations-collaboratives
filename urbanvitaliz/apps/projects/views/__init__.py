@@ -40,8 +40,9 @@ from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
 from ..utils import (can_administrate_or_403, can_administrate_project,
                      format_switchtender_identity, generate_ro_key,
-                     get_active_project, get_switchtenders_for_project,
-                     is_project_moderator, is_project_moderator_or_403,
+                     get_active_project, get_collaborators_for_project,
+                     get_switchtenders_for_project, is_project_moderator,
+                     is_project_moderator_or_403,
                      is_regional_actor_for_project_or_403,
                      refresh_user_projects_in_session, set_active_project_id)
 
@@ -258,6 +259,8 @@ def project_list_export_csv(request):
             [format_switchtender_identity(u) for u in switchtenders]
         )
 
+        collaborators = get_collaborators_for_project(project)
+
         followups = models.TaskFollowup.objects.filter(
             task__project=project,
             task__site=request.site,
@@ -307,9 +310,9 @@ def project_list_export_csv(request):
                     origin=reminders_models.Reminder.SELF,
                 ).count(),  # Reminders
                 notes.filter(public=True).count(),  # conversations conseillers
-                conversations.exclude(
-                    created_by__in=switchtenders
-                ).count(),  # conversations collectivite
+                max(
+                    0, conversations.filter(created_by__in=collaborators).count() - 1
+                ),  # conversations collectivite. -1 to remove a message from the system
                 notes.filter(public=False).count(),  # suivi interne conseillers
                 switchtenders.exclude(
                     is_staff=True
