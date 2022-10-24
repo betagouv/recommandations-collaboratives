@@ -1,0 +1,15 @@
+#notification {
+    position: fixed;
+
+    top: 28px;
+    right: 25px;
+
+    background-color: white;
+    color: #222;
+    padding: 15px;
+    
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+
+    z-index: 9999;
+    border-radius: 6px;
+}
