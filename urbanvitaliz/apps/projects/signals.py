@@ -413,7 +413,7 @@ def notify_note_created(sender, note, project, user, **kwargs):
     notify.send(
         sender=user,
         recipient=recipients,
-        verb="a créé une note de suivi",
+        verb="a rédigé un message",
         action_object=note,
         target=project,
         private=True,

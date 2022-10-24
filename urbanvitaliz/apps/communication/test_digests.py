@@ -212,9 +212,9 @@ def test_notification_formatter():
 
     tests = [
         (
-            "a créé une note de suivi",
+            "a rédigé un message",
             note,
-            ("Bobi Joe (DuckCorp) a rédigé une note de suivi", "my content"),
+            ("Bobi Joe (DuckCorp) a rédigé un message", "my content"),
         ),
         (
             "a commenté l'action",
