@@ -18,9 +18,9 @@
 
             <div class="flex-fill d-flex flex-column">
                 <label for="message">Message</label>
-                
                 {% include 'tools/editor.html' with input_name="content" input_required=True %}
-                
+            </div>
+
             <template x-if="push_type == 'single'">
                 <div class="buttons d-flex flex-row justify-content-between">
                     {% if not disable_draft %}
@@ -70,7 +70,3 @@
         <span class="ms-2" x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
     </div>
 </template>
-
-<style>
-    .ProseMirror { padding: 0.5rem 1rem; margin: 1rem 0; border: 1px solid #ccc; }
-  </style>

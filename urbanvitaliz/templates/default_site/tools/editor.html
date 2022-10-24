@@ -1,35 +1,24 @@
-<div x-data="editor(content)">
+<div x-data="editor({{input_name}})">
 
-    <template x-if="isLoaded()">
-      <div class="menu">
-        <button
-        @click.prevent
-          @click="toggleHeading({ level: 1 })"
-          :class="{ 'is-active': isActive('heading', { level: 1 }, updatedAt) }"
-        >
-          H1
-        </button>
-        <button
-        @click.prevent
-          @click="toggleBold()"
-          :class="{ 'is-active' : isActive('bold', updatedAt) }"
-        >
-          Bold
-        </button>
-        <button
-        @click.prevent
-          @click="toggleItalic()"
-          :class="{ 'is-active' : isActive('italic', updatedAt) }"
-        >
-          Italic
-        </button>
-      </div>
-    </template>
-
-    <div class="position-relative">
-      <div @input.debounce.500ms="renderMarkdown" x-ref="element"></div>
-      <textarea style="height: 0;" class="position-absolute top-0 opacity-0" x-model="markdownContent" name="{{input_name}}" {% if input_required %} required {% endif %}></textarea>
+  <template x-if="isLoaded()">
+    <div class="menu">
+      <button @click.prevent @click="toggleHeading({ level: 1 })"
+        :class="{ 'is-active': isActive('heading', { level: 1 }, updatedAt) }">
+        H1
+      </button>
+      <button @click.prevent @click="toggleBold()" :class="{ 'is-active' : isActive('bold', updatedAt) }">
+        Bold
+      </button>
+      <button @click.prevent @click="toggleItalic()" :class="{ 'is-active' : isActive('italic', updatedAt) }">
+        Italic
+      </button>
     </div>
+  </template>
 
+  <div class="position-relative">
+    <div @input.debounce.500ms="renderMarkdown" x-ref="element"></div>
+    <textarea style="height: 0;" class="position-absolute top-0 opacity-0" x-model="markdownContent"
+      name="{{input_name}}" {% if input_required %} required {% endif %}></textarea>
   </div>
+
 </div>

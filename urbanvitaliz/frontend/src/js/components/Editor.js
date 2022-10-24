@@ -3,6 +3,8 @@ import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import { createMarkdownEditor } from 'tiptap-markdown';
 
+import '../../css/tiptap.css'
+
 const MarkdownEditor = createMarkdownEditor(Editor);
 
 Alpine.data('editor', (content) => {

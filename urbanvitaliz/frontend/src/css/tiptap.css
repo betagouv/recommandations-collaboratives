@@ -1,0 +1,10 @@
+button.is-active {
+    background: black;
+    color: white;
+}
+
+.ProseMirror {
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    border: 1px solid #ccc;
+}
