@@ -55,14 +55,14 @@
             <hr/>
 
             <!-- Post message -->
-            <div class="message-form border p-3">
+            <div class="message-form">
                 <form class="form"
                       method="POST"
                       action="{% url 'projects-conversation-create-message' project.pk %}"
                       id="conversation-form">
                     {% csrf_token %}
-
-                    <textarea class="flex-grow-1 border-0 form-control {% if public_note_form.content.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-content" name="{{ public_note_form.content.name }}" value="{{ public_note_form.content.value|default:'' }}" placeholder="Entrez votre message."></textarea>
+                    
+                    {% include 'tools/editor.html' with input_name=public_note_form.content.name input_value=public_note_form.content.value|default:'' input_required=True %}
                     <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
 
                     {% for error in public_note_form.content.errors %}
