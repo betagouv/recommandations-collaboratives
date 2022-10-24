@@ -18,7 +18,7 @@ from django.views.generic.base import TemplateView
 from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
-from urbanvitaliz.apps.projects.models import Project
+from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.apps.resources.models import Resource
 from urbanvitaliz.utils import check_if_switchtender, get_site_administrators
 from watson import search as watson
@@ -140,6 +140,21 @@ def user_details(request, user_id):
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/user_details.html", locals())
+
+
+@staff_member_required
+def user_project_interest(request, user_id):
+    crm_user = get_object_or_404(User, pk=user_id)
+
+    actions = actor_stream(crm_user)
+
+    user_ct = ContentType.objects.get_for_model(User)
+
+    statuses = UserProjectStatus.objects.filter(user=crm_user).order_by("project__name")
+
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/user_project_interest.html", locals())
 
 
 @staff_member_required
