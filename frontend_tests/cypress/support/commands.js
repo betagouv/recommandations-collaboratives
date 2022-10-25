@@ -1,7 +1,5 @@
 import users from '../fixtures/users/users.json'
 
-console.log('users : ', users[4].fields.username);
-
 Cypress.Commands.add("login", (role) => {
 
     let username = ""
@@ -53,4 +51,11 @@ Cypress.Commands.add("login", (role) => {
             cy.getCookie("csrftoken").should("exist");
         })
     })
+})
+
+Cypress.Commands.add("becomeSwitchtenderOnProject", (projectName) => {
+        cy.visit('/projects')
+        cy.contains(`${projectName}`).click({force:true});
+        cy.contains("Conseiller le projet").click({ force: true })
+        cy.contains("Ne plus conseiller le projet").should('exist')
 })
