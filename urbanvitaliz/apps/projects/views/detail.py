@@ -12,17 +12,24 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
+from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import (check_if_switchtender, get_site_config_or_503,
                                 has_perm_or_403)
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm, SynopsisForm
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     can_manage_or_403, can_manage_project,
-                     check_if_national_actor,
-                     get_notification_recipients_for_project,
-                     is_regional_actor_for_project, set_active_project_id)
+from ..utils import (
+    can_administrate_or_403,
+    can_administrate_project,
+    can_manage_or_403,
+    can_manage_project,
+    check_if_national_actor,
+    get_notification_recipients_for_project,
+    get_switchtender_for_project,
+    is_regional_actor_for_project,
+    set_active_project_id,
+)
 
 
 @login_required
@@ -44,6 +51,7 @@ def project_overview(request, project_id=None):
         project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
+    switchtending = get_switchtender_for_project(request.user, project)
 
     try:
         onboarding_response = dict(project.onboarding.response)
@@ -51,13 +59,22 @@ def project_overview(request, project_id=None):
         onboarding_response = None
 
     # check user can administrate project (member or switchtender)
-    if request.user != project.members.filter(projectmember__is_owner=True).first():
+    if request.user != project.owner:
         # bypass if user is switchtender, all are allowed to view at least
         if not check_if_switchtender(request.user):
             can_manage_or_403(project, request.user)
 
     # Set this project as active
     set_active_project_id(request, project.pk)
+
+    # Make sure we track record of user's interest for this project
+    if (is_national_actor or is_regional_actor) and not request.user.is_staff:
+        models.UserProjectStatus.objects.get_or_create(
+            site=request.site,
+            user=request.user,
+            project=project,
+            defaults={"status": "NOT_INTERESTED"},
+        )
 
     # Mark some notifications as seen (general ones)
     project_ct = ContentType.objects.get_for_model(project)
@@ -75,6 +92,8 @@ def project_overview(request, project_id=None):
     )
 
     general_notifications.mark_all_as_read()
+
+    invite_form = InviteForm()
 
     return render(request, "projects/project/overview.html", locals())
 

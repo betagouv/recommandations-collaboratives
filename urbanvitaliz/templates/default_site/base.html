@@ -64,6 +64,9 @@
         {% include "header/menu-top.html" %}
 
         <main style="padding-top: 150px;">
+            <div id="notification" x-data="Notification" x-show="isOpen">
+                <span x-text="message"></span>
+            </div>
             {% if messages %}
             <div id="notification-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
                 {% for message in messages %}

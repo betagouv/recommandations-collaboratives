@@ -1,6 +1,14 @@
 {% load static %}
 
-<div class="col-12 d-flex justify-content-between align-items-start">
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/projectShare.js' %}
+{% endblock %}
+
+{% with request.resolver_match.url_name as url_name %}
+
+<div x-data="ProjectShare" class="col-12 d-flex justify-content-between align-items-start">
     <div class=" d-flex flex-column mb-4">
         <h2>{{ project.name|title }}</h2>
         <div class="d-flex">
@@ -19,14 +27,19 @@
         {% endif %}
     </div>
     <div class="flex-shrink-0 ps-2">
-        <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex align-items-center" href="{% url 'projects-access-update' project.id %}">
+        {% if 'actions' not in url_name and 'conversations' not in url_name and 'internal-followup' not in url_name %}
+        <a style="cursor: pointer;" @click="openPublicShareModal" data-toggle="modal" data-target="#publicShareModal" class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex align-items-center">
             {% if project.status == 'DRAFT' %}
                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
                 </svg>&nbsp;
             {% endif %}
-                <span>Partager le détail du projet</span>
+                <span>Partager l'état des lieux</span>
         </a>
+        {% endif %}
         {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True %}
+        {% include "projects/project/fragments/share/public_share_modal.html" %}
     </div>
 </div>
+
+{% endwith %}
