@@ -1,4 +1,5 @@
 {% load gravatar %}
+{% load static %}
 
 <div class="d-flex align-items-start justify-content-between mb-2">
     {% with advisor.switchtender as user %}
@@ -9,6 +10,14 @@
                 <strong class="text-nowrap text-capitalize">
                     {{ user.get_full_name }}
                 </strong>
+                {% if request.user.is_staff %}
+                &nbsp;
+                <a class="small" href="{% url 'crm-user-details' user.pk %}">
+                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                    </svg>
+                </a>
+                {% endif %}
             {% else %}
             <strong class="text-nowrap">
                 {{ user.email }}
