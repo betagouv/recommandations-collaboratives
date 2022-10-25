@@ -33,7 +33,9 @@ class UVSignupForm(SignupForm):
         self.fields["email"].widget = forms.TextInput(
             attrs={"type": "email", "class": "fr-input fr-mt-2v fr-mb-4v"}
         )
-        self.fields["password1"].label = "Définissez votre mot de passe (8 caractères minimum)"
+        self.fields[
+            "password1"
+        ].label = "Définissez votre mot de passe (8 caractères minimum)"
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
@@ -122,7 +124,6 @@ class UVResetPasswordKeyForm(ResetPasswordKeyForm):
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
-
 
         self.fields["password2"].label = "Nouveau mot de passe (confirmation)"
         self.fields["password2"].widget = forms.PasswordInput(

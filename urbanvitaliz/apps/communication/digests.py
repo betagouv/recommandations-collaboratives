@@ -555,7 +555,7 @@ class NotificationFormatter:
         """Format for User"""
         return self._format_or_default(
             {
-                "a créé une note de suivi": self.format_note_created,
+                "a rédigé un message": self.format_note_created,
                 "est devenu·e aiguilleur·se sur le projet": self.format_action_became_switchtender,
                 "a déposé le projet": self.format_new_project_available,
                 "a soumis pour modération le projet": self.format_project_submitted,
@@ -570,7 +570,7 @@ class NotificationFormatter:
     def format_note_created(self, notification):
         """An action was recommended by a switchtender"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} a rédigé une note de suivi"
+        summary = f"{subject} a rédigé un message"
         excerpt = self._represent_note_excerpt(notification.action_object)
 
         return FormattedNotification(summary=summary, excerpt=excerpt)

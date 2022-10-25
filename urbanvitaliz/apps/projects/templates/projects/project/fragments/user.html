@@ -1,11 +1,9 @@
 {% load gravatar %}
+{% load static %}
 
 <div class="d-flex flex-column align-items-start mb-2">
         <!-- member -->
     {% if member %}
-            {% if member.is_observer %}
-                OBSERVER
-            {% endif %}
             {% if member.first_name %}
                     <span class="me-2 d-flex align-items-center">
                         <img class="rounded-circle me-2" src="{% gravatar_url member.email size=24 %}" alt="{{action.actor}}">
@@ -14,6 +12,15 @@
                             {{ member.last_name }}
                         </strong>
                     </span>
+                    {% if request.user.is_staff %}
+                    &nbsp;
+                    <a class="w-100 small" href="{% url 'crm-user-details' member.pk %}">
+                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                        </svg>
+                    </a>
+                    {% endif %}
+
             {% else %}
                     <span class="me-2"><strong>{{member}}</strong></span>
             {% endif %}

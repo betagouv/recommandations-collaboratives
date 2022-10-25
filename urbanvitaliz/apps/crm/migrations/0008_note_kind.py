@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('crm', '0007_note_tags'),
+        ("crm", "0007_note_tags"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='note',
-            name='kind',
-            field=models.IntegerField(blank=True, choices=[(0, 'Appel Téléphonique'), (1, 'Email'), (2, 'Test utilisateur')], null=True, verbose_name='Type de contact'),
+            model_name="note",
+            name="kind",
+            field=models.IntegerField(
+                blank=True,
+                choices=[
+                    (0, "Appel Téléphonique"),
+                    (1, "Email"),
+                    (2, "Test utilisateur"),
+                ],
+                null=True,
+                verbose_name="Type de contact",
+            ),
         ),
     ]

@@ -10,7 +10,7 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
 from .models import Project, Task, TaskFollowup
-from .utils import create_reminder
+from .utils import create_reminder, get_collaborators_for_project
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
@@ -103,9 +103,10 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
         task = followup.task
 
         if followup.status not in [Task.ALREADY_DONE, Task.NOT_INTERESTED, Task.DONE]:
-            create_reminder(
-                7 * 6, task, followup.who, origin=reminders_models.Reminder.SYSTEM
-            )
+            if followup.who in get_collaborators_for_project(followup.task.project):
+                create_reminder(
+                    7 * 6, task, followup.who, origin=reminders_models.Reminder.SYSTEM
+                )
 
         return followup
 

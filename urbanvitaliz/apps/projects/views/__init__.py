@@ -32,18 +32,30 @@ from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
-                                get_site_config_or_503, is_staff_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    build_absolute_url,
+    check_if_switchtender,
+    get_site_config_or_503,
+    is_staff_or_403,
+    is_switchtender_or_403,
+)
 
 from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     format_switchtender_identity, generate_ro_key,
-                     get_active_project, get_switchtenders_for_project,
-                     is_project_moderator, is_project_moderator_or_403,
-                     is_regional_actor_for_project_or_403,
-                     refresh_user_projects_in_session, set_active_project_id)
+from ..utils import (
+    can_administrate_or_403,
+    can_administrate_project,
+    format_switchtender_identity,
+    generate_ro_key,
+    get_active_project,
+    get_collaborators_for_project,
+    get_switchtenders_for_project,
+    is_project_moderator,
+    is_project_moderator_or_403,
+    is_regional_actor_for_project_or_403,
+    refresh_user_projects_in_session,
+    set_active_project_id,
+)
 
 ########################################################################
 # On boarding
@@ -258,6 +270,8 @@ def project_list_export_csv(request):
             [format_switchtender_identity(u) for u in switchtenders]
         )
 
+        collaborators = get_collaborators_for_project(project)
+
         followups = models.TaskFollowup.objects.filter(
             task__project=project,
             task__site=request.site,
@@ -307,9 +321,9 @@ def project_list_export_csv(request):
                     origin=reminders_models.Reminder.SELF,
                 ).count(),  # Reminders
                 notes.filter(public=True).count(),  # conversations conseillers
-                conversations.exclude(
-                    created_by__in=switchtenders
-                ).count(),  # conversations collectivite
+                max(
+                    0, conversations.filter(created_by__in=collaborators).count() - 1
+                ),  # conversations collectivite. -1 to remove a message from the system
                 notes.filter(public=False).count(),  # suivi interne conseillers
                 switchtenders.exclude(
                     is_staff=True
@@ -443,6 +457,16 @@ def project_switchtender_join(request, project_id=None):
             switchtending.is_observer = False
             switchtending.save()
 
+        personal_status, created = models.UserProjectStatus.objects.get_or_create(
+            site=request.site,
+            user=request.user,
+            project=project,
+            defaults={"status": "FOLLOWED"},
+        )
+        if not created:
+            personal_status.status = "FOLLOWED"
+            personal_status.save()
+
         project.updated_on = timezone.now()
         project.save()
 
@@ -467,6 +491,16 @@ def project_observer_join(request, project_id=None):
             switchtending.is_observer = True
             switchtending.save()
 
+        personal_status, created = models.UserProjectStatus.objects.get_or_create(
+            site=request.site,
+            user=request.user,
+            project=project,
+            defaults={"status": "FOLLOWED"},
+        )
+        if not created:
+            personal_status.status = "FOLLOWED"
+            personal_status.save()
+
         project.updated_on = timezone.now()
         project.save()
 
@@ -486,6 +520,16 @@ def project_switchtender_leave(request, project_id=None):
         project.switchtenders_on_site.filter(switchtender=request.user).delete()
         project.updated_on = timezone.now()
         project.save()
+
+        personal_status, created = models.UserProjectStatus.objects.get_or_create(
+            site=request.site,
+            user=request.user,
+            project=project,
+            defaults={"status": "NOT_INTERESTED"},
+        )
+        if not created:
+            personal_status.status = "NOT_INTERESTED"
+            personal_status.save()
 
         signals.project_switchtender_leaved.send(sender=request.user, project=project)
 

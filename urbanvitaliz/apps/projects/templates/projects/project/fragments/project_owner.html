@@ -10,6 +10,14 @@
                 {{ project.owner.first_name }}
                 {{ project.owner.last_name }}
             </strong>
+            {% if request.user.is_staff %}
+            &nbsp;
+            <a class="small" href="{% url 'crm-user-details' project.owner.pk %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                </svg>
+            </a>
+            {% endif %}
         </span>
         <span style="color: #666666; font-style: italic; font-weight: 300;">
             {% if project.owner.profile.organization.name %}
