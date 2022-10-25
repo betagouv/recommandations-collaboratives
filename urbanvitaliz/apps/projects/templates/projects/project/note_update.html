@@ -50,7 +50,6 @@
 
 		        {% csrf_token %}
 
-            <!-- {{ form.as_p }} -->
             <div class="d-flex">
                 {% include 'tools/editor.html' with input_name=form.content.name input_value=form.content.value|default:'' input_required=True escapejs=True%}
             </div>
