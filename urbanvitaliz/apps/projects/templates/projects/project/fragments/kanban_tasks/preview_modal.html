@@ -1,4 +1,9 @@
 {% load static %}
+{% load guardian_tags %}
+
+{% get_obj_perms user for project as "permissions" %}
+
+{{permissions}}
 
 <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true" x-init="initPreviewModal()"
 	x-data="{ get currentTask() { return this.findById(this.currentTaskId)}}">
@@ -144,7 +149,7 @@
 									</template>
 								</div>
 							</div>
-							{% if can_manage and not disable_edit %}
+							{% if "use_tasks" in permissions and not disable_edit %}
 							<div class="p-3 border-top">
 								<template x-if="currentlyEditing">
 									<span>Editer un commentaire</span>

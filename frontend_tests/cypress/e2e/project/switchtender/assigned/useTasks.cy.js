@@ -1,14 +1,11 @@
 //Must be dore after `addARecommandationAsASwitchtender.cy.js`
 describe('I can comment & interact with a recommandation', () => {
     beforeEach(() => {
-        cy.login("jean");
+        cy.login("jeanne");
+        cy.becomeSwitchtenderOnProject('Friche numéro 1');
     })
 
     it('goes to recommandation page', () => {
-
-        cy.visit('/projects')
-
-        cy.contains('Friche numéro 1').click({force:true});
 
         cy.contains("Recommandations").click({ force: true })
 
