@@ -38,27 +38,15 @@ from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
 
 from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
-
-<<<<<<< HEAD
 from ..utils import (assign_advisor, can_administrate_or_403,
                      can_administrate_project, format_switchtender_identity,
                      generate_ro_key, get_active_project,
+                     get_collaborators_for_project,
                      get_switchtenders_for_project, is_project_moderator,
                      is_project_moderator_or_403,
                      is_regional_actor_for_project_or_403,
                      refresh_user_projects_in_session, set_active_project_id,
                      unassign_advisor)
-
-=======
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     format_switchtender_identity, generate_ro_key,
-                     get_active_project, get_collaborators_for_project,
-                     get_switchtenders_for_project, is_project_moderator,
-                     is_project_moderator_or_403,
-                     is_regional_actor_for_project_or_403,
-                     refresh_user_projects_in_session, set_active_project_id)
-
->>>>>>> develop
 
 ########################################################################
 # On boarding
