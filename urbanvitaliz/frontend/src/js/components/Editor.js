@@ -27,6 +27,7 @@ Alpine.data('editor', (content) => {
         },
         onUpdate({ editor }) {
           _this.updatedAt = Date.now()
+          _this.renderMarkdown();
         },
         onSelectionUpdate({ editor }) {
           _this.updatedAt = Date.now()
