@@ -29,6 +29,7 @@ module.exports = {
                 project: resolve('./src/js/apps/project.js'),
                 auth: resolve('./src/js/apps/auth.js'),
                 projectDetails : resolve('./src/js/apps/projectDetails.js'),
+                projectShare : resolve('./src/js/apps/projectShare.js'),
                 map: resolve('./src/js/apps/map.js'),
             },
             output: {
