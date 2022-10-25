@@ -25,12 +25,12 @@ from . import models
 
 def assign_collaborator(user, project, is_owner=False):
     """Make someone becomes a project collaborator"""
-    assign_perm("use_public_notes", user, project)
-    assign_perm("view_tasks", user, project)
-    assign_perm("use_tasks", user, project)
+    assign_perm("projects.use_public_notes", user, project)
+    assign_perm("projects.view_tasks", user, project)
+    assign_perm("projects.use_tasks", user, project)
 
     if project.status != "DRAFT":
-        assign_perm("can_invite", user, project)
+        assign_perm("projects.can_invite", user, project)
 
     models.ProjectMember.objects.get_or_create(
         project=project, member=user, is_owner=is_owner
@@ -38,13 +38,13 @@ def assign_collaborator(user, project, is_owner=False):
 
 
 ADVISOR_PERMISSIONS = [
-    "use_public_notes",
-    "use_private_notes",
-    "view_tasks",
-    "manage_tasks",
-    "user_tasks",
-    "can_invite",
-    "change_synopsis",
+    "projects.use_public_notes",
+    "projects.use_private_notes",
+    "projects.view_tasks",
+    "projects.manage_tasks",
+    "projects.use_tasks",
+    "projects.can_invite",
+    "projects.change_synopsis",
 ]
 
 
