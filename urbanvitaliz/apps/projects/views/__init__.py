@@ -44,7 +44,8 @@ from ..utils import (assign_advisor, can_administrate_or_403,
                      get_switchtenders_for_project, is_project_moderator,
                      is_project_moderator_or_403,
                      is_regional_actor_for_project_or_403,
-                     refresh_user_projects_in_session, set_active_project_id)
+                     refresh_user_projects_in_session, set_active_project_id,
+                     unassign_advisor)
 
 ########################################################################
 # On boarding
@@ -453,7 +454,7 @@ def project_switchtender_leave(request, project_id=None):
     is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
 
     if request.method == "POST":
-        project.switchtenders_on_site.filter(switchtender=request.user).delete()
+        unassign_advisor(request.user, project)
         project.updated_on = timezone.now()
         project.save()
 
