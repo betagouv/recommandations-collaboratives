@@ -1,0 +1,33 @@
+.tiptap-menu {
+    display: inline-flex;
+
+    border: solid 2px #222;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.tiptap-menu button {
+    appearance: none !important;
+    border: none;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tiptap-menu button.is-active {
+    background: black;
+    color: white;
+}
+
+.tiptap-menu button:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.ProseMirror {
+    min-height: 120px;
+    padding: 5px 3px;
+    margin: 1rem 0;
+    border: 2px solid #222;
+    border-radius: 6px;
+}

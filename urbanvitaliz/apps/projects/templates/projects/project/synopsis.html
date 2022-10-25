@@ -30,12 +30,26 @@
                 </svg>&nbsp;
                 Reformulation du besoin
             </h4>
-            <div class="rephrase-update">
-            {{ form.as_p }}
+            <div class="">
+
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="d-flex">
+                        {% include 'tools/editor.html' with input_name=form.synopsis.name input_value=form.synopsis.value|default:'' escapejs=True%}
+                    </div>
+                    <p class="d-flex flex-column">
+                        {{ form.tags.errors }}
+                        {{form.tags }}
+                        <span>{{form.tags.help_text }}</span>
+                    </p>
+                    <button type="submit" class="btn btn-primary">
+                        Enregistrer
+                    </button>
+                </form>
+
+            <!-- {{ form.as_p }} -->
             </div>
-            <button type="submit" class="btn btn-primary">
-                Enregistrer
-            </button>
+            
         </form>
 
         {{ form.media }}
