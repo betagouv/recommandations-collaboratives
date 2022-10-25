@@ -2,12 +2,12 @@ import Alpine from 'alpinejs'
 import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import { createMarkdownEditor } from 'tiptap-markdown';
-
 import '../../css/tiptap.css'
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
 Alpine.data('editor', (content) => {
+
   let editor
 
   return {
@@ -47,6 +47,9 @@ Alpine.data('editor', (content) => {
     },
     toggleItalic() {
       editor.chain().toggleItalic().focus().run()
+    },
+    toggleBulletList() {
+      editor.chain().toggleBulletList().focus().run()
     },
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown()
