@@ -53,11 +53,16 @@ def assign_advisor(user, project):
     for perm in ADVISOR_PERMISSIONS:
         assign_perm(perm, user, project)
 
-    models.ProjectSwitchtender.objects.get_or_create(
+    switchtending, created = models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,
         site=get_current_site(Site.objects.get_current()),
         project=project,
+        defaults={"is_observer": False},
     )
+
+    if not created:
+        switchtending.is_observer = False
+        switchtending.save()
 
 
 def unassign_advisor(user, project):
@@ -72,8 +77,21 @@ def unassign_advisor(user, project):
     )
 
 
-def assign_follower(user, project):
-    pass
+def assign_observer(user, project):
+    """Make someone becomes a project observer"""
+    for perm in ADVISOR_PERMISSIONS:  # XXX Should be different from an advisor
+        assign_perm(perm, user, project)
+
+    switchtending, created = models.ProjectSwitchtender.objects.get_or_create(
+        switchtender=user,
+        site=get_current_site(Site.objects.get_current()),
+        project=project,
+        defaults={"is_observer": True},
+    )
+
+    if not created:
+        switchtending.is_observer = True
+        switchtending.save()
 
 
 def can_manage_project(project, user, allow_draft=False):
@@ -208,6 +226,16 @@ def get_switchtenders_for_project(project):
         projects_switchtended_on_site__project=project,
         projects_switchtended_on_site__site=get_current_site(request=None),
     ).distinct()
+
+
+def get_switchtender_for_project(user, project):
+    """Return a switchtending position for the given user on the given project"""
+    try:
+        return models.ProjectSwitchtender.objects.get(
+            switchtender=user, project=project
+        )
+    except models.ProjectSwitchtender.DoesNotExist:
+        return None
 
 
 def get_collaborators_for_project(project):

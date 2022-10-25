@@ -99,19 +99,15 @@
             </div>
             {% endif %}
 
-            <div class="px-4 pt-4 crm-note relative">
-                <a class="btn btn-secondary" href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>
+            <div class="px-4 pt-4 crm-notes-wrapper relative">
+                <a class="btn btn-secondary mb-4" href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>
 
                 {% for note in sticky_notes.all %}
-                <div x-data="Note" x-ref="note" class="relative" :class="isOpen ? 'open' : 'closed'">
                     {% include 'crm/note.html' with pinned=True update_url_name='crm-organization-note-update' %}
-                </div>
                 {% endfor %}
 
                 {% for note in notes.all %}
-                <div x-data="Note" x-ref="note" class="relative" :class="isOpen ? 'open' : 'closed'">
                     {% include 'crm/note.html' with update_url_name='crm-organization-note-update' %}
-                </div>
                 {% endfor %}
 
             </div>

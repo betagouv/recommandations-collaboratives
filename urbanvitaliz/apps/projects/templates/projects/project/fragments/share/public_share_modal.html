@@ -1,0 +1,31 @@
+{% load static %}
+
+<div class="modal fade" id="public-share-modal" tabindex="-1" aria-labelledby="public-share-modal-label"
+  aria-hidden="true" x-init="initPublicShareModal()">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-0">Partager l'état des lieux</h6>
+      </div>
+      <div class="modal-body">
+        <div>
+          <p style="color: #929292; font-weight: 300;">
+            Partagez ce lien pour donner accès en lecture seule à la page État des lieux
+          </p>
+          <div
+            x-data="AccessUpdate('{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}')"
+            class="input-group input-group-lg">
+            <input type="text" readonly class="form-control fst-italic" :value="url" x-ref="input"
+              @focus="selectText()" />
+            <button class="btn btn-outline-primary" @click="clipboardCopy()" x-ref="button">
+              <svg class="bi align-baseline" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard" x-show="!isCopied" />
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-check" x-show="isCopied" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

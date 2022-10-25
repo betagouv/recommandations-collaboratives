@@ -1664,4 +1664,137 @@ def test_switchtender_writes_synopsis_for_project(request, client):
     assert project.synopsis_by == user
 
 
+#################################################################
+# User interest in project
+#################################################################
+@pytest.mark.django_db
+def test_regional_switchtender_can_observe_project(request, client):
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(
+        models.Project, commune=commune, sites=[get_current_site(request)]
+    ).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.departments.set([project.commune.department.pk])
+        response = client.post(
+            reverse("projects-project-observer-join", args=[project.id]),
+        )
+
+    assert response.status_code == 302
+    project = models.Project.objects.all()[0]
+    switchtending = models.ProjectSwitchtender.objects.get(
+        project=project, switchtender=user
+    )
+    assert switchtending.is_observer is True
+
+
+@pytest.mark.django_db
+def test_non_regional_switchtender_can_observe_project(request, client):
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(
+        models.Project, commune=commune, sites=[get_current_site(request)]
+    ).make()
+
+    with login(client, groups=["switchtender"]):
+        response = client.post(
+            reverse("projects-project-observer-join", args=[project.id]),
+        )
+
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_switchtender_visits_project_without_interest(request, client):
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(
+        models.Project, commune=commune, sites=[get_current_site(request)]
+    ).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        response = client.get(
+            reverse("projects-project-detail-overview", args=[project.id]),
+        )
+
+    assert response.status_code == 200
+
+    personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
+
+    assert personal_status.status == "NOT_INTERESTED"
+
+
+@pytest.mark.django_db
+def test_switchtender_observes_project_shows_interest(request, client):
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(
+        models.Project, commune=commune, sites=[get_current_site(request)]
+    ).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        response = client.get(
+            reverse("projects-project-detail-overview", args=[project.id]),
+        )
+        assert response.status_code == 200
+
+        response = client.post(
+            reverse("projects-project-observer-join", args=[project.id]),
+        )
+        assert response.status_code == 302
+
+    personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
+
+    assert personal_status.status == "FOLLOWED"
+
+
+@pytest.mark.django_db
+def test_switchtender_advises_project_shows_interest(request, client):
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(
+        models.Project, commune=commune, sites=[get_current_site(request)]
+    ).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        response = client.get(
+            reverse("projects-project-detail-overview", args=[project.id]),
+        )
+        assert response.status_code == 200
+
+        response = client.post(
+            reverse("projects-project-switchtender-join", args=[project.id]),
+        )
+        assert response.status_code == 302
+
+    personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
+
+    assert personal_status.status == "FOLLOWED"
+
+
+@pytest.mark.django_db
+def test_switchtender_stop_advising_or_observing_project_shows_no_interest(
+    request, client
+):
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(
+        models.Project, commune=commune, sites=[get_current_site(request)]
+    ).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        response = client.get(
+            reverse("projects-project-detail-overview", args=[project.id]),
+        )
+        assert response.status_code == 200
+
+        response = client.post(
+            reverse("projects-project-switchtender-join", args=[project.id]),
+        )
+        assert response.status_code == 302
+        response = client.post(
+            reverse("projects-project-switchtender-leave", args=[project.id]),
+        )
+        assert response.status_code == 302
+
+    personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
+
+    assert personal_status.status == "NOT_INTERESTED"
+
+
 # eof

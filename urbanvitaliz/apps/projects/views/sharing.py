@@ -115,6 +115,9 @@ def access_update(request, project_id):
                     ),
                     extra_tags=["email"],
                 )
+                return redirect(
+                    reverse("projects-project-detail-overview", args=[project_id])
+                )
 
             return redirect(reverse("projects-access-update", args=[project_id]))
     else:

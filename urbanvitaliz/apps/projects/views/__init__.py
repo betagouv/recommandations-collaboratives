@@ -41,6 +41,7 @@ from ..forms import ProjectForm, SelectCommuneForm
 from ..utils import (assign_advisor, can_administrate_or_403,
                      can_administrate_project, format_switchtender_identity,
                      generate_ro_key, get_active_project,
+                     get_collaborators_for_project,
                      get_switchtenders_for_project, is_project_moderator,
                      is_project_moderator_or_403,
                      is_regional_actor_for_project_or_403,
@@ -260,6 +261,8 @@ def project_list_export_csv(request):
             [format_switchtender_identity(u) for u in switchtenders]
         )
 
+        collaborators = get_collaborators_for_project(project)
+
         followups = models.TaskFollowup.objects.filter(
             task__project=project,
             task__site=request.site,
@@ -309,9 +312,9 @@ def project_list_export_csv(request):
                     origin=reminders_models.Reminder.SELF,
                 ).count(),  # Reminders
                 notes.filter(public=True).count(),  # conversations conseillers
-                conversations.exclude(
-                    created_by__in=switchtenders
-                ).count(),  # conversations collectivite
+                max(
+                    0, conversations.filter(created_by__in=collaborators).count() - 1
+                ),  # conversations collectivite. -1 to remove a message from the system
                 notes.filter(public=False).count(),  # suivi interne conseillers
                 switchtenders.exclude(
                     is_staff=True
@@ -430,7 +433,7 @@ def project_accept(request, project_id=None):
 
 @login_required
 def project_switchtender_join(request, project_id=None):
-    """Join switchtender"""
+    """Join as switchtender"""
     is_switchtender_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
     is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
@@ -438,10 +441,49 @@ def project_switchtender_join(request, project_id=None):
     if request.method == "POST":
         assign_advisor(request.user, project)
 
+        personal_status, created = models.UserProjectStatus.objects.get_or_create(
+            site=request.site,
+            user=request.user,
+            project=project,
+            defaults={"status": "FOLLOWED"},
+        )
+        if not created:
+            personal_status.status = "FOLLOWED"
+            personal_status.save()
+
         project.updated_on = timezone.now()
         project.save()
 
         signals.project_switchtender_joined.send(sender=request.user, project=project)
+
+    return redirect(reverse("projects-project-detail", args=[project_id]))
+
+
+@login_required
+def project_observer_join(request, project_id=None):
+    """Join as observer"""
+    is_switchtender_or_403(request.user)
+
+    project = get_object_or_404(models.Project, pk=project_id)
+    is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+
+    if request.method == "POST":
+        assign_observer(request.user, project)
+
+        personal_status, created = models.UserProjectStatus.objects.get_or_create(
+            site=request.site,
+            user=request.user,
+            project=project,
+            defaults={"status": "FOLLOWED"},
+        )
+        if not created:
+            personal_status.status = "FOLLOWED"
+            personal_status.save()
+
+        project.updated_on = timezone.now()
+        project.save()
+
+        signals.project_observer_joined.send(sender=request.user, project=project)
 
     return redirect(reverse("projects-project-detail", args=[project_id]))
 
@@ -457,6 +499,16 @@ def project_switchtender_leave(request, project_id=None):
         unassign_advisor(request.user, project)
         project.updated_on = timezone.now()
         project.save()
+
+        personal_status, created = models.UserProjectStatus.objects.get_or_create(
+            site=request.site,
+            user=request.user,
+            project=project,
+            defaults={"status": "NOT_INTERESTED"},
+        )
+        if not created:
+            personal_status.status = "NOT_INTERESTED"
+            personal_status.save()
 
         signals.project_switchtender_leaved.send(sender=request.user, project=project)
 

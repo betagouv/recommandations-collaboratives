@@ -30,6 +30,7 @@ from .utils import (
 project_submitted = django.dispatch.Signal()
 project_validated = django.dispatch.Signal()
 project_switchtender_joined = django.dispatch.Signal()
+project_observer_joined = django.dispatch.Signal()
 project_switchtender_leaved = django.dispatch.Signal()
 
 project_member_joined = django.dispatch.Signal()
@@ -98,6 +99,34 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
         sender=sender,
         recipient=recipients,
         verb="est devenu·e aiguilleur·se sur le projet",
+        action_object=project,
+        target=project,
+        private=True,
+    )
+
+
+@receiver(project_observer_joined)
+def log_project_observer_joined(sender, project, **kwargs):
+    action.send(
+        sender,
+        verb="est devenu·e observateur·rice sur le projet",
+        action_object=project,
+        target=project,
+    )
+
+
+@receiver(project_observer_joined)
+def notify_project_observer_joined(sender, project, **kwargs):
+    if project.status == "DRAFT" or project.muted:
+        return
+
+    recipients = get_collaborators_for_project(project).exclude(id=sender.id)
+
+    # Notify regional actors
+    notify.send(
+        sender=sender,
+        recipient=recipients,
+        verb="est devenu·e observateur·rice sur le projet",
         action_object=project,
         target=project,
         private=True,
@@ -389,7 +418,7 @@ def notify_note_created(sender, note, project, user, **kwargs):
     notify.send(
         sender=user,
         recipient=recipients,
-        verb="a créé une note de suivi",
+        verb="a rédigé un message",
         action_object=note,
         target=project,
         private=True,

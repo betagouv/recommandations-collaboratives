@@ -8,10 +8,15 @@
 {{ block.super }} > Connaissance
 {% endblock %}
 
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/projectShare.js' %}
+{% endblock %}
 
 {% block project_detail %}
 
-<div class="col-12">
+<div x-data="ProjectShare" class="col-12">
     <div class="row">
         {% if not is_switchtender %}
         {% if can_manage_draft and session and session.next_question and session.completion < 80 %} <div
@@ -78,62 +83,88 @@
             </div>
     </div>
     <div class="col-4">
-        <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Informations générales</h6>
-        <div class="d-flex flex-column">
-            <span style="font-size: 14px; color:#666666; font-weight: 300;" class="d-block mb-2">Référent collectivité</span>
-            {% include 'projects/project/fragments/user.html' with project=project %}
-            <a class="d-flex align-items-center mb-1" style="font-size: 14px; color: #0063CB; text-decoration: none;"
-                href="mailto:{{project.owner.email}}">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#link-45deg" />
-                </svg>&nbsp;
-                {{ project.owner.email }}
-            </a>
-            {% if project.owner.profile.phone_no or project.phone %}
-            <span style="font-size: 14px; color: #0063CB;" class="d-flex align-items-center">
-                <svg class="bi align-middle" width="15" height="15" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone" />
-                </svg>&nbsp;
-                {% if project.owner.profile.phone_no %}
-                    {{project.owner.profile.phone_no}}</span>   
-                {% else %}
-                    {{project.phone}}</span>   
+        <div class="mb-4">
+            <div class="d-flex flex-column">
+                <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Référent collectivité</h6>
+                {% include 'projects/project/fragments/project_owner.html' with project=project %}
+                <a class="d-flex align-items-center mb-1" style="font-size: 14px; color: #0063CB; text-decoration: none;"
+                    href="mailto:{{project.owner.email}}">
+                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#link-45deg" />
+                    </svg>&nbsp;
+                    {{ project.owner.email }}
+                </a>
+                {% if project.owner.profile.phone_no or project.phone %}
+                <span style="font-size: 14px; color: #0063CB;" class="d-flex align-items-center">
+                    <svg class="bi align-middle" width="15" height="15" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone" />
+                    </svg>&nbsp;&nbsp;
+                    {% if project.owner.profile.phone_no %}
+                    <a style="font-size: 14px; color: #0063CB; text-decoration: none;" href="tel:{{project.owner.profile.phone_no}}">{{project.owner.profile.phone_no}}</a>
+                    {% else %}
+                    <a style="font-size: 14px; color: #0063CB; text-decoration: none;" href="tel:{{project.phone}}">{{project.phone}}</a>
+                    {% endif %}
+                </span>
                 {% endif %}
-            {% endif %}
+            </div>
+            {% include 'projects/project/fragments/positioning.html' %}
         </div>
+        
+        <!-- User lists -->
         <div class="d-flex flex-column my-4">
-            <span style="font-size: 14px; color:#666666;font-weight: 300;" class="d-block mb-2">Participants</span>
-            <ul class="d-flex flex-column list-unstyled">
-                {% for switchtender in project.switchtenders.all %}
-                        <li>
-                            {% include 'projects/project/fragments/user.html' with member=switchtender project=project %}
-                        </li>
-                {% endfor %}
-                {% for member in project.members.all %}
+            <!-- Collectivity -->
+            <div>
+                <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Membres de la collectivité</h6>
+                <ul class="flex-column list-unstyled mb-0">
+                    {% for member in project.members.all %}
                     {% if forloop.counter0 == 0 %}
                         <li>
-                            {% include 'projects/project/fragments/user.html' with member=False project=project %}
+                            {% include 'projects/project/fragments/project_owner.html' with project=project %}
                         </li>
-                    {% else %}
+                        {% else %}
                         <li>
                             {% include 'projects/project/fragments/user.html' with member=member project=project %}
                         </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-            <div class="d-block mb-2">
-                <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex" href="{% url 'projects-access-update' project.id %}">
-                    {% if project.status == 'DRAFT' %}
+                        {% endif %}
+                        {% endfor %}
+                </ul>
+                <div class="d-block mb-2">
+                    <a style="cursor: pointer;" @click="openInviteMemberModal" data-toggle="modal" data-target="#InviteMemberModal" class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex justify-content-center w-100">
+                        {% if project.status == 'DRAFT' %}
                         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
                         </svg>&nbsp;
-                    {% endif %}
-                        <span>Inviter d'autres participants</span>
-                </a>
+                        {% endif %}
+                        <span>Inviter un membre de la collectivité</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Advisors -->
+            <div class="mt-4">
+                <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Équipe de suvi</h6>
+                <ul class="d-flex flex-column list-unstyled mb-0">
+                    {% for advisor in project.switchtenders_on_site.all %}
+                    <li>
+                        {% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="d-block mb-2">
+                    <a style="cursor: pointer;" @click="openInviteSwitchtenderModal" data-toggle="modal" data-target="#InviteSwitchtenderModal" class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex justify-content-center w-100">
+                        {% if project.status == 'DRAFT' %}
+                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
+                        </svg>&nbsp;
+                        {% endif %}
+                        <span>Inviter un conseiller</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
+    {% include "projects/project/fragments/share/invite_member.html" %}
+    {% include "projects/project/fragments/share/invite_switchtender.html" %}
 </div>
 {% endblock %}
