@@ -1,13 +1,10 @@
 describe('I can create a recommandation with no resource as a switcthender', () => {
     beforeEach(() => {
-        cy.login("jean");
+        cy.login("jeanne");
+        cy.becomeSwitchtenderOnProject('Friche numéro 1');
     })
 
     it('creates a reco', () => {
-
-        cy.visit('/projects')
-
-        cy.contains('Friche numéro 1').click({force:true});
 
         cy.contains("Recommandations").click({ force: true })
 

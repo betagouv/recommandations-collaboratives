@@ -1,5 +1,8 @@
 {% load static %}
 {% load gravatar %}
+{% load guardian_tags %}
+
+{% get_obj_perms user for project as "permissions" %}
 
 
 {% if is_switchtender or can_administrate %}
@@ -24,7 +27,7 @@
 			{% endfor %}
 		</div>
 
-		{% if can_administrate %}
+		{% if "manage_tasks" in permissions %}
 		<span class="ms-4">
 			<a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'projects-project-create-action' project.id %}">
 				<svg class="bi me-1" width="16" height="16" fill="currentColor">
