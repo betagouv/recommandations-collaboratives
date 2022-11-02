@@ -24,6 +24,35 @@
     background: rgba(0, 0, 0, 0.5);
 }
 
+.tiptap-menu button.unset-link {
+    position: relative;
+}
+
+.tiptap-menu button.unset-link svg {
+    z-index: 2;
+}
+
+.tiptap-menu button.unset-link::before {
+    content: '';
+    position: absolute;
+
+    width: 60%;
+    height: 1px;
+    background-color: #222;
+
+
+    top: 50%;
+    left: 15%;
+
+    z-index: 1;
+
+    font-weight: 700;
+}
+
+.tiptap-menu button.unset-link:disabled::before {
+    opacity: 0.3;
+}
+
 .ProseMirror {
     min-height: 120px;
     padding: 5px 3px;
