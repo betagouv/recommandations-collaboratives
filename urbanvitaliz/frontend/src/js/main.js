@@ -5,6 +5,7 @@ import './store/app'
 
 //Global reused component
 import './components/Notification'
+import './components/Editor'
 
 //Global CSS
 import '../css/buttons.css'
