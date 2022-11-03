@@ -61,7 +61,7 @@
     <div class="col-8">
             {% if can_administrate %}
                 {% if project.synopsis %}
-                    {% include 'projects/project/fragments/information_card.html' with full_width=True project=project is_editable=True title="Reformulation du besoin" description=project.synopsis updated_on=project.synopsis_on card_user=project.synopsis_by org_name=project.synopsis_by.profile.organization.name %}
+                    {% include 'projects/project/fragments/information_card.html' with full_width=True project=project is_editable=True title="Reformulation du besoin" description=project.synopsis_rendered updated_on=project.synopsis_on card_user=project.synopsis_by org_name=project.synopsis_by.profile.organization.name %}
                 {% else %}
                     <div class="project-card-details me-4 py-4 d-flex flex-column align-items-center justify-content-center">
                         <span style="color:#929292; font-size: 14px;" class="text-uppercase">Aucune reformulation n'a été faite pour le moment</span>
