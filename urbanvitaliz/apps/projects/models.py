@@ -176,6 +176,12 @@ class Project(models.Model):
     synopsis = models.TextField(
         verbose_name="Reformulation du besoin", default="", blank=True, null=True
     )
+
+    @property
+    def synopsis_rendered(self):
+        """Return synopsis as markdown"""
+        return markdownify(self.synopsis)
+
     synopsis_on = models.DateTimeField(
         verbose_name="Reformulé le", null=True, blank=True
     )
