@@ -68,6 +68,12 @@ class Note(models.Model):
     related = GenericForeignKey("content_type", "object_id")
 
     def get_absolute_url(self):
+        project_ct = ContentType.objects.get_for_model(projects_models.Project)
+        user_ct = ContentType.objects.get_for_model(auth_models.User)
+        organization_ct = ContentType.objects.get_for_model(
+            addressbook_models.Organization
+        )
+
         try:
             url = {
                 user_ct: reverse("crm-user-details", args=[self.object_id]),
@@ -85,8 +91,3 @@ class Note(models.Model):
     def content_rendered(self):
         """Return content as markdown"""
         return markdownify(self.content)
-
-
-project_ct = ContentType.objects.get_for_model(projects_models.Project)
-user_ct = ContentType.objects.get_for_model(auth_models.User)
-organization_ct = ContentType.objects.get_for_model(addressbook_models.Organization)
