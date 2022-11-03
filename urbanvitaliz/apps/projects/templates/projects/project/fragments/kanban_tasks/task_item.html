@@ -69,7 +69,7 @@
 								<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
 							</template>
 							<template x-if="t.content !== ''">
-								<p x-text="truncate(t.content, 200)" class="mb-3"></p>
+								<p x-html="truncate(renderMarkdown(t.content), 200)" class="mb-3"></p>
 							</template>
 							<div class="d-flex justify-content-between">
 								<div>
