@@ -55,26 +55,27 @@
                 <div class="crm-header no-project px-4 py-4">
             {% endif %}
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <div class="d-flex align-items-center justify-content-center">
-                    <h3 class="d-flex align-items-center mb-0">
+                <div class="d-flex align-items-start justify-content-between w-100">
+                    <div class="d-flex align-items-center">
+                    <h5 class="d-flex align-items-center mb-0">
                         <svg class="bi me-2" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
                         </svg>
                         <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
-                    </h3>
+                    </h5>
                         {% if crm_user.profile.phone_no %}
                             <span class="ms-2 me-2 d-block">|</span>
                             <svg class="bi" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-fill" />
                             </svg>  
-                            {{crm_user.profile.phone_no}}
+                            <span>{{crm_user.profile.phone_no}}</span>
                         {% endif %}
                         {% if crm_user.email %}
                             <span class="ms-2 me-2">|</span>
                             <svg class="bi" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope-fill" />
                             </svg>  
-                            {{crm_user.email}}
+                            <span>{{crm_user.email}}</span>
                         {% endif %}
                         {% if crm_user.profile.organization.position %}
                             <span class="ms-2 me-2">|</span>
@@ -83,28 +84,34 @@
                             </svg>  
                             {{crm_user.profile.organization.position}}
                         {% endif %}
-                </div>
-                <div class="d-flex align-items-center">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-fill" />
-                    </svg>
-                    <a class="ms-2" style="font-size: 1rem;" href="{% url 'crm-user-notifications' crm_user.pk %}">Voir les notifications envoyées</a>
-                </div>
-                <div class="d-flex align-items-center">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#balloon-heart" />
-                    </svg>
-                    <a class="ms-2" style="font-size: 1rem;" href="{% url 'crm-user-project-interest' crm_user.pk %}">Intérêts envers les projets</a>
+                    </div>
+                        <div class="d-flex align-items-end flex-column">
+                            <div class="d-flex align-items-center">
+                                <svg class="bi" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-fill" />
+                                </svg>
+                                <a class="ms-2" style="font-size: 1rem;" href="{% url 'crm-user-notifications' crm_user.pk %}">Voir les notifications envoyées</a>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <svg class="bi" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#balloon-heart" />
+                                </svg>
+                                <a class="ms-2" style="font-size: 1rem;" href="{% url 'crm-user-project-interest' crm_user.pk %}">Intérêts envers les projets</a>
+                            </div>
+                        </div>
                 </div>
             </div>
             {% if crm_user.profile.organization %}
-            <a class="d-flex align-items-center"
-                href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">
-                <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left" />
-                </svg>
-                <span>Revenir aux détails de l'organisation : <strong>{{crm_user.profile.organization.name}}</strong></span>
-            </a>
+            <div class="d-flex justify-content-between align-items-start">
+                <a class="d-flex align-items-center"
+                    href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">
+                    <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left" />
+                    </svg>
+                    <span>Revenir aux détails de l'organisation : <strong>{{crm_user.profile.organization.name}}</strong></span>
+                </a>
+                
+            </div>
             {% endif %}
                 </div>
                 <div class="px-4 pt-4 crm-notes-wrapper relative">
