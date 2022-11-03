@@ -8,5 +8,5 @@
         {% endif %}
     {% endfor %}
 {% else %}
-    {{ description }}
+    {{ description|safe }}
 {% endif %}

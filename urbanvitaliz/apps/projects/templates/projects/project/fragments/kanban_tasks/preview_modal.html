@@ -153,10 +153,10 @@
 									<span>Répondre</span>
 								</template>
 								<form x-ref="commentTextFormRef" class="position-relative mt-2 form d-flex flex-column align-items-end" @submit.prevent="onSubmitComment">
-									<textarea id="modal-textarea" x-ref="commentTextRef" name="comment" style="min-height: 100px; border-color: #ccc;"
+									<textarea x-model="commentText" id="modal-textarea" x-ref="commentTextRef" name="comment" style="min-height: 100px; border-color: #ccc;"
 										class="w-100 p-2 rounded rounded-4 my-2 mb-3 border" placeholder="Votre message..."
 										x-model="pendingComment"></textarea>
-									<button type="submit" class="btn btn-primary">Envoyer</button>
+									<button x-bind:disabled="commentText.length == 0" type="submit" class="btn btn-primary">Envoyer</button>
 								</form>
 							</div>
 							{% endif %}

@@ -24,6 +24,16 @@
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#list-ul"/>
         </svg>&nbsp;
       </button>
+      <button @click.prevent @click="setLink()" :class="{ 'is-active' : isActive('link', updatedAt) }">
+        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#link"/>
+        </svg>&nbsp;
+      </button>
+      <button class="unset-link" @click.prevent @click="unsetLink()" x-bind:disabled="!isActive('link', updatedAt)">
+        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#link"/>
+        </svg>&nbsp;
+      </button>
     </div>
   </template>
 
