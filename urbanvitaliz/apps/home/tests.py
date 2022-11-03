@@ -28,6 +28,7 @@ from . import models, utils
 ####
 # utils
 ####
+@pytest.mark.django_db
 def test_get_current_site_sender_with_configuration(request):
     current_site = get_current_site(request)
     site_config = baker.make(models.SiteConfiguration, site=current_site)
@@ -38,6 +39,7 @@ def test_get_current_site_sender_with_configuration(request):
     assert site_config.sender_name in sender
 
 
+@pytest.mark.django_db
 def test_get_current_site_sender_without_configuration(request):
     sender = utils.get_current_site_sender()
     assert sender == settings.DEFAULT_FROM_EMAIL
@@ -75,6 +77,7 @@ def test_create_user_fails_for_known_email():
 # seding message to team
 
 
+@pytest.mark.django_db
 def test_user_can_access_contact_form(client):
 
     url = reverse("home-contact") + "?next=/"
@@ -189,18 +192,21 @@ def test_user_can_access_stats(client):
 #######################################################################
 
 
+@pytest.mark.django_db
 def test_user_can_access_methodology(client):
     url = reverse("methodology")
     response = client.get(url)
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
 def test_user_can_access_whoweare(client):
     url = reverse("whoweare")
     response = client.get(url)
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
 def test_user_can_access_followus(client):
     url = reverse("followus")
     response = client.get(url)
@@ -212,6 +218,7 @@ def test_user_can_access_followus(client):
 ################################################################
 
 
+@pytest.mark.django_db
 def test_guardian_supports_assign_for_user_with_site_framework(client, request):
     """Test usage of assign_perm for User"""
     user = baker.make(auth_models.User)
@@ -232,6 +239,7 @@ def test_guardian_supports_assign_for_user_with_site_framework(client, request):
         assert user_has_perm is False
 
 
+@pytest.mark.django_db
 def test_guardian_supports_assign_for_group_with_site_framework(client, request):
     """Test usage of assign_perm for Group"""
     group = baker.make(auth_models.Group)
@@ -253,6 +261,7 @@ def test_guardian_supports_assign_for_group_with_site_framework(client, request)
         assert user_has_perm is False
 
 
+@pytest.mark.django_db
 def test_guardian_supports_bulk_assign_users_with_site_framework(client, request):
     baker.make(auth_models.User)
     baker.make(auth_models.User)
@@ -275,6 +284,7 @@ def test_guardian_supports_bulk_assign_users_with_site_framework(client, request
             assert not user.has_perm("projects.add_project", project)
 
 
+@pytest.mark.django_db
 def test_guardian_supports_bulk_assign_groups_with_site_framework(client, request):
     baker.make(auth_models.Group)
     baker.make(auth_models.Group)
@@ -291,6 +301,7 @@ def test_guardian_supports_bulk_assign_groups_with_site_framework(client, reques
             assert perm.site == get_current_site(request)
 
 
+@pytest.mark.django_db
 def test_guardian_supports_assigning_perms_to_two_different_sites(client, request):
     user = baker.make(auth_models.User)
     project = baker.make(projects_models.Project)
@@ -305,6 +316,7 @@ def test_guardian_supports_assigning_perms_to_two_different_sites(client, reques
         assign_perm("add_project", user, project)
 
 
+@pytest.mark.django_db
 def test_guardian_supports_remove_perm_with_site_framework(client, request):
     user = baker.make(auth_models.User)
     project = baker.make(projects_models.Project)
@@ -326,6 +338,7 @@ def test_guardian_supports_remove_perm_with_site_framework(client, request):
         assert user.has_perm("add_project", project)
 
 
+@pytest.mark.django_db
 def test_guardian_supports_remove_bulk_perm_for_user_with_site_framework(
     client, request
 ):
@@ -354,6 +367,7 @@ def test_guardian_supports_remove_bulk_perm_for_user_with_site_framework(
             assert user.has_perm("add_project", project)
 
 
+@pytest.mark.django_db
 def test_guardian_supports_remove_bulk_perm_for_group_with_site_framework(
     client, request
 ):

@@ -42,6 +42,7 @@ from .. import models, signals, utils
 ########################################################################
 
 
+@pytest.mark.django_db
 def test_home_page_is_reachable_without_login(client):
     url = reverse("home")
     response = client.get(url)
@@ -102,6 +103,7 @@ def test_proper_commune_selection_contains_all_possible_commmunes(request, clien
 #################################################################
 # Prefilled projects
 #################################################################
+@pytest.mark.django_db
 def test_create_prefilled_project_is_not_reachable_without_login(request, client):
     baker.make(home_models.SiteConfiguration, site=get_current_site(request))
 
@@ -110,6 +112,7 @@ def test_create_prefilled_project_is_not_reachable_without_login(request, client
     assert response.status_code == 403
 
 
+@pytest.mark.django_db
 def test_create_prefilled_project_is_not_reachable_with_simple_login(request, client):
     baker.make(home_models.SiteConfiguration, site=get_current_site(request))
 
@@ -119,6 +122,7 @@ def test_create_prefilled_project_is_not_reachable_with_simple_login(request, cl
     assert response.status_code == 403
 
 
+@pytest.mark.django_db
 def test_create_prefilled_project_reachable_by_switchtenders(request, client):
     baker.make(home_models.SiteConfiguration, site=get_current_site(request))
 
@@ -851,6 +855,7 @@ def test_notifications_are_deleted_on_project_hard_delete(request):
 ########################################################################
 
 
+@pytest.mark.django_db
 def test_notification_not_sent_when_project_is_draft(request):
     switchtender = Recipe(
         auth.User, username="switchtender", email="switchtender@example.com"
@@ -881,6 +886,7 @@ def test_notification_not_sent_when_project_is_draft(request):
     assert membership.member.notifications.unsent().count() == 0
 
 
+@pytest.mark.django_db
 def test_notification_not_sent_when_project_is_muted(request):
     switchtender = Recipe(
         auth.User, username="switchtender", email="switchtender@example.com"
@@ -1607,6 +1613,7 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(client)
 #################################################################
 
 
+@pytest.mark.django_db
 def test_switchtender_exports_csv(request, client):
     # Expected project
     p1 = Recipe(

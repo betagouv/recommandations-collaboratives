@@ -337,6 +337,7 @@ def test_refuse_task_for_project_and_redirect_for_project_owner(request, client)
     assert response.status_code == 302
 
 
+@pytest.mark.django_db
 def test_already_done_task_for_project_and_redirect_for_project_owner(request, client):
     user = baker.make(auth.User)
 

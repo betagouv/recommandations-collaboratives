@@ -5,6 +5,7 @@ from model_bakery.recipe import Recipe
 from . import utils
 
 
+@pytest.mark.django_db
 def test_build_absolute_url():
     url = utils.build_absolute_url("somewhere")
 
@@ -24,6 +25,7 @@ def test_build_absolute_url_with_auto_login():
     assert "?sesame=" in url
 
 
+@pytest.mark.django_db
 def test_build_absolute_url_with_empty_auto_login():
     url = utils.build_absolute_url("somewhere", auto_login_user=None)
 
@@ -32,6 +34,7 @@ def test_build_absolute_url_with_empty_auto_login():
     assert "?sesame=" not in url
 
 
+@pytest.mark.django_db
 def test_build_absolute_url_keeps_anchor():
     url = utils.build_absolute_url("somewhere#around-the-rainbow")
 

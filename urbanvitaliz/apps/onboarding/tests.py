@@ -30,6 +30,7 @@ baker.generators.add("dynamic_forms.models.FormField", gen_onboarding_func)
 ########################################################################
 
 
+@pytest.mark.django_db
 def test_onboarding_page_is_reachable_without_login(request, client):
     baker.make(home_models.SiteConfiguration, site=get_current_site(request))
 

@@ -8,6 +8,7 @@ created: 2022-02-03 16:14:54 CET
 """
 import test  # noqa
 
+import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
@@ -28,6 +29,7 @@ from .digests import NotificationFormatter
 ########################################################################
 
 
+@pytest.mark.django_db
 def test_send_digests_for_new_reco(client, request):
     membership = baker.make(projects_models.ProjectMember)
 
@@ -59,6 +61,7 @@ def test_send_digests_for_new_reco(client, request):
     assert membership.member.notifications.unsent().count() == 0
 
 
+@pytest.mark.django_db
 def test_send_digests_for_new_reco_empty(client):
     membership = baker.make(projects_models.ProjectMember)
 
@@ -76,6 +79,7 @@ def test_send_digests_for_new_reco_empty(client):
 ########################################################################
 
 
+@pytest.mark.django_db
 def test_send_digests_for_new_sites_by_user():
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     auth.Group.objects.get_or_create(name="project_moderator")
@@ -124,6 +128,7 @@ def test_send_digests_for_new_sites_by_user():
     assert non_regional_actor.notifications.unsent().count() == 0
 
 
+@pytest.mark.django_db
 def test_send_digests_for_switchtender_by_user(client):
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     auth.Group.objects.get_or_create(name="project_moderator")
@@ -183,6 +188,7 @@ def test_send_digests_for_switchtender_by_user(client):
     assert non_regional_actor.notifications.unsent().count() == 0
 
 
+@pytest.mark.django_db
 def test_notification_formatter():
     formatter = NotificationFormatter()
 
