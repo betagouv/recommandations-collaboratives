@@ -3,12 +3,21 @@
 {% load static %}
 {% load humanize %}
 {% load gravatar %}
+{% load training %}
 
 {% block title %}
 {{ block.super }} > Conversations
 {% endblock %}
 
 {% block project_detail %}
+
+{% challenge_for request.user "project-conversation-reader" as challenge %}
+
+{% if not challenge.acquired %}
+REaD IT§§
+{% challenge_acquire challenge %}
+{% endif %}
+
 
 <div class="col-12 mx-auto">
     {% include 'projects/project/navigation.html' with conversation=True %}
