@@ -100,9 +100,9 @@
                                 <a class="ms-2" style="font-size: 1rem;" href="{% url 'crm-user-project-interest' crm_user.pk %}">Intérêts envers les projets</a>
                             </div>
 
-                            {% get_challenges_for request.user as challenges %}
+                            {% get_challenges_for request.user acquired=None as challenges %}
                             {% if challenges.count %}
-                           
+
                             <div class="d-flex justify-content-between align-items-end mt-2">
                                 <svg class="mx-2 my-2" width="18" height="18" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trophy" />
@@ -110,11 +110,19 @@
 
                                 {% for challenge in challenges.all %}
                                 {% with challenge.challenge_definition as definition %}
-                                <span data-toggle="tooltip" title="{{ definition.name }}" class="rounded-circle bg-light">
-                                    <svg class="mx-2 my-2" width="16" height="16" fill="currentColor">
+                                {% if challenge.acquired %}
+                                <span data-toggle="tooltip" title="(ACQUIS) {{ definition.name }}" class="rounded-circle bg-light ">
+                                    <svg class="text-success mx-2 my-2" width="16" height="16" fill="currentColor">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ definition.icon_name|default:'award' }}" />
                                     </svg>
                                 </span>
+                                {% else %}
+                                <span data-toggle="tooltip" title="(OUVERT) {{ definition.name }}" class="rounded-circle bg-black">
+                                    <svg class="mx-2 my-2 text-white" width="16" height="16" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ definition.icon_name|default:'award' }}" />
+                                    </svg>
+                                </span>
+                                {% endif %}
                                 {% endwith %}
                                 {% endfor %}
                             </div>

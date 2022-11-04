@@ -3,6 +3,7 @@ import datetime
 import django.dispatch
 from actstream import action
 from actstream.models import action_object_stream
+from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
@@ -12,17 +13,13 @@ from notifications.signals import notify
 from urbanvitaliz.apps.reminders import api as reminders_api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
+from urbanvitaliz.apps.training import utils as training_utils
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-    remove_reminder,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project, remove_reminder)
 
 #####
 # Projects
@@ -423,6 +420,13 @@ def notify_note_created(sender, note, project, user, **kwargs):
         target=project,
         private=True,
     )
+
+
+@receiver(note_created)
+def note_created_challenged(sender, note, project, user, **kwargs):
+    challenge = training_utils.get_challenge_for(user, "project-conversation-writer")
+    if challenge and not challenge.acquired:
+        challenge.acquire()
 
 
 ################################################################
