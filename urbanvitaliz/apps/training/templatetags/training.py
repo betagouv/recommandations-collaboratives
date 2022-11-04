@@ -19,7 +19,9 @@ def challenge_acquire(challenge):
 
 @register.simple_tag
 def get_challenges_for(user, acquired=True):
-    challenges = Challenge.objects.filter(user=user)
+    challenges = Challenge.objects.order_by("acquired", "-acquired_on").filter(
+        user=user
+    )
     if acquired is not None:
         challenges = challenges.filter(acquired=acquired)
 

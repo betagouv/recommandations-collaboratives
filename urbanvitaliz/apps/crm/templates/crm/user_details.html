@@ -3,6 +3,7 @@
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
+{% load humanize %}
 {% load training %}
 
 {% block js %}
@@ -111,7 +112,7 @@
                                 {% for challenge in challenges.all %}
                                 {% with challenge.challenge_definition as definition %}
                                 {% if challenge.acquired %}
-                                <span data-toggle="tooltip" title="(ACQUIS) {{ definition.name }}" class="rounded-circle bg-light ">
+                                <span data-toggle="tooltip" title="(ACQUIS) {{ definition.name }} - {{ challenge.acquired_on|naturalday }}" class="rounded-circle bg-light ">
                                     <svg class="text-success mx-2 my-2" width="16" height="16" fill="currentColor">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ definition.icon_name|default:'award' }}" />
                                     </svg>
