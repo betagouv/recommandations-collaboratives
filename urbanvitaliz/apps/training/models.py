@@ -19,6 +19,7 @@ class ChallengeDefinition(models.Model):
     code = models.SlugField(max_length=128, unique=True)
     name = models.CharField(max_length=128)
     description = models.TextField(null=True, blank=True)
+    icon_name = models.CharField(null=True, blank=True, max_length=25)
     next_challenge = models.ForeignKey(
         "self", blank=True, null=True, on_delete=models.CASCADE
     )
@@ -26,49 +27,8 @@ class ChallengeDefinition(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        if self.pk:
-            super().save(*args, **kwargs)
 
-            # Update all Challenges that use this definition
-            for challenge in Challenge.objects.filter(challenge_definition=self):
-                challenge.name = self.name
-                challenge.description = self.description
-
-                if self.next_challenge:
-                    challenge.next_challenge = Challenge.objects.filter(
-                        challenge_definition=self.next_challenge
-                    ).first()
-
-                challenge.save()
-        else:
-            super().save(*args, **kwargs)
-
-
-class ChallengeManager(models.Manager):
-    """ """
-
-    def create_challenge(self, definition):
-        """
-        Creates a new challenge from a challenge definition
-        :param definition: ChallengeDefinition object
-        :return: Challenge object
-        """
-
-        challenge = self.create(
-            name=definition.name,
-            description=definition.description,
-            challenge_definition=definition,
-        )
-        if definition.next_challenge:
-            challenge.next_challenge = self.filter(
-                challenge_definition=definition.next_challenge
-            ).first()
-            challenge.save()
-        return challenge
-
-
-class AcquiredChallengesManager(ChallengeManager):
+class AcquiredChallengesManager(models.Manager):
     """ """
 
     def get_queryset(self):
@@ -93,11 +53,5 @@ class Challenge(models.Model):
         auth_models.User, on_delete=models.CASCADE, related_name="training_challenges"
     )
 
-    name = models.CharField(max_length=128, blank=True)
-    description = models.TextField(null=True, blank=True)
-    next_challenge = models.ForeignKey(
-        "self", blank=True, null=True, on_delete=models.CASCADE
-    )
-
-    objects = ChallengeManager()
+    objects = models.Manager()
     acquired_objects = AcquiredChallengesManager()
