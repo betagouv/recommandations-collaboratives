@@ -14,7 +14,7 @@
 
 {% challenge_for request.user "project-knowledge-reader" as challenge %}
 
-{% if not challenge.acquired %}
+{% if challenge and not challenge.acquired %}
 {% challenge_acquire challenge %}
 {% endif %}
 
