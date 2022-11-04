@@ -3,6 +3,7 @@
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
+{% load training %}
 
 {% block js %}
 {% vite_asset 'js/apps/crm.js' %}
@@ -101,6 +102,18 @@
                         </div>
                 </div>
             </div>
+            {% get_challenges_for request.user as challenges %}
+            <div class="d-flex justify-content-between align-items-start">
+                {% for challenge in challenges.all %}
+                <span>
+                    <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#award" />
+                    </svg>
+                    {{ challenge.challenge_definition.name }}
+                </span>
+                {% endfor %}
+            </div>
+
             {% if crm_user.profile.organization %}
             <div class="d-flex justify-content-between align-items-start">
                 <a class="d-flex align-items-center"
@@ -110,9 +123,12 @@
                     </svg>
                     <span>Revenir aux détails de l'organisation : <strong>{{crm_user.profile.organization.name}}</strong></span>
                 </a>
-                
+
             </div>
             {% endif %}
+
+            
+
                 </div>
                 <div class="px-4 pt-4 crm-notes-wrapper relative">
                     <a class="btn btn-secondary mb-4" href="{% url 'crm-user-note-create' crm_user.pk %}">créer une note</a>
