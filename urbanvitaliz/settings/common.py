@@ -62,8 +62,8 @@ INSTALLED_APPS = [
     "ordered_model",
     "dynamic_forms",
     "watson",
-    "urbanvitaliz.apps.onboarding",
     "phonenumber_field",
+    "urbanvitaliz.apps.onboarding",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
     "urbanvitaliz.apps.resources",
@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.communication",
     "urbanvitaliz.apps.invites",
     "urbanvitaliz.apps.crm",
+    "urbanvitaliz.apps.training",
 ]
 
 SITE_ID = SiteID(default=1)
