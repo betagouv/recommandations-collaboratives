@@ -1560,7 +1560,7 @@ def test_switchtender_leaves_project(request, client):
     ).make()
 
     url = reverse("projects-project-switchtender-leave", args=[project.id])
-    with login(client, groups=["switchtender"]) as user:
+    with login(client) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
