@@ -10,7 +10,6 @@ created: 2022-05-31 10:11:56 CEST
 
 import pytest
 from actstream.models import action_object_stream
-from django.contrib.auth import models as auth
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery import baker

@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs'
 import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
+import Link from '@tiptap/extension-link'
 import { createMarkdownEditor } from 'tiptap-markdown';
 import '../../css/tiptap.css'
 
@@ -19,7 +20,8 @@ Alpine.data('editor', (content) => {
       editor = new MarkdownEditor({
         element: this.$refs.element,
         extensions: [
-          StarterKit
+          StarterKit,
+          Link
         ],
         content: content,
         onCreate({ editor }) {
@@ -51,6 +53,31 @@ Alpine.data('editor', (content) => {
     },
     toggleBulletList() {
       editor.chain().toggleBulletList().focus().run()
+    },
+    setLink() {
+
+      const previousUrl = editor.getAttributes('link').href
+      const url = window.prompt('URL', previousUrl)
+
+      // cancelled
+      if (url === null) {
+        return
+      }
+
+      // empty
+      if (url === '') {
+        editor.chain().focus().extendMarkRange('link').unsetLink()
+          .run()
+
+        return
+      }
+
+      // update link
+      editor.chain().focus().extendMarkRange('link').setLink({ href: url })
+        .run()
+    },
+    unsetLink() {
+      editor.chain().focus().unsetLink().run()
     },
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown()

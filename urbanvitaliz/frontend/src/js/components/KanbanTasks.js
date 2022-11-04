@@ -34,6 +34,7 @@ function boardTasksApp(projectId) {
     }
 
     const app = {
+        commentText:'',
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await issueFollowup(e.detail.task, e.detail.status)
@@ -190,12 +191,14 @@ function boardTasksApp(projectId) {
             this.currentTaskNotifications = data;
         },
         initPreviewModal() {
+            
             const element = document.getElementById("task-preview");
             this.previewModalHandle = new bootstrap.Modal(element);
             element.addEventListener("shown.bs.modal", () => {
                 this.scrollToLastElement();
             });
             const cleanup = () => {
+                console.log(this.$refs.commentTextRef.value.length);
                 // FIXME : Race condition when bootstrap unloads modal
                 // this.currentTaskId = null;
                 // this.currentTaskFollowups = null;
@@ -204,7 +207,7 @@ function boardTasksApp(projectId) {
                 //Cleaning status changes behaviour
                 this.$refs.commentTextRef.classList.remove('textarea-highlight');
                 this.$refs.commentTextFormRef.classList.remove('tooltip-highlight');
-                this.$refs.commentTextRef.placeholder="Votre message";
+                this.$refs.commentTextRef.placeholder = "Votre message";
 
                 this.pendingComment = "";
                 this.currentlyEditing = null;
