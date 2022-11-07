@@ -5,9 +5,7 @@
     <div class="tiptap-menu">
       <button @click.prevent @click="toggleHeading({ level: 3 })"
         :class="{ 'is-active': isActive('heading', { level: 3 }, updatedAt) }">
-        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#type-h3"/>
-        </svg>&nbsp;
+        <span style="font-weight:500">Title</span>
       </button>
       <button @click.prevent @click="toggleBold()" :class="{ 'is-active' : isActive('bold', updatedAt) }">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
