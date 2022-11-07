@@ -1,0 +1,7 @@
+.flag {
+    padding: 20px;
+}
+
+.flag.blue {
+    background-color: #E8EDFF;
+}
