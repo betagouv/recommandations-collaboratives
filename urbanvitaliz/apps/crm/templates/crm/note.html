@@ -29,9 +29,11 @@
         {% endif %}
         {% endif %}
         {% endif %}
-        {{ note.title }}
+        {% if note.title %}
+            {{ note.title }}
+        {% endif %}
     </span>
-    <span class="d-flex align-items-center" style="margin-left: 15px; font-size: 0.8rem; color: grey;">
+    <span class="d-flex align-items-center {% if note.title %} ms-3 {% else %} ms-0{% endif %} " style="font-size: 0.8rem; color: grey;">
         <svg class="bi me-1" width="15" height="15" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
         </svg>
