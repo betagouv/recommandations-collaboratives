@@ -16,6 +16,10 @@
 
 {% block project_detail %}
 
+{% load guardian_tags %}
+
+{% get_obj_perms user for project as "permissions" %}
+
 <div x-data="ProjectShare" class="col-12">
     <div class="row">
         {% if not is_switchtender %}
@@ -59,13 +63,14 @@
 {% include 'projects/project/navigation.html' with overview=True %}
 <div class="row">
     <div class="col-8">
-            {% if can_administrate %}
+        {{permissions}}
+            {% if "view_synopsis" in permissions or "change_synopsis" in permissions %}
                 {% if project.synopsis %}
                     {% include 'projects/project/fragments/information_card.html' with full_width=True project=project is_editable=True title="Reformulation du besoin" description=project.synopsis updated_on=project.synopsis_on card_user=project.synopsis_by org_name=project.synopsis_by.profile.organization.name %}
                 {% else %}
                     <div class="project-card-details me-4 py-4 d-flex flex-column align-items-center justify-content-center">
                         <span style="color:#929292; font-size: 14px;" class="text-uppercase">Aucune reformulation n'a été faite pour le moment</span>
-                        {% if can_administrate %}
+                        {% if "change_synopsis" in permissions %}
                             <a class="button mt-3" href="{% url "projects-project-synopsis" project.id %}">Reformuler le besoin de la collectivité</a>
                         {% endif %}
                     </div>
@@ -128,6 +133,7 @@
                         {% endif %}
                         {% endfor %}
                 </ul>
+                {% if "can_invite" in permissions %}
                 <div class="d-block mb-2">
                     <a style="cursor: pointer;" @click="openInviteMemberModal" data-toggle="modal" data-target="#InviteMemberModal" class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex justify-content-center w-100">
                         {% if project.status == 'DRAFT' %}
@@ -138,6 +144,7 @@
                         <span>Inviter un membre de la collectivité</span>
                     </a>
                 </div>
+                {% endif %}
             </div>
 
             <!-- Advisors -->
@@ -150,6 +157,7 @@
                     </li>
                     {% endfor %}
                 </ul>
+                {% if "can_invite" in permissions %}
                 <div class="d-block mb-2">
                     <a style="cursor: pointer;" @click="openInviteSwitchtenderModal" data-toggle="modal" data-target="#InviteSwitchtenderModal" class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex justify-content-center w-100">
                         {% if project.status == 'DRAFT' %}
@@ -160,6 +168,7 @@
                         <span>Inviter un conseiller</span>
                     </a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
