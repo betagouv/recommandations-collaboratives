@@ -6,6 +6,7 @@ Views for projects application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
+from actstream import action
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -88,6 +89,15 @@ def access_update(request, project_id):
                 invite.site = request.site
                 invite.save()
 
+                # Add activity
+                action.send(
+                    invite.inviter,
+                    verb="a invité un·e collaborateur·rice à rejoindre le projet",
+                    action_object=invite,
+                    target=invite.project,
+                )
+
+                # Dispatch notifications
                 params = {
                     "sender": {
                         "first_name": request.user.first_name,
