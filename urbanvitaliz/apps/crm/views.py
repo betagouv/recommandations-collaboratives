@@ -332,7 +332,15 @@ class LatestNotesFeed(Feed):
         return models.Note.on_site.order_by("-updated_on", "-created_on")[:20]
 
     def item_title(self, item):
-        return item.title
+        result = ""
+
+        if item.kind:
+            result = f"#{item.get_kind_display()} // "
+
+        if item.title:
+            result = f"{result}{item.title} - "
+
+        return f"{result}{item.related}"
 
     def item_description(self, item):
         return item.content
