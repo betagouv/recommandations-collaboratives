@@ -544,6 +544,27 @@ def test_notifications_are_deleted_on_task_soft_delete(request):
 
 
 @pytest.mark.django_db
+def test_notifications_are_deleted_when_cancelling_publishing(request):
+    user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
+    recipient = Recipe(auth.User).make()
+
+    task = Recipe(models.Task, public=True, site=get_current_site(request)).make()
+
+    notify.send(
+        sender=user,
+        recipient=recipient,
+        verb="a reçu une notif",
+        action_object=task,
+        target=task.project,
+    )
+
+    assert recipient.notifications.count() == 1
+    task.public = False
+    task.save()
+    assert recipient.notifications.count() == 0
+
+
+@pytest.mark.django_db
 def test_notifications_are_deleted_on_task_hard_delete(request):
     user = Recipe(auth.User).make()
     recipient = Recipe(auth.User).make()

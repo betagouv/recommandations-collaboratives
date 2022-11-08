@@ -363,16 +363,32 @@ def delete_notifications_on_project_delete(sender, instance, **kwargs):
     ).delete()
 
 
-def delete_task_history(task):
+def delete_task_history(
+    task,
+    suppress_notifications=True,
+    suppress_reminders=True,
+    suppress_actions=True,
+    after=None,
+):
     """Remove all logging history and notification is a task is deleted"""
     task_ct = ContentType.objects.get_for_model(task)
-    notifications_models.Notification.on_site.filter(
+    notifications = notifications_models.Notification.on_site.filter(
         action_object_content_type_id=task_ct.pk, action_object_object_id=task.pk
-    ).delete()
+    )
+    actions = action_object_stream(task)
 
-    action_object_stream(task).delete()
+    if after:
+        notifications = notifications.filter(timestamp__gte=after)
+        actions = actions.filter(timestamp__gte=after)
 
-    reminders_api.remove_reminder_email(task)
+    if suppress_notifications:
+        notifications.delete()
+
+    if suppress_actions:
+        actions.delete()
+
+    if suppress_reminders:
+        reminders_api.remove_reminder_email(task)
 
 
 @receiver(pre_save, sender=models.Task, dispatch_uid="task_soft_delete_notifications")
@@ -380,6 +396,21 @@ def delete_notifications_on_soft_task_delete(sender, instance, **kwargs):
     if instance.deleted is None:
         return
     delete_task_history(instance)
+
+
+@receiver(
+    pre_save,
+    sender=models.Task,
+    dispatch_uid="task_cancel_publishing_deletes_notifications",
+)
+def delete_notifications_on_cancel_publishing(sender, instance, **kwargs):
+    if instance.pk:
+        delete_task_history(
+            instance,
+            suppress_actions=False,
+            suppress_reminders=False,
+            after=timezone.now() - datetime.timedelta(minutes=30),
+        )
 
 
 @receiver(pre_delete, sender=models.Task, dispatch_uid="task_hard_delete_notifications")
