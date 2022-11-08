@@ -28,9 +28,13 @@ from urbanvitaliz.apps.home.models import SiteConfiguration
 ########################################################################
 # View helpers
 ########################################################################
+def has_perm(user, permission, obj=None):
+    return user.has_perm(permission, obj)
+
+
 def has_perm_or_403(user, permission, obj=None):
     """Raise a 403 error is user does not have the given permission"""
-    if not user.has_perm(permission, obj):
+    if not has_perm(user, permission, obj):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
 

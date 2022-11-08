@@ -12,17 +12,13 @@ from notifications.signals import notify
 from urbanvitaliz.apps.reminders import api as reminders_api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
+from urbanvitaliz.apps.training import utils as training_utils
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_collaborators_for_project,
-    get_notification_recipients_for_project,
-    get_project_moderators,
-    get_regional_actors_for_project,
-    get_switchtenders_for_project,
-    remove_reminder,
-)
+from .utils import (create_reminder, get_collaborators_for_project,
+                    get_notification_recipients_for_project,
+                    get_project_moderators, get_regional_actors_for_project,
+                    get_switchtenders_for_project, remove_reminder)
 
 #####
 # Projects
@@ -81,7 +77,7 @@ def log_project_validated(sender, moderator, project, **kwargs):
 def log_project_switchtender_joined(sender, project, **kwargs):
     action.send(
         sender,
-        verb="est devenu·e aiguilleur·se sur le projet",
+        verb="est devenu·e conseiller·e sur le projet",
         action_object=project,
         target=project,
     )
@@ -98,7 +94,7 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     notify.send(
         sender=sender,
         recipient=recipients,
-        verb="est devenu·e aiguilleur·se sur le projet",
+        verb="est devenu·e conseiller·e sur le projet",
         action_object=project,
         target=project,
         private=True,
@@ -137,7 +133,7 @@ def notify_project_observer_joined(sender, project, **kwargs):
 def log_project_switchtender_leaved(sender, project, **kwargs):
     action.send(
         sender,
-        verb="n'aiguille plus le projet",
+        verb="ne conseille plus le projet",
         action_object=project,
         target=project,
     )
@@ -149,7 +145,7 @@ def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
     notifications_models.Notification.on_site.filter(
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
-        verb="est devenu·e aiguilleur·se sur le projet",
+        verb="est devenu·e conseiller·e sur le projet",
         timestamp__gte=timezone.now() - datetime.timedelta(hours=12),
     ).delete()
 
@@ -163,7 +159,7 @@ def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
 def log_project_member_joined(sender, project, **kwargs):
     action.send(
         sender,
-        verb="a rejoint l'équipe sur le projet",
+        verb="a rejoint l'équipe projet",
         action_object=project,
         target=project,
     )
@@ -180,7 +176,7 @@ def notify_project_member_joined(sender, project, **kwargs):
     notify.send(
         sender=sender,
         recipient=recipients,
-        verb="a rejoint l'équipe sur le projet",
+        verb="a rejoint l'équipe projet",
         action_object=project,
         target=project,
         private=True,
@@ -367,16 +363,32 @@ def delete_notifications_on_project_delete(sender, instance, **kwargs):
     ).delete()
 
 
-def delete_task_history(task):
+def delete_task_history(
+    task,
+    suppress_notifications=True,
+    suppress_reminders=True,
+    suppress_actions=True,
+    after=None,
+):
     """Remove all logging history and notification is a task is deleted"""
     task_ct = ContentType.objects.get_for_model(task)
-    notifications_models.Notification.on_site.filter(
+    notifications = notifications_models.Notification.on_site.filter(
         action_object_content_type_id=task_ct.pk, action_object_object_id=task.pk
-    ).delete()
+    )
+    actions = action_object_stream(task)
 
-    action_object_stream(task).delete()
+    if after:
+        notifications = notifications.filter(timestamp__gte=after)
+        actions = actions.filter(timestamp__gte=after)
 
-    reminders_api.remove_reminder_email(task)
+    if suppress_notifications:
+        notifications.delete()
+
+    if suppress_actions:
+        actions.delete()
+
+    if suppress_reminders:
+        reminders_api.remove_reminder_email(task)
 
 
 @receiver(pre_save, sender=models.Task, dispatch_uid="task_soft_delete_notifications")
@@ -384,6 +396,21 @@ def delete_notifications_on_soft_task_delete(sender, instance, **kwargs):
     if instance.deleted is None:
         return
     delete_task_history(instance)
+
+
+@receiver(
+    pre_save,
+    sender=models.Task,
+    dispatch_uid="task_cancel_publishing_deletes_notifications",
+)
+def delete_notifications_on_cancel_publishing(sender, instance, **kwargs):
+    if instance.pk and instance.public is False:
+        delete_task_history(
+            instance,
+            suppress_actions=False,
+            suppress_reminders=False,
+            after=timezone.now() - datetime.timedelta(minutes=30),
+        )
 
 
 @receiver(pre_delete, sender=models.Task, dispatch_uid="task_hard_delete_notifications")
@@ -423,6 +450,13 @@ def notify_note_created(sender, note, project, user, **kwargs):
         target=project,
         private=True,
     )
+
+
+@receiver(note_created)
+def note_created_challenged(sender, note, project, user, **kwargs):
+    challenge = training_utils.get_challenge_for(user, "project-conversation-writer")
+    if challenge and not challenge.acquired:
+        challenge.acquire()
 
 
 ################################################################

@@ -19,10 +19,11 @@ from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import has_perm_or_403
+from urbanvitaliz.utils import has_perm, has_perm_or_403
 
 from .. import models
-from ..utils import can_manage_or_403, can_manage_project
+from ..utils import (can_manage_or_403, can_manage_project,
+                     is_regional_actor_for_project)
 
 ########################################################################
 # Access
@@ -33,8 +34,11 @@ from ..utils import can_manage_or_403, can_manage_project
 def access_update(request, project_id):
     """Handle ACL for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-
-    has_perm_or_403(request.user, "projects.can_invite", project)
+    if not (
+        has_perm(request.user, "projects.can_invite", project)
+        or is_regional_actor_for_project(project, request.user, allow_national=True)
+    ):
+        raise PermissionDenied
 
     # Fetch pending invites
     pending_invites = []
