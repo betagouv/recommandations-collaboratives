@@ -28,7 +28,7 @@ djangorestframework
 rest-framework-generic-relations
 django-filter
 dynamic-django-forms
-django-hijack==3.2.1
+django-hijack==3.2.2
 django-sesame[ua]==2.4
 django-recaptcha==3.0.0
 django-allauth==0.51.0

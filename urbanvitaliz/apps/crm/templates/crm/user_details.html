@@ -5,6 +5,7 @@
 {% load django_vite %}
 {% load humanize %}
 {% load training %}
+{% load hijack %}
 
 {% block js %}
 {% vite_asset 'js/apps/crm.js' %}
@@ -85,7 +86,21 @@
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope-fill" />
                             </svg>  
                             {{crm_user.profile.organization.position}}
-                        {% endif %}
+                            {% endif %}
+
+                            {% if crm_user is not request.user and request.user|can_hijack:crm_user %}
+                            <form action="{% url 'hijack:acquire' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="user_pk" value="{{ crm_user.pk }}">
+                                <button class="btn btn-link" type="submit" title="Usurper l'identité">
+                                    <svg class="align-middle bi" width="18px" height="18px" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#incognito"/>
+                                    </svg>
+                                </button>
+                                <input type="hidden" name="next" value="{{ home }}">
+                            </form>
+                            {% endif %}
+
                     </div>
                         <div class="d-flex align-items-end flex-column">
                             <div class="d-flex align-items-center">
