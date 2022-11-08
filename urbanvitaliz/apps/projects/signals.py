@@ -404,7 +404,7 @@ def delete_notifications_on_soft_task_delete(sender, instance, **kwargs):
     dispatch_uid="task_cancel_publishing_deletes_notifications",
 )
 def delete_notifications_on_cancel_publishing(sender, instance, **kwargs):
-    if instance.pk:
+    if instance.pk and instance.public is False:
         delete_task_history(
             instance,
             suppress_actions=False,
