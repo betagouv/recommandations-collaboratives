@@ -81,7 +81,8 @@ def project_overview(request, project_id=None):
         | Q(verb="a mis à jour le questionnaire")
         | Q(verb="a ajouté un document")
         | Q(verb="a envoyé un message")
-        | Q(verb="a rejoint l'équipe sur le projet")
+        | Q(verb="a rejoint l'équipe sur le projet")  # XXX For compatibility
+        | Q(verb="a rejoint l'équipe projet"),
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
     )
