@@ -62,32 +62,34 @@ def project_overview(request, project_id=None):
     set_active_project_id(request, project.pk)
 
     # Make sure we track record of user's interest for this project
-    if (is_national_actor or is_regional_actor) and not request.user.is_staff:
-        models.UserProjectStatus.objects.get_or_create(
-            site=request.site,
-            user=request.user,
-            project=project,
-            defaults={"status": "NOT_INTERESTED"},
-        )
+    if not request.user.is_hijacked:
+        if (is_national_actor or is_regional_actor) and not request.user.is_staff:
+            models.UserProjectStatus.objects.get_or_create(
+                site=request.site,
+                user=request.user,
+                project=project,
+                defaults={"status": "NOT_INTERESTED"},
+            )
 
     # Mark some notifications as seen (general ones)
-    project_ct = ContentType.objects.get_for_model(project)
-    general_notifications = request.user.notifications.unread().filter(
-        Q(verb="est devenu·e aiguilleur·se sur le projet")  # XXX For compatibility
-        | Q(verb="est devenu·e conseiller·e sur le projet")
-        | Q(verb="a été validé")
-        | Q(verb="a validé le projet")
-        | Q(verb="a soumis pour modération le projet")
-        | Q(verb="a mis à jour le questionnaire")
-        | Q(verb="a ajouté un document")
-        | Q(verb="a envoyé un message")
-        | Q(verb="a rejoint l'équipe sur le projet")  # XXX For compatibility
-        | Q(verb="a rejoint l'équipe projet"),
-        target_content_type=project_ct.pk,
-        target_object_id=project.pk,
-    )
+    if not request.user.is_hijacked:
+        project_ct = ContentType.objects.get_for_model(project)
+        general_notifications = request.user.notifications.unread().filter(
+            Q(verb="est devenu·e aiguilleur·se sur le projet")  # XXX For compatibility
+            | Q(verb="est devenu·e conseiller·e sur le projet")
+            | Q(verb="a été validé")
+            | Q(verb="a validé le projet")
+            | Q(verb="a soumis pour modération le projet")
+            | Q(verb="a mis à jour le questionnaire")
+            | Q(verb="a ajouté un document")
+            | Q(verb="a envoyé un message")
+            | Q(verb="a rejoint l'équipe sur le projet")  # XXX For compatibility
+            | Q(verb="a rejoint l'équipe projet"),
+            target_content_type=project_ct.pk,
+            target_object_id=project.pk,
+        )
 
-    general_notifications.mark_all_as_read()
+        general_notifications.mark_all_as_read()
 
     invite_form = InviteForm()
 
@@ -155,7 +157,7 @@ def project_actions(request, project_id=None):
         action_object_content_type=task_ct,
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
-    )
+    )  # XXX Bug?
 
     return render(request, "projects/project/actions.html", locals())
 
@@ -188,14 +190,15 @@ def project_conversations(request, project_id=None):
     recipients = get_notification_recipients_for_project(project)
 
     # Mark this project notifications as read
-    project_ct = ContentType.objects.get_for_model(project)
-    note_ct = ContentType.objects.get_for_model(models.Note)
-    request.user.notifications.unread().filter(
-        action_object_content_type=note_ct,
-        action_notes__public=True,
-        target_content_type=project_ct.pk,
-        target_object_id=project.pk,
-    ).mark_all_as_read()
+    if not request.user.is_hijacked:
+        project_ct = ContentType.objects.get_for_model(project)
+        note_ct = ContentType.objects.get_for_model(models.Note)
+        request.user.notifications.unread().filter(
+            action_object_content_type=note_ct,
+            action_notes__public=True,
+            target_content_type=project_ct.pk,
+            target_object_id=project.pk,
+        ).mark_all_as_read()
 
     return render(request, "projects/project/conversations.html", locals())
 
@@ -220,14 +223,15 @@ def project_internal_followup(request, project_id=None):
     set_active_project_id(request, project.pk)
 
     # Mark this project notifications as read
-    project_ct = ContentType.objects.get_for_model(project)
-    note_ct = ContentType.objects.get_for_model(models.Note)
-    request.user.notifications.unread().filter(
-        action_object_content_type=note_ct,
-        action_notes__public=False,
-        target_content_type=project_ct.pk,
-        target_object_id=project.pk,
-    ).mark_all_as_read()
+    if not request.user.is_hijacked:
+        project_ct = ContentType.objects.get_for_model(project)
+        note_ct = ContentType.objects.get_for_model(models.Note)
+        request.user.notifications.unread().filter(
+            action_object_content_type=note_ct,
+            action_notes__public=False,
+            target_content_type=project_ct.pk,
+            target_object_id=project.pk,
+        ).mark_all_as_read()
 
     private_note_form = PrivateNoteForm()
 
