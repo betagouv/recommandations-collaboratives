@@ -77,7 +77,7 @@
 									</template>
 									<template x-if="currentTaskFollowups">
 										<template x-for="f in currentTaskFollowups" x-key="f.timestamp"
-											x-effect="currentTaskFollowups && scrollToLastElement">
+											x-effect="currentTaskFollowups">
 											<div>
 												<template x-if="!isStatusUpdate(f)">
 													<div class="rounded bg-light p-2 m-3 message"

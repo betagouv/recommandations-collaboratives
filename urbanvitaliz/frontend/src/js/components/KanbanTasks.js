@@ -184,7 +184,6 @@ function boardTasksApp(projectId) {
         async loadFollowups(taskId) {
             const { data } = await api.get(followupsUrl(projectId, taskId));
             this.currentTaskFollowups = data
-            this.scrollToLastElement();
         },
         async loadNotifications(taskId) {
             const { data } = await api.get(taskNotificationsUrl(projectId, taskId));
@@ -194,11 +193,8 @@ function boardTasksApp(projectId) {
             
             const element = document.getElementById("task-preview");
             this.previewModalHandle = new bootstrap.Modal(element);
-            element.addEventListener("shown.bs.modal", () => {
-                this.scrollToLastElement();
-            });
+            
             const cleanup = () => {
-                console.log(this.$refs.commentTextRef.value.length);
                 // FIXME : Race condition when bootstrap unloads modal
                 // this.currentTaskId = null;
                 // this.currentTaskFollowups = null;
@@ -241,14 +237,6 @@ function boardTasksApp(projectId) {
 
             await markAllAsRead(this.currentTaskId);
             await this.getData();
-        },
-        scrollToLastElement() {
-            this.$nextTick(() => {
-                const nodes = document.querySelectorAll(".message");
-                if (nodes.length > 0) {
-                    nodes[nodes.length - 1].scrollIntoView();
-                }
-            })
         },
         async onSetTaskPublic(id, value) {
             await patchTask(id, { public: value });
