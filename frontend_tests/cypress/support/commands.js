@@ -54,12 +54,16 @@ Cypress.Commands.add("login", (role) => {
 })
 
 Cypress.Commands.add("becomeSwitchtenderOnProject", (projectName) => {
-        cy.visit('/projects')
-        cy.contains(`${projectName}`).click({force:true});
+    cy.visit('/projects')
+    cy.contains(`${projectName}`).click({ force: true });
 
+    cy.get('body').then(($body) => {
         //If we already are switchtender
-        if (cy.contains("Ne plus conseiller le projet").should('exist')) return
-
-        cy.contains("Conseiller le projet").click({ force: true })
-        cy.contains("Ne plus conseiller le projet").should('exist')
+        if ($body.text().includes('Ne plus conseiller le projet')) {
+            return
+        } else {
+            cy.contains("Conseiller le projet").click({ force: true })
+            cy.contains("Ne plus conseiller le projet").should('exist')
+        }
+    })
 })
