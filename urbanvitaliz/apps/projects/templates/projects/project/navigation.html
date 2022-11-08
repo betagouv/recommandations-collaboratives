@@ -1,5 +1,10 @@
 {% load static %}
 {% load sass_tags %}
+{% load guardian_tags %}
+
+{% get_obj_perms user for project as "permissions" %}
+
+{{permissions}}
 
 {% block css %}
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
@@ -46,6 +51,7 @@
             <span>Recommandations</span>
         </a>
     </li>
+	{% if "view_public_notes" in permissions or "use_public_notes" in permissions %}
     <li>
         <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if conversation %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-conversations' project.pk %}">
             {% if active_project_conversations_notification_count %}
@@ -66,7 +72,8 @@
             <span class="">Conversation</span>
         </a>
     </li>
-    {% if active_project_can_administrate %}
+    {% endif %}
+    {% if "view_private_notes" in permissions or "use_private_notes" in permissions %}
     <li>
         <a class="{% if internal_followup %} active {% endif %} {% if not active_project_can_administrate %} disabled {% endif %}align-items-center" href="{% url 'projects-project-detail-internal-followup' project.pk %}">
             {% if not active_project_can_administrate %}
