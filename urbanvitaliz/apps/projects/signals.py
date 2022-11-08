@@ -3,7 +3,6 @@ import datetime
 import django.dispatch
 from actstream import action
 from actstream.models import action_object_stream
-from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
@@ -78,7 +77,7 @@ def log_project_validated(sender, moderator, project, **kwargs):
 def log_project_switchtender_joined(sender, project, **kwargs):
     action.send(
         sender,
-        verb="est devenu·e aiguilleur·se sur le projet",
+        verb="est devenu·e conseiller·e sur le projet",
         action_object=project,
         target=project,
     )
@@ -95,7 +94,7 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     notify.send(
         sender=sender,
         recipient=recipients,
-        verb="est devenu·e aiguilleur·se sur le projet",
+        verb="est devenu·e conseiller·e sur le projet",
         action_object=project,
         target=project,
         private=True,
@@ -134,7 +133,7 @@ def notify_project_observer_joined(sender, project, **kwargs):
 def log_project_switchtender_leaved(sender, project, **kwargs):
     action.send(
         sender,
-        verb="n'aiguille plus le projet",
+        verb="ne conseille plus le projet",
         action_object=project,
         target=project,
     )
@@ -146,7 +145,7 @@ def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
     notifications_models.Notification.on_site.filter(
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
-        verb="est devenu·e aiguilleur·se sur le projet",
+        verb="est devenu·e conseiller·e sur le projet",
         timestamp__gte=timezone.now() - datetime.timedelta(hours=12),
     ).delete()
 

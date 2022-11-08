@@ -18,17 +18,12 @@ from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 
 from .. import models
 from ..forms import PrivateNoteForm, PublicNoteForm, SynopsisForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    can_manage_or_403,
-    can_manage_project,
-    check_if_national_actor,
-    get_notification_recipients_for_project,
-    get_switchtender_for_project,
-    is_regional_actor_for_project,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403, can_manage_project,
+                     check_if_national_actor,
+                     get_notification_recipients_for_project,
+                     get_switchtender_for_project,
+                     is_regional_actor_for_project, set_active_project_id)
 
 
 @login_required
@@ -78,14 +73,15 @@ def project_overview(request, project_id=None):
     # Mark some notifications as seen (general ones)
     project_ct = ContentType.objects.get_for_model(project)
     general_notifications = request.user.notifications.unread().filter(
-        Q(verb="est devenu·e aiguilleur·se sur le projet")
+        Q(verb="est devenu·e aiguilleur·se sur le projet")  # XXX For compatibility
+        | Q(verb="est devenu·e conseiller·e sur le projet")
         | Q(verb="a été validé")
         | Q(verb="a validé le projet")
         | Q(verb="a soumis pour modération le projet")
         | Q(verb="a mis à jour le questionnaire")
         | Q(verb="a ajouté un document")
         | Q(verb="a envoyé un message")
-        | Q(verb="a rejoint l'équipe sur le projet"),
+        | Q(verb="a rejoint l'équipe sur le projet")
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
     )
