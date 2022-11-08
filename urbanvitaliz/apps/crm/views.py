@@ -5,13 +5,15 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2022-07-20 12:27:25 CEST
 """
 
+from collections import defaultdict
+
 from actstream.models import Action, actor_stream, target_stream
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.generic.base import TemplateView
@@ -316,6 +318,14 @@ def update_note_for_organization(request, organization_id, note_id):
     )
 
     return update_note_for_object(request, note, "crm-organization-details")
+
+
+@staff_member_required
+def project_list_by_tags(request):
+    projects_per_tag = defaultdict()
+    tags = Project.tags.all().annotate(Count("project")).order_by("-project__count")
+
+    return render(request, "crm/tags_for_projects.html", locals())
 
 
 ########################################################################

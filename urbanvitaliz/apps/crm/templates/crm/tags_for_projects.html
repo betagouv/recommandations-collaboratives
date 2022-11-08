@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load humanize %}
+{% load crm_tags %}
+
+{% block js %}
+<script src="{% static "/js/d3.min.js" %}"></script>
+<script src="{% static "/js/nv.d3.min.js" %}"></script>
+
+
+<!-- Charts -->
+<script type="text/javascript">
+
+ nv.addGraph(function() {
+     var chart = nv.models.discreteBarChart()
+                   .x(function(d) { return d.label })    //Specify the data accessors.
+                   .y(function(d) { return d.value })
+                   .staggerLabels(false)    //Too many bars and not enough room? Try staggering labels.
+                   .tooltips(false)        //Don't show tooltips
+                   .showValues(true)       //...instead, show the bar value right on top of each bar.
+                   .transitionDuration(350)
+                   .valueFormat(d3.format('d'))
+                   .margin({left: 100, bottom:150})
+     ;
+
+     chart.xAxis.rotateLabels(-45);
+
+     d3.select('#chart-new svg')
+       .datum(newFrichesData())
+       .call(chart);
+
+     nv.utils.windowResize(chart.update);
+
+     return chart;
+ });
+
+ //Each bar represents a single discrete quantity.
+ function newFrichesData() {
+     return  [ 
+         {
+             key: "Utilisation des tags",
+             values: [
+                 {% for tag in tags.all %}
+                 {
+                     "label" : "{{ tag.name }}",
+                     "value" : {{ tag.project__count }}
+                 } ,
+                 {% endfor %}
+             ]
+         }
+     ]
+
+ }
+</script>
+
+
+{% endblock %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+    <h2>Relation Projets-Tags</h2>
+
+    <a href="#" class="btn btn-primary">Export CSV</a>
+
+    <div id="chart-new">
+        <svg class="w-100" style=" min-height: 300px"> </svg>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Tag</th>
+                <th>Utilisation</th>
+                <th>Projets</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for tag in tags %}
+            <tr>
+                <td>{{ tag.name }}</td>
+                <td>{{ tag.project__count }}</td>
+                <td>
+                    {% projects_for_tag tag.name as projects %}
+                    {% for project in projects.all %}
+                    <a href="{% url 'crm-project-details' project.pk %}">{{ project }}</a>
+                    {% endfor %}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -78,5 +78,10 @@ urlpatterns = [
         views.update_note_for_project,
         name="crm-project-note-update",
     ),
+    path(
+        r"crm/projects/by_tags",
+        views.project_list_by_tags,
+        name="crm-project-list-by-tags",
+    ),
     path("crm/feed/", views.LatestNotesFeed(), name="crm-feed"),
 ]
