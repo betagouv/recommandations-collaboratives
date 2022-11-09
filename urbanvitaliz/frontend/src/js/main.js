@@ -9,5 +9,9 @@ import './components/Editor'
 
 //Global CSS
 import '../css/buttons.css'
+import '../css/flags.css'
+import '../css/typography.css'
+import '../css/hover.css'
+
 
 console.log('js main added');
