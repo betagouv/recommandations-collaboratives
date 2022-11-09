@@ -183,13 +183,18 @@ def get_answers_for_question(site, question):
     db_answers = (
         models.Answer.objects.filter(session__survey__site=site, question=question)
         .exclude(session__project__exclude_stats=True)
-        .order_by("signals", "session__project")
-        .values("signals", "session__project", "session__project__name")
+        .order_by("values", "session__project")
+        .values("values", "session__project", "session__project__name")
         .distinct()
     )
 
     for record in db_answers:
-        answers[record["signals"] or "--aucun--"].append(
+        if isinstance(record["values"], list):
+            key = ", ".join(record["values"])
+        else:
+            key = record["values"]
+
+        answers[str(key) or "--aucun--"].append(
             {"id": record["session__project"], "name": record["session__project__name"]}
         )
 
