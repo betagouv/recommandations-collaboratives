@@ -5,7 +5,8 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2022-07-20 12:27:25 CEST
 """
 
-from collections import defaultdict
+import csv
+import datetime
 
 from actstream.models import Action, actor_stream, target_stream
 from django.contrib.admin.views.decorators import staff_member_required
@@ -14,6 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
 from django.db.models import Count, Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.generic.base import TemplateView
@@ -322,10 +324,54 @@ def update_note_for_organization(request, organization_id, note_id):
 
 @staff_member_required
 def project_list_by_tags(request):
-    projects_per_tag = defaultdict()
-    tags = Project.tags.all().annotate(Count("project")).order_by("-project__count")
+    tags = (
+        Project.tags.filter(project__sites=request.site)
+        .annotate(Count("project"))
+        .order_by("-project__count", "project")
+    )
 
     return render(request, "crm/tags_for_projects.html", locals())
+
+
+@staff_member_required
+def project_list_by_tags_as_csv(request):
+    tags = (
+        Project.tags.filter(project__sites=request.site)
+        .annotate(Count("project"))
+        .order_by("-project__count", "project")
+    )
+
+    today = datetime.datetime.today().date()
+
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="tags-for-projects-{today}.csv"'
+        },
+    )
+
+    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
+    writer.writerow(
+        [
+            "tag",
+            "usage_count",
+            "project_ids",
+            "project_names",
+        ]
+    )
+
+    for tag in tags:
+        projects = Project.on_site.filter(tags__name=tag.name).order_by("name")
+        writer.writerow(
+            [
+                tag.name,
+                tag.project__count,
+                list(projects.values_list(flat=True)),
+                ", ".join([f'"{p.name}"' for p in projects]),
+            ]
+        )
+
+    return response
 
 
 ########################################################################
