@@ -20,7 +20,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -802,7 +803,7 @@ def test_general_notifications_are_consumed_on_project_overview(request, client)
         notify.send(
             sender=user,
             recipient=user,
-            verb="est devenu·e aiguilleur·se sur le projet",
+            verb="est devenu·e conseiller·e sur le projet",
             target=project,
         )
 
@@ -918,7 +919,7 @@ def test_non_staff_cannot_add_email_to_project(request, client):
 
 
 @pytest.mark.django_db
-def test_switchtender_can_add_email_to_project(request, client):
+def test_assigned_switchtender_can_add_email_to_project(request, client):
     project = baker.make(
         models.Project, sites=[get_current_site(request)], projectmember_set=[]
     )
@@ -930,6 +931,31 @@ def test_switchtender_can_add_email_to_project(request, client):
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
+
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+    invite = invites_models.Invite.on_site.first()
+    assert invite.email == data["email"]
+
+
+@pytest.mark.django_db
+def test_regional_actor_can_add_email_to_project(request, client):
+    commune = Recipe(geomatics.Commune).make()
+    dept = Recipe(geomatics.Department).make()
+
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[],
+        commune=commune,
+    )
+
+    url = reverse("projects-access-update", args=[project.id])
+    data = {"email": "test@example.com", "role": "COLLABORATOR"}
+
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.departments.set([project.commune.department.pk])
 
         response = client.post(url, data=data)
 

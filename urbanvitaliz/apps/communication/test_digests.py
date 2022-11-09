@@ -230,7 +230,7 @@ def test_notification_formatter():
             ("Bobi Joe (DuckCorp) a recommandé 'Belle Ressource'", task.content),
         ),
         (
-            "est devenu·e aiguilleur·se sur le projet",
+            "est devenu·e conseiller·e sur le projet",
             project,
             ("Bobi Joe (DuckCorp) s'est joint·e à l'équipe d'aiguillage.", None),
         ),

@@ -115,6 +115,15 @@
                 </svg>
                 Ajouter un choix de réponse
             </a>
+
+            <!-- Answers -->
+            <a class="btn btn-light mb-1 d-inline-block btn-outline-primary btn-sm" href="{% url 'survey-editor-question-results' question.id %}" role="button">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bar-chart-line"/>
+                </svg>
+                &nbsp;
+                Réponses
+            </a>
         </div>
     </div>
 

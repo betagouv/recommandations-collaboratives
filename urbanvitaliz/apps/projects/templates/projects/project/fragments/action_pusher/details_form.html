@@ -2,7 +2,7 @@
 <!-- Action details -->
 <template x-if="push_type != 'multiple'">
     <div class="message d-flex flex-row justify-content-between">
-        <div id="action-details" class="form flex-fill d-flex flex-column">
+        <div id="action-details" class="form w-50 pe-4 flex-fill d-flex flex-column">
 
             <h4><span class="text-muted me-1" x-text="push_type == 'noresource' ? '2.' : '3.'"></span>Décrivez votre recommandation</h4>
 
@@ -39,7 +39,7 @@
             </template>
 
         </div>
-        <div class="help p-3 ms-3 w-50 bg-light rounded">
+        <div class="help w-50 p-3 bg-light rounded">
             <h6>Comment écrire une recommandation</h6>
             <img class="mt-3 img-fluid" src="{% static 'projects/img/push_example.png' %}" />
             <ol class="mt-3">

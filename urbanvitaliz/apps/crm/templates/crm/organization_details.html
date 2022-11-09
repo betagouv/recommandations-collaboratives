@@ -103,11 +103,11 @@
                 <a class="btn btn-secondary mb-4" href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>
 
                 {% for note in sticky_notes.all %}
-                    {% include 'crm/note.html' with pinned=True update_url_name='crm-organization-note-update' %}
+                    {% include 'crm/note.html' with pinned=True update_url_name='crm-organization-note-update' get_user_profile=True %}
                 {% endfor %}
 
                 {% for note in notes.all %}
-                    {% include 'crm/note.html' with update_url_name='crm-organization-note-update' %}
+                    {% include 'crm/note.html' with update_url_name='crm-organization-note-update' get_user_profile=True %}
                 {% endfor %}
 
             </div>

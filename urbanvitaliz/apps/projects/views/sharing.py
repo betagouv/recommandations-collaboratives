@@ -6,6 +6,7 @@ Views for projects application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
+from actstream import action
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -21,7 +22,8 @@ from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
 
 from .. import models
-from ..utils import can_manage_or_403, can_manage_project
+from ..utils import (can_manage_or_403, can_manage_project,
+                     is_regional_actor_for_project)
 
 ########################################################################
 # Access
@@ -32,7 +34,11 @@ from ..utils import can_manage_or_403, can_manage_project
 def access_update(request, project_id):
     """Handle ACL for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    can_manage_or_403(project, request.user)
+    if not (
+        can_manage_project(project, request.user)
+        or is_regional_actor_for_project(project, request.user, allow_national=True)
+    ):
+        raise PermissionDenied
 
     # Fetch pending invites
     pending_invites = []
@@ -83,6 +89,15 @@ def access_update(request, project_id):
                 invite.site = request.site
                 invite.save()
 
+                # Add activity
+                action.send(
+                    invite.inviter,
+                    verb="a invité un·e collaborateur·rice à rejoindre le projet",
+                    action_object=invite,
+                    target=invite.project,
+                )
+
+                # Dispatch notifications
                 params = {
                     "sender": {
                         "first_name": request.user.first_name,
