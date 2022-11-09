@@ -182,6 +182,7 @@ def get_answers_for_question(site, question):
 
     db_answers = (
         models.Answer.objects.filter(session__survey__site=site, question=question)
+        .exclude(session__project__exclude_stats=True)
         .order_by("signals", "session__project")
         .values("signals", "session__project", "session__project__name")
         .distinct()
