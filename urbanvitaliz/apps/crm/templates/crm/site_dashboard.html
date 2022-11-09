@@ -82,6 +82,18 @@
                     {% endfor %}
                 </ul>
             </div>
+
+            <div class="pt-3 px-4 crm-border-bottom pb-4">
+                <h5 class="d-inline-block relative">
+                    <svg class="bi align-middle" width="24" height="24">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#tools"/>
+                    </svg>
+                    <span>Boite à outils</span>
+                </h5>
+                <ul class="list">
+                    <li><a href="{% url 'crm-project-list-by-tags' %}">Tags / Projects</a></li>
+                </ul>
+            </div>
         </div>
     </aside>
     <div class="w-75 d-flex flex-column justify-content-start">
