@@ -8,7 +8,7 @@
 
 {% with request.resolver_match.url_name as url_name %}
 
-{% if not switchtending and is_regional_actor %}
+{% if not switchtending and is_regional_actor and url_name == "projects-project-detail-overview"%}
 <div class="flag blue mb-4 d-flex align-items-start justify-content-between">
     <div class="pe-4 w-75">
         <span class="title-info text-uppercase">Ce projet est en attente de positionnement de votre part</span>
