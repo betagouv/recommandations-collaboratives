@@ -105,6 +105,16 @@ urlpatterns = [
         name="survey-editor-question-delete",
     ),
     path(
+        r"survey/editor/question/<int:question_id>/results/",
+        edit.question_results,
+        name="survey-editor-question-results",
+    ),
+    path(
+        r"survey/editor/question/<int:question_id>/results.csv",
+        edit.question_results_as_csv,
+        name="survey-editor-question-results-csv",
+    ),
+    path(
         r"survey/editor/question/<int:question_id>/choice/create/",
         edit.choice_create,
         name="survey-editor-choice-create",

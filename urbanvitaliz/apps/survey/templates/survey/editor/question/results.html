@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load tagging_tags %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-square-fill"/>
+                </svg>&nbsp;
+                Questionnaire
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'survey-editor-survey-details' question_set.survey.id %}">
+                    {{ question_set.survey.name|default:"Questionnaire"|title|truncatechars:20 }}
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'survey-editor-question-set-details' question_set.id %}">
+                    {{ question_set.heading|default:"Ensemble de Questions"|title|truncatechars:20 }}
+                </a>
+            </li>
+            <li class="breadcrumb-item active">
+                Résultats
+            </li>
+        </ol>
+    </nav>
+
+    <div>
+        <h5>Réponses à la question "{{ question }}" ({{ total_count }})</h5>
+
+        <a href="{% url 'survey-editor-question-results-csv' question.pk %}" class="btn btn-primary">Export CSV</a>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Réponse</th>
+                    <th>Projets</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for signal, projects in answers.items %}
+                <tr>
+                    <td>
+                        {% ifchanged signal %}
+                        <strong>
+                            <span class="badge bg-dark rounded-pill">{{ signal }}</span>
+                            ({{ projects|length }})
+                        </strong>
+                        {% endifchanged %}
+                    </td>
+                    <td>
+                        {% for project in projects %}
+                        <a href="{% url 'crm-project-details' project.id %}">{{ project.name }}</a>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+{% endblock %}
