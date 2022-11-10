@@ -11,8 +11,8 @@
 {% if not switchtending and is_regional_actor %}
 <div class="flag blue mb-4 d-flex align-items-start justify-content-between">
     <div class="pe-4 w-75">
-        <span class="title-info text-uppercase">Ce projet est en attente de positionnement de votre part</span>
-        <p class="text-info mb-0 mt-2">En suivant le projet, vous aurez accès aux discussions sur ce projet vous recevrez aussi des notifications sur les avancements de la collectivité.</p>
+        <span class="title-info text-blue text-uppercase">Ce projet est en attente de positionnement de votre part</span>
+        <p class="text-info-custom text-blue mb-0 mt-2">En suivant le projet, vous aurez accès aux discussions sur ce projet vous recevrez aussi des notifications sur les avancements de la collectivité.</p>
     </div>
     <div class="ps-4 w-25">
         <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
