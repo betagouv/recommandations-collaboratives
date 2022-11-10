@@ -1,3 +1,7 @@
+.font-marianne {
+    font-family: 'Marianne', arial, sans-serif;
+}
+
 .title-info {
     font-family: 'Marianne';
     font-style: normal;
@@ -5,16 +9,29 @@
     font-weight: 700;
     line-height: 24px;
 
-    color: #0063CB;
     text-transform: uppercase;
 }
 
-.text-info {
+.title-primary {
+    font-family: 'Marianne';
+    font-style: normal;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 36px;
+}
+
+.subtitle-primary {
+    font-family: 'Marianne';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.text-info-custom {
     font-family: 'Marianne';
     font-style: normal;
     font-weight: 300;
     font-size: 16px;
     line-height: 24px;
-
-    color: #0063CB !important;
 }
