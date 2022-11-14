@@ -30,9 +30,6 @@
             {% include 'resources/resource/fragments/author.html' %}
         </div>
         {% include 'resources/resource/fragments/flag.html' %}
-        {% include 'resources/resource/fragments/title.html' %}
-        {% include 'resources/resource/fragments/summary.html' %}
-
         {% include 'resources/resource/fragments/resource_content.html' with resource=resource contacts=contacts %}
         {% comment %} <div class="bd-callout mt-6">
             <svg class="bi me-2 align-middle" width="24" height="24">
@@ -92,6 +89,22 @@
                 </a>
             </div>
             {% endif %}
+            {% endif %}
+            <div class="mt-4">
+            {% if resource.departments.count %}
+            <div class="d-inline text-secondary">
+                <span class="align-middle text-info-custom text-grey-light d-block mb-2">
+                    Cette ressource est disponible dans les régions suivantes :
+                </span>
+                <ul class="d-flex flex-wrap list-unstyled">
+                    {% for department in resource.departments.all %}
+                       <li class="mx-1">- <span class="small font-marianne fw-light text-grey-light">{{ department.name }}</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            </div>
+            {% if request.user %}
                 {% include 'resources/resource/fragments/contact_list.html' %}
             {% endif %}
         </div>
@@ -106,7 +119,6 @@
                     <li><a class="text-info-custom text-grey-light text-decoration-none" href="{% url 'projects-project-detail' project.pk %}">{{ project.name }}</a></li>
                     {% endfor %}
                 </ul>
-    
             </div>
             {% endif %}
         </div>

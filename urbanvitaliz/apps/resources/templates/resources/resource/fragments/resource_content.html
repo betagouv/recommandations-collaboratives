@@ -12,12 +12,13 @@
             <q> {{ bookmark.comments }} </q>
             -
             <a href="{% url "resources-bookmark-create" bookmark.resource.id %}" class="small">éditer</a>
-
         </div>
         {% endif %}
     </div> {% endcomment %}
 </div>
 
-<div class="text-justified">
-    {{ resource.content_rendered|safe }}
+<div class="text-justified font-marianne">
+        {% include 'resources/resource/fragments/title.html' %}
+        {% include 'resources/resource/fragments/summary.html' %}
+        {{ resource.content_rendered|safe }}
 </div>

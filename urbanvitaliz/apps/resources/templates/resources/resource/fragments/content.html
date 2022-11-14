@@ -63,10 +63,6 @@
             </div>
             {% endif %}
 
-            {% if resource.departments.count and resource.tags %}
-            &nbsp;-&nbsp;
-            {% endif %}
-
             <div class="mb-2 d-inline">
                 {% for tag in resource.tags_as_list  %}
                 <span class="badge rounded-pill bg-light text-dark">#{{ tag }}</span>
