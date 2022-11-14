@@ -1,9 +1,25 @@
+{% comment %} {% if not resource.expired %}   {% endcomment %}
 <div class="flag blue mb-4 d-flex align-items-start justify-content-start">
   <span class="title-info text-blue text-uppercase my-0 me-3">Attention</span>
   <p class="text-info-custom text-blue my-0 ">Cet appel à projet a une date de limite de dépôt fixée au 21 Janvier 2023</p>
 </div>
+{% comment %} {% %} {% endcomment %}
 
+{% comment %} {% %} {% endcomment %}
 <div class="flag red mb-4 d-flex align-items-start justify-content-start">
     <span class="title-info text-red text-uppercase my-0 me-3">Attention</span>
     <p class="text-info-custom text-red my-0">Cet appel à projet a dépassé sa date de limite de dépôt du 21 Octobre 2022</p>
-  </div>
+</div>
+{% comment %} {% %} {% endcomment %}
+
+<!-- Show banner if draft -->
+{% comment %} {% if is_switchtender %} {% endcomment %}
+{% comment %} {% if not resource.public %} {% endcomment %}
+<div class="flag orange mb-4 d-flex align-items-start justify-content-start">
+  <span class="title-info text-uppercase my-0 me-3">Édition</span>
+  <p class="text-info-custom my-0">Cette ressource est en cours d'écriture. Pensez à la
+    <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <em>Public</em> si vous souhaitez que les visiteurs puissent la consulter !</p>
+</div>
+{% comment %} {% endif %} {% endcomment %}
+{% comment %} {% endif %} {% endcomment %}
+

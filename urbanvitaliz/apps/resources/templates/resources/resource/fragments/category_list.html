@@ -6,3 +6,16 @@
     <span class="text-grey fw-normal">{{ resource.category.name }}</span>
   </li>
 </ul>
+
+{% comment %} {% if user.is_staff %}
+<ul class="d-flex align-items-center list-unstyled mb-0 me-2">
+  {% for tag in resource.tags.all %}
+  <li class="bg-green me-2 px-2 py-1">
+    <a class="text-white fw-normal" href="{% url 'resources-resource-search' %}?query={{ tag.name }}">
+      {{ tag }}
+  </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %} {% endcomment %}
+
