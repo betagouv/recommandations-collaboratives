@@ -14,6 +14,10 @@
     {% vite_asset 'js/apps/projectShare.js' %}
 {% endblock %}
 
+{% block banner %}
+    {% include 'projects/project/fragments/positioning_banner.html' %}
+{% endblock %}
+
 {% block project_detail %}
 
 <div x-data="ProjectShare" class="col-12">
