@@ -157,7 +157,7 @@ class Resource(models.Model):
 
     @property
     def expired(self):
-        return self.expires_on > datetime.date.today()
+        return self.expires_on < datetime.date.today()
 
     tags = TaggableManager(blank=True)
 
