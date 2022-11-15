@@ -20,9 +20,9 @@
                     <span class="text-black fw-medium my-1">
                         {{ contact.full_name|title }}
                     </span>
-                    <div class="text-info-custom text-grey-light d-flex justify-content-between align-items-center">
-                        {% if contact.division %}<span class="me-1 w-75">{{ contact.division }}</span>{% endif %}
-                        <span class="w-25">{{ contact.organization.name|truncatechars:120 }}</span>
+                    <div class="text-info-custom text-grey-light d-flex flex-column">
+                        {% if contact.division %}<span class="me-1  fw-bolder">{{ contact.division }}</span>{% endif %}
+                        <span class="small">{{ contact.organization.name|truncatechars:120 }}</span>
                     </div>
                 </div>
                 <div class="d-flex flex-column">

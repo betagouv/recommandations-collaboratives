@@ -17,6 +17,7 @@ import '../css/text-colors.css'
 //Global reused component CSS
 import '../css/flags.css'
 import '../css/callout.css'
+import '../css/markdown.css'
 
 
 

@@ -1,22 +1,5 @@
 {% load static %}
 
-<div class="row resource-details mb-3">
-    {% comment %} <div class="col-sm-12 col-lg-8 col-xl-9">
-        {% if bookmark and bookmark.comments %}
-        <div class="text-secondary mt-2 p-1">
-            <svg class="bi align-baseline" width="12" height="12" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
-            </svg>
-            <span class="small">Note personnelle</span>
-            <br/>
-            <q> {{ bookmark.comments }} </q>
-            -
-            <a href="{% url "resources-bookmark-create" bookmark.resource.id %}" class="small">éditer</a>
-        </div>
-        {% endif %}
-    </div> {% endcomment %}
-</div>
-
 <div class="text-justified font-marianne">
         {% include 'resources/resource/fragments/title.html' %}
         {% include 'resources/resource/fragments/summary.html' %}
