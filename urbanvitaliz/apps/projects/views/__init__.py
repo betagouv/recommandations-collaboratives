@@ -27,35 +27,25 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from notifications import models as notifications_models
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
+from urbanvitaliz.apps.communication.digests import normalize_user_name
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.utils import (
-    build_absolute_url,
-    check_if_switchtender,
-    get_site_config_or_503,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
+                                get_site_config_or_503, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
 from ..forms import ProjectForm, SelectCommuneForm
-from ..utils import (
-    can_administrate_or_403,
-    can_administrate_project,
-    format_switchtender_identity,
-    generate_ro_key,
-    get_active_project,
-    get_collaborators_for_project,
-    get_switchtenders_for_project,
-    is_project_moderator,
-    is_project_moderator_or_403,
-    is_regional_actor_for_project_or_403,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-)
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     format_switchtender_identity, generate_ro_key,
+                     get_active_project, get_collaborators_for_project,
+                     get_switchtenders_for_project, is_project_moderator,
+                     is_project_moderator_or_403,
+                     is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -436,6 +426,22 @@ def project_accept(request, project_id=None):
         signals.project_validated.send(
             sender=models.Project, moderator=request.user, project=project
         )
+
+        if project.owner:
+            # Send an email to the project owner
+            params = {
+                "project": digests.make_project_digest(project, project.owner),
+            }
+            send_email(
+                template_name="project_accepted",
+                recipients=[
+                    {
+                        "name": normalize_user_name(project.owner),
+                        "email": project.owner.email,
+                    }
+                ],
+                params=params,
+            )
 
     return redirect(reverse("projects-project-detail", args=[project_id]))
 
