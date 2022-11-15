@@ -65,7 +65,7 @@
         {% endif %}
 
         <!-- Show banner if expired -->
-        {% if not resource.expired %}
+        {% if resource.expired %}
         <div class="bd-callout bd-callout-warning">
             <svg class="bi align-middle text-danger" width="24" height="24" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#exclamation-octagon-fill"/>
