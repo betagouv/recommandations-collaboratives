@@ -25,6 +25,7 @@ module.exports = {
         rollupOptions: {
             input: {
                 main: resolve('./src/js/main.js'),
+                home: resolve('./src/js/home.js'),
                 crm: resolve('./src/js/apps/crm.js'),
                 project: resolve('./src/js/apps/project.js'),
                 auth: resolve('./src/js/apps/auth.js'),
