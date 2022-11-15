@@ -1,0 +1,54 @@
+[
+    {
+        "model": "addressbook.organization",
+        "pk": 1,
+        "fields": {
+            "name": "DDT 01",
+            "departments": [
+                "42"
+            ]
+        }
+    },
+    {
+        "model": "addressbook.contact",
+        "pk": 1,
+        "fields": {
+            "site": 1,
+            "first_name": "Lala",
+            "last_name": "Lala",
+            "phone_no": "39393838383",
+            "mobile_no": "",
+            "email": "blah@bloh.fr",
+            "division": "Un service",
+            "organization": 1
+        }
+    },
+    {
+        "model": "addressbook.contact",
+        "pk": 2,
+        "fields": {
+            "site": 1,
+            "first_name": "lili",
+            "last_name": "lili",
+            "phone_no": "39393838383",
+            "mobile_no": "",
+            "email": "blahblah@bloh.fr",
+            "division": "Un service",
+            "organization": 1
+        }
+    },
+    {
+        "model": "addressbook.contact",
+        "pk": 3,
+        "fields": {
+            "site": 1,
+            "first_name": "lulu",
+            "last_name": "lulu",
+            "phone_no": "39393838383",
+            "mobile_no": "",
+            "email": "blahblahblah@bloh.fr",
+            "division": "Un service",
+            "organization": 1
+        }
+    }
+]
