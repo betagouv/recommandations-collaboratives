@@ -8,60 +8,6 @@
 
 {% with request.resolver_match.url_name as url_name %}
 
-{% if not switchtending and is_regional_actor %}
-<div class="flag blue mb-4 d-flex align-items-start justify-content-between">
-    <div class="pe-4 w-75">
-        <span class="title-info text-blue text-uppercase">Ce projet est en attente de positionnement de votre part</span>
-        <p class="text-info-custom text-blue mb-0 mt-2">En suivant le projet, vous aurez accès aux discussions sur ce projet vous recevrez aussi des notifications sur les avancements de la collectivité.</p>
-    </div>
-    <div class="ps-4 w-25">
-        <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
-            {% csrf_token %}
-            <button class="button py-2 px-1 green d-flex justify-content-center align-items-center my-2 w-100">
-                <span>Conseiller le projet</span>
-                <div class="hover-trigger">
-                    <svg class="ms-2 bi align-middle" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#info-circle" />
-                    </svg>
-                    <div class="hover-content">
-                        <span class="d-flex align-items-center"> 
-                            <svg class="bi me-2 align-middle" width="18" height="18" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#info-circle" />
-                            </svg>
-                            Conseiller
-                        </span>
-                        <p class="mb-0">
-                            En vous déclarant conseiller, vous indiquez aux autres participants du projet que vous êtes un interlocuteur disponible. Vous pouvez émettre des recommandations directement sur {{request.site.name}}.
-                        </p>
-                    </div>
-                </div>
-            </button>
-        </form>
-        <form method="POST" action="{% url 'projects-project-observer-join' project.id %}">
-            {% csrf_token %}
-            <button class="button py-2 px-2 d-flex justify-content-center align-items-center my-2 w-100">
-                <span>Observer le projet</span>
-                <div class="hover-trigger">
-                    <svg class="bi ms-2 align-middle" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#info-circle" />
-                    </svg>
-                    <div class="mb-0 hover-content">
-                        <span class="d-flex align-items-center"> 
-                            <svg class="bi me-2 align-middle" width="18" height="18" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#info-circle" />
-                            </svg>
-                            Observateur
-                        </span>
-                        <p class="mb-0">
-                            En tant qu’observateur, vous recevez des notifications email quand le projet évolue. Vous pouvez le consulter en intégralité et participer aux échanges
-                        </p>
-                    </div>
-                </div>
-            </button>
-        </form>
-    </div>
-</div>
-{% endif %}
 <div x-data="ProjectShare" class="col-12 d-flex justify-content-between align-items-start">
     <div class=" d-flex flex-column mb-4">
         <h2>{{ project.name|title }}</h2>

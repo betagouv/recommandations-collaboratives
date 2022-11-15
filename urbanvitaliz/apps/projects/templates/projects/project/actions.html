@@ -22,6 +22,10 @@
 {{ block.super }} > Recommandation
 {% endblock %}
 
+{% block banner %}
+    {% include 'projects/project/fragments/positioning_banner.html' %}
+{% endblock %}
+
 {% block project_detail %}
 <div class="col-12 mx-auto">
     <div class="row">
