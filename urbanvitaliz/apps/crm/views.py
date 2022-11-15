@@ -326,6 +326,7 @@ def update_note_for_organization(request, organization_id, note_id):
 def project_list_by_tags(request):
     tags = (
         Project.tags.filter(project__sites=request.site)
+        .exclude(project__exclude_stats=True)
         .annotate(Count("project", distinct=True))
         .order_by("-project__count")
         .distinct()
@@ -338,6 +339,7 @@ def project_list_by_tags(request):
 def project_list_by_tags_as_csv(request):
     tags = (
         Project.tags.filter(project__sites=request.site)
+        .exclude(project__exclude_stats=True)
         .annotate(Count("project", distinct=True))
         .order_by("-project__count")
         .distinct()
