@@ -1,0 +1,113 @@
+[
+    {
+        "model": "resources.category",
+        "pk": 1,
+        "fields": {
+            "name": "Méthodologie",
+            "color": "green",
+            "icon": "ui-checks",
+            "deleted": null,
+            "sites": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "resources.category",
+        "pk": 2,
+        "fields": {
+            "name": "Financement",
+            "color": "orange",
+            "icon": "currency-exchange",
+            "deleted": null,
+            "sites": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "resources.category",
+        "pk": 3,
+        "fields": {
+            "name": "Outil",
+            "color": "blue",
+            "icon": "tools",
+            "deleted": null,
+            "sites": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "resources.resource",
+        "pk": 1,
+        "fields": {
+            "status": 1,
+            "created_on": "2021-06-22T16:03:43.196Z",
+            "updated_on": "2021-06-22T16:03:43.196Z",
+            "expires_on": "2021-10-01",
+            "created_by": null,
+            "category": 2,
+            "title": "Resource 1",
+            "subtitle": "Appel à Projets Rétablissement des continuités écologiques - Agence de l'eau Loire-Bretagne",
+            "summary": "Objectif : restaurer les cours d’eau, les zones humides et leur biodiversité. Dossiers à déposer avant le 1er octobre 2021. Financement des études, travaux, acquisition du foncier.",
+            "content": "## 🚀 Plus d'info ? c'est par ici !\r\nCet appel à projet est lancé pour accélérer et susciter rapidement des travaux de restauration de la continuité écologique des cours d’eau par effacement ou arasement d’obstacles à l’écoulement (barrages, seuils, digues de plans d’eau sur cours…).\r\n\r\nL’objectif global des projets sera de restaurer les cours d’eau, les zones humides et leur biodiversité dont les espèces de poissons migrateurs.\r\nAvec France Relance et son 11e programme d'intervention, l'agence mobilise une **enveloppe de 15,7 millions €** pour cet appel à projets avec **un taux plafond de 80 % pour les collectivités** et exceptionnellement **jusqu’à 100 % pour les particuliers, entreprises, associations ou fondations.**\r\n### →  Bénéficiaires\r\n\r\n- les propriétaires privés : particuliers et entreprises ;\r\n- les communes et les établissements publics de coopération intercommunale (métropoles, agglomérations, communautés de communes, syndicats) ;\r\n- les associations et les fondations.\r\n\r\n### →  Actions éligibles\r\n\r\n- Les actions financées sont les travaux d’effacement ou d’arasement d’obstacles à l’écoulement, y compris :\r\n- les études préalables aux travaux et la maîtrise d’œuvre ;\r\n- les travaux collatéraux de restauration de cours d’eau et zones humides associées ;\r\n- l’acquisition des parcelles intéressant le projet (hors bâti) ;\r\n- les suivis avant et après travaux permettant de montrer rapidement des résultats ; et la communication associée au projet.\r\n- Les critères de sélection des actions sont précisés dans le règlement.\r\n\r\n### →  Calendrier\r\n\r\n**1er octobre 2021** : date limite de dépôt des dossiers pour décision d’aide avant fin 2021 dans la limite de l’enveloppe financière disponible.\r\n\r\n### →  Mode de sélection\r\n\r\nLe dossier de demande d’aide doit être déposé via le service en ligne *Démarches simplifiées*\r\n\r\nLes dossiers de demande d’aides reçus sont examinés au fil de l’eau par les services de l’agence de l’eau dans l'ordre d'arrivée. Un accusé de réception sera émis par l’agence.\r\n\r\nVous pouvez retrouver **le réglement complet** à partir de ce [lien](https://sdage-sage.eau-loire-bretagne.fr/files/live/sites/sdage-sage/files/Icono/Aides/11-prog/AAP-AAI%202020/REGL_AAP_mesures_exceptionnelles_continuite.pdf)\r\n\r\n## 📞 Contacts et accès au dossier :\r\n\r\nPour des renseignements généraux : 02 38 51 73 73\r\n\r\n- Retrouvez ici le lien de connexion pour les **collectivités et associations ayant un n°SIRET** : [ici](https://www.demarches-simplifiees.fr/commencer/agence-eau-lb-aap-maq)\r\n- Retrouvez également le lien de connexion pour les **particuliers** : [ici](https://www.demarches-simplifiees.fr/commencer/agence-eau-lb-aap-maq-particulier)\r\n\r\nPour avoir éventuellement plus d'information sur les actions de l'Agence de l'eau Loire-Bretagne, c'est par [ici](https://aides-redevances.eau-loire-bretagne.fr/home/aides/appels-a-projets/retablissement-de-la-continuite-ecologique.html)",
+            "deleted": null,
+            "sites": [
+                1
+            ],
+            "contacts": [1,2,3],
+            "departments": [
+               "42"
+            ]
+        }
+    },
+    {
+        "model": "resources.resource",
+        "pk": 2,
+        "fields": {
+            "status": 3,
+            "created_on": "2021-06-22T16:03:43.196Z",
+            "updated_on": "2021-06-22T16:03:43.196Z",
+            "expires_on": "2023-10-01",
+            "created_by": null,
+            "category": 2,
+            "title": "Resource 1 - publiée",
+            "subtitle": "Appel à Projets Rétablissement des continuités écologiques - Agence de l'eau Loire-Bretagne",
+            "summary": "Objectif : restaurer les cours d’eau, les zones humides et leur biodiversité. Dossiers à déposer avant le 1er octobre 2021. Financement des études, travaux, acquisition du foncier.",
+            "content": "## 🚀 Plus d'info ? c'est par ici !\r\nCet appel à projet est lancé pour accélérer et susciter rapidement des travaux de restauration de la continuité écologique des cours d’eau par effacement ou arasement d’obstacles à l’écoulement (barrages, seuils, digues de plans d’eau sur cours…).\r\n\r\nL’objectif global des projets sera de restaurer les cours d’eau, les zones humides et leur biodiversité dont les espèces de poissons migrateurs.\r\nAvec France Relance et son 11e programme d'intervention, l'agence mobilise une **enveloppe de 15,7 millions €** pour cet appel à projets avec **un taux plafond de 80 % pour les collectivités** et exceptionnellement **jusqu’à 100 % pour les particuliers, entreprises, associations ou fondations.**\r\n### →  Bénéficiaires\r\n\r\n- les propriétaires privés : particuliers et entreprises ;\r\n- les communes et les établissements publics de coopération intercommunale (métropoles, agglomérations, communautés de communes, syndicats) ;\r\n- les associations et les fondations.\r\n\r\n### →  Actions éligibles\r\n\r\n- Les actions financées sont les travaux d’effacement ou d’arasement d’obstacles à l’écoulement, y compris :\r\n- les études préalables aux travaux et la maîtrise d’œuvre ;\r\n- les travaux collatéraux de restauration de cours d’eau et zones humides associées ;\r\n- l’acquisition des parcelles intéressant le projet (hors bâti) ;\r\n- les suivis avant et après travaux permettant de montrer rapidement des résultats ; et la communication associée au projet.\r\n- Les critères de sélection des actions sont précisés dans le règlement.\r\n\r\n### →  Calendrier\r\n\r\n**1er octobre 2021** : date limite de dépôt des dossiers pour décision d’aide avant fin 2021 dans la limite de l’enveloppe financière disponible.\r\n\r\n### →  Mode de sélection\r\n\r\nLe dossier de demande d’aide doit être déposé via le service en ligne *Démarches simplifiées*\r\n\r\nLes dossiers de demande d’aides reçus sont examinés au fil de l’eau par les services de l’agence de l’eau dans l'ordre d'arrivée. Un accusé de réception sera émis par l’agence.\r\n\r\nVous pouvez retrouver **le réglement complet** à partir de ce [lien](https://sdage-sage.eau-loire-bretagne.fr/files/live/sites/sdage-sage/files/Icono/Aides/11-prog/AAP-AAI%202020/REGL_AAP_mesures_exceptionnelles_continuite.pdf)\r\n\r\n## 📞 Contacts et accès au dossier :\r\n\r\nPour des renseignements généraux : 02 38 51 73 73\r\n\r\n- Retrouvez ici le lien de connexion pour les **collectivités et associations ayant un n°SIRET** : [ici](https://www.demarches-simplifiees.fr/commencer/agence-eau-lb-aap-maq)\r\n- Retrouvez également le lien de connexion pour les **particuliers** : [ici](https://www.demarches-simplifiees.fr/commencer/agence-eau-lb-aap-maq-particulier)\r\n\r\nPour avoir éventuellement plus d'information sur les actions de l'Agence de l'eau Loire-Bretagne, c'est par [ici](https://aides-redevances.eau-loire-bretagne.fr/home/aides/appels-a-projets/retablissement-de-la-continuite-ecologique.html)",
+            "deleted": null,
+            "sites": [
+                1
+            ],
+            "contacts": [1,2,3],
+            "departments": [
+               "42"
+            ]
+        }
+    },
+    {
+        "model": "resources.resource",
+        "pk": 3,
+        "fields": {
+            "status": 0,
+            "created_on": "2021-06-22T16:03:43.196Z",
+            "updated_on": "2021-06-22T16:03:43.196Z",
+            "expires_on": "2021-10-01",
+            "created_by": null,
+            "category": 2,
+            "title": "Ressource 3 - expiré et brouillon",
+            "subtitle": "Appel à Projets Rétablissement des continuités écologiques - Agence de l'eau Loire-Bretagne",
+            "summary": "Objectif : restaurer les cours d’eau, les zones humides et leur biodiversité. Dossiers à déposer avant le 1er octobre 2021. Financement des études, travaux, acquisition du foncier.",
+            "content": "## 🚀 Plus d'info ? c'est par ici !\r\nCet appel à projet est lancé pour accélérer et susciter rapidement des travaux de restauration de la continuité écologique des cours d’eau par effacement ou arasement d’obstacles à l’écoulement (barrages, seuils, digues de plans d’eau sur cours…).\r\n\r\nL’objectif global des projets sera de restaurer les cours d’eau, les zones humides et leur biodiversité dont les espèces de poissons migrateurs.\r\nAvec France Relance et son 11e programme d'intervention, l'agence mobilise une **enveloppe de 15,7 millions €** pour cet appel à projets avec **un taux plafond de 80 % pour les collectivités** et exceptionnellement **jusqu’à 100 % pour les particuliers, entreprises, associations ou fondations.**\r\n### →  Bénéficiaires\r\n\r\n- les propriétaires privés : particuliers et entreprises ;\r\n- les communes et les établissements publics de coopération intercommunale (métropoles, agglomérations, communautés de communes, syndicats) ;\r\n- les associations et les fondations.\r\n\r\n### →  Actions éligibles\r\n\r\n- Les actions financées sont les travaux d’effacement ou d’arasement d’obstacles à l’écoulement, y compris :\r\n- les études préalables aux travaux et la maîtrise d’œuvre ;\r\n- les travaux collatéraux de restauration de cours d’eau et zones humides associées ;\r\n- l’acquisition des parcelles intéressant le projet (hors bâti) ;\r\n- les suivis avant et après travaux permettant de montrer rapidement des résultats ; et la communication associée au projet.\r\n- Les critères de sélection des actions sont précisés dans le règlement.\r\n\r\n### →  Calendrier\r\n\r\n**1er octobre 2021** : date limite de dépôt des dossiers pour décision d’aide avant fin 2021 dans la limite de l’enveloppe financière disponible.\r\n\r\n### →  Mode de sélection\r\n\r\nLe dossier de demande d’aide doit être déposé via le service en ligne *Démarches simplifiées*\r\n\r\nLes dossiers de demande d’aides reçus sont examinés au fil de l’eau par les services de l’agence de l’eau dans l'ordre d'arrivée. Un accusé de réception sera émis par l’agence.\r\n\r\nVous pouvez retrouver **le réglement complet** à partir de ce [lien](https://sdage-sage.eau-loire-bretagne.fr/files/live/sites/sdage-sage/files/Icono/Aides/11-prog/AAP-AAI%202020/REGL_AAP_mesures_exceptionnelles_continuite.pdf)\r\n\r\n## 📞 Contacts et accès au dossier :\r\n\r\nPour des renseignements généraux : 02 38 51 73 73\r\n\r\n- Retrouvez ici le lien de connexion pour les **collectivités et associations ayant un n°SIRET** : [ici](https://www.demarches-simplifiees.fr/commencer/agence-eau-lb-aap-maq)\r\n- Retrouvez également le lien de connexion pour les **particuliers** : [ici](https://www.demarches-simplifiees.fr/commencer/agence-eau-lb-aap-maq-particulier)\r\n\r\nPour avoir éventuellement plus d'information sur les actions de l'Agence de l'eau Loire-Bretagne, c'est par [ici](https://aides-redevances.eau-loire-bretagne.fr/home/aides/appels-a-projets/retablissement-de-la-continuite-ecologique.html)",
+            "deleted": null,
+            "sites": [
+                1
+            ],
+            "contacts": [1,2,3],
+            "departments": [
+               "42"
+            ]
+        }
+    }
+]
