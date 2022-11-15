@@ -1,0 +1,10 @@
+<div class="d-inline text-secondary">
+    <span class="align-middle text-info-custom text-grey-light d-block mb-2">
+        Cette ressource est disponible dans les régions suivantes :
+    </span>
+    <ul class="d-flex flex-wrap list-unstyled">
+        {% for department in resource.departments.all %}
+           <li class="mx-1">- <span class="small font-marianne fw-light text-grey-light">{{ department.name }}</span></li>
+        {% endfor %}
+    </ul>
+</div>

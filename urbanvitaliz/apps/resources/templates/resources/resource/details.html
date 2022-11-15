@@ -45,15 +45,15 @@
         <!-- Sidebar -->
         <div class="admin-sidebar">
             <!-- User actions -->
-            {% comment %} <div class="d-grid gap-2 mt-3">
-                <a class="btn btn-primary btn-sm" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource {{ resource.title|truncatewords:4 }}" role="button">
+            <div class="d-grid gap-2 mt-3">
+                <a class="button blue d-flex justify-content-center align-items-center" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource {{ resource.title|truncatewords:4 }}" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
                     </svg>
                     &nbsp;
                     Poser une question
                 </a>
-            </div> {% endcomment %}
+            </div>
 
             {% if is_switchtender %}
             <!-- Switchtender actions -->
@@ -92,16 +92,7 @@
             {% endif %}
             <div class="mt-4">
             {% if resource.departments.count %}
-            <div class="d-inline text-secondary">
-                <span class="align-middle text-info-custom text-grey-light d-block mb-2">
-                    Cette ressource est disponible dans les régions suivantes :
-                </span>
-                <ul class="d-flex flex-wrap list-unstyled">
-                    {% for department in resource.departments.all %}
-                       <li class="mx-1">- <span class="small font-marianne fw-light text-grey-light">{{ department.name }}</span></li>
-                    {% endfor %}
-                </ul>
-            </div>
+                {% include 'resources/resource/fragments/departments.html' %}
             {% endif %}
             </div>
             {% if request.user %}
@@ -110,16 +101,7 @@
         </div>
         <div class="mt-4">
             {% if projects_used_by %}
-            <div>
-                <span class="align-middle text-info-custom text-grey-light">
-                    Cette ressource a été recommandée sur les projets suivants :
-                </span>
-                <ul class="mt-3 text-grey-light">
-                    {% for project in projects_used_by %}
-                    <li><a class="text-info-custom text-grey-light text-decoration-none" href="{% url 'projects-project-detail' project.pk %}">{{ project.name }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>
+                {% include 'resources/resource/fragments/project_used.html' %}
             {% endif %}
         </div>
     </div>
