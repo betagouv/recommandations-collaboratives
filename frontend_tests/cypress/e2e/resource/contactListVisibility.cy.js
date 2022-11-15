@@ -1,9 +1,9 @@
-describe('I can see a resource contact list if im logged', () => {
+describe('I can see the resource contact list if im logged', () => {
     beforeEach(() => {
         cy.login("bob");
     })
 
-    it('see a contact list', () => {
+    it('see the contact list', () => {
         cy.visit('/ressource/3/')
 
         cy.contains("Lala")
@@ -12,12 +12,12 @@ describe('I can see a resource contact list if im logged', () => {
     })
 })
 
-describe("I can't see a resource contact list if im logged", () => {
+describe("I can't see the resource contact list if im not logged", () => {
     beforeEach(() => {
     })
 
     it('cannot see a contact list', () => {
         cy.visit('/ressource/3/')
-        cy.contains("Nous avons des contacts associés à cette ressource. Si vous souhaitez y accéder, veuillez vous identifier.");
+        cy.contains("contacts associés à cette ressource. Si vous souhaitez y accéder, veuillez vous identifier.");
     })
 })

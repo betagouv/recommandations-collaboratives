@@ -33,9 +33,7 @@ describe('I can create a resource as a switchtender', () => {
 
         cy.url().should('include', '/ressource/')
 
-        cy.contains("Cette ressource a une date limite fixée")
         cy.contains("Ressource de test")
-        cy.contains("Cette ressource est en cours d'écriture")
         cy.contains("résumé de la ressource de test")
     })
 })
