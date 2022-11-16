@@ -87,12 +87,10 @@ class Project(models.Model):
     PROJECT_STATES = (
         ("DRAFT", "Brouillon"),
         ("TO_PROCESS", "A traiter"),
-        ("QUESTIONS", "En attente de retour de la collectivité"),
-        ("READY", "Prêt à aiguiller"),
-        ("IN_PROGRESS", "Recommandations en cours"),
-        ("REVIEW_REQUEST", "Demande de relecture"),
-        ("DONE", "Appui réalisé"),
-        ("STUCK", "En attente/bloqué"),
+        ("READY", "En attente"),
+        ("IN_PROGRESS", "En cours"),
+        ("DONE", "Traité"),
+        ("STUCK", "Conseil Interrompu"),
         ("REJECTED", "Rejeté"),
     )
 
