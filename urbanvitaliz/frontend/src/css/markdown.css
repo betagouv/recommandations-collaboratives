@@ -1,0 +1,12 @@
+.markdown-flag {
+    padding: 20px;
+    background-color: #E8EDFF;
+}
+
+.markdown-flag p {
+    font-family: 'Marianne';
+    font-style: normal;
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 28px;
+}

@@ -109,6 +109,7 @@ def project_knowledge(request, project_id=None):
         project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
+    switchtending = get_switchtender_for_project(request.user, project)
 
     # check user can administrate project (member or switchtender)
     if request.user != project.members.filter(projectmember__is_owner=True).first():
@@ -140,6 +141,7 @@ def project_actions(request, project_id=None):
         project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
+    switchtending = get_switchtender_for_project(request.user, project)
 
     # check user can administrate project (member or switchtender)
     if request.user != project.members.filter(projectmember__is_owner=True).first():

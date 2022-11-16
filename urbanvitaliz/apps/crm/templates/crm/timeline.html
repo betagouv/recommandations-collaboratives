@@ -2,51 +2,55 @@
 
 <ul class="list-group">
     {% for action in actions %}
-    <li class="d-flex flex-columns list-group-item">
-        {% if action.actor %}
-        <div class="align-middle mx-2 flex-shrink">
-            <img class="rounded-circle" src="{% gravatar_url action.actor.email size=24 %}" alt="{{action.actor}}">
-        </div>
-        {% endif %}
-        <div class=" flex-row flex-grow-1">
-            <div class="flex-grow w-100 flex-grow-1">
+        {% if action.verb == "a invité un·e collaborateur·rice à rejoindre le projet" %}
+            {% include 'crm/fragments/action_invite.html' %}
+        {% else %}
+            <li class="d-flex flex-columns list-group-item">
                 {% if action.actor %}
-                <span class="actor">
-                    <a href="{% url 'crm-user-details' action.actor.pk %}">
-                        {{ action.actor.first_name|default:action.actor.email }}
-                        {{ action.actor.last_name|default:"" }}
-                    </a>
-                </span>
-                {% else %}
-                <span class="actor">
-                    (compte supprimé)
-                </span>
+                <div class="align-middle mx-2 flex-shrink">
+                    <img class="rounded-circle" src="{% gravatar_url action.actor.email size=24 %}" alt="{{action.actor}}">
+                </div>
                 {% endif %}
-                <span class="verb">
-                    <strong>{{ action.verb }}</strong>
-                </span>
-                {% if action.target %}
-                <span class="target">
-                    sur <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-                </span>
-                {% endif %}
-                <span class="ms-1 small text-secondary">il y a {{ action.timestamp|timesince }}</span>
-            </div>
-
-            {% if action.action_object.resource %}
-            <div class="border p-2 rounded bg-white w-100">
-                {{ action.action_object.resource.title }}
-            </div>
-            {% endif %}
-
-            {% if action.action_object.comment %}
-            <div class="border p-2 rounded bg-white w-100">
-                "{{ action.action_object.comment }}" à propos de <a
-                    href=" {{ action.action_object.task.get_absolute_url }}">{{
-                    notification.action_object.task }}</a>
-            </div>
-            {% endif %}
-        </div>
-    </li>
+                <div class=" flex-row flex-grow-1">
+                    <div class="flex-grow w-100 flex-grow-1">
+                        {% if action.actor %}
+                        <span class="actor">
+                            <a href="{% url 'crm-user-details' action.actor.pk %}">
+                                {{ action.actor.first_name|default:action.actor.email }}
+                                {{ action.actor.last_name|default:"" }}
+                            </a>
+                        </span>
+                        {% else %}
+                        <span class="actor">
+                            (compte supprimé)
+                        </span>
+                        {% endif %}
+                        <span class="verb">
+                            <strong>{{ action.verb }}</strong>
+                        </span>
+                        {% if action.target %}
+                        <span class="target">
+                            sur <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                        </span>
+                        {% endif %}
+                        <span class="ms-1 small text-secondary">il y a {{ action.timestamp|timesince }}</span>
+                    </div>
+        
+                    {% if action.action_object.resource %}
+                    <div class="border p-2 rounded bg-white w-100">
+                        {{ action.action_object.resource.title }}
+                    </div>
+                    {% endif %}
+        
+                    {% if action.action_object.comment %}
+                    <div class="border p-2 rounded bg-white w-100">
+                        "{{ action.action_object.comment }}" à propos de <a
+                            href=" {{ action.action_object.task.get_absolute_url }}">{{
+                            notification.action_object.task }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </li>
+        {% endif %}
     {% endfor %}
 </ul>

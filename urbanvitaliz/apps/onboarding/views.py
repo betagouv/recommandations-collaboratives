@@ -3,6 +3,9 @@ from django.contrib.auth import models as auth
 from django.shortcuts import redirect, render, reverse
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
+from urbanvitaliz.apps.communication import digests
+from urbanvitaliz.apps.communication.api import send_email
+from urbanvitaliz.apps.communication.digests import normalize_user_name
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import signals as projects_signals
@@ -58,6 +61,8 @@ def onboarding(request):
                 },
             )
 
+            project.submitted_by = user
+
             if not created:
                 if request.user.username != user.username:
                     # account exists, redirect to login
@@ -98,6 +103,23 @@ def onboarding(request):
             # All green, notify
             projects_signals.project_submitted.send(
                 sender=projects.Project, submitter=user, project=project
+            )
+
+            # Send an email to the project owner
+            params = {
+                "project": digests.make_project_digest(
+                    project, project.owner, url_name="knowledge"
+                ),
+            }
+            send_email(
+                template_name="project_received",
+                recipients=[
+                    {
+                        "name": normalize_user_name(project.owner),
+                        "email": project.owner.email,
+                    }
+                ],
+                params=params,
             )
 
             # NOTE check if commune is unique for code postal

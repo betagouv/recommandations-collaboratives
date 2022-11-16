@@ -1,0 +1,20 @@
+<div class="d-flex align-items-center list-unstyled mb-0 me-2">
+  <li class="bg-green me-2 px-2 py-1">
+    <span class="text-white fw-normal">{{ resource.category.name }}</span>
+  </li>
+  {% if user.is_staff %}
+    <ul class="d-flex align-items-center list-unstyled mb-0">
+      {% for tag in resource.tags.all %}
+      <li class="bg-grey me-2 px-2 py-1">
+        <a class="text-grey fw-normal text-decoration-none" href="{% url 'resources-resource-search' %}?query={{ tag.name }}">
+          {{ tag }}
+      </a>
+      </li>
+      {% endfor %}
+    </ul>
+{% endif %}
+
+</div>
+
+
+

@@ -46,6 +46,7 @@
     </div>
 
     <div class="row" style="font-family: 'Marianne', arial, sans-serif;">
+        {% block banner %}{% endblock %}
         {% include 'projects/project/header.html' %}
         {% block project_detail %}{% endblock %}
     </div>

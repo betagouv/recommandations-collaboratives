@@ -1,0 +1,9 @@
+{% load humanize %}
+
+<div class="d-flex align-items-center">
+  <span class="align-middle mb-0">
+    par
+    <strong>{{ resource.created_by.get_full_name|default:request.site.name }}</strong>
+    modifiée le <em>{{ resource.updated_on }}</em>
+  </span>
+</div>

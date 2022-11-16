@@ -1,0 +1,60 @@
+{% load static %}
+
+{% if contacts.count %}
+<div class="mt-4">
+    {% if user.is_anonymous %}
+    <div class="flag blue">
+        <span class="title text-blue text-uppercase fw-bold mb-2 d-block">Contacts</span>
+        <p class="content">
+            Nous avons des <strong>contact{{ contacts.count|pluralize }} associé{{ contacts.count|pluralize }}</strong>
+            à cette ressource. Si vous souhaitez y accéder, veuillez <a href="{% url 'magicauth-login' %}">vous identifier</a>.
+        </p>
+    </div>
+    {% else %}
+
+    <div class="bg-grey-light py-4 px-3 font-marianne">
+        <h6 class="fw-bold text-uppercase d-block mb-3">👩‍💼 Contacts</h6>
+        {% for contact in contacts.all %}
+            <div class="bg-white border py-2 px-3 mb-2">
+                <div>
+                    <span class="text-black fw-medium my-1">
+                        {{ contact.full_name|title }}
+                    </span>
+                    <div class="text-info-custom text-grey-light d-flex flex-column">
+                        {% if contact.division %}<span class="me-1  fw-bolder">{{ contact.division }}</span>{% endif %}
+                        <span class="small">{{ contact.organization.name|truncatechars:120 }}</span>
+                    </div>
+                </div>
+                <div class="d-flex flex-column">
+                    {% if contact.email %}
+                    <div class="text-blue my-1">
+                        <svg class="bi me-1" width="12" height="12" fill="#0063CB">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'%}#envelope"/>
+                        </svg>
+                        <a class="text-blue text-decoration-none small" href="mailto:{{contact.email}}">{{ contact.email }}</a>
+                    </div>
+                    {% endif %}
+                    {% if contact.phone_no %}
+                    <div class="text-blue d-flex align-items-center">
+                        <svg class="bi me-2" width="12" height="12" fill="#0063CB">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone"/>
+                        </svg>
+                        <a class="text-blue text-decoration-none small" href="tel:{{contact.phone_no}}">{{ contact.phone_no }}</a>
+                    </div>
+                    {% endif %}
+                    {% if contact.mobile_no %}
+                    <div class="text-blue">
+                        <svg class="bi me-2" width="12" height="12" fill="#0063CB">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#phone"/>
+                        </svg>
+                        <a class="text-blue text-decoration-none small" href="tel:{{contact.mobile_no}}">{{ contact.mobile_no }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% endif %}
+</div>
+{% endif %}

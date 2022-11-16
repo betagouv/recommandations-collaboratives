@@ -143,7 +143,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
         "last_name": "doe",
         "response_0": "blah",
     }
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
         response = client.post(reverse("projects-project-prefill"), data=data)
 
     project = models.Project.on_site.all()[0]
@@ -151,7 +151,13 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
-    assert data["email"] in [member.email for member in project.members.all()]
+    assert data["email"] == project.owner.email
+    assert data["first_name"] == project.owner.first_name
+    assert data["last_name"] == project.owner.last_name
+
+    assert user in project.switchtenders.all()
+
+    assert user == project.submitted_by
 
     invite = invites_models.Invite.objects.first()
     assert invite.project == project
@@ -679,6 +685,26 @@ def test_accept_project_not_available_for_non_staff_users(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_and_redirect(request, client):
+    owner = Recipe(auth.User, username="owner@owner.co").make()
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    Recipe(auth.Group, name="project_moderator").make()
+    baker.make(models.ProjectMember, member=owner, is_owner=True)
+
+    updated_on_before = project.updated_on
+    url = reverse("projects-project-accept", args=[project.id])
+
+    with login(client, groups=["project_moderator", "switchtender"]):
+        response = client.post(url)
+
+    project = models.Project.on_site.get(id=project.id)
+    assert project.status == "TO_PROCESS"
+    assert project.updated_on > updated_on_before
+
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_accept_project_without_owner_and_redirect(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     Recipe(auth.Group, name="project_moderator").make()
     updated_on_before = project.updated_on
@@ -982,6 +1008,36 @@ def test_owner_can_add_email_to_project_if_not_draft(request, client):
 
     url = reverse("projects-access-update", args=[project.id])
     data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
+
+    with login(client, user=membership.member):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    invite = invites_models.Invite.on_site.first()
+    assert invite.email == data["email"]
+
+
+@pytest.mark.django_db
+def test_add_email_for_existing_user_uses_autologin(request, client):
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__email="own@er.fr",
+        member__username="own@er.fr",
+    )
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+        status="READY",
+    )
+
+    collab = baker.make(auth.User, email="collaborator@example.com")
+
+    url = reverse("projects-access-update", args=[project.id])
+    data = {"email": collab.email, "role": "COLLABORATOR"}
 
     with login(client, user=membership.member):
         response = client.post(url, data=data)
