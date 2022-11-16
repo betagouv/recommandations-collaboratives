@@ -10,7 +10,8 @@ created : 2021-05-26 13:55:23 CEST
 
 from csvexport.actions import csvexport
 from django.contrib import admin
-from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
+from ordered_model.admin import (OrderedInlineModelAdminMixin,
+                                 OrderedTabularInline)
 
 from . import models
 
@@ -46,6 +47,7 @@ class ProjectSwitchtenderTabularInline(admin.TabularInline):
     model = models.ProjectSwitchtender
     fields = (
         "switchtender",
+        "is_observer",
         "site",
     )
     extra = 1
