@@ -143,7 +143,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
         "last_name": "doe",
         "response_0": "blah",
     }
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
         response = client.post(reverse("projects-project-prefill"), data=data)
 
     project = models.Project.on_site.all()[0]
@@ -151,7 +151,13 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
-    assert data["email"] in [member.email for member in project.members.all()]
+    assert data["email"] == project.owner.email
+    assert data["first_name"] == project.owner.first_name
+    assert data["last_name"] == project.owner.last_name
+
+    assert user in project.switchtenders.all()
+
+    assert user == project.submitted_by
 
     invite = invites_models.Invite.objects.first()
     assert invite.project == project

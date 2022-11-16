@@ -61,6 +61,8 @@ def onboarding(request):
                 },
             )
 
+            project.submitted_by = user
+
             if not created:
                 if request.user.username != user.username:
                     # account exists, redirect to login

@@ -81,6 +81,7 @@ def create_project_prefilled(request):
             project.postcode = form.cleaned_data.get("postcode")
             project.ro_key = generate_ro_key()
             project.status = "TO_PROCESS"
+            project.submitted_by = request.user
 
             insee = form.cleaned_data.get("insee", None)
             if insee:
