@@ -1,30 +1,11 @@
-## 🚀 Plus de détails !
+## 🚀 L’APPUI PROPOSÉ
 
-### →  L'appui proposé
+## 🔥 CONDITIONS D’ÉLIGIBILITÉ
 
-*AAAA*
-aaaaaa
+<div class="markdown-flag">
+<h2>⚡ PASSER À L’ACTION</h2>
+<p>Texte</p>
+</div>
 
-- a
-- b
-  
 
-### →  Conditions d'éligibilité
-
-aaa
-
-## ⚡ Passez à l'action !
-
-### Intégrer un Contact
-
-Exemple d'intégration d'un contact : [Madame Friche](#contact-3)
-
-Le "#contact-X" est à récupérer sur la carte contact en bas de page, à droite du nom.
-  
-### Un lien 
-  
-[Formulaire de contact](https://www.epf-npdc.fr/lepf-pratique/contact)
-
-### →  Autres informations
-
-AAA
+## ℹ️ AUTRES INFORMATIONS

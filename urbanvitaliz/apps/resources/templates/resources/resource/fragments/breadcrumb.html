@@ -1,0 +1,18 @@
+<!-- Resource Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4 pb-1">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a class="small" href="{% url 'home' %}">Accueil</a>
+        </li>
+        <li class="breadcrumb-item">
+            <span class="text-secondary small">
+                <a href="{% url 'resources-resource-search' %}">Ressources</a>
+            </span>
+        </li>
+        <li class="breadcrumb-item">
+            <span class="text-secondary small">
+                {{ resource.title|capfirst|truncatewords:10 }}
+            </span>
+        </li>
+    </ol>
+</nav>
