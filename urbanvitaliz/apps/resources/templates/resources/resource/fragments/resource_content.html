@@ -87,7 +87,6 @@
         </div>
 
         <!-- Show banner if draft -->
-        {% if is_switchtender %}
         {% if not resource.public %}
         <div class="bd-callout bd-callout-warning">
             <svg class="bi align-middle" width="24" height="24" fill="currentColor">
@@ -96,9 +95,6 @@
             Cette ressource est en cours d'écriture. Pensez à la
             <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <em>Public</em> si vous souhaitez que les visiteurs puissent la consulter !
         </div>
-        {% endif %}
-
-
         {% endif %}
 
         {% if resource.subtitle %}
