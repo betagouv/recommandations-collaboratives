@@ -97,6 +97,12 @@ def access_update(request, project_id):
                     target=invite.project,
                 )
 
+                # Do we already know this user?
+                try:
+                    invited_user = User.objects.get(email=email)
+                except User.DoesNotExist:
+                    invited_user = None
+
                 # Dispatch notifications
                 params = {
                     "sender": {
@@ -105,7 +111,9 @@ def access_update(request, project_id):
                         "email": request.user.email,
                     },
                     "message": invite.message,
-                    "invite_url": utils.build_absolute_url(invite.get_absolute_url()),
+                    "invite_url": utils.build_absolute_url(
+                        invite.get_absolute_url(), auto_login_user=invited_user
+                    ),
                     "project": digests.make_project_digest(project),
                 }
 

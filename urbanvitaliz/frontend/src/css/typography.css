@@ -1,11 +1,13 @@
+.font-marianne {
+    font-family: 'Marianne', arial, sans-serif;
+}
+
 .title-info {
     font-family: 'Marianne';
     font-style: normal;
     font-size: 14px;
     font-weight: 700;
-    line-height: 24px;
 
-    color: #0063CB;
     text-transform: uppercase;
 }
 
@@ -15,6 +17,8 @@
     font-weight: 300;
     font-size: 16px;
     line-height: 24px;
+}
 
-    color: #0063CB !important;
+.fw-medium {
+    font-weight: 500 !important;
 }

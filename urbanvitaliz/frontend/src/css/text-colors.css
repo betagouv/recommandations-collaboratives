@@ -1,0 +1,23 @@
+.text-grey {
+    color: #999999;
+}
+
+.text-red {
+    color: #B34000;
+}
+
+.text-blue {
+    color: #0063CB !important;
+}
+
+.text-black {
+    color: #161616;
+}
+
+.text-black-secondary {
+    color: #3A3A3A;
+}
+
+.text-grey-light {
+    color: #929292;
+}

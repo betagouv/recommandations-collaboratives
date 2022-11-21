@@ -97,6 +97,9 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
     assert project
     user = project.members.first()
 
+    assert project.owner == user
+    assert project.submitted_by == user
+
     next_url = urlencode(
         {"next": reverse("survey-project-session", args=[project.id]) + "?first_time=1"}
     )

@@ -1,0 +1,35 @@
+{% load gravatar %}
+
+<li class="d-flex flex-columns list-group-item">
+    {% if action.actor %}
+    <div class="align-middle mx-2 flex-shrink">
+        <img class="rounded-circle" src="{% gravatar_url action.actor.email size=24 %}" alt="{{action.actor}}">
+    </div>
+    {% endif %}
+    <div class=" flex-row flex-grow-1">
+        <div class="flex-grow w-100 flex-grow-1">
+            {% if action.actor %}
+            <span class="actor">
+                <a href="{% url 'crm-user-details' action.actor.pk %}">
+                    {{ action.actor.first_name|default:action.actor.email }}
+                    {{ action.actor.last_name|default:"" }}
+                </a>
+            </span>
+            {% endif %}
+            <span class="verb">
+                {% if action.action_object.role %}
+                    <span>a invité <strong class="d-inline-block">{{action.action_object.email}}</strong> en tant que
+                        <strong>
+                            {% if action.action_object.role == "SWITCHTENDER" %}conseiller·e{% else %}collectivité{% endif %}</strong>
+                    </span>
+                {% endif %}
+            </span>
+            {% if action.target %}
+            <span class="target">
+                sur le projet <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+            </span>
+            {% endif %}
+            <span class="ms-1 small text-secondary">il y a {{ action.timestamp|timesince }}</span>
+        </div>
+    </div>
+</li>

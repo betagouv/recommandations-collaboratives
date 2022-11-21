@@ -17,6 +17,8 @@ class EmailTemplate(models.Model):
         unique_together = ("site", "name")
 
     NAME_CHOICES = (
+        ("project_received", "Projet bien reçu"),
+        ("project_accepted", "Projet accepté par l'équipe de modération"),
         ("project_reminders_digest", "Résumé des rappels"),
         ("digest_for_non_switchtender", "Résumé quotidien général de notifications"),
         ("digest_for_switchtender", "Résumé quotidien des conseillers"),

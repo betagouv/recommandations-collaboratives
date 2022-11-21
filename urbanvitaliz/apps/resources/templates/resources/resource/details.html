@@ -22,71 +22,31 @@
 {% block content %}
 
 <div class="row py-5">
-    <div class="col-2 mx-auto">
-        {% if projects_used_by %}
-        <div class="">
-            <svg class="align-middle bi" width="24px" height="24px" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-2"/>
-            </svg>
-            &nbsp;
-            <span class="align-middle fs-6">
-                Cette ressource a été recommandée sur les projets suivants :
-            </span>
-            <ul class="mt-3">
-                {% for project in projects_used_by %}
-                <li><a href="{% url 'projects-project-detail' project.pk %}">{{ project.name }}</a></li>
-                {% endfor %}
-            </ul>
+    <div class="col-9 px-5 mx-auto font-marianne">
 
+        {% include 'resources/resource/fragments/breadcrumb.html' %}
+        <div class="d-flex align-items-center mb-3">
+            {% include 'resources/resource/fragments/category_list.html' %}
+            {% include 'resources/resource/fragments/author.html' %}
         </div>
-        {% endif %}
-    </div>
-
-    <div class="col-7 px-5 mx-auto">
-
+        {% include 'resources/resource/fragments/flag.html' %}
         {% include 'resources/resource/fragments/resource_content.html' with resource=resource contacts=contacts %}
-        <div class="bd-callout mt-6">
+        {% comment %} <div class="bd-callout mt-6">
             <svg class="bi me-2 align-middle" width="24" height="24">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle-fill"/>
             </svg>
             &nbsp;
-            Un problème sur cette ressource ? Un doute, des questions ? N'hésitez pas à <a href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'"">nous interpeller</a>.
-        </div>
+            Un problème sur cette ressource ? Un doute, des questions ? N'hésitez pas à <a href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'">nous interpeller</a>.
+        </div> {% endcomment %}
 
     </div>
 
-    <div class="col-2 mx-auto">
+    <div class="col-3 mx-auto">
         <!-- Sidebar -->
         <div class="admin-sidebar">
-            <p class="small text-secondary">
-                    <span class="align-items-center link-dark text-decoration-none">
-                        {% if resource.created_by %}
-                        <img
-                            src="{% gravatar_url resource.created_by.email 32 %}"
-                            alt="{{ resource.created_by.get_full_name }}"
-                            class="me-2 rounded-circle"
-                            style="width: 32px; height: 32px;"
-                        />
-                        {% else %}
-                        <img src="{% static 'img/logo-small.png' %}" alt="" width="32" height="32" class="rounded-circle me-2">
-                        {% endif %}
-                    </span>
-                    &nbsp;
-                    <span class="align-middle">
-                        Rédigé par <strong>{{ resource.created_by.get_full_name|default:"UrbanVitaliz" }}</strong>
-                    </span>
-            </p>
-
-            <p class="small text-secondary">
-                <svg class="bi" width="20" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-history"/>
-                </svg>
-                Crée <em>{{ resource.created_on|naturalday }}</em> et modifiée <em>{{ resource.updated_on|naturaltime }}</em>.
-            </p>
-
             <!-- User actions -->
             <div class="d-grid gap-2 mt-3">
-                <a class="btn btn-primary btn-sm" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource {{ resource.title|truncatewords:4 }}" role="button">
+                <a class="button blue d-flex justify-content-center align-items-center" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource {{ resource.title|truncatewords:4 }}" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
                     </svg>
@@ -103,22 +63,14 @@
                 {% if active_project %}
                 {% if not resource.status == 0  %}
                 <form action="{% url "projects-create-resource-action" resource.id %}" method="GET">
-                    <button type="submit" class="btn btn-success w-100 btn-sm" role="submit">
-                        <svg class="bi" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
-                        </svg>
-                        &nbsp;
+                    <button type="submit" class="button w-100 btn-sm" role="submit">
                         Pousser la ressource
                     </button>
                 </form>
                 {% endif %}
                 {% else %}
                 <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="left" title="Sélectionner d'abord un projet pour pousser une ressource">
-                    <button type="submit" class="btn btn-light w-100 btn-sm" role="submit" disabled>
-                        <svg class="bi" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
-                        </svg>
-                        &nbsp;
+                    <button type="submit" class="button w-100 btn-sm" role="submit" disabled>
                         Pousser la ressource
                     </button>
                 </span>
@@ -137,11 +89,20 @@
                 </a>
             </div>
             {% endif %}
-
             {% endif %}
-
-
-
+            <div class="mt-4">
+            {% if resource.departments.count %}
+                {% include 'resources/resource/fragments/departments.html' %}
+            {% endif %}
+            </div>
+            {% if request.user %}
+                {% include 'resources/resource/fragments/contact_list.html' %}
+            {% endif %}
+        </div>
+        <div class="mt-4">
+            {% if projects_used_by %}
+                {% include 'resources/resource/fragments/project_used.html' %}
+            {% endif %}
         </div>
     </div>
 </div>
