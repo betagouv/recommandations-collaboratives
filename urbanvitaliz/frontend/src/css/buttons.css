@@ -12,6 +12,11 @@
     background: transparent;
 }
 
+.button.filled {
+    background-color: #0063CB;
+    color: white;
+}
+
 .button.white {
     border-color: white;
     color: white;
