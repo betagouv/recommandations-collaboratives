@@ -34,7 +34,6 @@ function boardTasksApp(projectId) {
     }
 
     const app = {
-        commentText:'',
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await issueFollowup(e.detail.task, e.detail.status)
