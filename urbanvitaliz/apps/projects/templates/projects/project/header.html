@@ -19,9 +19,9 @@
             {% endif %}
         </div>
         {% if user.is_staff %}
-        <div class="d-flex">
+        <div class="d-flex flex-wrap">
             {% for tag in project.tags.all %}
-            <span class="mx-1 badge rounded-pill bg-dark">{{ tag }}</span>
+            <span class="mx-1 my-1 badge rounded-pill bg-dark">{{ tag }}</span>
             {% endfor %}
         </div>
         {% endif %}
