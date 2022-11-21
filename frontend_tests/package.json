@@ -6,7 +6,7 @@
   "scripts": {
     "test_ui": "./node_modules/cypress/bin/cypress open",
     "test": "./node_modules/cypress/bin/cypress run",
-    "db:test:init": "DJANGO_SETTINGS_MODULE=urbanvitaliz.settings.frontend_tests ../manage.py testserver ./cypress/fixtures/settings/siteWithOnboardingAndSurvey.json ./cypress/fixtures/users/authGroup.json ./cypress/fixtures/users/users.json ./cypress/fixtures/geomatics/region.json ./cypress/fixtures/geomatics/department.json ./cypress/fixtures/geomatics/commune.json ./cypress/fixtures/projects/projects.json ./cypress/fixtures/projects/projectsMembers.json ./cypress/fixtures/addressbook/organizations.json ./cypress/fixtures/profiles/profiles.json ./cypress/fixtures/addressbook/contacts.json ./cypress/fixtures/resources/resources.json --noinput"
+    "db:test:init": "DJANGO_SETTINGS_MODULE=urbanvitaliz.settings.frontend_tests ../manage.py testserver ./cypress/fixtures/settings/siteWithOnboardingAndSurvey.json ./cypress/fixtures/users/authGroup.json ./cypress/fixtures/users/users.json ./cypress/fixtures/geomatics/region.json ./cypress/fixtures/geomatics/department.json ./cypress/fixtures/geomatics/commune.json ./cypress/fixtures/projects/projects.json ./cypress/fixtures/projects/projectsMembers.json ./cypress/fixtures/addressbook/organizations.json ./cypress/fixtures/profiles/profiles.json ./cypress/fixtures/resources/resources.json ./cypress/fixtures/addressbook/contacts.json --noinput"
   },
   "author": "",
   "license": "ISC",

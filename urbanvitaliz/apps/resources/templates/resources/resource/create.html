@@ -52,9 +52,67 @@
                 Veuillez utiliser un titre qui reprend le problème de l'utilisateur, court et parlant.
                 <p class="mb-0">Par ex : <em class="text-secondary">"Financer des travaux de récupération des eaux pluviales"</em> plutôt que <em class="text-secondary">"Financements de l'Agence de l'eau"</em></p>
             </div>
-            {{ form.as_p }}
 
+            <p>
+                {{form.title.label}}
+                {{form.title.errors}}
+                {{form.title}}
+            </p>
 
+            <p>
+                {{form.status.label}}
+                {{form.status.errors}}
+                {{form.status}}
+            </p>
+
+            <p>
+                {{form.subtitle.label}}
+                {{form.subtitle.errors}}
+                {{form.subtitle}}
+            </p>
+
+            <p>
+                {{form.summary.label}}
+                {{form.summary.errors}}
+                {{form.summary}}
+            </p>
+
+            <p>
+                {{form.tags.label}}
+                {{form.tags.errors}}
+                {{form.tags}}
+            </p>
+
+            <p>
+                {{form.category.label}}
+                {{form.category.errors}}
+                {{form.category}}
+            </p>
+
+            <div class="d-flex">
+                <p class="w-50 d-flex flex-column select-custom">
+                    {{form.departments.label}}
+                    {{form.departments.errors}}
+                    {{form.departments}}
+                </p>
+
+                <p class="w-50 d-flex flex-column select-custom">
+                    {{form.contacts.label}}
+                    {{form.contacts.errors}}
+                    {{form.contacts}}
+                </p>
+            </div>
+
+            <div class="d-flex">
+                {% include 'tools/editor.html' with input_name=form.content.name input_value=form.content.value|default:'' input_required=True escapejs=True%}
+            </div>
+            
+            <p>
+                {{form.expires_on.label}}
+                {{form.expires_on.errors}}
+                {{form.expires_on}}
+            </p>
+            
 		        <button type="submit" class="btn btn-primary">
 			          Créer
 		        </button>

@@ -55,12 +55,10 @@ function boardProjectsApp() {
         departments: [],
         boards: [
             { code: 'TO_PROCESS', title: 'A traiter', color_class: 'border-secondary' },
-            { code: 'QUESTIONS', title: 'En attente', color_class: 'border-warning' },
-            { code: 'READY', title: 'Prêt à aiguiller', color_class: 'border-info' },
-            { code: "IN_PROGRESS", title: "Recommandations en cours", color_class: 'border-primary' },
-            { code: "REVIEW_REQUEST", title: "Demande de relecture", color_class: 'border-warning' },
-            { code: "DONE", title: "Aiguillage terminé", color_class: 'border-success' },
-            { code: "STUCK", title: "En Attente/Bloqué", color_class: 'border-dark' },
+            { code: 'READY', title: 'En attente', color_class: 'border-info' },
+            { code: "IN_PROGRESS", title: "En cours", color_class: 'border-primary' },
+            { code: "DONE", title: "Traité", color_class: 'border-success' },
+            { code: "STUCK", title: "Conseil interrompu", color_class: 'border-dark' },
         ]
     };
 

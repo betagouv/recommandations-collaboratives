@@ -19,7 +19,8 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -86,12 +87,10 @@ class Project(models.Model):
     PROJECT_STATES = (
         ("DRAFT", "Brouillon"),
         ("TO_PROCESS", "A traiter"),
-        ("QUESTIONS", "En attente de retour de la collectivité"),
-        ("READY", "Prêt à aiguiller"),
-        ("IN_PROGRESS", "Recommandations en cours"),
-        ("REVIEW_REQUEST", "Demande de relecture"),
-        ("DONE", "Appui réalisé"),
-        ("STUCK", "En attente/bloqué"),
+        ("READY", "En attente"),
+        ("IN_PROGRESS", "En cours"),
+        ("DONE", "Traité"),
+        ("STUCK", "Conseil Interrompu"),
         ("REJECTED", "Rejeté"),
     )
 
@@ -108,6 +107,15 @@ class Project(models.Model):
         related_query_name="target_projects",
         content_type_field="target_content_type",
         object_id_field="target_object_id",
+    )
+
+    submitted_by = models.ForeignKey(
+        auth_models.User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name="Déposé par",
+        related_name="projects_submitted",
     )
 
     status = models.CharField(max_length=20, choices=PROJECT_STATES, default="DRAFT")

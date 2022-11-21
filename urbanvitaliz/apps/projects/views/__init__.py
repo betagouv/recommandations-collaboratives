@@ -43,9 +43,9 @@ from ..utils import (can_administrate_or_403, can_administrate_project,
                      format_switchtender_identity, generate_ro_key,
                      get_active_project, get_collaborators_for_project,
                      get_switchtenders_for_project, is_project_moderator,
-                     is_project_moderator_or_403,
-                     is_regional_actor_for_project_or_403,
-                     refresh_user_projects_in_session, set_active_project_id)
+                     is_project_moderator_or_403, is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session,
+                     set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -81,6 +81,7 @@ def create_project_prefilled(request):
             project.postcode = form.cleaned_data.get("postcode")
             project.ro_key = generate_ro_key()
             project.status = "TO_PROCESS"
+            project.submitted_by = request.user
 
             insee = form.cleaned_data.get("insee", None)
             if insee:
@@ -449,9 +450,11 @@ def project_accept(request, project_id=None):
 @login_required
 def project_switchtender_join(request, project_id=None):
     """Join as switchtender"""
-    is_switchtender_or_403(request.user)
+
     project = get_object_or_404(models.Project, pk=project_id)
-    is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+
+    if not can_administrate_project(project, request.user):
+        is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
 
     if request.method == "POST":
         switchtending, created = project.switchtenders_on_site.get_or_create(
@@ -484,10 +487,10 @@ def project_switchtender_join(request, project_id=None):
 @login_required
 def project_observer_join(request, project_id=None):
     """Join as observer"""
-    is_switchtender_or_403(request.user)
-
     project = get_object_or_404(models.Project, pk=project_id)
-    is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+
+    if not can_administrate_project(project, request.user):
+        is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
 
     if request.method == "POST":
         switchtending, created = project.switchtenders_on_site.get_or_create(
@@ -518,9 +521,8 @@ def project_observer_join(request, project_id=None):
 @login_required
 def project_switchtender_leave(request, project_id=None):
     """Leave switchtender"""
-    is_switchtender_or_403(request.user)
     project = get_object_or_404(models.Project, pk=project_id)
-    is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+    can_administrate_or_403(project, request.user)
 
     if request.method == "POST":
         project.switchtenders_on_site.filter(switchtender=request.user).delete()
