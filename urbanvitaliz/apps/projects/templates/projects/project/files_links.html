@@ -1,0 +1,26 @@
+{% extends "projects/project/detail.html" %}
+
+{% load humanize %}
+{% load static %}
+{% load gravatar %}
+
+{% block title %}
+{{ block.super }} > Fichiers et liens
+{% endblock %}
+
+{% load django_vite %}
+
+{% block project_detail %}
+
+{% include 'projects/project/navigation.html' with file_links=True %}
+<div class="row">
+    <div class="col-8">
+        <h2 class="mb-4">Fichiers</h2>
+        {% include 'projects/project/fragments/files_links/empty_files.html' %}
+    </div>
+    <div class="col-4">
+        <h2 class="mb-4">Liens</h2>
+        {% include 'projects/project/fragments/files_links/empty_links.html' %}
+    </div>
+</div>
+{% endblock %}
