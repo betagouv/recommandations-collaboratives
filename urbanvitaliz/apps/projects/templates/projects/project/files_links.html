@@ -12,14 +12,22 @@
 
 {% block project_detail %}
 
-{% include 'projects/project/navigation.html' with file_links=True %}
+{% include 'projects/project/navigation.html' with files_links=True %}
 <div class="row">
     <div class="col-8">
-        <h2 class="mb-4">Fichiers</h2>
-        {% include 'projects/project/fragments/files_links/empty_files.html' %}
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h6 class="text-uppercase">Fichiers partagés</h6>
+            {% url 'projects-conversation-upload-file' project.pk as upload_action %}
+            {% include 'projects/project/fragments/files_links/file_upload_button.html' with type='project' action=upload_action %}
+        </div>
+        
+        {% include 'projects/project/fragments/files_links/file_list.html' %}
     </div>
     <div class="col-4">
-        <h2 class="mb-4">Liens</h2>
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h6 class="text-uppercase">Liens épinglés</h6>
+            
+        </div>
         {% include 'projects/project/fragments/files_links/empty_links.html' %}
     </div>
 </div>

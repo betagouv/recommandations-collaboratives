@@ -11,7 +11,7 @@
 {% endblock %}
 
 <div x-data="fileUpload('{{ type }}')">
-  <button x-ref="button" class="btn btn-sm btn-outline-primary" @click="onButtonClick">Ajouter un fichier</button>
+  <button x-ref="button" class="button small" @click="onButtonClick">Ajouter un fichier</button>
 
   <div x-cloak x-ref="popover" @click.outside="onOutsideClick" class="rounded bg-white shadow" style="width: 420px;">
     <form method="post" action="{{ action }}" enctype="multipart/form-data">

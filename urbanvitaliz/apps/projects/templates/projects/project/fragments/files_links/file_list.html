@@ -1,0 +1,14 @@
+{% load static %}
+
+<div>
+    {% include 'projects/project/fragments/files_links/file_search.html' %}
+    {% if project.documents.count == 0 %}
+        {% include 'projects/project/fragments/files_links/empty_files.html' %}
+    {% else %}
+    <div class="d-flex flex-column">
+        {% for document in project.documents.all|slice:"4" %}
+        {% include 'projects/project/fragments/files_links/file_list_item.html' %}
+        {% endfor %}
+    </div>
+  {% endif %}
+</div>
