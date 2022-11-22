@@ -21,8 +21,15 @@
 
 <div x-data="ProjecstWithNoResourcesList" class="col-11 py-5 mx-auto">
     <h2>Liste des projets en texte libre</h2>
+    <div x-data="Spinner" class="d-flex justify-content-center align-items-center">
+        <div x-show="isLoading" x-transition class="mx-5 justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
     <template x-for="project in data"  :key="project.id">
-        <div class="d-flex flex-column bg-grey-light border rounded px-4 py-2">
+        <div class="d-flex flex-column bg-grey-light border rounded px-4 py-2 mb-1">
             <div class="d-flex align-items-center">
                 <svg class="bi me-2" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
