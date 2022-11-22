@@ -378,6 +378,11 @@ def project_list_by_tags_as_csv(request):
     return response
 
 
+@staff_member_required
+def project_list_with_no_resources(request):
+    return render(request, "crm/projects_list_with_no_resources.html", locals())
+
+
 ########################################################################
 # RSS Feeds
 ########################################################################

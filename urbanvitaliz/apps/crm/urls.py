@@ -88,5 +88,10 @@ urlpatterns = [
         views.project_list_by_tags_as_csv,
         name="crm-project-list-by-tags-csv",
     ),
+    path(
+        r"crm/projects/no_resources",
+        views.project_list_with_no_resources,
+        name="crm-project-list-with-no-resources",
+    ),
     path("crm/feed/", views.LatestNotesFeed(), name="crm-feed"),
 ]
