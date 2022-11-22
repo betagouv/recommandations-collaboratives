@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load humanize %}
+
+{% load django_vite %}
+
+
+{% block js %}
+    {% vite_asset 'js/apps/projectsWithNoResources.js' %}
+
+    <script type="text/javascript">
+        const project_url_tmpl = "{% url 'projects-project-detail' 0 %}";
+        function makeProjectURL(id) {
+            return project_url_tmpl.replace('0', id);
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+
+<div x-data="ProjecstWithNoResourcesList" class="col-11 py-5 mx-auto">
+    <h2>Liste des projets en texte libre</h2>
+    <template x-for="project in data"  :key="project.id">
+        <div class="d-flex flex-column bg-grey-light border rounded px-4 py-2">
+            <div class="d-flex align-items-center">
+                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
+                </svg>
+                <a class="text-info-custom fw-bold" :href="makeProjectURL(project.id)" x-text="project.name"></a>
+            </div>
+            <ul class="ms-4 mb-0">
+                <template x-for="task in project.tasks" :key="task.id">
+                    <li class="d-flex flex-column mb-2">
+                        <div class="d-flex align-items-center">
+                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat-fill" />
+                            </svg>
+                            <span class="text-grey-dark fw-medium" x-text="task.name"></span>
+                        </div>
+                        <p class="text-grey-dark small ms-4" x-text="task.content"></p>
+                    </div>
+                </template>
+            </ul>
+        </div>
+    </template>
+</div>
+
+{% endblock %}

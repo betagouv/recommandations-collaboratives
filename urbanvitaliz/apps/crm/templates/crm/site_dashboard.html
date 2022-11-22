@@ -92,6 +92,7 @@
                 </h5>
                 <ul class="list">
                     <li><a href="{% url 'crm-project-list-by-tags' %}">Tags / Projects</a></li>
+                    <li><a href="{% url 'crm-project-list-with-no-resources' %}">Liste des recommandations en texte libre</a></li>
                 </ul>
             </div>
         </div>
@@ -135,7 +136,6 @@
                     {{ action.actor|capfirst }} <strong>{{ action.verb }}</strong>
                     {% endif %}
                     {% endif %}
-
                 </li>
                 {% empty %}
                 -- Pas encore d'activité, revenez plus tard ! --
