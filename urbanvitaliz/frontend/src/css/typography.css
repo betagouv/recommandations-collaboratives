@@ -22,3 +22,7 @@
 .fw-medium {
     font-weight: 500 !important;
 }
+
+.tiny{
+    font-size: 12px;
+}

@@ -12,6 +12,10 @@
     background: transparent;
 }
 
+.button.small {
+    padding: 5px 15px;
+}
+
 .button.filled {
     background-color: #0063CB;
     color: white;
