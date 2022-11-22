@@ -1,4 +1,4 @@
 <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
-    <p class="m-0 text-info-custom text-grey fw-normal pb-3">Aucun fichier n'a été ajouté</p>
+    <p class="m-0 text-info-custom text-grey fw-normal pb-3">Aucun fichier n'a été {% if pinned == True %} épinglé {% else %}ajouté {% endif %}</p>
     <a class="button filled" href="#">Ajouter un fichier</a>
 </div>

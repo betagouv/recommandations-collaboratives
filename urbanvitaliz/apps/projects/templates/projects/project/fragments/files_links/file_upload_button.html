@@ -19,24 +19,23 @@
 
       <div class="p-3">
         <h6 class="text-uppercase" style="font-size: 1em;">Ajouter un fichier</h6>
-        <p class="mb-2 fst-italic">Vous pouvez joindre un fichier à votre <span x-text="getString(`types.${type}`)"></span>, d'une taille maximum de 20Mo</p>
+        <p class="mb-2 text-info-custom text-grey-dark small">Vous pouvez joindre un fichier à votre <span x-text="getString(`types.${type}`)"></span>, d'une taille maximum de 20Mo</p>
     
-        <div class="mb-2">
+        <div class="mb-2 mt-3">
           <label class="d-block">
-            <span class="mb-1 d-block">Sélectionnez votre fichier</span>
+            <span class="mb-1 d-block text-info-custom text-grey-dark">Sélectionnez votre fichier</span>
             <input required name="the_file" x-model="pendingFile" class="form-control form-control-sm" type="file" />
           </label>
         </div>
     
-        <label class="d-block">
-          <span class="mb-1 d-block">Donnez un nom au fichier</span>
-          <input required name="description" x-model="pendingTitle" class="form-control form-control-sm" type="text" />
+        <label class="d-block mt-3">
+          <span class="mb-1 d-block text-info-custom text-grey-dark">Donnez un nom au fichier</span>
+          <input required name="description" x-model="pendingTitle" class="form-control form-control-sm py-2" type="text" />
         </label>
       </div>
 
-      <div class="border-top border-light p-3 d-flex justify-content-between">
-        <button class="btn btn-sm btn-outline-danger" @click="hide">Annuler</button>
-        <button class="btn btn-sm btn-primary" type="submit">Envoyer</button>
+      <div class="border-top border-light p-3 d-flex justify-content-end">
+        <button class="button filled small" type="submit">Envoyer</button>
       </div>
     </form>
     <div x-ref="arrow" class="popover-arrow"></div>
