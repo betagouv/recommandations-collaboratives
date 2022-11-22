@@ -21,6 +21,10 @@
     color: white;
 }
 
+.button.filled:hover {
+    color: #0063CB !important;
+}
+
 .button.white {
     border-color: white;
     color: white;
