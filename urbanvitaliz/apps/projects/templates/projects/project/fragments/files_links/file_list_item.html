@@ -11,8 +11,8 @@
         <a href="{{ document.the_file.url }}" class="d-flex flex-column align-items-start text-decoration-none" target="_new" download>
           <span class="text-info-custom text-black fw-medium">{{ document.description|truncatechars:33 }}</span>
           <div>
-            <span class="text-info-custom text-black">{{document.the_file.name|truncatechars:15}}</span>
-            <span class="text-info-custom text-black ms-2">(88mo)</span>
+            <span class="text-info-custom text-black">{{document.filename|truncatechars:15}}</span>
+            <span class="text-info-custom text-black ms-2">({{ document.the_file.size|filesizeformat }})</span>
           </div>
         </a>
       </div>
@@ -23,8 +23,8 @@
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
           </svg>
           <span class="text-info-custom text-black fw-medium">{{ document.description|truncatechars:33 }}</span>
-          <span class="text-info-custom text-black ms-2">{{document.the_file.name|truncatechars:15}}</span>
-          <span class="text-info-custom text-black ms-2">(88mo)</span>
+          <span class="text-info-custom text-black ms-2">{{ document.filename|truncatechars:15 }}</span>
+          <span class="text-info-custom text-black ms-2">({{ document.the_file.size|filesizeformat }})</span>
         </a>
       </div>
     {% endif %}

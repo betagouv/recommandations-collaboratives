@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
 
+import os
 import uuid
 
 from django.contrib.auth import models as auth_models
@@ -727,6 +728,9 @@ class Document(models.Model):
         return "projects/%d/%s" % (self.project.pk, filename)
 
     the_file = models.FileField(upload_to=upload_path)
+
+    def filename(self):
+        return os.path.basename(self.the_file.name)
 
     deleted = models.DateTimeField(null=True, blank=True)
 

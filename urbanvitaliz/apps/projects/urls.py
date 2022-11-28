@@ -11,7 +11,7 @@ created : 2021-05-26 15:54:25 CEST
 from django.urls import path
 
 from . import views
-from .views import detail, documents, feeds, notes, sharing, tasks
+from .views import detail, feeds, files, notes, sharing, tasks
 
 urlpatterns = [
     path(
@@ -52,6 +52,11 @@ urlpatterns = [
         r"project/<int:project_id>/connaissance",
         detail.project_knowledge,
         name="projects-project-detail-knowledge",
+    ),
+    path(
+        r"project/<int:project_id>/fichiers",
+        files.project_files_and_links,
+        name="projects-project-detail-files-links",
     ),
     path(
         r"project/<int:project_id>/suivi",
@@ -175,12 +180,12 @@ urlpatterns = [
     ),
     path(
         r"project/<int:project_id>/conversation/televerser",
-        documents.document_upload,
+        files.document_upload,
         name="projects-conversation-upload-file",
     ),
     path(
         r"project/<int:project_id>/conversation/document/<int:document_id>/delete",
-        documents.document_delete,
+        files.document_delete,
         name="projects-conversation-delete-file",
     ),
     path(
