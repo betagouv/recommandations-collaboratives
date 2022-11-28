@@ -46,9 +46,11 @@ def document_list(request, project_id=None):
     # Set this project as active
     set_active_project_id(request, project.pk)
 
-    all_files = models.Document.on_site.filter(project_id=project.pk)
+    all_files = models.Document.on_site.filter(project_id=project.pk).exclude(
+        the_file__in=["", None]
+    )
     pinned_files = all_files.filter(pinned=True)
-    links = models.Document.on_site.filter(project_id=project.pk)
+    links = models.Document.on_site.filter(project_id=project.pk).exclude(the_link=None)
 
     return render(request, "projects/project/files_links.html", locals())
 

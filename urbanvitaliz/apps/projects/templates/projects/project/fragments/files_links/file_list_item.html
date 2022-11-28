@@ -27,8 +27,9 @@
           <span class="text-info-custom text-black ms-2">({{ document.the_file.size|filesizeformat }})</span>
         </a>
       </div>
-    {% endif %}
+      {% endif %}
       <div class="d-flex align-items-center {% if document.pinned == True %}flex-column {% endif %}">
+          {% if not disable_toolbar %}
           <form method="POST" action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
               {% csrf_token %}
               <button class="btn btn-link d-flex {% if document.pinned == True %} me-0 mb-2 {% else %} me-2 {% endif %}">
@@ -52,6 +53,7 @@
         </button>
       </form>
       {% endif %}
+      {% endif %}
       <a class="d-flex" href="{{ document.the_file.url }}" target="_new" download>
         <svg class="bi align-baseline fill-blue" width="20" height="20">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#download" />
@@ -70,5 +72,6 @@
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />
       </svg> {{ document.created_on|naturalday }}</span>
     </div>
-  {% endif%}
+    {% endif%}
+    {% if document.attached_object %}From:  {{ document.attached_object }} {% endif %}
 </div>

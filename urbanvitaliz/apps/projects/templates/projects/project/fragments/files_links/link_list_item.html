@@ -8,7 +8,7 @@
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#box-arrow-up-right" />
           </svg>
         <div class="flex-column align-items-start justify-content-start">
-            <a href="{{ document.the_file.url }}" class="d-flex align-items-center text-decoration-none" target="_new" download>
+            <a href="{{ document.the_link }}" class="d-flex align-items-center text-decoration-none" target="_new" download>
                 <span class="text-info-custom text-black fw-medium">{{ document.description|truncatechars:33 }}</span>
             </a>
             <span class="small text-black font-marianne fw-light">({{document.filename|truncatechars:25}})</span>
