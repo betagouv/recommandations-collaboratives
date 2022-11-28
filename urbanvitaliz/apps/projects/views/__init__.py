@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-__all__ = ["rest", "feeds", "notes", "sharing", "tasks", "files"]
+__all__ = ["rest", "feeds", "notes", "sharing", "tasks", "documents"]
 
 """
 Views for projects application

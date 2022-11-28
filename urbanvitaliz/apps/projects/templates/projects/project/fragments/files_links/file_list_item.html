@@ -41,7 +41,7 @@
         </a>
       {% endif %}
       {% if document.uploaded_by == user and not pinned == True %}
-      <form class="me-2" method="post" action="{% url 'projects-conversation-delete-file' project.pk document.pk %}">
+      <form class="me-2" method="post" action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
         {% csrf_token %}
         <button class="d-flex" style="border: 0; background: 0;">
           <svg class="bi align-baseline fill-grey" width="20" height="20">

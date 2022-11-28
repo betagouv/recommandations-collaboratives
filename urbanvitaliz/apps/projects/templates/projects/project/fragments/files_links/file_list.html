@@ -8,7 +8,7 @@
         {% include 'projects/project/fragments/files_links/empty_files.html' with pinned=pinned %}
     {% else %}
     <div class="d-flex flex-column">
-        {% for document in project.documents.all|slice:"4" %}
+        {% for document in files.all|slice:"4" %}
             {% include 'projects/project/fragments/files_links/file_list_item.html' with pinned=pinned %}
         {% endfor %}
     </div>

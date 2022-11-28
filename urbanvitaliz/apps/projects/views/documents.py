@@ -23,7 +23,7 @@ from ..utils import (can_administrate_project, can_manage_or_403,
 
 
 @login_required
-def project_files_and_links(request, project_id=None):
+def document_list(request, project_id=None):
     """Manage files and links for project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
@@ -46,13 +46,16 @@ def project_files_and_links(request, project_id=None):
     # Set this project as active
     set_active_project_id(request, project.pk)
 
+    files = models.Document.on_site.filter(project_id=project.pk)
+    links = models.Document.on_site.filter(project_id=project.pk)
+
     return render(request, "projects/project/files_links.html", locals())
 
 
 @login_required
 def document_upload(request, project_id):
     """Upload a new document for a project"""
-    project = get_object_or_404(models.Project, pk=project_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
     can_manage_or_403(project, request.user)
 
     if request.method == "POST":
@@ -61,23 +64,24 @@ def document_upload(request, project_id):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.project = project
+            instance.site = request.site
             instance.uploaded_by = request.user
 
             instance.save()
 
             messages.success(
                 request,
-                "Le fichier a bien été envoyé",
+                "Le document a bien été enregistré",
             )
 
-    return redirect(reverse("projects-project-detail-files-links", args=[project.id]))
+    return redirect(reverse("projects-project-detail-documents", args=[project.id]))
 
 
 @login_required
 def document_delete(request, project_id, document_id):
     """Delete a document for a project"""
-    project = get_object_or_404(models.Project, pk=project_id)
-    document = get_object_or_404(models.Document, pk=document_id)
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
+    document = get_object_or_404(models.Document, pk=document_id, site=request.site)
 
     can_manage_or_403(project, request.user)
 
@@ -87,10 +91,10 @@ def document_delete(request, project_id, document_id):
             document.save()
             messages.success(
                 request,
-                "Le fichier a bien été supprimé",
+                "Le document a bien été supprimé",
             )
 
         else:
             raise PermissionDenied()
 
-    return redirect(reverse("projects-project-detail-files-links", args=[project.id]))
+    return redirect(reverse("projects-project-detail-documents", args=[project.id]))

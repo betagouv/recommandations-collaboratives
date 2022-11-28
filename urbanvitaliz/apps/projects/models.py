@@ -696,6 +696,10 @@ class DocumentManager(models.Manager):
         return super().get_queryset().filter(deleted=None)
 
 
+class DocumentOnSiteManager(CurrentSiteManager, DocumentManager):
+    pass
+
+
 class DeletedDocumentManager(models.Manager):
     """Manager for deleted documents"""
 
@@ -707,7 +711,10 @@ class Document(models.Model):
     """Représente un document associé à un project"""
 
     objects = DocumentManager()
+    on_site = DocumentOnSiteManager()
     objects_deleted = DeletedDocumentManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     project = models.ForeignKey(
         "Project", on_delete=models.CASCADE, related_name="documents"

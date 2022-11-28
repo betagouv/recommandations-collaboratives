@@ -67,7 +67,7 @@
         </a>
     </li>
     <li>
-        <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if files_links %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-files-links' project.pk %}">
+        <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if files_links %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-documents' project.pk %}">
             {% if project.status == 'DRAFT' %}
             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />

@@ -11,7 +11,7 @@ created : 2021-05-26 15:54:25 CEST
 from django.urls import path
 
 from . import views
-from .views import detail, feeds, files, notes, sharing, tasks
+from .views import detail, documents, feeds, notes, sharing, tasks
 
 urlpatterns = [
     path(
@@ -54,9 +54,9 @@ urlpatterns = [
         name="projects-project-detail-knowledge",
     ),
     path(
-        r"project/<int:project_id>/fichiers",
-        files.project_files_and_links,
-        name="projects-project-detail-files-links",
+        r"project/<int:project_id>/documents",
+        documents.document_list,
+        name="projects-project-detail-documents",
     ),
     path(
         r"project/<int:project_id>/suivi",
@@ -179,14 +179,14 @@ urlpatterns = [
         name="projects-conversation-create-message",
     ),
     path(
-        r"project/<int:project_id>/conversation/televerser",
-        files.document_upload,
-        name="projects-conversation-upload-file",
+        r"project/<int:project_id>/documents/televerser",
+        documents.document_upload,
+        name="projects-documents-upload-document",
     ),
     path(
-        r"project/<int:project_id>/conversation/document/<int:document_id>/delete",
-        files.document_delete,
-        name="projects-conversation-delete-file",
+        r"project/<int:project_id>/documents/<int:document_id>/delete",
+        documents.document_delete,
+        name="projects-documents-delete-document",
     ),
     path(
         r"project/<int:project_id>/note/",
