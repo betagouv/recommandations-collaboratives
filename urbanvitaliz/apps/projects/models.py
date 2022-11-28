@@ -719,6 +719,9 @@ class Document(models.Model):
     project = models.ForeignKey(
         "Project", on_delete=models.CASCADE, related_name="documents"
     )
+
+    pinned = models.BooleanField(default=False)
+
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )

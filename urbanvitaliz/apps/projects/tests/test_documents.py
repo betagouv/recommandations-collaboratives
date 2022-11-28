@@ -20,7 +20,6 @@ from urbanvitaliz.utils import login
 from .. import models
 
 
-# Overview
 @pytest.mark.django_db
 def test_project_documents_not_available_for_non_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
@@ -170,3 +169,30 @@ def test_delete_document_not_available_for_others(client, request):
 
     assert response.status_code == 403
     document = models.Document.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_project_pin_document(request, client):
+    current_site = get_current_site(request)
+
+    # project email is same as test user to be logged in
+    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
+    project = Recipe(
+        models.Project, sites=[current_site], projectmember_set=[membership]
+    ).make()
+
+    document = baker.make(
+        models.Document,
+        uploaded_by=membership.member,
+        project=project,
+        site=get_current_site(request),
+    )
+
+    with login(client, user=membership.member, is_staff=False):
+        url = reverse("projects-documents-pin-unpin", args=[project.id, document.pk])
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    document = models.Document.on_site.get(pk=document.pk)
+    assert document.pinned is True

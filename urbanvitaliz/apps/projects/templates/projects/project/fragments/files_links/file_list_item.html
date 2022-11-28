@@ -1,9 +1,9 @@
 {% load static %}
 {% load humanize %}
 
-<div class="{% if pinned == True %} mb-1 {% else %} mb-3 {% endif %}">
+<div class="{% if document.pinned == True %} mb-1 {% else %} mb-3 {% endif %}">
   <div class="rounded border py-2 px-3 mb-2 d-flex align-items-center justify-content-between">
-    {% if pinned == True %}
+    {% if document.pinned == True %}
       <div class="d-flex align-items-start">
         <svg class="bi align-baseline me-2 mt-1" width="17" height="17" fill="#222">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
@@ -28,19 +28,21 @@
         </a>
       </div>
     {% endif %}
-    <div class="d-flex align-items-center {% if pinned == True %}flex-column {% endif %}">
-      {% if not favory == False %}
-        <a class="d-flex {% if pinned == True %} me-0 mb-2 {% else %} me-2 {% endif %}" href="{{ document.the_file.url }}" target="_new" download>
-          <svg class="bi align-baseline fill-blue" width="20" height="20">
-            {% if pinned == True %}
-              <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
-            {% else %}
-              <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star" />
-            {% endif %}
-          </svg>
-        </a>
-      {% endif %}
-      {% if document.uploaded_by == user and not pinned == True %}
+      <div class="d-flex align-items-center {% if document.pinned == True %}flex-column {% endif %}">
+          <form method="POST" action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
+              {% csrf_token %}
+              <button class="btn btn-link d-flex {% if document.pinned == True %} me-0 mb-2 {% else %} me-2 {% endif %}">
+                  <svg class="bi align-baseline fill-blue" width="20" height="20">
+                      {% if document.pinned == True %}
+                      <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
+                      {% else %}
+                      <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star" />
+                      {% endif %}
+                  </svg>
+              </button>
+          </form>
+
+          {% if document.uploaded_by == user and not document.pinned == True %}
       <form class="me-2" method="post" action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
         {% csrf_token %}
         <button class="d-flex" style="border: 0; background: 0;">
@@ -57,7 +59,7 @@
       </a>
     </div>
   </div>
-  {% if not pinned == True %}
+  {% if not document.pinned == True %}
     <div class="ps-4 ms-4 d-flex align-items-center">
       <span class="tiny"><strong>{% if document.uploaded_by.get_full_name %}{{ document.uploaded_by.get_full_name }}{% else %}{{ document.uploaded_by.email }}{% endif %}.</strong>
           {% if document.uploaded_by.profile.organization %}

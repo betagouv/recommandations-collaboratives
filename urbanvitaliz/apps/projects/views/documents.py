@@ -46,7 +46,8 @@ def document_list(request, project_id=None):
     # Set this project as active
     set_active_project_id(request, project.pk)
 
-    files = models.Document.on_site.filter(project_id=project.pk)
+    all_files = models.Document.on_site.filter(project_id=project.pk)
+    pinned_files = all_files.filter(pinned=True)
     links = models.Document.on_site.filter(project_id=project.pk)
 
     return render(request, "projects/project/files_links.html", locals())
@@ -96,5 +97,20 @@ def document_delete(request, project_id, document_id):
 
         else:
             raise PermissionDenied()
+
+    return redirect(reverse("projects-project-detail-documents", args=[project.id]))
+
+
+@login_required
+def document_pin_unpin(request, project_id, document_id):
+    """Delete a document for a project"""
+    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
+    document = get_object_or_404(models.Document, pk=document_id, site=request.site)
+
+    can_manage_or_403(project, request.user)
+
+    if request.method == "POST":
+        document.pinned = not document.pinned
+        document.save()
 
     return redirect(reverse("projects-project-detail-documents", args=[project.id]))

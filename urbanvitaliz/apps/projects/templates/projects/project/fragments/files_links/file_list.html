@@ -4,12 +4,12 @@
     {% if not search == False %}
         {% include 'projects/project/fragments/files_links/file_search.html' %}
     {% endif %}
-    {% if project.documents.count == 0 %}
+    {% if files.count == 0 %}
         {% include 'projects/project/fragments/files_links/empty_files.html' with pinned=pinned %}
     {% else %}
     <div class="d-flex flex-column">
-        {% for document in files.all|slice:"4" %}
-            {% include 'projects/project/fragments/files_links/file_list_item.html' with pinned=pinned %}
+        {% for document in files.all %}
+            {% include 'projects/project/fragments/files_links/file_list_item.html' %}
         {% endfor %}
     </div>
   {% endif %}

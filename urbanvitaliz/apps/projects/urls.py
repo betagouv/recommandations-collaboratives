@@ -184,6 +184,11 @@ urlpatterns = [
         name="projects-documents-upload-document",
     ),
     path(
+        r"project/<int:project_id>/documents/<int:document_id>/pin-unpin",
+        documents.document_pin_unpin,
+        name="projects-documents-pin-unpin",
+    ),
+    path(
         r"project/<int:project_id>/documents/<int:document_id>/delete",
         documents.document_delete,
         name="projects-documents-delete-document",

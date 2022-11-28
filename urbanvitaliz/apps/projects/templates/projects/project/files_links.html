@@ -21,7 +21,7 @@
             {% include 'projects/project/fragments/files_links/file_upload_button.html' with type='project' action=upload_action %}
         </div>
         
-        {% include 'projects/project/fragments/files_links/file_list.html' %}
+        {% include 'projects/project/fragments/files_links/file_list.html' with files=all_files %}
     </div>
     <div class="col-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
@@ -37,7 +37,7 @@
         <div class="d-flex align-items-center justify-content-between mb-2 mt-2">
             <h6 class="text-uppercase small">Fichiers épinglés</h6>
         </div>
-        {% include 'projects/project/fragments/files_links/file_list.html' with search=False pinned=True %}
+        {% include 'projects/project/fragments/files_links/file_list.html' with search=False files=pinned_files %}
     </div>
 </div>
 {% endblock %}
