@@ -221,7 +221,7 @@ class SelectCommuneForm(forms.Form):
 class DocumentUploadForm(forms.ModelForm):
     class Meta:
         model = models.Document
-        fields = ["the_file", "description"]
+        fields = ["the_file", "the_link", "description"]
 
 
 class SynopsisForm(forms.ModelForm):

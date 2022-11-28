@@ -13,3 +13,15 @@
 .bg-red {
     background-color: #FFE9E9;
 }
+
+.bg-blue {
+    background: #0063CB;
+}
+
+.fill-blue {
+    fill: #0063CB;
+}
+
+.fill-grey {
+    fill:#929292;
+}

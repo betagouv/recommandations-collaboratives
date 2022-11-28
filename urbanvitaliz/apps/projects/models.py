@@ -7,10 +7,13 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
 
+import os
 import uuid
 
 from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+                                                GenericRelation)
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
@@ -345,6 +348,8 @@ class Note(models.Model):
         content_type_field="action_object_content_type",
         object_id_field="action_object_object_id",
     )
+
+    document = GenericRelation("Document")
 
     def get_absolute_url(self):
         if self.public:
@@ -695,6 +700,10 @@ class DocumentManager(models.Manager):
         return super().get_queryset().filter(deleted=None)
 
 
+class DocumentOnSiteManager(CurrentSiteManager, DocumentManager):
+    pass
+
+
 class DeletedDocumentManager(models.Manager):
     """Manager for deleted documents"""
 
@@ -706,11 +715,17 @@ class Document(models.Model):
     """Représente un document associé à un project"""
 
     objects = DocumentManager()
+    on_site = DocumentOnSiteManager()
     objects_deleted = DeletedDocumentManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     project = models.ForeignKey(
         "Project", on_delete=models.CASCADE, related_name="documents"
     )
+
+    pinned = models.BooleanField(default=False)
+
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )
@@ -721,17 +736,37 @@ class Document(models.Model):
         blank=True,
     )
 
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, blank=True, null=True
+    )
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    attached_object = GenericForeignKey("content_type", "object_id")
+
     description = models.CharField(max_length=256, default="", blank=True)
 
     def upload_path(self, filename):
         return "projects/%d/%s" % (self.project.pk, filename)
 
-    the_file = models.FileField(upload_to=upload_path)
+    the_file = models.FileField(null=True, blank=True, upload_to=upload_path)
+    the_link = models.URLField(max_length=500, null=True, blank=True)
+
+    def filename(self):
+        return os.path.basename(self.the_file.name)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = []
+        constraints = [
+            models.CheckConstraint(
+                check=Q(the_file__isnull=False, the_link=None)
+                | Q(the_link__isnull=False, the_file=None),
+                name="not_both_link_and_file_are_null",
+            )
+        ]
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
+
         verbose_name = "document"
         verbose_name_plural = "documents"
 
