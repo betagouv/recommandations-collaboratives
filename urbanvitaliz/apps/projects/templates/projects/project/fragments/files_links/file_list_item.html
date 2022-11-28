@@ -1,0 +1,72 @@
+{% load static %}
+{% load humanize %}
+
+<div class="{% if pinned == True %} mb-1 {% else %} mb-3 {% endif %}">
+  <div class="rounded border py-2 px-3 mb-2 d-flex align-items-center justify-content-between">
+    {% if pinned == True %}
+      <div class="d-flex align-items-start">
+        <svg class="bi align-baseline me-2 mt-1" width="17" height="17" fill="#222">
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
+        </svg>
+        <a href="{{ document.the_file.url }}" class="d-flex flex-column align-items-start text-decoration-none" target="_new" download>
+          <span class="text-info-custom text-black fw-medium">{{ document.description|truncatechars:33 }}</span>
+          <div>
+            <span class="text-info-custom text-black">{{document.the_file.name|truncatechars:15}}</span>
+            <span class="text-info-custom text-black ms-2">(88mo)</span>
+          </div>
+        </a>
+      </div>
+    {% else %}
+      <div class="d-flex align-items-center">
+        <a href="{{ document.the_file.url }}" class="d-flex align-items-center text-decoration-none" target="_new" download>
+          <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
+          </svg>
+          <span class="text-info-custom text-black fw-medium">{{ document.description|truncatechars:33 }}</span>
+          <span class="text-info-custom text-black ms-2">{{document.the_file.name|truncatechars:15}}</span>
+          <span class="text-info-custom text-black ms-2">(88mo)</span>
+        </a>
+      </div>
+    {% endif %}
+    <div class="d-flex align-items-center {% if pinned == True %}flex-column {% endif %}">
+      {% if not favory == False %}
+        <a class="d-flex {% if pinned == True %} me-0 mb-2 {% else %} me-2 {% endif %}" href="{{ document.the_file.url }}" target="_new" download>
+          <svg class="bi align-baseline fill-blue" width="20" height="20">
+            {% if pinned == True %}
+              <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
+            {% else %}
+              <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star" />
+            {% endif %}
+          </svg>
+        </a>
+      {% endif %}
+      {% if document.uploaded_by == user and not pinned == True %}
+      <form class="me-2" method="post" action="{% url 'projects-conversation-delete-file' project.pk document.pk %}">
+        {% csrf_token %}
+        <button class="d-flex" style="border: 0; background: 0;">
+          <svg class="bi align-baseline fill-grey" width="20" height="20">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
+          </svg>
+        </button>
+      </form>
+      {% endif %}
+      <a class="d-flex" href="{{ document.the_file.url }}" target="_new" download>
+        <svg class="bi align-baseline fill-blue" width="20" height="20">
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#download" />
+        </svg>
+      </a>
+    </div>
+  </div>
+  {% if not pinned == True %}
+    <div class="ps-4 ms-4 d-flex align-items-center">
+      <span class="tiny"><strong>{% if document.uploaded_by.get_full_name %}{{ document.uploaded_by.get_full_name }}{% else %}{{ document.uploaded_by.email }}{% endif %}.</strong>
+          {% if document.uploaded_by.profile.organization %}
+          <span class="tiny text-grey-dark">Équipe {{ document.uploaded_by.profile.organization.name }}</strong></span>
+          {% endif %}
+      </span>
+      <span class="ms-4 tiny d-flex align-items-center"><svg class="bi align-baseline me-2" width="12" height="12" fill="#222">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />
+      </svg> {{ document.created_on|naturalday }}</span>
+    </div>
+  {% endif%}
+</div>

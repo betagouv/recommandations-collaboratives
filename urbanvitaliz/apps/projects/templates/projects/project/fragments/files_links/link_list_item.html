@@ -1,0 +1,30 @@
+{% load static %}
+{% load humanize %}
+
+<div class="mb-3">
+  <div class="rounded border py-2 px-3 mb-2 d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-start">
+        <svg class="bi align-baseline me-2 mt-1" width="17" height="17" fill="#222">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#box-arrow-up-right" />
+          </svg>
+        <div class="flex-column align-items-start justify-content-start">
+            <a href="{{ document.the_file.url }}" class="d-flex align-items-center text-decoration-none" target="_new" download>
+                <span class="text-info-custom text-black fw-medium">{{ document.description|truncatechars:33 }}</span>
+            </a>
+            <span class="small text-black font-marianne fw-light">({{document.the_file.name|truncatechars:25}})</span>
+        </div>
+    </div>
+    <div class="d-flex align-items-center">
+      {% if document.uploaded_by == user %}
+      <form class="" method="post" action="{% url 'projects-conversation-delete-file' project.pk document.pk %}">
+        {% csrf_token %}
+        <button class="d-flex" style="border: 0; background: 0;">
+          <svg class="bi align-baseline fill-grey" width="20" height="20">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
+          </svg>
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
