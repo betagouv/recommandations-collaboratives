@@ -11,10 +11,11 @@ import os
 import uuid
 
 from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+                                                GenericRelation)
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
@@ -347,6 +348,8 @@ class Note(models.Model):
         content_type_field="action_object_content_type",
         object_id_field="action_object_object_id",
     )
+
+    document = GenericRelation("Document")
 
     def get_absolute_url(self):
         if self.public:
@@ -733,6 +736,12 @@ class Document(models.Model):
         blank=True,
     )
 
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, blank=True, null=True
+    )
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    attached_object = GenericForeignKey("content_type", "object_id")
+
     description = models.CharField(max_length=256, default="", blank=True)
 
     def upload_path(self, filename):
@@ -749,10 +758,15 @@ class Document(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=~Q(the_file=""),
+                check=Q(the_file__isnull=False, the_link=None)
+                | Q(the_link__isnull=False, the_file=None),
                 name="not_both_link_and_file_are_null",
             )
         ]
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
+
         verbose_name = "document"
         verbose_name_plural = "documents"
 
