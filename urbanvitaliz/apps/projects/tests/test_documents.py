@@ -54,7 +54,7 @@ def test_upload_document_not_available_for_non_logged_users(client, request):
 
 
 @pytest.mark.django_db
-def test_upload_document_available_for_project_collaborators(client, request):
+def test_upload_file_available_for_project_collaborators(client, request):
     png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
     data = {"description": "this is some content", "the_file": png}
 
@@ -80,7 +80,26 @@ def test_upload_document_available_for_project_collaborators(client, request):
 
 
 @pytest.mark.django_db
-def test_upload_document_triggers_notifications(client, request):
+def test_upload_document_is_either_link_or_file(client, request):
+    data = {"description": "this is some content"}
+
+    membership = baker.make(models.ProjectMember, is_owner=True, member__is_staff=False)
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+        status="READY",
+    )
+
+    with login(client, user=membership.member):
+        url = reverse("projects-documents-upload-document", args=[project.id])
+        client.post(url, data=data)
+
+    assert models.Document.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_upload_file_triggers_notifications(client, request):
     png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
     data = {"description": "this is some content", "the_file": png}
 
@@ -178,7 +197,10 @@ def test_project_pin_document(request, client):
     # project email is same as test user to be logged in
     membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
     project = Recipe(
-        models.Project, sites=[current_site], projectmember_set=[membership]
+        models.Project,
+        status="READY",
+        sites=[current_site],
+        projectmember_set=[membership],
     ).make()
 
     document = baker.make(
@@ -190,9 +212,40 @@ def test_project_pin_document(request, client):
 
     with login(client, user=membership.member, is_staff=False):
         url = reverse("projects-documents-pin-unpin", args=[project.id, document.pk])
-        response = client.get(url)
+        response = client.post(url)
 
-    assert response.status_code == 200
+    assert response.status_code == 302
 
     document = models.Document.on_site.get(pk=document.pk)
     assert document.pinned is True
+
+
+@pytest.mark.django_db
+def test_project_unpin_document(request, client):
+    current_site = get_current_site(request)
+
+    # project email is same as test user to be logged in
+    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
+    project = Recipe(
+        models.Project,
+        status="READY",
+        sites=[current_site],
+        projectmember_set=[membership],
+    ).make()
+
+    document = baker.make(
+        models.Document,
+        uploaded_by=membership.member,
+        project=project,
+        site=get_current_site(request),
+        pinned=True,
+    )
+
+    with login(client, user=membership.member, is_staff=False):
+        url = reverse("projects-documents-pin-unpin", args=[project.id, document.pk])
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    document = models.Document.on_site.get(pk=document.pk)
+    assert document.pinned is False

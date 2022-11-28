@@ -14,6 +14,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
@@ -737,7 +738,8 @@ class Document(models.Model):
     def upload_path(self, filename):
         return "projects/%d/%s" % (self.project.pk, filename)
 
-    the_file = models.FileField(upload_to=upload_path)
+    the_file = models.FileField(null=True, blank=True, upload_to=upload_path)
+    the_link = models.URLField(max_length=500, null=True, blank=True)
 
     def filename(self):
         return os.path.basename(self.the_file.name)
@@ -745,7 +747,12 @@ class Document(models.Model):
     deleted = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = []
+        constraints = [
+            models.CheckConstraint(
+                check=~Q(the_file=""),
+                name="not_both_link_and_file_are_null",
+            )
+        ]
         verbose_name = "document"
         verbose_name_plural = "documents"
 
