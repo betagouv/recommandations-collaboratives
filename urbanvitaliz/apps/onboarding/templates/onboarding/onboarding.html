@@ -202,7 +202,7 @@
 
             <div class="mb-3">
                 <label class="text-info-custom text-grey-dark" for="input-project-description">Contexte du projet</label>
-                <textarea maxlength="500" class="py-4 form-control {% if form.description.errors %}is-invalid{% endif %}"
+                <textarea maxlength="500" class="form-control {% if form.description.errors %}is-invalid{% endif %}"
                     style="height: 100px;" id="input-project-description" name="{{ form.description.name }}"
                     placeholder="">{{ form.description.value|default:'' }}</textarea>
                 
