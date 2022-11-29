@@ -10,6 +10,10 @@
 
 {% load django_vite %}
 
+{% block js %}
+    {% vite_asset 'js/apps/filesLinks.js' %}
+{% endblock %}
+
 {% block project_detail %}
 
 {% include 'projects/project/navigation.html' with files_links=True %}
@@ -31,13 +35,13 @@
         </div>
         
         <!-- Liens épinglés -->
-        {% include 'projects/project/fragments/files_links/link_list.html' %}
+        {% include 'projects/project/fragments/files_links/link_list.html' with is_pinned=True %}
 
         <!-- Fichiers épinglés -->
-        <div class="d-flex align-items-center justify-content-between mb-2 mt-2">
+        <div class="d-flex align-items-center justify-content-between mb-2 mt-4 pt-2">
             <h6 class="text-uppercase small">Fichiers épinglés</h6>
         </div>
-        {% include 'projects/project/fragments/files_links/file_list.html' with search=False files=pinned_files %}
+        {% include 'projects/project/fragments/files_links/file_list.html' with search=False files=pinned_files is_pinned=True %}
     </div>
 </div>
 {% endblock %}
