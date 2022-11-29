@@ -40,26 +40,37 @@
 
 {% block content %}
 
-<div class="col-11 col-lg-9 py-5 mx-auto">
+<div class="col-11 col-lg-9 py-5 mx-auto font-marianne">
+    <nav class="mb-4 pb-1">
+        <ol class="list-unstyled d-flex align-items-center">
+            <li>
+                <a class="small text-decoration-underline text-grey" href="{% url 'home' %}">Accueil</a>
+            </li>
+            <svg class="bi mx-2" width="15" height="15">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-right" />
+            </svg>
+            <li>
+                <span class="small text-dark">
+                    Soliciter {{request.site.name}}
+                </span>
+            </li>
+        </ol>
+    </nav>
+
     <h2>
-        <svg class="bi me-2" width="32" height="32">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#megaphone" />
-        </svg>
-        Solliciter l'équipe {{ request.site.name }}
+        Solliciter {{ request.site.name }}
     </h2>
 
-    <div class="bd-callout bd-callout-info mb-5">
-        <p class="mt-3">
-            <svg class="bi me-1" width="16" height="16">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#patch-exclamation" />
-            </svg>
-            <span class=" align-middle">
-                Pour toute <strong>autre demande</strong> qu'un dépôt de dossier, merci de <a
-                    href="{% url 'home-contact' %}?next=/&subject=Prise de contact">nous contacter par email</a>.
-            </span>
-        </p>
+    <div class="callout my-4">
+        <span class="callout-title">{{ request.site.name }} est un service public gratuit.</span>
+        <p class="callout-content mb-0 mt-2">Il répond aux questions et aux blocages des collectivités dans le recyclage de leurs fonciers artificialisés (construits, bétonnés, pollués) qui ont perdu leur usage. Le suivi des projets friche est assuré par les urbanistes de l’équipe ainsi que par les conseiller·e·s publics (selon les territoires : DDT, DREAL, EPF…).</p>
     </div>
 
+    <div class="flag grey mb-4 d-flex align-items-center justify-content-start">
+        <span class="title-info text-grey text-uppercase my-0 me-3">Attention</span>
+        <p class="text-info-custom text-grey-dark my-0 ">Pour toute <strong>autre demande</strong> qu'un dépôt de dossier, merci de <a
+            class="text-grey-dark text-decoration-underline" href="{% url 'home-contact' %}?next=/&subject=Prise de contact">nous contacter par email</a>.</p>
+    </div>
 
     <form id="form-projects-onboarding" method="post" action="{% url 'projects-onboarding' %}"
         class="{% if form.errors %}was-validated{% endif %}">
@@ -73,21 +84,16 @@
         {% endif %}
 
         <div id="form-leader" class="mb-5">
-
-            <h3 class="mb-3">
-                <svg class="bi me-2" width="28" height="28">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge" />
-                </svg>
-                Qui êtes-vous ?
-            </h3>
+            <h3 class="mb-3 title-info">Qui êtes-vous ?</h3>
 
             <div class="row mb-3">
                 <div class="col">
-                    <div class="form-floating">
-                        <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                    <div class="">
+                        <label class="text-info-custom text-grey-dark" for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                        <input type="text" class="py-4 form-control {% if form.first_name.errors %}is-invalid{% endif %}"
                             id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.name }}"
                             placeholder="Camille" value="{{ form.first_name.value }}" required>
-                        <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                        
 
                         {% for error in form.first_name.errors %}
                         <div class="invalid-feedback">{{ error }}</div>
@@ -95,12 +101,11 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="form-floating">
-                        <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                    <div class="">
+                        <label class="text-info-custom text-grey-dark" for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                        <input type="text" class="py-4 form-control {% if form.last_name.errors %}is-invalid{% endif %}"
                             id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.name }}" placeholder="Dupont"
                             value="{{ form.last_name.value }}" required>
-                        <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
-
                         {% for error in form.last_name.errors %}
                         <div class="text-danger text-end">{{ error }}</div>
                         {% endfor %}
@@ -108,32 +113,36 @@
                 </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row">
                 <div class="col">
-                    <div class="form-floating">
+                    <div class="">
+                        <label class="text-info-custom text-grey-dark" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
                         {% if user.is_authenticated %}
-                        <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                        <input type="email" class="py-4 form-control {% if form.email.errors %}is-invalid{% endif %}"
                             id="{{ form.email.id_for_label }}" name="{{ form.email.name }}"
                             placeholder="nom@organisme.fr" value="{{ form.email.value|default:user.email }}" required>
                         {% else %}
-                        <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                        <input type="email" class="py-4 form-control {% if form.email.errors %}is-invalid{% endif %}"
                             id="{{ form.email.id_for_label }}" name="{{ form.email.name }}"
                             placeholder="nom@organisme.fr" value="{{ form.email.value|default:'' }}" required>
                         {% endif %}
-                        <div class="form-text">Votre courriel ne sera jamais partagé en dehors de notre équipe.</div>
-                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                        <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
+                            <p class="text-info-custom font-small text-grey-dark my-0 ">Votre courriel ne sera jamais partagé en dehors de notre équipe.</p>
+                        </div>
                         {% for error in form.email.errors %}
                         <div class="text-danger text-end">{{ error }}</div>
                         {% endfor %}
                     </div>
                 </div>
                 <div class="col">
-                    <div class="form-floating">
-                        <input type="tel" class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
+                    <div class="">
+                        <label class="text-info-custom text-grey-dark" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                        <input type="tel" class="py-4 form-control {% if form.phone.errors %}is-invalid{% endif %}"
                             id="{{ form.phone.id_for_label }}" name="{{ form.phone.name }}"
                             value="{{ form.phone.value }}" placeholder="">
-                        <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
-                        <div class="form-text">Facultatif mais recommandé</div>
+                        <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
+                            <p class="text-info-custom font-small text-grey-dark my-0 ">Optionnel mais recommandé.</p>
+                        </div>
                         {% for error in form.phone.errors %}
                         <div class="text-danger text-end">{{ error }}</div>
                         {% endfor %}
@@ -141,12 +150,11 @@
                 </div>
             </div>
 
-            <div class="form-floating">
-                <input type="text" class="form-control {% if form.org_name.errors %}is-invalid{% endif %}"
-                    id="{{ form.org_name.id_for_label }}" name="{{ form.org_name.name }}" placeholder="Mon organisatino"
+            <div class="">
+                <label class="text-info-custom text-grey-dark" for="{{ form.org_name.id_for_label }}">{{ form.org_name.label }}</label>
+                <input type="text" class="py-4 form-control {% if form.org_name.errors %}is-invalid{% endif %}"
+                    id="{{ form.org_name.id_for_label }}" name="{{ form.org_name.name }}" placeholder="Mon organisation"
                     value="{{ form.org_name.value|default:'' }}" required>
-                <label for="{{ form.org_name.id_for_label }}">{{ form.org_name.label }}</label>
-
                 {% for error in form.org_name.errors %}
                 <div class="text-danger text-end">{{ error }}</div>
                 {% endfor %}
@@ -156,19 +164,16 @@
 
         <div id="form-project" class="mb-3">
 
-            <h3 class="mb-3">
-                <svg class="bi me-2" width="28" height="28">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#cone-striped" />
-                </svg>
-                De quel projet parle-t-on ?
-            </h3>
+            <h3 class="mb-3 title-info">De quel projet parle-t-on ?</h3>
 
-            <div class="form-floating mb-3">
+            <div class="mb-3">
+                <label class="text-info-custom text-grey-dark" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
                 <input type="text" id="{{ form.name.id_for_label }}"
-                    class="form-control {% if form.name.errors %}is-invalid{% endif %}" name="{{ form.name.name }}"
+                    class="py-4 form-control {% if form.name.errors %}is-invalid{% endif %}" name="{{ form.name.name }}"
                     maxlength="35" placeholder="Mon nom de dossier" value="{{ form.name.value|default:'' }}" required>
-                <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
-
+                    <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
+                                <p class="text-info-custom font-small text-grey-dark my-0 ">Limité à 35 caractères</p>
+                    </div>
                 {% for error in form.name.errors %}
                 <div class="text-danger text-end">{{ error }}</div>
                 {% endfor %}
@@ -176,14 +181,14 @@
 
             <div class="row">
                 <div class="col-12">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control {% if form.location.errors %}is-invalid{% endif %}"
+                    <div class="mb-3">
+                        <label class="text-info-custom text-grey-dark" for="input-project-address">Adresse</label>
+                        <input type="text" class="py-4 form-control {% if form.location.errors %}is-invalid{% endif %}"
                             id="input-project-address" name="{{ form.location.name }}" placeholder="Adresse"
                             value="{{ form.location.value|default:'' }}" required>
-                        <label for="input-project-address">Adresse</label>
-                        <div id="input-email-help" class="form-text">Si le projet n'a pas d'adresse exacte, utilisez
-                            uniquement le nom de la commune.</div>
-
+                            <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
+                                <p class="text-info-custom font-small text-grey-dark my-0 ">Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.</p>
+                            </div>
                         {% for error in form.location.errors %}
                         <div class="text-danger text-end">{{ error }}</div>
                         {% endfor %}
@@ -195,21 +200,22 @@
 
             </div>
 
-            <div class="form-floating mb-3">
-                <textarea maxlength="500" class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+            <div class="mb-3">
+                <label class="text-info-custom text-grey-dark" for="input-project-description">Contexte du projet</label>
+                <textarea maxlength="500" class="py-4 form-control {% if form.description.errors %}is-invalid{% endif %}"
                     style="height: 100px;" id="input-project-description" name="{{ form.description.name }}"
                     placeholder="">{{ form.description.value|default:'' }}</textarea>
-                <label class="mb-2" for="input-project-description">Dites-nous quelques mots sur le contexte si vous le
-                    souhaitez...</label>
-                <div id="input-description-help" class="form-text">Limité à 500 caractères, vous pourrez nous en dire
-                    beaucoup plus par la suite !</div>
+                
+                    <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
+                        <p class="text-info-custom font-small text-grey-dark my-0 ">Dites-nous quelques mots sur le contexte si vous le souhaitez.</p>
+                    </div>
 
                 {% for error in form.description.errors %}
                 <div class="text-danger text-end">{{ error }}</div>
                 {% endfor %}
             </div>
 
-            <div class="mt-5">
+            <div class="mt-5 onboarding-response-form">
                 {{ form.response }}
             </div>
 
@@ -220,7 +226,7 @@
         <div class="text-danger text-start mb-2">{{ error }}</div>
         {% endfor %}
 
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="button filled mt-4">
             Envoyer ma demande
         </button>
     </form>
