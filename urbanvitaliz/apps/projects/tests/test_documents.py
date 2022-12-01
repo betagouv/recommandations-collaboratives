@@ -12,6 +12,7 @@ import pytest
 from actstream.models import action_object_stream
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import transaction
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -79,9 +80,7 @@ def test_upload_file_available_for_project_collaborators(client, request):
     assert document.the_file is not None
 
 
-from django.db import transaction
-
-
+@pytest.mark.django_db
 def test_upload_document_is_either_link_or_file(client, request):
     data = {"description": "this is some content"}
 
