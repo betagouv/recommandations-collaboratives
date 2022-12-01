@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-__all__ = ["rest", "feeds", "notes", "sharing", "tasks"]
+__all__ = ["rest", "feeds", "notes", "sharing", "tasks", "documents"]
 
 """
 Views for projects application
@@ -43,9 +43,9 @@ from ..utils import (can_administrate_or_403, can_administrate_project,
                      format_switchtender_identity, generate_ro_key,
                      get_active_project, get_collaborators_for_project,
                      get_switchtenders_for_project, is_project_moderator,
-                     is_project_moderator_or_403, is_regional_actor_for_project_or_403,
-                     refresh_user_projects_in_session,
-                     set_active_project_id)
+                     is_project_moderator_or_403,
+                     is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding

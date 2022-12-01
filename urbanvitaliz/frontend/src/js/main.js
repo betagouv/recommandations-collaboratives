@@ -9,6 +9,7 @@ import './components/Editor'
 
 //Global CSS
 import '../css/buttons.css'
+import '../css/input.css'
 import '../css/typography.css'
 import '../css/hover.css'
 import '../css/colors.css'

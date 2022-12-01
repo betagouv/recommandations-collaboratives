@@ -1,0 +1,39 @@
+{% load static %}
+{% load sass_tags %}
+{% load humanize %}
+
+{% load django_vite %}
+
+{% block css %}
+<link href="{% sass_src 'projects/css/file_upload.scss' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+<div x-data="FileUpload('{{ type }}')">
+  <button x-ref="button" class="button small" @click="onButtonClick">Épingler un lien</button>
+
+  <div x-cloak x-ref="popover" @click.outside="onOutsideClick" class="rounded bg-white shadow" style="width: 420px;">
+    <form method="post" action="{{ action }}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="p-3">
+        <h6 class="text-uppercase" style="font-size: 1em;">Épingler un lien</h6>
+        <div class="mb-2 pt-3">
+          <label class="d-block">
+              <span class="mb-1 d-block text-info-custom text-grey-dark">Titre du lien</span>
+              <input placeholder="Dossier dropbox" required name="title" class="form-control form-control-sm py-2" type="text" />
+          </label>
+        </div>
+    
+        <label class="d-block mt-3">
+          <span class="mb-1 d-block text-info-custom text-grey-dark">Url du lien</span>
+          <!-- <input placeholder="https://www.dropbox.com/.." required name="the_link" x-model="pendingLink" class="form-control form-control-sm py-2" type="text" /> -->
+        </label>
+      </div>
+
+      <div class="p-3 pt-0 d-flex justify-content-end">
+        <button class="button filled small" type="submit">Épingler</button>
+      </div>
+    </form>
+    <div x-ref="arrow" class="popover-arrow"></div>
+  </div>
+</div>

@@ -1,6 +1,5 @@
 import Alpine from 'alpinejs'
 import { createPopper } from '@popperjs/core';
-import { getString } from '../utils/getString'
 
 Alpine.data('FileUpload', (type) => ({
     getString,
@@ -55,4 +54,23 @@ Alpine.data('FileUpload', (type) => ({
     }
 }))
 
-Alpine.start();
+const STRINGS = {
+    types: {
+        project: 'projet',
+        message: 'message'
+    }
+}
+
+function getString(path) {
+    let temp = STRINGS;
+
+    path.split('.').forEach(element => {
+        if (temp[element]) {
+            temp = temp[element]
+        } else {
+            return ""
+        }
+    });
+
+    return temp
+}

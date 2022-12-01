@@ -14,8 +14,9 @@ from django.utils import timezone
 from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
 
 from .. import models, signals
-from ..forms import NoteForm, PublicNoteForm, StaffNoteForm
-from ..utils import can_administrate_or_403, can_administrate_project, can_manage_or_403
+from ..forms import DocumentUploadForm, NoteForm, PublicNoteForm, StaffNoteForm
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403)
 
 
 @login_required
@@ -33,6 +34,18 @@ def create_public_note(request, project_id=None):
             instance.created_by = request.user
             instance.public = True
             instance.save()
+
+            # Check if we have a file or link
+            document_form = DocumentUploadForm(request.POST, request.FILES)
+            if document_form.is_valid():
+                if document_form.cleaned_data["the_file"]:
+                    document = document_form.save(commit=False)
+                    document.attached_object = instance
+                    document.site = request.site
+                    document.uploaded_by = request.user
+                    document.project = instance.project
+
+                    document.save()
 
             signals.note_created.send(
                 sender=create_note,
