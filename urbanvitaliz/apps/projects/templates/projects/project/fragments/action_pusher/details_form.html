@@ -21,6 +21,8 @@
                 {% include 'tools/editor.html' with input_name="content" input_value="content" input_required=True %}
             </div>
 
+            <input type="file" name="the_file">
+
             <template x-if="push_type == 'single'">
                 <div class="buttons d-flex flex-row justify-content-between">
                     {% if not disable_draft %}

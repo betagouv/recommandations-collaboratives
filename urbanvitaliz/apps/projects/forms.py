@@ -116,11 +116,7 @@ class CreateActionWithoutResourceForm(forms.ModelForm):
 
     class Meta:
         model = models.Task
-        fields = [
-            "intent",
-            "content",
-            "public",
-        ]
+        fields = ["intent", "content", "public"]
 
 
 class CreateActionWithResourceForm(CreateActionWithoutResourceForm):

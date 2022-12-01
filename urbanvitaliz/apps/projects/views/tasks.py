@@ -17,31 +17,18 @@ from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import (
-    CreateActionsFromResourcesForm,
-    CreateActionWithoutResourceForm,
-    CreateActionWithResourceForm,
-    PushTypeActionForm,
-    RemindTaskForm,
-    RsvpTaskFollowupForm,
-    TaskFollowupForm,
-    TaskRecommendationForm,
-    UpdateTaskFollowupForm,
-    UpdateTaskForm,
-)
-from ..utils import (
-    can_manage_or_403,
-    create_reminder,
-    get_active_project_id,
-    remove_reminder,
-)
+from ..forms import (CreateActionsFromResourcesForm,
+                     CreateActionWithoutResourceForm,
+                     CreateActionWithResourceForm, DocumentUploadForm,
+                     PushTypeActionForm, RemindTaskForm, RsvpTaskFollowupForm,
+                     TaskFollowupForm, TaskRecommendationForm,
+                     UpdateTaskFollowupForm, UpdateTaskForm)
+from ..utils import (can_manage_or_403, create_reminder, get_active_project_id,
+                     remove_reminder)
 
 
 @login_required
@@ -513,6 +500,18 @@ def create_action(request, project_id=None):
                 action.created_by = request.user
                 action.save()
                 action.top()
+
+                # Check if we have a file or link
+                document_form = DocumentUploadForm(request.POST, request.FILES)
+                if document_form.is_valid():
+                    if document_form.cleaned_data["the_file"]:
+                        document = document_form.save(commit=False)
+                        document.attached_object = action
+                        document.site = request.site
+                        document.uploaded_by = request.user
+                        document.project = action.project
+
+                        document.save()
 
                 # Notify other switchtenders
                 signals.action_created.send(
