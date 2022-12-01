@@ -295,7 +295,7 @@ def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
 
-    membership = task.project.projectmember_set.filter(is_owner=True).first()
+    membership = task.project.owner
     if not membership:
         raise Http404
 
