@@ -32,6 +32,7 @@ module.exports = {
                 projectDetails : resolve('./src/js/apps/projectDetails.js'),
                 projectShare : resolve('./src/js/apps/projectShare.js'),
                 map: resolve('./src/js/apps/map.js'),
+                fileLinks: resolve('./src/js/apps/filesLinks.js')
             },
             output: {
                 chunkFileNames: undefined,
