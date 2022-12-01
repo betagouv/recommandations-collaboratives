@@ -38,13 +38,14 @@ def create_public_note(request, project_id=None):
             # Check if we have a file or link
             document_form = DocumentUploadForm(request.POST, request.FILES)
             if document_form.is_valid():
-                document = document_form.save(commit=False)
-                document.attached_object = instance
-                document.site = request.site
-                document.uploaded_by = request.user
-                document.project = instance.project
+                if document_form.cleaned_data["the_file"]:
+                    document = document_form.save(commit=False)
+                    document.attached_object = instance
+                    document.site = request.site
+                    document.uploaded_by = request.user
+                    document.project = instance.project
 
-                document.save()
+                    document.save()
 
             signals.note_created.send(
                 sender=create_note,
