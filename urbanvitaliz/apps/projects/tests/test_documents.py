@@ -79,7 +79,9 @@ def test_upload_file_available_for_project_collaborators(client, request):
     assert document.the_file is not None
 
 
-@pytest.mark.django_db
+from django.db import transaction
+
+
 def test_upload_document_is_either_link_or_file(client, request):
     data = {"description": "this is some content"}
 
@@ -93,7 +95,8 @@ def test_upload_document_is_either_link_or_file(client, request):
 
     with login(client, user=membership.member):
         url = reverse("projects-documents-upload-document", args=[project.id])
-        client.post(url, data=data)
+        with transaction.atomic():
+            client.post(url, data=data)
 
     assert models.Document.objects.count() == 0
 
@@ -150,6 +153,7 @@ def test_delete_document_available_for_owner(client, request):
         models.Document,
         uploaded_by=membership.member,
         project=project,
+        the_link="http://yo",
         site=get_current_site(request),
     )
 
@@ -175,6 +179,7 @@ def test_delete_document_not_available_for_others(client, request):
     document = baker.make(
         models.Document,
         project=project,
+        the_link="http://yo",
         site=get_current_site(request),
         uploaded_by__username="other",
         description="Doc description",
@@ -207,6 +212,7 @@ def test_project_pin_document(request, client):
         models.Document,
         uploaded_by=membership.member,
         project=project,
+        the_link="http://yo",
         site=get_current_site(request),
     )
 
@@ -237,6 +243,7 @@ def test_project_unpin_document(request, client):
         models.Document,
         uploaded_by=membership.member,
         project=project,
+        the_link="http://yo",
         site=get_current_site(request),
         pinned=True,
     )

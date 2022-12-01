@@ -70,12 +70,18 @@ def document_upload(request, project_id):
             instance.site = request.site
             instance.uploaded_by = request.user
 
-            instance.save()
+            from django.db.utils import IntegrityError
 
-            messages.success(
-                request,
-                "Le document a bien été enregistré",
-            )
+            try:
+                instance.save()
+
+                messages.success(
+                    request,
+                    "Le document a bien été enregistré",
+                )
+
+            except IntegrityError as e:
+                messages.error(request, "Impossible de sauver le document")
 
     return redirect(reverse("projects-project-detail-documents", args=[project.id]))
 
