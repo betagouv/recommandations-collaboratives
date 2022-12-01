@@ -54,6 +54,11 @@ urlpatterns = [
         name="projects-project-detail-knowledge",
     ),
     path(
+        r"project/<int:project_id>/documents",
+        documents.document_list,
+        name="projects-project-detail-documents",
+    ),
+    path(
         r"project/<int:project_id>/suivi",
         detail.project_internal_followup,
         name="projects-project-detail-internal-followup",
@@ -174,14 +179,19 @@ urlpatterns = [
         name="projects-conversation-create-message",
     ),
     path(
-        r"project/<int:project_id>/conversation/televerser",
+        r"project/<int:project_id>/documents/televerser",
         documents.document_upload,
-        name="projects-conversation-upload-file",
+        name="projects-documents-upload-document",
     ),
     path(
-        r"project/<int:project_id>/conversation/document/<int:document_id>/delete",
+        r"project/<int:project_id>/documents/<int:document_id>/pin-unpin",
+        documents.document_pin_unpin,
+        name="projects-documents-pin-unpin",
+    ),
+    path(
+        r"project/<int:project_id>/documents/<int:document_id>/delete",
         documents.document_delete,
-        name="projects-conversation-delete-file",
+        name="projects-documents-delete-document",
     ),
     path(
         r"project/<int:project_id>/note/",

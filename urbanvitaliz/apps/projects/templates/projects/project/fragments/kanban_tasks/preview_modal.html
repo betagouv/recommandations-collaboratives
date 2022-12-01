@@ -82,7 +82,7 @@
 												<template x-if="!isStatusUpdate(f)">
 													<div class="rounded bg-light p-2 m-3 message"
 														:class="hasNotification(f.id) && 'border border-warning'">
-														<p x-html="renderMarkdown(f.comment)" class="mb-2"></p>
+														<p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
 														<div class="d-flex justify-content-between" style="font-size: 0.9em;">
 															<div>
 																<img class="rounded-circle d-inline-block" width="20px" height="20px"
@@ -115,7 +115,7 @@
 														</div>
 														<template x-if="f.comment !== ''">
 															<div class="rounded bg-light p-2 m-3 message">
-																<p x-html="renderMarkdown(f.comment)" class="mb-2"></p>
+																<p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
 																<div class="d-flex justify-content-between" style="font-size: 0.9em;">
 																	<div>
 																		<img class="rounded-circle d-inline-block" width="20px" height="20px"

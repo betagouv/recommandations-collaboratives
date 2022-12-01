@@ -19,7 +19,6 @@
 
 {% challenge_for request.user "project-conversation-writer" as challenge %}
 
-
 <div class="col-12 mx-auto">
     {% include 'projects/project/navigation.html' with conversation=True %}
     <div class="row">
@@ -33,7 +32,12 @@
                         <div class="small my-2 text-center w-100 text-secondary">{{ date|naturalday|capfirst }}</div>
                         {% for note in notes reversed  %}
                         <div class="bg-light rounded-3 p-3 text-secondary my-1">
-                            {{ note.content_rendered|safe }}
+                                {{ note.content_rendered|safe }}
+                                {% if note.document.count %}
+                                    {% for document in note.document.all %}
+                                            {% include 'projects/project/fragments/files_links/file_list_item.html' with document=document disable_toolbar=True %}
+                                    {% endfor %}
+                                {% endif %}
                             {% if note.created_by %}
                             <div>
                                 <span class="align-items-center link-dark text-decoration-none">
@@ -69,6 +73,7 @@
                 <form class="form"
                       method="POST"
                       action="{% url 'projects-conversation-create-message' project.pk %}"
+                      enctype="multipart/form-data"
                       id="conversation-form">
                     {% csrf_token %}
                     
@@ -78,22 +83,18 @@
                     {% for error in public_note_form.content.errors %}
                     <div class="text-danger text-end">{{ error }}</div>
                     {% endfor %}
-                </form>
+                    <input type="file" name="the_file">
 
-                <div class="d-flex justify-content-end mt-2">
-                    <button form="conversation-form" class="btn btn-sm btn-primary" type="submit">Envoyer</button>
-                </div>
+                    <div class="d-flex justify-content-end mt-2">
+                        <button form="conversation-form" class="btn btn-sm btn-primary" type="submit">Envoyer</button>
+                    </div>
+                </form>
 
             </div>
             {% endif %}
         </div>
         <div class="col mx-auto col-lg-4 col-md-12">
-            <div class="mb-4">
-                {% include "projects/project/fragments/file_list.html" %}
-            </div>
-            <hr/>
             <h6 class="mb-2">Participants de la conversation</h6>
-
             {% for recipient in recipients %}
             <div class="bg-light mt-3 p-4">
                 <span class="align-items-center link-dark text-decoration-none">

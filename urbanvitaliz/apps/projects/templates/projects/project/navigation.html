@@ -66,6 +66,16 @@
             <span class="">Conversation</span>
         </a>
     </li>
+    <li>
+        <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if files_links %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-documents' project.pk %}">
+            {% if project.status == 'DRAFT' %}
+            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
+            </svg>&nbsp;
+            {% endif %}
+            <span class="">Fichiers et liens</span>
+        </a>
+    </li>
     {% if active_project_can_administrate %}
     <li>
         <a class="{% if internal_followup %} active {% endif %} {% if not active_project_can_administrate %} disabled {% endif %}align-items-center" href="{% url 'projects-project-detail-internal-followup' project.pk %}">
@@ -74,7 +84,7 @@
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
             </svg>&nbsp;
             {% endif %}
-            <span class="text-nowrap">Suivi interne</span>
+            <span class="text-nowrap">Espace conseiller</span>
         </a>
     </li>
     {% endif %}

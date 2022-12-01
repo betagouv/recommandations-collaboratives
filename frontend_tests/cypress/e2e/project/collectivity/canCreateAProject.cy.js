@@ -66,7 +66,5 @@ describe('I can follow a project', () => {
         cy.get(".introjs-skipbutton").click({ force: true });
 
         cy.contains('fake project name').click({ force: true });
-
-        cy.contains("Un peu de patience, on vérifie que vous n'êtes pas un pirate du web ;)")
     })
 })
