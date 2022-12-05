@@ -169,6 +169,8 @@ def project_conversations(request, project_id=None):
     """Action page for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
+    can_manage_or_403(project, request.user, allow_draft=request.user == project.owner)
+
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
@@ -177,10 +179,6 @@ def project_conversations(request, project_id=None):
         project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
-
-    # check user can administrate project (member or switchtender)
-    if request.user != project.owner:
-        can_administrate_or_403(project, request.user)
 
     # Set this project as active
     set_active_project_id(request, project.pk)
