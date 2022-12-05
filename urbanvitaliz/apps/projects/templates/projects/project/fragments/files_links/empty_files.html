@@ -1,4 +1,5 @@
 <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
     <p class="m-0 text-info-custom text-grey fw-normal pb-3">Aucun fichier n'a été {% if pinned == True %} épinglé {% else %}ajouté {% endif %}</p>
-    <a class="button filled" href="#">Ajouter un fichier</a>
+    {% url 'projects-documents-upload-document' project.pk as upload_action %}
+    {% include 'projects/project/fragments/files_links/file_upload_button.html' with type='project' action=upload_action filled=True %}    
 </div>
