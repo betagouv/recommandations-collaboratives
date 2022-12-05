@@ -11,7 +11,7 @@
 {% load django_vite %}
 
 {% block js %}
-    {% vite_asset 'js/apps/filesLinks.js' %}
+    {% vite_asset 'js/apps/documents.js' %}
 {% endblock %}
 
 {% block project_detail %}
@@ -22,7 +22,7 @@
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="text-uppercase small">Fichiers partagés</h6>
             {% url 'projects-documents-upload-document' project.pk as upload_action %}
-            {% include 'projects/project/fragments/files_links/file_upload_button.html' with type='project' action=upload_action %}
+            {% include 'projects/project/fragments/files_links/file_upload_button.html' with type='project' action=upload_action small=True %}
         </div>
         
         {% include 'projects/project/fragments/files_links/file_list.html' with files=all_files %}

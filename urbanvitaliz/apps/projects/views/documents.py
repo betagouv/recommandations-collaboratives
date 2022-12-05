@@ -52,7 +52,7 @@ def document_list(request, project_id=None):
     pinned_files = all_files.filter(pinned=True)
     links = models.Document.on_site.filter(project_id=project.pk).exclude(the_link=None)
 
-    return render(request, "projects/project/files_links.html", locals())
+    return render(request, "projects/project/documents.html", locals())
 
 
 @login_required
