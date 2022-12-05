@@ -10,27 +10,27 @@
       <button @click.prevent @click="toggleBold()" :class="{ 'is-active' : isActive('bold', updatedAt) }">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#type-bold"/>
-        </svg>&nbsp;
+        </svg>
       </button>
       <button @click.prevent @click="toggleItalic()" :class="{ 'is-active' : isActive('italic', updatedAt) }">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#type-italic"/>
-        </svg>&nbsp;
+        </svg>
       </button>
       <button @click.prevent @click="toggleBulletList()" :class="{ 'is-active' : isActive('bulletList', updatedAt) }">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#list-ul"/>
-        </svg>&nbsp;
+        </svg>
       </button>
       <button @click.prevent @click="setLink()" :class="{ 'is-active' : isActive('link', updatedAt) }">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#link"/>
-        </svg>&nbsp;
+        </svg>
       </button>
       <button class="unset-link" @click.prevent @click="unsetLink()" x-bind:disabled="!isActive('link', updatedAt)">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#link"/>
-        </svg>&nbsp;
+        </svg>
       </button>
     </div>
   </template>

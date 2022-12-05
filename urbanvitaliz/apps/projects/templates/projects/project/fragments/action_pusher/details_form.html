@@ -3,43 +3,45 @@
 <template x-if="push_type != 'multiple'">
     <div class="message d-flex flex-row justify-content-between">
         <div id="action-details" class="form w-50 pe-4 flex-fill d-flex flex-column">
+            <div class="bg-light p-3 border-form">
+                <h4><span class="text-muted me-1" x-text="push_type == 'noresource' ? '2.' : '3.'"></span>Décrivez votre recommandation</h4>
 
-            <h4><span class="text-muted me-1" x-text="push_type == 'noresource' ? '2.' : '3.'"></span>Décrivez votre recommandation</h4>
-
-            <div>
-                <label for="intent">Titre</label>
-                <div class="input-group mb-3">
-                    <input class="form-control" type="text" id="intent" name="intent" x-model="intent" required :readonly="push_type != 'noresource'">
-                    {% for error in form.intent.errors %}
-                    <div class="text-danger text-end">{{ error }}</div>
-                    {% endfor %}
+                <div class="mt-2">
+                    <label class="mb-2 text-info-custom text-grey-dark" for="intent">Titre</label>
+                    <div class="input-group mb-3">
+                        <input class="form-control" type="text" id="intent" name="intent" x-model="intent" required :readonly="push_type != 'noresource'">
+                        {% for error in form.intent.errors %}
+                        <div class="text-danger text-end">{{ error }}</div>
+                        {% endfor %}
+                    </div>
                 </div>
+
+                <div class="d-flex flex-column">
+                    <label class="mb-2 text-info-custom text-grey-dark" for="message">Message</label>
+                    {% include 'tools/editor.html' with input_name="content" input_value="content" input_required=True %}
+                </div>
+
+                <div class="mb-4">
+                    {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
+                </div>
+
+                <template x-if="push_type == 'single'">
+                    <div class="buttons d-flex flex-row justify-content-between">
+                        {% if not disable_draft %}
+                        <button @click="set_draft(true)" class="button small" :disabled="!selected_resource">Enregistrer comme Brouillon</button>
+                        {% endif %}
+                        <button @click="set_draft(false)" type="submit" class="button small filled" :disabled="!selected_resource">Publier</button>
+                    </div>
+                </template>
+                <template x-if="push_type == 'noresource'">
+                    <div class="buttons d-flex flex-row justify-content-between">
+                        {% if not disable_draft %}
+                        <button @click="set_draft(true)" class="button small">Enregister comme Brouillon</button>
+                        {% endif %}
+                        <button @click="set_draft(false)" type="submit" class="button filled small">Publier</button>
+                    </div>
+                </template>
             </div>
-
-            <div class="flex-fill d-flex flex-column">
-                <label for="message">Message</label>
-                {% include 'tools/editor.html' with input_name="content" input_value="content" input_required=True %}
-            </div>
-
-            <input type="file" name="the_file">
-
-            <template x-if="push_type == 'single'">
-                <div class="buttons d-flex flex-row justify-content-between">
-                    {% if not disable_draft %}
-                    <button @click="set_draft(true)" class="btn btn-secondary" :disabled="!selected_resource">Enregistrer comme Brouillon</button>
-                    {% endif %}
-                    <button @click="set_draft(false)" type="submit" class="btn btn-primary" :disabled="!selected_resource">Publier</button>
-                </div>
-            </template>
-            <template x-if="push_type == 'noresource'">
-                <div class="buttons d-flex flex-row justify-content-between">
-                    {% if not disable_draft %}
-                    <button @click="set_draft(true)" class="btn btn-secondary">Enregister comme Brouillon</button>
-                    {% endif %}
-                    <button @click="set_draft(false)" type="submit" class="btn btn-primary">Publier</button>
-                </div>
-            </template>
-
         </div>
         <div class="help w-50 p-3 bg-light rounded">
             <h6>Comment écrire une recommandation</h6>
