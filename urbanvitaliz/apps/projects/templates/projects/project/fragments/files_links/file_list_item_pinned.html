@@ -1,0 +1,38 @@
+{% load static %}
+{% load humanize %}
+
+{% if document %}
+<div class="mb-1">
+  <div class="rounded border py-2 px-3 mb-2 d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-start">
+        <svg class="bi align-baseline me-2 mt-1" width="17" height="17" fill="#222">
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
+        </svg>
+        <a href="{{ document.the_file.url }}" class="d-flex flex-column align-items-start text-decoration-none" target="_new" download>
+          <span class="text-info-custom text-black fw-medium">{{ document.description|truncatechars:33 }}</span>
+          <div>
+            <span class="text-info-custom text-black">{{document.filename|truncatechars:15}}</span>
+            {% if document and document.the_file.size %}
+              <span class="text-info-custom text-black ms-2">({{ document.the_file.size|filesizeformat }})</span>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+      <div class="d-flex align-items-center flex-column">
+            <form method="POST" action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-link d-flex p-0 me-0 mb-2">
+                    <svg class="bi align-baseline fill-blue" width="20" height="20">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
+                    </svg>
+                </button>
+            </form>
+            <a class="d-flex" href="{{ document.the_file.url }}" target="_new" download>
+                <svg class="bi align-baseline fill-blue" width="20" height="20">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#download" />
+                </svg>
+            </a>
+        </div>
+    </div>
+  </div>
+  {% endif %}
