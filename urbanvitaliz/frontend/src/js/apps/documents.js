@@ -1,2 +1,2 @@
 import '../components/FileUploads'
-import '../components/Files'
+import '../components/Documents'
