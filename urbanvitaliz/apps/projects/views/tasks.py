@@ -295,8 +295,8 @@ def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
 
-    membership = task.project.owner
-    if not membership:
+    owner = task.project.owner
+    if not owner:
         raise Http404
 
     if request.method == "POST":
@@ -305,9 +305,7 @@ def remind_task(request, task_id=None):
             days = form.cleaned_data.get("days")
             days = days or 6 * 7  # 6 weeks is default
 
-            if create_reminder(
-                days, task, membership.member, origin=api.models.Reminder.SELF
-            ):
+            if create_reminder(days, task, owner, origin=api.models.Reminder.SELF):
                 messages.success(
                     request,
                     "Une alarme a bien été programmée dans {0} jours.".format(days),

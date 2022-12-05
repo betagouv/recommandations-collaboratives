@@ -489,16 +489,32 @@ def test_project_conversations_available_for_owner(request, client):
 
 
 @pytest.mark.django_db
-def test_project_conversations_available_for_switchtender(request, client):
+def test_project_conversations_not_available_for_unassigned_switchtender(
+    request, client
+):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-conversations", args=[project.id])
     with login(client, groups=["switchtender"]):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_conversations_available_for_assigned_switchtender(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    url = reverse("projects-project-detail-conversations", args=[project.id])
+    with login(client) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_project_conversations_available_for_restricted_switchtender(request, client):
+def test_project_conversations_not_available_for_restricted_switchtender(
+    request, client
+):
     other = Recipe(geomatics.Department, code="02").make()
     project = Recipe(
         models.Project,
@@ -509,7 +525,7 @@ def test_project_conversations_available_for_restricted_switchtender(request, cl
     with login(client, groups=["switchtender"]) as user:
         user.profile.departments.add(other)
         response = client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
 # internal
