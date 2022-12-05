@@ -3,14 +3,17 @@ import List from 'list.js'
 
 Alpine.data("Files", Files)
 
-function Files() {
+function Files(nbDocuments) {
     return {
         init() {
+
+            if (!nbDocuments > 0) return
+            
             const options = {
                 valueNames: ['name', 'description']
             };
 
-            const fileList = new List('filesId', options);
+            new List('filesId', options);
         }
     }
 }
