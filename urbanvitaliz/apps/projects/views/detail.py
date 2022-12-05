@@ -179,10 +179,8 @@ def project_conversations(request, project_id=None):
     can_administrate = can_administrate_project(project, request.user)
 
     # check user can administrate project (member or switchtender)
-    if request.user != project.members.filter(projectmember__is_owner=True).first():
-        # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_switchtender(request.user):
-            can_manage_or_403(project, request.user)
+    if request.user != project.owner:
+        can_administrate_or_403(project, request.user)
 
     # Set this project as active
     set_active_project_id(request, project.pk)
