@@ -112,6 +112,18 @@
 
     </section>
 
+    <section>
+
+        <a href="{% url 'resources-resource-delete' resource.pk %}" class="btn btn-danger">
+            <svg class="bi " width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash"/>
+            </svg>
+			      Supprimer
+		    </a>
+
+
+    </section>
+
 </div>
 
 {% endblock %}
