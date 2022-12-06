@@ -23,7 +23,7 @@ describe('I can create a recommandation with no resource as a switcthender', () 
             .type('fake recommandation with no resource', { force: true })
             .should('have.value', 'fake recommandation with no resource')
 
-        cy.get('#content')
+        cy.get('textarea')
             .type(`fake recommandation content with no resource : ${now}`, { force: true })
             .should('have.value', `fake recommandation content with no resource : ${now}`)
 
