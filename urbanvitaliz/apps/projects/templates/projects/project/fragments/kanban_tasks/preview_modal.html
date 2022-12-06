@@ -29,6 +29,16 @@
 							style="width: 33%;">
 							<div class="d-flex flex-column flex-fill overflow-hidden">
 								{% include 'projects/project/fragments/status_switcher.html' %}
+								<div x-show="currentTask.document && currentTask.document.length > 0">
+									<h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
+										Fichier(s) partagé(s)
+									</h2>
+									<template x-for="document in currentTask.document" x-key="document.id">
+										<div class="px-3">
+											{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}
+										</div>
+									</template>
+								</div>
 								<h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
 									Conversation
 								</h2>
