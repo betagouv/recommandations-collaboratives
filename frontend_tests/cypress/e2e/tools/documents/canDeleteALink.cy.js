@@ -14,7 +14,7 @@ describe('I can delete a link on the document tab', () => {
 
         cy.url().should('include', '/documents')
 
-        cy.contains(documents[0].fields.description).parent().parent().get("#link-delete-button").click({ force: true });
+        cy.contains(documents[0].fields.description).parent().parent().parent().find("#link-delete-button").click({ force: true });
 
         cy.contains('Le document a bien été supprimé');
     })

@@ -14,7 +14,7 @@ describe('I can delete a file on the document tab', () => {
 
         cy.url().should('include', '/documents')
 
-        cy.contains(documents[1].fields.description).parent().parent().get("#file-delete-button").click({ force: true });
+        cy.contains(documents[3].fields.description).parent().siblings().children().find("#file-delete-button").click({ force: true });
 
         cy.contains('Le document a bien été supprimé');
     })
@@ -28,6 +28,6 @@ describe('I can delete a file on the document tab', () => {
 
         cy.url().should('include', '/documents')
 
-        cy.contains(documents[1].fields.description).should('not.exist');
+        cy.contains(documents[3].fields.description).should('not.exist');
     })
 })

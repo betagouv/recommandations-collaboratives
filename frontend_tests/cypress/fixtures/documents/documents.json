@@ -27,7 +27,7 @@
             "uploaded_by": 5,
             "content_type": null,
             "object_id": null,
-            "description": "Fichier bookmark",
+            "description": "File bookmarked",
             "the_file": "projects/2/ui-screenshot.png",
             "the_link": null,
             "deleted": null
@@ -44,7 +44,24 @@
             "uploaded_by": 5,
             "content_type": null,
             "object_id": null,
-            "description": "Fichier de test",
+            "description": "File to bookmark",
+            "the_file": "projects/2/ui-screenshot.png",
+            "the_link": null,
+            "deleted": null
+        }
+    },
+    {
+        "model": "projects.document",
+        "pk": 4,
+        "fields": {
+            "site": 1,
+            "project": 2,
+            "pinned": false,
+            "created_on": "2022-12-05T17:21:17.344Z",
+            "uploaded_by": 5,
+            "content_type": null,
+            "object_id": null,
+            "description": "File to delete",
             "the_file": "projects/2/ui-screenshot.png",
             "the_link": null,
             "deleted": null

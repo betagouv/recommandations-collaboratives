@@ -15,8 +15,8 @@ describe('I can unbookmark a file already pinned', () => {
         cy.url().should('include', '/documents')
 
         //Unbookmark a file
-        cy.contains(documents[1].fields.description).parent().parent().get("#file-is-bookmarked")
-        cy.contains(documents[1].fields.description).parent().parent().get("#file-is-bookmarked").parent().parent().click({ force: true })
+        cy.contains(documents[1].fields.description).parent().siblings().children().find("#file-is-bookmarked")
+        cy.contains(documents[1].fields.description).parent().siblings().children().find("#file-is-bookmarked").parent().parent().click({ force: true })
 
         cy.wait(500);
     })
@@ -30,6 +30,6 @@ describe('I can unbookmark a file already pinned', () => {
 
         cy.url().should('include', '/documents')
 
-        cy.contains(documents[1].fields.description).parent().parent().get("#file-is-not-bookmarked")
+        cy.contains(documents[1].fields.description).parent().siblings().children().find("#file-is-not-bookmarked")
     })
 })
