@@ -94,27 +94,33 @@
             {% endif %}
         </div>
         <div class="col mx-auto col-lg-4 col-md-12">
-            <h6 class="mb-2">Participants de la conversation</h6>
-            {% for recipient in recipients %}
-            <div class="bg-light mt-3 p-4">
-                <span class="align-items-center link-dark text-decoration-none">
-                    <img
-                        src="{% gravatar_url recipient.email 32 %}"
-                        alt="{{ recipient.get_full_name }}"
-                        class="me-2 rounded-circle"
-                        style="width: 32px; height: 32px;"
-                    />
-                </span>
-                <span class="align-middle">
-                    <strong>{{ recipient.get_full_name|default:recipient.email }}</strong>
-                    {% if recipient.profile.organization %}
-                    - {{ recipient.profile.organization.name }}
-                    {% elif recipient.email == project.email %}
-                    - {{ project.org_name|capfirst }}
-                    {% endif %}
-                </span>
+            <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Participants</h6>
+            <div>
+                <p class="text-info-custom">Membres de la collectivité</p>
+                <ul class="flex-column list-unstyled mb-0">
+                        {% for member in project.members.all %}
+                        {% if forloop.counter0 == 0 %}
+                            <li>
+                                {% include 'projects/project/fragments/project_owner.html' with project=project %}
+                            </li>
+                            {% else %}
+                            <li>
+                                {% include 'projects/project/fragments/user.html' with member=member project=project %}
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                </ul>
             </div>
-            {% endfor %}
+            <div class="d-block mt-4">
+                <p class="text-info-custom">Équipe de suvi</p>
+                <ul class="d-flex flex-column list-unstyled mb-0">
+                    {% for advisor in project.switchtenders_on_site.all %}
+                    <li>
+                        {% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
 </div>
