@@ -61,10 +61,7 @@
         Solliciter {{ request.site.name }}
     </h2>
 
-    <div class="callout my-4">
-        <span class="callout-title">{{ request.site.name }} est un service public gratuit.</span>
-        <p class="callout-content mb-0 mt-2">Il répond aux questions et aux blocages des collectivités dans le recyclage de leurs fonciers artificialisés (construits, bétonnés, pollués) qui ont perdu leur usage. Le suivi des projets friche est assuré par les urbanistes de l’équipe ainsi que par les conseiller·e·s publics (selon les territoires : DDT, DREAL, EPF…).</p>
-    </div>
+    {% include "onboarding/onboarding_service_message.html" %}
 
     <div class="flag grey mb-4 d-flex align-items-center justify-content-start">
         <span class="title-info text-grey text-uppercase my-0 me-3">Attention</span>
