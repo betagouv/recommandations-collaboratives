@@ -22,9 +22,9 @@
                 <button class="btn btn-link d-flex p-0 me-2">
                     <svg class="bi align-baseline fill-blue" width="20" height="20">
                         {% if document.pinned == True %}
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
+                        <use id="file-is-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
                         {% else %}
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star" />
+                        <use id="file-is-not-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star" />
                         {% endif %}
                     </svg>
                 </button>
@@ -32,7 +32,7 @@
           {% if document.uploaded_by == user or can_administrate %}
               <form class="me-2" method="post" action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
                 {% csrf_token %}
-                <button class="d-flex" style="border: 0; background: 0;">
+                <button id="file-delete-button" class="d-flex" style="border: 0; background: 0;">
                   <svg class="bi align-baseline fill-grey" width="20" height="20">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
                   </svg>

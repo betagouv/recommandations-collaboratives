@@ -21,9 +21,9 @@
       <div class="d-flex align-items-center flex-column">
             <form method="POST" action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
                 {% csrf_token %}
-                <button class="btn btn-link d-flex p-0 me-0 mb-2">
+                <button id="file-bookmark" class="btn btn-link d-flex p-0 me-0 mb-2">
                     <svg class="bi align-baseline fill-blue" width="20" height="20">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
+                        <use id="file-is-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
                     </svg>
                 </button>
             </form>

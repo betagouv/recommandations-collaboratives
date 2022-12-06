@@ -18,7 +18,7 @@
         {% if files.count == 0 %}
             {% include 'projects/project/fragments/files_links/empty_files.html' %}
         {% else %}
-        <ul class="d-flex flex-column list-unstyled">
+        <ul id="file-list" class="d-flex flex-column list-unstyled">
             {% for document in files.all %}
                 {% if is_pinned %}
                     {% include 'projects/project/fragments/files_links/file_list_item_pinned.html' %}

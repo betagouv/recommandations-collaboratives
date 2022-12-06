@@ -18,7 +18,7 @@
       {% if document.uploaded_by == user or can_administrate %}
       <form class="" method="post" action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
         {% csrf_token %}
-        <button class="d-flex" style="border: 0; background: 0;">
+        <button id="link-delete-button" class="d-flex" style="border: 0; background: 0;">
           <svg class="bi align-baseline fill-grey" width="20" height="20">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
           </svg>
