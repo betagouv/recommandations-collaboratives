@@ -20,7 +20,7 @@
 <div class="row">
     <div class="col-8">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="text-uppercase small">{% if all_files.count > 0 %} {{all_files.count}} {% endif %} {% if all_files.count <= 1 %} fichier partagé {% else %} fichiers partagés {% endif %}</h6>
+            <h6 class="text-uppercase small">{% if all_files.count > 0 %} {{all_files.count}} {% endif %} fichier{{ all_files.count|pluralize }} partagé{{ all_files.count|pluralize }}</h6>
             {% url 'projects-documents-upload-document' project.pk as upload_action %}
             {% include 'projects/project/fragments/files_links/file_upload_button.html' with type='project' action=upload_action small=True %}
         </div>

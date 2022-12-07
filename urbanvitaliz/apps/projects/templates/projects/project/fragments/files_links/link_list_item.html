@@ -11,7 +11,7 @@
             <a href="{{ document.the_link }}" class="d-flex align-items-center text-decoration-none" target="_new" download>
                 <span class="text-info-custom text-black fw-medium">{{ document.description|truncatechars:33 }}</span>
             </a>
-            <a href="{{document.the_link}}" target="_blank" class="small text-black font-marianne fw-light">({{document.the_link|truncatechars:25}})</a>
+            <a rel="noopener noreferrer" href="{{document.the_link}}" target="_blank" class="small text-black font-marianne fw-light">({{document.the_link|truncatechars:25}})</a>
         </div>
     </div>
     <div class="d-flex align-items-center">
