@@ -46,6 +46,7 @@
             <span>Recommandations</span>
         </a>
     </li>
+    {% if can_administrate or request.user == project.owner %}
     <li>
         <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if conversation %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-conversations' project.pk %}">
             {% if active_project_conversations_notification_count %}
@@ -66,6 +67,7 @@
             <span class="">Conversation</span>
         </a>
     </li>
+    {% endif %}
     <li>
         <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if files_links %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-documents' project.pk %}">
             {% if project.status == 'DRAFT' %}
@@ -84,7 +86,7 @@
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
             </svg>&nbsp;
             {% endif %}
-            <span class="text-nowrap">Espace conseiller</span>
+            <span class="text-nowrap">Espace conseillers</span>
         </a>
     </li>
     {% endif %}

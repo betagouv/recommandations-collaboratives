@@ -1,13 +1,14 @@
-describe('I can create a recommandation with no resource as a switcthender', () => {
+import file from '../../../fixtures/documents/file.json'
+
+describe('I can add a file in a recommandation', () => {
     beforeEach(() => {
         cy.login("jean");
     })
 
-    it('creates a reco', () => {
-
+    it('writes a message with a file', () => {
         cy.visit('/projects')
 
-        cy.contains('Friche numéro 1').click({force:true});
+        cy.contains('Friche numéro 1').click({ force: true });
 
         cy.contains("Recommandations").click({ force: true })
 
@@ -27,8 +28,13 @@ describe('I can create a recommandation with no resource as a switcthender', () 
             .type(`fake recommandation content with no resource : ${now}`, { force: true })
             .should('have.value', `fake recommandation content with no resource : ${now}`)
 
+        cy.get('[name="the_file"]').selectFile(file.path, { force: true });
+
         cy.get("[type=submit]").click({ force: true });
 
         cy.url().should('include', '/actions#action-')
+
+        cy.contains(`fake recommandation content with no resource : ${now}`)
+        cy.contains(file.path.slice(-17,-4))
     })
 })

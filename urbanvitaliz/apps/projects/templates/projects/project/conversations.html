@@ -35,7 +35,7 @@
                                 {{ note.content_rendered|safe }}
                                 {% if note.document.count %}
                                     {% for document in note.document.all %}
-                                            {% include 'projects/project/fragments/files_links/file_list_item.html' with document=document disable_toolbar=True %}
+                                            {% include 'projects/project/fragments/files_links/file_list_item_embedded.html' with document=document %}
                                     {% endfor %}
                                 {% endif %}
                             {% if note.created_by %}
@@ -69,7 +69,7 @@
             <hr/>
 
             <!-- Post message -->
-            <div class="message-form">
+            <div class="message-form mt-4 p-3 bg-light border-form">
                 <form class="form"
                       method="POST"
                       action="{% url 'projects-conversation-create-message' project.pk %}"
@@ -83,13 +83,13 @@
                     {% for error in public_note_form.content.errors %}
                     <div class="text-danger text-end">{{ error }}</div>
                     {% endfor %}
-                    <input type="file" name="the_file">
 
-                    <div class="d-flex justify-content-end mt-2">
-                        <button form="conversation-form" class="btn btn-sm btn-primary" type="submit">Envoyer</button>
+                    {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button form="conversation-form" class="button filled" type="submit">Envoyer</button>
                     </div>
                 </form>
-
             </div>
             {% endif %}
         </div>

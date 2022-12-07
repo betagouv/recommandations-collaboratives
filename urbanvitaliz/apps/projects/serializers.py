@@ -20,6 +20,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "the_file",
             "the_link",
+            "filename",
             "description",
             "uploaded_by",
             "created_on",
