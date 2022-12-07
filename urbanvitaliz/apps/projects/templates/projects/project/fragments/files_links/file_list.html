@@ -1,7 +1,7 @@
 {% load static %}
 
 {% if not search == False %}
-    <div x-data="Files" id="filesId">
+    <div x-data="Files({{files.all.count}})" id="filesId">
         {% include 'projects/project/fragments/files_links/file_search.html' with files=files %}
         {% if files.count == 0 %}
             {% include 'projects/project/fragments/files_links/empty_files.html' %}
@@ -18,9 +18,13 @@
         {% if files.count == 0 %}
             {% include 'projects/project/fragments/files_links/empty_files.html' %}
         {% else %}
-        <ul class="d-flex flex-column list-unstyled">
+        <ul id="file-list" class="d-flex flex-column list-unstyled">
             {% for document in files.all %}
-                {% include 'projects/project/fragments/files_links/file_list_item.html' with is_pinned=is_pinned %}
+                {% if is_pinned %}
+                    {% include 'projects/project/fragments/files_links/file_list_item_pinned.html' %}
+                {% else %}
+                    {% include 'projects/project/fragments/files_links/file_list_item.html' %}
+                {% endif %}
             {% endfor %}
         </ul>
     {% endif %}

@@ -22,8 +22,8 @@ from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
 
 from .. import models
-from ..utils import (can_manage_or_403, can_manage_project,
-                     is_regional_actor_for_project)
+from ..utils import (can_administrate_project, can_manage_or_403,
+                     can_manage_project, is_regional_actor_for_project)
 
 ########################################################################
 # Access
@@ -75,7 +75,7 @@ def access_update(request, project_id):
             if already_member or already_invited:
                 messages.warning(
                     request,
-                    "Cet usager ({0}) a déjà été invité, aucun courrier n'a été envoyé.".format(
+                    "Cet usager ({0}) a déjà été invité, aucun courriel n'a été envoyé.".format(
                         email
                     ),
                 )
@@ -84,6 +84,17 @@ def access_update(request, project_id):
             else:
                 # New invite
                 invite = form.save(commit=False)
+
+                # Check if we are allowed to invite in case of an advisor's invite
+                if invite.role == "SWITCHTENDER":
+                    if not (
+                        can_administrate_project(project, request.user)
+                        or is_regional_actor_for_project(
+                            project, request.user, allow_national=True
+                        )
+                    ):
+                        raise PermissionDenied
+
                 invite.project = project
                 invite.inviter = request.user
                 invite.site = request.site

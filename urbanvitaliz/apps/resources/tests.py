@@ -15,7 +15,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import models as projects_models
@@ -299,6 +300,44 @@ def test_update_resource_and_redirect(request, client):
     assert response.status_code == 302
     resource = models.Resource.on_site.get(id=resource.id)
     assert resource.content == data["content"]
+
+
+#
+# delete
+
+
+@pytest.mark.django_db
+def test_delete_resource_not_available_for_non_staff_users(client, request):
+    resource = baker.make(models.Resource, sites=[get_current_site(request)])
+
+    url = reverse("resources-resource-delete", args=[resource.pk])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_delete_resource_available_for_staff(client, request):
+    resource = baker.make(models.Resource, sites=[get_current_site(request)])
+
+    url = reverse("resources-resource-delete", args=(resource.pk,))
+    with login(client, is_staff=True):
+        response = client.get(url)
+    assert response.status_code == 200
+    assertContains(response, 'form id="form-resource-delete"')
+
+
+@pytest.mark.django_db
+def test_delete_resource_and_redirect(client, request):
+    resource = baker.make(models.Resource, sites=[get_current_site(request)])
+
+    assert models.Resource.on_site.count() == 1
+    with login(client, is_staff=True):
+        response = client.post(reverse("resources-resource-delete", args=[resource.pk]))
+
+    assert response.status_code == 302
+
+    assert models.Resource.on_site.count() == 0
 
 
 ########################################################################

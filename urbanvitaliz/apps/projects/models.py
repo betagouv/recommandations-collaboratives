@@ -553,6 +553,8 @@ class Task(OrderedModel):
         resources.Resource, on_delete=models.CASCADE, null=True, blank=True
     )
 
+    document = GenericRelation("Document")
+
     contact = models.ForeignKey(
         addressbook_models.Contact, on_delete=models.CASCADE, null=True, blank=True
     )

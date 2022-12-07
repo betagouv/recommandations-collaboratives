@@ -489,16 +489,32 @@ def test_project_conversations_available_for_owner(request, client):
 
 
 @pytest.mark.django_db
-def test_project_conversations_available_for_switchtender(request, client):
+def test_project_conversations_not_available_for_unassigned_switchtender(
+    request, client
+):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-conversations", args=[project.id])
     with login(client, groups=["switchtender"]):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_conversations_available_for_assigned_switchtender(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    url = reverse("projects-project-detail-conversations", args=[project.id])
+    with login(client) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_project_conversations_available_for_restricted_switchtender(request, client):
+def test_project_conversations_not_available_for_restricted_switchtender(
+    request, client
+):
     other = Recipe(geomatics.Department, code="02").make()
     project = Recipe(
         models.Project,
@@ -509,7 +525,7 @@ def test_project_conversations_available_for_restricted_switchtender(request, cl
     with login(client, groups=["switchtender"]) as user:
         user.profile.departments.add(other)
         response = client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
 # internal
@@ -951,7 +967,7 @@ def test_assigned_switchtender_can_add_email_to_project(request, client):
     )
 
     url = reverse("projects-access-update", args=[project.id])
-    data = {"email": "test@example.com", "role": "COLLABORATOR"}
+    data = {"email": "test@example.com", "role": "SWITCHTENDER"}
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders_on_site.create(
@@ -1016,6 +1032,33 @@ def test_owner_can_add_email_to_project_if_not_draft(request, client):
 
     invite = invites_models.Invite.on_site.first()
     assert invite.email == data["email"]
+
+
+@pytest.mark.django_db
+def test_collectivity_member_cannot_invite_an_advisor(request, client):
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=False,
+        member__is_staff=False,
+        member__email="us@er.fr",
+        member__username="us@er.fr",
+    )
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+        status="READY",
+    )
+
+    url = reverse("projects-access-update", args=[project.id])
+    data = {"email": "collaborator@example.com", "role": "SWITCHTENDER"}
+
+    with login(client, user=membership.member):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 403
+
+    assert invites_models.Invite.on_site.count() == 0
 
 
 @pytest.mark.django_db

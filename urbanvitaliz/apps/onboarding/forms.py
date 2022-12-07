@@ -40,7 +40,7 @@ class OnboardingResponseForm(forms.ModelForm):
     phone = forms.CharField(
         max_length=16, label="Téléphone", initial="", required=False
     )
-    email = forms.CharField(label="Email principal", required=True)
+    email = forms.CharField(label="Courriel", required=True)
     org_name = forms.CharField(
         label="Nom de votre structure", initial="", required=True
     )

@@ -9,8 +9,25 @@ from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
-from .models import Project, Task, TaskFollowup
+from .models import Document, Project, Task, TaskFollowup
 from .utils import create_reminder, get_collaborators_for_project
+
+
+class DocumentSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Document
+        fields = [
+            "id",
+            "the_file",
+            "the_link",
+            "filename",
+            "description",
+            "uploaded_by",
+            "created_on",
+            "pinned",
+        ]
+
+    uploaded_by = UserSerializer(read_only=True, many=False)
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
@@ -126,6 +143,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "created_by",
             "intent",
             "content",
+            "document",
             "reminders",
             "resource_id",
             "notifications",
@@ -135,6 +153,8 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
 
     created_by = UserSerializer(read_only=True, many=False)
     reminders = ReminderSerializer(read_only=True, many=True)
+
+    document = DocumentSerializer(read_only=True, many=True)
 
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()
