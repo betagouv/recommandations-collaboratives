@@ -1,0 +1,25 @@
+.onboarding-response-form label {
+    font-family: 'Marianne';
+    font-style: normal;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 24px;
+    color: #666666;
+}
+
+.common-form label {
+    font-family: 'Marianne';
+    font-style: normal;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 24px;
+    color: #666666;
+}
+
+.common-form input {
+    padding: 11px 10px !important;
+}
+
+.onboarding-response-form textarea {
+    margin-bottom: 20px;
+}

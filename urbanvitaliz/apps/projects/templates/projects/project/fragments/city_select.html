@@ -2,9 +2,9 @@
     x-init="{% if form.postcode.value and form.insee.value %}getPostcode({{form.postcode.value}},{{form.insee.value}}) {% endif %}">
     <div class="row g-3">
         <div class="col-auto">
-            <div class="form-floating mb-3">
-                <input :disabled="isLoading" @change.debounce="fetchCities()" x-model="postal" type="text" class="form-control {% if form.postcode.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.postcode.name }}" placeholder="Code Postal" value="{{ form.postcode.value|default:'' }}" required>
-                <label for="input-project-address">{{ form.postcode.label }}</label>
+            <div class="mb-3">
+                <label class="text-info-custom text-grey-dark" for="input-project-address">{{ form.postcode.label }}</label>
+                <input :disabled="isLoading" @change.debounce="fetchCities()" x-model="postal" type="text" class="py-4 form-control {% if form.postcode.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.postcode.name }}" placeholder="Code Postal" value="{{ form.postcode.value|default:'' }}" required>
 
                 {% for error in form.postcode.errors %}
                 <div class="text-danger text-end">{{ error }}</div>
@@ -13,11 +13,12 @@
         </div>
 
         <div class="mb-3 col-auto" x-show="cities">
-                <select x-ref="insee" name="insee" class="form-select" :disabled="cities && !cities.length">
+                <label class="text-info-custom text-grey-dark" for="input-project-address">Commune</label>
+                <select style="padding: 12px 10px; border-radius: 0.25rem;" x-ref="insee" name="insee" class="form-select" :disabled="cities && !cities.length">
                     <template x-if="cities && cities.length == 0 && postal">
                         <option selected>Aucune commune trouvée, vérifiez le code postal ?</option>
                     </template>
-
+                    
                     <template x-if="cities">
                         <template
                             x-for="city in cities"
