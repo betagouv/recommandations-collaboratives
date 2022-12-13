@@ -1,6 +1,6 @@
 const STATUSES = {
     TO_PROCESS: {
-        title: 'A traiter',
+        title: 'À traiter',
         color: "#6c757d",
         colorClass: 'bg-secondary',
     },
