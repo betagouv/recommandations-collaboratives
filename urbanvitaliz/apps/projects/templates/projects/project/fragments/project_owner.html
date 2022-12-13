@@ -4,14 +4,15 @@
 
 {% if project.owner and project.owner.first_name and project.owner.last_name %}
     <div class="d-flex flex-column align-items-start mb-2">
-        <span class="me-2 d-flex align-items-center">
-            <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-            <strong class="text-nowrap text-capitalize">
-                {{ project.owner.first_name }}
-                {{ project.owner.last_name }}
-            </strong>
+        <span class="me-2 d-flex align-items-center w-100 justify-content-between">
+            <div class="d-flex align-items-center">
+                <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
+                <strong class="text-nowrap text-capitalize">
+                    {{ project.owner.first_name }}
+                    {{ project.owner.last_name }}
+                </strong>
+            </div>
             {% if request.user.is_staff %}
-            &nbsp;
             <a class="small" href="{% url 'crm-user-details' project.owner.pk %}">
                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />

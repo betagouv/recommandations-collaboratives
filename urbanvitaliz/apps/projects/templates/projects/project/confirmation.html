@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="col-11 col-lg-9 py-5 mx-auto font-marianne">
+    <nav class="mb-4 pb-1">
+        <ol class="list-unstyled d-flex align-items-center">
+            <li>
+                <a class="small text-decoration-underline text-grey" href="{% url 'home' %}">Accueil</a>
+            </li>
+            <svg class="bi mx-2" width="15" height="15">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-right" />
+            </svg>
+            <li>
+                <span class="small text-dark">
+                    Soliciter {{request.site.name}}
+                </span>
+            </li>
+        </ol>
+    </nav>
+    <h2>
+        Votre demande à bien été prise en compte !
+    </h2>
+    <p class="text-info-custom">
+        Vous recevrez un courriel de confirmation d’ici peu ! <br /> 🎉 Notre équipe va valider votre demande et prendre
+        contact pour convenir d’un échange.
+    </p>
+    <div class="flag orange mb-4 d-flex align-items-center justify-content-start">
+        <span class="title-info text-orange text-uppercase my-0 me-3">Attention</span>
+        <p class="text-info-custom text-orange my-0">Il se peut que certains fournisseurs de mails bloquent nos email,
+            n’hésitez pas à vérifier vos <strong>SPAM</strong></p>
+    </div>
+    <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
+        <h4 class="pt-2">Prochaine étape : Remplissez le parcours d’état des lieux</h4>
+        <p class="m-0 text-info-custom fw-normal pb-3">Pour faire le point sur votre avancement et recevoir des conseils pertinents.</p>
+        <a class="button filled pb-2" href="#">Compléter l'état des lieux</a>
+    </div>
+</div>
+{% endblock %}

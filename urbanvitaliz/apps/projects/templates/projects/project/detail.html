@@ -24,30 +24,12 @@
 {% block content %}
 
 <div class="col-10 py-5 mx-auto">
-
-    <div class="row">
-        {% if project.status == "DRAFT" %}
-        <div class="border mb-4 p-4 align-items-center">
-            <div class="w-100">
-                <p class="text-center d-flex justify-content-center flex-column">
-                    <span class="mb-2">
-                        <svg class="align-middle bi" width="28px" height="28px" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#hourglass-split"/>
-                        </svg>
-                    </span>
-
-                    <span class="align-middle fs-4">Nous avons bien reçu votre dossier, il est en attente de validation par l'équipe {{request.site.name}}.</span>
-                    <br/>
-                    <span class="align-middle text-secondary">Les conseillers de votre territoire reviendront vers vous sous quelques semaines. Vous pourrez aussi partager votre dossier à vos collaborateurs.</span>
-                </p>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-
     <div class="row" style="font-family: 'Marianne', arial, sans-serif;">
         {% block banner %}{% endblock %}
         {% include 'projects/project/header.html' %}
+        {% if project.status == "DRAFT" %}
+            {% include 'projects/project/fragments/pending_confirmation_banner.html' %}
+        {% endif %}
         {% block project_detail %}{% endblock %}
     </div>
 
