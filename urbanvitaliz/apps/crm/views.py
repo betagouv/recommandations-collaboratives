@@ -204,6 +204,7 @@ def handle_create_note_for_object(
             note.created_by = request.user
             note.site = request.site
             note.save()
+            form.save_m2m()
             return True, redirect(reverse(return_view_name, args=(the_object.pk,)))
 
     else:
