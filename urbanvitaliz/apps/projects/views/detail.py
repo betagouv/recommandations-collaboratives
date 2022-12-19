@@ -17,7 +17,7 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 
 from .. import models
-from ..forms import PrivateNoteForm, PublicNoteForm, SynopsisForm
+from ..forms import PrivateNoteForm, PublicNoteForm, TagsForm, TopicsForm
 from ..utils import (can_administrate_or_403, can_administrate_project,
                      can_manage_or_403, can_manage_project,
                      check_if_national_actor,
@@ -237,14 +237,14 @@ def project_internal_followup(request, project_id=None):
 
 
 @login_required
-def project_synopsis(request, project_id=None):
-    """Delete a task from a project"""
+def project_create_or_update_topics(request, project_id=None):
+    """Create/Update topics for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     can_administrate_or_403(project, request.user)
 
     if request.method == "POST":
-        form = SynopsisForm(request.POST, instance=project)
+        form = TopicsForm(request.POST, instance=project)
         if form.is_valid():
             project = form.save(commit=False)
             project.synopsis_on = timezone.now()
@@ -256,6 +256,6 @@ def project_synopsis(request, project_id=None):
                 reverse("projects-project-detail-overview", args=[project.pk])
             )
     else:
-        form = SynopsisForm(instance=project)
+        form = TopicsForm(instance=project)
 
     return render(request, "projects/project/synopsis.html", locals())

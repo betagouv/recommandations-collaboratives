@@ -182,26 +182,26 @@ class Project(models.Model):
     )
     description = models.TextField(verbose_name="Description", default="", blank=True)
 
-    # Synopsis (needs rephrased by an advisor)
-    synopsis = models.TextField(
-        verbose_name="Reformulation du besoin", default="", blank=True, null=True
+    # Internal advisors note
+    advisors_note = models.TextField(
+        verbose_name="Note interne", default="", blank=True, null=True
     )
 
     @property
-    def synopsis_rendered(self):
+    def advisors_note_rendered(self):
         """Return synopsis as markdown"""
-        return markdownify(self.synopsis)
+        return markdownify(self.advisors_note)
 
-    synopsis_on = models.DateTimeField(
-        verbose_name="Reformulé le", null=True, blank=True
+    advisors_note_on = models.DateTimeField(
+        verbose_name="Rédigé le", null=True, blank=True
     )
-    synopsis_by = models.ForeignKey(
+    advisors_note_by = models.ForeignKey(
         auth_models.User,
-        verbose_name="Reformulé par",
+        verbose_name="Rédigé par",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name="synopses",
+        related_name="advisors_notes",
     )
 
     location = models.CharField(max_length=256, verbose_name="Localisation")
@@ -299,6 +299,20 @@ class ProjectSwitchtender(models.Model):
         Project, on_delete=models.CASCADE, related_name="switchtenders_on_site"
     )
     is_observer = models.BooleanField(default=False)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+
+class ProjectTopicOnSiteManager(CurrentSiteManager):
+    pass
+
+
+class ProjectTopic(models.Model):
+    objects = ProjectTopicOnSiteManager()
+
+    label = models.CharField(max_length=255)
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name="topics_on_site"
+    )
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
 

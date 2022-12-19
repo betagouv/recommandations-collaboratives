@@ -220,12 +220,20 @@ class DocumentUploadForm(forms.ModelForm):
         fields = ["the_file", "the_link", "description"]
 
 
-class SynopsisForm(forms.ModelForm):
-    """Form for synopsis creation/update"""
+class TagsForm(forms.ModelForm):
+    """Form for tags creation/update"""
 
     class Meta:
         model = models.Project
-        fields = ["synopsis", "tags"]
+        fields = ["tags"]
+
+
+class TopicsForm(forms.ModelForm):
+    """Form for topics creation/update"""
+
+    class Meta:
+        model = models.Project
+        fields = ["advisors_note"]
 
 
 # eof
