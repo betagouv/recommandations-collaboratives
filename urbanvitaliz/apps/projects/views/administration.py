@@ -11,23 +11,61 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from urbanvitaliz import utils
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.forms import InviteForm
-from urbanvitaliz.apps.survey import models as survey_models
 
-from .. import models
+from .. import forms, models
 from ..utils import (can_administrate_project, can_manage_or_403,
                      can_manage_project, is_regional_actor_for_project)
 
 ########################################################################
 # Access
 ########################################################################
+
+
+@login_required
+def project_administration(request, project_id):
+    """Handle ACL for a project"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    if not (
+        can_manage_project(project, request.user)
+        or is_regional_actor_for_project(project, request.user, allow_national=True)
+    ):
+        raise PermissionDenied
+
+    # Fetch pending invites
+    pending_invites = []
+    for invite in invites_models.Invite.on_site.filter(
+        project=project, accepted_on=None
+    ):
+        pending_invites.append(invite)
+
+    invite_form = InviteForm()
+
+    if request.method == "POST":
+        form = forms.ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.updated_on = timezone.now()
+            instance.save()
+            form.save_m2m()
+            return redirect(reverse("projects-project-detail", args=[project_id]))
+    else:
+        if project.commune:
+            postcode = project.commune.postal
+        else:
+            postcode = None
+        project_form = forms.ProjectForm(
+            instance=project, initial={"postcode": postcode}
+        )
+
+    return render(request, "projects/project/administration_panel.html", locals())
 
 
 @login_required
@@ -188,26 +226,6 @@ def access_delete(request, project_id: int, email: str):
             )
 
     return redirect(reverse("projects-access-update", args=[project_id]))
-
-
-def project_detail_from_sharing_link(request, project_ro_key):
-    """Return a special view of the project using the sharing link"""
-    try:
-        project = models.Project.on_site.get(ro_key=project_ro_key)
-    except Exception:
-        raise Http404()
-
-    try:
-        site_config = utils.get_site_config_or_503(request.site)
-        session, created = survey_models.Session.objects.get_or_create(
-            project=project, survey=site_config.project_survey
-        )
-    except Exception:
-        pass
-
-    can_manage = can_manage_project(project, request.user)
-
-    return render(request, "projects/project/detail-ro.html", locals())
 
 
 # eof
