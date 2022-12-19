@@ -43,7 +43,7 @@
                         </div>
                         <div>
                             {% if membership.is_owner is False %}
-                            <form id="form-projects-access-remove-user" action="{% url 'projects-access-delete' project.pk membership.member.email %}" method="post">
+                            <form id="form-projects-access-remove-user" action="{% url 'projects-project-access-delete' project.pk membership.member.email %}" method="post">
                                 {% csrf_token %}
                                 <button class="btn btn-outline-danger btn-sm">Supprimer</button>
                             </form>
