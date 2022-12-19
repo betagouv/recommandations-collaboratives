@@ -1,0 +1,15 @@
+{% load gravatar %}
+{% load static %}
+<div class="d-flex flex-column align-items-start mb-2">
+    <div class="w-100 d-flex align-items-center justify-content-between">
+        <span class="me-2 d-flex align-items-center">
+            <img class="rounded-circle me-2"
+                 src="{% gravatar_url user_invited.email size=24 %}"
+                 alt="{{ action.actor }}"/>
+            <strong class="text-nowrap text-capitalize">{{ user_invited.email }}</strong>
+        </span>
+    </div>
+    <div class="d-flex align-items-center">
+        <span style="color: #666666; font-style: italic; font-weight: 300;">invité·e par {{ invite.inviter }}</span>
+    </div>
+</div>
