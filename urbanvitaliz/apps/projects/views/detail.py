@@ -10,6 +10,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
+from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from urbanvitaliz.apps.invites.forms import InviteForm
@@ -17,7 +18,8 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
 
 from .. import models
-from ..forms import PrivateNoteForm, PublicNoteForm, TagsForm, TopicsForm
+from ..forms import (PrivateNoteForm, ProjectTopicsForm, PublicNoteForm,
+                     TagsForm)
 from ..utils import (can_administrate_or_403, can_administrate_project,
                      can_manage_or_403, can_manage_project,
                      check_if_national_actor,
@@ -243,19 +245,36 @@ def project_create_or_update_topics(request, project_id=None):
 
     can_administrate_or_403(project, request.user)
 
+    TopicFormset = modelformset_factory(
+        models.ProjectTopic, fields=("label",), extra=10, can_delete=True
+    )
+
     if request.method == "POST":
-        form = TopicsForm(request.POST, instance=project)
-        if form.is_valid():
+        topic_formset = TopicFormset(request.POST)
+        form = ProjectTopicsForm(request.POST, instance=project)
+        if form.is_valid() and topic_formset.is_valid():
             project = form.save(commit=False)
             project.advisors_note_on = timezone.now()
             project.advisors_note_by = request.user
             project.save()
             form.save_m2m()
 
+            ## Topics
+            # save new ones
+            for topic in topic_formset.save(commit=False):
+                topic.project = project
+                topic.site = request.site
+                topic.save()
+
+            # deleted flagged ones
+            for deleted_topic in topic_formset.deleted_objects:
+                deleted_topic.delete()
+
             return redirect(
                 reverse("projects-project-detail-overview", args=[project.pk])
             )
     else:
-        form = TopicsForm(instance=project)
+        topic_formset = TopicFormset()
+        form = ProjectTopicsForm(instance=project)
 
     return render(request, "projects/project/synopsis.html", locals())

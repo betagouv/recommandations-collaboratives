@@ -228,7 +228,7 @@ class TagsForm(forms.ModelForm):
         fields = ["tags"]
 
 
-class TopicsForm(forms.ModelForm):
+class ProjectTopicsForm(forms.ModelForm):
     """Form for topics creation/update"""
 
     class Meta:

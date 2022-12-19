@@ -35,13 +35,15 @@
                 <form action="" method="post">
                     {% csrf_token %}
                     <div class="d-flex">
-                        {% include 'tools/editor.html' with input_name=form.synopsis.name input_value=form.synopsis.value|default:'' escapejs=True%}
+                        {% include 'tools/editor.html' with input_name=form.advisors_note.name input_value=form.advisors_note.value|default:'' escapejs=True%}
                     </div>
                     <p class="d-flex flex-column">
                         {{ form.tags.errors }}
                         {{form.tags }}
                         <span>{{form.tags.help_text }}</span>
                     </p>
+
+                    {{ topic_formset.as_p }}
                     <button type="submit" class="btn btn-primary">
                         Enregistrer
                     </button>
