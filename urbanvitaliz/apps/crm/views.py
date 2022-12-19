@@ -180,13 +180,24 @@ def project_details(request, project_id):
 
     actions = target_stream(project)
 
+    user_ct = ContentType.objects.get_for_model(User)
+
     project_ct = ContentType.objects.get_for_model(Project)
 
-    all_notes = models.Note.on_site.filter(
+    participants = project.members.all()
+    participant_ids = list(participants.values_list("id", flat=True))
+    participant_notes = models.Note.on_site.filter(
+        object_id__in=participant_ids,
+        content_type=user_ct,
+    ).order_by("-updated_on")
+
+    project_notes = models.Note.on_site.filter(
         object_id=project.pk, content_type=project_ct
     ).order_by("-updated_on")
-    sticky_notes = all_notes.filter(sticky=True)
-    notes = all_notes.exclude(sticky=True)
+
+    sticky_notes = project_notes.filter(sticky=True)
+
+    notes = project_notes.exclude(sticky=True) | participant_notes
 
     search_form = forms.CRMSearchForm()
 
@@ -204,6 +215,7 @@ def handle_create_note_for_object(
             note.created_by = request.user
             note.site = request.site
             note.save()
+            form.save_m2m()
             return True, redirect(reverse(return_view_name, args=(the_object.pk,)))
 
     else:
