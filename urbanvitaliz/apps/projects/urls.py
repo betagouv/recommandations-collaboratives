@@ -11,7 +11,8 @@ created : 2021-05-26 15:54:25 CEST
 from django.urls import path
 
 from . import views
-from .views import detail, documents, feeds, notes, sharing, tasks
+from .views import (administration, detail, documents, feeds, notes, sharing,
+                    tasks)
 
 urlpatterns = [
     path(
@@ -72,11 +73,6 @@ urlpatterns = [
         r"project/<int:project_id>/conversations",
         detail.project_conversations,
         name="projects-project-detail-conversations",
-    ),
-    path(
-        r"project/<int:project_id>/update/",
-        views.project_update,
-        name="projects-project-update",
     ),
     path(
         r"project/<int:project_id>/switchtender/join",
@@ -219,14 +215,19 @@ urlpatterns = [
         name="projects-project-create-action",
     ),
     path(
-        r"project/<int:project_id>/access/",
-        sharing.access_update,
-        name="projects-access-update",
+        r"project/<int:project_id>/administration/",
+        administration.project_administration,
+        name="projects-project-administration",
     ),
     path(
-        r"project/<int:project_id>/access/<str:email>/delete",
-        sharing.access_delete,
-        name="projects-access-delete",
+        r"project/<int:project_id>/administration/access",
+        administration.access_update,
+        name="projects-project-access-update",
+    ),
+    path(
+        r"project/<int:project_id>/administration/access/<str:email>/delete",
+        administration.access_delete,
+        name="projects-project-access-delete",
     ),
     # Recommendations
     path(

@@ -389,31 +389,6 @@ def project_maplist(request):
 
 
 @login_required
-def project_update(request, project_id=None):
-    """Update the base information of a project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    can_administrate_or_403(project, request.user)
-
-    if request.method == "POST":
-        form = ProjectForm(request.POST, instance=project)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            # postcode = form.cleaned_data.get("postcode")
-            # project.commune = geomatics.Commune.get_by_postal_code(postcode)
-            instance.updated_on = timezone.now()
-            instance.save()
-            form.save_m2m()
-            return redirect(reverse("projects-project-detail", args=[project_id]))
-    else:
-        if project.commune:
-            postcode = project.commune.postal
-        else:
-            postcode = None
-        form = ProjectForm(instance=project, initial={"postcode": postcode})
-    return render(request, "projects/project/update.html", locals())
-
-
-@login_required
 def project_accept(request, project_id=None):
     """Update project as accepted for processing"""
     is_project_moderator_or_403(request.user)
