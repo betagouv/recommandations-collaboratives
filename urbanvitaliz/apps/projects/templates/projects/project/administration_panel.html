@@ -9,6 +9,53 @@
     <div class="row">
         <div class="col-12">
             <h6 class="text-uppercase fw-bold d-block mb-3 font-small">informations générales</h6>
+            <form method="post"
+                  action="{% url 'projects-project-administration' project.pk %}"
+                  class="{% if project_form.errors %}was-validated{% endif %}">
+                {% csrf_token %}
+                {% if project_form.errors %}
+                    <div class="border border-danger rounded mb-3 pt-3 text-danger">{{ project_form.errors }}</div>
+                {% endif %}
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="mb-2 text-info-custom text-grey-dark"
+                               for="{{ project_form.name.id_for_label }}">
+                            {{ project_form.name.label }}
+                        </label>
+                        <input type="text"
+                               class="py-3 placeholder-grey form-control {% if project_form.name.errors %}is-invalid{% endif %}"
+                               id="{{ project_form.name.id_for_label }}"
+                               name="{{ project_form.name.name }}"
+                               placeholder="Nom du projet"
+                               value="{{ project_form.name.value }}"
+                               required/>
+                        {% for error in project_form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="mb-2 text-info-custom text-grey-dark"
+                               for="input-project-address">Adresse</label>
+                        <input type="text"
+                               class="py-3 placeholder-grey form-control {% if project_form.location.errors %}is-invalid{% endif %}"
+                               id="input-project-address"
+                               name="{{ project_form.location.name }}"
+                               placeholder="Adresse"
+                               value="{{ project_form.location.value|default:'' }}"
+                               required>
+                        {% for error in project_form.location.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="text-info-custom text-grey-dark"
+                               for="input-project-description">Contexte du projet</label>
+                        <textarea maxlength="500" class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %}" style="height: 100px;" id="input-project-description" name="{{ project_form.description.name }}" placeholder="">{{ project_form.description.value|default:'' }}</textarea>
+                        {% for error in project_form.description.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+                <button type="submit" class="button filled mt-4">Modifier les informations du projet</button>
+            </form>
         </div>
     </div>
 {% endblock %}
