@@ -1793,6 +1793,36 @@ def test_switchtender_writes_advisors_note(request, client):
     assert project.advisors_note_by == user
 
 
+@pytest.mark.django_db
+def test_switchtender_add_topics(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    data = {
+        "advisors_note": "",
+        "form-TOTAL_FORMS": 1,
+        "form-INITIAL_FORMS": 0,
+        "form-0-id": "",
+        "form-0-label": "blah",
+    }
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
+        response = client.post(
+            reverse("projects-project-topics", args=[project.id]),
+            data=data,
+        )
+
+        print(response.content)
+
+    assert response.status_code == 302
+    topic = models.ProjectTopic.objects.all()[0]
+    assert topic.project == project
+    assert topic.label == data["form-0-label"]
+
+
 #################################################################
 # User interest in project
 #################################################################
