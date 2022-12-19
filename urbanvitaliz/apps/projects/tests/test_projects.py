@@ -1770,6 +1770,29 @@ def test_switchtender_exports_csv(request, client):
 
 
 #################################################################
+# Tags
+#################################################################
+@pytest.mark.django_db
+def test_switchtender_updates_tags(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    data = {"tags": "blah"}
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
+        response = client.post(
+            reverse("projects-project-tags", args=[project.id]), data=data
+        )
+
+    assert response.status_code == 302
+    project = models.Project.objects.all()[0]
+    assert list(project.tags.names()) == [data["tags"]]
+
+
+#################################################################
 # Topics
 #################################################################
 @pytest.mark.django_db

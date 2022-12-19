@@ -220,7 +220,7 @@ class DocumentUploadForm(forms.ModelForm):
         fields = ["the_file", "the_link", "description"]
 
 
-class TagsForm(forms.ModelForm):
+class ProjectTagsForm(forms.ModelForm):
     """Form for tags creation/update"""
 
     class Meta:
