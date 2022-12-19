@@ -1783,7 +1783,11 @@ def test_switchtender_writes_advisors_note(request, client):
 
         response = client.post(
             reverse("projects-project-topics", args=[project.id]),
-            data={"advisors_note": "this is some content"},
+            data={
+                "advisors_note": "this is some content",
+                "form-TOTAL_FORMS": 1,
+                "form-INITIAL_FORMS": 0,
+            },
         )
 
     assert response.status_code == 302
