@@ -1770,10 +1770,10 @@ def test_switchtender_exports_csv(request, client):
 
 
 #################################################################
-# Synopsis
+# Topics
 #################################################################
 @pytest.mark.django_db
-def test_switchtender_writes_synopsis_for_project(request, client):
+def test_switchtender_writes_advisors_note(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
     with login(client, groups=["switchtender"]) as user:
@@ -1782,15 +1782,15 @@ def test_switchtender_writes_synopsis_for_project(request, client):
         )
 
         response = client.post(
-            reverse("projects-project-synopsis", args=[project.id]),
-            data={"synopsis": "this is some content"},
+            reverse("projects-project-topics", args=[project.id]),
+            data={"advisors_note": "this is some content"},
         )
 
     assert response.status_code == 302
     project = models.Project.objects.all()[0]
-    assert project.synopsis is not None
-    assert project.synopsis_on is not None
-    assert project.synopsis_by == user
+    assert project.advisors_note is not None
+    assert project.advisors_note_on is not None
+    assert project.advisors_note_by == user
 
 
 #################################################################

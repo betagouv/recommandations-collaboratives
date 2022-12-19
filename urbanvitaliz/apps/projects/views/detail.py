@@ -247,8 +247,8 @@ def project_create_or_update_topics(request, project_id=None):
         form = TopicsForm(request.POST, instance=project)
         if form.is_valid():
             project = form.save(commit=False)
-            project.synopsis_on = timezone.now()
-            project.synopsis_by = request.user
+            project.advisors_note_on = timezone.now()
+            project.advisors_note_by = request.user
             project.save()
             form.save_m2m()
 
