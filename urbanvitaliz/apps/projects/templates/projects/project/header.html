@@ -17,17 +17,16 @@
                 {% endif %}
             </div>
             {% if user.is_staff %}
-                <div class="d-flex flex-column">
+                <div class="d-flex justify-content-between">
                     <ul class="d-flex list-unstyled m-0 p-0 flex-wrap mb-3">
                         {% for tag in project.tags.all %}<li class="mx-1 my-1 badge rounded-pill bg-dark">{{ tag }}</li>{% endfor %}
-                    </ul>
-                    <a class="d-flex align-items-center"
+                        <a class="d-flex align-items-center"
                        href="{% url "projects-project-tags" project.id %}">
-                        Éditer les tags
                         <svg class="bi ms-2 " width="15" height="15" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
                         </svg>
                     </a>
+                    </ul>
                 </div>
             {% endif %}
         </div>

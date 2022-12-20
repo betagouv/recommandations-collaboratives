@@ -1,11 +1,11 @@
 {% load static %}
-<div class="pt-4 w-100 mb-4 pb-2">
+<div class="pt-4 w-100 mb-3">
     <div class="d-flex align-items-center justify-content-between w-100">
-        <h6 class="d-flex align-items-center text-uppercase fw-bold font-small mb-4">
+        <h6 class="d-flex align-items-center text-uppercase fw-bold font-small mb-2">
             <svg class="bi me-2 " width="32" height="32" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#card-checklist" />
             </svg>
-            Sujets
+            Sujets diagnostiqués
         </h6>
         {% if can_administrate %}
             <a class="d-flex align-items-center"
@@ -30,7 +30,7 @@
         </div>
     {% else %}
         {% for topic in project.topics_on_site.all %}
-            <ul class="list-unstyled">
+            <ul class="list-unstyled mb-0">
                 {% include 'projects/project/fragments/topics/topic_list_item.html' %}
             </ul>
         {% endfor %}

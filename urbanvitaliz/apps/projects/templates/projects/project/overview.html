@@ -53,28 +53,20 @@
         {% include 'projects/project/navigation.html' with overview=True %}
         <div class="row">
             <div class="col-8">
-                {% include 'projects/project/fragments/topics/topic_list.html' %}
-
-                {% if can_administrate %}
-                    {% if project.advisors_note %}
-                        <div class="advisor-item">
-                            <span class="advisor-item-icon">
-                                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#incognito" />
-                                </svg>
-                            </span>
-                            {% include 'projects/project/fragments/information_card.html' with full_width=True project=project is_editable=True title="Note interne" description=project.advisors_note_rendered updated_on=project.advisors_note_on card_user=project.advisors_note_by %}
+                <div class="d-flex">
+                    {% if can_administrate %}
+                        <div class="w-50">
+                            <div class="pe-4">
+                                {% include 'projects/project/fragments/topics/topic_list.html' %}
+                            </div>
                         </div>
+                        <div class="w-50">{% include 'projects/project/fragments/advisor_note.html' %}</div>
                     {% else %}
-                        <div class="project-card-details me-4 py-4 d-flex flex-column align-items-center justify-content-center">
-                            <span style="color:#929292; font-size: 14px;" class="text-uppercase">Aucune reformulation n'a été faite pour le moment</span>
-                            {% if can_administrate %}
-                                <a class="button mt-3"
-                                   href="{% url "projects-project-topics" project.id %}">Reformuler le besoin de la collectivité</a>
-                            {% endif %}
+                        <div class="pe-4 w-100">
+                        {% include 'projects/project/fragments/topics/topic_list.html' %}
                         </div>
                     {% endif %}
-                {% endif %}
+                </div>
                 <div class="mt-4">
                     <div class="d-flex w-full flex-wrap">
                         {% include 'projects/project/fragments/information_card.html' with project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}

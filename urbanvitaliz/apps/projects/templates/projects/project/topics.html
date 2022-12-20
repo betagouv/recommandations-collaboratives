@@ -28,7 +28,7 @@
                             Édition des sujets
                         </h4>
                         <div class="flag blue mb-4 d-flex align-items-center justify-content-start">
-                            <span class="title-info text-red text-uppercase my-0 me-3 fw-bold">PUBLIQUE</span>
+                            <span class="title-info text-red text-uppercase my-0 me-3 fw-bold">PUBLIC</span>
                             <p class="text-info-custom text-blue my-0 ">Les sujets sont visibles par l'ensemble des utilisateur•rice•s</p>
                         </div>
                         {{ topic_formset.management_form }}
@@ -37,7 +37,7 @@
                                 <li class="w-50">
                                     <div class="rounded d-flex flex-column my-2 p-3 me-3 align-items-start border border-secondary">
                                         <div class="flex-1 w-100 topic-label">
-                                            <label class="text-info-custom text-grey-dark mb-2">Sujet {{ forloop.counter }}</label>
+                                            <label class="text-info-custom text-grey-dark mb-2">Sujet diagnostiqué {{ forloop.counter }}</label>
                                             <input type="text"
                                                    class="py-2 form-control"
                                                    id="{{ topic_form.label.id_for_label }}"

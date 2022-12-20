@@ -21,11 +21,10 @@
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
                 </svg>
                 &nbsp;
-                Édition des tags
+                Édition des étiquettes
             </h4>
             <form action="{% url "projects-project-tags" project.pk %}" method="post">
                 <div class="d-flex flex-column mt-4">
-                    <label class="text-info-custom text-grey-dark mb-2">{{ form.tags.label }}</label>
                     <div class="common-input">
                         {{form.tags}}
                     </div>
