@@ -11,10 +11,10 @@
         </div>
     {% else %}
         <div class="project-card-details me-4 py-4 d-flex flex-column align-items-center justify-content-center">
-            <span style="color:#929292; font-size: 14px;" class="text-uppercase">Aucune reformulation n'a été faite pour le moment</span>
+            <span style="color:#929292; font-size: 14px;" class="text-uppercase">Aucune note interne n'a été faite pour le moment</span>
             {% if can_administrate %}
                 <a class="button mt-3"
-                   href="{% url "projects-project-topics" project.id %}">Reformuler le besoin de la collectivité</a>
+                   href="{% url "projects-project-topics" project.id %}">Écrire une note interne</a>
             {% endif %}
         </div>
     {% endif %}
