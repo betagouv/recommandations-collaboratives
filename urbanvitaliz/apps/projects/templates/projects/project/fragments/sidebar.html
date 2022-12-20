@@ -4,7 +4,7 @@
 <div class="d-grid gap-2 my-3">
     {% if can_manage and not disable_can_share %}
     <span class="d-inline-block">
-        <a href="{% url 'projects-access-update' project.id %}" class="btn btn-primary w-100 btn-sm">
+        <a href="{% url 'projects-project-access-update' project.id %}" class="btn btn-primary w-100 btn-sm">
             <svg class="bi" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
             </svg>
