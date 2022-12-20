@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/project.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
+{% block content %}
+    <div class="col-11 py-5 mx-auto">
+        <section>
+            <h2 class="mb-4 d-flex align-items-center">
+                <span style="font-weight: 300;">
+                    Projet
+                    <strong style="font-weight: 500;">{{ project.name }}</strong>
+                </span>
+            </h2>
+            <h4 class="d-block mb-2">
+                <svg class="bi " width="32" height="32" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
+                </svg>
+                &nbsp;
+                Édition des tags
+            </h4>
+            <form action="{% url "projects-project-tags" project.pk %}" method="post">
+                <div class="d-flex flex-column mt-4">
+                    <label class="text-info-custom text-grey-dark mb-2">{{ form.tags.label }}</label>
+                    <div class="common-input">
+                        {{form.tags}}
+                    </div>
+                    <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
+                        <p class="text-info-custom font-small text-grey-dark my-0 ">{{ form.tags.help_text }}</p>
+                    </div>
+                </div>
+                {% csrf_token %}
+                <button type="submit" class="button filled">Enregistrer</button>
+            </form>
+            {{ form.media }}
+        </section>
+    </div>
+{% endblock %}
