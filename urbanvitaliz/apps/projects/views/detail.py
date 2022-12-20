@@ -246,7 +246,7 @@ def project_create_or_update_topics(request, project_id=None):
     can_administrate_or_403(project, request.user)
 
     TopicFormset = modelformset_factory(
-        models.ProjectTopic, fields=("label",), extra=10, can_delete=True
+        models.ProjectTopic, fields=("label",), extra=6, max_num=6, can_delete=True
     )
 
     if request.method == "POST":
@@ -279,7 +279,7 @@ def project_create_or_update_topics(request, project_id=None):
         topic_formset = TopicFormset(queryset=project.topics_on_site.all())
         form = ProjectTopicsForm(instance=project)
 
-    return render(request, "projects/project/synopsis.html", locals())
+    return render(request, "projects/project/topics.html", locals())
 
 
 def project_update_tags(request, project_id=None):
