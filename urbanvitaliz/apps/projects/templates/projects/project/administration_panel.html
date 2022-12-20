@@ -117,7 +117,9 @@
                 </a>
                 <ul class="d-flex flex-column list-unstyled mb-0">
                     {% for advisor in project.switchtenders_on_site.all %}
-                        <li>{% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}</li>
+                        <li>
+                            {% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}
+                        </li>
                     {% endfor %}
                 </ul>
                 <hr class="my-4"/>
@@ -128,14 +130,14 @@
                             <li class="d-flex justify-content-between align-items-start mb-1">
                                 {% include 'projects/project/fragments/user_invited.html' with user_invited=invite %}
                                 <div class="d-flex align-items-center">
-                                    <form action="" method="post">
+                                    <!-- <form action="" method="post">
                                         {% csrf_token %}
                                         <button class="btn btn-outline-danger btn-sm">
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x" />
                                             </svg>
                                         </button>
-                                    </form>
+                                    </form> -->
                                 </div>
                             </li>
                         {% endif %}
@@ -170,10 +172,10 @@
                             <li class="d-flex align-items-start justify-content-between">
                                 {% include 'projects/project/fragments/user.html' with member=member project=project %}
                                 <div class="d-flex align-items-center">
-                                    <form action="" method="post" class="me-2">
+                                    <!-- <form action="" method="post" class="me-2">
                                         {% csrf_token %}
                                         <button class="button small">Faire devenir référent</button>
-                                    </form>
+                                    </form> -->
                                     <form id="form-projects-access-remove-user"
                                           action="{% url 'projects-project-access-delete' project.pk member.email %}"
                                           method="post">
@@ -197,22 +199,22 @@
                             <li class="d-flex justify-content-between align-items-start mb-1">
                                 {% include 'projects/project/fragments/user_invited.html' with user_invited=invite %}
                                 <div class="d-flex align-items-center">
-                                    <form action="" method="post">
+                                    <!-- <form action="" method="post">
                                         {% csrf_token %}
                                         <button class="btn btn-outline-danger btn-sm">
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x" />
                                             </svg>
                                         </button>
-                                    </form>
+                                    </form> -->
                                 </div>
                             </li>
                         {% endif %}
                     {% endfor %}
                 </ul>
             </div>
-            {% include "projects/project/fragments/share/invite_member.html" %}
-            {% include "projects/project/fragments/share/invite_switchtender.html" %}
+            {% include "projects/project/fragments/share/invite_member.html" with source="admin" %}
+            {% include "projects/project/fragments/share/invite_switchtender.html" with source="admin" %}
         </div>
     </div>
 {% endblock %}
