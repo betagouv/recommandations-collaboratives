@@ -53,6 +53,8 @@
         {% include 'projects/project/navigation.html' with overview=True %}
         <div class="row">
             <div class="col-8">
+                {% include 'projects/project/fragments/topics/topic_list.html' %}
+
                 {% if can_administrate %}
                     {% if project.advisors_note %}
                         <div class="advisor-item">
