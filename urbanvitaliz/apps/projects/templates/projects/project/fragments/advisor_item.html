@@ -24,7 +24,10 @@
             </strong>
             {% endif %}
         </span>
-        <span style="color: #666666; font-style: italic; font-weight: 300;">{{user.profile.organization.name}}</span>
+        <div class="d-flex align-items-center">
+            <span style="color: #666666; font-style: italic; font-weight: 300;">{{user.profile.organization.name}}</span>
+            {% if  user.profile.organization_position %}<span class="ms-1 text-lowercase" style="color: #666666; font-style: italic; font-weight: 300;">({{user.profile.organization_position}})</span> {% endif %}
+        </div>
     </div>
     <div class="d-flex align-items-center">
         {% if advisor.is_observer %}

@@ -154,7 +154,7 @@
                     </li>
                     {% endfor %}
                 </ul>
-                {% if can_administrate or request.user == project.owner %}
+                {% if is_switchtender or is_staff %}
                 <div class="d-block mb-2">
                     <a style="cursor: pointer;" @click="openInviteSwitchtenderModal" data-toggle="modal" data-target="#InviteSwitchtenderModal" class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex justify-content-center w-100">
                         {% if project.status == 'DRAFT' %}
