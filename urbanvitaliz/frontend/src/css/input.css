@@ -35,3 +35,8 @@
     color: #666666;
     font-weight: 300;
 }
+
+.placeholder-grey::placeholder {
+    color: #cfcccc;
+    font-weight: 300;
+}
