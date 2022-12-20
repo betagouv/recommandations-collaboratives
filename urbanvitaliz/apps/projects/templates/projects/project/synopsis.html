@@ -1,63 +1,85 @@
 {% extends "base.html" %}
-
 {% load static %}
 {% load humanize %}
-
 {% load sass_tags %}
-
 {% block css %}
-    <link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
+    <link href="{% sass_src 'projects/css/project.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
-
 {% block content %}
-
-<div class="col-11 py-5 mx-auto">
-
-    <section>
-        <form method="post">
-            {% csrf_token %}
-            <h2 class="mb-4 d-flex align-items-center">
-                <span style="font-weight: 300;">
-                    Projet 
-                    <strong style="font-weight: 500;">
-                        {{project.name}}
-                    </strong>
-                </span>
-            </h2>
-            <h4 class="d-block mb-3">
-                <svg class="bi " width="32" height="32" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-square" />
-                </svg>&nbsp;
-                Reformulation du besoin
-            </h4>
-            <div class="">
-
-                <form action="" method="post">
-                    {% csrf_token %}
-                    <div class="d-flex">
-                        {% include 'tools/editor.html' with input_name=form.advisors_note.name input_value=form.advisors_note.value|default:'' escapejs=True%}
-                    </div>
-                    <p class="d-flex flex-column">
-                        {{ form.tags.errors }}
-                        {{form.tags }}
-                        <span>{{form.tags.help_text }}</span>
-                    </p>
-
-                    {{ topic_formset.as_p }}
-                    <button type="submit" class="btn btn-primary">
-                        Enregistrer
-                    </button>
-                </form>
-
-            <!-- {{ form.as_p }} -->
-            </div>
-            
-        </form>
-
-        {{ form.media }}
-
-    </section>
-
-</div>
-
+    <div class="col-11 py-5 mx-auto">
+        <section>
+            <form method="post">
+                {% csrf_token %}
+                <h2 class="mb-4 d-flex align-items-center">
+                    <span style="font-weight: 300;">
+                        Projet
+                        <strong style="font-weight: 500;">{{ project.name }}</strong>
+                    </span>
+                </h2>
+                <h4 class="d-block mb-3">
+                    <svg class="bi " width="32" height="32" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-square" />
+                    </svg>
+                    &nbsp;
+                    Reformulation du besoin
+                </h4>
+                <div class="">
+                    <form action="" method="post">
+                        <div>
+                            {% csrf_token %}
+                            <div class="d-flex">
+                                {% include 'tools/editor.html' with input_name=form.advisors_note.name input_value=form.advisors_note.value|default:'' escapejs=True %}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="d-block mb-3">
+                                <svg class="bi " width="32" height="32" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#card-checklist" />
+                                </svg>
+                                &nbsp;
+                                Édition des sujets
+                            </h4>
+                            <!-- {{ topic_formset.as_p }} -->
+                            <form method="post">
+                                {{ topic_formset.management_form }}
+                                <ul class="flex-wrap d-flex ">
+                                    {% for topic_form in topic_formset %}
+                                        <li class="d-flex my-2 w-50 align-items-center">
+                                            {% for field in topic_form.visible_fields %}
+                                                <label class="text-info-custom text-grey-dark" id="{{ field.id_for_label }}">{{ field.label|capfirst }}</label>
+                                                {% if forloop.first %}
+                                                    {% for hidden in topic_form.hidden_fields %}{{ hidden }}{% endfor %}
+                                                {% endif %}
+                                                {{ field }}
+                                                {% for error in field.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                                            {% endfor %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </form>
+                        </div>
+                        <div>
+                            <h4 class="d-block mb-3">
+                                <svg class="bi " width="32" height="32" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
+                                </svg>
+                                &nbsp;
+                                Édition des tags
+                            </h4>
+                        </div>
+                        <p class="d-flex flex-column">
+                            {{ form.tags.errors }}
+                            {{ form.tags }}
+                            <span>{{ form.tags.help_text }}</span>
+                        </p>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </form>
+                    <!-- {{ form.as_p }} -->
+                </div>
+            </form>
+            {{ form.media }}
+        </section>
+    </div>
 {% endblock %}
