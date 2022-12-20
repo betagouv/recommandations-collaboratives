@@ -250,7 +250,9 @@ def project_create_or_update_topics(request, project_id=None):
     )
 
     if request.method == "POST":
-        topic_formset = TopicFormset(request.POST)
+        topic_formset = TopicFormset(
+            request.POST, queryset=project.topics_on_site.all()
+        )
         form = ProjectTopicsForm(request.POST, instance=project)
         if form.is_valid() and topic_formset.is_valid():
             project = form.save(commit=False)
@@ -274,7 +276,7 @@ def project_create_or_update_topics(request, project_id=None):
                 reverse("projects-project-detail-overview", args=[project.pk])
             )
     else:
-        topic_formset = TopicFormset()
+        topic_formset = TopicFormset(queryset=project.topics_on_site.all())
         form = ProjectTopicsForm(instance=project)
 
     return render(request, "projects/project/synopsis.html", locals())
