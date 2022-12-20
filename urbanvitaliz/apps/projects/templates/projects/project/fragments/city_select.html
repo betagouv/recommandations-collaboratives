@@ -4,7 +4,7 @@
         <div class="col-auto">
             <div class="mb-3">
                 <label class="text-info-custom text-grey-dark" for="input-project-address">{{ form.postcode.label }}</label>
-                <input :disabled="isLoading" @change.debounce="fetchCities()" x-model="postal" type="text" class="py-4 form-control {% if form.postcode.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.postcode.name }}" placeholder="Code Postal" value="{{ form.postcode.value|default:'' }}" required>
+                <input :disabled="isLoading" @change.debounce="fetchCities()" x-model="postal" type="text" class="py-4 placeholder-grey form-control {% if form.postcode.errors %}is-invalid{% endif %}" id="input-project-address" name="{{ form.postcode.name }}" placeholder="Code Postal" value="{{ form.postcode.value|default:'' }}" required>
 
                 {% for error in form.postcode.errors %}
                 <div class="text-danger text-end">{{ error }}</div>
