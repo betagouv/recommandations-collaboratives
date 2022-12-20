@@ -27,6 +27,10 @@
                             &nbsp;
                             Édition des sujets
                         </h4>
+                        <div class="flag blue mb-4 d-flex align-items-center justify-content-start">
+                            <span class="title-info text-red text-uppercase my-0 me-3 fw-bold">PUBLIQUE</span>
+                            <p class="text-info-custom text-blue my-0 ">Les sujets sont visibles par l'ensemble des utilisateur•rice•s</p>
+                        </div>
                         {{ topic_formset.management_form }}
                         <ul class="flex-wrap d-flex topic-form p-0 list-unstyled">
                             {% for topic_form in topic_formset %}
