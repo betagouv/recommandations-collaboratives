@@ -1,7 +1,6 @@
 .tiptap-menu {
     display: inline-flex;
     overflow: hidden;
-    
 }
 
 .tiptap-menu button {
@@ -66,4 +65,8 @@
     border: 1px solid #ced4da;
     border-radius: 6px;
     background-color: white;
+}
+
+.tiptap-editor.is-wide .ProseMirror {
+    min-height: 40vh;
 }
