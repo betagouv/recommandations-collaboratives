@@ -78,5 +78,11 @@ def invite_send(invite, invited_user=None):
     return False
 
 
-def invite_resend(invite_id):
-    invite = get_object_or_404(models.Invite, pk=invite_id, accepted_on=None)
+def invite_resend(invite):
+    """Resend the invitation email"""
+    try:
+        user = auth_models.User.objects.get(username=invite.email)
+    except auth_models.User.DoesNotExist:
+        user = None
+
+    invite_send(invite, invited_user=user)

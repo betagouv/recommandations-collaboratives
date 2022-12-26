@@ -16,7 +16,8 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
-from urbanvitaliz.apps.invites.api import invite_collaborator_on_project
+from urbanvitaliz.apps.invites.api import (invite_collaborator_on_project,
+                                           invite_resend)
 from urbanvitaliz.apps.invites.forms import InviteForm
 
 from .. import forms, models
@@ -140,6 +141,24 @@ def access_collectivity_invite(request, project_id):
 
 @login_required
 @require_http_methods(["POST"])
+def access_collectivity_resend_invite(request, project_id, invite_id):
+    """Resend invitation for an advisor"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    if not (
+        can_manage_project(project, request.user)
+        or is_regional_actor_for_project(project, request.user, allow_national=True)
+    ):
+        raise PermissionDenied
+
+    invite = get_object_or_404(
+        invites_models.Invite, role="COLLABORATOR", pk=invite_id, accepted_on=None
+    )
+
+    invite_resend(invite)
+
+
+@login_required
+@require_http_methods(["POST"])
 def access_collectivity_delete(request, project_id: int, email: str):
     """Delete a collectivity member from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
@@ -185,6 +204,24 @@ def access_advisor_invite(request, project_id):
         raise PermissionDenied
 
     return access_invite(request, "SWITCHTENDER", project)
+
+
+@login_required
+@require_http_methods(["POST"])
+def access_advisor_resend_invite(request, project_id, invite_id):
+    """Resend invitation for an advisor"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    if not (
+        can_administrate_project(project, request.user)
+        or is_regional_actor_for_project(project, request.user, allow_national=True)
+    ):
+        raise PermissionDenied
+
+    invite = get_object_or_404(
+        invites_models.Invite, role="SWITCHTENDER", pk=invite_id, accepted_on=None
+    )
+
+    invite_resend(invite)
 
 
 @login_required

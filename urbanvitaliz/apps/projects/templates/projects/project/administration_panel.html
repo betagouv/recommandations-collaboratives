@@ -177,7 +177,7 @@
                                         <button class="button small">Faire devenir référent</button>
                                     </form> -->
                                     <form id="form-projects-access-remove-user"
-                                          action="{% url 'projects-project-access-delete' project.pk member.email %}"
+                                          action="{% url 'projects-project-access-collectivity-delete' project.pk member.email %}"
                                           method="post">
                                         {% csrf_token %}
                                         <button class="btn btn-outline-danger btn-sm">
