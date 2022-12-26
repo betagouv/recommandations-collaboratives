@@ -1202,41 +1202,6 @@ def test_switchtender_can_delete_email_from_project(request, client):
     assertRedirects(response, update_url)
 
 
-@pytest.mark.django_db
-def test_owner_cannot_be_removed_from_project_acl(request, client):
-    membership = baker.make(
-        models.ProjectMember,
-        is_owner=True,
-        member__is_staff=False,
-        member__username="coll@ab.fr",
-        member__email="coll@ab.fr",
-    )
-
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        projectmember_set=[membership],
-        status="READY",
-    )
-
-    url = reverse(
-        "projects-project-access-delete", args=[project.id, membership.member.email]
-    )
-
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
-
-        response = client.post(url)
-
-    project = models.Project.on_site.get(id=project.id)
-    assert membership in project.projectmember_set.all()
-
-    update_url = reverse("projects-project-access-update", args=[project.id])
-    assertRedirects(response, update_url)
-
-
 ########################################################################
 # Project syndication feed
 ########################################################################

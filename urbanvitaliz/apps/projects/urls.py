@@ -230,9 +230,9 @@ urlpatterns = [
         name="projects-project-access-update",
     ),
     path(
-        r"project/<int:project_id>/administration/access/<str:email>/delete",
-        administration.access_delete,
-        name="projects-project-access-delete",
+        r"project/<int:project_id>/administration/access/collectivity/<str:email>/delete",
+        administration.collectivity_access_delete,
+        name="projects-project-access-collectivity-delete",
     ),
     # Recommendations
     path(

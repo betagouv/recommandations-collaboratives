@@ -22,7 +22,7 @@ from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.forms import InviteForm
 
 from .. import forms, models
-from ..utils import (can_administrate_project, can_manage_or_403,
+from ..utils import (can_administrate_or_403, can_administrate_project,
                      can_manage_project, is_regional_actor_for_project)
 
 ########################################################################
@@ -34,10 +34,7 @@ from ..utils import (can_administrate_project, can_manage_or_403,
 def project_administration(request, project_id):
     """Handle ACL for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    if not (
-        can_manage_project(project, request.user)
-        or is_regional_actor_for_project(project, request.user, allow_national=True)
-    ):
+    if not can_administrate_project(project, request.user):
         raise PermissionDenied
 
     # Fetch pending invites
@@ -212,18 +209,14 @@ def access_update(request, project_id):
 
 
 @login_required
-def access_delete(request, project_id: int, email: str):
-    """Delete en email from the project ACL"""
+def collectivity_access_delete(request, project_id: int, email: str):
+    """Delete a collectivity member from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-
-    if project.status == "DRAFT":
-        raise PermissionDenied()
+    can_administrate_or_403(project, request.user)
 
     membership = get_object_or_404(
         models.ProjectMember, project=project, member__username=email
     )
-
-    can_manage_or_403(project, request.user)
 
     if request.method == "POST":
         if membership.is_owner:
@@ -241,7 +234,7 @@ def access_delete(request, project_id: int, email: str):
                 extra_tags=["auth"],
             )
 
-    return redirect(reverse("projects-project-access-update", args=[project_id]))
+    return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
 # eof
