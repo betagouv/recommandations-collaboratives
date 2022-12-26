@@ -16,7 +16,7 @@
     {% if can_administrate and not is_switchtender %}
     {% if not disable_can_edit %}
     <span class="d-inline-block">
-        <a href="{% url 'projects-project-update' project.id %}" class="btn btn-primary w-100 btn-sm">
+        <a href="{% url 'projects-project-administration' project.id %}" class="btn btn-primary w-100 btn-sm">
             <svg class="bi" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil" />
             </svg>

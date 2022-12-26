@@ -76,22 +76,8 @@ def project_administration(request, project_id):
     return render(request, "projects/project/administration_panel.html", locals())
 
 
-##############################################################################
-# Collectivity
-##############################################################################
-
-
-@login_required
-@require_http_methods(["POST"])
-def access_collectivity_invite(request, project_id):
-    """Invite a collectivity member"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    if not (
-        can_manage_project(project, request.user)
-        or is_regional_actor_for_project(project, request.user, allow_national=True)
-    ):
-        raise PermissionDenied
-
+def access_invite(request, role, project):
+    """Generic function to invite a member. NOT to be exposed"""
     form = InviteForm(request.POST)
     if form.is_valid():
         email = form.cleaned_data["email"]
@@ -128,14 +114,32 @@ def access_collectivity_invite(request, project_id):
                 ),
             )
 
-    context = request.POST.get("context")
-    if context == "admin":
-        return redirect(reverse("projects-project-administration", args=[project_id]))
+    source = request.POST.get("source")
+    if source == "admin":
+        return redirect(reverse("projects-project-administration", args=[project.pk]))
 
-    return redirect(reverse("projects-project-detail-overview", args=[project_id]))
+    return redirect(reverse("projects-project-detail-overview", args=[project.pk]))
+
+
+##############################################################################
+# Collectivity
+##############################################################################
+@login_required
+@require_http_methods(["POST"])
+def access_collectivity_invite(request, project_id):
+    """Invite a collectivity member"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    if not (
+        can_manage_project(project, request.user)
+        or is_regional_actor_for_project(project, request.user, allow_national=True)
+    ):
+        raise PermissionDenied
+
+    return access_invite(request, "COLLABORATOR", project)
 
 
 @login_required
+@require_http_methods(["POST"])
 def access_collectivity_delete(request, project_id: int, email: str):
     """Delete a collectivity member from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
@@ -170,21 +174,42 @@ def access_collectivity_delete(request, project_id: int, email: str):
 
 
 @login_required
+@require_http_methods(["POST"])
 def access_advisor_invite(request, project_id):
     """Invite an advisor"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     if not (
-        can_manage_project(project, request.user)
+        can_administrate_project(project, request.user)
         or is_regional_actor_for_project(project, request.user, allow_national=True)
     ):
         raise PermissionDenied
 
+    return access_invite(request, "SWITCHTENDER", project)
+
 
 @login_required
+@require_http_methods(["POST"])
 def access_advisor_delete(request, project_id: int, email: str):
-    """Delete a collectivity member from the project ACL"""
+    """Delete an advisor from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     can_administrate_or_403(project, request.user)
+
+    advisor = get_object_or_404(
+        models.ProjectSwitchtender,
+        project=project,
+        switchtender__username=email,
+        site=request.site,
+    )
+
+    advisor.delete()
+
+    messages.success(
+        request,
+        "{0} a bien été supprimé de la liste des conseiller·e·s.".format(email),
+        extra_tags=["auth"],
+    )
+
+    return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
 # eof

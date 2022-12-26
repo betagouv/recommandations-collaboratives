@@ -171,7 +171,7 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
 
 
 @pytest.mark.django_db
-def test_collectivity_member_cannot_remove_email_from_project(request, client):
+def test_collectivity_member_cannot_remove_member_from_project(request, client):
     owner_membership = baker.make(
         models.ProjectMember,
         is_owner=True,
@@ -270,3 +270,93 @@ def test_non_staff_cannot_remove_collectivity_member_from_project(request, clien
         response = client.post(url)
 
     assert response.status_code == 403
+
+
+#####################################################################
+# Adivsor ACLs
+#####################################################################
+
+
+@pytest.mark.django_db
+def test_collectivity_member_cannot_remove_advisor_from_project(request, client):
+    owner_membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__email="owner@ab.fr",
+        member__username="owner@ab.fr",
+    )
+    advisor = baker.make(
+        models.ProjectSwitchtender,
+        switchtender__is_staff=False,
+        switchtender__email="ad@visor.fr",
+        switchtender__username="ad@visor.fr",
+        site=get_current_site(request),
+    )
+    project = Recipe(
+        models.Project,
+        projectmember_set=[owner_membership],
+        switchtenders_on_site=[advisor],
+        sites=[get_current_site(request)],
+        status="READY",
+    ).make()
+
+    url = reverse(
+        "projects-project-access-collectivity-delete",
+        args=[project.id, advisor.switchtender.email],
+    )
+
+    with login(client, user=owner_membership.member):
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+    project = models.Project.on_site.get(id=project.id)
+    assert advisor in project.switchtenders_on_site.all()
+
+
+@pytest.mark.django_db
+def test_advisor_can_remove_advisor_from_project(request, client):
+    owner_membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__email="owner@ab.fr",
+        member__username="owner@ab.fr",
+    )
+    active_advisor = baker.make(
+        models.ProjectSwitchtender,
+        switchtender__is_staff=False,
+        switchtender__email="me@visor.fr",
+        switchtender__username="me@visor.fr",
+        site=get_current_site(request),
+    )
+
+    advisor = baker.make(
+        models.ProjectSwitchtender,
+        switchtender__is_staff=False,
+        switchtender__email="ad@visor.fr",
+        switchtender__username="ad@visor.fr",
+        site=get_current_site(request),
+    )
+    project = Recipe(
+        models.Project,
+        projectmember_set=[owner_membership],
+        switchtenders_on_site=[advisor, active_advisor],
+        sites=[get_current_site(request)],
+        status="READY",
+    ).make()
+
+    url = reverse(
+        "projects-project-access-advisor-delete",
+        args=[project.id, advisor.switchtender.email],
+    )
+
+    with login(client, user=active_advisor.switchtender):
+        response = client.post(url)
+
+    update_url = reverse("projects-project-administration", args=[project.id])
+    assertRedirects(response, update_url)
+
+    project = models.Project.on_site.get(id=project.id)
+    assert advisor not in project.switchtenders_on_site.all()
