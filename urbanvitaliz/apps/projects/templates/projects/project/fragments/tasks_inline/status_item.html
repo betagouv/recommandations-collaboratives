@@ -1,0 +1,7 @@
+<div class="bg-grey-light border rounded p-4">
+    <div class="d-flex align-items-center mb-4">
+        <i :style="`background-color: ${board.color}`" class="status-color-indicator me-2"></i>
+        <h3 x-text="board.title" class="title-info m-0 p-0"></h3>
+    </div>
+    {% include 'projects/project/fragments/tasks_inline/task_list.html' %}
+</div>

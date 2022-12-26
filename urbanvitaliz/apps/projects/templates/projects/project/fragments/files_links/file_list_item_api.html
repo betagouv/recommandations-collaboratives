@@ -30,6 +30,6 @@
       </span>
       <span class="ms-4 tiny d-flex align-items-center"><svg class="bi align-baseline me-2" width="12" height="12" fill="#222">
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />
-      </svg><strong x-text="`${formatDate(document.created_on)}`"></strong></span>
+      </svg><strong x-text="`${$store.tasks.formatDate(document.created_on)}`"></strong></span>
     </div>
   </div>

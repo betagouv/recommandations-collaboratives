@@ -1,0 +1,9 @@
+<div class="bg-white border rounded d-flex flex-column py-3 px-4 mb-2">
+    <i class="task-separator mt-1 mb-2"></i>
+    <span class="fw-bold mt-0 pt-0 font-medium" x-text="task.intent" @click="$store.tasks.onPreviewClick(task.id)"></span>
+    <article class="mt-2">
+        <template x-if="task.content !== ''">
+            <p x-html="$store.tasks.renderMarkdown(task.content)" class="text-info-custm font-small text-grey-dark m-0 p-0"></p>
+        </template>
+    </article>
+</div>

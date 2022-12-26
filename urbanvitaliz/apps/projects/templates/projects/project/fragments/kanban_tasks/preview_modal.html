@@ -1,9 +1,9 @@
 {% load static %}
 
-<div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true" x-init="initPreviewModal()"
-	x-data="{ get currentTask() { return this.findById(this.currentTaskId)}}">
+<div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true" x-init="$store.tasks.initPreviewModal()"
+	x-data="{ get currentTask() { return $store.tasks.findById($store.tasks.currentTaskId)}}">
 	<div class="modal-dialog modal-xl">
-		<template x-if="currentTaskId && currentTask">
+		<template x-if="$store.tasks.currentTaskId && currentTask">
 			<div class="modal-content">
 				<div class="modal-header">
 					<h3 :text="currentTask.intent"></h3>
@@ -20,7 +20,7 @@
 									<div class="resource-details pb-3">
 										<h1 x-text="currentTask.intent" class="mb-3"></h1>
 									</div>
-									<p class="text-justified" x-html="renderMarkdown(currentTask.content)"></p>
+									<p class="text-justified" x-html="$store.tasks.renderMarkdown(currentTask.content)"></p>
 								</div>
 							</div>
 						</template>
@@ -28,7 +28,7 @@
 							class="border border-top-0 border-bottom-0 border-right-0 flex-shrink-0 d-flex flex-column justify-content-between"
 							style="width: 33%;">
 							<div class="d-flex flex-column flex-fill overflow-hidden">
-								{% include 'projects/project/fragments/status_switcher.html' %}
+								<!-- {% include 'projects/project/fragments/status_switcher.html' %} -->
 								<div x-show="currentTask.document && currentTask.document.length > 0">
 									<h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
 										Fichier(s) partagé(s)
@@ -66,7 +66,7 @@
 														<span x-text="currentTask.created_by.profile.organization.name"
 															class="fst-italic text-muted"></span>
 													</template>
-													<span class="ms-2 text-muted" x-text="`le ${formatDate(currentTask.created_on)}`"
+													<span class="ms-2 text-muted" x-text="`le ${$store.tasks.formatDate(currentTask.created_on)}`"
 														style="line-height: 20px"></span>
 												</div>
 												<template x-if="canAdministrate">
@@ -80,19 +80,19 @@
 											<div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
 												<span class="ms-1 fst-italic" x-text="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
 													style="line-height: 20px"></span> a créé cette recommandation sans ressource
-													<span class="ms-1 text-muted" x-text="`le ${formatDate(currentTask.created_on)}`"
+													<span class="ms-1 text-muted" x-text="`le ${$store.tasks.formatDate(currentTask.created_on)}`"
 																style="line-height: 20px"></span>
 											</div>
 										</div>
 									</template>
-									<template x-if="currentTaskFollowups">
-										<template x-for="f in currentTaskFollowups" x-key="f.timestamp"
-											x-effect="currentTaskFollowups">
+									<template x-if="$store.tasks.currentTaskFollowups">
+										<template x-for="f in $store.tasks.currentTaskFollowups" x-key="f.timestamp"
+											x-effect="$store.tasks.currentTaskFollowups">
 											<div>
-												<template x-if="!isStatusUpdate(f)">
+												<template x-if="!$store.tasks.isStatusUpdate(f)">
 													<div class="rounded bg-light p-2 m-3 message"
-														:class="hasNotification(f.id) && 'border border-warning'">
-														<p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
+														:class="$store.tasks.hasNotification(f.id) && 'border border-warning'">
+														<p x-html="$store.tasks.renderMarkdown(f.comment)" class="mb-2 text-break"></p>
 														<div class="d-flex justify-content-between" style="font-size: 0.9em;">
 															<div>
 																<img class="rounded-circle d-inline-block" width="20px" height="20px"
@@ -105,7 +105,7 @@
 																<template x-if="f.who.profile.organization">
 																	<span x-text="f.who.profile.organization.name" class="fst-italic text-muted"></span>
 																</template>
-																<span class="ms-2 text-muted" x-text="`le ${formatDate(f.timestamp)}`"
+																<span class="ms-2 text-muted" x-text="`le ${$store.tasks.formatDate(f.timestamp)}`"
 																	style="line-height: 20px"></span>
 															</div>
 															<template x-if="canManage && f.who.email === userEmail">
@@ -115,12 +115,12 @@
 													</div>
 												</template>
 												<template x-if="isStatusUpdate(f)">
-													<div class="my-3" :class="hasNotification(f.id) && 'text-warning'">
+													<div class="my-3" :class="$store.tasks.hasNotification(f.id) && 'text-warning'">
 														<div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
 															<span class="ms-1 fst-italic" x-text="`${f.who.first_name} ${f.who.last_name}`"
 																style="line-height: 20px"></span> a changé le statut de la recommandation en <span
 																class="fw-bold" x-text="statusText(f.status)"></span>
-																<span class="text-muted" x-text="`le ${formatDate(f.timestamp)}`"
+																<span class="text-muted" x-text="`le ${$store.tasks.formatDate(f.timestamp)}`"
 																style="line-height: 20px"></span>
 														</div>
 														<template x-if="f.comment !== ''">
@@ -138,7 +138,7 @@
 																			<span x-text="f.who.profile.organization.name"
 																				class="fst-italic text-muted"></span>
 																		</template>
-																		<span class="ms-2 text-muted" x-text="`le ${formatDate(f.timestamp)}`"
+																		<span class="ms-2 text-muted" x-text="`le ${$store.tasks.formatDate(f.timestamp)}`"
 																			style="line-height: 20px"></span>
 																	</div>
 																	<template x-if="canManage && f.who.email === userEmail">
@@ -156,17 +156,17 @@
 							</div>
 							{% if can_manage and not disable_edit %}
 							<div class="p-3 border-top">
-								<template x-if="currentlyEditing">
+								<template x-if="$store.tasks.currentlyEditing">
 									<span>Editer un commentaire</span>
 								</template>
-								<template x-if="!currentlyEditing">
+								<template x-if="!$store.tasks.currentlyEditing">
 									<span>Répondre</span>
 								</template>
-								<form x-ref="commentTextFormRef" class="position-relative mt-2 form d-flex flex-column align-items-end" @submit.prevent="onSubmitComment">
-									<textarea id="modal-textarea" x-ref="commentTextRef" name="comment" style="min-height: 100px; border-color: #ccc;"
+								<form x-ref="$store.tasks.commentTextFormRef" class="position-relative mt-2 form d-flex flex-column align-items-end" @submit.prevent="$store.tasks.onSubmitComment">
+									<textarea id="modal-textarea" x-ref="$store.tasks.commentTextRef" name="comment" style="min-height: 100px; border-color: #ccc;"
 										class="w-100 p-2 rounded rounded-4 my-2 mb-3 border" placeholder="Votre message..."
-										x-model="pendingComment"></textarea>
-									<button x-bind:disabled="pendingComment.length == 0" type="submit" class="btn btn-primary">Envoyer</button>
+										x-model="$store.tasks.pendingComment"></textarea>
+									<button x-bind:disabled="$store.tasks.pendingComment.length == 0" type="submit" class="btn btn-primary">Envoyer</button>
 								</form>
 							</div>
 							{% endif %}
