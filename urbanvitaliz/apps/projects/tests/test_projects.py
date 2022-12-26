@@ -952,7 +952,7 @@ def test_notification_not_sent_when_project_is_muted(request):
 @pytest.mark.django_db
 def test_non_staff_cannot_add_email_to_project(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-    url = reverse("projects-access-update", args=[project.id])
+    url = reverse("projects-project-access-update", args=[project.id])
 
     with login(client, is_staff=False):
         response = client.get(url)
@@ -966,7 +966,7 @@ def test_assigned_switchtender_can_add_email_to_project(request, client):
         models.Project, sites=[get_current_site(request)], projectmember_set=[]
     )
 
-    url = reverse("projects-access-update", args=[project.id])
+    url = reverse("projects-project-access-update", args=[project.id])
     data = {"email": "test@example.com", "role": "SWITCHTENDER"}
 
     with login(client, groups=["switchtender"]) as user:
@@ -993,7 +993,7 @@ def test_regional_actor_can_add_email_to_project(request, client):
         commune=commune,
     )
 
-    url = reverse("projects-access-update", args=[project.id])
+    url = reverse("projects-project-access-update", args=[project.id])
     data = {"email": "test@example.com", "role": "COLLABORATOR"}
 
     with login(client, groups=["switchtender"]) as user:
@@ -1022,7 +1022,7 @@ def test_owner_can_add_email_to_project_if_not_draft(request, client):
         status="READY",
     )
 
-    url = reverse("projects-access-update", args=[project.id])
+    url = reverse("projects-project-access-update", args=[project.id])
     data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
 
     with login(client, user=membership.member):
@@ -1050,7 +1050,7 @@ def test_collectivity_member_cannot_invite_an_advisor(request, client):
         status="READY",
     )
 
-    url = reverse("projects-access-update", args=[project.id])
+    url = reverse("projects-project-access-update", args=[project.id])
     data = {"email": "collaborator@example.com", "role": "SWITCHTENDER"}
 
     with login(client, user=membership.member):
@@ -1079,7 +1079,7 @@ def test_add_email_for_existing_user_uses_autologin(request, client):
 
     collab = baker.make(auth.User, email="collaborator@example.com")
 
-    url = reverse("projects-access-update", args=[project.id])
+    url = reverse("projects-project-access-update", args=[project.id])
     data = {"email": collab.email, "role": "COLLABORATOR"}
 
     with login(client, user=membership.member):
@@ -1107,7 +1107,7 @@ def test_email_cannot_be_added_twice(request, client):
         status="READY",
     )
 
-    url = reverse("projects-access-update", args=[project.id])
+    url = reverse("projects-project-access-update", args=[project.id])
     data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
 
     with login(client, user=membership.member):
@@ -1138,7 +1138,7 @@ def test_owner_cannot_add_email_to_project_if_draft(request, client):
         status="DRAFT",
     ).make()
 
-    url = reverse("projects-access-update", args=[project.id])
+    url = reverse("projects-project-access-update", args=[project.id])
     data = {"email": "collaborator@example.com"}
 
     with login(client, user=membership.member):
@@ -1163,7 +1163,9 @@ def test_non_staff_cannot_delete_email_from_project(request, client):
         status="READY",
     ).make()
 
-    url = reverse("projects-access-delete", args=[project.id, membership.member.email])
+    url = reverse(
+        "projects-project-access-delete", args=[project.id, membership.member.email]
+    )
 
     with login(client, is_staff=False):
         response = client.post(url)
@@ -1195,7 +1197,7 @@ def test_owner_can_remove_email_from_project_if_not_draft(request, client):
     ).make()
 
     url = reverse(
-        "projects-access-delete",
+        "projects-project-access-delete",
         args=[project.id, collab_membership.member.email],
     )
 
@@ -1228,7 +1230,8 @@ def test_owner_cannot_remove_email_from_project_if_draft(request, client):
     ).make()
 
     url = reverse(
-        "projects-access-delete", args=[project.id, collab_membership.member.email]
+        "projects-project-access-delete",
+        args=[project.id, collab_membership.member.email],
     )
 
     with login(client, user=owner_membership.member):
@@ -1254,7 +1257,9 @@ def test_switchtender_can_delete_email_from_project(request, client):
         status="READY",
     )
 
-    url = reverse("projects-access-delete", args=[project.id, membership.member.email])
+    url = reverse(
+        "projects-project-access-delete", args=[project.id, membership.member.email]
+    )
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders_on_site.create(
@@ -1268,7 +1273,7 @@ def test_switchtender_can_delete_email_from_project(request, client):
     project = models.Project.on_site.get(id=project.id)
     assert membership not in project.projectmember_set.all()
 
-    update_url = reverse("projects-access-update", args=[project.id])
+    update_url = reverse("projects-project-access-update", args=[project.id])
     assertRedirects(response, update_url)
 
 
@@ -1289,7 +1294,9 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
         status="READY",
     )
 
-    url = reverse("projects-access-delete", args=[project.id, membership.member.email])
+    url = reverse(
+        "projects-project-access-delete", args=[project.id, membership.member.email]
+    )
 
     with login(client, groups=["switchtender"]) as user:
         project.switchtenders_on_site.create(
@@ -1301,7 +1308,7 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
     project = models.Project.on_site.get(id=project.id)
     assert membership in project.projectmember_set.all()
 
-    update_url = reverse("projects-access-update", args=[project.id])
+    update_url = reverse("projects-project-access-update", args=[project.id])
     assertRedirects(response, update_url)
 
 

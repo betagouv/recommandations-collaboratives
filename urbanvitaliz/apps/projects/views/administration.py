@@ -189,9 +189,12 @@ def access_update(request, project_id):
                     reverse("projects-project-detail-overview", args=[project_id])
                 )
 
-            return redirect(reverse("projects-access-update", args=[project_id]))
+            return redirect(
+                reverse("projects-project-access-update", args=[project_id])
+            )
     else:
         form = InviteForm()
+
     return render(request, "projects/project/access_update.html", locals())
 
 
@@ -225,7 +228,7 @@ def access_delete(request, project_id: int, email: str):
                 extra_tags=["auth"],
             )
 
-    return redirect(reverse("projects-access-update", args=[project_id]))
+    return redirect(reverse("projects-project-access-update", args=[project_id]))
 
 
 # eof
