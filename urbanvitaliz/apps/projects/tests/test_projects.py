@@ -1770,10 +1770,33 @@ def test_switchtender_exports_csv(request, client):
 
 
 #################################################################
-# Synopsis
+# Tags
 #################################################################
 @pytest.mark.django_db
-def test_switchtender_writes_synopsis_for_project(request, client):
+def test_switchtender_updates_tags(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    data = {"tags": "blah"}
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
+        response = client.post(
+            reverse("projects-project-tags", args=[project.id]), data=data
+        )
+
+    assert response.status_code == 302
+    project = models.Project.objects.all()[0]
+    assert list(project.tags.names()) == [data["tags"]]
+
+
+#################################################################
+# Topics
+#################################################################
+@pytest.mark.django_db
+def test_switchtender_writes_advisors_note(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
     with login(client, groups=["switchtender"]) as user:
@@ -1782,15 +1805,49 @@ def test_switchtender_writes_synopsis_for_project(request, client):
         )
 
         response = client.post(
-            reverse("projects-project-synopsis", args=[project.id]),
-            data={"synopsis": "this is some content"},
+            reverse("projects-project-topics", args=[project.id]),
+            data={
+                "advisors_note": "this is some content",
+                "form-TOTAL_FORMS": 1,
+                "form-INITIAL_FORMS": 0,
+            },
         )
 
     assert response.status_code == 302
     project = models.Project.objects.all()[0]
-    assert project.synopsis is not None
-    assert project.synopsis_on is not None
-    assert project.synopsis_by == user
+    assert project.advisors_note is not None
+    assert project.advisors_note_on is not None
+    assert project.advisors_note_by == user
+
+
+@pytest.mark.django_db
+def test_switchtender_add_topics(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    data = {
+        "advisors_note": "",
+        "form-TOTAL_FORMS": 1,
+        "form-INITIAL_FORMS": 0,
+        "form-0-id": "",
+        "form-0-label": "blah",
+    }
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
+        response = client.post(
+            reverse("projects-project-topics", args=[project.id]),
+            data=data,
+        )
+
+        print(response.content)
+
+    assert response.status_code == 302
+    topic = models.ProjectTopic.objects.all()[0]
+    assert topic.project == project
+    assert topic.label == data["form-0-label"]
 
 
 #################################################################
