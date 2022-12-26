@@ -17,6 +17,7 @@ from django.utils import timezone
 from urbanvitaliz import utils
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
+from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.forms import InviteForm
 
@@ -52,6 +53,15 @@ def project_administration(request, project_id):
         form = forms.ProjectForm(request.POST, instance=project)
         if form.is_valid():
             instance = form.save(commit=False)
+
+            try:
+                commune = geomatics_models.Commune.objects.get(
+                    insee=form.cleaned_data["insee"]
+                )
+                instance.commune = commune
+            except geomatics_models.Commune.DoesNotExist:
+                pass
+
             instance.updated_on = timezone.now()
             instance.save()
             form.save_m2m()
@@ -59,10 +69,13 @@ def project_administration(request, project_id):
     else:
         if project.commune:
             postcode = project.commune.postal
+            insee = project.commune.insee
         else:
             postcode = None
+            insee = None
         project_form = forms.ProjectForm(
-            instance=project, initial={"postcode": postcode}
+            instance=project,
+            initial={"postcode": postcode, "insee": insee},
         )
 
     return render(request, "projects/project/administration_panel.html", locals())
