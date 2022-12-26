@@ -63,7 +63,7 @@
                             <input :disabled="isLoading"
                                    @change.debounce="fetchCities()"
                                    x-model="postal"
-                                   type="number"
+                                   type="text"
                                    class="py-4 placeholder-grey form-control {% if project_form.postcode.errors %}is-invalid{% endif %}"
                                    id="input-project-address"
                                    name="{{ project_form.postcode.name }}"
