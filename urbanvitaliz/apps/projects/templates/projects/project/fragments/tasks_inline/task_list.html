@@ -1,0 +1,21 @@
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/tasksInline.js' %}
+{% endblock %}
+
+<div x-data="TasksInline" x-init="$store.tasks.getData({{ project.pk }})">
+    <p x-text="$store.app.title"></p>
+    <p x-text="$store.tasks.title"></p>
+    <p x-text="$store.app.isLoading"></p>
+    <div class="ms-2" style="width: 24px; height: 24px;">
+        <div x-show="$store.app.isLoading" class="spinner-border spinner-border spinner-border-sm text-primary" role="status">
+        </div>
+    </div>
+    <h1>Reco sous formes de listes</h1>
+    <div>
+        <template x-for="board in $store.boards.data">
+            <h1>board</h1>
+        </template>
+    </div>
+</div>
