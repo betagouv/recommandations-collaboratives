@@ -79,7 +79,7 @@
                                 x-ref="insee"
                                 name="insee"
                                 class="form-select"
-                                :disabled="cities && !cities.length">
+                                x-bind:disabled="!cities">
                             <template x-if="cities && cities.length == 0 && postal">
                                 <option selected>
                                     Aucune commune trouvée, vérifiez le code postal ?
