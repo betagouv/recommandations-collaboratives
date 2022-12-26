@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/project.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
+{% block content %}
+    <div class="col-11 py-5 mx-auto">
+        <section>
+            <h2 class="mb-4 d-flex align-items-center">
+                <span style="font-weight: 300;">
+                    Projet
+                    <strong style="font-weight: 500;">{{ project.name }}</strong>
+                </span>
+            </h2>
+            <form action="{% url "projects-project-topics" project.pk %}" method="post">
+                {% csrf_token %}
+                <div>
+                    <div>
+                        <h4 class="d-block mb-2">
+                            <svg class="bi " width="32" height="32" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#card-checklist" />
+                            </svg>
+                            &nbsp;
+                            Édition des sujets
+                        </h4>
+                        <div class="flag blue mb-4 d-flex align-items-center justify-content-start">
+                            <span class="title-info text-red text-uppercase my-0 me-3 fw-bold">PUBLIC</span>
+                            <p class="text-info-custom text-blue my-0 ">Les sujets sont visibles par l'ensemble des utilisateur•rice•s</p>
+                        </div>
+                        {{ topic_formset.management_form }}
+                        <ul class="flex-wrap d-flex topic-form p-0 list-unstyled">
+                            {% for topic_form in topic_formset %}
+                                <li class="w-50">
+                                    <div class="rounded d-flex flex-column my-2 p-3 me-3 align-items-start border border-secondary">
+                                        <div class="flex-1 w-100 topic-label">
+                                            <label class="text-info-custom text-grey-dark mb-2">Sujet diagnostiqué {{ forloop.counter }}</label>
+                                            <input type="text"
+                                                   class="py-2 form-control"
+                                                   id="{{ topic_form.label.id_for_label }}"
+                                                   name="{{ topic_form.label.html_name }}"
+                                                   value="{{ topic_form.label.value|default:'' }}"
+                                                   placeholder=""/>
+                                            {% if topic_form.label.errors %}
+                                                {% for error in topic_form.label.errors %}{{ error|escape }}{% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        {{ topic_form.id }}
+                                        <div class="topic-delete d-flex justify-content-end w-100">
+                                            <div class="w-full mt-2 border border-danger rounded flag red d-flex align-items-center justify-content-start">
+                                                <svg class="bi align-middle me-2" width="25" height="25">
+                                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
+                                                </svg>
+                                                {{ topic_form.DELETE }}
+                                                {% if topic_form.DELETE.errors %}
+                                                    {% for error in topic_form.DELETE.errors %}{{ error|escape }}{% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                            {% if topic_formset.non_form_errors %}
+                                {% for error in topic_formset.non_form_errors %}{{ error|escape }}{% endfor %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <button type="submit" class="button filled mb-4">Enregistrer</button>
+                </div>
+                <hr/>
+                <h4 class="d-block mb-3">
+                    <svg class="bi " width="32" height="32" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-square" />
+                    </svg>
+                    &nbsp;
+                    Note interne
+                </h4>
+                <div class="flag blue mb-4 d-flex align-items-center justify-content-start">
+                    <span class="title-info text-red text-uppercase my-0 me-3 fw-bold">PRIVÉ</span>
+                    <p class="text-info-custom text-blue my-0 ">Cette note ne sera que visible par les conseillers du projet</p>
+                </div>
+                <div>
+                    {% csrf_token %}
+                    <div class="d-flex">
+                        {% include 'tools/editor.html' with input_name=form.advisors_note.name input_value=form.advisors_note.value|default:'' escapejs=True wide=True %}
+                    </div>
+                </div>
+                <button type="submit" class="button filled">Enregistrer</button>
+            </form>
+            {{ form.media }}
+        </section>
+    </div>
+{% endblock %}

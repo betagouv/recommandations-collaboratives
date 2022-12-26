@@ -40,9 +40,14 @@ urlpatterns = [
         name="projects-project-detail",
     ),
     path(
-        r"project/<int:project_id>/synopsis",
-        detail.project_synopsis,
-        name="projects-project-synopsis",
+        r"project/<int:project_id>/tags",
+        detail.project_update_tags,
+        name="projects-project-tags",
+    ),
+    path(
+        r"project/<int:project_id>/topics",
+        detail.project_create_or_update_topics,
+        name="projects-project-topics",
     ),
     path(
         r"project/<int:project_id>/presentation",
