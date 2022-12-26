@@ -9,16 +9,14 @@ created : 2021-05-26 15:56:20 CEST
 from actstream import action
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from urbanvitaliz import utils
-from urbanvitaliz.apps.communication import digests
-from urbanvitaliz.apps.communication.api import send_email
+from django.views.decorators.http import require_http_methods
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
+from urbanvitaliz.apps.invites.api import invite_collaborator_on_project
 from urbanvitaliz.apps.invites.forms import InviteForm
 
 from .. import forms, models
@@ -78,9 +76,15 @@ def project_administration(request, project_id):
     return render(request, "projects/project/administration_panel.html", locals())
 
 
+##############################################################################
+# Collectivity
+##############################################################################
+
+
 @login_required
-def access_update(request, project_id):
-    """Handle ACL for a project"""
+@require_http_methods(["POST"])
+def access_collectivity_invite(request, project_id):
+    """Invite a collectivity member"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     if not (
         can_manage_project(project, request.user)
@@ -88,128 +92,51 @@ def access_update(request, project_id):
     ):
         raise PermissionDenied
 
-    # Fetch pending invites
-    pending_invites = []
-    for invite in invites_models.Invite.on_site.filter(
-        project=project, accepted_on=None
-    ):
-        pending_invites.append(invite)
+    form = InviteForm(request.POST)
+    if form.is_valid():
+        email = form.cleaned_data["email"]
+        message = form.cleaned_data["message"]
 
-    if request.method == "POST":
-        form = InviteForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data["email"]
-            role = form.cleaned_data["role"]
+        invite = invite_collaborator_on_project(
+            request.site,
+            project,
+            "COLLABORATOR",
+            email,
+            message,
+            request.user,
+        )
 
-            # Try to resolve email to a user first
-            try:
-                user = User.objects.get(username=email)
-            except User.DoesNotExist:
-                user = None
-
-            already_invited = False
-            already_member = False
-            if user and user in project.members.all():
-                already_member = True
-            else:
-                try:
-                    already_invited = invites_models.Invite.on_site.filter(
-                        project=project, email=email, role=role
-                    ).exists()
-                except invites_models.Invite.DoesNotExist:
-                    pass
-
-            # Already invited, skip
-            if already_member or already_invited:
-                messages.warning(
-                    request,
-                    "Cet usager ({0}) a déjà été invité, aucun courriel n'a été envoyé.".format(
-                        email
-                    ),
-                )
-                return render(request, "projects/project/access_update.html", locals())
-
-            else:
-                # New invite
-                invite = form.save(commit=False)
-
-                # Check if we are allowed to invite in case of an advisor's invite
-                if invite.role == "SWITCHTENDER":
-                    if not (
-                        can_administrate_project(project, request.user)
-                        or is_regional_actor_for_project(
-                            project, request.user, allow_national=True
-                        )
-                    ):
-                        raise PermissionDenied
-
-                invite.project = project
-                invite.inviter = request.user
-                invite.site = request.site
-                invite.save()
-
-                # Add activity
-                action.send(
-                    invite.inviter,
-                    verb="a invité un·e collaborateur·rice à rejoindre le projet",
-                    action_object=invite,
-                    target=invite.project,
-                )
-
-                # Do we already know this user?
-                try:
-                    invited_user = User.objects.get(email=email)
-                except User.DoesNotExist:
-                    invited_user = None
-
-                # Dispatch notifications
-                params = {
-                    "sender": {
-                        "first_name": request.user.first_name,
-                        "last_name": request.user.last_name,
-                        "email": request.user.email,
-                    },
-                    "message": invite.message,
-                    "invite_url": utils.build_absolute_url(
-                        invite.get_absolute_url(), auto_login_user=invited_user
-                    ),
-                    "project": digests.make_project_digest(project),
-                }
-
-                if request.user.profile:
-                    if request.user.profile.organization:
-                        params["sender"][
-                            "organization"
-                        ] = request.user.profile.organization.name
-
-                send_email(
-                    template_name="sharing invitation",
-                    recipients=[{"email": email}],
-                    params=params,
-                )
-
-                messages.success(
-                    request,
-                    "Un courriel d'invitation à rejoindre le projet a été envoyé à {0}.".format(
-                        email
-                    ),
-                    extra_tags=["email"],
-                )
-                return redirect(
-                    reverse("projects-project-detail-overview", args=[project_id])
-                )
-
-            return redirect(
-                reverse("projects-project-access-update", args=[project_id])
+        if invite:
+            action.send(
+                invite.inviter,
+                verb="a invité un·e collaborateur·rice à rejoindre le projet",
+                action_object=invite,
+                target=invite.project,
             )
-    else:
-        form = InviteForm()
+            messages.success(
+                request,
+                "Un courriel d'invitation à rejoindre le projet a été envoyé à {0}.".format(
+                    email
+                ),
+                extra_tags=["email"],
+            )
+        else:
+            messages.warning(
+                request,
+                "Cet usager ({0}) n'a pu être invité, aucun courriel n'a été envoyé. Vérifiez qu'il n'est pas déjà invité ou membre".format(
+                    email
+                ),
+            )
 
-    return render(request, "projects/project/access_update.html", locals())
+    context = request.POST.get("context")
+    if context == "admin":
+        return redirect(reverse("projects-project-administration", args=[project_id]))
+
+    return redirect(reverse("projects-project-detail-overview", args=[project_id]))
 
 
 @login_required
-def collectivity_access_delete(request, project_id: int, email: str):
+def access_collectivity_delete(request, project_id: int, email: str):
     """Delete a collectivity member from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
     can_administrate_or_403(project, request.user)
@@ -235,6 +162,29 @@ def collectivity_access_delete(request, project_id: int, email: str):
             )
 
     return redirect(reverse("projects-project-administration", args=[project_id]))
+
+
+##############################################################################
+# Advisors
+##############################################################################
+
+
+@login_required
+def access_advisor_invite(request, project_id):
+    """Invite an advisor"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    if not (
+        can_manage_project(project, request.user)
+        or is_regional_actor_for_project(project, request.user, allow_national=True)
+    ):
+        raise PermissionDenied
+
+
+@login_required
+def access_advisor_delete(request, project_id: int, email: str):
+    """Delete a collectivity member from the project ACL"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    can_administrate_or_403(project, request.user)
 
 
 # eof

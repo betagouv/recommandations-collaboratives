@@ -8,7 +8,7 @@
         <h6 style="font-size: 22px;" class="fw-bold d-block mb-0">Inviter un membre de la collectivité</h6>
       </div>
       <div class="modal-body">
-          <form class="form" id="form-projects-access-add-user" action="{% url 'projects-project-access-update' project.pk %}" method="post">
+          <form class="form" id="form-projects-access-add-user" action="{% url 'projects-project-access-collectivity-invite' project.pk %}" method="post">
             <div class="mb-3">
                 <label class="form-label" style="font-size: 16px; color: #666666;" for="invite-email">Saisissez l'adresse email de la personne à inviter</label>
                 <input id="invite-email" type="email" name="email" required class="form-control" placeholder="camille@ville-imaginaire.fr"/>

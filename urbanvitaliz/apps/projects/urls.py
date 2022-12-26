@@ -225,14 +225,24 @@ urlpatterns = [
         name="projects-project-administration",
     ),
     path(
-        r"project/<int:project_id>/administration/access",
-        administration.access_update,
-        name="projects-project-access-update",
+        r"project/<int:project_id>/administration/access/collectivity/invite",
+        administration.access_collectivity_invite,
+        name="projects-project-access-collectivity-invite",
+    ),
+    path(
+        r"project/<int:project_id>/administration/access/advisor/invite",
+        administration.access_advisor_invite,
+        name="projects-project-access-advisor-invite",
     ),
     path(
         r"project/<int:project_id>/administration/access/collectivity/<str:email>/delete",
-        administration.collectivity_access_delete,
+        administration.access_collectivity_delete,
         name="projects-project-access-collectivity-delete",
+    ),
+    path(
+        r"project/<int:project_id>/administration/access/advisor/<str:email>/delete",
+        administration.access_advisor_delete,
+        name="projects-project-access-advisor-delete",
     ),
     # Recommendations
     path(

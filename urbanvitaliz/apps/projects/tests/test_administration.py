@@ -130,7 +130,7 @@ def test_project_admin_update_commune(request, client):
 
 
 #####################################################################
-# ACLs
+# Collectivity ACLs
 #####################################################################
 
 
@@ -168,3 +168,105 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
 
     update_url = reverse("projects-project-administration", args=[project.id])
     assertRedirects(response, update_url)
+
+
+@pytest.mark.django_db
+def test_collectivity_member_cannot_remove_email_from_project(request, client):
+    owner_membership = baker.make(
+        models.ProjectMember,
+        is_owner=True,
+        member__is_staff=False,
+        member__email="owner@ab.fr",
+        member__username="owner@ab.fr",
+    )
+    collab_membership = baker.make(
+        models.ProjectMember,
+        is_owner=False,
+        member__is_staff=False,
+        member__email="coll@ab.fr",
+        member__username="coll@ab.fr",
+    )
+    project = Recipe(
+        models.Project,
+        projectmember_set=[owner_membership, collab_membership],
+        sites=[get_current_site(request)],
+        status="READY",
+    ).make()
+
+    url = reverse(
+        "projects-project-access-collectivity-delete",
+        args=[project.id, collab_membership.member.email],
+    )
+
+    with login(client, user=owner_membership.member):
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+    project = models.Project.on_site.get(id=project.id)
+    assert collab_membership.member in project.members.all()
+
+
+@pytest.mark.django_db
+def test_advisor_can_remove_collectivity_member_from_project(request, client):
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=False,
+        member__is_staff=False,
+        member__username="coll@ab.fr",
+        member__email="coll@ab.fr",
+    )
+
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+        status="READY",
+    )
+
+    url = reverse(
+        "projects-project-access-collectivity-delete",
+        args=[project.id, membership.member.email],
+    )
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    project = models.Project.on_site.get(id=project.id)
+    assert membership not in project.projectmember_set.all()
+
+    update_url = reverse("projects-project-administration", args=[project.id])
+    assertRedirects(response, update_url)
+
+
+@pytest.mark.django_db
+def test_non_staff_cannot_remove_collectivity_member_from_project(request, client):
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=False,
+        member__is_staff=False,
+        member__email="user@staff.fr",
+        member__username="user@staff.fr",
+    )
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+        status="READY",
+    ).make()
+
+    url = reverse(
+        "projects-project-access-collectivity-delete",
+        args=[project.id, membership.member.email],
+    )
+
+    with login(client, is_staff=False):
+        response = client.post(url)
+
+    assert response.status_code == 403
