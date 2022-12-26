@@ -230,7 +230,7 @@ urlpatterns = [
         name="projects-project-access-collectivity-invite",
     ),
     path(
-        r"project/<int:project_id>/administration/access/collectivity/invite/<int:invite_id>/resend",
+        r"project/<int:project_id>/administration/access/collectivity/invite/<uuid:invite_id>/resend",
         administration.access_collectivity_resend_invite,
         name="projects-project-access-collectivity-resend-invite",
     ),
@@ -240,7 +240,7 @@ urlpatterns = [
         name="projects-project-access-advisor-invite",
     ),
     path(
-        r"project/<int:project_id>/administration/access/advisor/invite/<int:invite_id>/resend",
+        r"project/<int:project_id>/administration/access/advisor/invite/<uuid:invite_id>/resend",
         administration.access_advisor_resend_invite,
         name="projects-project-access-advisor-resend-invite",
     ),
