@@ -56,7 +56,9 @@
                         {% for error in project_form.description.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
-                <div class="row mb-3" x-data="CitySearch()" x-init="{% if project_form.postcode.value and project_form.insee.value %}getPostcode({{project_form.postcode.value}},{{project_form.insee.value}}){% elif project_form.postcode.value %} setPostcode({{project_form.postcode.value}}){% endif %}">
+                <div class="row mb-3"
+                     x-data="CitySearch()"
+                     x-init="{% if project_form.postcode.value and project_form.insee.value %}getPostcode({{ project_form.postcode.value }},{{ project_form.insee.value }}){% elif project_form.postcode.value %} setPostcode({{ project_form.postcode.value }}){% endif %}">
                     <div class="col-auto">
                         <div class="mb-3">
                             <label class="text-info-custom text-grey-dark" for="input-project-address">{{ project_form.postcode.label }}</label>
@@ -117,8 +119,31 @@
                 </a>
                 <ul class="d-flex flex-column list-unstyled mb-0">
                     {% for advisor in project.switchtenders_on_site.all %}
-                        <li>
+                        <li class="d-flex align-items-center">
                             {% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}
+                            {% if request.user == advisor.switchtender %}
+                                <form id="projects-project-switchtender-leave"
+                                      action="{% url 'projects-project-switchtender-leave' project.pk %}"
+                                      method="post">
+                                    {% csrf_token %}
+                                    <button class="btn btn-outline-danger btn-sm">
+                                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form id="form-projects-access-remove-user"
+                                      action="{% url 'projects-project-access-advisor-delete' project.pk advisor.switchtender.email %}"
+                                      method="post">
+                                    {% csrf_token %}
+                                    <button class="btn btn-outline-danger btn-sm">
+                                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
@@ -126,18 +151,18 @@
                 <p class="text-info-custom mb-4 mt-1">Invitations conseiller·e·s</p>
                 <ul class="list-group">
                     {% for invite in pending_invites %}
-                        {% if invite.get_role_display == "Conseiller·e" %}
+                        {% if invite.role == "SWITCHTENDER" %}
                             <li class="d-flex justify-content-between align-items-start mb-1">
                                 {% include 'projects/project/fragments/user_invited.html' with user_invited=invite %}
                                 <div class="d-flex align-items-center">
-                                    <!-- <form action="" method="post">
+                                    <form action="{% url 'projects-project-access-advisor-resend-invite' project.pk invite.pk %}" method="post">
                                         {% csrf_token %}
-                                        <button class="btn btn-outline-danger btn-sm">
+                                        <button class="btn btn-outline-primary btn-sm">
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x" />
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#mailbox" />
                                             </svg>
                                         </button>
-                                    </form> -->
+                                    </form>
                                 </div>
                             </li>
                         {% endif %}
@@ -195,18 +220,18 @@
                 <p class="text-info-custom mb-4 mt-1">Invitations participant·e·s</p>
                 <ul class="list-group">
                     {% for invite in pending_invites %}
-                        {% if invite.get_role_display == "Participant·e" %}
+                        {% if invite.role == "COLLABORATOR" %}
                             <li class="d-flex justify-content-between align-items-start mb-1">
                                 {% include 'projects/project/fragments/user_invited.html' with user_invited=invite %}
                                 <div class="d-flex align-items-center">
-                                    <!-- <form action="" method="post">
+                                    <form action="{% url 'projects-project-access-collectivity-resend-invite' project.pk invite.pk %}" method="post">
                                         {% csrf_token %}
-                                        <button class="btn btn-outline-danger btn-sm">
+                                        <button class="btn btn-outline-primary btn-sm">
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x" />
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#mailbox" />
                                             </svg>
                                         </button>
-                                    </form> -->
+                                    </form>
                                 </div>
                             </li>
                         {% endif %}
