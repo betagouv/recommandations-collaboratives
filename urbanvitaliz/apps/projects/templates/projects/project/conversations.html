@@ -31,9 +31,9 @@
                         <div class="small my-2 text-center w-100 text-secondary">{{ date|naturalday|capfirst }}</div>
                         {% for note in notes reversed  %}
                             {% if request.user == note.created_by %}
-                                <div class="rounded-3 p-3 text-secondary bg-blue-light my-1" style="margin-left: 2vw;">
+                                <div class="rounded-3 p-3 text-secondary bg-blue-light my-2" style="margin-left: 2vw;">
                             {% else %}
-                                <div class="bg-grey-light rounded-3 p-3 text-secondary my-1" style="margin-right: 2vw;">
+                                <div class="bg-grey-light rounded-3 p-3 text-secondary my-2" style="margin-right: 2vw;">
                             {% endif %}
                                 {{ note.content_rendered|safe }}
                                 {% if note.document.count %}

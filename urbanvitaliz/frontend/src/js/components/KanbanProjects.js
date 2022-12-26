@@ -14,7 +14,7 @@ function boardProjectsApp() {
         selectedDepartment: null,
         departments: [],
         boards: [
-            { code: 'TO_PROCESS', title: 'A traiter', color_class: 'border-secondary' },
+            { code: 'TO_PROCESS', title: 'À traiter', color_class: 'border-secondary' },
             { code: 'READY', title: 'En attente', color_class: 'border-info' },
             { code: "IN_PROGRESS", title: "En cours", color_class: 'border-primary' },
             { code: "DONE", title: "Traité", color_class: 'border-success' },

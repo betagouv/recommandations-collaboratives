@@ -78,42 +78,24 @@
                     </div>
                 </div>
             </div>
-            <div class="col-4">
-                <div class="mb-4">
-                    <div class="d-flex flex-column">
-                        <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Référent collectivité</h6>
-                        {% include 'projects/project/fragments/project_owner.html' with project=project %}
-                        <a class="d-flex align-items-center mb-1"
-                           style="font-size: 14px;
-                                  color: #0063CB;
-                                  text-decoration: none"
-                           href="mailto:{{ project.owner.email }}">
-                            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
-                            </svg>
-                            &nbsp;
-                            {{ project.owner.email }}
-                        </a>
-                        {% if project.owner.profile.phone_no or project.phone %}
-                            <span style="font-size: 14px;
-                                         color: #0063CB"
-                                  class="d-flex align-items-center">
-                                <svg class="bi align-middle" width="15" height="15" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
-                                </svg>
-                                &nbsp;&nbsp;
-                                {% if project.owner.profile.phone_no %}
-                                    <a style="font-size: 14px;
-                                              color: #0063CB;
-                                              text-decoration: none"
-                                       href="tel:{{ project.owner.profile.phone_no }}">{{ project.owner.profile.phone_no }}</a>
-                                {% else %}
-                                    <a style="font-size: 14px;
-                                              color: #0063CB;
-                                              text-decoration: none"
-                                       href="tel:{{ project.phone }}">{{ project.phone }}</a>
-                                {% endif %}
-                            </span>
+
+            <!-- Advisors -->
+            <div class="mt-4">
+                <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Équipe de suvi</h6>
+                <ul class="d-flex flex-column list-unstyled mb-0">
+                    {% for advisor in project.switchtenders_on_site.all %}
+                    <li>
+                        {% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if is_switchtender or is_staff %}
+                <div class="d-block mb-2">
+                    <a style="cursor: pointer;" @click="openInviteSwitchtenderModal" data-toggle="modal" data-target="#InviteSwitchtenderModal" class="{% if project.status == 'DRAFT' %} disabled {% endif %} button d-inline-flex justify-content-center w-100">
+                        {% if project.status == 'DRAFT' %}
+                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
+                        </svg>&nbsp;
                         {% endif %}
                     </div>
                     {% include 'projects/project/fragments/positioning.html' %}
