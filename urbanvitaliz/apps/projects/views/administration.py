@@ -156,7 +156,20 @@ def access_collectivity_resend_invite(request, project_id, invite_id):
         invites_models.Invite, role="COLLABORATOR", pk=invite_id, accepted_on=None
     )
 
-    invite_resend(invite)
+    if invite_resend(invite):
+        messages.success(
+            request,
+            "{0} a bien été relancé par courriel.".format(invite.email),
+            extra_tags=["auth"],
+        )
+    else:
+        messages.error(
+            request,
+            "Désolé, nous n'avons pas pu relancer {0} par courriel.".format(
+                invite.email
+            ),
+            extra_tags=["auth"],
+        )
 
 
 @login_required
@@ -223,7 +236,20 @@ def access_advisor_resend_invite(request, project_id, invite_id):
         invites_models.Invite, role="SWITCHTENDER", pk=invite_id, accepted_on=None
     )
 
-    invite_resend(invite)
+    if invite_resend(invite):
+        messages.success(
+            request,
+            "{0} a bien été relancé par courriel.".format(invite.email),
+            extra_tags=["auth"],
+        )
+    else:
+        messages.error(
+            request,
+            "Désolé, nous n'avons pas pu relancer {0} par courriel.".format(
+                invite.email
+            ),
+            extra_tags=["auth"],
+        )
 
 
 @login_required
