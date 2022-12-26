@@ -235,6 +235,11 @@ urlpatterns = [
         name="projects-project-access-advisor-invite",
     ),
     path(
+        r"project/<int:project_id>/administration/access/advisor/invite/<str:email>/resend",
+        administration.access_advisor_resend_invite,
+        name="projects-project-access-advisor-resend-invite",
+    ),
+    path(
         r"project/<int:project_id>/administration/access/collectivity/<str:email>/delete",
         administration.access_collectivity_delete,
         name="projects-project-access-collectivity-delete",

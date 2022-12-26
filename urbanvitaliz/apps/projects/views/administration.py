@@ -36,6 +36,8 @@ def project_administration(request, project_id):
     if not can_administrate_project(project, request.user):
         raise PermissionDenied
 
+    can_administrate = can_administrate_project(project, request.user)
+
     # Fetch pending invites
     pending_invites = []
     for invite in invites_models.Invite.on_site.filter(
