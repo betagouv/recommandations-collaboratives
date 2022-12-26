@@ -171,6 +171,8 @@ def access_collectivity_resend_invite(request, project_id, invite_id):
             extra_tags=["auth"],
         )
 
+    return redirect(reverse("projects-project-administration", args=[project_id]))
+
 
 @login_required
 @require_http_methods(["POST"])
@@ -250,6 +252,8 @@ def access_advisor_resend_invite(request, project_id, invite_id):
             ),
             extra_tags=["auth"],
         )
+
+    return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
 @login_required
