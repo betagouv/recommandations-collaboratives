@@ -188,6 +188,7 @@ class ProjectForm(forms.ModelForm):
     """Form for updating the base information of a project"""
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
+    insee = forms.CharField(max_length=5, required=False, label="Code Insee")
     publish_to_cartofriches = forms.BooleanField(
         label="Publication sur cartofriches", disabled=True, required=False
     )
@@ -199,6 +200,7 @@ class ProjectForm(forms.ModelForm):
             "phone",
             "name",
             "postcode",
+            "insee",
             "location",
             "description",
             "publish_to_cartofriches",
