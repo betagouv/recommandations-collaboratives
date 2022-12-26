@@ -85,4 +85,4 @@ def invite_resend(invite):
     except auth_models.User.DoesNotExist:
         user = None
 
-    invite_send(invite, invited_user=user)
+    return invite_send(invite, invited_user=user)
