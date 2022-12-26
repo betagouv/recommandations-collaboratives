@@ -11,6 +11,10 @@
         <input class="w-100 fs-5 form-control" type="text" x-on:input.debounce="searchResources()" x-model="search" placeholder="Rechercher une ressource...">
     </div>
 
+    {% for error in form.resource.errors %}
+        <div class="text-danger text-start mb-2">{{ error }}</div>
+    {% endfor %}
+
     <!-- listing -->
     <p class="search-counter fs-6 mb-0" x-show="!search" x-text="`${db.documentCount} ressources au total`"></p>
     <p class="search-counter fs-6 mb-0" x-show="search" x-text="`${results.length} ressource(s) trouvée(s)`"></p>

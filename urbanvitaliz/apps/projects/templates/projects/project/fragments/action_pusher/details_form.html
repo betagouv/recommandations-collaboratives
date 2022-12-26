@@ -15,14 +15,17 @@
                         {% endfor %}
                     </div>
                 </div>
-
+                
                 <div class="d-flex flex-column">
                     <label class="mb-2 text-info-custom text-grey-dark" for="message">Message</label>
-                    {% include 'tools/editor.html' with input_name="content" input_value="content" input_required=True %}
+                    {% include 'tools/editor.html' with input_name="content" input_value="content" input_required=True errors=form.content.errors %}
                 </div>
 
                 <div class="mb-4">
                     {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
+                    {% for error in document_form.the_file.errors %}
+                        <div class="text-danger text-start mb-2">{{ error }}</div>
+                    {% endfor %}
                 </div>
 
                 <template x-if="push_type == 'single'">
