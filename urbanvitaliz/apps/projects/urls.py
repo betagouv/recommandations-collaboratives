@@ -230,6 +230,11 @@ urlpatterns = [
         name="projects-project-access-collectivity-invite",
     ),
     path(
+        r"project/<int:project_id>/administration/access/collectivity/invite/<str:email>/resend",
+        administration.access_collectivity_resend_invite,
+        name="projects-project-access-collectivity-resend-invite",
+    ),
+    path(
         r"project/<int:project_id>/administration/access/advisor/invite",
         administration.access_advisor_invite,
         name="projects-project-access-advisor-invite",
