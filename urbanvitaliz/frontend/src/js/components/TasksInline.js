@@ -3,12 +3,7 @@ import TaskApp from './Tasks'
 
 function TasksInline(projectId) {
 
-    const app = {
-        init() {
-            console.log('task inline initialization');
-            console.log('project id task inline', projectId);
-        }
-    }
+    const app = {}
 
     return TaskApp(app, projectId);
 }
