@@ -24,9 +24,6 @@ Alpine.store('tasks', {
 
         return this.tasks = data;
     },
-    async patchTask(taskId, patch) {
-        await api.patch(taskUrl(this.projectId, taskId), patch)
-    },
     getBoards() {
         return this.boards = [
             { status: STATUSES.PROPOSED, title: "Nouvelles ", color_class: "border-primary", color: "#0d6efd" },

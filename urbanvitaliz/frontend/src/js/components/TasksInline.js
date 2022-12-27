@@ -1,18 +1,19 @@
 import Alpine from 'alpinejs'
+import TaskApp from './Tasks'
 
-function TasksInline() {
-    return {
+function TasksInline(projectId) {
+
+    const app = {
         init() {
-            console.log('tasks inline ready')
-            console.log(this.$store.app.title)
+            console.log('task inline initialization');
+            console.log('project id task inline', projectId);
         },
-        get tasks() {
-            return this.$store.app.data
-        },
-        get isLoading() {
-            return this.$store.app.isLoading
+        handleLol() {
+            return 'looooool';
         }
     }
+
+    return TaskApp(app, projectId);
 }
 
 Alpine.data("TasksInline", TasksInline)

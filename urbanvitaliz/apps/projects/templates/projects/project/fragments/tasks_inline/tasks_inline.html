@@ -6,8 +6,15 @@
 {% endblock %}
 
 <!-- Index of tasks inline app -->
-<div x-data="KanbanTasks({{project.pk}})" x-init="getData(); getBoards();">
+<div x-data="TasksInline({{project.pk}})" x-init="getData(); getBoards(); processUrl();">
     <h1>Vue alternative</h1>
-    {% include 'projects/project/fragments/tasks_inline/status_list.html' %}
+    <h2 x-text="handleLol"></h2>
+    <div class="ms-2" style="width: 24px; height: 24px;">
+        <div x-show="isBusy" class="spinner-border spinner-border spinner-border-sm text-primary" role="status">
+        </div>
+    </div>
+    <div x-show="!isBusy">
+        {% include 'projects/project/fragments/tasks_inline/status_list.html' %}
+    </div>
     {% include 'projects/project/fragments/kanban_tasks/preview_modal.html' %}
 </div>
