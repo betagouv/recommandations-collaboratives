@@ -7,9 +7,6 @@ function TasksInline(projectId) {
         init() {
             console.log('task inline initialization');
             console.log('project id task inline', projectId);
-        },
-        handleLol() {
-            return 'looooool';
         }
     }
 

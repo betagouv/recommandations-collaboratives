@@ -50,6 +50,10 @@ export default function TasksApp(app, projectId) {
         issueFollowup,
         isArchivedStatus,
         resourcePreviewUrl,
+        moveTask,
+        editComment,
+        patchTask,
+        markAllAsRead,
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await issueFollowup(e.detail.task, e.detail.status)

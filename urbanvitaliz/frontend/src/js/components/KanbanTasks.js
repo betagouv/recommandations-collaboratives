@@ -57,13 +57,13 @@ function boardTasksApp(projectId) {
 
             if (status instanceof Array) {
                 if (this.isArchivedStatus(data.status) && nextData) {
-                    await moveTask(data.id, nextData.id);
+                    await this.moveTask(data.id, nextData.id);
                 } else {
                     this.openFeedbackModal(data);
                 }
             } else {
                 await this.issueFollowup(data, status);
-                if (nextData) await moveTask(data.id, nextData.id);
+                if (nextData) await this.moveTask(data.id, nextData.id);
             }
 
             await this.getData();
