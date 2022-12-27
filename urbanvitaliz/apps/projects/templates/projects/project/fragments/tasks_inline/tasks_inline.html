@@ -1,11 +1,12 @@
 {% load django_vite %}
 
 {% block js %}
-    {% vite_asset 'js/apps/tasksInline.js' %}
+    <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+    {% vite_asset 'js/apps/tasks.js' %}
 {% endblock %}
 
 <!-- Index of tasks inline app -->
-<div x-data="TasksInline" x-init="$store.tasks.getData({{ project.pk }}); $store.tasks.setProjectId({{ project.pk }})">
+<div x-data="KanbanTasks({{project.pk}})" x-init="getData(); getBoards();">
     <h1>Vue alternative</h1>
     {% include 'projects/project/fragments/tasks_inline/status_list.html' %}
     {% include 'projects/project/fragments/kanban_tasks/preview_modal.html' %}

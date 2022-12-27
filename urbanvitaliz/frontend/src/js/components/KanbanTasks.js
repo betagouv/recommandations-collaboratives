@@ -1,6 +1,12 @@
 import Alpine from "alpinejs"
-import api, { tasksUrl, followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
-import { generateUUID } from '../utils/uuid'
+import { STATUSES } from '../store/tasks'
+
+import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
+import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
+import { isStatusUpdate, statusText } from "../utils/taskStatus"
+import { toArchiveTooltip, reminderTooltip } from '../utils/tooltip'
+import { renderMarkdown } from '../utils/markdown'
+import { generateGravatarUrl } from '../utils/gravatar'
 
 Alpine.data("KanbanTasks", boardTasksApp)
 
@@ -34,24 +40,41 @@ function boardTasksApp(projectId) {
     }
 
     const app = {
+        init() {
+            console.log('lol');
+        },
+        //utils function
+        renderMarkdown,
+        formatDate,
+        isStatusUpdate,
+        statusText,
+        generateGravatarUrl,
+        toArchiveTooltip,
+        reminderTooltip,
+        editTaskUrl,
+        deleteTaskReminderUrl,
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await issueFollowup(e.detail.task, e.detail.status)
             await this.getData()
         },
         data: [],
+        boards: [],
+        STATUSES: STATUSES,
         get isBusy() {
             return this.$store.app.isLoading
         },
         currentlyHoveredElement: null,
         async getData() {
-            const json = await api.get(tasksUrl(projectId))
-
-            const data = json.data.map(d => Object.assign(d, {
-                uuid: generateUUID()
-            }));
-
-            this.data = data;
+            return this.data = await this.$store.tasks.getTasks(projectId)
+        },
+        async getBoards() {
+            return this.boards = await this.$store.tasks.getBoards()
+        },
+        getStatuses() {
+            console.log('lol');
+            console.log(this.$store.tasks.STATUSES)
+            return this.STATUSES = this.$store.tasks.STATUSES
         },
         sortFn(a, b) {
             return a.order - b.order;
@@ -128,12 +151,12 @@ function boardTasksApp(projectId) {
             await this.getData();
         },
         // Boards
-        boards: [
-            { status: STATUSES.PROPOSED, title: "Nouvelles ", color_class: "border-primary" },
-            { status: STATUSES.INPROGRESS, title: "En cours", color_class: "border-secondary" },
-            { status: STATUSES.BLOCKED, title: "En attente", color_class: "border-warning" },
-            { status: [STATUSES.DONE, STATUSES.NOT_INTERESTED, STATUSES.ALREADY_DONE], title: "Archivées", color_class: "border-error" },
-        ],
+        // boards: [
+        //     { status: STATUSES.PROPOSED, title: "Nouvelles ", color_class: "border-primary" },
+        //     { status: STATUSES.INPROGRESS, title: "En cours", color_class: "border-secondary" },
+        //     { status: STATUSES.BLOCKED, title: "En attente", color_class: "border-warning" },
+        //     { status: [STATUSES.DONE, STATUSES.NOT_INTERESTED, STATUSES.ALREADY_DONE], title: "Archivées", color_class: "border-error" },
+        // ],
 
         // Administrate
         canAdministrate: false,
@@ -189,10 +212,10 @@ function boardTasksApp(projectId) {
             this.currentTaskNotifications = data;
         },
         initPreviewModal() {
-            
+
             const element = document.getElementById("task-preview");
             this.previewModalHandle = new bootstrap.Modal(element);
-            
+
             const cleanup = () => {
                 // FIXME : Race condition when bootstrap unloads modal
                 // this.currentTaskId = null;
