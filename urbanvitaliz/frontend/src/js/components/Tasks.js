@@ -1,4 +1,4 @@
-import { STATUSES } from '../store/tasks'
+import { STATUSES } from '../config/statuses';
 
 import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, resourcePreviewUrl , followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
 import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
@@ -68,12 +68,6 @@ export default function TasksApp(app, projectId) {
         currentlyHoveredElement: null,
         async getData() {
             return this.data = await this.$store.tasks.getTasks(projectId)
-        },
-        async getBoards() {
-            return this.boards = await this.$store.tasks.getBoards()
-        },
-        getStatuses() {
-            return this.STATUSES = this.$store.tasks.STATUSES
         },
         sortFn(a, b) {
             return a.order - b.order;

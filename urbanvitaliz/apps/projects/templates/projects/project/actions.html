@@ -28,7 +28,7 @@
 {% block project_detail %}
 <div class="col-12 mx-auto">
     <div class="row">
-        <div class="col" x-data="KanbanTasks({{ project.id }})" x-init="getData(); getBoards(); initTooltips(); loadCanAdministrate(); loadCanManage(); loadIsSwitchtender(); loadUserId(); processUrl();">
+        <div class="col" x-data="KanbanTasks({{ project.id }})" x-init="getData(); initTooltips(); loadCanAdministrate(); loadCanManage(); loadIsSwitchtender(); loadUserId(); processUrl();">
             {% include 'projects/project/navigation.html' with recommandations=True %}
             {% include 'projects/project/fragments/kanban_tasks/kanban_header.html' %}
 

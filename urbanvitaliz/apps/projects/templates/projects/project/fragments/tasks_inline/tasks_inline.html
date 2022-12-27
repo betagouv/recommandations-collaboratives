@@ -6,7 +6,7 @@
 {% endblock %}
 
 <!-- Index of tasks inline app -->
-<div x-data="TasksInline({{project.pk}})" x-init="getData(); getBoards(); processUrl();">
+<div x-data="TasksInline({{project.pk}})" x-init="getData(); processUrl();">
     <h1>Vue alternative</h1>
     <div class="ms-2" style="width: 24px; height: 24px;">
         <div x-show="isBusy" class="spinner-border spinner-border spinner-border-sm text-primary" role="status">

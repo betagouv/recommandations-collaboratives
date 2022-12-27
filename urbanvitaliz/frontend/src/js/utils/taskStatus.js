@@ -1,4 +1,4 @@
-import { STATUSES } from "../store/tasks";
+import { STATUSES } from '../config/statuses';
 
 export const STATUS_TEXT = {
     0: "nouveau",
