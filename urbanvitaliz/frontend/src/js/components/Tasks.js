@@ -1,6 +1,6 @@
 import { STATUSES } from '../store/tasks'
 
-import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
+import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, resourcePreviewUrl , followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
 import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
 import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
 import { toArchiveTooltip, reminderTooltip } from '../utils/tooltip'
@@ -49,6 +49,7 @@ export default function TasksApp(app, projectId) {
         deleteTaskReminderUrl,
         issueFollowup,
         isArchivedStatus,
+        resourcePreviewUrl,
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await issueFollowup(e.detail.task, e.detail.status)
