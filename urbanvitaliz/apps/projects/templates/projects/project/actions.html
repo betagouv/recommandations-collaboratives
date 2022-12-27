@@ -7,7 +7,6 @@
 {% load django_vite %}
 
 {% block js %}
-<script src="{% static 'projects/js/tmp_kanban_globals.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 {% vite_asset 'js/apps/project.js' %}
@@ -29,7 +28,7 @@
 {% block project_detail %}
 <div class="col-12 mx-auto">
     <div class="row">
-        <div class="col" x-data="KanbanTasks({{ project.id }})" x-init="getData(); initTooltips(); loadCanAdministrate(); loadCanManage(); loadIsSwitchtender(); loadUserId(); processUrl();">
+        <div class="col" x-data="KanbanTasks({{ project.id }})" x-init="getData(); getBoards(); initTooltips(); loadCanAdministrate(); loadCanManage(); loadIsSwitchtender(); loadUserId(); processUrl();">
             {% include 'projects/project/navigation.html' with recommandations=True %}
             {% include 'projects/project/fragments/kanban_tasks/kanban_header.html' %}
 
