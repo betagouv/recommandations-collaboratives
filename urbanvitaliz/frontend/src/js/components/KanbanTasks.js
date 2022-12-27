@@ -1,22 +1,11 @@
 import Alpine from "alpinejs"
 import TaskApp from './Tasks'
 
-import { STATUSES } from '../store/tasks'
-import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
-import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
-import { isStatusUpdate, statusText } from "../utils/taskStatus"
-import { toArchiveTooltip, reminderTooltip } from '../utils/tooltip'
-import { renderMarkdown } from '../utils/markdown'
-import { generateGravatarUrl } from '../utils/gravatar'
-
 Alpine.data("KanbanTasks", boardTasksApp)
 
 function boardTasksApp(projectId) {
 
     const app = {
-        init() {
-            console.log('kanban init');
-        },  
         onDragStart(event, uuid) {
             event.dataTransfer.clearData();
             event.dataTransfer.effectAllowed = "move";
