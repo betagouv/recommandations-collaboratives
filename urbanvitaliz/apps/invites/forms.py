@@ -17,7 +17,7 @@ class InviteForm(forms.ModelForm):
 
     class Meta:
         model = models.Invite
-        fields = ["email", "role", "message"]
+        fields = ["email", "message"]
 
 
 class InviteAcceptForm(forms.Form):

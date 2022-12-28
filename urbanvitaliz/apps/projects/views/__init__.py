@@ -38,7 +38,7 @@ from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
                                 is_switchtender_or_403)
 
 from .. import models, signals
-from ..forms import ProjectForm, SelectCommuneForm
+from ..forms import SelectCommuneForm
 from ..utils import (can_administrate_or_403, can_administrate_project,
                      format_switchtender_identity, generate_ro_key,
                      get_active_project, get_collaborators_for_project,
@@ -386,31 +386,6 @@ def project_maplist(request):
     )
 
     return render(request, "projects/project/list-map.html", locals())
-
-
-@login_required
-def project_update(request, project_id=None):
-    """Update the base information of a project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    can_administrate_or_403(project, request.user)
-
-    if request.method == "POST":
-        form = ProjectForm(request.POST, instance=project)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            # postcode = form.cleaned_data.get("postcode")
-            # project.commune = geomatics.Commune.get_by_postal_code(postcode)
-            instance.updated_on = timezone.now()
-            instance.save()
-            form.save_m2m()
-            return redirect(reverse("projects-project-detail", args=[project_id]))
-    else:
-        if project.commune:
-            postcode = project.commune.postal
-        else:
-            postcode = None
-        form = ProjectForm(instance=project, initial={"postcode": postcode})
-    return render(request, "projects/project/update.html", locals())
 
 
 @login_required

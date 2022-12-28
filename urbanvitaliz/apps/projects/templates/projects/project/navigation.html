@@ -90,4 +90,11 @@
         </a>
     </li>
     {% endif %}
+    {% if can_administrate %}
+    <li>
+        <a class="{% if administration_panel %} active {% endif %} align-items-center" href="{% url 'projects-project-administration' project.pk %}">
+            <span class="text-nowrap">Administration</span>
+        </a>
+    </li>
+    {% endif %}
 </ul>

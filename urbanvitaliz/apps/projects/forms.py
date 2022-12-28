@@ -188,21 +188,16 @@ class ProjectForm(forms.ModelForm):
     """Form for updating the base information of a project"""
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
-    publish_to_cartofriches = forms.BooleanField(
-        label="Publication sur cartofriches", disabled=True, required=False
-    )
+    insee = forms.CharField(max_length=5, required=False, label="Code Insee")
 
     class Meta:
         model = models.Project
         fields = [
-            "org_name",
-            "phone",
             "name",
             "postcode",
+            "insee",
             "location",
             "description",
-            "publish_to_cartofriches",
-            "muted",
         ]
 
 
