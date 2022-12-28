@@ -39,7 +39,7 @@ class SessionResultsView(LoginRequiredMixin, DetailView):
 class SessionDoneView(LoginRequiredMixin, RedirectView):
     permanent = False
     query_string = True
-    pattern_name = "projects-project-detail"
+    pattern_name = "projects-project-detail-knowledge"
 
     def get_redirect_url(self, *args, **kwargs):
         session = get_object_or_404(models.Session, pk=kwargs["session_id"])
