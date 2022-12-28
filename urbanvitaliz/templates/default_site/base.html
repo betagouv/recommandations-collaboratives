@@ -63,7 +63,11 @@
 
         {% include "header/menu-top.html" %}
 
-        <main style="padding-top: 150px;">
+        {% if user.is_authenticated %}
+            <main style="padding-top: 66px;">
+        {% else %}
+            <main style="padding-top: 150px;">
+        {% endif %}
             <div id="notification" x-data="Notification" x-show="isOpen">
                 <span x-text="message"></span>
             </div>
