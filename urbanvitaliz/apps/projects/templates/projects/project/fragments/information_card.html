@@ -1,13 +1,21 @@
 {% load gravatar %}
-
 <div class="pe-4 pt-4 {% if full_width %}w-100{% else %}w-50{% endif %}">
-    <h6 style="font-size: 14px;" class="text-uppercase fw-bold">
-        {% if onboarding_information %}
-            {% if title %} {{title}} {% else %} Compléments {% endif %}
-        {% else %}
-            {{ title }}
+    <div class="d-flex align-items-center justify-content-between">
+        <h6 style="font-size: 14px;" class="text-uppercase fw-bold m-0 p-0">
+            {% if onboarding_information %}
+                {% if title %}
+                    {{ title }}
+                {% else %}
+                    Compléments
+                {% endif %}
+            {% else %}
+                {{ title }}
+            {% endif %}
+        </h6>
+        {% if can_administrate and is_editable %}
+            <a class="ms-2 me-4 mb-1" href="{% url "projects-project-topics" project.id %}">éditer</a>
         {% endif %}
-    </h6>
+    </div>
     <div class="project-card-details p-4">
         <article>
             {% include 'projects/project/fragments/information_card_description.html' %}
@@ -15,27 +23,29 @@
         <footer class="d-flex mt-4 justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %} overflow-hidden">
             <div class="d-flex align-items-center">
                 <span class="me-2 d-flex align-items-center">
-                    <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}"
-                        alt="{{action.actor}}">
+                    <img class="rounded-circle me-2"
+                         src="{% gravatar_url project.owner.email size=24 %}"
+                         alt="{{ action.actor }}">
                     {% if card_user.first_name %}
-                    <strong class="text-nowrap text-capitalize">
-                        {{ card_user.first_name }}
-                        {{ card_user.last_name }}
-                    </strong>
+                        <strong class="text-nowrap text-capitalize">
+                            {{ card_user.first_name }}
+                            {{ card_user.last_name }}
+                        </strong>
                     {% else %}
-                    <strong class="text-nowrap text-capitalize">
-                        {{ project.first_name }}
-                        {{ project.last_name }}
-                    </strong>
+                        <strong class="text-nowrap text-capitalize">
+                            {{ project.first_name }}
+                            {{ project.last_name }}
+                        </strong>
                     {% endif %}
                 </span>
             </div>
-            {% if can_administrate and is_editable %}
-            <a href="{% url "projects-project-topics" project.id %}">éditer</a>
-            {% endif %}
-            <div class="mt-2">
-                <span style="color:#929292; text-align: right; font-weight: 300; font-size: 14px; text-align: right;"
-                    class="font-italic d-flex">{{ updated_on }}</span>
+            <div class=" {% if is_editable %}mt-0{% else %}mt-2{% endif %}">
+                <span style="color:#929292;
+                             text-align: right;
+                             font-weight: 300;
+                             font-size: 14px;
+                             text-align: right"
+                      class="font-italic d-flex">{{ updated_on }}</span>
             </div>
         </footer>
     </div>

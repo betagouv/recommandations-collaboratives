@@ -55,12 +55,14 @@
             <div class="col-8">
                 <div class="d-flex">
                     {% if can_administrate %}
-                        <div class="w-50">
-                            <div class="pe-4">
+                    <div class="row w-100">
+                        <div class="col-12 col-lg-6">
+                            <div class="pe-lg-4">
                                 {% include 'projects/project/fragments/topics/topic_list.html' %}
                             </div>
                         </div>
-                        <div class="w-50">{% include 'projects/project/fragments/advisor_note.html' %}</div>
+                        <div class="col-12 col-lg-6">{% include 'projects/project/fragments/advisor_note.html' %}</div>
+                    </div>
                     {% else %}
                         <div class="pe-4 w-100">
                         {% include 'projects/project/fragments/topics/topic_list.html' %}
