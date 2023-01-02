@@ -155,7 +155,7 @@
                                 <li>{% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}</li>
                             {% endfor %}
                         </ul>
-                        {% if is_switchtender or is_staff %}
+                        {% if is_switchtender or is_staff or is_regional_actor %}
                             <div class="d-block mb-2">
                                 <a style="cursor: pointer"
                                    @click="openInviteSwitchtenderModal"

@@ -11,7 +11,7 @@
           <form class="form" id="form-projects-access-add-user" action="{% url 'projects-project-access-advisor-invite' project.pk %}" method="post">
           <div class="mb-3">
               <label class="form-label" style="font-size: 16px; color: #666666;" for="invite-email">Saisissez l'adresse email de la personne à inviter</label>
-              <input id="invite-email" type="email" name="email" required class="form-control" placeholder="camille@region-hdf.fr"/>
+              <input id="invite-email" type="email" name="email" required class="form-control invite-switchtender-modal-email" placeholder="camille@region-hdf.fr"/>
           </div>
 
           <input type="hidden" name="{{ invite_form.role.html_name }}" id="role-switchtender" value="SWITCHTENDER">
@@ -22,11 +22,11 @@
 
           <div class="mb-3">
               <label style="font-size: 16px; color: #666666;" class="form-label" for="invite-message">Message d'invitation (optionnel)</label>
-              <textarea id="invite-message" rows="8" name="message" class="form-control" placeholder="J'aimerais vous inviter car..."></textarea>
+              <textarea id="invite-message" rows="8" name="message" class="form-control invite-switchtender-modal-textarea" placeholder="J'aimerais vous inviter car..."></textarea>
           </div>
 
           <div class="d-flex justify-content-end">
-              <button class="button d-inline-flex align-items-center" type="submit">
+              <button class="button d-inline-flex align-items-center invite-switchtender-modal-button" type="submit">
                   Envoyer l'invitation
               </button>
           </div>
