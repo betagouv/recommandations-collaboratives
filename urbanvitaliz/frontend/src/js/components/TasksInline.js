@@ -7,6 +7,10 @@ function TasksInline(projectId) {
     const app = {
         currentStatus: 'all',
         boardsFiltered: [],
+        // boards: [
+        //     { status: [STATUSES.PROPOSED, STATUSES.INPROGRESS, STATUSES.BLOCKED], title: "Archivées", color_class: "border-error", color: "#0d6efd" },
+        //     { status: [STATUSES.DONE, STATUSES.NOT_INTERESTED, STATUSES.ALREADY_DONE], title: "Archivées", color_class: "border-error", color: "#adb5bd" },
+        // ],
         boards: [
             { status: STATUSES.PROPOSED, title: "Nouvelles ", color_class: "border-primary", color: "#0d6efd" },
             { status: STATUSES.INPROGRESS, title: "En cours", color_class: "border-secondary", color: "#6c757d" },
@@ -22,6 +26,7 @@ function TasksInline(projectId) {
                 this.currentStatus = 'all'
                 return this.boardsFiltered = this.boards
             }
+
 
             this.currentStatus = status
 
