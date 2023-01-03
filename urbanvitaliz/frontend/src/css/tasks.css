@@ -11,3 +11,24 @@
     background-color: #CECECE;
     border-radius: 2px;
 }
+
+.board-status-filter-button {
+    cursor:  pointer !important;
+}
+
+.board-status-filter-button.active {
+    background-color: #CECECE !important;
+}
+
+.board-status-item {
+    animation: status-appear 0.5s ease forwards;
+}
+
+@keyframes status-appear {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

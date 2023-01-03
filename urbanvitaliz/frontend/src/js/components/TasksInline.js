@@ -5,12 +5,25 @@ import { STATUSES } from '../config/statuses';
 function TasksInline(projectId) {
 
     const app = {
+        currentStatus: 'all',
+        boardsFiltered: [],
         boards: [
             { status: STATUSES.PROPOSED, title: "Nouvelles ", color_class: "border-primary", color: "#0d6efd" },
             { status: STATUSES.INPROGRESS, title: "En cours", color_class: "border-secondary", color: "#6c757d" },
             { status: STATUSES.BLOCKED, title: "En attente", color_class: "border-warning", color: "#ffc107" },
             { status: [STATUSES.DONE, STATUSES.NOT_INTERESTED, STATUSES.ALREADY_DONE], title: "Archivées", color_class: "border-error", color: "#adb5bd" },
-        ]
+        ],
+        init() {
+            this.boardsFiltered = this.boards
+        },
+        handleStatusFilterClick(status) {
+
+            this.currentStatus = status
+
+            if(status === 'all') return this.boardsFiltered = this.boards
+
+            return this.boardsFiltered = this.boards.filter(board => board.status === status);
+        }
     }
 
     return TaskApp(app, projectId);
