@@ -1,3 +1,9 @@
 <template x-for="(task, i) in column(board.status)" :key="task.id">
-                {% include 'projects/project/fragments/tasks_inline/task_item.html' %}
+    {% include 'projects/project/fragments/tasks_inline/task_item.html' %}
 </template>
+
+<div x-show="column(board.status).length == '0'">
+    <div class="flag bg-white d-flex rounded align-items-center justify-content-start">
+        <p class="text-info-custom font-small text-grey-dark my-0 ">Aucune recommandation dans cette catégorie pour l'instant</p>
+    </div>
+</div>

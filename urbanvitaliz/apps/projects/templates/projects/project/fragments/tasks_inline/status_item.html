@@ -2,6 +2,11 @@
     <div class="d-flex align-items-center pb-3">
         <i :style="`background-color: ${board.color}`" class="status-color-indicator me-2"></i>
         <h3 x-text="board.title" class="title-info m-0 p-0"></h3>
+        <div class="d-flex align-items-center" style="margin-bottom: 2px;">
+            <span class="tiny text-grey-light mx-1">·</span>
+            <span class="tiny text-grey-light" x-text="column(board.status).length"></span>
+            <span class="tiny text-grey-light ms-1" x-text="column(board.status).length > 1 ? 'Recommandations' : 'Recommandation' "></span>
+        </div>
     </div>
     {% include 'projects/project/fragments/tasks_inline/task_list.html' %}
 </div>
