@@ -16,6 +16,10 @@
     cursor:  pointer !important;
 }
 
+.board-status-filter-button:hover {
+    background-color: #efefef !important;
+}
+
 .board-status-filter-button.active {
     background-color: #CECECE !important;
 }

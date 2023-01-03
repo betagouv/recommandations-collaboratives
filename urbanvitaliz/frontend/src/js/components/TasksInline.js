@@ -18,9 +18,16 @@ function TasksInline(projectId) {
         },
         handleStatusFilterClick(status) {
 
+            if(status === 'all') return this.boardsFiltered = this.boards
+
+            if (this.currentStatus === status) {
+                this.currentStatus = 'all'
+                return this.boardsFiltered = this.boards
+            }
+
             this.currentStatus = status
 
-            if(status === 'all') return this.boardsFiltered = this.boards
+            
 
             return this.boardsFiltered = this.boards.filter(board => board.status === status);
         }

@@ -8,8 +8,12 @@
                       class="fw-bold mt-0 pt-0 font-small"
                       x-text="task.intent"
                       @click="onPreviewClick(task.id)"></span>
-                <i class="mx-2">·</i>
-                <div class="tiny">
+                
+                <div class="tiny d-flex align-items-center">
+                    <span class="mx-2 text-muted">·</span>
+                    <svg class="bi me-1" width="14" height="14" fill="#c6c6c6">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
+                    </svg>
                     <span class="fst-italic"
                           x-text="`${task.created_by.first_name} ${task.created_by.last_name}`"
                           style="line-height: 20px"></span>
@@ -17,7 +21,10 @@
                         <span x-text="task.created_by.profile.organization.name"
                               class="fst-italic text-muted"></span>
                     </template>
-                    <span class="ms-2 text-muted"
+                    <svg class="bi ms-2 me-1" width="14" height="14" fill="#c6c6c6">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-fill" />
+                    </svg>
+                    <span class="text-muted"
                           x-text="`le ${formatDate(task.created_on)}`"
                           style="line-height: 20px"></span>
                 </div>
