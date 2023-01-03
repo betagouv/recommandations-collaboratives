@@ -20,15 +20,40 @@
     background-color: #CECECE !important;
 }
 
-.board-status-item {
-    animation: status-appear 0.5s ease forwards;
+.task-animation-appear-in {
+    animation: status-animation-appear 0.35s ease forwards;
+    transform: translate3d(0,-5px,0);
+    opacity: 0;
+    background-color: #CECECE;
 }
+
+.board-status-item {
+    animation: status-appear 0.35s ease forwards;
+    transform: translate3d(0,-5px,0);
+    opacity: 0;
+}
+
+@keyframes status-animation-appear {
+    from {
+        opacity: 0;
+        transform: translate3d(0,-5px,0);
+        background-color: #CECECE;
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0,0,0);
+        background-color: white;
+    }
+}
+
 
 @keyframes status-appear {
     from {
         opacity: 0;
+        transform: translate3d(0,-5px,0);
     }
     to {
         opacity: 1;
+        transform: translate3d(0,0,0);
     }
 }

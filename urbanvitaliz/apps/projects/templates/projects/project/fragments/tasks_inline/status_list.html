@@ -1,19 +1,12 @@
-<div class="d-flex justify-content-start">
-    <div class="d-inline-flex mb-2 overflow-hidden">
-        <div x-on:click="handleStatusFilterClick('all')" class="border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button" :class="currentStatus === 'all' ? 'active' : '' ">
-            <i style="background-color:#222"
-            class="status-color-indicator me-2"></i>
-            <h3 class="title-info m-0 p-0">Toutes</h3>
-        </div>
-        <template x-for="board in boards">
-            <div x-on:click='handleStatusFilterClick(board.status)' class="ms-2 border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button" :class="currentStatus === board.status ? 'active' : '' ">
-                <i :style="`background-color: ${board.color}`"
-                class="status-color-indicator me-2"></i>
-                <h3 x-text="board.title" class="title-info m-0 p-0"></h3>
-            </div>
-        </template>
+<div>
+    {% include 'projects/project/fragments/tasks_inline/status_filter.html' %}
+    <div x-show="isBusy" class="ms-2" style="width: 24px; height: 24px;">
+        <div class="spinner-border spinner-border spinner-border-sm text-primary"
+             role="status"></div>
     </div>
+    <template x-for="board in boardsFiltered">
+        <div>
+            {% include 'projects/project/fragments/tasks_inline/status_item.html' %}
+        </div>
+    </template>
 </div>
-<template x-for="board in boardsFiltered">
-    {% include 'projects/project/fragments/tasks_inline/status_item.html' %}
-</template>

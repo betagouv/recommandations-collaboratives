@@ -1,5 +1,7 @@
 <template x-for="(task, i) in column(board.status)" :key="task.id">
-    {% include 'projects/project/fragments/tasks_inline/task_item.html' %}
+    <div class="task-animation-appear-in">
+        {% include 'projects/project/fragments/tasks_inline/task_item.html' %}
+    </div>
 </template>
 
 <div x-show="column(board.status).length == '0'">

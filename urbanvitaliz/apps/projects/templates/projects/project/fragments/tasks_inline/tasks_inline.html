@@ -6,17 +6,7 @@
 <!-- Index of tasks inline app -->
 <div x-data="TasksInline({{ project.pk }})"
      x-init="getData(); processUrl();">
-    <div x-show="isBusy" class="ms-2" style="width: 24px; height: 24px;">
-        <div class="spinner-border spinner-border spinner-border-sm text-primary"
-             role="status"></div>
-    </div>
     <h1 class="mb-3 d-block">Listes des recommandations</h1>
-    <div x-show="!isBusy">
-        <div class="row">
-            <div class="col-12 mx-auto">
-                {% include 'projects/project/fragments/tasks_inline/status_list.html' %}
-            </div>
-        </div>
-    </div>
+    {% include 'projects/project/fragments/tasks_inline/status_list.html' %}
     {% include 'projects/project/fragments/kanban_tasks/preview_modal.html' %}
 </div>
