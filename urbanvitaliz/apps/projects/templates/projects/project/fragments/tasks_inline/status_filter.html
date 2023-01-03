@@ -1,5 +1,6 @@
-<div class="d-flex justify-content-start mt-3">
-    <div class="d-inline-flex mb-2 overflow-hidden">
+{% load static %}
+<div class="d-flex justify-content-between mt-3 mb-2">
+    <div class="d-inline-flex overflow-hidden">
         <div x-on:click="handleStatusFilterClick('all')"
              class="border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button"
              :class="currentStatus === 'all' ? 'active' : '' ">
@@ -16,4 +17,15 @@
             </div>
         </template>
     </div>
+    <div class="d-flex">
+        {% if not disable_add_recommendation %}
+            <a class="button filled"
+               href="{% url 'projects-project-create-action' project.id %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
+                </svg>
+                Ajouter une recommandation
+            </a>
+        </div>
+    {% endif %}
 </div>
