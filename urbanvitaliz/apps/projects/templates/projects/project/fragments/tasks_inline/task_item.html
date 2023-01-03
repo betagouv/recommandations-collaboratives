@@ -1,33 +1,30 @@
 {% load static %}
-<div class="border-top px-2 d-flex pt-2 justify-content-between align-items-start">
-    <div class="d-flex flex-column flex-grow-1">
+<div class="border-top px-2 d-flex pt-2 pb-2 justify-content-between align-items-start task-item">
+    {% if can_manage and not disable_edit %}
+        <div>
+            <template x-if="i > 0">
+                <a class="d-block" @click="moveAbove(task, column(board.status)[i - 1])" style="cursor: pointer">
+                    <svg class="aling-middle bi ms-1" width="13px" height="13px" fill="#c6c6c6">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
+                    </svg>
+                </a>
+            </template>
+            <template x-if="i < column(board.status).length - 1">
+                <a class="d-block" @click="moveBelow(task, column(board.status)[i + 1])" style="cursor: pointer">
+                    <svg class="aling-middle bi ms-1" width="13px" height="13px" fill="#c6c6c6">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
+                    </svg>
+                </a>
+            </template>
+        </div>
+    {% endif %}
+    <div class="d-flex flex-column flex-grow-1 ms-2">
         <div class="d-flex w-100 justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <!-- <i class="task-separator mt-1 mb-2"></i> -->
+            <div class="d-flex w-100 align-items-center justify-content-between">
                 <span style="cursor:pointer"
-                      class="fw-bold mt-0 pt-0 font-small"
+                      class="fw-bold mt-0 pt-0 font-medium mb-2"
                       x-text="task.intent"
                       @click="onPreviewClick(task.id)"></span>
-                
-                <div class="tiny d-flex align-items-center">
-                    <span class="mx-2 text-muted">·</span>
-                    <svg class="bi me-1" width="14" height="14" fill="#c6c6c6">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
-                    </svg>
-                    <span class="fst-italic"
-                          x-text="`${task.created_by.first_name} ${task.created_by.last_name}`"
-                          style="line-height: 20px"></span>
-                    <template x-if="task.created_by.profile.organization">
-                        <span x-text="task.created_by.profile.organization.name"
-                              class="fst-italic text-muted"></span>
-                    </template>
-                    <svg class="bi ms-2 me-1" width="14" height="14" fill="#c6c6c6">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-fill" />
-                    </svg>
-                    <span class="text-muted"
-                          x-text="`le ${formatDate(task.created_on)}`"
-                          style="line-height: 20px"></span>
-                </div>
             </div>
         </div>
         <article class="">
@@ -36,27 +33,34 @@
                    class="text-info-custm tiny text-grey-dark m-0 p-0"></p>
             </template>
         </article>
+        <footer class="d-flex justify-content-between align-items-center">
+            <div>
+                <span @click="onPreviewClick(task.id)"
+                      style="cursor: pointer"
+                      class="d-flex align-items-center text-blue tiny mt-2 mb-2">
+                    <svg class="bi me-1" width="14" height="14" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark-text" />
+                    </svg>
+                Consulter la recommandation complète</span>
+            </div>
+            <div class="tiny d-flex align-items-center">
+                <svg class="bi me-1" width="14" height="14" fill="#c6c6c6">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
+                </svg>
+                <span class="fst-italic"
+                      x-text="`${task.created_by.first_name} ${task.created_by.last_name}`"
+                      style="line-height: 20px"></span>
+                <template x-if="task.created_by.profile.organization">
+                    <span x-text="task.created_by.profile.organization.name"
+                          class="fst-italic text-muted ms-2"></span>
+                </template>
+                <svg class="bi ms-2 me-1" width="14" height="14" fill="#c6c6c6">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-fill" />
+                </svg>
+                <span class="text-muted"
+                      x-text="`le ${formatDate(task.created_on)}`"
+                      style="line-height: 20px"></span>
+            </div>
+        </footer>
     </div>
-    {% if can_manage and not disable_edit %}
-        <div>
-            <template x-if="i > 0">
-                <a class="d-block"
-                   @click="moveAbove(task, column(board.status)[i - 1])"
-                   style="cursor: pointer">
-                    <svg class="aling-middle bi ms-1" width="25px" height="25px" fill="#222">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up-square" />
-                    </svg>
-                </a>
-            </template>
-            <template x-if="i < column(board.status).length - 1">
-                <a class="d-block"
-                   @click="moveBelow(task, column(board.status)[i + 1])"
-                   style="cursor: pointer">
-                    <svg class="aling-middle bi ms-1" width="25px" height="25px" fill="#222">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down-square" />
-                    </svg>
-                </a>
-            </template>
-        </div>
-    {% endif %}
 </div>

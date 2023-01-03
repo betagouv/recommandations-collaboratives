@@ -12,6 +12,10 @@
     border-radius: 2px;
 }
 
+.task-item p {
+    margin-bottom: 5px;
+}
+
 .board-status-filter-button {
     cursor:  pointer !important;
 }
