@@ -13,6 +13,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import models as notifications_models
+from notifications.models import Notification
 from notifications.signals import notify
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
@@ -279,4 +280,12 @@ def test_notification_formatter():
         assert tests[idx][2][1] == fmt_reco.excerpt
 
 
-# eof
+def test_notification_formatter_with_bogus_user():
+    formatter = NotificationFormatter()
+
+    user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
+
+    notification = Notification(user, verb="a rédigé un message")
+
+    fmt_reco = formatter.format(notification)
+    assert fmt_reco is None
