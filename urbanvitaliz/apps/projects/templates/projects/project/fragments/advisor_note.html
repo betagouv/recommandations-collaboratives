@@ -9,12 +9,12 @@
         {% include 'projects/project/fragments/information_card.html' with full_width=True project=project is_editable=True title="Note interne" description=project.advisors_note_rendered updated_on=project.advisors_note_on card_user=project.advisors_note_by %}
     </div>
 {% else %}
-    <h6 style="font-size: 14px; margin-bottom: 14px;" class="text-uppercase fw-bold pt-4 mt-2">
+    <h6 class="title-info text-uppercase fw-bold m-0">
         Note interne
     </h6>
-    <div class="project-card-details rounded pt-4 me-4 py-4 d-flex flex-column align-items-center justify-content-center">
-        <span style="color:#929292; font-size: 14px;" class="text-uppercase text-center">Aucune note interne n'a été faite pour le moment</span>
-        <a class="button mt-3"
+    <div class="project-card-details py-4 d-flex flex-column align-items-center justify-content-center">
+        <span class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">Aucune note interne n'a été faite pour le moment</span>
+        <a class="button mt-3 text-center"
            href="{% url "projects-project-topics" project.id %}">Écrire une note interne</a>
     </div>
 {% endif %}
