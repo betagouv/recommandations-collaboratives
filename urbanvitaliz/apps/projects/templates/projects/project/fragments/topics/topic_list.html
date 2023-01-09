@@ -4,7 +4,7 @@
         <h6 class="d-flex align-items-center justify-content-center text-uppercase fw-bold font-small mb-0">
             <span>Sujets diagnostiqués</span>
         </h6>
-        {% if can_administrate %}
+        {% if can_administrate and project.topics_on_site.count != 0 %}
             <a class="d-flex align-items-center"
                href="{% url "projects-project-topics" project.id %}">
                 <span class="tiny">Éditer</span>

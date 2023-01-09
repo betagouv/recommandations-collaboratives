@@ -1,3 +1,4 @@
+{% load static %}
 {% load gravatar %}
 <div class="pe-4 pt-4 {% if full_width %}w-100{% else %}w-50{% endif %}">
     <div class="d-flex align-items-center justify-content-between">
@@ -13,7 +14,12 @@
             {% endif %}
         </h6>
         {% if can_administrate and is_editable %}
-            <a class="ms-2 me-4 mb-1" href="{% url "projects-project-topics" project.id %}">éditer</a>
+            <a class="ms-2 me-4 mb-1 tiny d-flex align-items-center" href="{% url "projects-project-topics" project.id %}#advisor-note">
+                <span>Éditer</span>
+                <svg class="bi ms-2 " width="10" height="10" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
+                </svg>
+            </a>
         {% endif %}
     </div>
     <div class="project-card-details p-4">
