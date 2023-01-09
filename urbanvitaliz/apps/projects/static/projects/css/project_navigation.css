@@ -6,7 +6,7 @@
 
 .project-navigation a {
     display: flex;
-    padding: 10px 30px;
+    padding: 8px 15px;
     margin: 0 5px;
 
     text-decoration: none;
@@ -22,6 +22,8 @@
 
     color: #222;
     font-weight: 500;
+
+    font-size: 15px;
 }
 
 .project-navigation a.active{
