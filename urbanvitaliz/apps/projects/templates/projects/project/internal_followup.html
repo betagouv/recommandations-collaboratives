@@ -95,7 +95,9 @@
 
             </li>
             {% empty %}
-            -- Pas encore d'activité, revenez plus tard ! --
+            <div class="mt-4 bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
+                <p class="m-0 text-info-custom text-grey text-center fw-normal">Cet espace est réservé aux échanges entre les conseillers, et n'est pas visible par la collectivité. Quelles sont vos actualités sur le dossier ?</p>
+            </div>
             {% endfor %}
         </ul>
     </div>
