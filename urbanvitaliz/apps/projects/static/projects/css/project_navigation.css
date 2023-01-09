@@ -6,7 +6,7 @@
 
 .project-navigation a {
     display: flex;
-    padding: 8px 15px;
+    padding: 10px 15px;
     margin: 0 5px;
 
     text-decoration: none;
@@ -46,4 +46,47 @@
     color: #929292;
     border-top: solid 1px #EEEEEE;
     border-bottom: solid 1px #EEEEEE;
+}
+
+.project-navigation .survey-completion {
+    position: absolute;
+    display: flex;
+    align-items: center;
+
+    bottom: 2px;
+    left: 5%;
+
+    width: 90%;
+}
+
+.project-navigation .survey-completion-progress-bar-container {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    height: 5px;
+
+    background-color: white;
+    overflow: hidden;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+}
+
+.project-navigation .survey-completion-progress-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+}
+
+.project-navigation .survey-completion-number {
+    color: #222;
+    font-weight: 400;
+    font-size: 11px;
+    margin-left: 5px;
+}
+
+.project-navigation .survey p {
+    margin: 0;
+    transform: translate3d(0,-4px,0);
 }

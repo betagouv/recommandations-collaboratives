@@ -13,9 +13,15 @@
             Présentation
         </a>
     </li>
-    <li>
+    <li class="position-relative survey">
         <a class="text-nowrap {% if state_of_play %} active {% endif %}" href="{% url 'projects-project-detail-knowledge' project.pk %}">
-            État des lieux
+            <p>État des lieux</p>
+            <div class="survey-completion">
+                <div class="survey-completion-progress-bar-container">
+                    <i class="survey-completion-progress-bar" style="width: {{active_project_survey_session.completion}}%; {%if active_project_survey_session.completion >= 90 %}background-color:#5ec495{% else %}background-color:#f58188{% endif %}"></i>
+                </div>
+                <span class="survey-completion-number">{{active_project_survey_session.completion}}%</span>
+            </div>
         </a>
     </li>
     <li>
