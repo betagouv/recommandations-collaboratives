@@ -207,7 +207,9 @@ class ResourceDetailView(BaseResourceDetailView):
 
         if check_if_switchtender(self.request.user):
             context["projects_used_by"] = (
-                projects.Project.on_site.filter(tasks__resource_id=resource.pk)
+                projects.Project.on_site.filter(
+                    Q(tasks__resource_id=resource.pk) & Q(tasks__public=True)
+                )
                 .order_by("name")
                 .distinct()
             )
