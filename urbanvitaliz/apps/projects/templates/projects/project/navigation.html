@@ -13,24 +13,30 @@
             Présentation
         </a>
     </li>
-    <li>
+    <li class="position-relative survey">
         <a class="text-nowrap {% if state_of_play %} active {% endif %}" href="{% url 'projects-project-detail-knowledge' project.pk %}">
-            État des lieux
+            <p>État des lieux</p>
+            <div class="survey-completion">
+                <div class="survey-completion-progress-bar-container">
+                    <i class="survey-completion-progress-bar" style="width: {{active_project_survey_session.completion}}%; {%if active_project_survey_session.completion >= 90 %}background-color:#5ec495{% else %}background-color:#f58188{% endif %}"></i>
+                </div>
+                <span class="survey-completion-number">{{active_project_survey_session.completion}}%</span>
+            </div>
         </a>
     </li>
     <li>
         <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if recommandations %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-actions' project.pk %}">
             {% if active_project_action_notification_count %}
                 {% if project.tasks.proposed.count %}
-                <span class="position-absolute  bg-info badge rounded-circle m-0" style="font-size: 8px;  top:5px; left:10px; width: 15px; height:15px"">
+                <span class="position-absolute  bg-info badge rounded-circle m-0 d-flex align-items-center justify-content-center" style="font-size: 8px;  top:3px; left:3px; width: 15px; height:15px"">
                     {{ project.tasks.open.count }}
                     <span class="visually-hidden">Action en cours</span>
                 </span>
                 {% endif %}
                 {% if active_project_action_notification_count %}
                 <span class="position-absolute bg-danger badge rounded-circle m-0"
-                    style="font-size: 8px; top:5px; right:5px">
-                    <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                    style="font-size: 8px; top:3px; right:3px">
+                    <svg class="align-middle bi" width="9px" height="10px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell" />
                     </svg>
                     <span class="visually-hidden">{{ active_project_action_notification_count }} Notifications des
@@ -51,10 +57,10 @@
         <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if conversation %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-conversations' project.pk %}">
             {% if active_project_conversations_notification_count %}
             <span class="position-absolute bg-danger badge rounded-circle m-0"
-                style="font-size: 8px; top:5px; right:5px">
-                <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell" />
-                </svg>
+                    style="font-size: 8px; top:3px; right:3px">
+                    <svg class="align-middle bi" width="9px" height="10px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell" />
+                    </svg>
                 <span class="visually-hidden">{{ active_project_conversations_notification_count }} Notifications des
                     conversations</span>
             </span>
@@ -90,7 +96,7 @@
         </a>
     </li>
     {% endif %}
-    {% if can_administrate %}
+    {% if user.is_staff %}
     <li>
         <a class="{% if administration_panel %} active {% endif %} align-items-center" href="{% url 'projects-project-administration' project.pk %}">
             <span class="text-nowrap">Administration</span>

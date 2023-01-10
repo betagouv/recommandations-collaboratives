@@ -49,7 +49,7 @@
                 <div class="my-3 mb-4 py-1 border-start border-4 ps-3">
 
                     {% if action.verb == 'a rédigé une note interne' %}
-                    <div class="p-2 mb-2 bg-light">
+                    <div class="p-2 mb-2 bg-light overflow-hidden">
                         {{ action.action_object.content_rendered|safe }}
                         <div class="d-flex align-items-center justify-content-between mt-3">
                             <div class="d-flex align-items-center">
@@ -95,7 +95,9 @@
 
             </li>
             {% empty %}
-            -- Pas encore d'activité, revenez plus tard ! --
+            <div class="mt-4 bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
+                <p class="m-0 text-info-custom text-grey text-center fw-normal">Cet espace est réservé aux échanges entre les conseillers, et n'est pas visible par la collectivité. Quelles sont vos actualités sur le dossier ?</p>
+            </div>
             {% endfor %}
         </ul>
     </div>
