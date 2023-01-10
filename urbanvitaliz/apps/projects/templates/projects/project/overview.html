@@ -133,6 +133,7 @@
                                 {% endif %}
                             {% endfor %}
                         </ul>
+                        {% if switchtending or is_regional_actor or can_manage %}
                         <div class="d-block mb-2">
                             <a style="cursor: pointer"
                                @click="openInviteMemberModal"
@@ -148,6 +149,7 @@
                                 <span>Inviter un membre de la collectivité</span>
                             </a>
                         </div>
+                        {% endif %}
                     </div>
                     <!-- Advisors -->
                     <div class="mt-4">
@@ -157,7 +159,7 @@
                                 <li>{% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}</li>
                             {% endfor %}
                         </ul>
-                        {% if is_switchtender or is_staff or is_regional_actor %}
+                        {% if switchtending or is_regional_actor or can_administrate %}
                             <div class="d-block mb-2">
                                 <a style="cursor: pointer"
                                    @click="openInviteSwitchtenderModal"
