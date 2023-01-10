@@ -1,6 +1,4 @@
-from django.contrib import messages
 from django.contrib.auth import models as auth_models
-from django.shortcuts import get_object_or_404
 from urbanvitaliz import utils
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
@@ -86,3 +84,12 @@ def invite_resend(invite):
         user = None
 
     return invite_send(invite, invited_user=user)
+
+
+def invite_revoke(invite):
+    """Revoke an invitation"""
+    if invite.accepted_on is None:
+        invite.delete()
+        return True
+
+    return False
