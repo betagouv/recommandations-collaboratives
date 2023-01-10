@@ -11,9 +11,11 @@ import csv
 import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
+from urbanvitaliz.apps.crm import models as crm_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.utils import build_absolute_url, is_switchtender_or_403
 
@@ -34,6 +36,8 @@ def project_list_export_csv(request):
         .exclude(status="DRAFT")
         .order_by("-created_on")
     )
+
+    project_ct = ContentType.objects.get_for_model(models.Project)
 
     today = datetime.datetime.today().date()
 
@@ -71,6 +75,9 @@ def project_list_export_csv(request):
             "tags",
             "lien_projet",
             "exclude_stats",
+            "impact_edl",
+            "impact_diag",
+            "impact_mise_en_relation",
         ]
     )
 
@@ -91,6 +98,10 @@ def project_list_export_csv(request):
             project=project,
             created_by__in=switchtenders,
             created_by__is_staff=False,
+        )
+
+        crm_notes = crm_models.Note.objects.filter(
+            content_type_id=project_ct.pk, object_id=project.pk
         )
 
         conversations = models.Note.objects.filter(project=project).filter(public=True)
@@ -143,6 +154,9 @@ def project_list_export_csv(request):
                     reverse("projects-project-detail", args=[project.id])
                 ),
                 project.exclude_stats,
+                crm_notes.filter(tags__name__in=["impact edl"]).count(),
+                crm_notes.filter(tags__name__in=["impact diag"]).count(),
+                crm_notes.filter(tags__name__in=["impact mise en relation"]).count(),
             ]
         )
 
