@@ -471,7 +471,11 @@ def make_project_notifications_digest(project_id, notifications, user):
 def make_notifications_digest(notifications):
     """Return digest of given notifications"""
     formatter = NotificationFormatter()
-    return [asdict(formatter.format(notification)) for notification in notifications]
+    return [
+        asdict(formatter.format(notification))
+        for notification in notifications
+        if notification is not None
+    ]
 
 
 ########################################################################
@@ -495,7 +499,10 @@ class FormattedNotification:
 
 class NotificationFormatter:
     def format(self, notification):
-        return self.format_for_actor(notification.actor, notification)
+        if notification.actor:
+            return self.format_for_actor(notification.actor, notification)
+        else:
+            return None
 
     def _format_or_default(self, dispatch_table, notification):
         """
@@ -553,6 +560,7 @@ class NotificationFormatter:
     @multimethod
     def format_for_actor(self, actor: auth_models.User, notification):
         """Format for User"""
+
         return self._format_or_default(
             {
                 "a rédigé un message": self.format_note_created,
