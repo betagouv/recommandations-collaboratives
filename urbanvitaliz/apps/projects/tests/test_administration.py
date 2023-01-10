@@ -274,6 +274,37 @@ def test_non_staff_cannot_remove_collectivity_member_from_project(request, clien
     assert "login" in response.url
 
 
+@pytest.mark.django_db
+def test_staff_can_remove_collectivity_member_from_project(request, client):
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=False,
+        member__is_staff=False,
+        member__email="user@staff.fr",
+        member__username="user@staff.fr",
+    )
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+        status="READY",
+    ).make()
+
+    url = reverse(
+        "projects-project-access-collectivity-delete",
+        args=[project.id, membership.member.email],
+    )
+
+    with login(client, is_staff=True):
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert "login" not in response.url
+
+    project = models.Project.on_site.get(id=project.id)
+    assert membership not in project.projectmember_set.all()
+
+
 #####################################################################
 # Adivsor ACLs
 #####################################################################
