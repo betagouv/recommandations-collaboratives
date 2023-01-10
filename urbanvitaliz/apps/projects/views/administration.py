@@ -88,7 +88,7 @@ def access_invite(request, role, project):
         invite = invite_collaborator_on_project(
             request.site,
             project,
-            "COLLABORATOR",
+            role,
             email,
             message,
             request.user,

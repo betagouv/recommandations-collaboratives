@@ -120,12 +120,26 @@ class CreateActionWithoutResourceForm(forms.ModelForm):
 
 
 class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
-    resource = forms.ModelChoiceField(
-        queryset=resources_models.Resource.on_site.exclude(
-            status=resources_models.Resource.DRAFT
+    resource = (
+        forms.ModelChoiceField(
+            queryset=resources_models.Resource.objects.exclude(
+                status=resources_models.Resource.DRAFT
+            )
         ),
-        required=True,
     )
+
+    def clean_resource(self):
+        resource = self.cleaned_data["resource"]
+
+        try:
+            resource = resources_models.Resource.on_site.exclude(
+                status=resources_models.Resource.DRAFT
+            ).get(pk=resource.pk)
+        except resources_models.Resource.DoesNotExist:
+            self.add_error("resource_unknown", "Cette ressource n'existe pas")
+            raise None
+
+        return resource
 
     class Meta:
         model = models.Task
@@ -134,11 +148,24 @@ class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
 
 class CreateActionsFromResourcesForm(forms.ModelForm):
     resources = forms.ModelMultipleChoiceField(
-        queryset=resources_models.Resource.on_site.exclude(
+        queryset=resources_models.Resource.objects.exclude(
             status=resources_models.Resource.DRAFT
         ),
         required=True,
     )
+
+    def clean_resources(self):
+        resources = self.cleaned_data["resources"]
+
+        resources = resources_models.Resource.on_site.exclude(
+            status=resources_models.Resource.DRAFT
+        ).filter(pk__in=[resource.pk for resource in resources.all()])
+
+        if resources.count() == 0:
+            self.add_error("no_valid_resource", "Aucune ressource")
+            raise None
+
+        return resources
 
     class Meta:
         model = models.Task

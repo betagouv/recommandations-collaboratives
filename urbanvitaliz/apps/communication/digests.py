@@ -415,7 +415,7 @@ def send_digest_by_user(
     if extra_context:
         digest.update(extra_context)
 
-    if len(digest) > 0:
+    if notification_count > 0:
         if not dry_run:
             send_email(
                 template_name,
