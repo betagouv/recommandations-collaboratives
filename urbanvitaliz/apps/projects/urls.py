@@ -11,8 +11,8 @@ created : 2021-05-26 15:54:25 CEST
 from django.urls import path
 
 from . import views
-from .views import (administration, detail, documents, feeds, notes, sharing,
-                    tasks)
+from .views import (administration, detail, documents, export, feeds, notes,
+                    sharing, tasks)
 
 urlpatterns = [
     path(
@@ -30,7 +30,7 @@ urlpatterns = [
     path(r"projects/map", views.project_maplist, name="projects-project-list-map"),
     path(
         r"projects/csv",
-        views.project_list_export_csv,
+        export.project_list_export_csv,
         name="projects-project-list-export-csv",
     ),
     path("projects/feed/", feeds.LatestProjectsFeed(), name="projects-feed"),
