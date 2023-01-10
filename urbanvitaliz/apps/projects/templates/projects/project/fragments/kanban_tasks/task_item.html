@@ -101,7 +101,7 @@
 
 				<div class="d-flex align-items-center"
 					x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
-					<div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" data-bs-toggle="tooltip"
+					<div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" :style="isOldReminder(t.reminders[0]) ? 'color:#6c757d !important;' : ''" data-bs-toggle="tooltip"
 						data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(t.id)"
 						style="cursor: pointer;">
 						<svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
