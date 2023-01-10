@@ -1,0 +1,42 @@
+{% extends "projects/project/detail.html" %}
+
+{% load static %}
+{% load humanize %}
+{% load gravatar %}
+{% load sass_tags %}
+{% load django_vite %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% vite_asset 'js/apps/project.js' %}
+{% endblock %}
+
+
+{% block css %}
+<link href="{% sass_src 'projects/css/board.scss' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block title %}
+{{ block.super }} > Recommandation
+{% endblock %}
+
+{% block banner %}
+    {% include 'projects/project/fragments/positioning_banner.html' %}
+{% endblock %}
+
+{% block project_detail %}
+<div class="col-12 mx-auto">
+
+    {% include 'projects/project/navigation.html' with recommandations=True %}
+
+    <div class="mb-4">
+        <a class="button" href="{% url 'projects-project-detail-actions' project.pk %}">Revenir sur la vue du kanban</a>
+    </div>
+    
+    {% include 'projects/project/fragments/tasks_inline/tasks_inline.html' %}
+     
+    {% include 'projects/project/fragments/kanban_tasks/preview_modal.html' %}
+
+</div>
+{% endblock %}

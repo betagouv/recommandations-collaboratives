@@ -3,15 +3,25 @@
     {% if can_manage and not disable_edit %}
         <div>
             <template x-if="i > 0">
-                <a class="d-block" @click="moveAbove(task, column(board.status)[i - 1])" style="cursor: pointer">
-                    <svg class="aling-middle bi ms-1" width="13px" height="13px" fill="#c6c6c6">
+                <a class="d-block"
+                   @click="moveAbove(task, column(board.status)[i - 1])"
+                   style="cursor: pointer">
+                    <svg class="aling-middle bi ms-1"
+                         width="13px"
+                         height="13px"
+                         fill="#c6c6c6">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
                     </svg>
                 </a>
             </template>
             <template x-if="i < column(board.status).length - 1">
-                <a class="d-block" @click="moveBelow(task, column(board.status)[i + 1])" style="cursor: pointer">
-                    <svg class="aling-middle bi ms-1" width="13px" height="13px" fill="#c6c6c6">
+                <a class="d-block"
+                   @click="moveBelow(task, column(board.status)[i + 1])"
+                   style="cursor: pointer">
+                    <svg class="aling-middle bi ms-1"
+                         width="13px"
+                         height="13px"
+                         fill="#c6c6c6">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
                     </svg>
                 </a>
@@ -20,33 +30,31 @@
     {% endif %}
     <div class="d-flex flex-column flex-grow-1 ms-2">
         <div class="d-flex w-100 justify-content-between align-items-center">
-            <div class="d-flex w-100 align-items-center justify-content-between">
+            <div class="d-flex w-100 align-items-center">
                 <span style="cursor:pointer"
-                      class="fw-bold mt-0 pt-0 font-medium mb-2"
+                      class="fw-bold mt-0 pt-0 font-normal mb-0"
                       x-text="task.intent"
                       @click="onPreviewClick(task.id)"></span>
+                <template x-if="!task.public">
+                    <span class="ms-2 rounded-pill px-2 bg-warning z-index-dropdown text-uppercase tiny fw-bold text-white">Brouillon</span>
+                </template>
             </div>
         </div>
         <article class="">
             <template x-if="task.content !== ''">
-                <p x-html="renderMarkdown(task.content)"
-                   class="text-info-custm tiny text-grey-dark m-0 p-0"></p>
+                <p x-html="renderMarkdown(task.content)" class="text-info-custm tiny text-grey-dark m-0 p-0"></p>
             </template>
         </article>
         <footer class="d-flex justify-content-between align-items-center">
-            <div>
-                <span @click="onPreviewClick(task.id)"
-                      style="cursor: pointer"
-                      class="d-flex align-items-center text-blue tiny mt-2 mb-2">
+            <!-- <div>
+                <span @click="onPreviewClick(task.id)" style="cursor: pointer" class="d-flex align-items-center text-blue tiny mt-2 mb-2">
                     <svg class="bi me-1" width="14" height="14" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark-text" />
                     </svg>
                 Consulter la recommandation complète</span>
-            </div>
+            </div> -->
             <div class="tiny d-flex align-items-center">
-                <svg class="bi me-1" width="14" height="14" fill="#c6c6c6">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
-                </svg>
+                <span class="fst-italic me-1" style="line-height: 20px">par</span>
                 <span class="fst-italic"
                       x-text="`${task.created_by.first_name} ${task.created_by.last_name}`"
                       style="line-height: 20px"></span>

@@ -6,17 +6,14 @@ function TasksInline(projectId) {
 
     const app = {
         currentStatus: 'all',
+        filterIsPublic: false,
         boardsFiltered: [],
-        // boards: [
-        //     { status: [STATUSES.PROPOSED, STATUSES.INPROGRESS, STATUSES.BLOCKED], title: "Archivées", color_class: "border-error", color: "#0d6efd" },
-        //     { status: [STATUSES.DONE, STATUSES.NOT_INTERESTED, STATUSES.ALREADY_DONE], title: "Archivées", color_class: "border-error", color: "#adb5bd" },
-        // ],
         boards: [
-            { status: STATUSES.PROPOSED, title: "Nouvelles ", color_class: "border-primary", color: "#0d6efd" },
-            { status: STATUSES.INPROGRESS, title: "En cours", color_class: "border-secondary", color: "#6c757d" },
-            { status: STATUSES.BLOCKED, title: "En attente", color_class: "border-warning", color: "#ffc107" },
-            { status: [STATUSES.DONE, STATUSES.NOT_INTERESTED, STATUSES.ALREADY_DONE], title: "Archivées", color_class: "border-error", color: "#adb5bd" },
+            { status: [STATUSES.PROPOSED], title: "Nouvelles", color_class: "border-error", color: "#0d6efd" },
         ],
+        filterFn(d) {
+            return this.canAdministrate || d.public || !d.public;
+        },
         init() {
             this.boardsFiltered = this.boards
         },
@@ -31,6 +28,17 @@ function TasksInline(projectId) {
             this.currentStatus = status
 
             return this.boardsFiltered = this.boards.filter(board => board.status === status);
+        },
+        handlePublicFilterClick() {
+            console.log('public filter clicked ');
+
+            this.filterIsPublic = !this.filterIsPublic
+
+            console.log(this.filterIsPublic);
+
+            this.data.filter((d) => !d.public);
+            
+            // this.data.filter((task) => this.filterFn(d)).sort((a, b) => this.sortFn(a, b));
         }
     }
 
