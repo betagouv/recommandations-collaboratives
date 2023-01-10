@@ -1,36 +1,28 @@
 {% load static %}
-<div class="pt-4 w-100 mb-3">
+<div class="w-100 mb-3">
     <div class="d-flex align-items-center justify-content-between w-100">
-        <h6 class="d-flex align-items-center text-uppercase fw-bold font-small mb-2">
-            <svg class="bi me-2 " width="32" height="32" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#card-checklist" />
-            </svg>
-            Sujets diagnostiqués
+        <h6 class="d-flex align-items-center justify-content-center text-uppercase fw-bold font-small mb-0">
+            <span>Sujets diagnostiqués</span>
         </h6>
-        {% if can_administrate %}
+        {% if can_administrate and project.topics_on_site.count != 0 %}
             <a class="d-flex align-items-center"
                href="{% url "projects-project-topics" project.id %}">
-                Éditer
-                <svg class="bi ms-2 " width="15" height="15" fill="currentColor">
+                <span class="tiny">Éditer</span>
+                <svg class="bi ms-2 " width="10" height="10" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
                 </svg>
             </a>
         {% endif %}
     </div>
     {% if project.topics_on_site.count == 0 %}
-        <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
-            <p class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">
-                Les sujets n'ont pas encore été identifiés</p>
-            <svg class="bi align-baseline me-2 mt-1"
-                 width="30"
-                 height="30"
-                 fill="#999999">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-list" />
-            </svg>
+        <div class="project-card-details pt-4 py-4 d-flex flex-column align-items-center justify-content-center">
+            <span class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">Les sujets n'ont pas encore été identifiés</span>
+            <a class="button mt-3"
+               href="{% url "projects-project-topics" project.id %}">Identifier les sujets</a>
         </div>
     {% else %}
         {% for topic in project.topics_on_site.all %}
-            <ul class="list-unstyled mb-0">
+            <ul class="list-unstyled mb-0 mt-2">
                 {% include 'projects/project/fragments/topics/topic_list_item.html' %}
             </ul>
         {% endfor %}

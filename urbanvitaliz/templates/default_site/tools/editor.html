@@ -36,9 +36,17 @@
   </template>
 
   <div class="position-relative">
-    <div class="tiptap-editor {% if wide %} is-wide {% endif %}" x-ref="element"></div>
+      <div class="tiptap-editor {% if wide %} is-wide {% endif %}" x-ref="element"></div>
+
+    {% if errors %}
+      {% for error in errors %}
+        <div class="text-danger text-start mb-2">{{ error }}</div>
+      {% endfor %}
+    {% endif %}
+
     <textarea style="height: 0;" class="position-absolute top-0 opacity-0" x-model="markdownContent"
       name="{{input_name}}" {% if input_required %} required {% endif %}></textarea>
+    
   </div>
 
 </div>

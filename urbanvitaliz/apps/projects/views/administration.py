@@ -8,6 +8,7 @@ created : 2021-05-26 15:56:20 CEST
 """
 from actstream import action
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
@@ -17,24 +18,22 @@ from django.views.decorators.http import require_http_methods
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.api import (invite_collaborator_on_project,
-                                           invite_resend)
+                                           invite_resend, invite_revoke)
 from urbanvitaliz.apps.invites.forms import InviteForm
 
 from .. import forms, models
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     can_manage_project, is_regional_actor_for_project)
+from ..utils import (can_administrate_project, can_manage_project,
+                     is_regional_actor_for_project)
 
 ########################################################################
 # Access
 ########################################################################
 
 
-@login_required
+@staff_member_required
 def project_administration(request, project_id):
     """Handle ACL for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    if not can_administrate_project(project, request.user):
-        raise PermissionDenied
 
     can_administrate = can_administrate_project(project, request.user)
 
@@ -89,7 +88,7 @@ def access_invite(request, role, project):
         invite = invite_collaborator_on_project(
             request.site,
             project,
-            "COLLABORATOR",
+            role,
             email,
             message,
             request.user,
@@ -124,6 +123,34 @@ def access_invite(request, role, project):
     return redirect(reverse("projects-project-detail-overview", args=[project.pk]))
 
 
+@staff_member_required
+@require_http_methods(["POST"])
+def access_revoke_invite(request, project_id, invite_id):
+    """Revoke an invitation for a collectivity member"""
+    get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    invite = get_object_or_404(
+        invites_models.Invite, role="COLLABORATOR", pk=invite_id, accepted_on=None
+    )
+
+    if invite_revoke(invite):
+        messages.success(
+            request,
+            "L'invitation de {0} a bien été supprimée.".format(invite.email),
+            extra_tags=["auth"],
+        )
+    else:
+        messages.error(
+            request,
+            "Désolé, nous n'avons pas pu supprimer l'invitation de {0}.".format(
+                invite.email
+            ),
+            extra_tags=["auth"],
+        )
+
+    return redirect(reverse("projects-project-administration", args=[project_id]))
+
+
 ##############################################################################
 # Collectivity
 ##############################################################################
@@ -132,6 +159,7 @@ def access_invite(request, role, project):
 def access_collectivity_invite(request, project_id):
     """Invite a collectivity member"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
     if not (
         can_manage_project(project, request.user)
         or is_regional_actor_for_project(project, request.user, allow_national=True)
@@ -141,16 +169,11 @@ def access_collectivity_invite(request, project_id):
     return access_invite(request, "COLLABORATOR", project)
 
 
-@login_required
+@staff_member_required
 @require_http_methods(["POST"])
 def access_collectivity_resend_invite(request, project_id, invite_id):
-    """Resend invitation for an advisor"""
+    """Resend invitation for a collectivity member"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    if not (
-        can_manage_project(project, request.user)
-        or is_regional_actor_for_project(project, request.user, allow_national=True)
-    ):
-        raise PermissionDenied
 
     invite = get_object_or_404(
         invites_models.Invite, role="COLLABORATOR", pk=invite_id, accepted_on=None
@@ -174,12 +197,11 @@ def access_collectivity_resend_invite(request, project_id, invite_id):
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
-@login_required
+@staff_member_required
 @require_http_methods(["POST"])
 def access_collectivity_delete(request, project_id: int, email: str):
     """Delete a collectivity member from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    can_administrate_or_403(project, request.user)
 
     membership = get_object_or_404(
         models.ProjectMember, project=project, member__username=email
@@ -214,6 +236,7 @@ def access_collectivity_delete(request, project_id: int, email: str):
 def access_advisor_invite(request, project_id):
     """Invite an advisor"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
     if not (
         can_administrate_project(project, request.user)
         or is_regional_actor_for_project(project, request.user, allow_national=True)
@@ -223,16 +246,11 @@ def access_advisor_invite(request, project_id):
     return access_invite(request, "SWITCHTENDER", project)
 
 
-@login_required
+@staff_member_required
 @require_http_methods(["POST"])
 def access_advisor_resend_invite(request, project_id, invite_id):
     """Resend invitation for an advisor"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    if not (
-        can_administrate_project(project, request.user)
-        or is_regional_actor_for_project(project, request.user, allow_national=True)
-    ):
-        raise PermissionDenied
 
     invite = get_object_or_404(
         invites_models.Invite, role="SWITCHTENDER", pk=invite_id, accepted_on=None
@@ -256,12 +274,11 @@ def access_advisor_resend_invite(request, project_id, invite_id):
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
-@login_required
+@staff_member_required
 @require_http_methods(["POST"])
 def access_advisor_delete(request, project_id: int, email: str):
     """Delete an advisor from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    can_administrate_or_403(project, request.user)
 
     advisor = get_object_or_404(
         models.ProjectSwitchtender,

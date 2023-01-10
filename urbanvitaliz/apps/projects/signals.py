@@ -31,6 +31,8 @@ project_switchtender_leaved = django.dispatch.Signal()
 
 project_member_joined = django.dispatch.Signal()
 
+document_uploaded = django.dispatch.Signal()
+
 
 @receiver(project_submitted)
 def log_project_submitted(sender, submitter, project, **kwargs):
@@ -462,11 +464,8 @@ def note_created_challenged(sender, note, project, user, **kwargs):
 ################################################################
 # File Upload
 ################################################################
-@receiver(post_save, sender=models.Document, dispatch_uid="document_uploaded")
-def project_document_uploaded(sender, instance, created, **kwargs):
-    if not created:  # We don't want to notify about updates
-        return
-
+@receiver(document_uploaded)
+def project_document_uploaded(sender, instance, **kwargs):
     project = instance.project
     if project.status == "DRAFT" or project.muted:
         return

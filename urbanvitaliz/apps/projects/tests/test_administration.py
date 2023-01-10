@@ -11,11 +11,12 @@ created: 2022-12-26 11:54:56 CEST
 import pytest
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.utils import timezone
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.utils import login
 
 from .. import models
@@ -31,11 +32,12 @@ def test_project_admin_not_available_for_non_staff_users(request, client):
     url = reverse("projects-project-administration", args=[project.id])
     with login(client):
         response = client.get(url)
-    assert response.status_code == 403
+    assert response.status_code == 302
+    assert "login" in response.url
 
 
 @pytest.mark.django_db
-def test_project_admin_available_for_switchtender(request, client):
+def test_project_admin_not_available_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-administration", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
@@ -44,7 +46,8 @@ def test_project_admin_available_for_switchtender(request, client):
         )
 
         response = client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert "login" in response.url
 
 
 @pytest.mark.django_db
@@ -62,7 +65,7 @@ def test_project_admin_wo_commune_and_redirect(request, client):
         "impediment": "some impediment",
     }
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["switchtender"], is_staff=True) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -84,7 +87,7 @@ def test_project_admin_with_commune(request, client):
     ).make()
     url = reverse("projects-project-administration", args=[project.id])
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["switchtender"], is_staff=True) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -116,7 +119,7 @@ def test_project_admin_update_commune(request, client):
         "insee": new_commune.insee,
     }
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["switchtender"], is_staff=True) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -156,7 +159,7 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
         args=[project.id, membership.member.email],
     )
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["switchtender"], is_staff=True) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -201,14 +204,15 @@ def test_collectivity_member_cannot_remove_member_from_project(request, client):
     with login(client, user=owner_membership.member):
         response = client.post(url)
 
-    assert response.status_code == 403
+    assert response.status_code == 302
+    assert "login" in response.url
 
     project = models.Project.on_site.get(id=project.id)
     assert collab_membership.member in project.members.all()
 
 
 @pytest.mark.django_db
-def test_advisor_can_remove_collectivity_member_from_project(request, client):
+def test_advisor_cannot_remove_collectivity_member_from_project(request, client):
     membership = baker.make(
         models.ProjectMember,
         is_owner=False,
@@ -237,12 +241,10 @@ def test_advisor_can_remove_collectivity_member_from_project(request, client):
         response = client.post(url)
 
     assert response.status_code == 302
+    assert "login" in response.url
 
     project = models.Project.on_site.get(id=project.id)
-    assert membership not in project.projectmember_set.all()
-
-    update_url = reverse("projects-project-administration", args=[project.id])
-    assertRedirects(response, update_url)
+    assert membership in project.projectmember_set.all()
 
 
 @pytest.mark.django_db
@@ -269,7 +271,117 @@ def test_non_staff_cannot_remove_collectivity_member_from_project(request, clien
     with login(client, is_staff=False):
         response = client.post(url)
 
-    assert response.status_code == 403
+    assert response.status_code == 302
+    assert "login" in response.url
+
+
+@pytest.mark.django_db
+def test_staff_can_remove_collectivity_member_from_project(request, client):
+    membership = baker.make(
+        models.ProjectMember,
+        is_owner=False,
+        member__is_staff=False,
+        member__email="user@staff.fr",
+        member__username="user@staff.fr",
+    )
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+        status="READY",
+    ).make()
+
+    url = reverse(
+        "projects-project-access-collectivity-delete",
+        args=[project.id, membership.member.email],
+    )
+
+    with login(client, is_staff=True):
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert "login" not in response.url
+
+    project = models.Project.on_site.get(id=project.id)
+    assert membership not in project.projectmember_set.all()
+
+
+@pytest.mark.django_db
+def test_staff_can_revoke_invitation(request, client):
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+    ).make()
+
+    invite = Recipe(invites_models.Invite, project=project).make()
+
+    url = reverse(
+        "projects-project-access-revoke-invite",
+        args=[project.id, invite.pk],
+    )
+
+    with login(client, is_staff=True):
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert "login" not in response.url
+
+    assert invites_models.Invite.on_site.count() == 0
+
+
+@pytest.mark.django_db
+def test_cannot_revoke_accepted_invitation(request, client):
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+    ).make()
+
+    invite = Recipe(
+        invites_models.Invite,
+        project=project,
+        accepted_on=timezone.now(),
+        site=get_current_site(request),
+    ).make()
+
+    url = reverse(
+        "projects-project-access-revoke-invite",
+        args=[project.id, invite.pk],
+    )
+
+    with login(client, is_staff=True):
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+    assert invites_models.Invite.on_site.count() == 1
+
+
+@pytest.mark.django_db
+def test_nonstaff_cannot_revoke_invitation(request, client):
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+    ).make()
+
+    invite = Recipe(
+        invites_models.Invite, site=get_current_site(request), project=project
+    ).make()
+
+    url = reverse(
+        "projects-project-access-revoke-invite",
+        args=[project.id, invite.pk],
+    )
+
+    with login(client, is_staff=False):
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert "login" in response.url
+
+    assert invites_models.Invite.on_site.count() == 1
 
 
 #####################################################################
@@ -309,14 +421,15 @@ def test_collectivity_member_cannot_remove_advisor_from_project(request, client)
     with login(client, user=owner_membership.member):
         response = client.post(url)
 
-    assert response.status_code == 403
+    assert response.status_code == 302
+    assert "login" in response.url
 
     project = models.Project.on_site.get(id=project.id)
     assert advisor in project.switchtenders_on_site.all()
 
 
 @pytest.mark.django_db
-def test_advisor_can_remove_advisor_from_project(request, client):
+def test_advisor_cannot_remove_advisor_from_project(request, client):
     owner_membership = baker.make(
         models.ProjectMember,
         is_owner=True,
@@ -355,8 +468,8 @@ def test_advisor_can_remove_advisor_from_project(request, client):
     with login(client, user=active_advisor.switchtender):
         response = client.post(url)
 
-    update_url = reverse("projects-project-administration", args=[project.id])
-    assertRedirects(response, update_url)
+    assert response.status_code == 302
+    assert "login" in response.url
 
     project = models.Project.on_site.get(id=project.id)
-    assert advisor not in project.switchtenders_on_site.all()
+    assert advisor in project.switchtenders_on_site.all()

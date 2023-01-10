@@ -245,6 +245,11 @@ urlpatterns = [
         name="projects-project-access-advisor-resend-invite",
     ),
     path(
+        r"project/<int:project_id>/administration/access/invite/<uuid:invite_id>/revoke",
+        administration.access_revoke_invite,
+        name="projects-project-access-revoke-invite",
+    ),
+    path(
         r"project/<int:project_id>/administration/access/collectivity/<str:email>/delete",
         administration.access_collectivity_delete,
         name="projects-project-access-collectivity-delete",

@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from urbanvitaliz.utils import check_if_switchtender
 
-from .. import models
+from .. import models, signals
 from ..forms import DocumentUploadForm
 from ..utils import (can_administrate_project, can_manage_or_403,
                      can_manage_project, check_if_national_actor,
@@ -75,12 +75,16 @@ def document_upload(request, project_id):
             try:
                 instance.save()
 
+                signals.document_uploaded.send(
+                    sender=document_upload, instance=instance
+                )
+
                 messages.success(
                     request,
                     "Le document a bien été enregistré",
                 )
 
-            except IntegrityError as e:
+            except IntegrityError:
                 messages.error(request, "Impossible de sauver le document")
 
     return redirect(reverse("projects-project-detail-documents", args=[project.id]))
