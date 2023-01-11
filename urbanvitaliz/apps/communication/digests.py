@@ -499,10 +499,7 @@ class FormattedNotification:
 
 class NotificationFormatter:
     def format(self, notification):
-        if notification.actor:
-            return self.format_for_actor(notification.actor, notification)
-        else:
-            return None
+        return self.format_for_actor(notification.actor, notification)
 
     def _format_or_default(self, dispatch_table, notification):
         """
@@ -518,6 +515,10 @@ class NotificationFormatter:
 
     # ------ Formatter Utils -----#
     def _represent_user(self, user):
+        if not user:
+            fmt = "--compte indisponible--"
+            return fmt
+
         if user.last_name:
             fmt = f"{user.first_name} {user.last_name}"
         else:
