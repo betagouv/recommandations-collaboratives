@@ -1,9 +1,4 @@
 <div>
-    {% include 'projects/project/fragments/tasks_inline/status_filter.html' %}
-    <div x-show="isBusy" class="ms-2" style="width: 24px; height: 24px;">
-        <div class="spinner-border spinner-border spinner-border-sm text-primary"
-             role="status"></div>
-    </div>
     <template x-for="board in boardsFiltered">
         <div>
             {% include 'projects/project/fragments/tasks_inline/status_item.html' %}

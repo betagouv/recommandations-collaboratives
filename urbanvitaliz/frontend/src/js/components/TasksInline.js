@@ -5,8 +5,7 @@ import { STATUSES } from '../config/statuses';
 function TasksInline(projectId) {
 
     const app = {
-        currentStatus: 'all',
-        filterIsPublic: false,
+        filterIsDraft: false,
         boardsFiltered: [],
         boards: [
             { status: [STATUSES.PROPOSED], title: "Nouvelles", color_class: "border-error", color: "#0d6efd" },
@@ -17,28 +16,29 @@ function TasksInline(projectId) {
         init() {
             this.boardsFiltered = this.boards
         },
-        handleStatusFilterClick(status) {
+        async handleDraftFilterChange() {
 
-            if (this.currentStatus === status || status === 'all') {
-                this.currentStatus = 'all'
-                return this.boardsFiltered = this.boards
-            }
+            this.filterIsDraft = !this.filterIsDraft
 
+            await this.getData();
 
-            this.currentStatus = status
-
-            return this.boardsFiltered = this.boards.filter(board => board.status === status);
+            this.updateView()
         },
-        handlePublicFilterClick() {
-            console.log('public filter clicked ');
-
-            this.filterIsPublic = !this.filterIsPublic
-
-            console.log(this.filterIsPublic);
-
-            this.data.filter((d) => !d.public);
+        async publishTask(taskId) {
+            await this.patchTask(taskId, { public: true });
+            await this.getData();
+            this.updateView()
+        },
+        //Custom behaviour
+        onPreviewClick(id) {
+            this.currentTaskId = id;
+            this.openPreviewModal();
+            this.filterIsDraft = false
+        },
+        updateView() {
+            if (!this.filterIsDraft) return
             
-            // this.data.filter((task) => this.filterFn(d)).sort((a, b) => this.sortFn(a, b));
+            return this.data = this.data.filter((d) => d.public == !this.filterIsDraft);
         }
     }
 
