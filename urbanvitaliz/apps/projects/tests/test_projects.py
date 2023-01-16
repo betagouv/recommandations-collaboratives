@@ -1498,7 +1498,7 @@ def test_switchtender_observes_project_shows_interest(request, client):
 
     personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
 
-    assert personal_status.status == "FOLLOWED"
+    assert personal_status.status == "TODO"
 
 
 @pytest.mark.django_db
@@ -1521,7 +1521,7 @@ def test_switchtender_advises_project_shows_interest(request, client):
 
     personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
 
-    assert personal_status.status == "FOLLOWED"
+    assert personal_status.status == "TODO"
 
 
 @pytest.mark.django_db
