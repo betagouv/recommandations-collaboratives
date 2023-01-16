@@ -70,6 +70,10 @@ export function editTaskUrl(taskId) {
     return `/task/${taskId}/update/`;
 }
 
+export function deleteTaskUrl(taskId) {
+    return `/task/${taskId}/delete/`;
+}
+
 export function deleteTaskReminderUrl(taskId) {
     return `/task/${taskId}/remind-delete/`;
 }

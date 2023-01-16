@@ -1,5 +1,5 @@
 import Alpine from "alpinejs"
-import api, { tasksUrl, followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
+import api, { tasksUrl, followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl, deleteTaskUrl } from '../utils/api'
 import { generateUUID } from '../utils/uuid'
 
 Alpine.data("KanbanTasks", boardTasksApp)
@@ -355,7 +355,9 @@ function boardTasksApp(projectId) {
         },
         formatDateDisplay(date) {
             return new Date(date).toLocaleDateString('fr-FR');
-        }
+        },
+        //actions
+        deleteTaskUrl,
     };
 
     return app
