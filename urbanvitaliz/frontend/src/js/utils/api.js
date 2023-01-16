@@ -34,10 +34,14 @@ export default instance
 
 
 // Projects :
-
 export function projectsUrl() {
     return `/api/projects/`
 }
+
+export function userProjectStatusUrl() {
+    return `/api/userprojectstatus/`
+}
+
 // Tasks : 
 export function taskUrl(projectId, taskId) {
     return `/api/projects/${projectId}/tasks/${taskId}/`

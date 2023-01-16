@@ -1,13 +1,20 @@
 import Alpine from 'alpinejs'
 
+// USERPROJECT_STATES = (
+//     ("TODO", "A traiter"),
+//     ("WIP", "En cours"),
+//     ("DONE", "Traité"),
+//     ("NOT_INTERESTED", "Pas d'intérêt"),
+// )
+
 function AdvisorDashboard() {
     return {
         data: [],
         title:"qsdqsd",
         boards:[
-            { code: 'TO_PROCESS', title: 'À traiter', color_class: 'border-secondary' },
-            { code: 'READY', title: 'En attente', color_class: 'border-info' },
-            { code: "IN_PROGRESS", title: "En cours", color_class: 'border-primary' },
+            { code: 'TODO', title: 'À traiter', color_class: 'border-secondary' },
+            { code: 'NOT_INTERESTED', title: "Pas d'intérêt", color_class: 'border-danger' },
+            { code: "WIP", title: "En cours", color_class: 'border-primary' },
             { code: "DONE", title: "Traité", color_class: 'border-success' },
         ],
         init() {
@@ -28,16 +35,16 @@ function AdvisorDashboard() {
         },
         column(status) {
             if (status instanceof Array) {
-                return this.view.filter(d => status.indexOf(d.status) !== -1);
+                return this.view.filter(d => status.indexOf(d.project.status) !== -1);
             } else {
                 return this.view.filter(d => d.status === status);
             }
         },
         sortFn(a, b) {
-            if (b.notifications.count - a.notifications.count)
-                return b.notifications.count - a.notifications.count;
+            if (b.project.notifications.count - a.project.notifications.count)
+                return b.project.notifications.count - a.project.notifications.count;
             else {
-                return b.created_on - a.created_on;
+                return b.project.created_on - a.project.created_on;
             }
         },
         filterFn(d) {
