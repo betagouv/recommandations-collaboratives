@@ -16,7 +16,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils import timezone
-from multimethod import multimethod
 from urbanvitaliz import utils
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.reminders import models as reminders_models
@@ -499,7 +498,7 @@ class FormattedNotification:
 
 class NotificationFormatter:
     def format(self, notification):
-        return self.format_for_actor(notification.actor, notification)
+        return self._format_for_actor(notification)
 
     def _format_or_default(self, dispatch_table, notification):
         """
@@ -558,9 +557,13 @@ class NotificationFormatter:
         return followup.comment[:50]
 
     # -------- Routers -----------#
-    @multimethod
-    def format_for_actor(self, actor: auth_models.User, notification):
+    def _format_for_actor(self, notification):
         """Format for User"""
+
+        # if not notification.actor:
+        #     notification.actor = auth_models.User(
+        #         username="-- compte supprimé --", first_name="-- compte supprimé --"
+        #     )
 
         return self._format_or_default(
             {
