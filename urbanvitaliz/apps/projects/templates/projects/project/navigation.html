@@ -52,7 +52,7 @@
             <span>Recommandations</span>
         </a>
     </li>
-    {% if can_administrate or request.user == project.owner %}
+    {% if can_manage %}
     <li>
         <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if conversation %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-conversations' project.pk %}">
             {% if active_project_conversations_notification_count %}

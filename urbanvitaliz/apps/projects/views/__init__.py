@@ -36,10 +36,10 @@ from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
 from .. import models, signals
 from ..forms import SelectCommuneForm
 from ..utils import (can_administrate_or_403, can_administrate_project,
-                     generate_ro_key, get_active_project,
-                     is_project_moderator, is_project_moderator_or_403,
-                     is_regional_actor_for_project_or_403, refresh_user_projects_in_session,
-                     set_active_project_id)
+                     generate_ro_key, get_active_project, is_project_moderator,
+                     is_project_moderator_or_403,
+                     is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -313,10 +313,10 @@ def project_switchtender_join(request, project_id=None):
             site=request.site,
             user=request.user,
             project=project,
-            defaults={"status": "FOLLOWED"},
+            defaults={"status": "TODO"},
         )
         if not created:
-            personal_status.status = "FOLLOWED"
+            personal_status.status = "TODO"
             personal_status.save()
 
         project.updated_on = timezone.now()
@@ -347,10 +347,10 @@ def project_observer_join(request, project_id=None):
             site=request.site,
             user=request.user,
             project=project,
-            defaults={"status": "FOLLOWED"},
+            defaults={"status": "TODO"},
         )
         if not created:
-            personal_status.status = "FOLLOWED"
+            personal_status.status = "TODO"
             personal_status.save()
 
         project.updated_on = timezone.now()

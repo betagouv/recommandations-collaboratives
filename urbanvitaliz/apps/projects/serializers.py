@@ -9,7 +9,7 @@ from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
-from .models import Document, Project, Task, TaskFollowup
+from .models import Document, Project, Task, TaskFollowup, UserProjectStatus
 from .utils import create_reminder, get_collaborators_for_project
 
 
@@ -198,3 +198,14 @@ class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):
     action_object = GenericRelatedField(
         {Task: TaskSerializer(), TaskFollowup: TaskFollowupSerializer()}
     )
+
+
+class UserProjectStatusSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = UserProjectStatus
+        fields = ["id", "project", "status"]
+
+    project = ProjectSerializer(read_only=True)
+
+
+# eof
