@@ -3,7 +3,7 @@ import { STATUSES } from '../config/statuses';
 import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, resourcePreviewUrl , followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
 import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
 import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
-import { toArchiveTooltip, reminderTooltip } from '../utils/tooltip'
+import { toArchiveTooltip, reminderTooltip, isOldReminder } from '../utils/tooltip'
 import { renderMarkdown } from '../utils/markdown'
 import { generateGravatarUrl } from '../utils/gravatar'
 
@@ -54,6 +54,7 @@ export default function TasksApp(app, projectId) {
         editComment,
         patchTask,
         markAllAsRead,
+        isOldReminder,
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await issueFollowup(e.detail.task, e.detail.status)
