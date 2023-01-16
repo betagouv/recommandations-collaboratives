@@ -75,6 +75,11 @@ urlpatterns = [
         name="projects-project-detail-actions",
     ),
     path(
+        r"project/<int:project_id>/actions/inline",
+        detail.project_actions_inline,
+        name="projects-project-detail-actions-inline",
+    ),
+    path(
         r"project/<int:project_id>/conversations",
         detail.project_conversations,
         name="projects-project-detail-conversations",

@@ -7,6 +7,7 @@
     font-style: normal;
     font-size: 14px;
     font-weight: 700;
+    line-height: normal;
 
     text-transform: uppercase;
 }
@@ -21,6 +22,10 @@
 
 .fw-medium {
     font-weight: 500 !important;
+}
+
+.font-medium {
+    font-size: 18px;
 }
 
 .font-small {

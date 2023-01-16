@@ -167,6 +167,33 @@ def project_actions(request, project_id=None):
 
 
 @login_required
+def project_actions_inline(request, project_id=None):
+    """Inline Action page for given project"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    # compute permissions
+    can_manage = can_manage_project(project, request.user)
+    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
+    is_national_actor = check_if_national_actor(request.user)
+    is_regional_actor = is_regional_actor_for_project(
+        project, request.user, allow_national=True
+    )
+    can_administrate = can_administrate_project(project, request.user)
+    switchtending = get_switchtender_for_project(request.user, project)
+
+    # check user can administrate project (member or switchtender)
+    if request.user != project.members.filter(projectmember__is_owner=True).first():
+        # bypass if user is switchtender, all are allowed to view at least
+        if not check_if_switchtender(request.user):
+            can_manage_or_403(project, request.user)
+
+    # Set this project as active
+    set_active_project_id(request, project.pk)
+
+    return render(request, "projects/project/actions_inline.html", locals())
+
+
+@login_required
 def project_conversations(request, project_id=None):
     """Action page for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
