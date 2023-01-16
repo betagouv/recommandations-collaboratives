@@ -31,6 +31,14 @@ instance.interceptors.response.use((response) => {
 
 export default instance
 
+
+
+// Projects :
+
+export function projectsUrl() {
+    return `/api/projects/`
+}
+// Tasks : 
 export function taskUrl(projectId, taskId) {
     return `/api/projects/${projectId}/tasks/${taskId}/`
 }
