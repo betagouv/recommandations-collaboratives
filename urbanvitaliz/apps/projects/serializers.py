@@ -59,7 +59,9 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_is_observer(self, obj):
         request = self.context.get("request")
-        return request.user in obj.switchtenders_on_site.filter(is_observer=True)
+        return request.user.pk in obj.switchtenders_on_site.filter(
+            is_observer=True
+        ).values_list("switchtender__id", flat=True)
 
     recommendation_count = serializers.SerializerMethodField()
 
