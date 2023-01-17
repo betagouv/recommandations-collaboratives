@@ -1,17 +1,11 @@
 import Alpine from 'alpinejs'
-
-// USERPROJECT_STATES = (
-//     ("TODO", "A traiter"),
-//     ("WIP", "En cours"),
-//     ("DONE", "Traité"),
-//     ("NOT_INTERESTED", "Pas d'intérêt"),
-// )
+import api from '../utils/api'
+import { formatDate } from '../utils/date';
 
 function AdvisorDashboard() {
     return {
         data: [],
-        title:"qsdqsd",
-        boards:[
+        boards: [
             { code: 'TODO', title: 'À traiter', color_class: 'border-secondary' },
             { code: 'NOT_INTERESTED', title: "Pas d'intérêt", color_class: 'border-danger' },
             { code: "WIP", title: "En cours", color_class: 'border-primary' },
@@ -24,9 +18,6 @@ function AdvisorDashboard() {
             return this.data = await this.$store.projects.getProjects()
         },
         get isBusy() {
-            console.log('this data : ', this.data);
-            console.log('this boards : ', this.boards);
-            console.log(this.$store.app.isLoading);
             return this.$store.app.isLoading
         },
         // View
@@ -53,7 +44,51 @@ function AdvisorDashboard() {
             } else {
                 return true
             }
-        }
+        },
+        // Drang n drop
+        async onDrop(event, status) {
+            event.preventDefault();
+
+            this.currentlyHoveredElement.classList.remove('drag-target');
+            this.currentlyHoveredElement = null;
+
+            const id = event.dataTransfer.getData("text/plain");
+
+            const data = this.data.find(d => d.id === JSON.parse(id));
+
+            await api.patch(`/api/userprojectstatus/${data.id}/`, { status: status })
+
+            await this.getData();
+        },
+        onDragStart(event, id) {
+            event.dataTransfer.clearData();
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData('text/plain', id)
+            event.target.classList.add('drag-dragging');
+            document.querySelectorAll(".drop-column").forEach(e => e.classList.add("drop-highlight"));
+        },
+        onDragEnd(event) {
+            event.target.classList.remove('drag-dragging');
+            document.querySelectorAll(".drop-column").forEach(e => e.classList.remove("drop-highlight"));
+        },
+        onDragEnter(event) {
+            if (this.currentlyHoveredElement && this.currentlyHoveredElement !== event.currentTarget) {
+                this.currentlyHoveredElement.classList.remove('drag-target');
+            }
+            this.currentlyHoveredElement = event.currentTarget;
+            event.currentTarget.classList.add('drag-target');
+        },
+        onDragLeave(event) {
+            if (event.target === this.currentlyHoveredElement) {
+                event.target.classList.remove('drag-target');
+            }
+        },
+        onDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "move";
+        },
+        // utils
+        formatDate,
     }
 }
 

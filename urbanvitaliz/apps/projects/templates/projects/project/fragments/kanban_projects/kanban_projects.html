@@ -8,8 +8,16 @@
             <template x-for="board in boards" :key="board.code">
                 <div class="px-2 bg-light border-top border-4 me-3" :class="board.color_class" style="width:30%">
                     <h5 x-text="board.title" class="font-medium text-gray-800 mt-2"></h5>
-                    <div style="height: 60vh; overflow-y: auto;">
-                        <template x-for="(t, taskIndex) in column(board.code)" :key="t.id" class="col">
+                    <div style="height: 80vh; overflow-y: auto;">
+                        <template x-if="column(board.code).length === 0">
+                            <div class="drag-targetable py-3" @dragover="onDragOver(event, null)" @drop="onDrop(event, board.code, null)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
+                                <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase"
+                                            style="height: 100px; font-size: 0.8em;">
+                                            Glissez et déposez une carte ici
+                                        </div>
+                            </div>
+                        </template>
+                        <template x-for="(p, taskIndex) in column(board.code)" :key="p.id" class="col">
                             {% include 'projects/project/fragments/kanban_projects/kanban_project_item.html' %}
                         </template>
                     </div>

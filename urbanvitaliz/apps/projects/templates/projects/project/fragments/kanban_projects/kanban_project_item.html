@@ -1,3 +1,39 @@
-<div class="px-4 py-4 mb-1 bg-white border rounded border-1 pb-4 mb-4">
-    <h1>Project</h1>
+{% load static %}
+<div :id="p.id""
+    class="drag-targetable py-1 my-1"
+    @dragover="onDragOver(event)"
+    @drop="onDrop(event, board.code)"
+    @dragenter="onDragEnter(event)"
+    @dragleave="onDragLeave(event)">
+    <div class="bg-white border rounded border-1 px-3 py-3"
+         draggable="true"
+         @dragstart="onDragStart(event, p.id)"
+         @dragend="onDragEnd(event)">
+        <span style="cursor:pointer;
+                     font-size: 18px"
+              class="fw-bold mt-0 pt-0 font-normal mb-0"
+              x-text="p.project.name">
+        </span>
+        <template x-if="p.project.commune">
+            <div class="fw-normal text-uppercase small d-flex align-items-center my-1">
+                <svg class="align-middle bi me-2"
+                     width="18px"
+                     height="18px"
+                     fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#geo-alt" />
+                </svg>
+                <span class="me-1" x-text="p.project.commune.name"></span>
+                <span x-text="`(${p.project.commune.postal})`"></span>
+            </div>
+        </template>
+        <div class="font-small text-dark d-flex align-items-center">
+            <svg class="align-middle bi me-2"
+                     width="18px"
+                     height="15px"
+                     fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#calendar-event" />
+                </svg>
+            <span x-text="`Déposé le ${formatDate(p.project.created_on)}`" class="align-middle"></span>
+        </div>
+    </div>
 </div>
