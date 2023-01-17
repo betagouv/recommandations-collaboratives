@@ -20,7 +20,8 @@ const project_url_tmpl = "{% url 'projects-project-detail' 0 %}";
     <header class="d-flex mb-2 w-100">
         <div class="d-flex justify-content-between align-items-start w-100">
             <div class="d-flex flex-column">
-                <h2 class="fw-medium mt-0" x-text="`${data.length} projets ouverts`"></h2>
+                <h2 class="mb-1">Mon tableau de bord</h2>
+                <span class="fw-medium mt-0" x-text="`${data.length} projets`"></span>
                 <div class="d-flex align-items-center mb-4 text-muted text-small">
                     <div class="d-flex align-items-center me-2">
                         <svg class="align-middle bi me-2"
@@ -42,7 +43,6 @@ const project_url_tmpl = "{% url 'projects-project-detail' 0 %}";
                     </div>
                 </div>
             </div>
-            <a class="button d-inline-flex" href="">Dashboard général</a>
         </div>
     </header>
     <div x-show="data.length == 0"

@@ -9,9 +9,9 @@ function AdvisorDashboard() {
         nbNewProjects:0,
         boards: [
             { code: ['TODO','NEW'], title: 'À traiter', color_class: 'border-secondary', color:'#0063CB' },
-            { code: "WIP", title: "En cours", color_class: 'border-primary', color: '#FCC63A' },
+            { code: 'WIP', title: "En cours", color_class: 'border-primary', color: '#FCC63A' },
             { code: "DONE", title: "Traité", color_class: 'border-success', color:'#F6F6F6' },
-            { code: 'NOT_INTERESTED', title: "Pas d'intérêt", color_class: 'border-danger', color:'#CE0500' },
+            { code: 'NOT_INTERESTED', title: "Dossier que je ne suis pas", color_class: 'border-danger', color:'#CE0500' },
         ],
         init() {
             console.log('advisor dashboard ready');
@@ -35,7 +35,7 @@ function AdvisorDashboard() {
         },
         // View
         get view() {
-            return this.data.filter(this.filterFn.bind(this)).sort(this.sortFn.bind(this));
+            return this.data.filter(this.filterFn.bind(this)).sort(this.sortFn.bind(this)).sort(this.sortStatusFn.bind(this));
         },
         column(status) {
             if (status instanceof Array) {
@@ -43,6 +43,13 @@ function AdvisorDashboard() {
             } else {
                 return this.view.filter(d => d.status === status);
             }
+        },
+        sortStatusFn(a, b) {
+            if (a.status === 'NEW') {
+                return -1
+            } else if (b.status === 'NEW') {
+                return 1
+            } else return 0
         },
         sortFn(a, b) {
             if (b.project.notifications.count - a.project.notifications.count)

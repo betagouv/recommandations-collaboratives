@@ -50,14 +50,9 @@
     </div>
     <div class="d-flex mt-3 justify-content-between align-items-center">
         <div class="d-flex">
-            <template x-if="p.status === 'NEW' ">
-                <span class="text-uppercase small fw-medium text-muted d-flex my-0">Nouveau projet</span>
-            </template>
-            <template x-if="p.status != 'NEW'">
                 <span :style="`color:${getProjectRoleColor(p.project)} !important`" class="text-uppercase small fw-medium text-muted d-flex my-0" x-text="p.project.recommendation_count >
                     0 ? `${p.project.recommendation_count} recommandations` : `${p.project.recommendation_count} recommandation`">
                 </span>
-            </template>
         </div>
         <div class="d-flex align-items-center">
             <template x-for="switchtender in p.project.switchtenders">
