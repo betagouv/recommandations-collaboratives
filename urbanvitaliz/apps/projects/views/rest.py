@@ -29,6 +29,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
+        # TODO tune query set to prevent loads of requests on subqueries
         return self.queryset.for_user(self.request.user).order_by(
             "-created_on", "-updated_on"
         )
