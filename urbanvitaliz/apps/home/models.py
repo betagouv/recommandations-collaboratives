@@ -30,6 +30,12 @@ class UserProfileManager(models.Manager):
         return super().get_queryset().filter(deleted=None)
 
 
+class UserProfileOnSiteManager(CurrentSiteManager, UserProfileManager):
+    """Manager for active UserProfile on the current site"""
+
+    pass
+
+
 class DeletedUserProfileManager(models.Manager):
     """Manager for deleted UserProfile"""
 
@@ -41,6 +47,7 @@ class UserProfile(models.Model):
     """Represents the profile of a user"""
 
     objects = UserProfileManager()
+    on_site = UserProfileOnSiteManager()
     deleted_objects = DeletedUserProfileManager()
 
     user = models.OneToOneField(
@@ -58,6 +65,8 @@ class UserProfile(models.Model):
         on_delete=models.SET_NULL,
         related_name="registered_profiles",
     )
+
+    sites = models.ManyToManyField(Site)
 
     phone_no = PhoneNumberField(blank=True)
 
