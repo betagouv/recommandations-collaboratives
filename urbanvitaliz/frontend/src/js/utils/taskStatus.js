@@ -1,4 +1,4 @@
-import { STATUSES } from '../config/statuses';
+import { TASK_STATUSES } from '../config/statuses';
 
 export const STATUS_TEXT = {
     0: "nouveau",
@@ -14,9 +14,9 @@ export function statusText(status) {
 }
 
 export function isArchivedStatus(status) {
-    return status === STATUSES.DONE
-        || status === STATUSES.NOT_INTERESTED
-        || status === STATUSES.ALREADY_DONE
+    return status === TASK_STATUSES.DONE
+        || status === TASK_STATUSES.NOT_INTERESTED
+        || status === TASK_STATUSES.ALREADY_DONE
 }
 
 export function isStatusUpdate(followup) {

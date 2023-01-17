@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs'
 import TaskApp from './Tasks'
-import { STATUSES } from '../config/statuses';
+import { TASK_STATUSES } from '../config/statuses';
 
 function TasksInline(projectId) {
 
@@ -8,7 +8,7 @@ function TasksInline(projectId) {
         filterIsDraft: false,
         boardsFiltered: [],
         boards: [
-            { status: [STATUSES.PROPOSED], title: "Nouvelles", color_class: "border-error", color: "#0d6efd" },
+            { status: [TASK_STATUSES.PROPOSED], title: "Nouvelles", color_class: "border-error", color: "#0d6efd" },
         ],
         filterFn(d) {
             return this.canAdministrate || d.public || !d.public;

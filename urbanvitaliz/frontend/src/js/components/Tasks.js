@@ -1,4 +1,4 @@
-import { STATUSES } from '../config/statuses';
+import { TASK_STATUSES } from '../config/statuses';
 
 import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, resourcePreviewUrl , followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
 import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
@@ -66,18 +66,18 @@ export default function TasksApp(app, projectId) {
         currentlyEditing: null,
         currentReminderTaskId: null,
         pendingReminderDate: formatReminderDate(daysFromNow(30 * 6)),
-        feedbackStatus: STATUSES.DONE,
+        feedbackStatus: TASK_STATUSES.DONE,
         feedbackComment: '',
         feedbackModal: null,
         currentFeedbackTask: null,
         data: [],
         boards: [],
+        STATUSES: TASK_STATUSES,
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await issueFollowup(e.detail.task, e.detail.status)
             await this.getData()
         },
-        STATUSES: STATUSES,
         get isBusy() {
             return this.$store.app.isLoading
         },
