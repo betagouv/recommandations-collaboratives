@@ -70,7 +70,7 @@ def project_overview(request, project_id=None):
                 site=request.site,
                 user=request.user,
                 project=project,
-                defaults={"status": "NOT_INTERESTED"},
+                defaults={"status": "TODO"},
             )
 
     # Mark some notifications as seen (general ones)
