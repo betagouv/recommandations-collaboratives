@@ -1,6 +1,5 @@
 {% load static %}
 {% load gravatar %}
-
 <div :id="p.id""
     class="drag-targetable py-1 my-1"
     @dragover="onDragOver(event)"
@@ -8,6 +7,7 @@
     @dragenter="onDragEnter(event)"
     @dragleave="onDragLeave(event)">
     <div class="bg-white border rounded border-1 px-3 py-3 position-relative"
+         :style="`border-color:${getProjectRoleColor(p.project)} !important`"
          draggable="true"
          @dragstart="onDragStart(event, p.id)"
          @dragend="onDragEnd(event)">
@@ -21,7 +21,8 @@
                   x-text="p.project.name">
             </span>
         </div>
-        <figure class="project-notification" x-text="p.project.notifications.count"></figure>
+        <figure class="project-notification" x-text="p.project.notifications.count">
+        </figure>
         <template x-if="p.project.commune">
             <div class="fw-normal text-uppercase small d-flex align-items-center my-1">
                 <svg class="align-middle bi me-2"
@@ -49,12 +50,21 @@
                 <template x-if="p.status === 'NEW' ">
                     <span class="text-uppercase small fw-medium text-muted d-flex my-0">Nouveau projet</span>
                 </template>
-                    <span class="text-uppercase small fw-medium text-muted d-flex my-0">2 recommandations</span>
+                <span :style="`color:${getProjectRoleColor(p.project)} !important`" class="text-uppercase small fw-medium text-muted d-flex my-0" x-text="p.project.recommendation_count >
+                    0 ? `${p.project.recommendation_count} recommandations` : `${p.project.recommendation_count} recommandation`">
+                </span>
             </div>
             <div class="d-flex align-items-center">
                 <template x-for="switchtender in p.project.switchtenders">
                     <div>
-                        <img class="align-middle rounded-circle d-inline-block" width="25px" :src="gravatar_url(switchtender.email, 25, switchtender.first_name + ' ' + switchtender.last_name)" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${switchtender.first_name} ${switchtender.last_name}`" style="z-index: 1000;" tabindex="0">
+                        <img class="align-middle rounded-circle d-inline-block"
+                             width="25px"
+                             :src="gravatar_url(switchtender.email, 25, switchtender.first_name + ' ' + switchtender.last_name)"
+                             data-bs-toggle="tooltip"
+                             data-bs-placement="bottom"
+                             :title="`${switchtender.first_name} ${switchtender.last_name}`"
+                             style="z-index: 1000"
+                             tabindex="0">
                     </div>
                 </template>
             </div>

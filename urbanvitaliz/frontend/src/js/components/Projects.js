@@ -20,12 +20,13 @@ function AdvisorDashboard() {
 
             const projects = await this.$store.projects.getProjects()
 
+            this.totalNotifications = 0
+            this.nbNewProjects = 0
+
             projects.forEach(p => this.totalNotifications += p.project.notifications.count)
             projects.forEach(p => {
                 if (p.status === 'NEW' ) return this.nbNewProjects += 1
             })
-
-            console.log('nb new projects : ', this.nbNewProjects)
 
             return this.data = projects
         },
@@ -37,7 +38,6 @@ function AdvisorDashboard() {
             return this.data.filter(this.filterFn.bind(this)).sort(this.sortFn.bind(this));
         },
         column(status) {
-            console.log('status :', status);
             if (status instanceof Array) {
                 return this.view.filter(d => status.indexOf(d.status) !== -1);
             } else {
@@ -58,13 +58,16 @@ function AdvisorDashboard() {
                 return true
             }
         },
+        getProjectRoleColor(project) {
+            if (project.is_observer) return '#27A658'
+            else if (project.is_switchtender) return '#0063CB'
+            else return ''
+        },
         // Drang n drop
         async onDrop(event, status) {
 
             if (status instanceof Array) status = status[0]
             
-            console.log('status qklsjdjlkqsdjlkdqljkqsdljkd: ', status);
-
             event.preventDefault();
 
             this.currentlyHoveredElement.classList.remove('drag-target');
