@@ -5,6 +5,8 @@ import { formatDate } from '../utils/date';
 function AdvisorDashboard() {
     return {
         data: [],
+        totalNotifications: 0,
+        nbNewProjects:0,
         boards: [
             { code: ['TODO','NEW'], title: 'À traiter', color_class: 'border-secondary', color:'#0063CB' },
             { code: "WIP", title: "En cours", color_class: 'border-primary', color: '#FCC63A' },
@@ -15,7 +17,17 @@ function AdvisorDashboard() {
             console.log('advisor dashboard ready');
         },
         async getData() {
-            return this.data = await this.$store.projects.getProjects()
+
+            const projects = await this.$store.projects.getProjects()
+
+            projects.forEach(p => this.totalNotifications += p.project.notifications.count)
+            projects.forEach(p => {
+                if (p.status === 'NEW' ) return this.nbNewProjects += 1
+            })
+
+            console.log('nb new projects : ', this.nbNewProjects)
+
+            return this.data = projects
         },
         get isBusy() {
             return this.$store.app.isLoading

@@ -5,6 +5,27 @@
     border-radius: 50%;
 }
 
+.project-notification {
+    position: absolute;
+    top: 20px;
+    right: 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 25px;
+    height: 25px;
+
+    margin: 0;
+
+    background-color: red;
+    border-radius: 50%;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+}
+
 .drop-column {
     padding: 0 2px;
 }
