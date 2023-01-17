@@ -1,1 +1,41 @@
+.status-color-indicator {
+    width: 12px;
+    height: 12px;
+
+    border-radius: 50%;
+}
+
+.drop-column {
+    padding: 0 2px;
+}
+
+.drop-column.drop-highlight {
+    padding: 0px;
+    border-width: 2px;
+    border-style: dashed;
+    border-top-style: solid;
+    border-color: #ccc !important;
+}
+
+.drag-target {
+    position: relative;
+    padding-top: 100px !important;
+    transition: padding-top 50ms ease-in;
+}
+
+.drag-target::before {
+    content: '';
+    width: 100%;
+    height: 70px;
+    position: absolute;
+    top: 15px;
+    border: 2px dashed #0d6efd;
+    border-radius: 3px;
+    z-index: 9999;
+}
+
+.drag-dragging {
+    background-color: #ffc107 !important;
+    opacity: .5;
+}
 

@@ -9,11 +9,16 @@
          draggable="true"
          @dragstart="onDragStart(event, p.id)"
          @dragend="onDragEnd(event)">
-        <span style="cursor:pointer;
-                     font-size: 18px"
-              class="fw-bold mt-0 pt-0 font-normal mb-0"
-              x-text="p.project.name">
-        </span>
+        <div class="d-flex align-items-center">
+            <template x-if="p.status === 'NEW' ">
+                <i style="background-color: #0063CB" class="status-color-indicator me-2"></i>
+            </template>
+            <span style="cursor:pointer;
+                         font-size: 18px"
+                  class="fw-bold mt-0 pt-0 font-normal mb-0"
+                  x-text="p.project.name">
+            </span>
+        </div>
         <template x-if="p.project.commune">
             <div class="fw-normal text-uppercase small d-flex align-items-center my-1">
                 <svg class="align-middle bi me-2"
@@ -28,12 +33,16 @@
         </template>
         <div class="font-small text-dark d-flex align-items-center">
             <svg class="align-middle bi me-2"
-                     width="18px"
-                     height="15px"
-                     fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#calendar-event" />
-                </svg>
-            <span x-text="`Déposé le ${formatDate(p.project.created_on)}`" class="align-middle"></span>
+                 width="18px"
+                 height="15px"
+                 fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#calendar-event" />
+            </svg>
+            <span x-text="`Déposé le ${formatDate(p.project.created_on)}`"
+                  class="align-middle"></span>
         </div>
+        <template x-if="p.status === 'NEW' ">
+            <span class="text-uppercase small text-muted">Nouveau projet</span>
+        </template>
     </div>
 </div>

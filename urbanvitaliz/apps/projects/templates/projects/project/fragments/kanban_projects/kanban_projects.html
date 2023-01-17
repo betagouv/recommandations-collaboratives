@@ -6,7 +6,7 @@
     <template x-if="!isBusy">
         <div class="d-flex justify-content-start row flex-nowrap" style="overflow-x: scroll;">
             <template x-for="board in boards" :key="board.code">
-                <div class="px-2 bg-light border-top border-4 me-3" :class="board.color_class" style="width:30%">
+                <div class="px-2 bg-light border-top border-4 me-3" :style="`border-color:${board.color}!important;width:30%`">
                     <h5 x-text="board.title" class="font-medium text-gray-800 mt-2"></h5>
                     <div style="height: 80vh; overflow-y: auto;">
                         <template x-if="column(board.code).length === 0">

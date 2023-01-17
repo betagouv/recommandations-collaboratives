@@ -6,10 +6,10 @@ function AdvisorDashboard() {
     return {
         data: [],
         boards: [
-            { code: 'TODO', title: 'À traiter', color_class: 'border-secondary' },
-            { code: 'NOT_INTERESTED', title: "Pas d'intérêt", color_class: 'border-danger' },
-            { code: "WIP", title: "En cours", color_class: 'border-primary' },
-            { code: "DONE", title: "Traité", color_class: 'border-success' },
+            { code: ['TODO','NEW'], title: 'À traiter', color_class: 'border-secondary', color:'#0063CB' },
+            { code: "WIP", title: "En cours", color_class: 'border-primary', color: '#FCC63A' },
+            { code: "DONE", title: "Traité", color_class: 'border-success', color:'#F6F6F6' },
+            { code: 'NOT_INTERESTED', title: "Pas d'intérêt", color_class: 'border-danger', color:'#CE0500' },
         ],
         init() {
             console.log('advisor dashboard ready');
@@ -25,8 +25,9 @@ function AdvisorDashboard() {
             return this.data.filter(this.filterFn.bind(this)).sort(this.sortFn.bind(this));
         },
         column(status) {
+            console.log('status :', status);
             if (status instanceof Array) {
-                return this.view.filter(d => status.indexOf(d.project.status) !== -1);
+                return this.view.filter(d => status.indexOf(d.status) !== -1);
             } else {
                 return this.view.filter(d => d.status === status);
             }
@@ -47,6 +48,11 @@ function AdvisorDashboard() {
         },
         // Drang n drop
         async onDrop(event, status) {
+
+            if (status instanceof Array) status = status[0]
+            
+            console.log('status qklsjdjlkqsdjlkdqljkqsdljkd: ', status);
+
             event.preventDefault();
 
             this.currentlyHoveredElement.classList.remove('drag-target');
