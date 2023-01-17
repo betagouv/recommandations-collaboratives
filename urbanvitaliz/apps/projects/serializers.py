@@ -42,8 +42,10 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "org_name",
             "switchtenders",
             "is_switchtender",
+            "is_observer",
             "commune",
             "notifications",
+            "recommendation_count",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
@@ -52,6 +54,17 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     def get_is_switchtender(self, obj):
         request = self.context.get("request")
         return request.user in obj.switchtenders.all()
+
+    is_observer = serializers.SerializerMethodField()
+
+    def get_is_observer(self, obj):
+        request = self.context.get("request")
+        return request.user in obj.switchtenders_on_site.filter(is_observer=True)
+
+    recommendation_count = serializers.SerializerMethodField()
+
+    def get_recommendation_count(self, obj):
+        return Task.on_site.published().filter(project=obj).count()
 
     commune = CommuneSerializer(read_only=True)
 
