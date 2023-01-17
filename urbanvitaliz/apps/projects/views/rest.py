@@ -205,9 +205,26 @@ class UserProjectStatusViewSet(
     """
 
     def get_queryset(self):
-        return models.UserProjectStatus.objects.filter(
-            user=self.request.user, site=self.request.site
+        project_statuses = models.UserProjectStatus.objects.filter(
+            user=self.request.user
         )
+
+        ids = list(project_statuses.values_list("project__id", flat=True))
+
+        projects = models.Project.on_site.for_user(self.request.user).exclude(
+            id__in=ids
+        )
+
+        new_statuses = [
+            models.UserProjectStatus(
+                user=self.request.user, site=self.request.site, project=p, status="NEW"
+            )
+            for p in projects
+        ]
+
+        models.UserProjectStatus.objects.bulk_create(new_statuses)
+
+        return project_statuses.all()
 
     serializer_class = UserProjectStatusSerializer
     permission_classes = [permissions.IsAuthenticated]

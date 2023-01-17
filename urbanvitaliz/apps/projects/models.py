@@ -265,6 +265,7 @@ class UserProjectStatus(models.Model):
     objects = UserProjectStatusOnSiteManager()
 
     USERPROJECT_STATES = (
+        ("NEW", "Nouveau"),
         ("TODO", "A traiter"),
         ("WIP", "En cours"),
         ("DONE", "Traité"),
