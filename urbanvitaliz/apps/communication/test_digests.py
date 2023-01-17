@@ -284,8 +284,9 @@ def test_notification_formatter_with_bogus_user():
     formatter = NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
+    note = Recipe(projects_models.Note).make()
 
-    notification = Notification(user, verb="a rédigé un message")
+    notification = Notification(user, verb="a rédigé un message", action_object=note)
 
     fmt_reco = formatter.format(notification)
-    assert fmt_reco is None
+    assert "compte indisponible" in str(fmt_reco)

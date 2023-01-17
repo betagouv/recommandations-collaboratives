@@ -47,6 +47,7 @@ def project_overview(request, project_id=None):
         project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
+    is_switchtender = check_if_national_actor(request.user)
     switchtending = get_switchtender_for_project(request.user, project)
 
     try:
@@ -57,7 +58,7 @@ def project_overview(request, project_id=None):
     # check user can administrate project (member or switchtender)
     if request.user != project.owner:
         # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_switchtender(request.user):
+        if not is_switchtender:
             can_manage_or_403(project, request.user)
 
     # Set this project as active
@@ -65,12 +66,12 @@ def project_overview(request, project_id=None):
 
     # Make sure we track record of user's interest for this project
     if not request.user.is_hijacked:
-        if (is_national_actor or is_regional_actor) and not request.user.is_staff:
+        if is_regional_actor or can_administrate:
             models.UserProjectStatus.objects.get_or_create(
                 site=request.site,
                 user=request.user,
                 project=project,
-                defaults={"status": "NOT_INTERESTED"},
+                defaults={"status": "TODO"},
             )
 
     # Mark some notifications as seen (general ones)

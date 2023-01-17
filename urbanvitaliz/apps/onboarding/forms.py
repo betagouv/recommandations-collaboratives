@@ -73,7 +73,7 @@ class OnboardingResponseWithCaptchaForm(OnboardingResponseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Prevent tests from failing
+        # Skip captcha during tests
         if "PYTEST_CURRENT_TEST" in os.environ:
             self.fields.pop("captcha")
 

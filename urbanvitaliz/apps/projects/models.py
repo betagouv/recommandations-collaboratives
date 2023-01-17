@@ -260,10 +260,15 @@ class UserProjectStatusOnSiteManager(CurrentSiteManager):
 
 
 class UserProjectStatus(models.Model):
+    """Project status for a given user"""
+
     objects = UserProjectStatusOnSiteManager()
 
     USERPROJECT_STATES = (
-        ("FOLLOWED", "Suivi"),
+        ("NEW", "Nouveau"),
+        ("TODO", "A traiter"),
+        ("WIP", "En cours"),
+        ("DONE", "Traité"),
         ("NOT_INTERESTED", "Pas d'intérêt"),
     )
 

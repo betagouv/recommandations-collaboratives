@@ -287,3 +287,34 @@ def test_collectivity_member_cannot_invite_an_advisor(request, client):
     assert response.status_code == 403
 
     assert invites_models.Invite.on_site.count() == 0
+
+
+##################################################
+# Revocation
+##################################################
+
+
+def test_invitation_revocation(request, client):
+    invited_email = "invite@party.com"
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+    )
+
+    invite = baker.make(
+        invites_models.Invite,
+        site=get_current_site(request),
+        project=project,
+        email=invited_email,
+    )
+
+    url = reverse("projects-project-access-revoke-invite", args=[project.id, invite.pk])
+    data = {"email": invited_email}
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+        assert response.status_code == 302
+        assert "login" not in response.url
+
+    assert invites_models.Invite.objects.count() == 0
