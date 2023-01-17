@@ -124,6 +124,61 @@ def test_access_my_user_project_status(request):
 
 
 @pytest.mark.django_db
+def test_advisor_access_new_regional_project_status(request):
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        commune__department__code="01",
+    )
+
+    group = auth_models.Group.objects.get(name="switchtender")
+    user = baker.make(auth_models.User, groups=[group])
+    user.profile.departments.add(project.commune.department)
+
+    site = get_current_site(request)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("userprojectstatus-list")
+    response = client.get(url)
+    assert response.status_code == 200
+    ups = response.data
+    assert len(ups) == 1
+    assert ups[0]["project"]["id"] == project.id
+
+
+@pytest.mark.django_db
+def test_advisor_access_makes_no_user_project_status_duplicate(request):
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        commune__department__code="01",
+    )
+
+    group = auth_models.Group.objects.get(name="switchtender")
+    user = baker.make(auth_models.User, groups=[group])
+    user.profile.departments.add(project.commune.department)
+
+    baker.make(
+        models.UserProjectStatus,
+        project=project,
+        site=get_current_site(request),
+        user=user,
+    )
+
+    site = get_current_site(request)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("userprojectstatus-list")
+    response = client.get(url)
+    assert response.status_code == 200
+    ups = response.data
+    assert len(ups) == 1
+    assert ups[0]["project"]["id"] == project.id
+
+
+@pytest.mark.django_db
 def test_cannot_access_other_user_project_status(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
