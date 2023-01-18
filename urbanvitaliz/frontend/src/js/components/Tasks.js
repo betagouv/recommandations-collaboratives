@@ -5,7 +5,7 @@ import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
 import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
 import { toArchiveTooltip, reminderTooltip, isOldReminder } from '../utils/tooltip'
 import { renderMarkdown } from '../utils/markdown'
-import { generateGravatarUrl } from '../utils/gravatar'
+import { gravatar_url } from '../utils/gravatar'
 
 export default function TasksApp(app, projectId) {
 
@@ -42,7 +42,7 @@ export default function TasksApp(app, projectId) {
         formatDate,
         isStatusUpdate,
         statusText,
-        generateGravatarUrl,
+        gravatar_url,
         toArchiveTooltip,
         reminderTooltip,
         editTaskUrl,
