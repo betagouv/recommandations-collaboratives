@@ -17,7 +17,7 @@
             </template>
             <a style="cursor:pointer;
                       font-size: 18px"
-               :href="makeProjectURL(p.project.id)"
+               :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', p.project.id)"
                class="fw-bold mt-0 pt-0 font-normal mb-0 text-decoration-none pe-4 text-dark"
                x-text="p.project.name"></a>
         </div>

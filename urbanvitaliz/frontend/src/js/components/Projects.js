@@ -1,21 +1,23 @@
 import Alpine from 'alpinejs'
 import api from '../utils/api'
 import { formatDate } from '../utils/date';
+import { gravatar_url } from '../utils/gravatar';
+import { makeProjectURL } from '../utils/createProjectUrl'
 
 function AdvisorDashboard() {
     return {
         data: [],
         totalNotifications: 0,
-        nbNewProjects:0,
+        nbNewProjects: 0,
+        gravatar_url,
+        formatDate,
+        makeProjectURL,
         boards: [
-            { code: ['TODO','NEW'], title: 'À traiter', color_class: 'border-secondary', color:'#0063CB' },
+            { code: ['TODO', 'NEW'], title: 'À traiter', color_class: 'border-secondary', color: '#0063CB' },
             { code: 'WIP', title: "En cours", color_class: 'border-primary', color: '#FCC63A' },
-            { code: "DONE", title: "Traité", color_class: 'border-success', color:'#F6F6F6' },
-            { code: 'NOT_INTERESTED', title: "Dossier que je ne suis pas", color_class: 'border-danger', color:'#CE0500' },
+            { code: "DONE", title: "Traité", color_class: 'border-success', color: '#F6F6F6' },
+            { code: 'NOT_INTERESTED', title: "Dossier que je ne suis pas", color_class: 'border-danger', color: '#CE0500' },
         ],
-        init() {
-            console.log('advisor dashboard ready');
-        },
         async getData() {
 
             const projects = await this.$store.projects.getProjects()
@@ -25,7 +27,7 @@ function AdvisorDashboard() {
 
             projects.forEach(p => this.totalNotifications += p.project.notifications.count)
             projects.forEach(p => {
-                if (p.status === 'NEW' ) return this.nbNewProjects += 1
+                if (p.status === 'NEW') return this.nbNewProjects += 1
             })
 
             return this.data = projects
@@ -70,11 +72,11 @@ function AdvisorDashboard() {
             else if (project.is_switchtender) return '#0063CB'
             else return ''
         },
-        // Drang n drop
+        // Drag n drop
         async onDrop(event, status) {
 
             if (status instanceof Array) status = status[0]
-            
+
             event.preventDefault();
 
             this.currentlyHoveredElement.classList.remove('drag-target');
@@ -115,8 +117,6 @@ function AdvisorDashboard() {
             event.preventDefault();
             event.dataTransfer.dropEffect = "move";
         },
-        // utils
-        formatDate,
     }
 }
 

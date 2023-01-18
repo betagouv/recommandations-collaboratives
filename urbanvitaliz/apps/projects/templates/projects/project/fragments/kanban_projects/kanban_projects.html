@@ -1,20 +1,4 @@
 {% load static %}
-<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
-<script type="text/javascript">
-const project_url_tmpl = "{% url 'projects-project-detail' 0 %}";
-
- function makeProjectURL(id) {
-     return project_url_tmpl.replace('0', id);
- }
-
- function gravatar_url(email, size=50, name="Inconnu") {
-     if (name.trim() == '') name = "Inconnu";
-
-     hash = md5(email);
-     encoded_fallback_uri = encodeURIComponent(`https://ui-avatars.com/api/${name}/${size}`);
-
-     return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=${encoded_fallback_uri}`
- }
 </script>
 <div x-data="AdvisorDashboard" x-init="getData();">
     <header class="d-flex mb-2 w-100">
