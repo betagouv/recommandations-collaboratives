@@ -3,6 +3,7 @@ import api from '../utils/api'
 import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar';
 import { makeProjectURL } from '../utils/createProjectUrl'
+import { roles } from '../config/roles';
 
 function AdvisorDashboard() {
     return {
@@ -68,8 +69,8 @@ function AdvisorDashboard() {
             }
         },
         getProjectRoleColor(project) {
-            if (project.is_observer) return '#27A658'
-            else if (project.is_switchtender) return '#0063CB'
+            if (project.is_observer) return roles.observer.color
+            else if (project.is_switchtender) return roles.switchtender.color
             else return ''
         },
         // Drag n drop
