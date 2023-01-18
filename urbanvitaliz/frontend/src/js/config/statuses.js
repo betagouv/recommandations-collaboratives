@@ -1,4 +1,4 @@
-export const STATUSES = {
+export const TASK_STATUSES = {
     PROPOSED: 0,
     INPROGRESS: 1,
     BLOCKED: 2,
@@ -7,4 +7,4 @@ export const STATUSES = {
     ALREADY_DONE: 5,
 }
 
-export default STATUSES
+export default TASK_STATUSES

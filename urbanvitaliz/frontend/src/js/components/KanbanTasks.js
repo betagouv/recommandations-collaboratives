@@ -1,6 +1,6 @@
 import Alpine from "alpinejs"
 import TaskApp from './Tasks'
-import { STATUSES } from '../config/statuses';
+import { TASK_STATUSES } from '../config/statuses';
 
 Alpine.data("KanbanTasks", boardTasksApp)
 

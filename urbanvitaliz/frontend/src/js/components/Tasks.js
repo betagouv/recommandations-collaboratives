@@ -1,4 +1,4 @@
-import { STATUSES } from '../config/statuses';
+import { TASK_STATUSES } from '../config/statuses';
 
 import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, resourcePreviewUrl , followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
 import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
@@ -55,18 +55,33 @@ export default function TasksApp(app, projectId) {
         patchTask,
         markAllAsRead,
         isOldReminder,
+        currentlyHoveredElement: null,
+        canAdministrate: false,
+        canManage: false,
+        isSwitchtender: false,
+        userEmail: null,
+        currentTaskId: null,
+        currentTaskFollowups: null,
+        currentTaskNotifications: [],
+        pendingComment: "",
+        currentlyEditing: null,
+        currentReminderTaskId: null,
+        pendingReminderDate: formatReminderDate(daysFromNow(30 * 6)),
+        feedbackStatus: TASK_STATUSES.DONE,
+        feedbackComment: '',
+        feedbackModal: null,
+        currentFeedbackTask: null,
+        data: [],
+        boards: [],
+        STATUSES: TASK_STATUSES,
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await issueFollowup(e.detail.task, e.detail.status)
             await this.getData()
         },
-        data: [],
-        boards: [],
-        STATUSES: STATUSES,
         get isBusy() {
             return this.$store.app.isLoading
         },
-        currentlyHoveredElement: null,
         async getData() {
             return this.data = await this.$store.tasks.getTasks(projectId)
         },
@@ -94,26 +109,22 @@ export default function TasksApp(app, projectId) {
             }
         },
         // Administrate
-        canAdministrate: false,
         loadCanAdministrate() {
             const canAdministrate = document.getElementById("canAdministrate").textContent;
             this.canAdministrate = JSON.parse(canAdministrate);
         },
 
-        canManage: false,
         loadCanManage() {
             const canManage = document.getElementById("canManage").textContent;
             this.canManage = JSON.parse(canManage);
         },
 
-        isSwitchtender: false,
         loadIsSwitchtender() {
             const isSwitchtender = document.getElementById("isSwitchtender").textContent;
             this.isSwitchtender = JSON.parse(isSwitchtender);
         },
 
         // UserId
-        userEmail: null,
         loadUserId() {
             const userEmail = document.getElementById("userEmail").textContent;
             this.userEmail = JSON.parse(userEmail);
@@ -135,9 +146,6 @@ export default function TasksApp(app, projectId) {
         },
 
         // Previews
-        currentTaskId: null,
-        currentTaskFollowups: null,
-        currentTaskNotifications: [],
         async loadFollowups(taskId) {
             const { data } = await api.get(followupsUrl(projectId, taskId));
             this.currentTaskFollowups = data
@@ -204,8 +212,6 @@ export default function TasksApp(app, projectId) {
         },
 
         // Comments
-        pendingComment: "",
-        currentlyEditing: null,
         onEditComment(followup) {
             this.pendingComment = followup.comment;
             this.currentlyEditing = ["followup", followup.id];
@@ -236,8 +242,6 @@ export default function TasksApp(app, projectId) {
         },
 
         // Reminiders
-        currentReminderTaskId: null,
-        pendingReminderDate: formatReminderDate(daysFromNow(30 * 6)),
         initReminderModal() {
             const element = document.getElementById("reminder-modal");
             this.reminderModalHandle = new bootstrap.Modal(element);
@@ -270,10 +274,6 @@ export default function TasksApp(app, projectId) {
         },
 
         // Feedback
-        feedbackStatus: STATUSES.DONE,
-        feedbackComment: '',
-        feedbackModal: null,
-        currentFeedbackTask: null,
         initFeedbackModal() {
             const element = document.getElementById("feedback-modal");
             this.feedbackModal = new bootstrap.Modal(element);
