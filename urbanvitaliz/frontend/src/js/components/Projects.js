@@ -5,6 +5,12 @@ import { gravatar_url } from '../utils/gravatar';
 import { makeProjectURL } from '../utils/createProjectUrl'
 import { roles } from '../config/roles';
 
+// A custom dashboard made for switctenders
+// Expose a list of projects
+// Filtered by a board.code 
+// Drag n drops utils added
+// TODO exctract drag n drop logics
+
 function AdvisorDashboard() {
     return {
         data: [],
@@ -13,6 +19,7 @@ function AdvisorDashboard() {
         gravatar_url,
         formatDate,
         makeProjectURL,
+        errors: null,
         boards: [
             { code: ['TODO', 'NEW'], title: 'À traiter', color_class: 'border-secondary', color: '#0063CB' },
             { code: 'WIP', title: "En cours", color_class: 'border-primary', color: '#FCC63A' },
@@ -87,7 +94,12 @@ function AdvisorDashboard() {
 
             const data = this.data.find(d => d.id === JSON.parse(id));
 
-            await api.patch(`/api/userprojectstatus/${data.id}/`, { status: status })
+            try {
+                await api.patch(`/api/userprojectstatus/${data.id}/`, { status: status })
+            }
+            catch (err) {
+                this.errors = err;
+            }
 
             await this.getData();
         },

@@ -32,6 +32,11 @@
                         </svg>
                         <span x-text="nbNewProjects > 0 ? `${nbNewProjects} Nouveaux projets` : `${nbNewProjects} Nouveau projet`"></span>
                     </div>
+                    <template x-if="errors">
+                        <div class="d-flex align-items-center me-2">
+                            <span class="text-danger" x-text="errors"></span>>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
