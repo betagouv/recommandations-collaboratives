@@ -9,6 +9,7 @@ created : 2022-11-28 14:14:20 CEST
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
@@ -30,9 +31,11 @@ def document_list(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_national_actor = check_if_national_actor(request.user)
+
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
     switchtending = get_switchtender_for_project(request.user, project)

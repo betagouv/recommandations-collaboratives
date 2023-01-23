@@ -55,30 +55,39 @@ def test_non_switchtender_cannot_administrate_project(client):
 
 
 @pytest.mark.django_db
-def test_get_regional_actors_for_project(client):
+def test_get_regional_actors_for_project(client, request):
     group = auth.Group.objects.get(name="switchtender")
 
     dept62 = baker.make(geomatics.Department, code="62")
     dept80 = baker.make(geomatics.Department, code="80")
     dept59 = baker.make(geomatics.Department, code="59")
 
+    site = get_current_site(request)
+
     switchtenderA = baker.make(auth.User, groups=[group])
     switchtenderA.profile.departments.set([dept62, dept80])
+    switchtenderA.profile.sites.set([site])
 
     switchtenderB = baker.make(auth.User, groups=[group])
     switchtenderB.profile.departments.set([dept59, dept80])
+    switchtenderB.profile.sites.set([site])
 
     switchtenderC = baker.make(auth.User, groups=[group])
     switchtenderC.profile.departments.set([])
+    switchtenderC.profile.sites.set([site])
+
+    switchtenderD = baker.make(auth.User, groups=[group])
+    switchtenderD.profile.departments.set([dept59, dept62])
 
     project = baker.make(models.Project, status="READY", commune__department=dept62)
 
-    selected_actors = utils.get_regional_actors_for_project(project)
+    selected_actors = utils.get_regional_actors_for_project(site, project)
 
     assert len(selected_actors) == 1
     assert switchtenderA in selected_actors
     assert switchtenderB not in selected_actors
     assert switchtenderC not in selected_actors
+    assert switchtenderD not in selected_actors
 
 
 @pytest.mark.django_db

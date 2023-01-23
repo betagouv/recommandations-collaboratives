@@ -14,6 +14,7 @@ from django.contrib import messages
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404, redirect, render
@@ -326,7 +327,9 @@ def project_switchtender_join(request, project_id=None):
     project = get_object_or_404(models.Project, pk=project_id)
 
     if not can_administrate_project(project, request.user):
-        is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+        is_regional_actor_for_project_or_403(
+            get_current_site(request), project, request.user, allow_national=True
+        )
 
     if request.method == "POST":
         switchtending, created = project.switchtenders_on_site.get_or_create(
@@ -362,7 +365,9 @@ def project_observer_join(request, project_id=None):
     project = get_object_or_404(models.Project, pk=project_id)
 
     if not can_administrate_project(project, request.user):
-        is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+        is_regional_actor_for_project_or_403(
+            get_current_site(request), project, request.user, allow_national=True
+        )
 
     if request.method == "POST":
         switchtending, created = project.switchtenders_on_site.get_or_create(

@@ -127,9 +127,11 @@ def test_regional_actor_can_invite_collectivity_to_project(request, client):
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
 
+    current_site = get_current_site(request)
+
     project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         projectmember_set=[],
         commune=commune,
     )
@@ -138,6 +140,7 @@ def test_regional_actor_can_invite_collectivity_to_project(request, client):
     data = {"email": "test@example.com"}
 
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
         user.profile.departments.set([project.commune.department.pk])
 
         response = client.post(url, data=data)
@@ -218,9 +221,9 @@ def test_user_cannot_invite_collectivity_to_project(request, client):
 
 @pytest.mark.django_db
 def test_assigned_switchtender_can_invite_advisor_to_project(request, client):
-    project = baker.make(
-        models.Project, sites=[get_current_site(request)], projectmember_set=[]
-    )
+    current_site = get_current_site(request)
+
+    project = baker.make(models.Project, sites=[current_site], projectmember_set=[])
 
     url = reverse("projects-project-access-advisor-invite", args=[project.id])
     data = {"email": "test@example.com", "message": "hey"}
@@ -242,9 +245,11 @@ def test_regional_actor_can_invite_advisor_to_project(request, client):
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
 
+    current_site = get_current_site(request)
+
     project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         projectmember_set=[],
         commune=commune,
     )
@@ -253,6 +258,7 @@ def test_regional_actor_can_invite_advisor_to_project(request, client):
     data = {"email": "test@example.com"}
 
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
         user.profile.departments.set([project.commune.department.pk])
 
         response = client.post(url, data=data)

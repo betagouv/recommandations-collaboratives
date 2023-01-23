@@ -9,6 +9,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Q
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -42,9 +43,11 @@ def project_overview(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_national_actor = check_if_national_actor(request.user)
+
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
     is_switchtender = check_if_switchtender(request.user)
@@ -111,9 +114,11 @@ def project_knowledge(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_national_actor = check_if_national_actor(request.user)
+
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
     switchtending = get_switchtender_for_project(request.user, project)
@@ -143,9 +148,10 @@ def project_actions(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_national_actor = check_if_national_actor(request.user)
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
     switchtending = get_switchtender_for_project(request.user, project)
@@ -179,9 +185,11 @@ def project_actions_inline(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_national_actor = check_if_national_actor(request.user)
+
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
     switchtending = get_switchtender_for_project(request.user, project)
@@ -208,9 +216,11 @@ def project_conversations(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_national_actor = check_if_national_actor(request.user)
+
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
 
@@ -245,10 +255,12 @@ def project_internal_followup(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
+
+    current_site = get_current_site(request)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
-    is_national_actor = check_if_national_actor(request.user)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     can_administrate = can_administrate_project(project, request.user)
 
     # Set this project as active
