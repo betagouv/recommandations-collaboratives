@@ -1475,7 +1475,34 @@ def test_switchtender_visits_project_without_interest(request, client):
 
     personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
 
-    assert personal_status.status == "NOT_INTERESTED"
+    assert personal_status.status == "TODO"
+
+
+@pytest.mark.django_db
+def test_switchtender_visits_new_project(request, client):
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(
+        models.Project, commune=commune, sites=[get_current_site(request)]
+    ).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        Recipe(
+            models.UserProjectStatus,
+            site=get_current_site(request),
+            project=project,
+            user=user,
+            status="NEW",
+        ).make()
+
+        response = client.get(
+            reverse("projects-project-detail-overview", args=[project.id]),
+        )
+
+    assert response.status_code == 200
+
+    personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
+
+    assert personal_status.status == "TODO"
 
 
 @pytest.mark.django_db

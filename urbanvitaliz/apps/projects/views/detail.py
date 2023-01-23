@@ -47,7 +47,7 @@ def project_overview(request, project_id=None):
         project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
-    is_switchtender = check_if_national_actor(request.user)
+    is_switchtender = check_if_switchtender(request.user)
     switchtending = get_switchtender_for_project(request.user, project)
 
     try:
@@ -67,12 +67,16 @@ def project_overview(request, project_id=None):
     # Make sure we track record of user's interest for this project
     if not request.user.is_hijacked:
         if is_regional_actor or can_administrate:
-            models.UserProjectStatus.objects.get_or_create(
+            pus, created = models.UserProjectStatus.objects.get_or_create(
                 site=request.site,
                 user=request.user,
                 project=project,
                 defaults={"status": "TODO"},
             )
+
+            if not created and pus.status == "NEW":
+                pus.status = "TODO"
+                pus.save()
 
     # Mark some notifications as seen (general ones)
     if not request.user.is_hijacked:
