@@ -98,8 +98,8 @@
             {% endif %}
 
             <div class="bg-light p-3 my-2">
-                <h6 class="fw-bolder">Qu'est ce que UrbanVializ ?</h6>
-                <p>Un service numérique et gratuit qui aiguille les collectivités dans leur projet de réhabilitation de foncier à l’abandon.</p>
+                <h6 class="fw-bolder">Qu'est ce que {{ request.site.name }} ?</h6>
+                {% include "invites/invite_site_message.html" %}
 
                 <p><a href="{% url 'home' %}">En savoir plus</a></p>
             </div>
