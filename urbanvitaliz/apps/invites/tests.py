@@ -179,14 +179,15 @@ def test_accept_invite_as_team_member_triggers_notification(request, client):
 
 
 @pytest.mark.django_db
-def test_logged_in_user_accepts_invite_without_existing_account(
+def test_user_cannot_access_member_invitation_for_someone_else(
     request,
     client,
 ):
+    current_site = get_current_site(request)
     with login(client, email="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
-            site=get_current_site(request),
+            site=current_site,
             email="whatever@wherever.com",
         ).make()
         url = reverse("invites-invite-accept", args=[invite.pk])
@@ -195,6 +196,7 @@ def test_logged_in_user_accepts_invite_without_existing_account(
     assert response.status_code == 403
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is None
+    assert current_site not in user.profile.sites.all()
     assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
 
@@ -204,10 +206,11 @@ def test_logged_in_user_accepts_invite_switchtender_with_matching_existing_accou
     request,
     client,
 ):
+    current_site = get_current_site(request)
     with login(client, email="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
-            site=get_current_site(request),
+            site=current_site,
             role="SWITCHTENDER",
             email=user.email,
             project__name="project",
@@ -219,22 +222,25 @@ def test_logged_in_user_accepts_invite_switchtender_with_matching_existing_accou
     assert response.status_code == 302
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is not None
+    assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
     assert user == invite.project.switchtenders_on_site.first().switchtender
 
 
 @pytest.mark.django_db
-def test_logged_in_user_accepts_invite_switchtender_with_mismatched_existing_account(
+def test_user_cannot_access_switchtender_invitation_for_someone_else(
     request,
     client,
 ):
+    current_site = get_current_site(request)
+
     invited = Recipe(
         auth_models.User, username="invited", email="invited@example.com"
     ).make()
 
     invite = Recipe(
         models.Invite,
-        site=get_current_site(request),
+        site=current_site,
         email=invited.email,
     ).make()
 
@@ -245,6 +251,7 @@ def test_logged_in_user_accepts_invite_switchtender_with_mismatched_existing_acc
     assert response.status_code == 403
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is None
+    assert current_site not in user.profile.sites.all()
     assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
 
@@ -254,11 +261,12 @@ def test_logged_in_user_accepts_invite_collaborator_with_matching_existing_accou
     request,
     client,
 ):
+    current_site = get_current_site(request)
     with login(client, email="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
             role="COLLABORATOR",
-            site=get_current_site(request),
+            site=current_site,
             email=user.email,
             project__name="project",
             project__location="here",
@@ -269,6 +277,7 @@ def test_logged_in_user_accepts_invite_collaborator_with_matching_existing_accou
     assert response.status_code == 302
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is not None
+    assert current_site in user.profile.sites.all()
     assert user in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
 
@@ -301,10 +310,11 @@ def test_logged_in_user_accepts_invite_collaborator_with_mismatched_existing_acc
 
 
 @pytest.mark.django_db
-def test_anonymous_accepts_invite_with_existing_account(
+def test_anonymous_accepts_invite_with_existing_account_fails(
     request,
     client,
 ):
+    current_site = get_current_site(request)
     invited = Recipe(
         auth_models.User, username="invited", email="invited@example.com"
     ).make()
@@ -312,7 +322,7 @@ def test_anonymous_accepts_invite_with_existing_account(
     invite = Recipe(
         models.Invite,
         role="COLLABORATOR",
-        site=get_current_site(request),
+        site=current_site,
         email=invited.email,
     ).make()
 
@@ -331,10 +341,11 @@ def test_anonymous_accepts_invite_as_switchtender(
     request,
     client,
 ):
+    current_site = get_current_site(request)
     invite = Recipe(
         models.Invite,
         role="SWITCHTENDER",
-        site=get_current_site(request),
+        site=current_site,
         email="a@new.one",
     ).make()
 
@@ -360,3 +371,45 @@ def test_anonymous_accepts_invite_as_switchtender(
     assert user.last_name == data["last_name"]
     assert user.profile.organization.name == data["organization"]
     assert user.profile.organization_position == data["position"]
+    assert current_site in user.profile.sites.all()
+
+
+@pytest.mark.django_db
+def test_anonymous_accepts_invite_as_collaborator(
+    request,
+    client,
+):
+    current_site = get_current_site(request)
+    invite = Recipe(
+        models.Invite,
+        role="COLLABORATOR",
+        site=current_site,
+        email="a@new.one",
+    ).make()
+
+    data = {
+        "first_name": "First",
+        "last_name": "Last",
+        "organization": "Some Organization",
+        "position": "Doing Stuff",
+    }
+
+    url = reverse("invites-invite-accept", args=[invite.pk])
+    response = client.post(url, data=data)
+
+    assert response.status_code == 302
+    invite = models.Invite.on_site.get(pk=invite.pk)
+    assert invite.accepted_on is not None
+    assert invite.project.members.count() == 1
+    assert invite.project.switchtenders_on_site.count() == 0
+
+    user = auth_models.User.objects.get(email=invite.email)
+    assert user.username == invite.email
+    assert user.first_name == data["first_name"]
+    assert user.last_name == data["last_name"]
+    assert user.profile.organization.name == data["organization"]
+    assert user.profile.organization_position == data["position"]
+    assert current_site in user.profile.sites.all()
+
+
+# eof

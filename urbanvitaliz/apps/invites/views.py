@@ -31,10 +31,9 @@ def invite_accept(request, invite_id):
         user = None
 
         if existing_account:
-            if existing_account == request.user:
-                user = request.user
-            else:
+            if existing_account != request.user:
                 return HttpResponseForbidden()
+            user = request.user
 
         # New account
         else:
@@ -64,26 +63,29 @@ def invite_accept(request, invite_id):
                 )
 
         if user:
+            # user now has access to site
+            user.profile.sites.add(current_site)
+
             # Now, grant the user her new rights
             if invite.role == "SWITCHTENDER":
-                projects_models.ProjectSwitchtender.objects.get_or_create(
+                _, created = projects_models.ProjectSwitchtender.objects.get_or_create(
                     switchtender=user, project=project, site=current_site
                 )
-                projects_signals.project_switchtender_joined.send(
-                    sender=request.user, project=project
-                )
-            else:
-                if user not in project.members.all():
-                    projects_models.ProjectMember.objects.create(
-                        project=project, member=user
+                if created:
+                    projects_signals.project_switchtender_joined.send(
+                        sender=request.user, project=project
                     )
-                projects_signals.project_member_joined.send(
-                    sender=request.user, project=project
+            else:
+                _, created = projects_models.ProjectMember.objects.get_or_create(
+                    project=project, member=user
                 )
+                if created:
+                    projects_signals.project_member_joined.send(
+                        sender=request.user, project=project
+                    )
 
             invite.accepted_on = timezone.now()
             invite.save()
-            project.save()
 
             return redirect(project.get_absolute_url())
 
