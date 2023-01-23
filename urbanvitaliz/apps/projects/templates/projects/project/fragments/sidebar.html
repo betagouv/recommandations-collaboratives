@@ -45,14 +45,15 @@
                 CRM
             </a>
         </span>
-
-        <span class="d-inline-block">
-            <a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'projects-project-administration' project.pk %}">
-                <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
-                </svg>
-                Administration
-            </a>
-        </span>
+        {% if not disable_administration %}
+            <span class="d-inline-block">
+                <a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'projects-project-administration' project.pk %}">
+                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
+                    </svg>
+                    Administration
+                </a>
+            </span>
         {% endif %}
+    {% endif %}
 </div>
