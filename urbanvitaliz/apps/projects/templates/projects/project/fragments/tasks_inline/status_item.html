@@ -1,0 +1,32 @@
+<div class="mb-2 pt-3 board-status-item">
+    <div class="d-flex align-items-center pb-3">
+        <i :style="`background-color: ${board.color}`"
+           class="status-color-indicator me-2"></i>
+        <h3 x-text="board.title" class="title-info m-0 p-0"></h3>
+        <div class="d-flex align-items-center" style="margin-bottom: 2px;">
+            <span class="tiny text-grey-light mx-1">·</span>
+            <span class="tiny text-grey-light" x-text="column(board.status).length"></span>
+            <span class="tiny text-grey-light ms-1"
+                  x-text="column(board.status).length > 1 ? 'Recommandations' : 'Recommandation' "></span>
+        </div>
+        <div class="ms-2 rounded-pill px-2 bg-warning z-index-dropdown text-uppercase tiny fw-bold text-white d-flex align-items-center">
+            <div class="form-check form-switch d-flex align-items-center">
+                <input style="cursor: pointer;
+                              margin-bottom: 2px"
+                       x-on:change="handleDraftFilterChange()"
+                       :value="filterIsDraft"
+                       class="form-check-input"
+                       type="checkbox"
+                       id="flexSwitchCheckDefault">
+                <label style="cursor: pointer"
+                       class="form-check-label ms-2 me-2"
+                       for="flexSwitchCheckDefault">Brouillon</label>
+            </div>
+        </div>
+    </div>
+    <div x-show="isBusy" class="mb-2 ms-2" style="width: 24px; height: 24px;">
+        <div class="spinner-border spinner-border spinner-border-sm text-primary"
+             role="status"></div>
+    </div>
+    {% include 'projects/project/fragments/tasks_inline/task_list.html' %}
+</div>

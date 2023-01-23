@@ -1,0 +1,52 @@
+{% extends "projects/project/detail.html" %}
+
+{% load static %}
+{% load humanize %}
+{% load gravatar %}
+{% load sass_tags %}
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/project.js' %}
+{% endblock %}
+
+
+{% block css %}
+<link href="{% sass_src 'projects/css/board.scss' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block title %}
+{{ block.super }} > Recommandation
+{% endblock %}
+
+{% block banner %}
+    {% include 'projects/project/fragments/positioning_banner.html' %}
+{% endblock %}
+
+{% block project_detail %}
+<div class="col-12 mx-auto">
+
+    {% include 'projects/project/navigation.html' with recommandations=True %}
+
+    <div class="mb-2 d-flex align-items-center justify-content-between">
+        <div>
+            <span class="title-info mb-0">Liste des nouvelles recommandations</span>
+            <p class="text-info-custom text-grey-light font-small mb-0">Vous pouvez filtrer cette liste en affichant uniquement les recommandations en brouillon</p>
+        </div>
+        <div class="d-flex align-items-center">
+            {% if not disable_add_recommendation %}
+            <a class="button filled me-2"
+               href="{% url 'projects-project-create-action' project.id %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
+                </svg>
+                Ajouter une recommandation
+            </a>
+            {% endif %}
+            <a class="button" href="{% url 'projects-project-detail-actions' project.pk %}">Revenir sur la vue du kanban</a>
+        </div>
+    </div>
+    
+    {% include 'projects/project/fragments/tasks_inline/tasks_inline.html' %}
+</div>
+{% endblock %}

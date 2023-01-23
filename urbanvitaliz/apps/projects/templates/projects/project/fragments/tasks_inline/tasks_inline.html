@@ -1,0 +1,10 @@
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/apps/tasks.js' %}
+{% endblock %}
+<!-- Index of tasks inline app -->
+<div x-data="TasksInline({{ project.pk }})"
+     x-init="getData(); processUrl();">
+    {% include 'projects/project/fragments/tasks_inline/status_list.html' %}
+    {% include 'projects/project/fragments/kanban_tasks/preview_modal.html' %}
+</div>
