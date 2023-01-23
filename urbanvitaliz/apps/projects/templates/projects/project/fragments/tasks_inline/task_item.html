@@ -43,9 +43,9 @@
                       x-text="task.intent"
                       @click="onPreviewClick(task.id)"></span>
                 <template x-if="!task.public">
-                    <div class="d-flex justify-content-center align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-grow-1">
                         <span class="ms-2 me-2 rounded-pill px-2 bg-warning z-index-dropdown text-uppercase tiny fw-bold text-white">Brouillon</span>
-                        <button @click="publishTask(task.id)" class="button small rounded-pill tiny py-0 px-2">publier</button>
+                        <button @click="publishTask(task.id)" class="button small tiny py-0 px-2 me-4">publier</button>
                     </div>
                 </template>
             </div>
