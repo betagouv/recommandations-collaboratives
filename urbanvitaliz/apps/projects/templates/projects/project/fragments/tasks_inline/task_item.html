@@ -35,13 +35,12 @@
             </a>
         </div>
     {% endif %}
-    <div class="d-flex flex-column flex-grow-1 ms-2">
+    <div style="cursor: pointer !important;" class="d-flex flex-column flex-grow-1 ms-2" @click="onPreviewClick(task.id)">
         <div class="d-flex w-100 justify-content-between align-items-center">
             <div class="d-flex w-100 align-items-center">
                 <span style="cursor:pointer;font-size: 18px;"
                       class="fw-bold mt-0 pt-0 font-normal mb-0"
-                      x-text="task.intent"
-                      @click="onPreviewClick(task.id)"></span>
+                      x-text="task.intent"></span>
                 <template x-if="!task.public">
                     <div class="d-flex justify-content-between align-items-center flex-grow-1">
                         <span class="ms-2 me-2 rounded-pill px-2 bg-warning z-index-dropdown text-uppercase tiny fw-bold text-white">Brouillon</span>
