@@ -109,8 +109,6 @@ function reminderTooltip(task) {
 
 function isOldReminder(reminder) {
 
-    console.log('reminder : ', reminder)
-
     if (!reminder) return false
 
     const now = new Date().getTime();

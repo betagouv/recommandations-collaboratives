@@ -1,0 +1,50 @@
+{% load static %}
+<div class="modal fade"
+     id="delete-task-confirmation-modal"
+     tabindex="-1"
+     aria-labelledby="delete-task-confirmation-modal"
+     aria-hidden="true"
+     x-init="initDeleteTaskConfirmationModal()">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reminder-modal-label">
+                    <svg class="bi align-middle me-2" width="25" height="25">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
+                    </svg>
+                    Êtes-vous sûr de vouloir supprimer cette recommandation ?
+                </h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="flag red d-block">
+                    <span class="title text-red text-uppercase fw-bold mb-2 d-block d-flex align-items-center">
+                        <svg class="bi align-middle me-2" width="20" height="20" fill="#CE0500">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#exclamation-triangle-fill" />
+                        </svg>
+                        Supression de recommandation
+                    </span>
+                    <p class="content mb-3 d-block" x-text="currentDeletingTask.intent"></p>
+                    <form id="form-delete-task" method="POST" :action="deleteTaskUrl(currentDeletingTask.id)"
+                    class="form mt-2">
+                    
+                    {% csrf_token %}
+            
+                    <button type="submit" class="button filled red">Supprimer</button>
+                    <a class="button" data-bs-dismiss="modal" aria-label="Close">Annuler</a>
+                </form>
+                </div>
+            </div>
+            <!-- <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button"
+                        type="submit"
+                        class="btn btn-primary"
+                        @click="onSubmitReminder">Programmer</button>
+            </div> -->
+        </div>
+    </div>
+</div>
