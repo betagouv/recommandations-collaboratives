@@ -36,6 +36,7 @@ def project_administration(request, project_id):
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     can_administrate = can_administrate_project(project, request.user)
+    can_manage = can_manage_project(project, request.user)
 
     # Fetch pending invites
     pending_invites = []

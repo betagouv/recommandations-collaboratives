@@ -1,5 +1,6 @@
 import Alpine from "alpinejs"
 import TaskApp from './Tasks'
+import { deleteTaskUrl } from "../utils/api";
 import { TASK_STATUSES } from '../config/statuses';
 
 Alpine.data("KanbanTasks", boardTasksApp)
@@ -64,6 +65,20 @@ function boardTasksApp(projectId) {
 
             await this.getData();
         },
+        deleteTaskUrl,
+        currentDeletingTask: {},
+        initDeleteTaskConfirmationModal() {
+            const element = document.getElementById("delete-task-confirmation-modal");
+            this.deleteTaskConfirmationModal = new bootstrap.Modal(element);
+            const cleanup = () => { };
+            element.addEventListener("hidePrevented.bs.modal", cleanup);
+            element.addEventListener("hidden.bs.modal", cleanup);
+        },
+        openDeleteTaskConfirmationModal(task) {
+            this.deleteTaskConfirmationModal.show();
+            this.currentDeletingTask = task;
+            console.log(this.currentDeletingTask);
+        }
     }
 
     return TaskApp(app, projectId)
