@@ -27,6 +27,11 @@ urlpatterns = [
     ),
     # projects for switchtenders
     path(r"projects/", views.project_list, name="projects-project-list"),
+    path(
+        r"projects/staff/",
+        views.project_list_for_staff,
+        name="projects-project-list-staff",
+    ),
     path(r"projects/map", views.project_maplist, name="projects-project-list-map"),
     path(
         r"projects/csv",
@@ -73,6 +78,11 @@ urlpatterns = [
         r"project/<int:project_id>/actions",
         detail.project_actions,
         name="projects-project-detail-actions",
+    ),
+    path(
+        r"project/<int:project_id>/actions/inline",
+        detail.project_actions_inline,
+        name="projects-project-detail-actions-inline",
     ),
     path(
         r"project/<int:project_id>/conversations",

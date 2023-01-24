@@ -663,6 +663,8 @@ def test_accept_project_without_owner_and_redirect(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_notifies_regional_actors(request, client):
+    current_site = get_current_site(request)
+
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     auth.Group.objects.get_or_create(name="project_moderator")
 
@@ -674,17 +676,19 @@ def test_accept_project_notifies_regional_actors(request, client):
     regional_actor = Recipe(auth.User).make()
     regional_actor.groups.add(st_group)
     regional_actor.profile.departments.add(dpt_nord)
+    regional_actor.profile.sites.add(current_site)
 
     membership = baker.make(models.ProjectMember, member=regional_actor, is_owner=True)
 
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         commune=commune,
         projectmember_set=[membership],
     ).make()
 
-    with login(client, groups=["switchtender", "project_moderator"]):
+    with login(client, groups=["switchtender", "project_moderator"]) as user:
+        user.profile.sites.add(current_site)
         client.post(reverse("projects-project-accept", args=[project.id]))
 
     assert regional_actor.notifications.count() == 1
@@ -1210,6 +1214,8 @@ def test_switchtender_create_action_for_resource_push(request, client):
 
 @pytest.mark.django_db
 def test_switchtender_joins_project(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
     Recipe(
@@ -1219,12 +1225,12 @@ def test_switchtender_joins_project(request, client):
             dept,
         ],
     ).make()
-    project = Recipe(
-        models.Project, sites=[get_current_site(request)], commune=commune
-    ).make()
+    project = Recipe(models.Project, sites=[current_site], commune=commune).make()
 
     url = reverse("projects-project-switchtender-join", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         # Then POST to join projet
         response = client.post(url)
 
@@ -1268,7 +1274,11 @@ def test_switchtender_leaves_project(request, client):
 
 
 @pytest.mark.django_db
-def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(client):
+def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(
+    request, client
+):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
 
@@ -1286,11 +1296,14 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(client)
         status="BLAH",
         projectmember_set=[membership],
         commune=commune,
+        sites=[current_site],
     ).make()
 
     join_url = reverse("projects-project-switchtender-join", args=[project.id])
     leave_url = reverse("projects-project-switchtender-leave", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         client.post(join_url)
         assert membership.member.notifications.count() == 1
 
@@ -1425,13 +1438,15 @@ def test_switchtender_add_topics(request, client):
 #################################################################
 @pytest.mark.django_db
 def test_regional_switchtender_can_observe_project(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
     with login(client, groups=["switchtender"]) as user:
         user.profile.departments.set([project.commune.department.pk])
+        user.profile.sites.add(current_site)
+
         response = client.post(
             reverse("projects-project-observer-join", args=[project.id]),
         )
@@ -1446,12 +1461,14 @@ def test_regional_switchtender_can_observe_project(request, client):
 
 @pytest.mark.django_db
 def test_non_regional_switchtender_can_observe_project(request, client):
-    commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    current_site = get_current_site(request)
 
-    with login(client, groups=["switchtender"]):
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         response = client.post(
             reverse("projects-project-observer-join", args=[project.id]),
         )
@@ -1461,12 +1478,14 @@ def test_non_regional_switchtender_can_observe_project(request, client):
 
 @pytest.mark.django_db
 def test_switchtender_visits_project_without_interest(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         response = client.get(
             reverse("projects-project-detail-overview", args=[project.id]),
         )
@@ -1475,17 +1494,48 @@ def test_switchtender_visits_project_without_interest(request, client):
 
     personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
 
-    assert personal_status.status == "NOT_INTERESTED"
+    assert personal_status.status == "TODO"
+
+
+@pytest.mark.django_db
+def test_switchtender_visits_new_project(request, client):
+    current_site = get_current_site(request)
+
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
+        Recipe(
+            models.UserProjectStatus,
+            site=current_site,
+            project=project,
+            user=user,
+            status="NEW",
+        ).make()
+
+        response = client.get(
+            reverse("projects-project-detail-overview", args=[project.id]),
+        )
+
+    assert response.status_code == 200
+
+    personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
+
+    assert personal_status.status == "TODO"
 
 
 @pytest.mark.django_db
 def test_switchtender_observes_project_shows_interest(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         response = client.get(
             reverse("projects-project-detail-overview", args=[project.id]),
         )
@@ -1503,12 +1553,14 @@ def test_switchtender_observes_project_shows_interest(request, client):
 
 @pytest.mark.django_db
 def test_switchtender_advises_project_shows_interest(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         response = client.get(
             reverse("projects-project-detail-overview", args=[project.id]),
         )
@@ -1528,12 +1580,14 @@ def test_switchtender_advises_project_shows_interest(request, client):
 def test_switchtender_stop_advising_or_observing_project_shows_no_interest(
     request, client
 ):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         response = client.get(
             reverse("projects-project-detail-overview", args=[project.id]),
         )
