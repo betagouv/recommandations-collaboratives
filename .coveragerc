@@ -1,7 +1,8 @@
 [run]
 # plugins = django_coverage_plugin
 source =
-    urbanvitaliz
+    ./urbanvitaliz
+
 omit =
     *test*,*migrations*,*sgi.py,*production.py
 
@@ -9,4 +10,6 @@ omit =
 template_extensions = html
 
 [report]
-ignore_errors = True
+# ignore_errors = True
+
+include = ./urbanvitaliz/**
