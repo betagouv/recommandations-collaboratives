@@ -8,3 +8,5 @@ omit =
 [django_coverage_plugin]
 template_extensions = html
 
+[report]
+ignore_errors = True
