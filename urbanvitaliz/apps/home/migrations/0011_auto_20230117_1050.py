@@ -18,8 +18,11 @@ def assign_sites_to_users(apps, schema_editor):
         ).distinct()
         profile.sites.set(sites)
 
-    # Everyone else is assigned to SITE 1
-    default = Site.objects.get(pk=1)
+    # Everyone else is assigned to SITE 1if exists
+    try:
+        default = Site.objects.get(pk=1)
+    except Site.DoesNotExist:
+        return
     for profile in UserProfile.objects.filter(sites=None):
         profile.sites.add(default)
 
