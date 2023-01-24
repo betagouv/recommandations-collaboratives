@@ -28,6 +28,8 @@ module.exports = {
                 home: resolve('./src/js/apps/home.js'),
                 crm: resolve('./src/js/apps/crm.js'),
                 project: resolve('./src/js/apps/project.js'),
+                task: resolve('./src/js/apps/task.js'),
+                advisorDashboard: resolve('./src/js/apps/advisorDashboard.js'),
                 auth: resolve('./src/js/apps/auth.js'),
                 projectDetails : resolve('./src/js/apps/projectDetails.js'),
                 projectShare : resolve('./src/js/apps/projectShare.js'),
