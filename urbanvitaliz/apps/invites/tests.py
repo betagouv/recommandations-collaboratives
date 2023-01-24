@@ -246,7 +246,6 @@ def test_user_cannot_access_switchtender_invitation_for_someone_else(
     ).make()
 
     with login(client, email="invited@here.tld") as user:
-        user.profile.sites.add(current_site)
         url = reverse("invites-invite-accept", args=[invite.pk])
         response = client.post(url)
 

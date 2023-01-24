@@ -298,7 +298,10 @@ def project_accept(request, project_id=None):
         project.save()
 
         signals.project_validated.send(
-            sender=models.Project, moderator=request.user, project=project
+            sender=models.Project,
+            site=request.site,
+            moderator=request.user,
+            project=project,
         )
 
         if project.owner:
