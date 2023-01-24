@@ -12,6 +12,7 @@ __pycache__
 *.swo
 .#*
 .coverage
+.coverage.*
 development.py
 htmlcov
 media
