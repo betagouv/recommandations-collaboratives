@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "dynamic_forms",
     "watson",
     "phonenumber_field",
+    "cookie_consent",
     "urbanvitaliz.apps.onboarding",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",

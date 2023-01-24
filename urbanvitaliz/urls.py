@@ -63,6 +63,7 @@ urlpatterns = [
     path("notifications/", include(notifications.urls, namespace="notifications")),
     path("hijack/", include("hijack.urls")),
     path("nimda/", admin.site.urls),
+    path("cookies/", include("cookie_consent.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
