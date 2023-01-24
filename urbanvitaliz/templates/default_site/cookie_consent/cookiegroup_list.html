@@ -1,14 +1,9 @@
-{% extends "cookie_consent/base.html" %}
+{% extends "base.html" %}
 
-{% block body %}
-  <h1>Cookies lol</h1>
-
-  <p>
-    This is a list of the categories of cookies used in our website and why we use them.
-  </p>
-
-  {% for cookie_group in object_list  %}
+{% block content %}
+    <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne">
+        <h2>Panneau de gestion des cookies</h2>
+        {% for cookie_group in object_list  %}
     {% include "cookie_consent/_cookie_group.html" %}
   {% endfor %}
-
 {% endblock %}

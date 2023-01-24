@@ -5,29 +5,27 @@ Alpine.data("Consent", Consent)
 
 function Consent() {
     return {
+        userHasSelectedCookies: false,
         init() {
             console.log('consent');
+            this.userHasSelectedCookies = document.cookie.includes('cookie_consent')
+            console.log('this.user', this.userHasSelectedCookies)
         },
         async handleAcceptAllCookies(url) {
-            console.log('url ?', url);
-            let response = await axios.post(url)
-
-
-            console.log('response : ', response);
-
+            try {
+                await axios.post(url)
+                location.reload()
+            } catch (err) {
+                console.error('Something went wrong : ', err)
+            }
         },
-        handleRejectAllCookies() {
-
+        async handleRejectAllCookies(url) {
+            try {
+                await axios.post(url)
+                location.reload()
+            } catch (err) {
+                console.error('Something went wrong : ', err)
+            }
         }
     }
 }
-
-// const instance = axios.create({
-//     cache: "no-cache",
-//     mode: "same-origin",
-//     credentials: "same-origin",
-//     headers: {
-//         "Content-Type": "application/json",
-//         "X-CSRFToken": Cookies.get("csrftoken"),
-//     },
-// })
