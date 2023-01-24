@@ -1,4 +1,9 @@
-<div class="fr-consent-banner">
+{% load cookie_consent_tags %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/apps/consent.js' %}
+{% endblock %}
+<div x-data="Consent" class="fr-consent-banner">
     <h2 class="fr-h6">À propos des cookies sur {{ request.site.name }}</h2>
     <div class="fr-consent-banner__content">
         <p class="fr-text--sm">
@@ -7,20 +12,24 @@
     </div>
     <ul class="fr-consent-banner__buttons fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-sm">
         <li>
-            <button class="fr-btn" title="Autoriser tous les cookies">Tout accepter</button>
-        </li>
-        <li>
+            <button @click="handleAcceptAllCookies('{% url 'cookie_consent_accept_all' %}')" class="fr-btn" title="Autoriser tous les cookies">Tout accepter</button>
+        </form>
+    </li>
+    <li>
+        <form method="POST" action="{% url 'cookie_consent_decline_all' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
             <button class="fr-btn" title="Refuser tous les cookies">Tout refuser</button>
-        </li>
-        <li>
-            <button class="fr-btn fr-btn--secondary"
-                    data-fr-opened="false"
-                    aria-controls="fr-consent-modal"
-                    title="Personnaliser les cookies">
-                Personnaliser
-            </button>
-        </li>
-    </ul>
+        </form>
+    </li>
+    <li>
+        <button class="fr-btn fr-btn--secondary"
+                data-fr-opened="false"
+                aria-controls="fr-consent-modal"
+                title="Personnaliser les cookies">
+            Personnaliser
+        </button>
+    </li>
+</ul>
 </div>
-
 {% include 'consent/consent-modal.html' %}

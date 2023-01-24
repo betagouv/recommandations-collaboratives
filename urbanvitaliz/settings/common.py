@@ -239,6 +239,9 @@ TAGGIT_CASE_INSENSITIVE = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 30 * 24 * 60 * 60  # 30d * 24h * 60m * 60s
 
+##Cookie consent settings
+COOKIE_CONSENT_HTTPONLY = False
+
 # emails to use for notifications
 TEAM_EMAILS = ["friches@beta.gouv.fr"]
 
