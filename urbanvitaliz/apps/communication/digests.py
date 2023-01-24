@@ -569,6 +569,7 @@ class NotificationFormatter:
             {
                 "a rédigé un message": self.format_note_created,
                 "est devenu·e aiguilleur·se sur le projet": self.format_action_became_switchtender,
+                # added for transition from switchtender (aiguilleur) to advisor (conseiller)
                 "est devenu·e conseiller·e sur le projet": self.format_action_became_switchtender,
                 "a déposé le projet": self.format_new_project_available,
                 "a soumis pour modération le projet": self.format_project_submitted,
@@ -581,7 +582,7 @@ class NotificationFormatter:
 
     # ------ Real Formatters -----#
     def format_note_created(self, notification):
-        """An action was recommended by a switchtender"""
+        """An note was written by a switchtender"""
         subject = self._represent_user(notification.actor)
         summary = f"{subject} a rédigé un message"
         excerpt = self._represent_note_excerpt(notification.action_object)
