@@ -18,7 +18,87 @@ from pytest_django.asserts import assertContains, assertNotContains
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
-from . import models
+from . import api, models
+
+
+################################################################
+# Invite API
+################################################################
+@pytest.mark.django_db
+def test_invite_collaborator_api(request, client):
+    current_site = get_current_site(request)
+
+    invited_email = "new@invited.org"
+
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        status="READY",
+    )
+
+    with login(client) as user:
+        invite = api.invite_collaborator_on_project(
+            current_site, project, "COLLABORATOR", invited_email, "hi", user
+        )
+
+    assert invite
+    assert invite.inviter == user
+    assert invite.site == current_site
+    assert invite.project == project
+    assert invite.email == invited_email
+
+
+@pytest.mark.django_db
+def test_invite_collaborator_twice_api(request, client):
+    current_site = get_current_site(request)
+
+    invited_email = "new@invited.org"
+
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        status="READY",
+    )
+
+    with login(client) as user:
+        invite1 = api.invite_collaborator_on_project(
+            current_site, project, "COLLABORATOR", invited_email, "hi", user
+        )
+
+        invite2 = api.invite_collaborator_on_project(
+            current_site, project, "COLLABORATOR", invited_email, "hi", user
+        )
+
+    assert invite1
+    assert invite2 is False
+
+
+@pytest.mark.django_db
+def test_invite_collaborator_after_leaved_api(request, client):
+    current_site = get_current_site(request)
+
+    invited_email = "new@invited.org"
+
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        status="READY",
+    )
+
+    Recipe(
+        models.Invite,
+        email=invited_email,
+        site=current_site,
+        project=project,
+        accepted_on="2022-01-01",
+    ).make()
+
+    with login(client) as user:
+        invite = api.invite_collaborator_on_project(
+            current_site, project, "COLLABORATOR", invited_email, "hi", user
+        )
+
+    assert invite
 
 
 ################################################################

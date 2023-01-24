@@ -21,7 +21,7 @@ def invite_collaborator_on_project(site, project, role, email, message, inviter)
         user = None
 
     already_invited = models.Invite.on_site.filter(
-        project=project, site=site, email=email
+        project=project, site=site, email=email, accepted_on=None
     ).exists()
 
     already_member = False
