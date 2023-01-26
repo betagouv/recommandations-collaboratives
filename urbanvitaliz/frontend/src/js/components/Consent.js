@@ -7,9 +7,7 @@ function Consent() {
     return {
         userHasSelectedCookies: false,
         init() {
-            console.log('consent');
             this.userHasSelectedCookies = document.cookie.includes('cookie_consent')
-            console.log('this.user', this.userHasSelectedCookies)
         },
         async handleAcceptAllCookies(url) {
             try {
@@ -26,6 +24,9 @@ function Consent() {
             } catch (err) {
                 console.error('Something went wrong : ', err)
             }
+        },
+        handleSetCookiesPreferences() {
+            console.log('lol');
         }
     }
 }
