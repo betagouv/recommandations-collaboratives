@@ -15,12 +15,12 @@
 {% endblock %}
 {% block content %}
     <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne">
-        <h2>Mentions légales de la plateforme UrbanVitaliz</h2>
+        <h2>Mentions légales de la plateforme {{ request.site.name }}</h2>
         <p class="mt-4 mb-2">
             <strong>Éditeur de la Plateforme</strong>
         </p>
         <p>
-            La Plateforme « UrbanVitaliz » est éditée par :
+            La Plateforme « {{ request.site.name }} » est éditée par :
             Le Centre d’études et d’expertise sur les risques, l’environnement, la mobilité et
             l’aménagement (CEREMA) :
         </br>
@@ -34,7 +34,7 @@
 </p>
 <p>Le directeur de la publication est Pascal Berteaud, directeur général du CEREMA.</p>
 <p class="mt-4 mb-2">
-    <strong>ébergement de la Plateforme</strong>
+    <strong>Hébergement de la Plateforme</strong>
 </p>
 <p>
     Ce site est hébergé en propre par :

@@ -17,11 +17,11 @@
     <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne">
         <h2>Politique de confidentialité de {{ request.site.name }}</h2>
         <p class="mt-4 mb-2">
-            <strong>Qui est responsable d’UrbanVitaliz ?</strong>
+            <strong>Qui est responsable de {{ request.site.name }} ?</strong>
         </p>
         <p>
-            UrbanVitaliz est développé au sein du Centre d’études et d’expertise sur les risques,
-            l’environnement, la mobilité et l’aménagement (CEREMA). UrbanVitaliz est une plateforme
+            {{ request.site.name }} est développé au sein du Centre d’études et d’expertise sur les risques,
+            l’environnement, la mobilité et l’aménagement (CEREMA). {{ request.site.name }} est une plateforme
             permettant de guider les collectivités en répondant à leurs questions et à leurs blocages dans la
             réhabilitation des friches.
             <br/>
@@ -32,7 +32,7 @@
         <p class="mt-4 mb-2">
             <strong>Pourquoi manipulons-nous ces données ?</strong>
         </p>
-        <p>UrbanVitaliz manipule des données à caractère personnelles pour les raisons suivantes :</p>
+        <p>{{ request.site.name }} manipule des données à caractère personnelles pour les raisons suivantes :</p>
         <p>
             <ul>
                 <li>Lutter contre l’artificialisation des sols</li>
@@ -49,7 +49,7 @@
         <p class="mt-4 mb-2">
             <strong>Quelles sont les données que nous manipulons ?</strong>
         </p>
-        <p>UrbanVitaliz manipule les données personnelles suivantes :</p>
+        <p>{{ request.site.name }} manipule les données personnelles suivantes :</p>
         <p>
             <ul>
                 <li>Prénom</li>
@@ -61,7 +61,7 @@
         <p class="mt-4 mb-2">
             <strong>Qu’est-ce qui nous autorise à manipuler ces données ?</strong>
         </p>
-        <p>UrbanVitaliz manipule des données personnelles en se basant sur :</p>
+        <p>{{ request.site.name }} manipule des données personnelles en se basant sur :</p>
         <p>
             <ul>
                 <li>
@@ -72,7 +72,7 @@
                 <li>
                     Le décret du 25 octobre 2019 relatif au système d’information et de communication de
                     l’Etat et à la direction interministérielle du numérique (DINUM) qui porte l’équipe
-                    UrbanVitaliz.
+                    {{ request.site.name }}.
                 </li>
             </ul>
         </p>
@@ -106,8 +106,8 @@
             Pour les exercer, contactez-nous à : <a class="text-decoration-underline" href="mailto:friches@beta.gouv.fr">friches@beta.gouv.fr</a>
         </p>
         <p>
-            Ou grâce au formulaire de contact du site UrbanVitaliz :<a class="text-decoration-underline"
-   href="https://urbanvitaliz.fr/contact/">https://urbanvitaliz.fr/contact/</a>
+            Ou grâce au formulaire de contact du site {{ request.site.name }} :<a class="text-decoration-underline"
+   href="https://{{request.site}}/contact/">https://{{request.site}}/contact/</a>
             <br/>
             <br/>
         </p>
@@ -135,7 +135,7 @@
             <br/>
             <ul>
                 <li>
-                    Les membres d’UrbanVitaliz qui ont besoin des données dans leurs missions ou qui y
+                    Les membres de {{ request.site.name }} qui ont besoin des données dans leurs missions ou qui y
                     ont accès de fait (développeur, etc.)
                 </li>
                 <li>Les conseillers publics (DDT, DREAL, EPF) ?</li>
@@ -256,7 +256,7 @@
             collecter des informations relatives à votre navigation et de vous adresser des services adaptés
             à votre terminal (ordinateur, mobile ou tablette).<br/><br/>
             Des cookies relatifs aux statistiques publiques et anonymes sont également déposés.
-            Cookies recensés sur le site UrbanVitaliz :<br/><br/>
+            Cookies recensés sur le site {{ request.site.name }}:<br/><br/>
         </p>
         <div class="d-flex border mt-4">
             <div class="d-flex flex-column w-25" style="border-right: 1px solid #dee2e6;">

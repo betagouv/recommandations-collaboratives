@@ -15,10 +15,10 @@
 {% endblock %}
 {% block content %}
     <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne">
-        <h2>CONDITIONS GENERALES D’UTILISATION URBANVITALIZ</h2>
-        <p>
+        <h2>Conditions générales d'utilisation {{ request.site.name }}</h2>
+        <p class="mt-4">
             Les présentes conditions générales d’utilisation (dites « CGU ») fixent le cadre juridique
-            de “UrbanVitaliz” et définissent les conditions d’accès et d’utilisation des services par
+            de “{{ request.site.name }}” et définissent les conditions d’accès et d’utilisation des services par
             l’Utilisateur.
         </p>
         <p class="mt-4 mb-2">
@@ -33,11 +33,11 @@
             <strong>Article 2 – Objet</strong>
         </p>
         <p>
-            UrbanVitaliz souhaite créer un service public gratuit d’appui aux petites collectivités pour la
+            {{ request.site.name }} souhaite créer un service public gratuit d’appui aux petites collectivités pour la
             reconversion des friches, en lien avec les objectifs de sobriété foncière du gouvernement. De
             nombreuses friches restent inutilisées pendant que les sols naturels et agricoles sont
             artificialisés. Les collectivités sont bloquées dans leurs projets de réhabilitation donc
-            UrbanVitaliz les oriente personnellement sur leurs projets de réhabilitation de friche tout en
+            {{ request.site.name }} les oriente personnellement sur leurs projets de réhabilitation de friche tout en
             permettant aux conseillers publics de suivre et de faire avancer les projets sur les friches.
         </p>
         <p class="mt-4 mb-2">
@@ -45,7 +45,7 @@
         </p>
         <p>
             « L&#39;Utilisateur » est toute collectivité ou porteur de projet en zone détendue utilisant la
-            plateforme UrbanVitaliz.
+            plateforme {{ request.site.name }}.
         </br>
     </br>
     « Les conseillers publics » désignent toute personne compétente pour guider la collectivité ou
@@ -62,13 +62,13 @@ finalités.
     <strong>Article 4 - Fonctionnalités</strong>
 </p>
 <p class="mb-1">
-    <strong>4.1 Création du compte UrbanVitaliz</strong>
+    <strong>4.1 Création du compte {{ request.site.name }}</strong>
 </p>
 <p class="mb-1">
     <strong>4.1.1. Avec mot de passe</strong>
 </p>
 <p>
-    Chaque utilisateur peut créer un compte UrbanVitaliz « avec mot de passe » en fournissant les
+    Chaque utilisateur peut créer un compte {{ request.site.name }} « avec mot de passe » en fournissant les
     informations suivantes :
     <br/>
     <br/>
@@ -86,21 +86,21 @@ finalités.
     <strong>4.1.2. Avec adresse e-mail</strong>
 </p>
 <p>
-    Chaque utilisateur peut créer un compte UrbanVitaliz « avec adresse e-mail » grâce à un lien
+    Chaque utilisateur peut créer un compte {{ request.site.name }} « avec adresse e-mail » grâce à un lien
     de connexion qui lui sera envoyé sur l’adresse e-mail communiquée.
 </p>
 <p class="mt-4 mb-2">
-    <strong>4.2. Connexion au compte UrbanVitaliz</strong>
+    <strong>4.2. Connexion au compte {{ request.site.name }}</strong>
 </p>
 <p>
-    Chaque utilisateur peut se connecter à son compte UrbanVitaliz soit grâce à son mot de passe
+    Chaque utilisateur peut se connecter à son compte {{ request.site.name }} soit grâce à son mot de passe
     soit grâce à son adresse e-mail et le lien de connexion fourni.
 </p>
 <p class="mt-4 mb-2">
-    <strong>4.3. Dépôt de dossier à UrbanVitaliz</strong>
+    <strong>4.3. Dépôt de dossier à {{ request.site.name }}</strong>
 </p>
 <p>
-    Chaque utilisateur peut solliciter l’équipe UrbanVitaliz lorsqu’il souhaite déposer un dossier.
+    Chaque utilisateur peut solliciter l’équipe {{ request.site.name }} lorsqu’il souhaite déposer un dossier.
     L’utilisateur remplit les informations suivantes :
     <br/>
     <br/>
@@ -120,17 +120,17 @@ finalités.
     </ul>
 </p>
 <p class="mt-4 mb-2">
-    <strong>4.4. Actualités liées à UrbanVitaliz</strong>
+    <strong>4.4. Actualités liées à {{ request.site.name }}</strong>
 </p>
 <p>
-    Chaque utilisateur peut revoir les webinaires UrbanVitaliz sur YouTube ou sur box.
+    Chaque utilisateur peut revoir les webinaires {{ request.site.name }} sur YouTube ou sur box.
 </p>
 <p class="mt-4 mb-2">
     <strong>4.5. Demande d’accès par le conseiller public</strong>
 </p>
 <p>
     Chaque conseiller public peut suivre les projets de son territoire et orienter les collectivités
-    grâce à UrbanVitaliz. Par mail, les conseillers publics peuvent demander un accès à la
+    grâce à {{ request.site.name }}. Par mail, les conseillers publics peuvent demander un accès à la
     plateforme leur permettant de répondre aux questionnements des collectivités et donc faire
     avancer les projets. Le service est ouvert aux acteurs publics qui conseillent les collectivités
     sur les friches, de manière régulière ou ponctuelle. Selon les territoires et les projets : DDT,
@@ -140,7 +140,7 @@ finalités.
     <strong>Article 5 - Responsabilités</strong>
 </p>
 <p class="mb-1">
-    <strong>5.1 L’éditeur de « UrbanVitaliz »</strong>
+    <strong>5.1 L’éditeur de « {{ request.site.name }} »</strong>
 </p>
 <p>
     Les sources des informations diffusées sur le site sont réputées fiables mais le site ne garantit
