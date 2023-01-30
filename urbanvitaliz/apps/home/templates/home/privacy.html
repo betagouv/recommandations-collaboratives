@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load gravatar %}
 {% load sass_tags %}
+{% load cookie_consent_tags %}
 {% load static %}
 {% block css %}
     <link href="{% sass_src 'home/css/home/home.scss' %}"
@@ -264,25 +265,13 @@
                     Nom du cookie
                 </p>
                 <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
-                    Googleads.g.doubleclick.net
+                    SessionId
                 </p>
                 <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
-                    Static.doubleclick.net
+                    Csrftoken
                 </p>
                 <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
-                    Play.google.com
-                </p>
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
-                    www.google.com
-                </p>
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
-                    Fonts.gstatic.com
-                </p>
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
-                    www.gstatic.com
-                </p>
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
-                    Cdn.jsdelivr.net
+                    Posthog
                 </p>
                 <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
                     www.youtube.com
@@ -293,28 +282,16 @@
                     Finalités
                 </p>
                 <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    Publicité
+                    Identifiant de session
                 </p>
                 <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    Publicité et tracking
+                    Cross Site Request Forgery cookie
                 </p>
                 <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    Publicité Playstore Google
+                    Plateforme moderne de tracking numérique
                 </p>
                 <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    Navigation
-                </p>
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    Chargement de scripts : géolocalisati on, moteurs de recherche et traductions.
-                </p>
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    Chargement de scripts : géolocalisati on, moteurs de recherche et traductions.
-                </p>
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    Hébergement de bibliothèques javascript
-                </p>
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    Service de partage de vidéos
+                    tracking de média
                 </p>
             </div>
             <div class="d-flex flex-column w-25" style="border-right: 1px solid #dee2e6;">
@@ -322,22 +299,10 @@
                     Hébergement
                 </p>
                 <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    USA
+                    {{request.site.name}}
                 </p>
                 <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    USA
-                </p>
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    USA
-                </p>
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    USA
-                </p>
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    USA
-                </p>
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    USA
+                    {{request.site.name}}
                 </p>
                 <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
                     USA
@@ -351,25 +316,13 @@
                     Garanties
                 </p>
                 <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    https://policies.google.com/privacy
+                    {{request.site.name}}
                 </p>
                 <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    https://policies.google.com/privacy
+                    {{request.site.name}}
                 </p>
                 <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    https://policies.google.com/privacy
-                </p>
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    https://policies.google.com/privacy
-                </p>
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    https://policies.google.com/privacy
-                </p>
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    https://policies.google.com/privacy
-                </p>
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
-                    https://www.jsdelivr.com/terms/acceptable-use-policy-jsdelivr-net
+                    https://app.posthog.com
                 </p>
                 <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
                     https://policies.google.com/privacy
