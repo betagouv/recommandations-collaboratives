@@ -1,18 +1,13 @@
 {% load static %}
 {% if project.advisors_note %}
-    <div class="advisor-item">
-        <span class="advisor-item-icon">
-            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#incognito" />
-            </svg>
-        </span>
-        {% include 'projects/project/fragments/information_card.html' with full_width=True project=project is_editable=True title="Note interne" description=project.advisors_note_rendered updated_on=project.advisors_note_on card_user=project.advisors_note_by %}
+    <div class="advisor-item h-100">
+        {% include 'projects/project/fragments/information_card.html' with is_advisor_note=True full_width=True project=project is_editable=True title="Note interne" description=project.advisors_note_rendered updated_on=project.advisors_note_on card_user=project.advisors_note_by %}
     </div>
 {% else %}
-    <h6 class="title-info text-uppercase fw-bold m-0">
+    <h6 class="title-info text-uppercase fw-bold m-0 mb-1">
         Note interne
     </h6>
-    <div class="project-card-details py-4 d-flex flex-column align-items-center justify-content-center">
+    <div class="project-card-details py-4 d-flex flex-column align-items-center justify-content-center h-100" style="min-height: 250px;">
         <span class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">Aucune note interne n'a été faite pour le moment</span>
         <a class="button mt-3 text-center"
            href="{% url "projects-project-topics" project.id %}#advisor-note">Écrire une note interne</a>

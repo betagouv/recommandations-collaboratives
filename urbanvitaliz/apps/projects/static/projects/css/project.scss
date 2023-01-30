@@ -74,14 +74,6 @@
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-.advisor-item {
-    position: relative;
-    background-color: #FFE9E9;
-    border: solid 1px #ff8e8e;
-    padding: 0 15px 20px 15px;
-    border-radius: 6px;
-}
-
 .advisor-item .advisor-item-icon {
     padding: 10px 15px;
     background-color: #ff8e8e;
@@ -92,8 +84,12 @@
     border-bottom-left-radius: 6px;
 }
 
-.advisor-item .project-card-details {
-    margin-top: 15px !important;
-    background-color: white;
-    border-radius: 6px;
+.advisor-item >div {
+    padding-top: 0 !important;
 }
+
+@media only screen and (max-width: 990px) {
+    .responsive-wrapper {
+        height: auto !important;
+    }
+  }
