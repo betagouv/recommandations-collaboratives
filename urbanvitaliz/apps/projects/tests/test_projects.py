@@ -133,7 +133,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
 
     data = {
         "name": "a project",
-        "email": "a@example.com",
+        "email": "a@ExAmple.Com",
         "location": "some place",
         "phone": "03939382828",
         "postcode": "59000",
@@ -151,7 +151,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
-    assert data["email"] == project.owner.email
+    assert data["email"].lower() == project.owner.email
     assert data["first_name"] == project.owner.first_name
     assert data["last_name"] == project.owner.last_name
 

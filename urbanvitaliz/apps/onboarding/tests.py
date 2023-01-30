@@ -45,7 +45,7 @@ def test_performing_onboarding_create_a_new_project(request, client):
 
     data = {
         "name": "a project",
-        "email": "a@example.com",
+        "email": "a@exAmpLe.Com",
         "location": "some place",
         "org_name": "MyOrg",
         "first_name": "john",
@@ -62,8 +62,8 @@ def test_performing_onboarding_create_a_new_project(request, client):
     assert project.name == "a project"
     assert project.status == "DRAFT"
     assert len(project.ro_key) == 32
-    assert data["email"] == project.members.first().username
-    assert data["email"] == project.members.first().email
+    assert project.members.first().username == data["email"].lower()
+    assert project.members.first().email == data["email"].lower()
     note = projects_models.Note.objects.all()[0]
     assert note.project == project
     assert note.public

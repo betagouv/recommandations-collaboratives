@@ -41,6 +41,12 @@ class OnboardingResponseForm(forms.ModelForm):
         max_length=16, label="Téléphone", initial="", required=False
     )
     email = forms.CharField(label="Courriel", required=True)
+
+    def clean_email(self):
+        """Make sure email is lowercased"""
+        email = self.cleaned_data["email"]
+        return email.lower()
+
     org_name = forms.CharField(
         label="Nom de votre structure", initial="", required=True
     )
