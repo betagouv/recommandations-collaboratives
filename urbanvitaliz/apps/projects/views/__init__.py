@@ -155,7 +155,10 @@ def create_project_prefilled(request):
             )
 
             signals.project_submitted.send(
-                sender=models.Project, submitter=user, project=project
+                sender=models.Project,
+                site=request.site,
+                submitter=user,
+                project=project,
             )
 
             # NOTE check if commune is unique for code postal
@@ -223,7 +226,7 @@ def project_list_for_advisor(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
-    project_moderator = is_project_moderator(request.user)
+    project_moderator = is_project_moderator(request.user, request.site)
 
     draft_projects = []
     if is_project_moderator:
@@ -252,7 +255,7 @@ def project_list_for_staff(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
-    project_moderator = is_project_moderator(request.user)
+    project_moderator = is_project_moderator(request.user, request.site)
 
     draft_projects = []
     if is_project_moderator:
@@ -281,7 +284,7 @@ def project_maplist(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
-    project_moderator = is_project_moderator(request.user)
+    project_moderator = is_project_moderator(request.user, request.site)
 
     draft_projects = []
     if is_project_moderator:
@@ -303,7 +306,7 @@ def project_maplist(request):
 @login_required
 def project_accept(request, project_id=None):
     """Update project as accepted for processing"""
-    is_project_moderator_or_403(request.user)
+    is_project_moderator_or_403(request.user, request.site)
 
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":

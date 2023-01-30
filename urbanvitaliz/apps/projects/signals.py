@@ -35,13 +35,13 @@ document_uploaded = django.dispatch.Signal()
 
 
 @receiver(project_submitted)
-def log_project_submitted(sender, submitter, project, **kwargs):
+def log_project_submitted(sender, site, submitter, project, **kwargs):
     action.send(project, verb="a été déposé")
 
 
 @receiver(project_submitted)
-def notify_moderators_project_submitted(sender, submitter, project, **kwargs):
-    recipients = get_project_moderators()
+def notify_moderators_project_submitted(sender, site, submitter, project, **kwargs):
+    recipients = get_project_moderators(site)
 
     # Notify project moderators
     notify.send(

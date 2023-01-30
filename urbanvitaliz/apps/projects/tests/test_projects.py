@@ -643,15 +643,17 @@ def test_accept_project_not_available_for_non_staff_users(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_and_redirect(request, client):
+    current_site = get_current_site(request)
     owner = Recipe(auth.User, username="owner@owner.co").make()
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(models.Project, sites=[current_site]).make()
     Recipe(auth.Group, name="project_moderator").make()
     baker.make(models.ProjectMember, member=owner, is_owner=True)
 
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, groups=["project_moderator", "switchtender"]):
+    with login(client, groups=["project_moderator", "switchtender"]) as moderator:
+        moderator.profile.sites.add(current_site)
         response = client.post(url)
 
     project = models.Project.on_site.get(id=project.id)
@@ -663,12 +665,15 @@ def test_accept_project_and_redirect(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_without_owner_and_redirect(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
     Recipe(auth.Group, name="project_moderator").make()
+
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, groups=["project_moderator", "switchtender"]):
+    with login(client, groups=["project_moderator", "switchtender"]) as moderator:
+        moderator.profile.sites.add(current_site)
         response = client.post(url)
 
     project = models.Project.on_site.get(id=project.id)

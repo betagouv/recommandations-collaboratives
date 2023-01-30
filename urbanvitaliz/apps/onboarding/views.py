@@ -102,7 +102,10 @@ def onboarding(request):
 
             # All green, notify
             projects_signals.project_submitted.send(
-                sender=projects.Project, submitter=user, project=project
+                sender=projects.Project,
+                site=request.site,
+                submitter=user,
+                project=project,
             )
 
             # Send an email to the project owner

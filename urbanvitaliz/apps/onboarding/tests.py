@@ -172,13 +172,17 @@ def test_performing_onboarding_does_not_allow_account_stealing(request, client):
 def test_performing_onboarding_sends_notification_to_project_moderators(
     request, client
 ):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     md_group = Recipe(auth.Group, name="project_moderator").make()
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     moderator = Recipe(
-        auth.User, email="moderator@example.com", groups=[md_group, st_group]
+        auth.User,
+        email="moderator@example.com",
+        groups=[md_group, st_group],
     ).make()
+    moderator.profile.sites.add(current_site)
 
     data = {
         "name": "a project",
