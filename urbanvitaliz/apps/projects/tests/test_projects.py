@@ -293,8 +293,24 @@ def test_project_list_not_available_for_non_staff_users(client):
 def test_project_list_available_for_switchtender_user(client):
     url = reverse("projects-project-list")
     with login(client, groups=["switchtender"]):
-        response = client.get(url)
-    assert response.status_code == 200
+        response = client.get(url, follow=True)
+
+    advisor_url = reverse("projects-project-list-advisor")
+    url, code = response.redirect_chain[-1]
+    assert code == 302
+    assert url == advisor_url
+
+
+@pytest.mark.django_db
+def test_project_list_available_for_staff(client):
+    url = reverse("projects-project-list")
+    with login(client, is_staff=True, groups=["switchtender"]):
+        response = client.get(url, follow=True)
+
+    staff_url = reverse("projects-project-list-staff")
+    url, code = response.redirect_chain[-1]
+    assert code == 302
+    assert url == staff_url
 
 
 @pytest.mark.django_db
@@ -308,7 +324,8 @@ def test_project_list_excludes_project_not_in_switchtender_departments(request, 
     url = reverse("projects-project-list")
     with login(client, groups=["switchtender"]) as user:
         user.profile.departments.add(department)
-        response = client.get(url)
+        response = client.get(url, follow=True)
+
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertNotContains(response, detail_url)
 
@@ -756,7 +773,7 @@ def test_delete_project_and_redirect(request, client):
     assert project.updated_on > updated_on_before
 
     list_url = reverse("projects-project-list")
-    assertRedirects(response, list_url)
+    assert response.url == list_url
 
 
 @pytest.mark.django_db

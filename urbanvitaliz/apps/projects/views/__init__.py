@@ -200,9 +200,23 @@ def select_commune(request, project_id=None):
 
 
 @login_required
-@ensure_csrf_cookie
 def project_list(request):
-    """Return the projects for the switchtender"""
+    if not (
+        check_if_switchtender(request.user)
+        or can_administrate_project(project=None, user=request.user)
+    ):
+        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+
+    if request.user.is_staff:
+        return redirect("projects-project-list-staff")
+
+    return redirect("projects-project-list-advisor")
+
+
+@login_required
+@ensure_csrf_cookie
+def project_list_for_advisor(request):
+    """Return the projects for the advisor"""
     if not (
         check_if_switchtender(request.user)
         or can_administrate_project(project=None, user=request.user)
