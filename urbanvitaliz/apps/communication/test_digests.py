@@ -8,6 +8,7 @@ created: 2022-02-03 16:14:54 CET
 """
 import test  # noqa
 
+import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
@@ -29,6 +30,7 @@ from .digests import NotificationFormatter
 ########################################################################
 
 
+@pytest.mark.django_db
 def test_send_digests_for_new_reco(client, request):
     membership = baker.make(projects_models.ProjectMember)
 
@@ -60,6 +62,7 @@ def test_send_digests_for_new_reco(client, request):
     assert membership.member.notifications.unsent().count() == 0
 
 
+@pytest.mark.django_db
 def test_send_digests_for_new_reco_empty(client):
     membership = baker.make(projects_models.ProjectMember)
 
@@ -77,7 +80,10 @@ def test_send_digests_for_new_reco_empty(client):
 ########################################################################
 
 
-def test_send_digests_for_new_sites_by_user():
+@pytest.mark.django_db
+def test_send_digests_for_new_sites_by_user(request):
+    current_site = get_current_site(request)
+
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     auth.Group.objects.get_or_create(name="project_moderator")
 
@@ -89,6 +95,7 @@ def test_send_digests_for_new_sites_by_user():
     regional_actor = Recipe(auth.User).make()
     regional_actor.groups.add(st_group)
     regional_actor.profile.departments.add(dpt_nord)
+    regional_actor.profile.sites.add(current_site)
 
     # non regional actor
     dpt_npdc = Recipe(geomatics_models.Department, code=62, name="PDC").make()
@@ -98,6 +105,7 @@ def test_send_digests_for_new_sites_by_user():
     non_regional_actor = Recipe(auth.User).make()
     non_regional_actor.groups.add(st_group)
     non_regional_actor.profile.departments.add(dpt_npdc)
+    non_regional_actor.profile.sites.add(current_site)
 
     # moderator
     moderator = Recipe(auth.User).make()
@@ -108,11 +116,15 @@ def test_send_digests_for_new_sites_by_user():
         projectmember_set=[membership],
         commune=commune,
         status="READY",
+        sites=[current_site],
     )
 
     # Generate a notification
     projects_signals.project_validated.send(
-        sender=projects_models.Project, moderator=moderator, project=project
+        sender=projects_models.Project,
+        site=current_site,
+        moderator=moderator,
+        project=project,
     )
 
     assert regional_actor.notifications.unsent().count() == 1
@@ -125,7 +137,10 @@ def test_send_digests_for_new_sites_by_user():
     assert non_regional_actor.notifications.unsent().count() == 0
 
 
-def test_send_digests_for_switchtender_by_user(client):
+@pytest.mark.django_db
+def test_send_digests_for_switchtender_by_user(request, client):
+    current_site = get_current_site(request)
+
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     auth.Group.objects.get_or_create(name="project_moderator")
 
@@ -137,6 +152,7 @@ def test_send_digests_for_switchtender_by_user(client):
 
     organization = Recipe(addressbook_models.Organization, name="Orga").make()
     regional_actor = Recipe(auth.User).make()
+    regional_actor.profile.sites.add(current_site)
     regional_actor.profile.organization = organization
     regional_actor.profile.save()
     regional_actor.groups.add(st_group)
@@ -145,6 +161,7 @@ def test_send_digests_for_switchtender_by_user(client):
     regional_actor2 = Recipe(auth.User).make()
     regional_actor2.groups.add(st_group)
     regional_actor2.profile.departments.add(dpt_nord)
+    regional_actor2.profile.sites.add(current_site)
 
     # non regional actor
     dpt_npdc = Recipe(geomatics_models.Department, code=62, name="PDC").make()
@@ -154,6 +171,7 @@ def test_send_digests_for_switchtender_by_user(client):
     non_regional_actor = Recipe(auth.User).make()
     non_regional_actor.groups.add(st_group)
     non_regional_actor.profile.departments.add(dpt_npdc)
+    non_regional_actor.profile.sites.add(current_site)
 
     membership = baker.make(projects_models.ProjectMember, is_owner=True)
     project = baker.make(
@@ -184,6 +202,7 @@ def test_send_digests_for_switchtender_by_user(client):
     assert non_regional_actor.notifications.unsent().count() == 0
 
 
+@pytest.mark.django_db
 def test_notification_formatter():
     formatter = NotificationFormatter()
 
@@ -280,12 +299,14 @@ def test_notification_formatter():
         assert tests[idx][2][1] == fmt_reco.excerpt
 
 
+@pytest.mark.django_db
 def test_notification_formatter_with_bogus_user():
     formatter = NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
+    note = Recipe(projects_models.Note).make()
 
-    notification = Notification(user, verb="a rédigé un message")
+    notification = Notification(user, verb="a rédigé un message", action_object=note)
 
     fmt_reco = formatter.format(notification)
-    assert fmt_reco is None
+    assert "compte indisponible" in str(fmt_reco)

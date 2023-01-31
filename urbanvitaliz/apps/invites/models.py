@@ -20,9 +20,6 @@ class InviteOnSiteManager(CurrentSiteManager, InviteManager):
 class Invite(models.Model):
     """Invitation for a project"""
 
-    class Meta:
-        unique_together = ("email", "project", "role")
-
     INVITE_ROLES = (
         ("COLLABORATOR", "Participant·e"),
         ("SWITCHTENDER", "Conseiller·e"),

@@ -31,6 +31,18 @@ instance.interceptors.response.use((response) => {
 
 export default instance
 
+
+
+// Projects :
+export function projectsUrl() {
+    return `/api/projects/`
+}
+
+export function userProjectStatusUrl() {
+    return `/api/userprojectstatus/`
+}
+
+// Tasks : 
 export function taskUrl(projectId, taskId) {
     return `/api/projects/${projectId}/tasks/${taskId}/`
 }
@@ -68,6 +80,10 @@ export function resourcePreviewUrl(resourceId) {
 // TODO : Make them into proper endpoints
 export function editTaskUrl(taskId) {
     return `/task/${taskId}/update/`;
+}
+
+export function deleteTaskUrl(taskId) {
+    return `/task/${taskId}/delete/`;
 }
 
 export function deleteTaskReminderUrl(taskId) {

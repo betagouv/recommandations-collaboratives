@@ -14,6 +14,7 @@ from django.contrib import messages
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404, redirect, render
@@ -36,10 +37,10 @@ from urbanvitaliz.utils import (build_absolute_url, check_if_switchtender,
 from .. import models, signals
 from ..forms import SelectCommuneForm
 from ..utils import (can_administrate_or_403, can_administrate_project,
-                     generate_ro_key, get_active_project,
-                     is_project_moderator, is_project_moderator_or_403,
-                     is_regional_actor_for_project_or_403, refresh_user_projects_in_session,
-                     set_active_project_id)
+                     generate_ro_key, get_active_project, is_project_moderator,
+                     is_project_moderator_or_403,
+                     is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session, set_active_project_id)
 
 ########################################################################
 # On boarding
@@ -224,6 +225,35 @@ def project_list(request):
         recipient=request.user, public=True
     )
 
+    return render(request, "projects/project/advisor_dashboard.html", locals())
+
+
+@login_required
+@ensure_csrf_cookie
+def project_list_for_staff(request):
+    """Return the projects for the staff"""
+    if not (
+        check_if_switchtender(request.user)
+        or can_administrate_project(project=None, user=request.user)
+    ):
+        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+
+    project_moderator = is_project_moderator(request.user)
+
+    draft_projects = []
+    if is_project_moderator:
+        draft_projects = (
+            models.Project.on_site.in_departments(
+                request.user.profile.departments.all()
+            )
+            .filter(status="DRAFT")
+            .order_by("-created_on")
+        )
+
+    unread_notifications = notifications_models.Notification.on_site.unread().filter(
+        recipient=request.user, public=True
+    )
+
     return render(request, "projects/project/list-kanban.html", locals())
 
 
@@ -268,7 +298,10 @@ def project_accept(request, project_id=None):
         project.save()
 
         signals.project_validated.send(
-            sender=models.Project, moderator=request.user, project=project
+            sender=models.Project,
+            site=request.site,
+            moderator=request.user,
+            project=project,
         )
 
         if project.owner:
@@ -297,7 +330,9 @@ def project_switchtender_join(request, project_id=None):
     project = get_object_or_404(models.Project, pk=project_id)
 
     if not can_administrate_project(project, request.user):
-        is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+        is_regional_actor_for_project_or_403(
+            get_current_site(request), project, request.user, allow_national=True
+        )
 
     if request.method == "POST":
         switchtending, created = project.switchtenders_on_site.get_or_create(
@@ -313,10 +348,10 @@ def project_switchtender_join(request, project_id=None):
             site=request.site,
             user=request.user,
             project=project,
-            defaults={"status": "FOLLOWED"},
+            defaults={"status": "TODO"},
         )
         if not created:
-            personal_status.status = "FOLLOWED"
+            personal_status.status = "TODO"
             personal_status.save()
 
         project.updated_on = timezone.now()
@@ -333,7 +368,9 @@ def project_observer_join(request, project_id=None):
     project = get_object_or_404(models.Project, pk=project_id)
 
     if not can_administrate_project(project, request.user):
-        is_regional_actor_for_project_or_403(project, request.user, allow_national=True)
+        is_regional_actor_for_project_or_403(
+            get_current_site(request), project, request.user, allow_national=True
+        )
 
     if request.method == "POST":
         switchtending, created = project.switchtenders_on_site.get_or_create(
@@ -347,10 +384,10 @@ def project_observer_join(request, project_id=None):
             site=request.site,
             user=request.user,
             project=project,
-            defaults={"status": "FOLLOWED"},
+            defaults={"status": "TODO"},
         )
         if not created:
-            personal_status.status = "FOLLOWED"
+            personal_status.status = "TODO"
             personal_status.save()
 
         project.updated_on = timezone.now()

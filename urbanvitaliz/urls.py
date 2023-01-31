@@ -47,6 +47,11 @@ router.register(
     basename="project-tasks-notifications",
 )
 router.register(r"projects", projects_rest.ProjectViewSet, basename="projects")
+router.register(
+    r"userprojectstatus",
+    projects_rest.UserProjectStatusViewSet,
+    basename="userprojectstatus",
+)
 
 router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
 router.register(

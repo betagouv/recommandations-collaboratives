@@ -7,7 +7,6 @@
 {% load django_vite %}
 
 {% block js %}
-<script src="{% static 'projects/js/tmp_kanban_globals.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 {% vite_asset 'js/apps/project.js' %}
@@ -81,9 +80,18 @@
                 <template x-for="board in boards">
                     <div class="col px-2">
                         <div class="rounded border-top border-2 drop-column" :class="board.color_class">
-                            <div class="d-flex align-items-start px-3 py-2 bg-light">
-                                <span x-show="column(board.status).length > 0" class="me-2 badge rounded-pill text-bg-secondary" x-text="column(board.status).length">Primary</span>
-                                <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
+                            <div class="d-flex align-items-center justify-content-between px-3 py-2 bg-light">
+                                <div class="d-flex align-items-start">
+                                    <span x-show="column(board.status).length > 0" class="me-2 badge rounded-pill text-bg-secondary" x-text="column(board.status).length">Primary</span>
+                                    <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
+                                </div>
+                                <template x-if="board.status == 0">
+                                    <a href="{% url 'projects-project-detail-actions-inline' project.pk %}" class="btn btn-outline-primary btn-sm">
+                                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#search" />
+                                        </svg>
+                                    </a>
+                                </template>
                             </div>
 
                             <div class="px-3 py-1 pb-1 bg-light shadow-sm overflow-auto" style="max-height: 70vh;">
@@ -108,6 +116,7 @@
                 {% include 'projects/project/fragments/kanban_tasks/preview_modal.html' %}
                 {% include 'projects/project/fragments/kanban_tasks/reminder_modal.html' %}
                 {% include 'projects/project/fragments/kanban_tasks/feedback_modal.html' %}
+                {% include 'projects/project/fragments/kanban_tasks/delete_task_confirmation_modal.html' %}
             </div>
             {% endif %}
         </div>

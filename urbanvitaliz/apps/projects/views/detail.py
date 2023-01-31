@@ -9,6 +9,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Q
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -42,11 +43,14 @@ def project_overview(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_national_actor = check_if_national_actor(request.user)
+
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
+    is_switchtender = check_if_switchtender(request.user)
     switchtending = get_switchtender_for_project(request.user, project)
 
     try:
@@ -57,7 +61,7 @@ def project_overview(request, project_id=None):
     # check user can administrate project (member or switchtender)
     if request.user != project.owner:
         # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_switchtender(request.user):
+        if not is_switchtender:
             can_manage_or_403(project, request.user)
 
     # Set this project as active
@@ -65,13 +69,17 @@ def project_overview(request, project_id=None):
 
     # Make sure we track record of user's interest for this project
     if not request.user.is_hijacked:
-        if (is_national_actor or is_regional_actor) and not request.user.is_staff:
-            models.UserProjectStatus.objects.get_or_create(
+        if is_regional_actor or can_administrate:
+            pus, created = models.UserProjectStatus.objects.get_or_create(
                 site=request.site,
                 user=request.user,
                 project=project,
-                defaults={"status": "NOT_INTERESTED"},
+                defaults={"status": "TODO"},
             )
+
+            if not created and pus.status == "NEW":
+                pus.status = "TODO"
+                pus.save()
 
     # Mark some notifications as seen (general ones)
     if not request.user.is_hijacked:
@@ -106,9 +114,11 @@ def project_knowledge(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_national_actor = check_if_national_actor(request.user)
+
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
     switchtending = get_switchtender_for_project(request.user, project)
@@ -138,9 +148,10 @@ def project_actions(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_national_actor = check_if_national_actor(request.user)
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
     switchtending = get_switchtender_for_project(request.user, project)
@@ -167,6 +178,35 @@ def project_actions(request, project_id=None):
 
 
 @login_required
+def project_actions_inline(request, project_id=None):
+    """Inline Action page for given project"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    # compute permissions
+    can_manage = can_manage_project(project, request.user)
+    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
+
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
+    is_regional_actor = is_regional_actor_for_project(
+        current_site, project, request.user, allow_national=True
+    )
+    can_administrate = can_administrate_project(project, request.user)
+    switchtending = get_switchtender_for_project(request.user, project)
+
+    # check user can administrate project (member or switchtender)
+    if request.user != project.members.filter(projectmember__is_owner=True).first():
+        # bypass if user is switchtender, all are allowed to view at least
+        if not check_if_switchtender(request.user):
+            can_manage_or_403(project, request.user)
+
+    # Set this project as active
+    set_active_project_id(request, project.pk)
+
+    return render(request, "projects/project/actions_inline.html", locals())
+
+
+@login_required
 def project_conversations(request, project_id=None):
     """Action page for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
@@ -176,9 +216,11 @@ def project_conversations(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    is_national_actor = check_if_national_actor(request.user)
+
+    current_site = get_current_site(request)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
 
@@ -213,10 +255,12 @@ def project_internal_followup(request, project_id=None):
     # compute permissions
     can_manage = can_manage_project(project, request.user)
     can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
+
+    current_site = get_current_site(request)
     is_regional_actor = is_regional_actor_for_project(
-        project, request.user, allow_national=True
+        current_site, project, request.user, allow_national=True
     )
-    is_national_actor = check_if_national_actor(request.user)
+    is_national_actor = check_if_national_actor(current_site, request.user)
     can_administrate = can_administrate_project(project, request.user)
 
     # Set this project as active

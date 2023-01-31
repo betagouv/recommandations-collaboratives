@@ -214,7 +214,6 @@ MAGICAUTH_ADAPTER = "urbanvitaliz.apps.home.adapters.UVMagicauthAdapter"
 MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à UrbanVitaliz ici"
 MAGICAUTH_EMAIL_FIELD = "email"
 MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "login-redirect"
-MAGICAUTH_EMAIL_UNKNOWN_CALLBACK = "urbanvitaliz.apps.home.utils.create_user"
 MAGICAUTH_TOKEN_DURATION_SECONDS = 60 * 60 * 24 * 3
 
 # MARKDOWNX

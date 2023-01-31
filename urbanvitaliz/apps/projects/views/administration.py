@@ -10,6 +10,7 @@ from actstream import action
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -36,6 +37,7 @@ def project_administration(request, project_id):
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     can_administrate = can_administrate_project(project, request.user)
+    can_manage = can_manage_project(project, request.user)
 
     # Fetch pending invites
     pending_invites = []
@@ -162,7 +164,9 @@ def access_collectivity_invite(request, project_id):
 
     if not (
         can_manage_project(project, request.user)
-        or is_regional_actor_for_project(project, request.user, allow_national=True)
+        or is_regional_actor_for_project(
+            get_current_site(request), project, request.user, allow_national=True
+        )
     ):
         raise PermissionDenied
 
@@ -239,7 +243,9 @@ def access_advisor_invite(request, project_id):
 
     if not (
         can_administrate_project(project, request.user)
-        or is_regional_actor_for_project(project, request.user, allow_national=True)
+        or is_regional_actor_for_project(
+            get_current_site(request), project, request.user, allow_national=True
+        )
     ):
         raise PermissionDenied
 

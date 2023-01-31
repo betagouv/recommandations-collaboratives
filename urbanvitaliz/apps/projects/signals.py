@@ -55,7 +55,7 @@ def notify_moderators_project_submitted(sender, submitter, project, **kwargs):
 
 
 @receiver(project_validated)
-def log_project_validated(sender, moderator, project, **kwargs):
+def log_project_validated(sender, site, moderator, project, **kwargs):
     action.send(project, verb="a été validé")
 
     if project.status == "DRAFT" or project.muted:
@@ -67,7 +67,7 @@ def log_project_validated(sender, moderator, project, **kwargs):
 
     notify.send(
         sender=project.owner,
-        recipient=get_regional_actors_for_project(project),
+        recipient=get_regional_actors_for_project(site, project),
         verb="a déposé le projet",
         action_object=project,
         target=project,

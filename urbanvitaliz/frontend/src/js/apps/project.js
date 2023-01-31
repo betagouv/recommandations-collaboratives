@@ -1,3 +1,4 @@
+import '../store/tasks'
 import '../components/KanbanTasks'
 import '../components/Spinner'
 import '../components/StatusSwitcher'

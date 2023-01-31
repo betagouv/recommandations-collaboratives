@@ -1,11 +1,7 @@
 import os
 
-from allauth.account.forms import (
-    LoginForm,
-    ResetPasswordForm,
-    ResetPasswordKeyForm,
-    SignupForm,
-)
+from allauth.account.forms import (LoginForm, ResetPasswordForm,
+                                   ResetPasswordKeyForm, SignupForm)
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
@@ -30,6 +26,10 @@ class UVSignupForm(SignupForm):
 
     def __init__(self, *args, **kwargs):
         super(UVSignupForm, self).__init__(*args, **kwargs)
+        # Skip captcha during tests
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            self.fields.pop("captcha")
+
         self.fields["email"].widget = forms.TextInput(
             attrs={"type": "email", "class": "fr-input fr-mt-2v fr-mb-4v"}
         )
@@ -153,11 +153,15 @@ class ContactForm(forms.Form):
 class UserPasswordFirstTimeSetupForm(forms.Form):
     password1 = forms.CharField(
         label="Mot de passe",
-        widget=forms.PasswordInput(attrs={"class": "form-control py-2 fr-mt-2v fr-mb-4v"}),
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control py-2 fr-mt-2v fr-mb-4v"}
+        ),
     )
     password2 = forms.CharField(
         label="Confirmation du mot de passe",
-        widget=forms.PasswordInput(attrs={"class": "form-control py-2 fr-mt-2v fr-mb-4v"}),
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control py-2 fr-mt-2v fr-mb-4v"}
+        ),
     )
     next = forms.CharField(widget=forms.HiddenInput())
 

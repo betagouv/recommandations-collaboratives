@@ -116,6 +116,13 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     )
 
 
+@admin.register(models.UserProjectStatus)
+class UserProjectStatusAdmin(admin.ModelAdmin):
+    list_display = ["project", "user", "status"]
+
+    list_filter = ["site"]
+
+
 @admin.register(models.Note)
 class NoteAdmin(admin.ModelAdmin):
     search_fields = ["content", "tags"]

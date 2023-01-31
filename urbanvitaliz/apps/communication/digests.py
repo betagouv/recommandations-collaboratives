@@ -16,7 +16,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils import timezone
-from multimethod import multimethod
 from urbanvitaliz import utils
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.reminders import models as reminders_models
@@ -499,10 +498,7 @@ class FormattedNotification:
 
 class NotificationFormatter:
     def format(self, notification):
-        if notification.actor:
-            return self.format_for_actor(notification.actor, notification)
-        else:
-            return None
+        return self._format_for_actor(notification)
 
     def _format_or_default(self, dispatch_table, notification):
         """
@@ -518,6 +514,10 @@ class NotificationFormatter:
 
     # ------ Formatter Utils -----#
     def _represent_user(self, user):
+        if not user:
+            fmt = "--compte indisponible--"
+            return fmt
+
         if user.last_name:
             fmt = f"{user.first_name} {user.last_name}"
         else:
@@ -557,14 +557,19 @@ class NotificationFormatter:
         return followup.comment[:50]
 
     # -------- Routers -----------#
-    @multimethod
-    def format_for_actor(self, actor: auth_models.User, notification):
+    def _format_for_actor(self, notification):
         """Format for User"""
+
+        # if not notification.actor:
+        #     notification.actor = auth_models.User(
+        #         username="-- compte supprimé --", first_name="-- compte supprimé --"
+        #     )
 
         return self._format_or_default(
             {
                 "a rédigé un message": self.format_note_created,
                 "est devenu·e aiguilleur·se sur le projet": self.format_action_became_switchtender,
+                # added for transition from switchtender (aiguilleur) to advisor (conseiller)
                 "est devenu·e conseiller·e sur le projet": self.format_action_became_switchtender,
                 "a déposé le projet": self.format_new_project_available,
                 "a soumis pour modération le projet": self.format_project_submitted,
@@ -577,7 +582,7 @@ class NotificationFormatter:
 
     # ------ Real Formatters -----#
     def format_note_created(self, notification):
-        """An action was recommended by a switchtender"""
+        """An note was written by a switchtender"""
         subject = self._represent_user(notification.actor)
         summary = f"{subject} a rédigé un message"
         excerpt = self._represent_note_excerpt(notification.action_object)

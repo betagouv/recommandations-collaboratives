@@ -1,106 +1,105 @@
 {% load static %}
 {% load sass_tags %}
-
 {% block css %}
-<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
-<link href="{% sass_src 'projects/css/project_navigation.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'projects/css/project_navigation.css' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
-
 <ul class="project-navigation d-flex align-items-center"
-    style="font-family: 'Marianne', arial, sans-serif; padding: 0;">
+    style="font-family: 'Marianne', arial, sans-serif;
+           padding: 0">
     <li>
-        <a class="{% if overview %} active {% endif %}" href="{% url 'projects-project-detail-overview' project.pk %}">
+        <a class="{% if overview %} active{% endif %}"
+           href="{% url 'projects-project-detail-overview' project.pk %}">
             Présentation
         </a>
     </li>
     <li class="position-relative survey">
-        <a class="text-nowrap {% if state_of_play %} active {% endif %}" href="{% url 'projects-project-detail-knowledge' project.pk %}">
+        <a class="text-nowrap {% if state_of_play %} active{% endif %}"
+           href="{% url 'projects-project-detail-knowledge' project.pk %}">
             <p>État des lieux</p>
             <div class="survey-completion">
                 <div class="survey-completion-progress-bar-container">
-                    <i class="survey-completion-progress-bar" style="width: {{active_project_survey_session.completion}}%; {%if active_project_survey_session.completion >= 90 %}background-color:#5ec495{% else %}background-color:#f58188{% endif %}"></i>
+                    <i class="survey-completion-progress-bar"
+                       style="width: {{ active_project_survey_session.completion }}%;
+                              {% if active_project_survey_session.completion >= 90 %}background-color:#5ec495{% else %}background-color:#f58188{% endif %}"></i>
                 </div>
-                <span class="survey-completion-number">{{active_project_survey_session.completion}}%</span>
+                <span class="survey-completion-number">{{ active_project_survey_session.completion }}%</span>
             </div>
         </a>
     </li>
     <li>
-        <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if recommandations %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-actions' project.pk %}">
+        <a class="{% if project.status == 'DRAFT' and not can_administrate %} disabled{% endif %} {% if recommandations %} active{% endif %} align-items-center"
+           href="{% url 'projects-project-detail-actions' project.pk %}">
             {% if active_project_action_notification_count %}
-                {% if project.tasks.proposed.count %}
-                <span class="position-absolute  bg-info badge rounded-circle m-0 d-flex align-items-center justify-content-center" style="font-size: 8px;  top:3px; left:3px; width: 15px; height:15px"">
-                    {{ project.tasks.open.count }}
-                    <span class="visually-hidden">Action en cours</span>
-                </span>
-                {% endif %}
-                {% if active_project_action_notification_count %}
-                <span class="position-absolute bg-danger badge rounded-circle m-0"
-                    style="font-size: 8px; top:3px; right:3px">
-                    <svg class="align-middle bi" width="9px" height="10px" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell" />
-                    </svg>
-                    <span class="visually-hidden">{{ active_project_action_notification_count }} Notifications des
-                        recommandations</span>
-                </span>
-                {% endif %}
+                    <span class="has-notification">{{ active_project_action_notification_count }}</span>
             {% endif %}
-            {% if project.status == 'DRAFT' %}
-            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
-            </svg>&nbsp;
+            {% if project.status == 'DRAFT' and not can_administrate %}
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                </svg>
+                &nbsp;
             {% endif %}
             <span>Recommandations</span>
         </a>
     </li>
-    {% if can_administrate or request.user == project.owner %}
-    <li>
-        <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if conversation %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-conversations' project.pk %}">
-            {% if active_project_conversations_notification_count %}
-            <span class="position-absolute bg-danger badge rounded-circle m-0"
-                    style="font-size: 8px; top:3px; right:3px">
-                    <svg class="align-middle bi" width="9px" height="10px" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell" />
+    {% if can_manage %}
+        <li>
+            <a class="{% if project.status == 'DRAFT' and not can_administrate %} disabled{% endif %} {% if conversation %} active{% endif %} align-items-center"
+               href="{% url 'projects-project-detail-conversations' project.pk %}">
+                {% if active_project_conversations_notification_count %}
+                    <span class="has-notification">{{ active_project_conversations_notification_count }}</span>
+                {% endif %}
+                {% if project.status == 'DRAFT' and not can_administrate %}
+                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
                     </svg>
-                <span class="visually-hidden">{{ active_project_conversations_notification_count }} Notifications des
-                    conversations</span>
-            </span>
-            {% endif %}
-            {% if project.status == 'DRAFT' %}
-            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
-            </svg>&nbsp;
-            {% endif %}
-            <span class="">Conversation</span>
-        </a>
-    </li>
+                {% endif %}
+                <span class="">Conversation</span>
+            </a>
+        </li>
     {% endif %}
     <li>
-        <a class="{% if project.status == 'DRAFT' %} disabled {% endif %} {% if files_links %} active {% endif %} align-items-center" href="{% url 'projects-project-detail-documents' project.pk %}">
-            {% if project.status == 'DRAFT' %}
-            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
-            </svg>&nbsp;
+        <a class="{% if project.status == 'DRAFT' and not can_administrate %} disabled{% endif %} {% if files_links %} active{% endif %} align-items-center"
+           href="{% url 'projects-project-detail-documents' project.pk %}">
+           {% if active_project_document_notification_count %}
+                    <span class="has-notification">{{active_project_document_notification_count}}</span>
+            {% endif %}
+            {% if project.status == 'DRAFT' and not can_administrate %}
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                </svg>
+                &nbsp;
             {% endif %}
             <span class="">Fichiers et liens</span>
         </a>
     </li>
     {% if active_project_can_administrate %}
-    <li>
-        <a class="{% if internal_followup %} active {% endif %} {% if not active_project_can_administrate %} disabled {% endif %}align-items-center" href="{% url 'projects-project-detail-internal-followup' project.pk %}">
-            {% if not active_project_can_administrate %}
-            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
-            </svg>&nbsp;
-            {% endif %}
-            <span class="text-nowrap">Espace conseillers</span>
-        </a>
-    </li>
+        <li>
+            <a class="{% if internal_followup %} active{% endif %} {% if not active_project_can_administrate %} disabled{% endif %}align-items-center"
+               href="{% url 'projects-project-detail-internal-followup' project.pk %}">
+               {% if active_project_private_note_notification_count %}
+                    <span class="has-notification">{{ active_project_private_note_notification_count }}</span>
+               {% endif %}
+                {% if not active_project_can_administrate %}
+                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                    </svg>
+                    &nbsp;
+                {% endif %}
+                <span class="text-nowrap">Espace conseillers</span>
+            </a>
+        </li>
     {% endif %}
     {% if user.is_staff %}
-    <li>
-        <a class="{% if administration_panel %} active {% endif %} align-items-center" href="{% url 'projects-project-administration' project.pk %}">
-            <span class="text-nowrap">Administration</span>
-        </a>
-    </li>
+        <li>
+            <a class="{% if administration_panel %} active{% endif %} align-items-center"
+               href="{% url 'projects-project-administration' project.pk %}">
+                <span class="text-nowrap">Administration</span>
+            </a>
+        </li>
     {% endif %}
 </ul>

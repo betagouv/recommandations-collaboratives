@@ -31,7 +31,14 @@ class CustomUserAdmin(UserAdmin):
 
     actions = [csvexport]
 
-    list_filter = ("date_joined", "is_staff", "is_superuser", "is_active", "groups")
+    list_filter = (
+        "date_joined",
+        "is_staff",
+        "is_superuser",
+        "is_active",
+        "groups",
+        "profile__sites",
+    )
 
     list_select_related = ("profile",)
 
