@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load gravatar %}
+{% load sass_tags %}
+{% load static %}
+{% block css %}
+    <link href="{% sass_src 'home/css/home/home.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
+{% block content %}
+    <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne">
+        <h2>Mentions légales de la plateforme {{ request.site.name }}</h2>
+        <p class="mt-4 mb-2">
+            <strong>Éditeur de la Plateforme</strong>
+        </p>
+        <p>
+            La Plateforme « {{ request.site.name }} » est éditée par :
+            Le Centre d’études et d’expertise sur les risques, l’environnement, la mobilité et
+            l’aménagement (CEREMA) :
+        </br>
+        Cité des mobilités – 25 avenue François Mitterrand – CS 92803
+        69674 Bron Cedex
+    </br>
+    04 72 14 30 30
+</p>
+<p class="mt-4 mb-2">
+    <strong>Directeur de la publication</strong>
+</p>
+<p>Le directeur de la publication est Pascal Berteaud, directeur général du CEREMA.</p>
+<p class="mt-4 mb-2">
+    <strong>Hébergement de la Plateforme</strong>
+</p>
+<p>
+    Ce site est hébergé en propre par :
+</br>
+Alwaysdata SARL
+</br>
+91 Rue du Faubourg Saint-Honoré
+</br>
+75008 Paris
+</p>
+<p class="mt-4 mb-2">
+    <strong>Accessibilité</strong>
+</p>
+<p>
+    La conformité aux normes d’accessibilité numérique est un objectif ultérieur mais nous
+    tâchons de rendre ce site accessible à toutes et à tous.
+</p>
+<p class="mt-4 mb-2">
+    <strong>Signaler un dysfonctionnement</strong>
+</p>
+<p>
+    Si vous rencontrez un défaut d’accessibilité vous empêchant d’accéder à un contenu ou une
+    fonctionnalité du site, merci de nous en faire part. Si vous n’obtenez pas de réponse rapide de
+    notre part, vous êtes en droit de faire parvenir vos doléances ou une demande de saisine au
+    Défenseur des droits.
+    Pour le joindre, vous pouvez :
+</br>
+<ul>
+    <li>
+        Utiliser le formulaire de contact en ligne <a class="text-decoration-underline" href="https://formulaire.defenseurdesdroits.fr/code/afficher.php?ETAPE=accueil_2016">ici</a>
+    </li>
+    <li>Composer le 09 69 39 00 00 (du lundi au vendredi de 8h à 20h)</li>
+    <li>
+        Envoyer un courrier (sans timbre) à l’adresse suivante : Défenseur des droits, Libre
+        réponse 71120, 75342 Paris CEDEX 07.
+    </li>
+</ul>
+</p>
+<p class="mt-4 mb-2">
+    <strong>En savoir plus</strong>
+</p>
+<p>
+    Pour en savoir plus sur la politique d’accessibilité numérique de l’État
+    <a class="text-decoration-underline"
+       href="http://references.modernisation.gouv.fr/accessibilite-numerique">accessibilite-numerique</a> 
+</p>
+<p class="mt-4 mb-2">
+    <strong>Sécurité</strong>
+</p>
+<p>
+    Le site est protégé par un certificat électronique, matérialisé pour la grande majorité des
+    navigateurs par un cadenas. Cette protection participe à la confidentialité des échanges. En
+    aucun cas les services associés à la plateforme ne seront à l’origine d’envoi de courriels pour
+    demander la saisie d’informations personnelles.
+</p>
+</div>
+{% endblock %}

@@ -59,6 +59,15 @@ class MethodologyPageView(TemplateView):
 class WhoWeArePageView(TemplateView):
     template_name = "home/whoweare.html"
 
+class LegalsPageView(TemplateView):
+    template_name = "home/legals.html"
+
+class TermsOfUsePageView(TemplateView):
+    template_name = "home/terms_of_use.html"
+
+class PrivacyPageView(TemplateView):
+    template_name = "home/privacy.html"
+
 
 class FollowUsPageView(TemplateView):
     template_name = "home/followus.html"

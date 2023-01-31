@@ -17,6 +17,8 @@ git+http://github.com/django-ordered-model/django-ordered-model@master#egg=djang
 
 git+https://github.com/jazzband/django-dbtemplates.git@master#egg=django-dbtemplates
 
+git+https://github.com/jazzband/django-cookie-consent@master#egg=django-cookie-consent
+
 django_otp
 django-tagging==0.5.0
 django-taggit==3.0.0

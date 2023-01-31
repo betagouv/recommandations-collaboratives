@@ -5,7 +5,6 @@
 
         <div class="col-6">
             <img src="{% static 'home/img/home/logo_rf.png' %}" width="150px" alt="Logo république française">
-
         </div>
         <div class="col-6 col-md">
             <h5>UrbanVitaliz</h5>
@@ -29,9 +28,17 @@
             </ul>
         </div>
         <div class="col-6 col-md">
-            <h5>Logiciel Libre</h5>
+            <h5>UrbanVitaliz</h5>
             <ul class="list-unstyled text-small">
-                <a href="https://github.com/betagouv/urbanvitaliz-django" target="_new">Code Source</a>
+                <li>
+                    <a class="link-secondary" href="{% url 'legals' %}">Mentions légales</a>
+                </li>
+                <li>
+                    <a class="link-secondary" href="{% url 'privacy' %}">Politique de confidentialité</a>
+                </li>
+                <li>
+                    <a class="link-secondary" href="{% url 'termsofuse' %}">Conditions d'utilisons</a>
+                </li>
             </ul>
         </div>
         <div class="col-6 col-md">
@@ -40,6 +47,10 @@
                 <li>
                     <a class="link-secondary" href="{% url 'statistics' %}">Statistiques d'impact</a>
                 </li>
+            </ul>
+            <h5>Logiciel Libre</h5>
+            <ul class="list-unstyled text-small">
+                <a href="https://github.com/betagouv/urbanvitaliz-django" target="_new">Code Source</a>
             </ul>
         </div>
 
