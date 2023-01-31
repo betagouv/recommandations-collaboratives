@@ -61,3 +61,7 @@ class Invite(models.Model):
 
     def get_absolute_url(self):
         return reverse("invites-invite-details", args=[self.pk])
+
+    def save(self, *args, **kwargs):
+        self.email = self.email.lower()
+        super().save(*args, **kwargs)

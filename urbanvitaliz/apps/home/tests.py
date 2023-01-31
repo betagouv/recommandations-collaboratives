@@ -212,7 +212,8 @@ def test_switchtender_is_sent_to_project_list_on_login(client):
     with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 302
-    assertRedirects(response, "/projects/")
+    list_url = reverse("projects-project-list")
+    assert response.url == list_url
 
 
 ########################################################################

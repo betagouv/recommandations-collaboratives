@@ -85,6 +85,7 @@
                     <div class="d-flex flex-column">
                         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Référent collectivité</h6>
                         {% include 'projects/project/fragments/project_owner.html' with project=project %}
+                        {% if project.owner %}
                         <a class="d-flex align-items-center mb-1"
                            style="font-size: 14px;
                                   color: #0063CB;
@@ -96,6 +97,7 @@
                             &nbsp;
                             {{ project.owner.email }}
                         </a>
+                        {% endif %}
                         {% if project.owner.profile.phone_no or project.phone %}
                             <span style="font-size: 14px;
                                          color: #0063CB"
@@ -125,12 +127,12 @@
                     <div>
                         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Membres de la collectivité</h6>
                         <ul class="flex-column list-unstyled mb-0">
-                            {% for member in project.members.all %}
-                                {% if forloop.counter0 == 0 %}
-                                    <li>{% include 'projects/project/fragments/project_owner.html' with project=project %}</li>
-                                {% else %}
-                                    <li>{% include 'projects/project/fragments/user.html' with member=member project=project %}</li>
-                                {% endif %}
+                            {% for projectmember in project.projectmember_set.all %}
+                              {% if projectmember.is_owner %}
+                              <li>{% include 'projects/project/fragments/project_owner.html' with project=project %}</li>
+                              {% else %}
+                              <li>{% include 'projects/project/fragments/user.html' with member=projectmember.member project=project %}</li>
+                              {% endif %}
                             {% endfor %}
                         </ul>
                         {% if switchtending or is_regional_actor or can_manage %}

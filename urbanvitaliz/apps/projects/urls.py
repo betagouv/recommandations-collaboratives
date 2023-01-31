@@ -25,8 +25,13 @@ urlpatterns = [
         views.select_commune,
         name="projects-onboarding-select-commune",
     ),
-    # projects for switchtenders
     path(r"projects/", views.project_list, name="projects-project-list"),
+    # projects for switchtenders
+    path(
+        r"projects/advisor/",
+        views.project_list_for_advisor,
+        name="projects-project-list-advisor",
+    ),
     path(
         r"projects/staff/",
         views.project_list_for_staff,

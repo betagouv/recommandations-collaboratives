@@ -21,6 +21,19 @@ from urbanvitaliz.utils import login
 from . import api, models
 
 
+@pytest.mark.django_db
+def test_email_is_always_lowercased_on_invite():
+    invited_email = "New@inVitEd.org"
+
+    Recipe(
+        models.Invite,
+        email=invited_email,
+    ).make()
+
+    invite = models.Invite.objects.first()
+    assert invite.email == invited_email.lower()
+
+
 ################################################################
 # Invite API
 ################################################################

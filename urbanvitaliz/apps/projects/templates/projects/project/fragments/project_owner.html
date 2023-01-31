@@ -2,14 +2,14 @@
 {% load gravatar %}
 
 
-{% if project.owner and project.owner.first_name and project.owner.last_name %}
+{% if project.owner %}
     <div class="d-flex flex-column align-items-start mb-2">
         <span class="me-2 d-flex align-items-center w-100 justify-content-between">
             <div class="d-flex align-items-center">
                 <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
                 <strong class="text-nowrap text-capitalize">
-                    {{ project.owner.first_name }}
-                    {{ project.owner.last_name }}
+                    {{ project.owner.first_name|default:"??" }}
+                    {{ project.owner.last_name|default:"(A renseigner)" }}
                 </strong>
             </div>
             {% if request.user.is_staff %}

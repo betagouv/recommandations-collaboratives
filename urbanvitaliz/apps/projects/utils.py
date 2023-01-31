@@ -88,20 +88,20 @@ def can_manage_or_403(project, user, allow_draft=False):
     raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
-def get_project_moderators():
-    """Return all the moderators for projects"""
+def get_project_moderators(site):
+    """Return all project moderators for a given site"""
     return auth_models.User.objects.filter(groups__name="project_moderator").filter(
-        groups__name="switchtender"
+        groups__name="switchtender", profile__sites=site
     )
 
 
-def is_project_moderator(user):
+def is_project_moderator(user, site):
     """Check if this user is allowed to moderate new projects"""
-    return (user in get_project_moderators()) or user.is_superuser
+    return (user in get_project_moderators(site)) or user.is_superuser
 
 
-def is_project_moderator_or_403(user):
-    if is_project_moderator(user):
+def is_project_moderator_or_403(user, site):
+    if is_project_moderator(user, site):
         return True
 
     raise PermissionDenied("L'information demandée n'est pas disponible")

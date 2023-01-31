@@ -133,7 +133,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
 
     data = {
         "name": "a project",
-        "email": "a@example.com",
+        "email": "a@ExAmple.Com",
         "location": "some place",
         "phone": "03939382828",
         "postcode": "59000",
@@ -151,7 +151,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
-    assert data["email"] == project.owner.email
+    assert data["email"].lower() == project.owner.email
     assert data["first_name"] == project.owner.first_name
     assert data["last_name"] == project.owner.last_name
 
@@ -293,8 +293,24 @@ def test_project_list_not_available_for_non_staff_users(client):
 def test_project_list_available_for_switchtender_user(client):
     url = reverse("projects-project-list")
     with login(client, groups=["switchtender"]):
-        response = client.get(url)
-    assert response.status_code == 200
+        response = client.get(url, follow=True)
+
+    advisor_url = reverse("projects-project-list-advisor")
+    url, code = response.redirect_chain[-1]
+    assert code == 302
+    assert url == advisor_url
+
+
+@pytest.mark.django_db
+def test_project_list_available_for_staff(client):
+    url = reverse("projects-project-list")
+    with login(client, is_staff=True, groups=["switchtender"]):
+        response = client.get(url, follow=True)
+
+    staff_url = reverse("projects-project-list-staff")
+    url, code = response.redirect_chain[-1]
+    assert code == 302
+    assert url == staff_url
 
 
 @pytest.mark.django_db
@@ -308,7 +324,8 @@ def test_project_list_excludes_project_not_in_switchtender_departments(request, 
     url = reverse("projects-project-list")
     with login(client, groups=["switchtender"]) as user:
         user.profile.departments.add(department)
-        response = client.get(url)
+        response = client.get(url, follow=True)
+
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertNotContains(response, detail_url)
 
@@ -626,15 +643,17 @@ def test_accept_project_not_available_for_non_staff_users(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_and_redirect(request, client):
+    current_site = get_current_site(request)
     owner = Recipe(auth.User, username="owner@owner.co").make()
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(models.Project, sites=[current_site]).make()
     Recipe(auth.Group, name="project_moderator").make()
     baker.make(models.ProjectMember, member=owner, is_owner=True)
 
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, groups=["project_moderator", "switchtender"]):
+    with login(client, groups=["project_moderator", "switchtender"]) as moderator:
+        moderator.profile.sites.add(current_site)
         response = client.post(url)
 
     project = models.Project.on_site.get(id=project.id)
@@ -646,12 +665,15 @@ def test_accept_project_and_redirect(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_without_owner_and_redirect(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
     Recipe(auth.Group, name="project_moderator").make()
+
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, groups=["project_moderator", "switchtender"]):
+    with login(client, groups=["project_moderator", "switchtender"]) as moderator:
+        moderator.profile.sites.add(current_site)
         response = client.post(url)
 
     project = models.Project.on_site.get(id=project.id)
@@ -756,7 +778,7 @@ def test_delete_project_and_redirect(request, client):
     assert project.updated_on > updated_on_before
 
     list_url = reverse("projects-project-list")
-    assertRedirects(response, list_url)
+    assert response.url == list_url
 
 
 @pytest.mark.django_db
