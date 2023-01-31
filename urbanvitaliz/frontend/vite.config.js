@@ -36,7 +36,7 @@ module.exports = {
                 projectAdministration : resolve('./src/js/apps/projectAdministration.js'),
                 map: resolve('./src/js/apps/map.js'),
                 documents: resolve('./src/js/apps/documents.js'),
-                resource: resolve('./src/js/apps/resource.js')
+                searchableList: resolve('./src/js/apps/searchableList.js')
             },
             output: {
                 chunkFileNames: undefined,
