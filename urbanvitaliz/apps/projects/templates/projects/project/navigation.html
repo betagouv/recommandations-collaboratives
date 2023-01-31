@@ -34,8 +34,8 @@
     <li>
         <a class="{% if project.status == 'DRAFT' and not can_administrate %} disabled{% endif %} {% if recommandations %} active{% endif %} align-items-center"
            href="{% url 'projects-project-detail-actions' project.pk %}">
-            {% if active_project_action_notification_count %}
-                    <span class="has-notification">{{ active_project_action_notification_count }}</span>
+            {% if active_project_action_notifications_count %}
+                    <span class="has-notification">{{ active_project_action_notifications_count }}</span>
             {% endif %}
             {% if project.status == 'DRAFT' and not can_administrate %}
                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
@@ -50,8 +50,8 @@
         <li>
             <a class="{% if project.status == 'DRAFT' and not can_administrate %} disabled{% endif %} {% if conversation %} active{% endif %} align-items-center"
                href="{% url 'projects-project-detail-conversations' project.pk %}">
-                {% if active_project_conversations_notification_count %}
-                    <span class="has-notification">{{ active_project_conversations_notification_count }}</span>
+                {% if active_project_conversation_notifications_count %}
+                    <span class="has-notification">{{ active_project_conversation_notifications_count }}</span>
                 {% endif %}
                 {% if project.status == 'DRAFT' and not can_administrate %}
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
@@ -65,8 +65,8 @@
     <li>
         <a class="{% if project.status == 'DRAFT' and not can_administrate %} disabled{% endif %} {% if files_links %} active{% endif %} align-items-center"
            href="{% url 'projects-project-detail-documents' project.pk %}">
-           {% if active_project_document_notification_count %}
-                    <span class="has-notification">{{active_project_document_notification_count}}</span>
+           {% if active_project_document_notifications_count %}
+                    <span class="has-notification">{{active_project_document_notifications_count}}</span>
             {% endif %}
             {% if project.status == 'DRAFT' and not can_administrate %}
                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
@@ -81,8 +81,8 @@
         <li>
             <a class="{% if internal_followup %} active{% endif %} {% if not active_project_can_administrate %} disabled{% endif %}align-items-center"
                href="{% url 'projects-project-detail-internal-followup' project.pk %}">
-               {% if active_project_private_note_notification_count %}
-                    <span class="has-notification">{{ active_project_private_note_notification_count }}</span>
+               {% if active_project_private_conversation_notifications_count %}
+                    <span class="has-notification">{{ active_project_private_conversation_notifications_count }}</span>
                {% endif %}
                 {% if not active_project_can_administrate %}
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
