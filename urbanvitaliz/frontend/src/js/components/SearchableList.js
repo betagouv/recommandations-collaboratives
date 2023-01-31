@@ -7,6 +7,7 @@ function SearchableList(listId, listCount, searchParams) {
 
     return {
         selectedList: [],
+        onFocus:false,
         init() {
 
             if (!listCount > 0) return
@@ -36,6 +37,14 @@ function SearchableList(listId, listCount, searchParams) {
                     }
                 })
             })
+        },
+        handleFocusList() {
+            return this.onFocus = true
+        },
+        handleBlurList(event) {
+            setTimeout(() => {
+                return this.onFocus = false
+            }, 100);
         },
         handleAddItem(event, value, name) {
             event.target.parentNode.classList.add('d-none')

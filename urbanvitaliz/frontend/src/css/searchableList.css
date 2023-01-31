@@ -1,4 +1,34 @@
-.searchable-list-wrapper ul {
+.searchable-list-wrapper {
+    position: relative;
+}
+
+.searchable-list-wrapper ul{
+
+    width: 100%;
+
+    transition: all 0.25s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+
+    background-color: white;
+    opacity: 1;
+
+    transform: translate3d(0,0,0);
+
     max-height: 40vh;
     overflow-y: scroll;
+}
+
+.searchable-list-wrapper.hide ul {
+    opacity: 0;
+    transform: translate3d(0,-20px,0);
+    z-index: -1;
+}
+
+.searchable-list-wrapper.show ul {
+    opacity: 1;
+    transform: translate3d(0,0,0);
+    z-index: 10000;
 }

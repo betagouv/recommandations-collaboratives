@@ -33,7 +33,7 @@
         </ul>
     </div>
     <div class="rounded py-2 mt-2">
-        <div class="border-top rounded-top border-start border-end py-2 pb-3">
+        <div class="border rounded border-start border-end py-2 pb-3">
             <div class="d-flex align-items-center mb-2 px-3">
                 <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#list" />
@@ -49,10 +49,14 @@
                 </svg>
                 <input type="search"
                        class="search input-field w-100"
-                       placeholder="Rechercher"/>
+                       placeholder="Rechercher"
+                       @focus="handleFocusList"
+                       @blur="handleBlurList(event)"
+                       />
+                       
             </div>
         </div>
-        <div class="searchable-list-wrapper">
+        <div class="searchable-list-wrapper" :class="onFocus ? 'show' : 'hide'">
             <ul class="list d-flex flex-column list-unstyled border"
                 x-ref="selectList">
                 {% for id, value in list.field.choices %}
