@@ -73,6 +73,106 @@ def test_performing_onboarding_create_a_new_project(request, client):
 
 
 @pytest.mark.django_db
+def test_onboarding_fills_existing_user_and_profile_missing_info(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
+    data = {
+        "name": "a project",
+        "email": "a@exAmpLe.Com",
+        "location": "some place",
+        "org_name": "MyOrg",
+        "phone": "+3893889393399",
+        "first_name": "john",
+        "last_name": "doe",
+        "description": "a description",
+        "impediment_kinds": ["Autre"],
+        "response_0": "blah",
+        "impediments": "some impediment",
+    }
+
+    with login(client, username=data["email"]) as user:
+        response = client.post(reverse("projects-onboarding"), data=data)
+
+    project = projects_models.Project.objects.first()
+
+    assert response.status_code == 302
+    assert response["Location"].startswith(
+        reverse("survey-project-session", args=[project.id])
+    )
+
+    user.refresh_from_db()
+
+    assert user.first_name == data["first_name"]
+    assert user.last_name == data["last_name"]
+    assert user.profile.organization.name == data["org_name"]
+    assert user.profile.phone_no == data["phone"]
+
+
+@pytest.mark.django_db
+def test_onbording_do_not_replace_existing_user_email_when_logged_in(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
+    data = {
+        "name": "a project",
+        "email": "a@exAmpLe.Com",
+        "location": "some place",
+        "org_name": "MyOrg",
+        "phone": "+3893889393399",
+        "first_name": "john",
+        "last_name": "doe",
+        "description": "a description",
+        "impediment_kinds": ["Autre"],
+        "response_0": "blah",
+        "impediments": "some impediment",
+    }
+
+    user_email = "user@existing.mail"
+    with login(client, username=user_email, email=user_email) as user:
+        response = client.post(reverse("projects-onboarding"), data=data)
+
+    project = projects_models.Project.objects.first()
+
+    assert response.status_code == 302
+    assert response["Location"].startswith(
+        reverse("survey-project-session", args=[project.id])
+    )
+
+    user.refresh_from_db()  # fonctionne dans ce contexte
+
+    assert user.email == user_email
+
+
+@pytest.mark.django_db
+def test_onboarding_redirect_anonymous_to_login_if_mail_exists(request, client):
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
+    data = {
+        "name": "a project",
+        "email": "a@exAmpLe.Com",
+        "location": "some place",
+        "org_name": "MyOrg",
+        "phone": "+3893889393399",
+        "first_name": "john",
+        "last_name": "doe",
+        "description": "a description",
+        "impediment_kinds": ["Autre"],
+        "response_0": "blah",
+        "impediments": "some impediment",
+    }
+
+    # someone exists with this email (which is lower case)
+    email = data["email"].lower()
+    baker.make(auth.User, email=email, username=email)
+
+    # i am not connected
+    response = client.post(reverse("projects-onboarding"), data=data)
+
+    # send me to login to prove i am the one
+    assert response.status_code == 302
+    assert response["Location"].startswith(reverse("account_login"))
+
+
+@pytest.mark.django_db
 def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
     baker.make(home_models.SiteConfiguration, site=get_current_site(request))
 
@@ -85,6 +185,7 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
         "first_name": "john",
         "last_name": "doe",
         "org_name": "MyOrg",
+        "phone": "",
         "response_0": "blah",
         "impediment_kinds": ["Autre"],
         "impediments": "some impediment",
@@ -106,8 +207,11 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
     url = reverse("home-user-setup-password")
     assert response.url == (f"{url}?{next_url}")
 
+    # the user and profile are filled according to provided information
     assert user.first_name == data["first_name"]
     assert user.last_name == data["last_name"]
+    assert user.profile.organization.name == data["org_name"]
+    assert user.profile.phone_no == data["phone"]
 
     assert int(client.session["_auth_user_id"]) == user.pk
 
