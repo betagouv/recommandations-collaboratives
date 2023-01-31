@@ -24,9 +24,6 @@ function Consent() {
             } catch (err) {
                 console.error('Something went wrong : ', err)
             }
-        },
-        handleSetCookiesPreferences() {
-            console.log('lol');
         }
     }
 }
