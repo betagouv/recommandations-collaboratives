@@ -96,11 +96,11 @@
                     {{form.departments}}
                 </p>
 
-                <p class="w-50 d-flex flex-column select-custom">
-                    {{form.contacts.label}}
+                <div class="w-50 d-flex flex-column select-custom">
                     {{form.contacts.errors}}
-                    {{form.contacts}}
-                </p>
+                    {% include 'resources/resource/fragments/contact_search.html' with contacts=form.contacts %}
+                </div>
+
             </div>
 
             <div class="d-flex">
