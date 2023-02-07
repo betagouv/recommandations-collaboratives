@@ -1,4 +1,4 @@
-django==3.2.16
+django==3.2.17
 ipython
 django-markdownx==3.0.1
 markdown-link-attr-modifier==0.2.0
