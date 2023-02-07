@@ -4,14 +4,23 @@
 {% block js %}
   {% vite_asset 'js/apps/consent.js' %}
 {% endblock %}
+{% load sass_tags %}
+{% block css %}
+  <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+        rel="stylesheet"
+        type="text/css">
+  <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
+        rel="stylesheet"
+        type="text/css">
+{% endblock %}
 {% block content %}
   <div class="fr-container fr-container--fluid fr-container-md">
     <div class="fr-grid-row fr-grid-row--center">
       <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
-        <div class="fr-modal__body">
-          <div class="fr-modal__header">
+        <div class="border mt-4">
+          <div class="mt-4 d-flex justify-content-end mx-4">
             <a href="{% url 'home' %}"
-               class="fr-btn--close fr-btn"
+               class="text-decoration-underline text-blue"
                aria-controls="fr-consent-modal"
                title="Fermer">Retour à l'accueil</a>
           </div>
@@ -24,20 +33,16 @@
                     Préférences pour tous les services. <a href="{% url 'privacy' %}">Données personnelles et cookies</a>
                   </legend>
                   <div class="fr-consent-service__radios">
-                    <div class="fr-radio-group">
-                      <form class="cookie-consent-accept"
-                            action="{% url 'cookie_consent_accept_all' %}"
-                            method="POST">
-                        <button class="button filled small" title="Autoriser tous les cookies">Tout accepter</button>
-                      </form>
-                    </div>
-                    <div class="fr-radio-group ms-2">
-                      <form class="cookie-consent-accept"
-                            action="{% url 'cookie_consent_decline_all' %}"
-                            method="POST">
-                        <button class="button filled small" title="Refuser tous les cookies">Tout refuser</button>
-                      </form>
-                    </div>
+                    <form class="cookie-consent-accept"
+                          action="{% url 'cookie_consent_accept_all' %}"
+                          method="POST">
+                      <button class="me-2 button filled small" title="Autoriser tous les cookies">Tout accepter</button>
+                    </form>
+                    <form class="cookie-consent-accept"
+                          action="{% url 'cookie_consent_decline_all' %}"
+                          method="POST">
+                      <button class="button filled small" title="Refuser tous les cookies">Tout refuser</button>
+                    </form>
                   </div>
                 </fieldset>
               </div>
@@ -45,9 +50,12 @@
                 <div class="fr-consent-service">
                   <fieldset aria-labelledby="finality-1-legend finality-1-desc"
                             role="group"
-                            class="fr-fieldset fr-fieldset--inline" style="margin-top: 15px !important; padding-top: 0 !important;">
+                            class="fr-fieldset fr-fieldset--inline"
+                            style="margin-top: 15px !important;
+                                   padding-top: 0 !important">
                     <div class="d-flex align-items-center justify-content-between w-100">
-                      <legend id="finality-{{ cookie_group.varname }}-legend" class="fr-consent-service__title mt-0 pt-0">
+                      <legend id="finality-{{ cookie_group.varname }}-legend"
+                              class="fr-consent-service__title mt-0 pt-0">
                         {{ cookie_group.name }}
                       </legend>
                       <div class="flex-grow-1">
@@ -59,7 +67,7 @@
                         {% else %}
                           {% if not cookie_group.is_required %}
                             <div class="d-flex align-items-center justify-content-end flex-grow-1">
-                              <div class="cookie-group-form me-3 d-flex align-items-center">
+                              <div class="cookie-group-form d-flex align-items-center">
                                 {% if request|cookie_group_accepted:cookie_group.varname %}
                                   <div class="fr-radio-group">
                                     <input checked
