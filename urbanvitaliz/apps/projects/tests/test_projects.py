@@ -286,24 +286,25 @@ def test_project_fails_unknown_sharing_link(request, client):
 
 
 @pytest.mark.django_db
-def test_existing_user_receives_email_on_login(client):
+def test_existing_user_receives_email_on_login(client, mailoutbox):
     user = Recipe(auth.User, email="jdoe@example.com").make()
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": user.email})
     assert response.status_code == 302
-    assert len(django.core.mail.outbox) == 1
-    assert user.email in django.core.mail.outbox[0].to
+    # assert len(django.core.mail.outbox) == 1
+    assert len(mailoutbox) == 1
+    assert user.email in mailoutbox[0].to
 
 
 @pytest.mark.django_db
-def test_unknown_user_is_created_and_receives_email_on_login(client):
+def test_unknown_user_is_created_and_receives_email_on_login(client, mailoutbox):
     email = "jdoe@example.com"
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": email})
     assert response.status_code == 302
     assert auth.User.objects.get(email=email)
-    assert len(django.core.mail.outbox) == 1
-    assert email in django.core.mail.outbox[0].to
+    assert len(mailoutbox) == 1
+    assert email in mailoutbox[0].to
 
 
 ########################################################################
