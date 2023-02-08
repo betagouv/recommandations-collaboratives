@@ -291,7 +291,6 @@ def test_existing_user_receives_email_on_login(client, mailoutbox):
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": user.email})
     assert response.status_code == 302
-    # assert len(django.core.mail.outbox) == 1
     assert len(mailoutbox) == 1
     assert user.email in mailoutbox[0].to
 
