@@ -15,9 +15,13 @@ from rest_framework.response import Response
 from urbanvitaliz.utils import check_if_switchtender
 
 from .. import models, signals
-from ..serializers import (ProjectSerializer, TaskFollowupSerializer,
-                           TaskNotificationSerializer, TaskSerializer,
-                           UserProjectStatusSerializer)
+from ..serializers import (
+    ProjectSerializer,
+    TaskFollowupSerializer,
+    TaskNotificationSerializer,
+    TaskSerializer,
+    UserProjectStatusSerializer,
+)
 
 
 ########################################################################
@@ -207,7 +211,7 @@ class UserProjectStatusViewSet(
 
     def get_queryset(self):
         project_statuses = models.UserProjectStatus.objects.filter(
-            user=self.request.user
+            user=self.request.user, project__deleted=None
         )
 
         ids = list(project_statuses.values_list("project__id", flat=True))
