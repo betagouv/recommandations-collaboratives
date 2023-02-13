@@ -13,6 +13,7 @@ import io
 import uuid
 
 import django.core.mail
+from django.core.mail import send_mail, outbox
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
