@@ -1,3 +1,9 @@
+import projects from '../../../../fixtures/projects/projects.json'
+const currentProject = projects[1];
+const currentTask = projects[5];
+
+console.log('current task : ', currentTask);
+
 describe('I can delete a recommandation', () => {
     beforeEach(() => {
         cy.login("jean");
@@ -7,29 +13,26 @@ describe('I can delete a recommandation', () => {
 
         cy.visit('/projects')
 
-        cy.contains('Friche numéro 1').click({force:true});
+        cy.contains(currentProject.fields.name).click({ force: true });
 
         cy.contains("Recommandations").click({ force: true })
 
         cy.url().should('include', '/actions')
 
-        cy.contains('Ma ressource sans recommandation').get('#dropdownMenuLink').click({force:true})
-        cy.contains('Modifier').click({force:true})
-
-        cy.url().should('include', '/task/1/update/')
-
-        cy.contains('Supprimer').click({force:true})
+        cy.get(`#task-${currentTask.pk}-edit-button`).click({ force: true })
+        cy.get(`#task-${currentTask.pk}-delete-button`).click({ force: true })
+        cy.get('#form-delete-task').contains('Supprimer').click({ force: true })
     })
 
     it ('checks if the recommandation is correclty deleted and not visible on the recommandation tab', () => {
         cy.visit('/projects')
 
-        cy.contains('Friche numéro 1').click({force:true});
+        cy.contains(currentProject.fields.name).click({force:true});
 
         cy.contains("Recommandations").click({ force: true })
 
         cy.url().should('include', '/actions')
 
-        cy.contains('Ma ressource sans recommandation').should('not.exist')
+        cy.contains(currentTask.fields.intent).should('not.exist')
     }) 
 })

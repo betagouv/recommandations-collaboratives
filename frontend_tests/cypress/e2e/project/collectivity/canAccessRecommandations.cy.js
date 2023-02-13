@@ -1,3 +1,7 @@
+import projects from '../../../fixtures/projects/projects.json'
+
+const currentProject = projects[1];
+
 describe('I can access the recommandations', () => {
 
     beforeEach(() => {
@@ -6,7 +10,7 @@ describe('I can access the recommandations', () => {
 
     it('goes to recommandations tab and see recommandations', () => {
 
-        cy.visit('/project/2')
+        cy.visit(`/project/${currentProject.pk}`)
 
         cy.contains("Recommandations").click({ force: true })
 

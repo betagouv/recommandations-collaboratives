@@ -110,7 +110,7 @@
 					</div>
 					{% if can_administrate and not disable_edit %}
 					<div class="dropdown">
-						<a class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button"
+						<a :id=`task-${t.id}-edit-button` class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button"
 							id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
 							Éditer
 						</a>
@@ -132,7 +132,7 @@
 							</li>
 							
 							<li>
-								<a class="dropdown-item text-danger" style="cursor: pointer;" @click="openDeleteTaskConfirmationModal(t)">Supprimer</a>
+								<a :id=`task-${t.id}-delete-button` class="dropdown-item text-danger" style="cursor: pointer;" @click="openDeleteTaskConfirmationModal(t)">Supprimer</a>
 							</li>
 
 						</ul>
