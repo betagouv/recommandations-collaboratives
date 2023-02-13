@@ -1,3 +1,7 @@
+import projects from '../../../fixtures/projects/projects.json'
+
+const currentProject = projects[3];
+
 describe('I can fill a project survey', () => {
 
     beforeEach(() => {
@@ -6,7 +10,7 @@ describe('I can fill a project survey', () => {
 
     it('fills up the survey', () => {
 
-        cy.visit('/project/4')
+        cy.visit(`/project/${currentProject.pk}`)
 
         cy.get('a').should('have.class', 'text-nowrap').contains('État des lieux').click({ force: true })
         cy.contains("Compléter l'état des lieux").click({ force: true })
