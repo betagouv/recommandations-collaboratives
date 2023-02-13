@@ -1,3 +1,7 @@
+import projects from '../../../fixtures/projects/projects.json'
+
+const currentProject = projects[2];
+
 describe('I can invite a member', () => {
 
     beforeEach(() => {
@@ -6,7 +10,7 @@ describe('I can invite a member', () => {
 
     it('goes to the overview page and invite a member', () => {
 
-        cy.visit('/project/3')
+        cy.visit(`/project/${currentProject.pk}`)
 
         cy.contains('Inviter un membre de la collectivité').click({ force: true });
 
