@@ -161,9 +161,6 @@
                                 <li>{% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}</li>
                             {% endfor %}
                         </ul>
-                        {{is_regional_actor}}
-                        {{switchtending}}
-                        {{can_administrate}}
                         {% if switchtending or is_regional_actor or can_administrate %}
                             <div class="d-block mb-2">
                                 <a style="cursor: pointer"
