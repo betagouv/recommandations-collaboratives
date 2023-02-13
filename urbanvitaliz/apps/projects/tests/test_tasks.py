@@ -717,9 +717,7 @@ def test_create_new_action_with_document(request, client):
     content = "My Content"
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+        utils.assign_advisor(user, project)
         png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
 
         response = client.post(

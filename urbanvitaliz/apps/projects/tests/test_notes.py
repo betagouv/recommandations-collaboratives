@@ -224,15 +224,12 @@ def test_public_note_available_to_readers(request, client):
 def test_create_conversation_message_with_attachment_for_project_collaborator(
     request, client
 ):
-    membership = baker.make(models.ProjectMember)
     project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-        projectmember_set=[membership],
+        models.Project, sites=[get_current_site(request)], status="READY"
     ).make()
 
-    with login(client, user=membership.member):
+    with login(client, username="collaborator") as user:
+        assign_collaborator(user, project)
         png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
         response = client.post(
             reverse("projects-conversation-create-message", args=[project.id]),

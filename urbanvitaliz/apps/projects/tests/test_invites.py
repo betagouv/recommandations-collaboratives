@@ -300,6 +300,7 @@ def test_collectivity_member_cannot_invite_an_advisor(request, client):
 ##################################################
 
 
+@pytest.mark.django_db
 def test_invitation_revocation(request, client):
     invited_email = "invite@party.com"
     project = baker.make(

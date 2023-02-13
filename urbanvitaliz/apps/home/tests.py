@@ -73,7 +73,7 @@ def test_create_user_assign_current_site_via_allauth(client, request):
     response = client.post(reverse("account_signup"), data)
     assert response.status_code == 302
 
-    user = auth_models.User.objects.first()
+    user = auth_models.User.objects.get(email=data["email"])
 
     assert len(user.profile.sites.all()) == 1
     assert site in user.profile.sites.all()
@@ -91,7 +91,7 @@ def test_create_user_assign_current_site_via_magicauth(client, request):
     response = client.post(reverse("magicauth-login"), data)
     assert response.status_code == 302
 
-    user = auth_models.User.objects.first()
+    user = auth_models.User.objects.get(email=data["email"])
 
     assert len(user.profile.sites.all()) == 1
     assert site in user.profile.sites.all()
@@ -103,7 +103,7 @@ def test_create_user_with_proper_email(request):
     email = "new.user@example.com"
     adapter.email_unknown_callback(request, email, None)
 
-    user = auth_models.User.objects.first()
+    user = auth_models.User.objects.get(email=email)
 
     assert user.email == email
     assert user.username == email

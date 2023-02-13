@@ -70,11 +70,11 @@ def unassign_advisor(user, project):
     for perm in ADVISOR_PERMISSIONS:
         remove_perm(perm, user, project)
 
-    models.ProjectSwitchtender.objects.get_or_create(
+    models.ProjectSwitchtender.objects.filter(
         switchtender=user,
         site=get_current_site(Site.objects.get_current()),
         project=project,
-    )
+    ).delete()
 
 
 def assign_observer(user, project):

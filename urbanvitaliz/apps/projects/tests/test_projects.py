@@ -1365,13 +1365,11 @@ def test_switchtender_leaves_project(request, client):
 
     url = reverse("projects-project-switchtender-leave", args=[project.id])
     with login(client) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+        utils.assign_advisor(user, project)
 
         assert project.switchtenders_on_site.count() == 1
 
-        # Then POST to leave projet
+        # Then POST to leave project
         response = client.post(url)
 
     project = models.Project.on_site.get(pk=project.pk)
@@ -1522,9 +1520,7 @@ def test_switchtender_add_topics(request, client):
     }
 
     with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+        utils.assign_advisor(user, project)
 
         response = client.post(
             reverse("projects-project-topics", args=[project.id]),
