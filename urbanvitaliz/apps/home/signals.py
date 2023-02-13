@@ -13,4 +13,6 @@ def post_login(sender, user, request, **kwargs):
 
 @receiver(hijack_started)
 def delete_login_trace(sender, hijacker, hijacked, request, **kwargs):
-    actor_stream(hijacked).last().delete()
+    last_login = actor_stream(hijacked).last()
+    if last_login:
+        last_login.delete()

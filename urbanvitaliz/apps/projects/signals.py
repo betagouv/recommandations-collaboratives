@@ -31,15 +31,17 @@ project_switchtender_leaved = django.dispatch.Signal()
 
 project_member_joined = django.dispatch.Signal()
 
+document_uploaded = django.dispatch.Signal()
+
 
 @receiver(project_submitted)
-def log_project_submitted(sender, submitter, project, **kwargs):
+def log_project_submitted(sender, site, submitter, project, **kwargs):
     action.send(project, verb="a été déposé")
 
 
 @receiver(project_submitted)
-def notify_moderators_project_submitted(sender, submitter, project, **kwargs):
-    recipients = get_project_moderators()
+def notify_moderators_project_submitted(sender, site, submitter, project, **kwargs):
+    recipients = get_project_moderators(site)
 
     # Notify project moderators
     notify.send(
@@ -53,7 +55,7 @@ def notify_moderators_project_submitted(sender, submitter, project, **kwargs):
 
 
 @receiver(project_validated)
-def log_project_validated(sender, moderator, project, **kwargs):
+def log_project_validated(sender, site, moderator, project, **kwargs):
     action.send(project, verb="a été validé")
 
     if project.status == "DRAFT" or project.muted:
@@ -65,7 +67,7 @@ def log_project_validated(sender, moderator, project, **kwargs):
 
     notify.send(
         sender=project.owner,
-        recipient=get_regional_actors_for_project(project),
+        recipient=get_regional_actors_for_project(site, project),
         verb="a déposé le projet",
         action_object=project,
         target=project,
@@ -462,11 +464,8 @@ def note_created_challenged(sender, note, project, user, **kwargs):
 ################################################################
 # File Upload
 ################################################################
-@receiver(post_save, sender=models.Document, dispatch_uid="document_uploaded")
-def project_document_uploaded(sender, instance, created, **kwargs):
-    if not created:  # We don't want to notify about updates
-        return
-
+@receiver(document_uploaded)
+def project_document_uploaded(sender, instance, **kwargs):
     project = instance.project
     if project.status == "DRAFT" or project.muted:
         return

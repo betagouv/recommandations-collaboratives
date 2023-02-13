@@ -15,8 +15,13 @@ from rest_framework.response import Response
 from urbanvitaliz.utils import check_if_switchtender
 
 from .. import models, signals
-from ..serializers import (ProjectSerializer, TaskFollowupSerializer,
-                           TaskNotificationSerializer, TaskSerializer)
+from ..serializers import (
+    ProjectSerializer,
+    TaskFollowupSerializer,
+    TaskNotificationSerializer,
+    TaskSerializer,
+    UserProjectStatusSerializer,
+)
 
 
 ########################################################################
@@ -28,6 +33,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
+        # TODO tune query set to prevent loads of requests on subqueries
         return self.queryset.for_user(self.request.user).order_by(
             "-created_on", "-updated_on"
         )
@@ -192,6 +198,42 @@ class TaskNotificationViewSet(
         return Response({}, status=status.HTTP_200_OK)
 
     serializer_class = TaskNotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class UserProjectStatusViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+):
+    """
+    API endpoint for UserProjectStatus
+    """
+
+    def get_queryset(self):
+        project_statuses = models.UserProjectStatus.objects.filter(
+            user=self.request.user
+        )
+
+        ids = list(project_statuses.values_list("project__id", flat=True))
+
+        projects = models.Project.on_site.for_user(self.request.user).exclude(
+            id__in=ids
+        )
+
+        new_statuses = [
+            models.UserProjectStatus(
+                user=self.request.user, site=self.request.site, project=p, status="NEW"
+            )
+            for p in projects
+        ]
+
+        models.UserProjectStatus.objects.bulk_create(new_statuses)
+
+        return project_statuses.all()
+
+    serializer_class = UserProjectStatusSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 

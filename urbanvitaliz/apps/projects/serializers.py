@@ -9,8 +9,25 @@ from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
-from .models import Project, Task, TaskFollowup
+from .models import Document, Project, Task, TaskFollowup, UserProjectStatus
 from .utils import create_reminder, get_collaborators_for_project
+
+
+class DocumentSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Document
+        fields = [
+            "id",
+            "the_file",
+            "the_link",
+            "filename",
+            "description",
+            "uploaded_by",
+            "created_on",
+            "pinned",
+        ]
+
+    uploaded_by = UserSerializer(read_only=True, many=False)
 
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
@@ -25,8 +42,10 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "org_name",
             "switchtenders",
             "is_switchtender",
+            "is_observer",
             "commune",
             "notifications",
+            "recommendation_count",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
@@ -35,6 +54,19 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     def get_is_switchtender(self, obj):
         request = self.context.get("request")
         return request.user in obj.switchtenders.all()
+
+    is_observer = serializers.SerializerMethodField()
+
+    def get_is_observer(self, obj):
+        request = self.context.get("request")
+        return request.user.pk in obj.switchtenders_on_site.filter(
+            is_observer=True
+        ).values_list("switchtender__id", flat=True)
+
+    recommendation_count = serializers.SerializerMethodField()
+
+    def get_recommendation_count(self, obj):
+        return Task.on_site.published().filter(project=obj).count()
 
     commune = CommuneSerializer(read_only=True)
 
@@ -126,6 +158,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "created_by",
             "intent",
             "content",
+            "document",
             "reminders",
             "resource_id",
             "notifications",
@@ -135,6 +168,8 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
 
     created_by = UserSerializer(read_only=True, many=False)
     reminders = ReminderSerializer(read_only=True, many=True)
+
+    document = DocumentSerializer(read_only=True, many=True)
 
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()
@@ -178,3 +213,14 @@ class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):
     action_object = GenericRelatedField(
         {Task: TaskSerializer(), TaskFollowup: TaskFollowupSerializer()}
     )
+
+
+class UserProjectStatusSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = UserProjectStatus
+        fields = ["id", "project", "status"]
+
+    project = ProjectSerializer(read_only=True)
+
+
+# eof

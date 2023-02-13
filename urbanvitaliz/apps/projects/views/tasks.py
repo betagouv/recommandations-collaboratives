@@ -17,18 +17,33 @@ from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (check_if_switchtender, has_perm_or_403,
-                                is_staff_or_403, is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    check_if_switchtender,
+    has_perm_or_403,
+    is_staff_or_403,
+    is_switchtender_or_403,
+)
 
 from .. import models, signals
-from ..forms import (CreateActionsFromResourcesForm,
-                     CreateActionWithoutResourceForm,
-                     CreateActionWithResourceForm, PushTypeActionForm,
-                     RemindTaskForm, RsvpTaskFollowupForm, TaskFollowupForm,
-                     TaskRecommendationForm, UpdateTaskFollowupForm,
-                     UpdateTaskForm)
-from ..utils import (can_manage_or_403, create_reminder, get_active_project_id,
-                     remove_reminder)
+from ..forms import (
+    CreateActionsFromResourcesForm,
+    CreateActionWithoutResourceForm,
+    PushTypeActionForm,
+    TaskFollowupForm,
+    TaskRecommendationForm,
+    UpdateTaskFollowupForm,
+    UpdateTaskForm,
+    CreateActionWithResourceForm,
+    DocumentUploadForm,
+    RemindTaskForm,
+    RsvpTaskFollowupForm,
+)
+
+from ..utils import (
+    create_reminder,
+    get_active_project_id,
+    remove_reminder,
+)
 
 
 @login_required
@@ -302,8 +317,8 @@ def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
 
-    membership = task.project.projectmember_set.filter(is_owner=True).first()
-    if not membership:
+    owner = task.project.owner
+    if not owner:
         raise Http404
 
     if request.method == "POST":
@@ -312,9 +327,7 @@ def remind_task(request, task_id=None):
             days = form.cleaned_data.get("days")
             days = days or 6 * 7  # 6 weeks is default
 
-            if create_reminder(
-                days, task, membership.member, origin=api.models.Reminder.SELF
-            ):
+            if create_reminder(days, task, owner, origin=api.models.Reminder.SELF):
                 messages.success(
                     request,
                     "Une alarme a bien été programmée dans {0} jours.".format(days),
@@ -509,6 +522,18 @@ def create_action(request, project_id=None):
                 action.created_by = request.user
                 action.save()
                 action.top()
+
+                # Check if we have a file or link
+                document_form = DocumentUploadForm(request.POST, request.FILES)
+                if document_form.is_valid():
+                    if document_form.cleaned_data["the_file"]:
+                        document = document_form.save(commit=False)
+                        document.attached_object = action
+                        document.site = request.site
+                        document.uploaded_by = request.user
+                        document.project = action.project
+
+                        document.save()
 
                 # Notify other switchtenders
                 signals.action_created.send(

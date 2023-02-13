@@ -26,6 +26,11 @@ urlpatterns = [
         name="resources-resource-detail",
     ),
     path(
+        r"ressource/<int:resource_id>/delete",
+        views.ResourceDeleteView.as_view(),
+        name="resources-resource-delete",
+    ),
+    path(
         r"ressource/<int:resource_id>/embed",
         views.EmbededResourceDetailView.as_view(),
         name="resources-resource-detail-embeded",

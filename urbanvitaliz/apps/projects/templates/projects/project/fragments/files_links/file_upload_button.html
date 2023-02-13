@@ -1,0 +1,38 @@
+{% load static %}
+{% load sass_tags %}
+{% load humanize %}
+
+{% load django_vite %}
+
+{% block css %}
+<link href="{% sass_src 'projects/css/file_upload.scss' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+<div x-data="FileUpload('{{ type }}')">
+  <button x-ref="button" class="button {% if filled == True %} filled {% endif %} {% if small == True %} small {% endif %}" @click="onButtonClick">Ajouter un fichier</button>
+
+  <div x-cloak x-ref="popover" id="popover" @click.outside="onOutsideClick" class="rounded bg-white shadow" style="width: 420px;">
+    <form method="post" action="{{ action }}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="p-3">
+        <h6 class="text-uppercase" style="font-size: 1em;">Ajouter un fichier</h6>
+        <p class="mb-2 text-info-custom text-grey-dark small">Vous pouvez joindre un fichier à votre <span x-text="getString(`types.${type}`)"></span>, d'une taille maximum de 20Mo</p>
+
+        <div class="mb-2 mt-3">
+          {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' with required=True %}
+        </div>
+
+        <label class="d-block mt-3">
+          <span class="mb-1 d-block text-info-custom text-grey-dark">Donnez un nom au fichier</span>
+          <input id="document-description" required name="description" x-model="pendingTitle" class="form-control form-control-sm py-2" type="text" />
+        </label>
+      </div>
+
+      <div class="border-top border-light p-3 d-flex justify-content-end">
+        <button id="document-submit-button" class="button filled small" type="submit">Envoyer</button>
+      </div>
+    </form>
+    <div x-ref="arrow" class="popover-arrow"></div>
+  </div>
+</div>

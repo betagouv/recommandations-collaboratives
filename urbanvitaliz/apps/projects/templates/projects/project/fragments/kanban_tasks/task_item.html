@@ -74,7 +74,7 @@
 							<div class="d-flex justify-content-between">
 								<div>
 									<img class="rounded-circle d-inline-block" width="20px" height="20px"
-										:src="generateGravatarUrl(t.created_by)" data-bs-toggle="tooltip" data-bs-placement="bottom"
+									:src="gravatar_url(t.created_by.email, 25)" data-bs-toggle="tooltip" data-bs-placement="bottom"
 										:title="`${t.created_by.first_name} ${t.created_by.last_name}`" style="z-index: 1000;" tabindex="0" />
 									<span class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
 									style="line-height: 20px"></span>
@@ -101,7 +101,7 @@
 
 				<div class="d-flex align-items-center"
 					x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
-					<div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" data-bs-toggle="tooltip"
+					<div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" :style="isOldReminder(t.reminders[0]) ? 'color:#6c757d !important;' : ''" data-bs-toggle="tooltip"
 						data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(t.id)"
 						style="cursor: pointer;">
 						<svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
@@ -129,6 +129,10 @@
 									{% csrf_token %}
 									<button class="dropdown-item">Supprimer le rappel</button>
 								</form>
+							</li>
+							
+							<li>
+								<a class="dropdown-item text-danger" style="cursor: pointer;" @click="openDeleteTaskConfirmationModal(t)">Supprimer</a>
 							</li>
 
 						</ul>

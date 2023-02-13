@@ -1,0 +1,72 @@
+.status-color-indicator {
+    width: 12px;
+    height: 12px;
+
+    border-radius: 2px;
+}
+
+.task-separator {
+    width: 32px;
+    height: 4px;
+    background-color: #CECECE;
+    border-radius: 2px;
+}
+
+.task-item .task-toolbar {
+    /* transform: translate3d(-25px,0,0); */
+    margin-left: -24px;
+}
+
+.task-item p {
+    margin-bottom: 5px;
+}
+
+.board-status-filter-button {
+    cursor:  pointer !important;
+}
+
+.board-status-filter-button:hover {
+    background-color: #efefef !important;
+}
+
+.board-status-filter-button.active {
+    background-color: #CECECE !important;
+}
+
+.task-animation-appear-in {
+    animation: status-animation-appear 0.35s ease forwards;
+    transform: translate3d(0,-5px,0);
+    opacity: 0;
+    background-color: #CECECE;
+}
+
+.board-status-item {
+    animation: status-appear 0.35s ease forwards;
+    transform: translate3d(0,-5px,0);
+    opacity: 0;
+}
+
+@keyframes status-animation-appear {
+    from {
+        opacity: 0;
+        transform: translate3d(0,-5px,0);
+        background-color: #CECECE;
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0,0,0);
+        background-color: white;
+    }
+}
+
+
+@keyframes status-appear {
+    from {
+        opacity: 0;
+        transform: translate3d(0,-5px,0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0,0,0);
+    }
+}

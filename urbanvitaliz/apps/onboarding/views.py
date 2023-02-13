@@ -1,8 +1,13 @@
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
+from django.db.models import Q
 from django.shortcuts import redirect, render, reverse
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
+from urbanvitaliz.apps.addressbook import models as addressbook_models
+from urbanvitaliz.apps.communication import digests
+from urbanvitaliz.apps.communication.api import send_email
+from urbanvitaliz.apps.communication.digests import normalize_user_name
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import signals as projects_signals
@@ -47,23 +52,40 @@ def onboarding(request):
                 postcode = form.cleaned_data.get("postcode")
                 project.commune = geomatics.Commune.get_by_postal_code(postcode)
 
-            # User handling
-            user, created = auth.User.objects.get_or_create(
-                username=form.cleaned_data.get("email"),
-                defaults={
-                    "username": form.cleaned_data.get("email"),
-                    "email": form.cleaned_data.get("email"),
-                    "first_name": form.cleaned_data.get("first_name"),
-                    "last_name": form.cleaned_data.get("last_name"),
-                },
-            )
+            email = form.cleaned_data.get("email").lower()
+            created = False  # for future redirection at end of view
 
-            if not created:
-                if request.user.username != user.username:
-                    # account exists, redirect to login
+            if request.user.is_authenticated:
+                user = request.user
+            else:
+                user_exists = auth.User.objects.filter(
+                    Q(email=email) | Q(username=email)
+                ).count()
+                if user_exists:  # ask for authentication
+                    # TODO store data into session (json?) for when coming back
                     login_url = reverse("account_login")
                     next_args = urlencode({"next": reverse("projects-onboarding")})
                     return redirect(f"{login_url}?{next_args}")
+                else:  # create new user
+                    user = auth.User.objects.create(username=email, email=email)
+                    created = True
+
+            # Update user profile if blank
+            user.first_name = user.first_name or form.cleaned_data.get("first_name")
+            user.last_name = user.last_name or form.cleaned_data.get("last_name")
+            user.save()
+            profile = user.profile
+            org_name = form.cleaned_data.get("org_name")
+            if org_name:
+                org, _ = addressbook_models.Organization.objects.get_or_create(
+                    name=org_name
+                )
+                profile.organization = profile.organization or org
+
+            profile.phone_no = profile.phone_no or form.cleaned_data.get("phone")
+            profile.save()
+
+            project.submitted_by = user
 
             # save project
             project.save()
@@ -97,7 +119,27 @@ def onboarding(request):
 
             # All green, notify
             projects_signals.project_submitted.send(
-                sender=projects.Project, submitter=user, project=project
+                sender=projects.Project,
+                site=request.site,
+                submitter=user,
+                project=project,
+            )
+
+            # Send an email to the project owner
+            params = {
+                "project": digests.make_project_digest(
+                    project, project.owner, url_name="knowledge"
+                ),
+            }
+            send_email(
+                template_name="project_received",
+                recipients=[
+                    {
+                        "name": normalize_user_name(project.owner),
+                        "email": project.owner.email,
+                    }
+                ],
+                params=params,
             )
 
             # NOTE check if commune is unique for code postal

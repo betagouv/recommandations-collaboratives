@@ -10,9 +10,52 @@ created : 2021-05-26 13:55:23 CEST
 
 from csvexport.actions import csvexport
 from django.contrib import admin
-from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
+from django.db.models import Count, F, Q
+from ordered_model.admin import (OrderedInlineModelAdminMixin,
+                                 OrderedTabularInline)
 
 from . import models
+
+
+class RecommendationListFilter(admin.SimpleListFilter):
+    title = "Recommandations"
+    parameter_name = "recommendation"
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+        return (
+            ("with", "Avec reco"),
+            ("with_resources", "Recos+au moins 1 resource"),
+            ("without_resources", "Recos sans aucune resource"),
+            ("without", "Sans reco"),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "with":
+            return queryset.exclude(tasks=None)
+        if self.value() == "without":
+            return queryset.filter(tasks=None)
+
+        qs_with_tasks_count = queryset.annotate(
+            tasks_count=Count("tasks"),
+            tasks_nores_count=Count("tasks", filter=Q(tasks__resource=None)),
+        ).exclude(tasks_count=0)
+
+        if self.value() == "with_resources":
+            return qs_with_tasks_count.filter(
+                tasks_count__gt=F("tasks_nores_count")
+            ).distinct()
+
+        if self.value() == "without_resources":
+            return qs_with_tasks_count.filter(
+                tasks_count=F("tasks_nores_count")
+            ).distinct()
 
 
 class ProjectTaskTabularInline(OrderedTabularInline):
@@ -46,6 +89,7 @@ class ProjectSwitchtenderTabularInline(admin.TabularInline):
     model = models.ProjectSwitchtender
     fields = (
         "switchtender",
+        "is_observer",
         "site",
     )
     extra = 1
@@ -59,8 +103,9 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
         "created_on",
         "exclude_stats",
         "publish_to_cartofriches",
-        "tags",
+        RecommendationListFilter,
         "status",
+        "tags",
     ]
     list_display = ["created_on", "name", "location"]
     actions = [csvexport]
@@ -69,6 +114,13 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
         ProjectSwitchtenderTabularInline,
         ProjectTaskTabularInline,
     )
+
+
+@admin.register(models.UserProjectStatus)
+class UserProjectStatusAdmin(admin.ModelAdmin):
+    list_display = ["project", "user", "status"]
+
+    list_filter = ["site"]
 
 
 @admin.register(models.Note)

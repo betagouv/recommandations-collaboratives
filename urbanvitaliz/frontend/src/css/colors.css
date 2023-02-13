@@ -1,0 +1,31 @@
+.bg-green {
+    background-color: #5BB5A7;
+}
+
+.bg-grey {
+    background-color: #E5E5E5;
+}
+
+.bg-grey-light {
+    background-color: #F6F6F6;
+}
+
+.bg-red {
+    background-color: #FFE9E9;
+}
+
+.bg-blue-light {
+    background-color: #E8EDFF;
+}
+
+.bg-blue {
+    background: #0063CB;
+}
+
+.fill-blue {
+    fill: #0063CB;
+}
+
+.fill-grey {
+    fill:#929292;
+}

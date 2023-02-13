@@ -1,0 +1,10 @@
+<div>
+    <span class="align-middle text-info-custom text-grey-light">
+        Cette ressource a été recommandée sur les projets suivants :
+    </span>
+    <ul class="mt-3 text-grey-light">
+        {% for project in projects_used_by %}
+        <li><a class="text-info-custom text-grey-light text-decoration-none" href="{% url 'projects-project-detail' project.pk %}">{{ project.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>

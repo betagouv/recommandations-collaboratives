@@ -7,10 +7,13 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
 
+import os
 import uuid
 
 from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+                                                GenericRelation)
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
@@ -87,12 +90,10 @@ class Project(models.Model):
     PROJECT_STATES = (
         ("DRAFT", "Brouillon"),
         ("TO_PROCESS", "A traiter"),
-        ("QUESTIONS", "En attente de retour de la collectivité"),
-        ("READY", "Prêt à aiguiller"),
-        ("IN_PROGRESS", "Recommandations en cours"),
-        ("REVIEW_REQUEST", "Demande de relecture"),
-        ("DONE", "Appui réalisé"),
-        ("STUCK", "En attente/bloqué"),
+        ("READY", "En attente"),
+        ("IN_PROGRESS", "En cours"),
+        ("DONE", "Traité"),
+        ("STUCK", "Conseil Interrompu"),
         ("REJECTED", "Rejeté"),
     )
 
@@ -109,6 +110,15 @@ class Project(models.Model):
         related_query_name="target_projects",
         content_type_field="target_content_type",
         object_id_field="target_object_id",
+    )
+
+    submitted_by = models.ForeignKey(
+        auth_models.User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name="Déposé par",
+        related_name="projects_submitted",
     )
 
     status = models.CharField(max_length=20, choices=PROJECT_STATES, default="DRAFT")
@@ -172,26 +182,26 @@ class Project(models.Model):
     )
     description = models.TextField(verbose_name="Description", default="", blank=True)
 
-    # Synopsis (needs rephrased by an advisor)
-    synopsis = models.TextField(
-        verbose_name="Reformulation du besoin", default="", blank=True, null=True
+    # Internal advisors note
+    advisors_note = models.TextField(
+        verbose_name="Note interne", default="", blank=True, null=True
     )
 
     @property
-    def synopsis_rendered(self):
+    def advisors_note_rendered(self):
         """Return synopsis as markdown"""
-        return markdownify(self.synopsis)
+        return markdownify(self.advisors_note)
 
-    synopsis_on = models.DateTimeField(
-        verbose_name="Reformulé le", null=True, blank=True
+    advisors_note_on = models.DateTimeField(
+        verbose_name="Rédigé le", null=True, blank=True
     )
-    synopsis_by = models.ForeignKey(
+    advisors_note_by = models.ForeignKey(
         auth_models.User,
-        verbose_name="Reformulé par",
+        verbose_name="Rédigé par",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name="synopses",
+        related_name="advisors_notes",
     )
 
     location = models.CharField(max_length=256, verbose_name="Localisation")
@@ -265,10 +275,15 @@ class UserProjectStatusOnSiteManager(CurrentSiteManager):
 
 
 class UserProjectStatus(models.Model):
+    """Project status for a given user"""
+
     objects = UserProjectStatusOnSiteManager()
 
     USERPROJECT_STATES = (
-        ("FOLLOWED", "Suivi"),
+        ("NEW", "Nouveau"),
+        ("TODO", "A traiter"),
+        ("WIP", "En cours"),
+        ("DONE", "Traité"),
         ("NOT_INTERESTED", "Pas d'intérêt"),
     )
 
@@ -304,6 +319,20 @@ class ProjectSwitchtender(models.Model):
         Project, on_delete=models.CASCADE, related_name="switchtenders_on_site"
     )
     is_observer = models.BooleanField(default=False)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+
+class ProjectTopicOnSiteManager(CurrentSiteManager):
+    pass
+
+
+class ProjectTopic(models.Model):
+    objects = ProjectTopicOnSiteManager()
+
+    label = models.CharField(max_length=255)
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name="topics_on_site"
+    )
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
 
@@ -353,6 +382,8 @@ class Note(models.Model):
         content_type_field="action_object_content_type",
         object_id_field="action_object_object_id",
     )
+
+    document = GenericRelation("Document")
 
     def get_absolute_url(self):
         if self.public:
@@ -556,6 +587,8 @@ class Task(OrderedModel):
         resources.Resource, on_delete=models.CASCADE, null=True, blank=True
     )
 
+    document = GenericRelation("Document")
+
     contact = models.ForeignKey(
         addressbook_models.Contact, on_delete=models.CASCADE, null=True, blank=True
     )
@@ -703,6 +736,10 @@ class DocumentManager(models.Manager):
         return super().get_queryset().filter(deleted=None)
 
 
+class DocumentOnSiteManager(CurrentSiteManager, DocumentManager):
+    pass
+
+
 class DeletedDocumentManager(models.Manager):
     """Manager for deleted documents"""
 
@@ -714,11 +751,17 @@ class Document(models.Model):
     """Représente un document associé à un project"""
 
     objects = DocumentManager()
+    on_site = DocumentOnSiteManager()
     objects_deleted = DeletedDocumentManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     project = models.ForeignKey(
         "Project", on_delete=models.CASCADE, related_name="documents"
     )
+
+    pinned = models.BooleanField(default=False)
+
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )
@@ -729,17 +772,36 @@ class Document(models.Model):
         blank=True,
     )
 
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, blank=True, null=True
+    )
+    object_id = models.PositiveIntegerField(blank=True, null=True)
+    attached_object = GenericForeignKey("content_type", "object_id")
+
     description = models.CharField(max_length=256, default="", blank=True)
 
     def upload_path(self, filename):
         return "projects/%d/%s" % (self.project.pk, filename)
 
-    the_file = models.FileField(upload_to=upload_path)
+    the_file = models.FileField(null=True, blank=True, upload_to=upload_path)
+    the_link = models.URLField(max_length=500, null=True, blank=True)
+
+    def filename(self):
+        return os.path.basename(self.the_file.name)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = []
+        constraints = [
+            models.CheckConstraint(
+                check=~Q(Q(the_file__exact="") & Q(the_link__isnull=True)),
+                name="not_both_link_and_file_are_null",
+            )
+        ]
+        indexes = [
+            models.Index(fields=["content_type", "object_id"]),
+        ]
+
         verbose_name = "document"
         verbose_name_plural = "documents"
 

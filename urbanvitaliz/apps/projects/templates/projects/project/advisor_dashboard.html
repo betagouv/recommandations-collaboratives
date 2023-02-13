@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/advisorDashboard.js' %}
+{% endblock %}
+
+
+{% block content %}
+<div class="col-11 py-5 mx-auto">
+    {% include 'projects/project/fragments/kanban_projects/kanban_projects.html' %}
+</div>
+{% endblock %}

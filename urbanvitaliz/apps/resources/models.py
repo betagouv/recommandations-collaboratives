@@ -95,7 +95,7 @@ class ResourceQuerySet(models.QuerySet):
 
 class ResourceManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().order_by(Lower("title"))
+        return super().get_queryset().filter(deleted=None).order_by(Lower("title"))
 
 
 ResourceManagerWithQS = ResourceManager.from_queryset(ResourceQuerySet)
@@ -157,7 +157,10 @@ class Resource(models.Model):
 
     @property
     def expired(self):
-        return self.expires_on > datetime.date.today()
+        if self.expires_on:
+            return self.expires_on < datetime.date.today()
+        else:
+            return False
 
     tags = TaggableManager(blank=True)
 

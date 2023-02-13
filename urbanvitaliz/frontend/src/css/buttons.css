@@ -10,6 +10,35 @@
 
     transition: background 0.25s ease;
     background: transparent;
+    cursor: pointer !important;
+}
+
+.button.small {
+    padding: 5px 15px;
+}
+
+.button.filled {
+    background-color: #0063CB;
+    color: white;
+}
+
+.button.filled:hover {
+    color: #0063CB !important;
+}
+
+.button.red.filled {
+    background-color: #CE0500;
+    color: white;
+}
+
+.button.white {
+    border-color: white;
+    color: white;
+}
+
+.button.white:hover {
+    border-color: white;
+    color: #222 !important;
 }
 
 .button.red {
@@ -44,4 +73,19 @@
 
 .button:hover{
     background-color: #e2effc;
+}
+
+.play-button {
+    transition: 0.15s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.play-button:hover {
+    transform: scale(1.2);
+}
+
+.border-form {
+    border: 1px solid #E5E5E5;
+    border-radius: 4px;
 }

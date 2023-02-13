@@ -1,0 +1,19 @@
+.flag {
+    padding: 20px;
+}
+
+.flag.blue {
+    background-color: #E8EDFF;
+}
+
+.flag.grey {
+    background-color: #F6F6F6;
+}
+
+.flag.red {
+    background-color: #FFE9E9;
+}
+
+.flag.orange {
+    background-color: #ffeeb9;
+}

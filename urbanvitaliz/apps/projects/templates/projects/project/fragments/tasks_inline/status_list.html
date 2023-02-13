@@ -1,0 +1,12 @@
+<div>
+    <template x-for="board in boardsFiltered">
+        <div>
+            {% include 'projects/project/fragments/tasks_inline/status_item.html' %}
+        </div>
+    </template>
+    <template x-if="boardsFiltered.length == '0'">
+        <div class="border rounded mb-3 px-3 d-flex pt-3 pb-3 justify-content-between align-items-start task-item">
+            <p class="text-info-custom font-small text-grey-dark my-0">Pas de données</p>
+        </div>
+    </template>
+</div>

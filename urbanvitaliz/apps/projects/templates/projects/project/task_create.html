@@ -40,7 +40,7 @@
 
 
     <div x-data="action_pusher_app()" x-init="create_recommendation()" x-cloak>
-        <form class="form" method="POST" action=".">
+        <form class="form" method="POST" action="." enctype="multipart/form-data">
             {% csrf_token %}
 
             {% include 'projects/project/fragments/action_pusher/type.html' %}

@@ -47,6 +47,11 @@ router.register(
     basename="project-tasks-notifications",
 )
 router.register(r"projects", projects_rest.ProjectViewSet, basename="projects")
+router.register(
+    r"userprojectstatus",
+    projects_rest.UserProjectStatusViewSet,
+    basename="userprojectstatus",
+)
 
 router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
 router.register(
@@ -63,6 +68,7 @@ urlpatterns = [
     path("notifications/", include(notifications.urls, namespace="notifications")),
     path("hijack/", include("hijack.urls")),
     path("nimda/", admin.site.urls),
+    path("cookies/", include("cookie_consent.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

@@ -12,6 +12,7 @@ import pytest
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -217,6 +218,38 @@ def test_public_note_available_to_readers(request, client):
         response = client.get(note.get_absolute_url())
 
     assertContains(response, note_content)
+
+
+@pytest.mark.django_db
+def test_create_conversation_message_with_attachment_for_project_collaborator(
+    request, client
+):
+    membership = baker.make(models.ProjectMember)
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+        projectmember_set=[membership],
+    ).make()
+
+    with login(client, user=membership.member):
+        png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+        response = client.post(
+            reverse("projects-conversation-create-message", args=[project.id]),
+            data={
+                "content": "this is some content",
+                "the_file": png,
+            },
+        )
+
+    assert response.status_code == 302
+
+    note = models.Note.objects.first()
+    assert note
+    document = models.Document.on_site.first()
+    assert document
+    assert document.the_file != ""
+    assert document.attached_object == note
 
 
 #

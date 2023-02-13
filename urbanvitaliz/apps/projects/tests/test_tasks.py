@@ -7,10 +7,10 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
-
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
@@ -707,6 +707,39 @@ def test_create_new_action_without_resource(request, client):
     assert task.intent == intent
     assert task.resource is None
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_create_new_action_with_document(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    intent = "My Intent"
+    content = "My Content"
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+        png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+
+        response = client.post(
+            reverse("projects-project-create-action", args=[project.id]),
+            data={
+                "push_type": "noresource",
+                "public": True,
+                "intent": intent,
+                "content": content,
+                "the_file": png,
+            },
+        )
+
+    assert response.status_code == 302
+
+    document = models.Document.objects.first()
+    assert document
+
+    task = models.Task.on_site.first()
+    assert task.document.first() == document
 
 
 @pytest.mark.django_db

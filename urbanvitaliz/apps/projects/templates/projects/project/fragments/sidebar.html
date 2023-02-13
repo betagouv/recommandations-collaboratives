@@ -4,7 +4,7 @@
 <div class="d-grid gap-2 my-3">
     {% if can_manage and not disable_can_share %}
     <span class="d-inline-block">
-        <a href="{% url 'projects-access-update' project.id %}" class="btn btn-primary w-100 btn-sm">
+        <a href="{% url 'projects-project-access-collectivity-invite' project.id %}" class="btn btn-primary w-100 btn-sm">
             <svg class="bi" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
             </svg>
@@ -16,7 +16,7 @@
     {% if can_administrate and not is_switchtender %}
     {% if not disable_can_edit %}
     <span class="d-inline-block">
-        <a href="{% url 'projects-project-update' project.id %}" class="btn btn-primary w-100 btn-sm">
+        <a href="{% url 'projects-project-administration' project.id %}" class="btn btn-primary w-100 btn-sm">
             <svg class="bi" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil" />
             </svg>
@@ -45,14 +45,15 @@
                 CRM
             </a>
         </span>
-
-        <span class="d-inline-block">
-            <a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'projects-access-update' project.pk %}">
-                <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
-                </svg>
-                Droits d'accès
-            </a>
-        </span>
+        {% if not disable_administration %}
+            <span class="d-inline-block">
+                <a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'projects-project-administration' project.pk %}">
+                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
+                    </svg>
+                    Administration
+                </a>
+            </span>
         {% endif %}
+    {% endif %}
 </div>

@@ -40,7 +40,13 @@ class OnboardingResponseForm(forms.ModelForm):
     phone = forms.CharField(
         max_length=16, label="Téléphone", initial="", required=False
     )
-    email = forms.CharField(label="Email principal", required=True)
+    email = forms.CharField(label="Courriel", required=True)
+
+    def clean_email(self):
+        """Make sure email is lowercased"""
+        email = self.cleaned_data["email"]
+        return email.lower()
+
     org_name = forms.CharField(
         label="Nom de votre structure", initial="", required=True
     )
@@ -73,7 +79,7 @@ class OnboardingResponseWithCaptchaForm(OnboardingResponseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Prevent tests from failing
+        # Skip captcha during tests
         if "PYTEST_CURRENT_TEST" in os.environ:
             self.fields.pop("captcha")
 

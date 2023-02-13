@@ -7,8 +7,13 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-08-03 14:26:39 CEST
 """
 
+import csv
+import datetime
+from collections import defaultdict
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -170,6 +175,88 @@ def question_delete(request, question_id=None):
         )
         return redirect(next_url)
     return render(request, "survey/editor/question/delete.html", locals())
+
+
+def get_answers_for_question(site, question):
+    answers = defaultdict(list)
+
+    db_answers = (
+        models.Answer.objects.filter(session__survey__site=site, question=question)
+        .exclude(session__project__exclude_stats=True)
+        .order_by("values", "session__project")
+        .values("values", "session__project", "session__project__name")
+        .distinct()
+    )
+
+    for record in db_answers:
+        if isinstance(record["values"], list):
+            key = ", ".join(record["values"])
+        else:
+            key = record["values"]
+
+        answers[str(key) or "--aucun--"].append(
+            {"id": record["session__project"], "name": record["session__project__name"]}
+        )
+
+    return dict(answers), db_answers.count()
+
+
+@login_required
+def question_results(request, question_id=None):
+    """Show question results"""
+    is_staff_or_403(request.user)
+
+    question = get_object_or_404(
+        models.Question, question_set__survey__site=request.site, pk=question_id
+    )
+    question_set = get_object_or_404(models.QuestionSet, pk=question.question_set_id)
+
+    answers, total_count = get_answers_for_question(request.site, question)
+
+    return render(request, "survey/editor/question/results.html", locals())
+
+
+@login_required
+def question_results_as_csv(request, question_id=None):
+    """Show question results"""
+    is_staff_or_403(request.user)
+
+    today = datetime.datetime.today().date()
+
+    question = get_object_or_404(
+        models.Question, question_set__survey__site=request.site, pk=question_id
+    )
+
+    answers, total_count = get_answers_for_question(request.site, question)
+
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="question-{question.id}-answers-{today}.csv"'
+        },
+    )
+
+    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
+    writer.writerow(
+        [
+            "tags",
+            "usage_count",
+            "project_ids",
+            "project_names",
+        ]
+    )
+
+    for signal, projects in answers.items():
+        writer.writerow(
+            [
+                signal,
+                len(projects),
+                [project["id"] for project in projects],
+                [project["name"] for project in projects],
+            ]
+        )
+
+    return response
 
 
 #######################################################################

@@ -9,6 +9,9 @@
 {{ block.super }} > Connaissance
 {% endblock %}
 
+{% block banner %}
+    {% include 'projects/project/fragments/positioning_banner.html' %}
+{% endblock %}
 
 {% block project_detail %}
 
@@ -18,6 +21,40 @@
 {% challenge_acquire challenge %}
 {% endif %}
 
+<style type="text/css">
+	@media print
+    {
+        main {
+            padding-top: 0 !important;
+        }
+
+        .project-navigation {
+            display: none !important;
+        }
+
+        .knowledge-title {
+            margin-top: 0 !important;
+        }
+        .masonry-wrapper{
+            display: block !important;
+        }
+        .masonry-wrapper .masonry-item{
+            display: block !important;
+            position: relative !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+        }
+        .navbar {
+            display: none !important;
+        }
+        footer {
+            display: none !important;
+        }
+	}
+</style>
+
 
 <div class="col-12">
 
@@ -26,35 +63,18 @@
 <div class="row">
 
     {% if not is_switchtender %}
-    {% if can_manage_draft and session and session.next_question and session.completion < 80 %} <div
-        class="col box-heading d-flex justify-content-between mb-4 mt-4">
-
-        <div class="flex-grow-1">
-
-            <h3>Complétez l'exploration du site !</h3>
-            {% if session.completion > 0 %}
-            🔎 Zoomer sur les bonnes questions à se poser pour démarrer
-            <br />
-            🚀 Obtenir des recommandations plus efficaces !
+    {% if can_manage_draft and session and session.next_question and session.completion < 80 %} 
+    <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
+        <h4 class="pt-2">
+            {% if session.completion == 0 %}
+                Prochaine étape : Remplissez le parcours d’état des lieux
             {% else %}
-            🔎 Laissez-vous guider vers <strong>les bonnes questions à se poser pour démarrer</strong> un projet de
-            revitalisation.
-            <br />
-            🚀 En prime, <strong>{{ request.site.name }} sera plus efficace</strong> pour vous conseiller !
+                Continuez le parcours d’état des lieux
             {% endif %}
-        </div>
-        <div class="flex-shrink-1">
-            {% if session.completion > 0 %}
-            <a href="{% url 'survey-session-start' session.id %}" class="btn btn-primary fw-bold p-2 m-4">
-                <span class="align-middle">Continuer le parcours</span><span class="align-middle"> &#8594;</span>
-            </a>
-            {% else %}
-            <a href="{% url 'survey-project-session' project.id %}" class="btn btn-primary fw-bold p-2 m-4">
-                <span class="align-middle">Démarrer le parcours</span><span class="align-middle"> &#8594;</span>
-            </a>
-            {% endif %}
-        </div>
-</div>
+        </h4>
+        <p class="m-0 text-info-custom fw-normal pb-3">Pour faire le point sur votre avancement et recevoir des conseils pertinents.</p>
+        <a class="button filled pb-2" href="{% url 'survey-session-start' session.id %}">Compléter l'état des lieux</a>
+    </div>
 {% else %}
 <div class="col"></div>
 {% endif %}

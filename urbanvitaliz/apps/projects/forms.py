@@ -116,20 +116,30 @@ class CreateActionWithoutResourceForm(forms.ModelForm):
 
     class Meta:
         model = models.Task
-        fields = [
-            "intent",
-            "content",
-            "public",
-        ]
+        fields = ["intent", "content", "public"]
 
 
 class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
-    resource = forms.ModelChoiceField(
-        queryset=resources_models.Resource.on_site.exclude(
-            status=resources_models.Resource.DRAFT
+    resource = (
+        forms.ModelChoiceField(
+            queryset=resources_models.Resource.objects.exclude(
+                status=resources_models.Resource.DRAFT
+            )
         ),
-        required=True,
     )
+
+    def clean_resource(self):
+        resource = self.cleaned_data["resource"]
+
+        try:
+            resource = resources_models.Resource.on_site.exclude(
+                status=resources_models.Resource.DRAFT
+            ).get(pk=resource.pk)
+        except resources_models.Resource.DoesNotExist:
+            self.add_error("resource_unknown", "Cette ressource n'existe pas")
+            raise None
+
+        return resource
 
     class Meta:
         model = models.Task
@@ -138,11 +148,24 @@ class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
 
 class CreateActionsFromResourcesForm(forms.ModelForm):
     resources = forms.ModelMultipleChoiceField(
-        queryset=resources_models.Resource.on_site.exclude(
+        queryset=resources_models.Resource.objects.exclude(
             status=resources_models.Resource.DRAFT
         ),
         required=True,
     )
+
+    def clean_resources(self):
+        resources = self.cleaned_data["resources"]
+
+        resources = resources_models.Resource.on_site.exclude(
+            status=resources_models.Resource.DRAFT
+        ).filter(pk__in=[resource.pk for resource in resources.all()])
+
+        if resources.count() == 0:
+            self.add_error("no_valid_resource", "Aucune ressource")
+            raise None
+
+        return resources
 
     class Meta:
         model = models.Task
@@ -192,21 +215,16 @@ class ProjectForm(forms.ModelForm):
     """Form for updating the base information of a project"""
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
-    publish_to_cartofriches = forms.BooleanField(
-        label="Publication sur cartofriches", disabled=True, required=False
-    )
+    insee = forms.CharField(max_length=5, required=False, label="Code Insee")
 
     class Meta:
         model = models.Project
         fields = [
-            "org_name",
-            "phone",
             "name",
             "postcode",
+            "insee",
             "location",
             "description",
-            "publish_to_cartofriches",
-            "muted",
         ]
 
 
@@ -221,15 +239,23 @@ class SelectCommuneForm(forms.Form):
 class DocumentUploadForm(forms.ModelForm):
     class Meta:
         model = models.Document
-        fields = ["the_file", "description"]
+        fields = ["the_file", "the_link", "description"]
 
 
-class SynopsisForm(forms.ModelForm):
-    """Form for synopsis creation/update"""
+class ProjectTagsForm(forms.ModelForm):
+    """Form for tags creation/update"""
 
     class Meta:
         model = models.Project
-        fields = ["synopsis", "tags"]
+        fields = ["tags"]
+
+
+class ProjectTopicsForm(forms.ModelForm):
+    """Form for topics creation/update"""
+
+    class Meta:
+        model = models.Project
+        fields = ["advisors_note"]
 
 
 # eof

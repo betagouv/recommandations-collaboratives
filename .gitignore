@@ -1,5 +1,6 @@
 tmp
 tags
+TAGS
 .venv
 .vscode
 dist
@@ -11,8 +12,11 @@ __pycache__
 *.swo
 .#*
 .coverage
+.coverage.*
 development.py
 htmlcov
 media
 node_modules/
 coverage.xml
+restart.sh
+multisites

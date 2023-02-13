@@ -20,9 +20,11 @@ from guardian.shortcuts import assign_perm, remove_perm
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.onboarding import models as onboarding_models
+from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.utils import login
 
-from . import models, utils
+from . import adapters, utils
 
 
 ####
@@ -31,7 +33,14 @@ from . import models, utils
 @pytest.mark.django_db
 def test_get_current_site_sender_with_configuration(request):
     current_site = get_current_site(request)
-    site_config = baker.make(models.SiteConfiguration, site=current_site)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    site_config = baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     sender = utils.get_current_site_sender()
 
@@ -45,32 +54,77 @@ def test_get_current_site_sender_without_configuration(request):
     assert sender == settings.DEFAULT_FROM_EMAIL
 
 
-#
+################################################
+# signup with sites
+################################################
+@pytest.mark.django_db
+def test_create_user_assign_current_site_via_allauth(client, request):
+    site = get_current_site(request)
+    data = {
+        "first_name": "Test",
+        "last_name": "test",
+        "organization": "test",
+        "organization_position": "test",
+        "email": "kkkd@kdkdk.fr",
+        "phone_no": "0303003033",
+        "password1": "6t2dCLGjNFTBuRv",
+        "password2": "6t2dCLGjNFTBuRv",
+    }
+    response = client.post(reverse("account_signup"), data)
+    assert response.status_code == 302
+
+    user = auth_models.User.objects.first()
+
+    assert len(user.profile.sites.all()) == 1
+    assert site in user.profile.sites.all()
+
+
+#################################################
 # create new user hook for magicauth
+#################################################
+@pytest.mark.django_db
+def test_create_user_assign_current_site_via_magicauth(client, request):
+    site = get_current_site(request)
+    data = {
+        "email": "kkkd@kdkdk.fr",
+    }
+    response = client.post(reverse("magicauth-login"), data)
+    assert response.status_code == 302
+
+    user = auth_models.User.objects.first()
+
+    assert len(user.profile.sites.all()) == 1
+    assert site in user.profile.sites.all()
 
 
 @pytest.mark.django_db
-def test_create_user_with_proper_email():
+def test_create_user_with_proper_email(request):
+    adapter = adapters.UVMagicauthAdapter()
     email = "new.user@example.com"
-    user = utils.create_user(email)
+    adapter.email_unknown_callback(request, email, None)
+
+    user = auth_models.User.objects.first()
+
     assert user.email == email
     assert user.username == email
     assert user.profile
 
 
 @pytest.mark.django_db
-def test_create_user_fails_with_missing_email():
+def test_create_user_fails_with_missing_email(request):
+    adapter = adapters.UVMagicauthAdapter()
     email = None
     with pytest.raises(forms.ValidationError):
-        utils.create_user(email)
+        adapter.email_unknown_callback(request, email, None)
 
 
 @pytest.mark.django_db
-def test_create_user_fails_for_known_email():
+def test_create_user_fails_for_known_email(request):
+    adapter = adapters.UVMagicauthAdapter()
     email = "known.user@example.com"
     baker.make(auth_models.User, username=email)
     with pytest.raises(IntegrityError):
-        utils.create_user(email)
+        adapter.email_unknown_callback(request, email, None)
 
 
 #
@@ -172,7 +226,8 @@ def test_switchtender_is_sent_to_project_list_on_login(client):
     with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 302
-    assertRedirects(response, "/projects/")
+    list_url = reverse("projects-project-list")
+    assert response.url == list_url
 
 
 ########################################################################

@@ -161,31 +161,31 @@ def can_manage_or_403(project, user, allow_draft=False):
     raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
-def get_project_moderators():
-    """Return all the moderators for projects"""
+def get_project_moderators(site):
+    """Return all project moderators for a given site"""
     return auth_models.User.objects.filter(groups__name="project_moderator").filter(
-        groups__name="switchtender"
+        groups__name="switchtender", profile__sites=site
     )
 
 
-def is_project_moderator(user):
+def is_project_moderator(user, site):
     """Check if this user is allowed to moderate new projects"""
-    return (user in get_project_moderators()) or user.is_superuser
+    return (user in get_project_moderators(site)) or user.is_superuser
 
 
-def is_project_moderator_or_403(user):
-    if is_project_moderator(user):
+def is_project_moderator_or_403(user, site):
+    if is_project_moderator(user, site):
         return True
 
     raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
-def get_regional_actors_for_project(project, allow_national=False):
-    """Return regional actors for a given project"""
+def get_regional_actors_for_project(site, project, allow_national=False):
+    """Return regional actors for a given site and project"""
     if not project.commune or not project.commune.department:
         return auth_models.User.objects.none()
 
-    users = auth_models.User.objects.filter(groups__name="switchtender")
+    users = get_advisors(site)
 
     area_filter = Q(profile__departments=project.commune.department)
     if allow_national:
@@ -196,27 +196,32 @@ def get_regional_actors_for_project(project, allow_national=False):
     return users.distinct()
 
 
-def get_national_actors():
-    """Return national actors"""
-    users = auth_models.User.objects.filter(groups__name="switchtender")
-    users = users.filter(profile__departments=None)
-    return users.distinct()
+def get_national_actors(site):
+    """Return national actors for a given site"""
+    return get_advisors(site).filter(profile__departments=None).distinct()
 
 
-def is_regional_actor_for_project(project, user, allow_national=False):
+def get_advisors(site):
+    """Return advisors for given site"""
+    return auth_models.User.objects.filter(groups__name="switchtender").filter(
+        profile__sites=site
+    )
+
+
+def is_regional_actor_for_project(site, project, user, allow_national=False):
     """Check if this user is a regional actor for a given project"""
-    return user in get_regional_actors_for_project(project, allow_national)
+    return user in get_regional_actors_for_project(site, project, allow_national)
 
 
-def check_if_national_actor(user):
+def check_if_national_actor(site, user):
     """Check if this user is a national actor"""
-    return user in get_national_actors()
+    return user in get_national_actors(site)
 
 
-def is_regional_actor_for_project_or_403(project, user, allow_national=False):
-    if is_regional_actor_for_project(project, user, allow_national):
+def is_regional_actor_for_project_or_403(site, project, user, allow_national=False):
+    if is_regional_actor_for_project(site, project, user, allow_national):
         return True
-
+    # TODO on met le raise sur un if not ?
     raise PermissionDenied("L'information demandée n'est pas disponible")
 
 

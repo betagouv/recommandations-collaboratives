@@ -43,15 +43,79 @@
 
 		        {% csrf_token %}
 
-            {{ form.as_p }}
+                <p>
+                    {{form.title.label}}
+                    {{form.title.errors}}
+                    {{form.title}}
+                </p>
+    
+                <p>
+                    {{form.status.label}}
+                    {{form.status.errors}}
+                    {{form.status}}
+                </p>
+    
+                <p>
+                    {{form.subtitle.label}}
+                    {{form.subtitle.errors}}
+                    {{form.subtitle}}
+                </p>
+    
+                <p>
+                    {{form.summary.label}}
+                    {{form.summary.errors}}
+                    {{form.summary}}
+                </p>
+    
+                <p>
+                    {{form.tags.label}}
+                    {{form.tags.errors}}
+                    {{form.tags}}
+                </p>
+    
+                <p>
+                    {{form.category.label}}
+                    {{form.category.errors}}
+                    {{form.category}}
+                </p>
+    
+                <div class="d-flex">
+                    <p class="w-50 d-flex flex-column select-custom">
+                        {{form.departments.label}}
+                        {{form.departments.errors}}
+                        {{form.departments}}
+                    </p>
+    
+                    <p class="w-50 d-flex flex-column select-custom">
+                        {{form.contacts.label}}
+                        {{form.contacts.errors}}
+                        {{form.contacts}}
+                    </p>
+                </div>
+    
+                <div class="d-flex">
+                    {% include 'tools/editor.html' with input_name=form.content.name input_value=form.content.value|default:'' input_required=True escapejs=True%}
+                </div>
+                
+                <p>
+                    {{form.expires_on.label}}
+                    {{form.expires_on.errors}}
+                    {{form.expires_on}}
+                </p>
 
-		        <button type="submit" class="btn btn-primary">
-			          Mettre à jour
-		        </button>
+                <div class="d-flex justify-content-between align-items-center">
+                    <button type="submit" class="button filled">
+                        Mettre à jour
+                    </button>
+                    <a href="{% url 'resources-resource-delete' resource.pk %}" class="button filled red btn-danger">
+                        <svg class="bi " width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash"/>
+                        </svg>
+                              Supprimer
+                        </a>
+                </div>
 	      </form>
-
         {{ form.media }}
-
     </section>
 
 </div>

@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+{% load gravatar %}
+{% load sass_tags %}
+{% load cookie_consent_tags %}
+{% load static %}
+{% block css %}
+    <link href="{% sass_src 'home/css/home/home.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
+{% block content %}
+    <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne">
+        <h2>Politique de confidentialité de {{ request.site.name }}</h2>
+        <p class="mt-4 mb-2">
+            <strong>Qui est responsable de {{ request.site.name }} ?</strong>
+        </p>
+        <p>
+            {{ request.site.name }} est développé au sein du Centre d’études et d’expertise sur les risques,
+            l’environnement, la mobilité et l’aménagement (CEREMA). {{ request.site.name }} est une plateforme
+            permettant de guider les collectivités en répondant à leurs questions et à leurs blocages dans la
+            réhabilitation des friches.
+            <br/>
+            <br/>
+            Le responsable de l’utilisation des données est le CEREMA représenté par Pascal Berteaud,
+            directeur général du CEREMA.
+        </p>
+        <p class="mt-4 mb-2">
+            <strong>Pourquoi manipulons-nous ces données ?</strong>
+        </p>
+        <p>{{ request.site.name }} manipule des données à caractère personnelles pour les raisons suivantes :</p>
+        <p>
+            <ul>
+                <li>Lutter contre l’artificialisation des sols</li>
+                <li>
+                    Enclencher la revitalisation des friches en fournissant les outils, les acteurs à contacter
+                    et les démarches aux collectivités
+                </li>
+                <li>
+                    Suivre les projets de réhabilitation de friches dans la durée grâce aux acteurs publics
+                    locaux
+                </li>
+            </ul>
+        </p>
+        <p class="mt-4 mb-2">
+            <strong>Quelles sont les données que nous manipulons ?</strong>
+        </p>
+        <p>{{ request.site.name }} manipule les données personnelles suivantes :</p>
+        <p>
+            <ul>
+                <li>Prénom</li>
+                <li>Nom</li>
+                <li>Adresse e-mail</li>
+                <li>Numéro de téléphone</li>
+            </ul>
+        </p>
+        <p class="mt-4 mb-2">
+            <strong>Qu’est-ce qui nous autorise à manipuler ces données ?</strong>
+        </p>
+        <p>{{ request.site.name }} manipule des données personnelles en se basant sur :</p>
+        <p>
+            <ul>
+                <li>
+                    L’exécution d’une mission d’intérêt public ou relevant de l’exercice de l’autorité
+                    publique dont est investi le responsable de traitement au sens de l’article 6-e du
+                    RPGD.
+                </li>
+                <li>
+                    Le décret du 25 octobre 2019 relatif au système d’information et de communication de
+                    l’Etat et à la direction interministérielle du numérique (DINUM) qui porte l’équipe
+                    {{ request.site.name }}.
+                </li>
+            </ul>
+        </p>
+        <p class="mt-4 mb-2">
+            <strong>Pendant combien de temps conservons-nous ces données ?</strong>
+        </p>
+        <div class="d-flex justify-content-between border p-2">
+            <p class=" w-50">
+                <strong>Données de contact :</strong>
+                <br/>
+                prénom, nom, adresse e-mail, numéro de téléphone.
+            </p>
+            <p class="w-50">
+                <strong>Durée de la conservation</strong>
+                <br/>
+                2 ans à compter de la fin du projet de réhabilitation de lafriche.
+            </p>
+        </div>
+        <p class="mt-4 mb-2">
+            <strong>Quels droits avez-vous ?</strong>
+        </p>
+        <p>
+            <ul>
+                <li>D’un droit d’information et d’un droit d’accès à vos données ;</li>
+                <li>D’un droit de rectification, et le cas échéant de suppression des données ;</li>
+                <li>D’un droit d’opposition ;</li>
+                <li>D’un droit à la portabilité de vos données.</li>
+            </ul>
+        </p>
+        <p>
+            Pour les exercer, contactez-nous à : <a class="text-decoration-underline" href="mailto:friches@beta.gouv.fr">friches@beta.gouv.fr</a>
+        </p>
+        <p>
+            Ou grâce au formulaire de contact du site {{ request.site.name }} :<a class="text-decoration-underline"
+   href="https://{{request.site}}/contact/">https://{{request.site}}/contact/</a>
+            <br/>
+            <br/>
+        </p>
+        <p>
+            Puisque ce sont des droits personnels, nous ne traiterons votre demande que si nous sommes
+            en mesure de vous identifier. Dans le cas où nous ne parvenons pas à vous identifier, nous
+            pouvons être amenés à vous demander une preuve de votre identité.
+            <br/>
+            <br/>
+            Pour vous aider dans votre démarche, vous trouverez un modèle de courrier élaboré par la
+            CNIL <a class="text-decoration-underline"
+    href="https://www.cnil.fr/fr/modele/courrier/exercer-son-droit-dacces">ici</a> :
+            <br/>
+            <br/>
+            Nous nous engageons à vous répondre dans un délai raisonnable qui ne saurait dépasser 1
+            mois à compter de la réception de votre demande.
+        </p>
+        <p class="mt-4 mb-2">
+            <strong>Qui va avoir accès à ces données ?</strong>
+        </p>
+        <p>
+            Les accès aux données sont strictement encadrés et juridiquement justifiés. Les personnes
+            suivantes vont avoir accès aux données :
+            <br/>
+            <br/>
+            <ul>
+                <li>
+                    Les membres de {{ request.site.name }} qui ont besoin des données dans leurs missions ou qui y
+                    ont accès de fait (développeur, etc.)
+                </li>
+                <li>Les conseillers publics (DDT, DREAL, EPF) ?</li>
+            </ul>
+        </p>
+        <p class="mt-4 mb-2">
+            <strong>Quelles mesures de sécurité mettons-nous en place ?</strong>
+        </p>
+        <p>
+            Nous mettons en place plusieurs mesures pour sécuriser les données :
+            <br/>
+            <br/>
+            <ul>
+                <li>
+                    Anonymisation
+                </li>
+                <li>
+                    Stockage des données en base de données
+                </li>
+                <li>
+                    Cloisonnement des données
+                </li>
+                <li>
+                    Mesures de traçabilité
+                </li>
+                <li>
+                    Surveillance
+                </li>
+                <li>
+                    Protection contre les virus, malwares et logiciels espions
+                </li>
+                <li>
+                    Protection des réseaux
+                </li>
+                <li>
+                    Sauvegarde
+                </li>
+                <li>
+                    Mesures restrictives limitant l’accès physiques aux données à caractère personnel
+                </li>
+            </ul>
+        </p>
+        <p class="mt-4 mb-2">
+            <strong>Qui nous aide à manipuler les données ?</strong>
+        </p>
+        <p>
+            Certaines des données sont envoyées à d’autres acteurs, appelés “sous-traitants de données”,
+            pour qu’ils nous aident à les manipuler. Nous nous assurons qu’ils respectent strictement le
+            RGPD et qu’ils apportent des garanties suffisantes en matière de sécurité.
+        </p>
+        <div class="d-flex border mt-4">
+            <div class="d-flex flex-column" style="border-right: 1px solid #dee2e6;">
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 70px;">
+                    Sous-traitant
+                </p>
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 200px">
+                    [Nom]
+                </p>
+                <p class="p-2">
+                    AlwaysData
+                </p>
+            </div>
+            <div class="d-flex flex-column" style="border-right: 1px solid #dee2e6;">
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 70px;">
+                    Pays destinataire
+                </p>
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 200px">
+                    [Lieu de manipulatio n des données]
+                </p>
+                <p class="p-2">
+                    France
+                </p>
+            </div>
+            <div class="d-flex flex-column" style="border-right: 1px solid #dee2e6;">
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 70px;">
+                    Traitement réalisé
+                </p>
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 200px">
+                    [Mission du sous-traitant : hébergement , envoi d&#39;emails, création de formulaire, cookies…]
+                </p>
+                <p class="p-2">
+                    Hébergement des données
+                </p>
+            </div>
+            <div class="d-flex flex-column" style="border-right: 1px solid #dee2e6;">
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 70px;">
+                    Garanties
+                </p>
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 200px">
+                    [Lien vers la politique de confidentialité du sous-traitant, vers un contrat, ou vers toute mesure qui prouve sa conformité au RGPD]
+                </p>
+                <p class="p-2">
+                    https://www.alwaysdata.com/en/contract/16/
+                </p>
+            </div>
+        </div>
+        <p class="mt-4 mb-2">
+            <strong>Cookies</strong>
+        </p>
+        <p>
+            En application de l’article 5(3) de la directive 2002/58/CE modifiée concernant le traitement
+            des données à caractère personnel et la protection de la vie privée dans le secteur des
+            communications électroniques, transposée à l’article 82 de la loi n°78-17 du 6 janvier 1978
+            relative à l’informatique, aux fichiers et aux libertés, les traceurs ou cookies suivent deux
+            régimes distincts.<br/><br/>
+            Les cookies strictement nécessaires au service ou ayant pour finalité exclusive de faciliter la
+            communication par voie électronique sont dispensés de consentement préalable au titre de
+            l’article 82 de la loi n°78-17 du 6 janvier 1978.<br/><br/>
+            Les cookies n’étant pas strictement nécessaires au service ou n’ayant pas pour finalité
+            exclusive de faciliter la communication par voie électronique doivent être consenti par
+            l’utilisateur.<br/><br/>
+            Ce consentement de la personne concernée pour une ou plusieurs finalités spécifiques
+            constitue une base légale au sens du RGPD et doit être entendu au sens de l&#39;article 6-a du
+            Règlement (UE) 2016/679 du Parlement européen et du Conseil du 27 avril 2016 relatif à la
+            protection des personnes physiques à l&#39;égard du traitement des données à caractère personnel
+            et à la libre circulation de ces données.<br/><br/>
+            Un cookie est un fichier déposé sur votre terminal lors de la visite d’un site. Il a pour but de
+            collecter des informations relatives à votre navigation et de vous adresser des services adaptés
+            à votre terminal (ordinateur, mobile ou tablette).<br/><br/>
+            Des cookies relatifs aux statistiques publiques et anonymes sont également déposés.
+            Cookies recensés sur le site {{ request.site.name }}:<br/><br/>
+        </p>
+        <div class="d-flex border mt-4">
+            <div class="d-flex flex-column w-25" style="border-right: 1px solid #dee2e6;">
+                <p class="p-2 bg-light" style="border-bottom: 1px solid #dee2e6;height: 70px; word-break: break-all;">
+                    Nom du cookie
+                </p>
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
+                    SessionId
+                </p>
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
+                    Csrftoken
+                </p>
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
+                    Posthog
+                </p>
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 100px; word-break: break-all;">
+                    www.youtube.com
+                </p>
+            </div>
+            <div class="d-flex flex-column w-25" style="border-right: 1px solid #dee2e6;">
+                <p class="p-2 bg-light" style="border-bottom: 1px solid #dee2e6;height: 70px;word-break: break-all;">
+                    Finalités
+                </p>
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    Identifiant de session
+                </p>
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    Cross Site Request Forgery cookie
+                </p>
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    Plateforme moderne de tracking numérique
+                </p>
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    tracking de média
+                </p>
+            </div>
+            <div class="d-flex flex-column w-25" style="border-right: 1px solid #dee2e6;">
+                <p class="p-2 bg-light"style="border-bottom: 1px solid #dee2e6; height: 70px;word-break: break-all;">
+                    Hébergement
+                </p>
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    {{request.site.name}}
+                </p>
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    {{request.site.name}}
+                </p>
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    USA
+                </p>
+                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    USA
+                </p>
+            </div>
+            <div class="d-flex flex-column w-25" style="border-right: 1px solid #dee2e6;">
+                <p class="p-2 bg-light" style="border-bottom: 1px solid #dee2e6;height: 70px;word-break: break-all;">
+                    Garanties
+                </p>
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    {{request.site.name}}
+                </p>
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    {{request.site.name}}
+                </p>
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    https://app.posthog.com
+                </p>
+                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 100px;word-break: break-all;">
+                    https://policies.google.com/privacy
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -15,13 +15,6 @@ from django.contrib.sites.models import Site
 from . import models
 
 
-def create_user(email=None):
-    """Create a new user with given email"""
-    if not email:
-        raise forms.ValidationError("Adresse email non reconnue")
-    return auth.User.objects.create_user(email=email.lower(), username=email.lower())
-
-
 def get_current_site_sender():
     current_site = Site.objects.get_current()
     try:

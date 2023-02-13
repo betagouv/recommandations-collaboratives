@@ -1,0 +1,40 @@
+.hover-trigger {
+    position: relative;
+}
+
+.hover-trigger:hover .hover-content{
+    display: block;
+}
+
+.hover-content {
+    position: absolute;
+    display: none;
+
+    top: 0;
+    left: -250px;
+
+    /* width: 250px; */
+    padding: 10px;
+    border: solid 2px #222;
+    border-radius: 6px;
+
+    background-color: white;
+    text-align: left;
+    text-transform: none;
+    z-index: 100;
+}
+.hover-content span{
+    text-transform: uppercase;
+    font-size: 14px;
+    color:#666666;
+    font-weight: 700;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.hover-content p {
+    
+    font-size: 14px;
+    color:#666666;
+    font-weight: 400;
+}

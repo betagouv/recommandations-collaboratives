@@ -1,0 +1,34 @@
+{% load static %}
+
+{% if not search == False %}
+    <div x-data="Files({{files.all.count}})" id="filesId">
+        {% include 'projects/project/fragments/files_links/file_search.html' with files=files %}
+        {% if files.count == 0 %}
+            {% include 'projects/project/fragments/files_links/empty_files.html' %}
+        {% else %}
+        <ul class="list d-flex flex-column list-unstyled">
+            {% for document in files.all %}
+                {% include 'projects/project/fragments/files_links/file_list_item.html' %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+    </div>
+{% else %}
+    <div>
+        {% if files.count == 0 %}
+            {% include 'projects/project/fragments/files_links/empty_files.html' %}
+        {% else %}
+        <ul id="file-list" class="d-flex flex-column list-unstyled">
+            {% for document in files.all %}
+                {% if is_pinned %}
+                    {% include 'projects/project/fragments/files_links/file_list_item_pinned.html' %}
+                {% else %}
+                    {% include 'projects/project/fragments/files_links/file_list_item.html' %}
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+    </div>
+{% endif %}
+
+

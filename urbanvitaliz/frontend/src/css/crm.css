@@ -121,7 +121,7 @@ main {
 
 .crm-sticky {
     position: sticky;
-    top: 150px;
+    top: 66px;
 }
 
 
@@ -132,7 +132,7 @@ main {
 
 .crm-header {
     position: sticky;
-    top: 150px;
+    top: 66px;
     background-color: white;
     border-bottom: 1px solid #e1e1e1;
 
@@ -161,7 +161,6 @@ main {
 .crm-search {
     background-color: #b8d8fb;
     padding: 20px;
-    top: 151px;
     z-index: 100;
     border-bottom: solid 1px #f2F2F2;
 }

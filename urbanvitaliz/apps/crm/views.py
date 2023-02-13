@@ -5,13 +5,17 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2022-07-20 12:27:25 CEST
 """
 
+import csv
+import datetime
+
 from actstream.models import Action, actor_stream, target_stream
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
-from django.db.models import Q
+from django.db.models import Count, Q
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.generic.base import TemplateView
@@ -176,13 +180,24 @@ def project_details(request, project_id):
 
     actions = target_stream(project)
 
+    user_ct = ContentType.objects.get_for_model(User)
+
     project_ct = ContentType.objects.get_for_model(Project)
 
-    all_notes = models.Note.on_site.filter(
+    participants = project.members.all()
+    participant_ids = list(participants.values_list("id", flat=True))
+    participant_notes = models.Note.on_site.filter(
+        object_id__in=participant_ids,
+        content_type=user_ct,
+    ).order_by("-updated_on")
+
+    project_notes = models.Note.on_site.filter(
         object_id=project.pk, content_type=project_ct
     ).order_by("-updated_on")
-    sticky_notes = all_notes.filter(sticky=True)
-    notes = all_notes.exclude(sticky=True)
+
+    sticky_notes = project_notes.filter(sticky=True)
+
+    notes = project_notes.exclude(sticky=True) | participant_notes
 
     search_form = forms.CRMSearchForm()
 
@@ -200,6 +215,7 @@ def handle_create_note_for_object(
             note.created_by = request.user
             note.site = request.site
             note.save()
+            form.save_m2m()
             return True, redirect(reverse(return_view_name, args=(the_object.pk,)))
 
     else:
@@ -318,6 +334,62 @@ def update_note_for_organization(request, organization_id, note_id):
     return update_note_for_object(request, note, "crm-organization-details")
 
 
+@staff_member_required
+def project_list_by_tags(request):
+    tags = (
+        Project.tags.filter(project__sites=request.site)
+        .exclude(project__exclude_stats=True)
+        .annotate(Count("project", distinct=True))
+        .order_by("-project__count")
+        .distinct()
+    )
+
+    return render(request, "crm/tags_for_projects.html", locals())
+
+
+@staff_member_required
+def project_list_by_tags_as_csv(request):
+    tags = (
+        Project.tags.filter(project__sites=request.site)
+        .exclude(project__exclude_stats=True)
+        .annotate(Count("project", distinct=True))
+        .order_by("-project__count")
+        .distinct()
+    )
+
+    today = datetime.datetime.today().date()
+
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="tags-for-projects-{today}.csv"'
+        },
+    )
+
+    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
+    writer.writerow(
+        [
+            "tag",
+            "usage_count",
+            "project_ids",
+            "project_names",
+        ]
+    )
+
+    for tag in tags:
+        projects = Project.on_site.filter(tags__name=tag.name).order_by("name")
+        writer.writerow(
+            [
+                tag.name,
+                tag.project__count,
+                list(projects.values_list(flat=True)),
+                ", ".join([f'"{p.name}"' for p in projects]),
+            ]
+        )
+
+    return response
+
+
 ########################################################################
 # RSS Feeds
 ########################################################################
@@ -332,7 +404,15 @@ class LatestNotesFeed(Feed):
         return models.Note.on_site.order_by("-updated_on", "-created_on")[:20]
 
     def item_title(self, item):
-        return item.title
+        result = ""
+
+        if item.kind:
+            result = f"#{item.get_kind_display()} // "
+
+        if item.title:
+            result = f"{result}{item.title} - "
+
+        return f"{result}{item.related}"
 
     def item_description(self, item):
         return item.content

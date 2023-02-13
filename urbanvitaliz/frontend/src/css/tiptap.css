@@ -1,8 +1,5 @@
 .tiptap-menu {
     display: inline-flex;
-
-    border: solid 2px #222;
-    border-radius: 6px;
     overflow: hidden;
 }
 
@@ -13,6 +10,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    border:solid 1px #929292;
+    border-radius: 2px;
+    background: white;
+    margin-right: 5px;
+
+    display: flex;
+    text-align: center;
+    justify-content: center;
 }
 
 .tiptap-menu button.is-active {
@@ -57,6 +62,11 @@
     min-height: 120px;
     padding: 5px 3px;
     margin: 1rem 0;
-    border: 2px solid #222;
+    border: 1px solid #ced4da;
     border-radius: 6px;
+    background-color: white;
+}
+
+.tiptap-editor.is-wide .ProseMirror {
+    min-height: 40vh;
 }

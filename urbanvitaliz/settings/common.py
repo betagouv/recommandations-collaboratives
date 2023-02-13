@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "dynamic_forms",
     "watson",
     "phonenumber_field",
+    "cookie_consent",
     "urbanvitaliz.apps.onboarding",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
@@ -219,7 +220,6 @@ MAGICAUTH_ADAPTER = "urbanvitaliz.apps.home.adapters.UVMagicauthAdapter"
 MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à UrbanVitaliz ici"
 MAGICAUTH_EMAIL_FIELD = "email"
 MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "login-redirect"
-MAGICAUTH_EMAIL_UNKNOWN_CALLBACK = "urbanvitaliz.apps.home.utils.create_user"
 MAGICAUTH_TOKEN_DURATION_SECONDS = 60 * 60 * 24 * 3
 
 # MARKDOWNX
@@ -244,6 +244,9 @@ TAGGIT_CASE_INSENSITIVE = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 30 * 24 * 60 * 60  # 30d * 24h * 60m * 60s
 
+##Cookie consent settings
+COOKIE_CONSENT_HTTPONLY = False
+
 # emails to use for notifications
 TEAM_EMAILS = ["friches@beta.gouv.fr"]
 
@@ -263,6 +266,7 @@ DYNAMIC_FORMS_CUSTOM_JS = ""
 # ALLAUTH
 ACCOUNT_ADAPTER = "urbanvitaliz.apps.home.adapters.UVAccountAdapter"
 ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = "optional"

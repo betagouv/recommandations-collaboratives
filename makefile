@@ -13,9 +13,13 @@ all:
 test:
 	pytest
 
+.PHONY: tags
 tags:
-	ctags --exclude=*.js --exclude=.venv --exclude=*.css -R ./urbanvitaliz/
+	@ctags --exclude=*.js --exclude=.venv --exclude=*.css -R ./urbanvitaliz/
+	@find ./urbanvitaliz -name \*.py | etags --language=python -
+
 nice:
+	isort urbanvitaliz
 	black urbanvitaliz
 	flake8 urbanvitaliz
 
@@ -23,7 +27,7 @@ coverage:
 	pytest --cov
 
 clean:
-	rm -f tags
+	rm -f tags TAGS
 	find . -name \*.pyc -delete
 	find . -name __pycache__ -delete
 	rm -rf ./static

@@ -12,20 +12,18 @@ import datetime
 import io
 import uuid
 
-import django.core.mail
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -105,7 +103,13 @@ def test_proper_commune_selection_contains_all_possible_commmunes(request, clien
 #################################################################
 @pytest.mark.django_db
 def test_create_prefilled_project_is_not_reachable_without_login(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     url = reverse("projects-project-prefill")
     response = client.get(url)
@@ -114,7 +118,13 @@ def test_create_prefilled_project_is_not_reachable_without_login(request, client
 
 @pytest.mark.django_db
 def test_create_prefilled_project_is_not_reachable_with_simple_login(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     with login(client):
         response = client.get(reverse("projects-project-prefill"))
@@ -124,7 +134,13 @@ def test_create_prefilled_project_is_not_reachable_with_simple_login(request, cl
 
 @pytest.mark.django_db
 def test_create_prefilled_project_reachable_by_switchtenders(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     with login(client, groups=["switchtender"]):
         response = client.get(reverse("projects-project-prefill"))
@@ -134,11 +150,17 @@ def test_create_prefilled_project_reachable_by_switchtenders(request, client):
 
 @pytest.mark.django_db
 def test_create_prefilled_project_creates_a_new_project(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
-        "email": "a@example.com",
+        "email": "a@ExAmple.Com",
         "location": "some place",
         "phone": "03939382828",
         "postcode": "59000",
@@ -148,7 +170,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
         "last_name": "doe",
         "response_0": "blah",
     }
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
         response = client.post(reverse("projects-project-prefill"), data=data)
 
     project = models.Project.on_site.all()[0]
@@ -156,7 +178,13 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
-    assert data["email"] in [member.email for member in project.members.all()]
+    assert data["email"].lower() == project.owner.email
+    assert data["first_name"] == project.owner.first_name
+    assert data["last_name"] == project.owner.last_name
+
+    assert user in project.switchtenders.all()
+
+    assert user == project.submitted_by
 
     invite = invites_models.Invite.objects.first()
     assert invite.project == project
@@ -166,7 +194,13 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
 
 @pytest.mark.django_db
 def test_created_prefilled_project_stores_initial_info(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
@@ -255,24 +289,24 @@ def test_project_fails_unknown_sharing_link(request, client):
 
 
 @pytest.mark.django_db
-def test_existing_user_receives_email_on_login(client):
+def test_existing_user_receives_email_on_login(client, mailoutbox):
     user = Recipe(auth.User, email="jdoe@example.com").make()
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": user.email})
     assert response.status_code == 302
-    assert len(django.core.mail.outbox) == 1
-    assert user.email in django.core.mail.outbox[0].to
+    assert len(mailoutbox) == 1
+    assert user.email in mailoutbox[0].to
 
 
 @pytest.mark.django_db
-def test_unknown_user_is_created_and_receives_email_on_login(client):
+def test_unknown_user_is_created_and_receives_email_on_login(client, mailoutbox):
     email = "jdoe@example.com"
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": email})
     assert response.status_code == 302
     assert auth.User.objects.get(email=email)
-    assert len(django.core.mail.outbox) == 1
-    assert email in django.core.mail.outbox[0].to
+    assert len(mailoutbox) == 1
+    assert email in mailoutbox[0].to
 
 
 ########################################################################
@@ -292,8 +326,24 @@ def test_project_list_not_available_for_non_staff_users(client):
 def test_project_list_available_for_switchtender_user(client):
     url = reverse("projects-project-list")
     with login(client, groups=["switchtender"]):
-        response = client.get(url)
-    assert response.status_code == 200
+        response = client.get(url, follow=True)
+
+    advisor_url = reverse("projects-project-list-advisor")
+    url, code = response.redirect_chain[-1]
+    assert code == 302
+    assert url == advisor_url
+
+
+@pytest.mark.django_db
+def test_project_list_available_for_staff(client):
+    url = reverse("projects-project-list")
+    with login(client, is_staff=True, groups=["switchtender"]):
+        response = client.get(url, follow=True)
+
+    staff_url = reverse("projects-project-list-staff")
+    url, code = response.redirect_chain[-1]
+    assert code == 302
+    assert url == staff_url
 
 
 @pytest.mark.django_db
@@ -307,7 +357,8 @@ def test_project_list_excludes_project_not_in_switchtender_departments(request, 
     url = reverse("projects-project-list")
     with login(client, groups=["switchtender"]) as user:
         user.profile.departments.add(department)
-        response = client.get(url)
+        response = client.get(url, follow=True)
+
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertNotContains(response, detail_url)
 
@@ -329,7 +380,14 @@ def test_project_overview_not_available_for_non_switchtender(request, client):
 @pytest.mark.django_db
 def test_project_overview_available_for_owner(request, client):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     # project email is same as test user to be logged in
     membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
@@ -346,7 +404,13 @@ def test_project_overview_available_for_owner(request, client):
 @pytest.mark.django_db
 def test_project_overview_available_for_switchtender(request, client):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-detail-overview", args=[project.id])
@@ -368,7 +432,14 @@ def test_project_knowledge_not_available_for_non_switchtender(request, client):
 @pytest.mark.django_db
 def test_project_knowledge_available_for_owner(request, client):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     # project email is same as test user to be logged in
     owner = baker.make(auth.User, is_staff=False)
@@ -386,7 +457,14 @@ def test_project_knowledge_available_for_owner(request, client):
 @pytest.mark.django_db
 def test_project_knowledge_available_for_switchtender(request, client):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
@@ -398,7 +476,14 @@ def test_project_knowledge_available_for_switchtender(request, client):
 @pytest.mark.django_db
 def test_project_knowledge_available_for_restricted_switchtender(request, client):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     other = Recipe(geomatics.Department, code="02").make()
     project = Recipe(
@@ -489,16 +574,32 @@ def test_project_conversations_available_for_owner(request, client):
 
 
 @pytest.mark.django_db
-def test_project_conversations_available_for_switchtender(request, client):
+def test_project_conversations_not_available_for_unassigned_switchtender(
+    request, client
+):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-conversations", args=[project.id])
     with login(client, groups=["switchtender"]):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_conversations_available_for_assigned_switchtender(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    url = reverse("projects-project-detail-conversations", args=[project.id])
+    with login(client) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_project_conversations_available_for_restricted_switchtender(request, client):
+def test_project_conversations_not_available_for_restricted_switchtender(
+    request, client
+):
     other = Recipe(geomatics.Department, code="02").make()
     project = Recipe(
         models.Project,
@@ -509,7 +610,7 @@ def test_project_conversations_available_for_restricted_switchtender(request, cl
     with login(client, groups=["switchtender"]) as user:
         user.profile.departments.add(other)
         response = client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
 # internal
@@ -568,7 +669,14 @@ def test_project_internal_followup_not_available_for_restricted_switchtender(
 @pytest.mark.django_db
 def test_project_detail_contains_informations(request, client):
     current_site = get_current_site(request)
-    Recipe(home_models.SiteConfiguration, site=current_site).make()
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
+
     project = Recipe(models.Project, sites=[current_site]).make()
     task = Recipe(models.Task, project=project).make()
     note = Recipe(models.Note, project=project).make()
@@ -595,81 +703,6 @@ def test_project_detail_contains_actions_for_switchtender(request, client):
 
 
 ########################################################################
-# update project
-########################################################################
-
-
-@pytest.mark.django_db
-def test_update_project_not_available_for_non_staff_users(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-    url = reverse("projects-project-update", args=[project.id])
-    with login(client):
-        response = client.get(url)
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_update_project_available_for_switchtender(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-    url = reverse("projects-project-update", args=[project.id])
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
-
-        response = client.get(url)
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_update_project_wo_commune_and_redirect(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-    updated_on_before = project.updated_on
-    url = reverse("projects-project-update", args=[project.id])
-    data = {
-        "name": "a project",
-        "email": "a@example.com",
-        "location": "some place",
-        "first_name": "john",
-        "last_name": "doe",
-        "description": "a project description",
-        "impediment": "some impediment",
-    }
-
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
-
-        response = client.post(url, data=data)
-
-    project = models.Project.on_site.get(id=project.id)
-    assert project.name == data["name"]
-    assert project.updated_on > updated_on_before
-
-    assert response.status_code == 302
-
-
-@pytest.mark.django_db
-def test_update_project_with_commune(request, client):
-    commune = Recipe(geomatics.Commune, postal="12345").make()
-    project = Recipe(
-        models.Project, sites=[get_current_site(request)], commune=commune
-    ).make()
-    url = reverse("projects-project-update", args=[project.id])
-
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
-
-        response = client.get(url)
-
-    assertContains(response, "<form")
-    assertContains(response, commune.postal)
-
-
-########################################################################
 # accept project
 ########################################################################
 
@@ -685,12 +718,37 @@ def test_accept_project_not_available_for_non_staff_users(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_and_redirect(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+    owner = Recipe(auth.User, username="owner@owner.co").make()
+    project = Recipe(models.Project, sites=[current_site]).make()
     Recipe(auth.Group, name="project_moderator").make()
+    baker.make(models.ProjectMember, member=owner, is_owner=True)
+
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, groups=["project_moderator", "switchtender"]):
+    with login(client, groups=["project_moderator", "switchtender"]) as moderator:
+        moderator.profile.sites.add(current_site)
+        response = client.post(url)
+
+    project = models.Project.on_site.get(id=project.id)
+    assert project.status == "TO_PROCESS"
+    assert project.updated_on > updated_on_before
+
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_accept_project_without_owner_and_redirect(request, client):
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
+    Recipe(auth.Group, name="project_moderator").make()
+
+    updated_on_before = project.updated_on
+    url = reverse("projects-project-accept", args=[project.id])
+
+    with login(client, groups=["project_moderator", "switchtender"]) as moderator:
+        moderator.profile.sites.add(current_site)
         response = client.post(url)
 
     project = models.Project.on_site.get(id=project.id)
@@ -702,6 +760,8 @@ def test_accept_project_and_redirect(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_notifies_regional_actors(request, client):
+    current_site = get_current_site(request)
+
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     auth.Group.objects.get_or_create(name="project_moderator")
 
@@ -713,17 +773,19 @@ def test_accept_project_notifies_regional_actors(request, client):
     regional_actor = Recipe(auth.User).make()
     regional_actor.groups.add(st_group)
     regional_actor.profile.departments.add(dpt_nord)
+    regional_actor.profile.sites.add(current_site)
 
     membership = baker.make(models.ProjectMember, member=regional_actor, is_owner=True)
 
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         commune=commune,
         projectmember_set=[membership],
     ).make()
 
-    with login(client, groups=["switchtender", "project_moderator"]):
+    with login(client, groups=["switchtender", "project_moderator"]) as user:
+        user.profile.sites.add(current_site)
         client.post(reverse("projects-project-accept", args=[project.id]))
 
     assert regional_actor.notifications.count() == 1
@@ -791,13 +853,21 @@ def test_delete_project_and_redirect(request, client):
     assert project.updated_on > updated_on_before
 
     list_url = reverse("projects-project-list")
-    assertRedirects(response, list_url)
+    assert response.url == list_url
 
 
 @pytest.mark.django_db
 def test_general_notifications_are_consumed_on_project_overview(request, client):
     current_site = get_current_site(request)
-    Recipe(home_models.SiteConfiguration, site=current_site).make()
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
     project = Recipe(
         models.Project,
         sites=[current_site],
@@ -915,300 +985,6 @@ def test_notification_not_sent_when_project_is_muted(request):
     assert membership.member.notifications.unsent().count() == 0
 
 
-@pytest.mark.django_db
-def test_non_staff_cannot_add_email_to_project(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-    url = reverse("projects-access-update", args=[project.id])
-
-    with login(client, is_staff=False):
-        response = client.get(url)
-
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_assigned_switchtender_can_add_email_to_project(request, client):
-    project = baker.make(
-        models.Project, sites=[get_current_site(request)], projectmember_set=[]
-    )
-
-    url = reverse("projects-access-update", args=[project.id])
-    data = {"email": "test@example.com", "role": "COLLABORATOR"}
-
-    with login(client) as user:
-        utils.assign_advisor(user, project)
-
-        response = client.post(url, data=data)
-
-    assert response.status_code == 302
-    invite = invites_models.Invite.on_site.first()
-    assert invite.email == data["email"]
-
-
-@pytest.mark.django_db
-def test_regional_actor_can_add_email_to_project(request, client):
-    commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
-
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        projectmember_set=[],
-        commune=commune,
-    )
-
-    url = reverse("projects-access-update", args=[project.id])
-    data = {"email": "test@example.com", "role": "COLLABORATOR"}
-
-    with login(client, groups=["switchtender"]) as user:
-        user.profile.departments.set([project.commune.department.pk])
-
-        response = client.post(url, data=data)
-
-    assert response.status_code == 302
-    invite = invites_models.Invite.on_site.first()
-    assert invite.email == data["email"]
-
-
-@pytest.mark.django_db
-def test_owner_can_add_email_to_project_if_not_draft(request, client):
-    owner = baker.make(
-        auth.User,
-        is_staff=False,
-        email="own@er.fr",
-        username="own@er.fr",
-    )
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    )
-
-    utils.assign_collaborator(owner, project, is_owner=True)
-
-    url = reverse("projects-access-update", args=[project.id])
-    data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
-
-    with login(client, user=owner):
-        response = client.post(url, data=data)
-
-    assert response.status_code == 302
-
-    invite = invites_models.Invite.on_site.first()
-    assert invite.email == data["email"]
-
-
-@pytest.mark.django_db
-def test_email_cannot_be_added_twice(request, client):
-    owner = baker.make(
-        auth.User,
-        is_staff=False,
-        email="own@er.fr",
-        username="own@er.fr",
-    )
-
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    )
-
-    utils.assign_collaborator(owner, project, is_owner=True)
-
-    url = reverse("projects-access-update", args=[project.id])
-    data = {"email": "collaborator@example.com", "role": "COLLABORATOR"}
-
-    with login(client, user=owner):
-        response = client.post(url, data=data)
-        assert response.status_code == 302
-
-        response = client.post(url, data=data)
-        assert response.status_code == 200
-
-    assert invites_models.Invite.objects.count() == 1
-    invite = invites_models.Invite.objects.first()
-    assert invite.email == data["email"]
-
-
-@pytest.mark.django_db
-def test_owner_cannot_add_email_to_project_if_draft(request, client):
-    user = baker.make(
-        auth.User,
-        is_staff=False,
-        email="user@staff.fr",
-        username="user@staff.fr",
-    )
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="DRAFT",
-    ).make()
-
-    utils.assign_collaborator(user, project, is_owner=True)
-
-    url = reverse("projects-access-update", args=[project.id])
-    data = {"email": "collaborator@example.com"}
-
-    with login(client, user=user):
-        response = client.post(url, data=data)
-
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_non_staff_cannot_delete_email_from_project(request, client):
-    user = baker.make(
-        auth.User,
-        is_staff=False,
-        email="user@staff.fr",
-        username="user@staff.fr",
-    )
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    ).make()
-
-    utils.assign_collaborator(user, project)
-
-    url = reverse("projects-access-delete", args=[project.id, user.email])
-
-    with login(client, is_staff=False):
-        response = client.post(url)
-
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_owner_cannot_remove_email_from_project_if_not_draft(request, client):
-    owner = baker.make(
-        auth.User,
-        is_staff=False,
-        email="owner@ab.fr",
-        username="owner@ab.fr",
-    )
-    collab = baker.make(
-        auth.User,
-        is_staff=False,
-        email="coll@ab.fr",
-        username="coll@ab.fr",
-    )
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    ).make()
-
-    utils.assign_collaborator(owner, project, is_owner=True)
-    utils.assign_collaborator(collab, project)
-
-    url = reverse(
-        "projects-access-delete",
-        args=[project.id, collab.email],
-    )
-
-    with login(client, user=owner):
-        client.post(url)
-
-    project = models.Project.on_site.get(id=project.id)
-    assert collab in project.members.all()
-
-
-@pytest.mark.django_db
-def test_owner_cannot_remove_email_from_project_if_draft(request, client):
-    owner = baker.make(
-        auth.User,
-        is_staff=False,
-        email="owner@ab.fr",
-        username="owner@ab.fr",
-    )
-    collab = baker.make(
-        auth.User,
-        is_staff=False,
-        email="coll@ab.fr",
-        username="coll@ab.fr",
-    )
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="DRAFT",
-    ).make()
-
-    utils.assign_collaborator(owner, project, is_owner=True)
-    utils.assign_collaborator(collab, project)
-
-    url = reverse("projects-access-delete", args=[project.id, collab.email])
-
-    with login(client, user=owner):
-        response = client.post(url)
-
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_staff_can_delete_email_from_project(request, client):
-    user = baker.make(
-        auth.User,
-        is_staff=True,
-        username="coll@ab.fr",
-        email="coll@ab.fr",
-    )
-
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    )
-
-    utils.assign_collaborator(user, project)
-
-    url = reverse("projects-access-delete", args=[project.id, user.email])
-
-    with login(client) as user:
-        utils.assign_advisor(user, project)
-
-        response = client.post(url)
-
-    assert response.status_code == 302
-
-    project = models.Project.on_site.get(id=project.id)
-    assert user not in project.projectmember_set.all()
-
-    update_url = reverse("projects-access-update", args=[project.id])
-    assertRedirects(response, update_url)
-
-
-@pytest.mark.django_db
-def test_owner_cannot_be_removed_from_project_acl(request, client):
-    owner = baker.make(
-        auth.User,
-        is_staff=False,
-        username="owner@ab.fr",
-        email="owner@ab.fr",
-    )
-
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    )
-
-    utils.assign_collaborator(owner, project, is_owner=True)
-
-    url = reverse("projects-access-delete", args=[project.id, owner.email])
-
-    with login(client) as user:
-        assign_perm("projects.manage_members", user, project)
-
-        response = client.post(url)
-
-    project = models.Project.on_site.get(id=project.id)
-    assert owner in project.members.all()
-
-    update_url = reverse("projects-access-update", args=[project.id])
-    assertRedirects(response, update_url)
-
-
 ########################################################################
 # Project syndication feed
 ########################################################################
@@ -1223,8 +999,9 @@ def test_projects_feed_available_for_all_users(request, client):
     assertContains(response, detail_url)
 
 
-#
+########################################################################
 # reminder
+########################################################################
 
 
 @pytest.mark.django_db
@@ -1544,6 +1321,8 @@ def test_switchtender_create_action_for_resource_push(request, client):
 
 @pytest.mark.django_db
 def test_switchtender_joins_project(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
     Recipe(
@@ -1553,12 +1332,12 @@ def test_switchtender_joins_project(request, client):
             dept,
         ],
     ).make()
-    project = Recipe(
-        models.Project, sites=[get_current_site(request)], commune=commune
-    ).make()
+    project = Recipe(models.Project, sites=[current_site], commune=commune).make()
 
     url = reverse("projects-project-switchtender-join", args=[project.id])
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         # Then POST to join projet
         response = client.post(url)
 
@@ -1602,7 +1381,11 @@ def test_switchtender_leaves_project(request, client):
 
 
 @pytest.mark.django_db
-def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(client):
+def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(
+    request, client
+):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
 
@@ -1620,11 +1403,14 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(client)
         status="BLAH",
         projectmember_set=[membership],
         commune=commune,
+        sites=[current_site],
     ).make()
 
     join_url = reverse("projects-project-switchtender-join", args=[project.id])
     leave_url = reverse("projects-project-switchtender-leave", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         client.post(join_url)
         assert membership.member.notifications.count() == 1
 
@@ -1675,25 +1461,82 @@ def test_switchtender_exports_csv(request, client):
 
 
 #################################################################
-# Synopsis
+# Tags
 #################################################################
 @pytest.mark.django_db
-def test_switchtender_writes_synopsis_for_project(request, client):
+def test_switchtender_updates_tags(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    data = {"tags": "blah"}
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
+        response = client.post(
+            reverse("projects-project-tags", args=[project.id]), data=data
+        )
+
+    assert response.status_code == 302
+    project = models.Project.objects.all()[0]
+    assert list(project.tags.names()) == [data["tags"]]
+
+
+#################################################################
+# Topics
+#################################################################
+@pytest.mark.django_db
+def test_switchtender_writes_advisors_note(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
     with login(client) as user:
         utils.assign_advisor(user, project)
 
         response = client.post(
-            reverse("projects-project-synopsis", args=[project.id]),
-            data={"synopsis": "this is some content"},
+            reverse("projects-project-topics", args=[project.id]),
+            data={
+                "advisors_note": "this is some content",
+                "form-TOTAL_FORMS": 1,
+                "form-INITIAL_FORMS": 0,
+            },
         )
 
     assert response.status_code == 302
     project = models.Project.objects.all()[0]
-    assert project.synopsis is not None
-    assert project.synopsis_on is not None
-    assert project.synopsis_by == user
+    assert project.advisors_note is not None
+    assert project.advisors_note_on is not None
+    assert project.advisors_note_by == user
+
+
+@pytest.mark.django_db
+def test_switchtender_add_topics(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    data = {
+        "advisors_note": "",
+        "form-TOTAL_FORMS": 1,
+        "form-INITIAL_FORMS": 0,
+        "form-0-id": "",
+        "form-0-label": "blah",
+    }
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
+        response = client.post(
+            reverse("projects-project-topics", args=[project.id]),
+            data=data,
+        )
+
+        print(response.content)
+
+    assert response.status_code == 302
+    topic = models.ProjectTopic.objects.all()[0]
+    assert topic.project == project
+    assert topic.label == data["form-0-label"]
 
 
 #################################################################
@@ -1701,13 +1544,15 @@ def test_switchtender_writes_synopsis_for_project(request, client):
 #################################################################
 @pytest.mark.django_db
 def test_regional_switchtender_can_observe_project(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
     with login(client, groups=["switchtender"]) as user:
         user.profile.departments.set([project.commune.department.pk])
+        user.profile.sites.add(current_site)
+
         response = client.post(
             reverse("projects-project-observer-join", args=[project.id]),
         )
@@ -1722,12 +1567,14 @@ def test_regional_switchtender_can_observe_project(request, client):
 
 @pytest.mark.django_db
 def test_non_regional_switchtender_can_observe_project(request, client):
-    commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    current_site = get_current_site(request)
 
-    with login(client, groups=["switchtender"]):
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         response = client.post(
             reverse("projects-project-observer-join", args=[project.id]),
         )
@@ -1737,12 +1584,14 @@ def test_non_regional_switchtender_can_observe_project(request, client):
 
 @pytest.mark.django_db
 def test_switchtender_visits_project_without_interest(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         response = client.get(
             reverse("projects-project-detail-overview", args=[project.id]),
         )
@@ -1751,17 +1600,48 @@ def test_switchtender_visits_project_without_interest(request, client):
 
     personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
 
-    assert personal_status.status == "NOT_INTERESTED"
+    assert personal_status.status == "TODO"
+
+
+@pytest.mark.django_db
+def test_switchtender_visits_new_project(request, client):
+    current_site = get_current_site(request)
+
+    commune = Recipe(geomatics.Commune).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
+        Recipe(
+            models.UserProjectStatus,
+            site=current_site,
+            project=project,
+            user=user,
+            status="NEW",
+        ).make()
+
+        response = client.get(
+            reverse("projects-project-detail-overview", args=[project.id]),
+        )
+
+    assert response.status_code == 200
+
+    personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
+
+    assert personal_status.status == "TODO"
 
 
 @pytest.mark.django_db
 def test_switchtender_observes_project_shows_interest(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         response = client.get(
             reverse("projects-project-detail-overview", args=[project.id]),
         )
@@ -1774,17 +1654,19 @@ def test_switchtender_observes_project_shows_interest(request, client):
 
     personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
 
-    assert personal_status.status == "FOLLOWED"
+    assert personal_status.status == "TODO"
 
 
 @pytest.mark.django_db
 def test_switchtender_advises_project_shows_interest(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         response = client.get(
             reverse("projects-project-detail-overview", args=[project.id]),
         )
@@ -1797,19 +1679,21 @@ def test_switchtender_advises_project_shows_interest(request, client):
 
     personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
 
-    assert personal_status.status == "FOLLOWED"
+    assert personal_status.status == "TODO"
 
 
 @pytest.mark.django_db
 def test_switchtender_stop_advising_or_observing_project_shows_no_interest(
     request, client
 ):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
-    project = Recipe(
-        models.Project, commune=commune, sites=[get_current_site(request)]
-    ).make()
+    project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
     with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
         response = client.get(
             reverse("projects-project-detail-overview", args=[project.id]),
         )

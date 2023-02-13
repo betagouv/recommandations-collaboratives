@@ -1,9 +1,14 @@
 import Alpine from 'alpinejs'
-import { STATUSES, isStatus } from '../utils/tasks'
+import { STATUSES, isStatus, statusText } from '../utils/tasks'
 
 function StatusSwitcher(commentTextRef, commentTextFormRef) {
     return {
         STATUSES,
+        statusText,
+        openStatusWrapper : false,
+        handleStatusWrapper() {
+            return this.openStatusWrapper = !this.openStatusWrapper
+        },
         activeStatus(task, status) {
             return isStatus(task, status) ? "active" : undefined
         },

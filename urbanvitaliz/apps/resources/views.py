@@ -10,25 +10,25 @@ import datetime
 
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import DeleteView
 from markdownx.fields import MarkdownxFormField
 from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import (
-    check_if_switchtender,
-    is_staff_or_403,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
+                                is_switchtender_or_403)
 
 from . import models
 from .serializers import ResourceSerializer
@@ -207,7 +207,11 @@ class ResourceDetailView(BaseResourceDetailView):
 
         if check_if_switchtender(self.request.user):
             context["projects_used_by"] = (
-                projects.Project.on_site.filter(tasks__resource_id=resource.pk)
+                projects.Project.on_site.filter(
+                    Q(tasks__resource_id=resource.pk)
+                    & Q(tasks__public=True)
+                    & Q(tasks__deleted=None)
+                )
                 .order_by("name")
                 .distinct()
             )
@@ -219,6 +223,32 @@ class EmbededResourceDetailView(BaseResourceDetailView):
     model = models.Resource
     template_name = "resources/resource/details_embeded.html"
     pk_url_kwarg = "resource_id"
+
+
+########################################################################
+# Deleting resources
+########################################################################
+
+
+class ResourceDeleteView(UserPassesTestMixin, DeleteView):
+    model = models.Resource
+    template_name = "resources/resource/delete.html"
+    success_url = reverse_lazy("resources-resource-search")
+    pk_url_kwarg = "resource_id"
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Call the delete() method on the fetched object and then redirect to the
+        success URL.
+        """
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.deleted = timezone.now()
+        self.object.save()
+        return HttpResponseRedirect(success_url)
+
+    def test_func(self):
+        return self.request.user.is_staff
 
 
 ########################################################################
