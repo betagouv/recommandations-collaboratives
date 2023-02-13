@@ -1,3 +1,7 @@
+import projects from '../../../../fixtures/projects/projects.json'
+
+const currentProject = projects[1];
+
 describe('I can access and use public notes', () => {
 
     beforeEach(() => {
@@ -8,7 +12,7 @@ describe('I can access and use public notes', () => {
 
         cy.visit('/projects')
 
-        cy.contains('Friche numéro 1').click({force:true});
+        cy.contains(currentProject.fields.name).click({force:true});
 
         cy.contains("Conversation").click({ force: true })
 

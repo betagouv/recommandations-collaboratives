@@ -1,3 +1,7 @@
+import projects from '../../../fixtures/projects/projects.json'
+
+const currentProject = projects[2];
+
 describe('I can have a public url to share', () => {
 
     beforeEach(() => {
@@ -6,7 +10,7 @@ describe('I can have a public url to share', () => {
 
     it('goes to share a project page', () => {
 
-        cy.visit('/project/3/')
+        cy.visit(`/project/${currentProject.pk}`)
 
         cy.contains("Partager l'état des lieux").click({ force: true })
 
