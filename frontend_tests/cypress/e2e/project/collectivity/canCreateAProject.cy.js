@@ -12,22 +12,6 @@ describe('I can follow a project', () => {
 
         cy.url().should('include', '/onboarding/')
 
-        // cy.get('#id_first_name')
-        //     .type('', { force: true })
-        //     .should('have.value', '')
-
-        // cy.get('#id_last_name')
-        //     .type('', { force: true })
-        //     .should('have.value', '')
-
-        // cy.get('#id_phone')
-        //     .type('', { force: true })
-        //     .should('have.value', '')
-
-        // cy.get('#id_org_name')
-        //     .type('', { force: true })
-        //     .should('have.value', '')
-
         cy.get('#id_name')
             .type('fake project name', { force: true })
             .should('have.value', 'fake project name')
