@@ -1,3 +1,6 @@
+import projects from '../../../../fixtures/projects/projects.json'
+const currentProject = projects[1];
+
 //Must be dore after `addARecommandationAsASwitchtender.cy.js`
 describe('I can comment & interact with a recommandation', () => {
     beforeEach(() => {
@@ -8,7 +11,7 @@ describe('I can comment & interact with a recommandation', () => {
 
         cy.visit('/projects')
 
-        cy.contains('Friche numéro 1').click({force:true});
+        cy.contains(currentProject.fields.name).click({force:true});
 
         cy.contains("Recommandations").click({ force: true })
 
@@ -26,9 +29,7 @@ describe('I can comment & interact with a recommandation', () => {
 
         cy.contains(`test : ${now}`)
 
-        cy.get('a').contains("En cours").click({ force: true });
-
-        cy.get('[aria-label="Close"]').click({force:true})
+        cy.get('#task-preview').get('[aria-label="Close"]').first().click({force:true})
 
         cy.wait(500)
 
