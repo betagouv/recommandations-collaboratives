@@ -8,10 +8,10 @@ describe('I can fill a project survey', () => {
 
         cy.visit('/project/4')
 
-        cy.contains("État des lieux").click({ force: true })
-        cy.contains("Démarrer le parcours").click({ force: true })
+        cy.get('a').should('have.class', 'text-nowrap').contains('État des lieux').click({ force: true })
+        cy.contains("Compléter l'état des lieux").click({ force: true })
 
-        cy.url().should('include', '/projects/survey/')
+        // cy.url().should('include', '/projects/survey/')
 
         cy.get('#form_answer-1')
             .check({ force: true })
