@@ -1,5 +1,7 @@
 .searchable-list-wrapper {
-    position: relative;
+    position: absolute;
+    top: 20px;
+    width: 100%;
 }
 
 .searchable-list-wrapper ul{
@@ -19,6 +21,11 @@
 
     max-height: 40vh;
     overflow-y: scroll;
+}
+
+.searchable-list-wrapper .item-selected {
+    background-color: #f6f6f6;
+    user-select: none;
 }
 
 .searchable-list-wrapper.hide ul {

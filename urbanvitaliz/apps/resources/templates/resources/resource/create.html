@@ -91,12 +91,12 @@
 
             <hr/>
             <div class="d-flex mt-4 mb-4">
-                <div class="w-50 d-flex flex-column select-custom">
+                <div class="w-50 d-flex flex-column select-custom border-end pe-4">
                     {{form.departments.errors}}
                     {% include 'tools/searchable_list.html' with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département"%}
                 </div>
 
-                <div class="w-50 d-flex flex-column select-custom ms-2">
+                <div class="w-50 d-flex flex-column select-custom ms-2 ms-4">
                     {{form.contacts.errors}}
                     {% include 'tools/searchable_list.html' with list=form.contacts label=form.contacts.label search_list_id=form.contacts.id_for_label search_options="['name']" item_label="contact" %}
                 </div>

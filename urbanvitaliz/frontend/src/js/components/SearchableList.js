@@ -33,12 +33,13 @@ function SearchableList(listId, listCount, searchParams) {
             Array.from(this.$refs.selectList.children).forEach(li => {
                 this.selectedList.forEach(item => {
                     if (li.getAttribute("id") == item.value) {
-                        li.classList.add('d-none')
+                        li.classList.add('item-selected')
                     }
                 })
             })
         },
         handleFocusList() {
+            console.log('triggered');
             return this.onFocus = true
         },
         handleBlurList(event) {
@@ -47,7 +48,11 @@ function SearchableList(listId, listCount, searchParams) {
             }, 100);
         },
         handleAddItem(event, value, name) {
-            event.target.parentNode.classList.add('d-none')
+            // event.target.parentNode.classList.add('d-none')
+
+            event.target.classList.add('item-selected')
+            console.log('event : ', event.target)
+
             const selectedItem = {
                 name: name,
                 value: value,
