@@ -88,8 +88,8 @@
                     <div class="">
                         <label class="text-info-custom text-grey-dark" for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
                         {% if user.is_authenticated and user.first_name %}
-                        <input type="text" disabled class="py-4 placeholder-grey form-control"
-                            id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.name }}" value="{{ user.first_name }}" required>
+                        <input type="text" class="py-4 placeholder-grey form-control input-disabled"
+                            id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.name }}" value="{{ user.first_name }}">
                         {% else %}
                         <input type="text" class="py-4 placeholder-grey form-control {% if form.first_name.errors %}is-invalid{% endif %}"
                             id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.name }}"
@@ -105,9 +105,9 @@
                     <div class="">
                         <label class="text-info-custom text-grey-dark" for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
                         {% if user.is_authenticated and user.last_name %}
-                        <input type="text" disabled class="py-4 placeholder-grey form-control"
+                        <input type="text" class="py-4 placeholder-grey form-control input-disabled"
                             id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.name }}"
-                            value="{{ user.last_name }}" required>
+                            value="{{ user.last_name }}">
                         {% else %}
                         <input type="text" class="py-4 placeholder-grey form-control {% if form.last_name.errors %}is-invalid{% endif %}"
                             id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.name }}" placeholder="Dupont"
@@ -125,9 +125,9 @@
                     <div class="">
                         <label class="text-info-custom text-grey-dark" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
                         {% if user.is_authenticated and user.email %}
-                        <input type="email" disabled class="py-4 placeholder-grey form-control"
+                        <input type="email" class="py-4 placeholder-grey form-control input-disabled"
                             id="{{ form.email.id_for_label }}" name="{{ form.email.name }}"
-                            placeholder="nom@organisme.fr" value="{{ user.email }}" required>
+                            placeholder="nom@organisme.fr" value="{{ user.email }}">
                         {% else %}
                         <input type="email" class="py-4 placeholder-grey form-control {% if form.email.errors %}is-invalid{% endif %}"
                             id="{{ form.email.id_for_label }}" name="{{ form.email.name }}"
@@ -145,7 +145,7 @@
                     <div class="">
                         <label class="text-info-custom text-grey-dark" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
                         {% if user.is_authenticated and user.profile.phone_no %}
-                        <input type="tel" disabled class="py-4 placeholder-grey form-control"
+                        <input type="tel" class="py-4 placeholder-grey form-control input-disabled"
                             id="{{ form.phone.id_for_label }}" name="{{ form.phone.name }}"
                             value="{{ user.profile.phone_no }}" placeholder="">
                         {% else %}
@@ -166,9 +166,9 @@
             <div class="">
                 <label class="text-info-custom text-grey-dark" for="{{ form.org_name.id_for_label }}">{{ form.org_name.label }}</label>
                 {% if user.is_authenticated and user.profile.organization.name %}
-                    <input disabled type="text" class="py-4 placeholder-grey form-control"
+                    <input type="text" class="py-4 placeholder-grey form-control input-disabled"
                     id="{{ form.org_name.id_for_label }}" name="{{ form.org_name.name }}" placeholder="Mon organisation"
-                    value="{{ user.profile.organization.name }}" required>
+                    value="{{ user.profile.organization.name }}">
                 {% else %}
                     <input type="text" class="py-4 placeholder-grey form-control {% if form.org_name.errors %}is-invalid{% endif %}"
                     id="{{ form.org_name.id_for_label }}" name="{{ form.org_name.name }}" placeholder="Mon organisation"
