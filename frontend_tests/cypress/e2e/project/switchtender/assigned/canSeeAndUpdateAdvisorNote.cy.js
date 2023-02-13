@@ -1,30 +1,31 @@
 import projects from '../../../../fixtures/projects/projects.json'
-
 const currentProject = projects[1];
 
-describe('I can access and use private notes', () => {
+describe('I can see and update an advisor note', () => {
 
     beforeEach(() => {
         cy.login("jean");
     })
 
-    it('goes to private notes', () => {
+    it('goes to project overview and update advisor note', () => {
 
         cy.visit('/projects')
 
         cy.contains(currentProject.fields.name).click({force:true});
 
-        cy.contains("Espace conseiller").click({ force: true })
+        cy.contains("Note interne")
 
-        cy.url().should('include', '/suivi')
+        cy.contains('Non visible par la collectivité').parent().siblings('a').click({force:true})
 
         const now = new Date();
 
+        cy.get('textarea').clear({ force: true })
+
         cy.get('textarea')
-            .type(`test : ${now}`, { force: true })
+            .type(`test : ${now}`)
             .should('have.value', `test : ${now}`)
 
-        cy.contains("Envoyer").click({ force: true })
+        cy.contains("Enregistrer").click({ force: true })
 
         cy.contains(`test : ${now}`)
     })

@@ -1,3 +1,7 @@
+import projects from '../../../../fixtures/projects/projects.json'
+
+const currentProject = projects[1];
+
 describe('I can create a recommandation with no resource as a switcthender', () => {
     beforeEach(() => {
         cy.login("jean");
@@ -7,7 +11,7 @@ describe('I can create a recommandation with no resource as a switcthender', () 
 
         cy.visit('/projects')
 
-        cy.contains('Friche numéro 1').click({force:true});
+        cy.contains(currentProject.fields.name).click({force:true});
 
         cy.contains("Recommandations").click({ force: true })
 
