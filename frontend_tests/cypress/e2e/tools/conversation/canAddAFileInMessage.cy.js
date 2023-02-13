@@ -1,14 +1,18 @@
 import file from '../../../fixtures/documents/file.json'
+import projects from '../../../fixtures/projects/projects.json'
+
+const currentProject = projects[2];
 
 describe('I can add a file with my message in public notes', () => {
     beforeEach(() => {
-        cy.login("bob");
+        cy.login("jeannot");
     })
 
     it('writes a message with a file', () => {
-        cy.visit('/')
+        cy.visit('/projects')
 
-        cy.contains('Friche numéro 1').click({ force: true });
+        cy.contains(currentProject.fields.name).click({force:true});
+        cy.contains('Conseiller le projet').click({force:true});
 
         cy.contains("Conversation").click({ force: true })
 

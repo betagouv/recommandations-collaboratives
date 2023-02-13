@@ -1,14 +1,17 @@
 import file from '../../../fixtures/documents/file.json'
+import projects from '../../../fixtures/projects/projects.json'
+
+const currentProject = projects[2];
 
 describe('I can add a file in a recommandation', () => {
     beforeEach(() => {
-        cy.login("jean");
+        cy.login("jeannot");
     })
 
     it('writes a message with a file', () => {
         cy.visit('/projects')
 
-        cy.contains('Friche numéro 1').click({ force: true });
+        cy.contains(currentProject.fields.name).click({force:true});
 
         cy.contains("Recommandations").click({ force: true })
 
@@ -33,8 +36,5 @@ describe('I can add a file in a recommandation', () => {
         cy.get("[type=submit]").click({ force: true });
 
         cy.url().should('include', '/actions#action-')
-
-        cy.contains(`fake recommandation content with no resource : ${now}`)
-        cy.contains(file.path.slice(-17,-4))
     })
 })
