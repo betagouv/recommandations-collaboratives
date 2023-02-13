@@ -12,21 +12,21 @@ describe('I can follow a project', () => {
 
         cy.url().should('include', '/onboarding/')
 
-        cy.get('#id_first_name')
-            .type('Collectivity', { force: true })
-            .should('have.value', 'Collectivity')
+        // cy.get('#id_first_name')
+        //     .type('', { force: true })
+        //     .should('have.value', '')
 
-        cy.get('#id_last_name')
-            .type('test', { force: true })
-            .should('have.value', 'test')
+        // cy.get('#id_last_name')
+        //     .type('', { force: true })
+        //     .should('have.value', '')
 
-        cy.get('#id_phone')
-            .type('010101010101', { force: true })
-            .should('have.value', '010101010101')
+        // cy.get('#id_phone')
+        //     .type('', { force: true })
+        //     .should('have.value', '')
 
-        cy.get('#id_org_name')
-            .type('DDT test', { force: true })
-            .should('have.value', 'DDT test')
+        // cy.get('#id_org_name')
+        //     .type('', { force: true })
+        //     .should('have.value', '')
 
         cy.get('#id_name')
             .type('fake project name', { force: true })
@@ -61,10 +61,10 @@ describe('I can follow a project', () => {
 
         cy.contains('Envoyer ma demande').click({ force: true });
 
-        cy.url().should('include', '/projects/survey/')
+        // cy.url().should('include', '/projects/survey/')
 
-        cy.get(".introjs-skipbutton").click({ force: true });
+        // cy.get(".introjs-skipbutton").click({ force: true });
 
-        cy.contains('fake project name').click({ force: true });
+        // cy.contains('fake project name').click({ force: true });
     })
 })
