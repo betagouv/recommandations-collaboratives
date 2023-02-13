@@ -62,6 +62,7 @@
             </a>
         </li>
     {% endif %}
+    {% if can_manage %}
     <li>
         <a class="{% if project.status == 'DRAFT' and not can_administrate %} disabled{% endif %} {% if files_links %} active{% endif %} align-items-center"
            href="{% url 'projects-project-detail-documents' project.pk %}">
@@ -77,6 +78,7 @@
             <span class="">Fichiers et liens</span>
         </a>
     </li>
+    {% endif %}
     {% if active_project_can_administrate %}
         <li>
             <a class="{% if internal_followup %} active{% endif %} {% if not active_project_can_administrate %} disabled{% endif %}align-items-center"

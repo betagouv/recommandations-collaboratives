@@ -12,6 +12,13 @@
     min-width: 200px;
 }
 
+.input-disabled {
+    user-select: none !important;
+    pointer-events: none !important;
+    background-color: #e9ecef !important;
+    opacity: 1;
+}
+
 .input-icon {
     position: absolute;
     left: 10px;
