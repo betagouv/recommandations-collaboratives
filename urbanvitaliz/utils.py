@@ -100,6 +100,7 @@ def build_absolute_url(path, auto_login_user=None):
     return url
 
 
+# TODO move me to home/utils.py
 def get_site_administrators(site):
     return auth.User.objects.filter(is_staff=True, is_active=True)
 
@@ -134,6 +135,7 @@ def login(
 ################################################################
 # Site configuration
 ################################################################
+# TODO move me to home/utils.py
 def get_site_config_or_503(site):
     try:
         return SiteConfiguration.objects.get(site=site)

@@ -4,7 +4,18 @@ from urbanvitaliz.apps.projects import models as projects_models
 
 
 class Onboarding(models.Model):
-    form = FormField()
+    form = FormField(
+        default=[
+            {
+                "type": "text",
+                "required": False,
+                "label": "Vide",
+                "className": "form-control",
+                "name": "text-0000000000000-0",
+                "subtype": "text",
+            }
+        ]
+    )
 
 
 class OnboardingResponse(models.Model):
