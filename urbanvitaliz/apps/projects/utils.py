@@ -15,6 +15,7 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
+from django.db import transaction
 from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
 from urbanvitaliz import utils as uv_utils
@@ -23,6 +24,7 @@ from urbanvitaliz.apps.reminders import api
 from . import models
 
 
+@transaction.atomic
 def assign_collaborator(user, project, is_owner=False):
     """Make someone becomes a project collaborator"""
     assign_perm("projects.use_public_notes", user, project)
@@ -48,6 +50,7 @@ ADVISOR_PERMISSIONS = [
 ]
 
 
+@transaction.atomic
 def assign_advisor(user, project):
     """Make someone becomes a project advisor"""
     for perm in ADVISOR_PERMISSIONS:
@@ -65,6 +68,7 @@ def assign_advisor(user, project):
         switchtending.save()
 
 
+@transaction.atomic
 def unassign_advisor(user, project):
     """Remove someone from being a project advisor"""
     for perm in ADVISOR_PERMISSIONS:
@@ -77,6 +81,7 @@ def unassign_advisor(user, project):
     ).delete()
 
 
+@transaction.atomic
 def assign_observer(user, project):
     """Make someone becomes a project observer"""
     for perm in ADVISOR_PERMISSIONS:  # XXX Should be different from an advisor
