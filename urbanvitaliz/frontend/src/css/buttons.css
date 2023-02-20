@@ -36,6 +36,18 @@
     color: white;
 }
 
+.button.white.filled {
+    border-color: white;
+    background-color: white;
+    color: #222 !important;
+}
+
+.button.white.filled:hover {
+    border-color: #b6b6b6;
+    background-color: #b6b6b6;
+    color: #222 !important;
+}
+
 .button.white:hover {
     border-color: white;
     color: #222 !important;
