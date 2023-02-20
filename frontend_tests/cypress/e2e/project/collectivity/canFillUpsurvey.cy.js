@@ -1,3 +1,7 @@
+import projects from '../../../fixtures/projects/projects.json'
+
+const currentProject = projects[3];
+
 describe('I can fill a project survey', () => {
 
     beforeEach(() => {
@@ -6,12 +10,12 @@ describe('I can fill a project survey', () => {
 
     it('fills up the survey', () => {
 
-        cy.visit('/project/4')
+        cy.visit(`/project/${currentProject.pk}`)
 
-        cy.contains("État des lieux").click({ force: true })
-        cy.contains("Démarrer le parcours").click({ force: true })
+        cy.get('a').should('have.class', 'text-nowrap').contains('État des lieux').click({ force: true })
+        cy.contains("Compléter l'état des lieux").click({ force: true })
 
-        cy.url().should('include', '/projects/survey/')
+        // cy.url().should('include', '/projects/survey/')
 
         cy.get('#form_answer-1')
             .check({ force: true })

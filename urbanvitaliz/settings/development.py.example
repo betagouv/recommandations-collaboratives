@@ -42,8 +42,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 SENDINBLUE_API_KEY = os.environ.get('SENDINBLUE_API_KEY')
 SENDINBLUE_FORCE_DEBUG = True
 
-# Recpatcha
-
+# Recaptcha
 RECAPTCHA_REQUIRED_SCORE = 0
+
+# Vite
+DJANGO_VITE_DEV_MODE = True
 
 # eof

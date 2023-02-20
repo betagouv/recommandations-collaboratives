@@ -1,3 +1,7 @@
+import projects from '../../../../fixtures/projects/projects.json'
+
+const currentProject = projects[1];
+
 describe('I can access and use private notes', () => {
 
     beforeEach(() => {
@@ -8,9 +12,9 @@ describe('I can access and use private notes', () => {
 
         cy.visit('/projects')
 
-        cy.contains('Friche numéro 1').click({force:true});
+        cy.contains(currentProject.fields.name).click({force:true});
 
-        cy.contains("Suivi interne").click({ force: true })
+        cy.contains("Espace conseiller").click({ force: true })
 
         cy.url().should('include', '/suivi')
 

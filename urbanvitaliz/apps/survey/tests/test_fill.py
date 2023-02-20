@@ -16,6 +16,7 @@ from django.urls import reverse
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
 from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.utils import login
 
@@ -31,8 +32,14 @@ def test_new_survey_session_is_created(request, client):
     current_site = get_current_site(request)
     project = Recipe(projects.Project, sites=[current_site]).make()
     survey = Recipe(models.Survey, site=current_site).make()
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
     Recipe(
-        home_models.SiteConfiguration, site=current_site, project_survey=survey
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+        project_survey=survey,
     ).make()
 
     url = reverse("survey-project-session", args=(project.id,))
@@ -63,9 +70,16 @@ def test_existing_survey_session_is_reused(request, client):
     current_site = get_current_site(request)
     project = Recipe(projects.Project, sites=[current_site]).make()
     survey = Recipe(models.Survey, site=current_site).make()
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
     Recipe(
-        home_models.SiteConfiguration, site=current_site, project_survey=survey
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+        project_survey=survey,
     ).make()
+
     session = Recipe(models.Session, project=project, survey=survey).make()
 
     url = reverse("survey-project-session", args=(project.id,))

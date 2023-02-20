@@ -12,7 +12,6 @@ import datetime
 import io
 import uuid
 
-import django.core.mail
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
@@ -20,11 +19,11 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
@@ -102,7 +101,13 @@ def test_proper_commune_selection_contains_all_possible_commmunes(request, clien
 # Prefilled projects
 #################################################################
 def test_create_prefilled_project_is_not_reachable_without_login(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     url = reverse("projects-project-prefill")
     response = client.get(url)
@@ -110,7 +115,13 @@ def test_create_prefilled_project_is_not_reachable_without_login(request, client
 
 
 def test_create_prefilled_project_is_not_reachable_with_simple_login(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     with login(client):
         response = client.get(reverse("projects-project-prefill"))
@@ -119,7 +130,13 @@ def test_create_prefilled_project_is_not_reachable_with_simple_login(request, cl
 
 
 def test_create_prefilled_project_reachable_by_switchtenders(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     with login(client, groups=["switchtender"]):
         response = client.get(reverse("projects-project-prefill"))
@@ -129,7 +146,13 @@ def test_create_prefilled_project_reachable_by_switchtenders(request, client):
 
 @pytest.mark.django_db
 def test_create_prefilled_project_creates_a_new_project(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
@@ -167,7 +190,13 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
 
 @pytest.mark.django_db
 def test_created_prefilled_project_stores_initial_info(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
@@ -256,24 +285,24 @@ def test_project_fails_unknown_sharing_link(request, client):
 
 
 @pytest.mark.django_db
-def test_existing_user_receives_email_on_login(client):
+def test_existing_user_receives_email_on_login(client, mailoutbox):
     user = Recipe(auth.User, email="jdoe@example.com").make()
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": user.email})
     assert response.status_code == 302
-    assert len(django.core.mail.outbox) == 1
-    assert user.email in django.core.mail.outbox[0].to
+    assert len(mailoutbox) == 1
+    assert user.email in mailoutbox[0].to
 
 
 @pytest.mark.django_db
-def test_unknown_user_is_created_and_receives_email_on_login(client):
+def test_unknown_user_is_created_and_receives_email_on_login(client, mailoutbox):
     email = "jdoe@example.com"
     url = reverse("magicauth-login")
     response = client.post(url, data={"email": email})
     assert response.status_code == 302
     assert auth.User.objects.get(email=email)
-    assert len(django.core.mail.outbox) == 1
-    assert email in django.core.mail.outbox[0].to
+    assert len(mailoutbox) == 1
+    assert email in mailoutbox[0].to
 
 
 ########################################################################
@@ -347,7 +376,14 @@ def test_project_overview_not_available_for_non_switchtender(request, client):
 @pytest.mark.django_db
 def test_project_overview_available_for_owner(request, client):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     # project email is same as test user to be logged in
     membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
@@ -364,7 +400,13 @@ def test_project_overview_available_for_owner(request, client):
 @pytest.mark.django_db
 def test_project_overview_available_for_switchtender(request, client):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-detail-overview", args=[project.id])
@@ -386,7 +428,14 @@ def test_project_knowledge_not_available_for_non_switchtender(request, client):
 @pytest.mark.django_db
 def test_project_knowledge_available_for_owner(request, client):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     # project email is same as test user to be logged in
     membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
@@ -403,7 +452,14 @@ def test_project_knowledge_available_for_owner(request, client):
 @pytest.mark.django_db
 def test_project_knowledge_available_for_switchtender(request, client):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
@@ -415,7 +471,14 @@ def test_project_knowledge_available_for_switchtender(request, client):
 @pytest.mark.django_db
 def test_project_knowledge_available_for_restricted_switchtender(request, client):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     other = Recipe(geomatics.Department, code="02").make()
     project = Recipe(
@@ -601,7 +664,14 @@ def test_project_internal_followup_not_available_for_restricted_switchtender(
 @pytest.mark.django_db
 def test_project_detail_contains_informations(request, client):
     current_site = get_current_site(request)
-    Recipe(home_models.SiteConfiguration, site=current_site).make()
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
+
     project = Recipe(models.Project, sites=[current_site]).make()
     task = Recipe(models.Task, project=project).make()
     note = Recipe(models.Note, project=project).make()
@@ -784,7 +854,15 @@ def test_delete_project_and_redirect(request, client):
 @pytest.mark.django_db
 def test_general_notifications_are_consumed_on_project_overview(request, client):
     current_site = get_current_site(request)
-    Recipe(home_models.SiteConfiguration, site=current_site).make()
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
     project = Recipe(
         models.Project,
         sites=[current_site],

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load cookie_consent_tags %}
+{% load django_vite %}
+{% block js %}
+  {% vite_asset 'js/apps/consent.js' %}
+{% endblock %}
+{% load sass_tags %}
+{% block css %}
+  <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+        rel="stylesheet"
+        type="text/css">
+  <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
+        rel="stylesheet"
+        type="text/css">
+{% endblock %}
+{% block content %}
+  <div class="fr-container fr-container--fluid fr-container-md">
+    <div class="fr-grid-row fr-grid-row--center">
+      <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
+        <div class="border mt-4">
+          <div class="mt-4 d-flex justify-content-end mx-4">
+            <a href="{% url 'home' %}"
+               class="text-decoration-underline text-blue"
+               aria-controls="fr-consent-modal"
+               title="Fermer">Retour à l'accueil</a>
+          </div>
+          <div class="fr-modal__content">
+            <h1 id="fr-consent-modal-title" class="fr-modal__title">Panneau de gestion des cookies</h1>
+            <div class="fr-consent-manager">
+              <div class="fr-consent-service fr-consent-manager__header">
+                <fieldset class="fr-fieldset fr-fieldset--inline">
+                  <legend id="finality-legend" class="fr-consent-service__title">
+                    Préférences pour tous les services. <a href="{% url 'privacy' %}">Données personnelles et cookies</a>
+                  </legend>
+                  <div class="fr-consent-service__radios">
+                    <form class="cookie-consent-accept"
+                          action="{% url 'cookie_consent_accept_all' %}"
+                          method="POST">
+                      <button class="me-2 button filled small" title="Autoriser tous les cookies">Tout accepter</button>
+                    </form>
+                    <form class="cookie-consent-accept"
+                          action="{% url 'cookie_consent_decline_all' %}"
+                          method="POST">
+                      <button class="button filled small" title="Refuser tous les cookies">Tout refuser</button>
+                    </form>
+                  </div>
+                </fieldset>
+              </div>
+              {% for cookie_group in object_list  %}
+                <div class="fr-consent-service">
+                  <fieldset aria-labelledby="finality-1-legend finality-1-desc"
+                            role="group"
+                            class="fr-fieldset fr-fieldset--inline"
+                            style="margin-top: 15px !important;
+                                   padding-top: 0 !important">
+                    <div class="d-flex align-items-center justify-content-between w-100">
+                      <legend id="finality-{{ cookie_group.varname }}-legend"
+                              class="fr-consent-service__title mt-0 pt-0">
+                        {{ cookie_group.name }}
+                      </legend>
+                      <div class="flex-grow-1">
+                        {% if cookie_group.is_required %}
+                          <div class="fr-radio-group d-flex align-items-center justify-content-end flex-grow-1">
+                            <input checked type="radio">
+                            <label class="fr-label me-0">Accepté</label>
+                          </div>
+                        {% else %}
+                          {% if not cookie_group.is_required %}
+                            <div class="d-flex align-items-center justify-content-end flex-grow-1">
+                              <div class="cookie-group-form d-flex align-items-center">
+                                {% if request|cookie_group_accepted:cookie_group.varname %}
+                                  <div class="fr-radio-group">
+                                    <input checked
+                                           type="radio"
+                                           id="consent-finality-{{ cookie_group.varname }}-accept"
+                                           name="consent-finality-{{ cookie_group.varname }}">
+                                    <label class="fr-label me-3"
+                                           for="consent-finality-{{ cookie_group.varname }}-accept">Accepté</label>
+                                  </div>
+                                {% else %}
+                                  <form class="cookie-consent-accept me-2"
+                                        action="{% url "cookie_consent_accept" cookie_group.varname %}"
+                                        method="POST">
+                                    {% csrf_token %}
+                                    <input class="button filled small" type="submit" value="Accepter">
+                                  </form>
+                                {% endif %}
+                                {% if request|cookie_group_declined:cookie_group.varname %}
+                                  <div class="fr-radio-group">
+                                    <input checked
+                                           type="radio"
+                                           id="consent-finality-{{ cookie_group.varname }}-declined"
+                                           name="consent-finality-{{ cookie_group.varname }}">
+                                    <label class="fr-label me-0"
+                                           for="consent-finality-{{ cookie_group.varname }}-declined">Refusé</label>
+                                  </div>
+                                {% else %}
+                                  <form class="cookie-consent-decline"
+                                        action="{% url "cookie_consent_decline" cookie_group.varname %}"
+                                        method="POST">
+                                    {% csrf_token %}
+                                    <input class="button filled small" type="submit" value="Refuser">
+                                  </form>
+                                {% endif %}
+                              </div>
+                            </div>
+                          {% endif %}
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="d-flex flex-column w-100">
+                      <p id="finality-1-desc" class="fr-consent-service__desc">{{ cookie_group.description }}</p>
+                      <div class="d-flex flex-column">
+                        {% for cookie in cookie_group.cookie_set.all %}
+                          <div class="d-flex align-items-center justify-content-between">
+                            <div style="width: 60%;">
+                              <strong>{{ cookie.name }}</strong>
+                              {% if cookie.domain %}({{ cookie.domain }}){% endif %}
+                            </div>
+                            <div style="width: 40%;">
+                              {% if cookie.description %}{{ cookie.description }}{% endif %}
+                            </div>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

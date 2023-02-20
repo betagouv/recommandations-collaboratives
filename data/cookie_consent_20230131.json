@@ -1,0 +1,89 @@
+[
+    {
+        "model": "cookie_consent.cookiegroup",
+        "pk": 3,
+        "fields": {
+            "varname": "analytics",
+            "name": "Analytics",
+            "description": "Analytics",
+            "is_required": false,
+            "is_deletable": true,
+            "ordering": 1,
+            "created": "2023-01-24T16:13:06.342Z"
+        }
+    },
+    {
+        "model": "cookie_consent.cookiegroup",
+        "pk": 4,
+        "fields": {
+            "varname": "tracking_media",
+            "name": "Tracking media",
+            "description": "",
+            "is_required": false,
+            "is_deletable": true,
+            "ordering": 2,
+            "created": "2023-01-24T16:13:43.112Z"
+        }
+    },
+    {
+        "model": "cookie_consent.cookiegroup",
+        "pk": 5,
+        "fields": {
+            "varname": "required",
+            "name": "Nécessaire",
+            "description": "Les cookies nécessaire au bon fonctionnement du site",
+            "is_required": true,
+            "is_deletable": false,
+            "ordering": 0,
+            "created": "2023-01-24T16:14:09.120Z"
+        }
+    },
+    {
+        "model": "cookie_consent.cookie",
+        "pk": 5,
+        "fields": {
+            "cookiegroup": 5,
+            "name": "csrftoken",
+            "description": "csrftoken description",
+            "path": "",
+            "domain": "",
+            "created": "2023-01-24T16:14:33.057Z"
+        }
+    },
+    {
+        "model": "cookie_consent.cookie",
+        "pk": 6,
+        "fields": {
+            "cookiegroup": 5,
+            "name": "Sessionid",
+            "description": "Sessionid",
+            "path": "",
+            "domain": "",
+            "created": "2023-01-24T16:14:51.864Z"
+        }
+    },
+    {
+        "model": "cookie_consent.cookie",
+        "pk": 7,
+        "fields": {
+            "cookiegroup": 3,
+            "name": "Posthog",
+            "description": "The modern platform for\r\nproduct analytics and experimentation",
+            "path": "/",
+            "domain": "https://app.posthog.com",
+            "created": "2023-01-24T16:15:59.934Z"
+        }
+    },
+    {
+        "model": "cookie_consent.cookie",
+        "pk": 8,
+        "fields": {
+            "cookiegroup": 4,
+            "name": "Youtube",
+            "description": "Service de partage de vidéo",
+            "path": "/",
+            "domain": "www.youtube.com",
+            "created": "2023-01-24T16:16:36.735Z"
+        }
+    }
+]

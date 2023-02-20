@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% load gravatar %}
+{% load sass_tags %}
+{% load static %}
+{% block css %}
+    <link href="{% sass_src 'home/css/home/home.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
+{% block content %}
+    <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne">
+        <h2>Conditions générales d'utilisation {{ request.site.name }}</h2>
+        <p class="mt-4">
+            Les présentes conditions générales d’utilisation (dites « CGU ») fixent le cadre juridique
+            de “{{ request.site.name }}” et définissent les conditions d’accès et d’utilisation des services par
+            l’Utilisateur.
+        </p>
+        <p class="mt-4 mb-2">
+            <strong>Article 1 - Champ d’application</strong>
+        </p>
+        <p>
+            L&#39;inscription est gratuite et réservée aux collectivités et porteurs de projet en zone détendues
+            pour la reconversion des friches et aux conseillers publics qui font avancer les projets des
+            collectivités.
+        </p>
+        <p class="mt-4 mb-2">
+            <strong>Article 2 – Objet</strong>
+        </p>
+        <p>
+            {{ request.site.name }} souhaite créer un service public gratuit d’appui aux petites collectivités pour la
+            reconversion des friches, en lien avec les objectifs de sobriété foncière du gouvernement. De
+            nombreuses friches restent inutilisées pendant que les sols naturels et agricoles sont
+            artificialisés. Les collectivités sont bloquées dans leurs projets de réhabilitation donc
+            {{ request.site.name }} les oriente personnellement sur leurs projets de réhabilitation de friche tout en
+            permettant aux conseillers publics de suivre et de faire avancer les projets sur les friches.
+        </p>
+        <p class="mt-4 mb-2">
+            <strong>Article 3 – Définitions</strong>
+        </p>
+        <p>
+            « L&#39;Utilisateur » est toute collectivité ou porteur de projet en zone détendue utilisant la
+            plateforme {{ request.site.name }}.
+        </br>
+    </br>
+    « Les conseillers publics » désignent toute personne compétente pour guider la collectivité ou
+    le porteur de projet dans la réhabilitation des friches.
+</br>
+</br>
+« L’Administration » vient désigner toute administration française ;
+</br>
+</br>
+Les « Services » sont les fonctionnalités offertes par la plateforme pour répondre à ses
+finalités.
+</p>
+<p class="mt-4 mb-2">
+    <strong>Article 4 - Fonctionnalités</strong>
+</p>
+<p class="mb-1">
+    <strong>4.1 Création du compte {{ request.site.name }}</strong>
+</p>
+<p class="mb-1">
+    <strong>4.1.1. Avec mot de passe</strong>
+</p>
+<p>
+    Chaque utilisateur peut créer un compte {{ request.site.name }} « avec mot de passe » en fournissant les
+    informations suivantes :
+    <br/>
+    <br/>
+    <ul>
+        <li>Prénom</li>
+        <li>Nom</li>
+        <li>Organisation</li>
+        <li>Fonction</li>
+        <li>Adresse e-mail</li>
+        <li>Numéro de téléphone</li>
+        <li>Mot de passe (et confirmation de mot de passe)</li>
+    </ul>
+</p>
+<p class="mt-4 mb-2">
+    <strong>4.1.2. Avec adresse e-mail</strong>
+</p>
+<p>
+    Chaque utilisateur peut créer un compte {{ request.site.name }} « avec adresse e-mail » grâce à un lien
+    de connexion qui lui sera envoyé sur l’adresse e-mail communiquée.
+</p>
+<p class="mt-4 mb-2">
+    <strong>4.2. Connexion au compte {{ request.site.name }}</strong>
+</p>
+<p>
+    Chaque utilisateur peut se connecter à son compte {{ request.site.name }} soit grâce à son mot de passe
+    soit grâce à son adresse e-mail et le lien de connexion fourni.
+</p>
+<p class="mt-4 mb-2">
+    <strong>4.3. Dépôt de dossier à {{ request.site.name }}</strong>
+</p>
+<p>
+    Chaque utilisateur peut solliciter l’équipe {{ request.site.name }} lorsqu’il souhaite déposer un dossier.
+    L’utilisateur remplit les informations suivantes :
+    <br/>
+    <br/>
+    <ul>
+        <li>Prénom</li>
+        <li>Nom</li>
+        <li>Adresse e-mail</li>
+        <li>Numéro de téléphone (facultatif)</li>
+        <li>Nom de sa structure</li>
+        <li>Nom du projet</li>
+        <li>Adresse du projet ou nom de la commune</li>
+        <li>Code postal</li>
+        <li>Context</li>
+        <li>
+            Demande initiale
+        </li>
+    </ul>
+</p>
+<p class="mt-4 mb-2">
+    <strong>4.4. Actualités liées à {{ request.site.name }}</strong>
+</p>
+<p>
+    Chaque utilisateur peut revoir les webinaires {{ request.site.name }} sur YouTube ou sur box.
+</p>
+<p class="mt-4 mb-2">
+    <strong>4.5. Demande d’accès par le conseiller public</strong>
+</p>
+<p>
+    Chaque conseiller public peut suivre les projets de son territoire et orienter les collectivités
+    grâce à {{ request.site.name }}. Par mail, les conseillers publics peuvent demander un accès à la
+    plateforme leur permettant de répondre aux questionnements des collectivités et donc faire
+    avancer les projets. Le service est ouvert aux acteurs publics qui conseillent les collectivités
+    sur les friches, de manière régulière ou ponctuelle. Selon les territoires et les projets : DDT,
+    EPF, DREAL, Conseils départementaux et régionaux etc.
+</p>
+<p class="mt-4 mb-2">
+    <strong>Article 5 - Responsabilités</strong>
+</p>
+<p class="mb-1">
+    <strong>5.1 L’éditeur de « {{ request.site.name }} »</strong>
+</p>
+<p>
+    Les sources des informations diffusées sur le site sont réputées fiables mais le site ne garantit
+    pas qu’il soit exempt de défauts, d’erreurs ou d’omissions.
+    <br/>
+    <br/>
+    L’éditeur s’engage à la sécurisation du site, notamment en prenant toutes les mesures
+    nécessaires permettant de garantir la sécurité et la confidentialité des informations fournies. Il
+    le réalise dans la limite des capacités techniques liées au chiffrement.
+    <br/>
+    <br/>
+    L’éditeur fournit les moyens nécessaires et raisonnables pour assurer un accès continu au site.
+    Il se réserve la liberté de faire évoluer, de modifier ou de suspendre, sans préavis, le site pour
+    des raisons de maintenance ou pour tout autre motif jugé nécessaire.
+</p>
+<p class="mt-4 mb-2">
+    <strong>5.2 L’Utilisateur</strong>
+</p>
+<p>
+    L&#39;Utilisateur s&#39;assure de garder son mot de passe secret. Toute divulgation du mot de passe,
+    quelle que soit sa forme, est interdite. Il assume les risques liés à l&#39;utilisation de son identifiant
+    et mot de passe.
+    <br/>
+    <br/>
+    Il s’engage à ne pas commercialiser les données reçues et à ne pas les communiquer à des
+    tiers en dehors des cas prévus par la loi.
+    <br/>
+    <br/>
+    Toute information transmise par l&#39;Utilisateur est de sa seule responsabilité. Il est rappelé que
+    toute personne procédant à une fausse déclaration pour elle-même ou pour autrui s’expose,
+    notamment, aux sanctions prévues à l’article 441-1 du code pénal, prévoyant des peines
+    pouvant aller jusqu’à trois ans d’emprisonnement et 45 000 euros d’amende.
+    <br/>
+    <br/>
+    L&#39;Utilisateur s&#39;engage à ne pas mettre en ligne de contenus ou informations contraires aux
+    dispositions légales et réglementaires en vigueur.
+</p>
+<p class="mt-4 mb-2">
+    <strong>5.3. Le conseiller public</strong>
+</p>
+<p>
+    Le conseiller public s’engage à ne pas commercialiser les données reçues et à ne pas les
+    communiquer à des tiers en dehors des cas prévus par la loi.
+    <br/>
+    Toute information transmise par le conseiller public est de sa seule responsabilité. Il est
+    rappelé que toute personne procédant à une fausse déclaration pour elle-même ou pour autrui
+    s’expose, notamment, aux sanctions prévues à l’article 441-1 du code pénal, prévoyant des
+    peines pouvant aller jusqu’à trois ans d’emprisonnement et 45 000 euros d’amende.
+    <br/>
+    Le conseiller public s&#39;engage à ne pas mettre en ligne de contenus ou informations contraires
+    aux dispositions légales et réglementaires en vigueur.
+</p>
+<p class="mt-4 mb-2">
+    <strong>Article 6 - Mise à jour des conditions d’utilisation</strong>
+</p>
+<p>
+    Les termes des présentes conditions d’utilisation peuvent être amendés à tout moment, en
+    fonction des modifications apportées à la plateforme, de l’évolution de la législation ou pour
+    tout autre motif jugé nécessaire. Chaque modification donne lieu à une nouvelle version qui
+    est acceptée par les parties.
+</p>
+</div>
+{% endblock %}

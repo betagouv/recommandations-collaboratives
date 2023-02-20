@@ -18,6 +18,8 @@ from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.onboarding import models as onboarding_models
+from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.utils import login
 
 from . import adapters, models, utils
@@ -28,7 +30,14 @@ from . import adapters, models, utils
 ####
 def test_get_current_site_sender_with_configuration(request):
     current_site = get_current_site(request)
-    site_config = baker.make(models.SiteConfiguration, site=current_site)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    site_config = baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     sender = utils.get_current_site_sender()
 
