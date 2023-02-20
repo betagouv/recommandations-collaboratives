@@ -24,7 +24,7 @@ from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.utils import login
 
-from . import adapters, utils
+from . import adapters, utils, models
 
 
 ####
@@ -450,6 +450,35 @@ def test_guardian_supports_remove_bulk_perm_for_group_with_site_framework(
     with settings.SITE_ID.override(site2.pk):
         for project in projects:
             assert user.has_perm("add_project", project)
+
+
+@pytest.mark.django_db
+def test_make_new_site_fails_for_existing_domain(client):
+
+    before = models.SiteConfiguration.objects.count()
+
+    site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender")
+
+    assert site is None
+    assert models.SiteConfiguration.objects.count() == before
+
+
+@pytest.mark.django_db
+def test_make_new_site(client):
+
+    site = utils.make_new_site(
+        "New example", "new-example.com", "sender@example.com", "Sender"
+    )
+
+    assert site
+    assert models.SiteConfiguration.objects.filter(site=site).count() == 1
+
+    for name in (
+        "new_example_com_staff",
+        "new_example_com_advisor",
+        "new_example_com_admin",
+    ):
+        assert auth_models.Group.objects.get(name=name)
 
 
 # eof
