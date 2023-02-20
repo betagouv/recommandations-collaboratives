@@ -46,6 +46,7 @@ from ..forms import SelectCommuneForm
 from ..utils import (
     assign_advisor,
     assign_observer,
+    assign_collaborator,
     can_administrate_or_403,
     can_administrate_project,
     generate_ro_key,
@@ -338,16 +339,20 @@ def project_accept(request, project_id=None):
             project=project,
         )
 
-        if project.owner:
+        owner = project.owner
+        if owner:
+            # Update owner permissions now the project is no in DRAFT state anymore
+            assign_collaborator(owner, project, is_owner=True)
+
             # Send an email to the project owner
             params = {
-                "project": digests.make_project_digest(project, project.owner),
+                "project": digests.make_project_digest(project, owner),
             }
             send_email(
                 template_name="project_accepted",
                 recipients=[
                     {
-                        "name": normalize_user_name(project.owner),
+                        "name": normalize_user_name(owner),
                         "email": project.owner.email,
                     }
                 ],

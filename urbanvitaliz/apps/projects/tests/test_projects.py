@@ -16,6 +16,7 @@ import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
@@ -722,7 +723,7 @@ def test_accept_project_and_redirect(request, client):
     owner = Recipe(auth.User, username="owner@owner.co").make()
     project = Recipe(models.Project, sites=[current_site]).make()
     Recipe(auth.Group, name="project_moderator").make()
-    baker.make(models.ProjectMember, member=owner, is_owner=True)
+    baker.make(models.ProjectMember, project=project, member=owner, is_owner=True)
 
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
@@ -734,6 +735,9 @@ def test_accept_project_and_redirect(request, client):
     project = models.Project.on_site.get(id=project.id)
     assert project.status == "TO_PROCESS"
     assert project.updated_on > updated_on_before
+
+    # check updated permissions
+    assert "can_invite" in get_user_perms(owner, project)
 
     assert response.status_code == 302
 
