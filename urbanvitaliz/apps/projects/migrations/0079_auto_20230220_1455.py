@@ -14,9 +14,7 @@ from ..utils import (
 
 def assign_project_permissions_to_users(apps, schema_editor):
     for project in models.Project.objects.all():
-        print(project.name)
         for membership in project.projectmember_set.all():
-            print(membership)
             assign_collaborator(
                 membership.member, project, is_owner=membership.is_owner
             )
@@ -24,7 +22,6 @@ def assign_project_permissions_to_users(apps, schema_editor):
         for project_advisor in models.ProjectSwitchtender.objects.filter(
             project=project
         ):
-            print(project_advisor)
             if project_advisor.is_observer:
                 assign_observer(
                     project_advisor.switchtender, project, site=project_advisor.site
