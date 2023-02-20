@@ -7,7 +7,7 @@ function SearchableList(listId, listCount, searchParams) {
 
     return {
         selectedList: [],
-        onFocus:false,
+        onFocus: false,
         init() {
 
             if (!listCount > 0) return
@@ -17,7 +17,7 @@ function SearchableList(listId, listCount, searchParams) {
             };
 
             new List(listId, options);
-            
+
             //Get already selected items
             Array.from(this.$refs.defaultField.children[listId].options).forEach(option => {
                 if (option.selected) {
@@ -33,13 +33,12 @@ function SearchableList(listId, listCount, searchParams) {
             Array.from(this.$refs.selectList.children).forEach(li => {
                 this.selectedList.forEach(item => {
                     if (li.getAttribute("id") == item.value) {
-                        li.classList.add('item-selected')
+                        li.children[0].classList.add('item-selected')
                     }
                 })
             })
         },
         handleFocusList() {
-            console.log('triggered');
             return this.onFocus = true
         },
         handleBlurList(event) {
@@ -48,10 +47,7 @@ function SearchableList(listId, listCount, searchParams) {
             }, 100);
         },
         handleAddItem(event, value, name) {
-            // event.target.parentNode.classList.add('d-none')
-
             event.target.classList.add('item-selected')
-            console.log('event : ', event.target)
 
             const selectedItem = {
                 name: name,
@@ -72,7 +68,14 @@ function SearchableList(listId, listCount, searchParams) {
 
             event.target.parentNode.classList.remove('d-none')
             const itemFound = this.selectedList.indexOf(el)
+
             this.selectedList.splice(itemFound, 1)
+
+            Array.from(this.$refs.selectList.children).forEach(li => {
+                if (li.getAttribute("id") == removedItem.value) {
+                    li.children[0].classList.remove('item-selected');
+                }
+            })
 
             Array.from(this.$refs.defaultField.children[listId].options).forEach(option => {
                 if (option.value == el.value) {

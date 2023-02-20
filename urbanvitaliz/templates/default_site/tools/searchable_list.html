@@ -5,7 +5,7 @@
 {% endblock %}
 <div x-data="SearchableList('{{ search_list_id }}', {{ list.field.choices|length }}, {{ search_options }})"
      id="{{ search_list_id }}"
-     class="p-2">
+     class="p-2 py-4 my-4">
     <h5 class="mb-0 d-flex align-items-center justify-content-start">
         <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#list" />
@@ -28,23 +28,23 @@
                 </svg>
                 <span>Liste des {{ item_label }}s</span>
             </div> -->
-            <div class="input-item">
+            <div class="common-input with-icon d-flex align-items-center justify-content-center">
                 <svg class="input-icon bi align-baseline me-2"
                      width="17"
                      height="17"
                      fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
                 </svg>
-                <input type="search"
-                       class="search input-field w-100"
-                       placeholder="Ajouter un {{item_label}}"
-                       @focus="handleFocusList"
-                       @blur="handleBlurList(event)"/>
+                    <input type="search ms-4 ps-4"
+                        class="search w-100"
+                        placeholder="Ajouter un {{item_label}}"
+                        @focus="handleFocusList"
+                        @blur="handleBlurList(event)"/>
             </div>
         </div>
         <ul class="list-unstyled m-0 d-flex flex-column">
             <template x-for="item in selectedList">
-                <li class="d-inline-flex rounded justify-content-between align-items-center px-3 py-1 bg-grey-light d-flex align-items-center mb-1">
+                <li class="border d-inline-flex rounded justify-content-between align-items-center px-3 py-1 bg-grey-light d-flex align-items-center mb-1">
                     <p class="mb-0 pb-0 fw-bold font-small" x-text="item.name"></p>
                     <span @click='handleRemoveItem(event, item)'
                           class="btn btn-outline-danger btn-sm ms-2">
@@ -69,7 +69,7 @@
                             id="{{id}}"
                             style="cursor: pointer"
                             @click='handleAddItem(event, "{{ id }}","{{ value|lower }}")'>
-                            <p class="border-bottom px-3 py-1 m-0 hover-bg-grey name fw-medium font-small">{{ value|lower }}</p>
+                            <p class="border-bottom px-3 py-2 m-0 hover-bg-grey name fw-medium font-small">{{ value|lower }}</p>
                         </li>
                     {% endif %}
                 {% endfor %}

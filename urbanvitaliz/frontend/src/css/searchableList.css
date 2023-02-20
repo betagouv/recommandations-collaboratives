@@ -1,6 +1,6 @@
 .searchable-list-wrapper {
     position: absolute;
-    top: 20px;
+    top: 40px;
     width: 100%;
 }
 
@@ -15,12 +15,14 @@
 
 
     background-color: white;
+    /* border: solid 2px #0d6efd !important; */
     opacity: 1;
 
     transform: translate3d(0,0,0);
 
     max-height: 40vh;
     overflow-y: scroll;
+    border-radius: 0.25rem;
 }
 
 .searchable-list-wrapper .item-selected {
