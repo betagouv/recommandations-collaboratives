@@ -11,8 +11,7 @@ import os
 import uuid
 
 from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes.fields import (GenericForeignKey,
-                                                GenericRelation)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
@@ -22,8 +21,7 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import (OrderedModel, OrderedModelManager,
-                                  OrderedModelQuerySet)
+from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -35,6 +33,24 @@ from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import CastedGenericRelation, check_if_switchtender
 
 from .utils import generate_ro_key
+
+COLLABORATOR_PERMISSIONS = (
+    "projects.use_public_notes",
+    "projects.view_tasks",
+    "projects.use_tasks",
+)
+
+ADVISOR_PERMISSIONS = [
+    "projects.use_public_notes",
+    "projects.use_private_notes",
+    "projects.view_tasks",
+    "projects.manage_tasks",
+    "projects.use_tasks",
+    "projects.can_invite",
+    "projects.change_synopsis",
+]
+
+OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
 
 
 class ProjectManager(models.Manager):

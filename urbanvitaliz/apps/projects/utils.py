@@ -27,9 +27,8 @@ from . import models
 @transaction.atomic
 def assign_collaborator(user, project, is_owner=False):
     """Make someone becomes a project collaborator"""
-    assign_perm("projects.use_public_notes", user, project)
-    assign_perm("projects.view_tasks", user, project)
-    assign_perm("projects.use_tasks", user, project)
+    for perm in models.COLLABORATOR_PERMISSIONS:
+        assign_perm(perm, user, project)
 
     if project.status != "DRAFT":
         assign_perm("projects.can_invite", user, project)
@@ -39,26 +38,17 @@ def assign_collaborator(user, project, is_owner=False):
     )
 
 
-ADVISOR_PERMISSIONS = [
-    "projects.use_public_notes",
-    "projects.use_private_notes",
-    "projects.view_tasks",
-    "projects.manage_tasks",
-    "projects.use_tasks",
-    "projects.can_invite",
-    "projects.change_synopsis",
-]
-
-
 @transaction.atomic
-def assign_advisor(user, project):
+def assign_advisor(user, project, site=None):
     """Make someone becomes a project advisor"""
-    for perm in ADVISOR_PERMISSIONS:
+    site = site or Site.objects.get_current()
+
+    for perm in models.ADVISOR_PERMISSIONS:
         assign_perm(perm, user, project)
 
     switchtending, created = models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,
-        site=get_current_site(Site.objects.get_current()),
+        site=site,
         project=project,
         defaults={"is_observer": False},
     )
@@ -69,27 +59,31 @@ def assign_advisor(user, project):
 
 
 @transaction.atomic
-def unassign_advisor(user, project):
+def unassign_advisor(user, project, site=None):
     """Remove someone from being a project advisor"""
-    for perm in ADVISOR_PERMISSIONS:
+    site = site or Site.objects.get_current()
+
+    for perm in models.ADVISOR_PERMISSIONS:
         remove_perm(perm, user, project)
 
     models.ProjectSwitchtender.objects.filter(
         switchtender=user,
-        site=get_current_site(Site.objects.get_current()),
+        site=site,
         project=project,
     ).delete()
 
 
 @transaction.atomic
-def assign_observer(user, project):
+def assign_observer(user, project, site=None):
     """Make someone becomes a project observer"""
-    for perm in ADVISOR_PERMISSIONS:  # XXX Should be different from an advisor
+    site = site or Site.objects.get_current()
+
+    for perm in models.OBSERVER_PERMISSIONS:
         assign_perm(perm, user, project)
 
     switchtending, created = models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,
-        site=get_current_site(Site.objects.get_current()),
+        site=site,
         project=project,
         defaults={"is_observer": True},
     )
@@ -97,6 +91,10 @@ def assign_observer(user, project):
     if not created:
         switchtending.is_observer = True
         switchtending.save()
+
+
+# XXX currently no difference, but may need different perms in the future
+unassign_observer = unassign_advisor
 
 
 def can_manage_project(project, user, allow_draft=False):
