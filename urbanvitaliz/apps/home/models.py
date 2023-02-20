@@ -16,14 +16,23 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from guardian.core import ObjectPermissionChecker
 from guardian.managers import BaseObjectPermissionManager
-from guardian.models import (BaseGenericObjectPermission,
-                             GroupObjectPermissionAbstract,
-                             GroupObjectPermissionBase,
-                             UserObjectPermissionAbstract,
-                             UserObjectPermissionBase)
+from guardian.models import (
+    BaseGenericObjectPermission,
+    GroupObjectPermissionAbstract,
+    GroupObjectPermissionBase,
+    UserObjectPermissionAbstract,
+    UserObjectPermissionBase,
+)
 from phonenumber_field.modelfields import PhoneNumberField
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
+
+
+SITE_GROUP_PERMISSIONS = {
+    "staff": (),
+    "admin": (),
+    "advisor": (),
+}
 
 
 class SiteActionManager(CurrentSiteManager, ActionManager):
@@ -120,7 +129,7 @@ class BaseObjectPermissionManagerOnSite(
         if "site" not in kwargs.keys():
             kwargs["site"] = Site.objects.get_current()
 
-        # XXX Not sure if needed
+        # XXX Not sure if needed -- better coverage needed to improve
         if defaults and "site" not in defaults.keys:
             kwargs["site"] = Site.objects.get_current()
 

@@ -61,13 +61,7 @@ def make_new_site(name: str, domain: str, sender_email: str, sender_name: str) -
         project_survey=survey,
     )
 
-    groups = {
-        "staff": (),
-        "admin": (),
-        "advisor": (),
-    }
-
-    for name, permissions in groups.items():
+    for name, permissions in models.SITE_GROUP_PERMISSIONS.items():
         group_name = make_group_name_for_site(name, site)
         group = auth_models.Group.objects.create(name=group_name)
         # TODO add permission for group
