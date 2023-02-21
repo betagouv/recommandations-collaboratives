@@ -38,7 +38,7 @@ class Command(BaseCommand):
                 self.send_email_digests_for_site(site, dry_run)
 
     def send_email_digests_for_site(self, site, dry_run):
-        # Get all switchtenders
+        # FIXME Get all switchtenders BY SITE
         sw_group = auth_models.Group.objects.get(name="switchtender")
 
         print("** Sending Task Reminders **")
