@@ -4,36 +4,18 @@ describe('I can assign new deparments when I edit a resource', () => {
     })
 
     it('goes to edit a resource and assign 3 new deparments', () => {
-        cy.visit('/ressource/create/')
+        cy.visit('/ressource/1/')
+        cy.contains('Éditer').click({force:true})
 
-        cy.get('#id_title')
-            .type('Ressource de test', { force: true })
-            .should('have.value', 'Ressource de test')
+        cy.get('#id_departments-selected-list').children().eq('1').children('span').click({force:true})
 
-        cy.get('#id_subtitle')
-            .type('Soustitre de la ressource de test', { force: true })
-            .should('have.value', 'Soustitre de la ressource de test')
-
-        cy.get('#id_summary')
-            .type('résumé de la ressource de test', { force: true })
-            .should('have.value', 'résumé de la ressource de test')
-
-        cy.get('#id_tags')
-            .type('etiquette1', { force: true })
-            .should('have.value', 'etiquette1')
-
-        // cy.get('#id_departments')
-        //     .select(1, {force:true})
-
-        cy.get('#id_expires_on')
-            .type('20/12/2022', { force: true })
-            .should('have.value', '20/12/2022')
+        cy.get('#id_departments-input').focus()
+        cy.get('#id_departments-list').children().first('p').click({force:true})
 
         cy.get('[type="submit"]').click({ force: true });
 
         cy.url().should('include', '/ressource/')
 
-        cy.contains("Ressource de test")
-        cy.contains("résumé de la ressource de test")
+        cy.contains("Département de test")
     })
 })

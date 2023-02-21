@@ -3,7 +3,7 @@ describe('I can assign some deparments when I create a resource', () => {
         cy.login("staff");
     })
 
-    it('goes to create a resource and assign 3 deparments', () => {
+    it('goes to create a resource and assign 2 deparments', () => {
         cy.visit('/ressource/create/')
 
         cy.get('#id_title')
@@ -22,8 +22,11 @@ describe('I can assign some deparments when I create a resource', () => {
             .type('etiquette1', { force: true })
             .should('have.value', 'etiquette1')
 
-        // cy.get('#id_departments')
-        //     .select(1, {force:true})
+        cy.get('#id_departments-input').focus()
+        cy.get('#id_departments-list').children().first('p').click({force:true})
+
+        cy.get('#id_departments-input').focus()
+        cy.get('#id_departments-list').children().eq('1').children().first().click({force:true})
 
         cy.get('#id_expires_on')
             .type('20/12/2022', { force: true })
@@ -35,5 +38,10 @@ describe('I can assign some deparments when I create a resource', () => {
 
         cy.contains("Ressource de test")
         cy.contains("résumé de la ressource de test")
+
+        cy.contains("Cette ressource est disponible dans les régions suivantes :")
+        cy.contains("Département de test")
+        cy.contains("Département de test numéro 2")
+
     })
 })

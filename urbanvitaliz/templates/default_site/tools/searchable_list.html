@@ -35,14 +35,14 @@
                      fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
                 </svg>
-                    <input type="search ms-4 ps-4"
+                    <input id="{{search_list_id}}-input" type="search ms-4 ps-4"
                         class="search w-100"
                         placeholder="Ajouter un {{item_label}}"
                         @focus="handleFocusList"
                         @blur="handleBlurList(event)"/>
             </div>
         </div>
-        <ul class="list-unstyled m-0 d-flex flex-column">
+        <ul class="list-unstyled m-0 d-flex flex-column"  id="{{search_list_id}}-selected-list">
             <template x-for="item in selectedList">
                 <li class="border d-inline-flex rounded justify-content-between align-items-center px-3 py-1 bg-grey-light d-flex align-items-center mb-1">
                     <p class="mb-0 pb-0 fw-bold font-small" x-text="item.name"></p>
@@ -62,11 +62,10 @@
         </ul>
         <div class="searchable-list-wrapper mt-4" :class="onFocus ? 'show' : 'hide'">
             <ul class="list d-flex flex-column list-unstyled border"
-                x-ref="selectList">
+                x-ref="selectList" id="{{search_list_id}}-list">
                 {% for id, value in list.field.choices %}
                     {% if value != '' %}
                         <li class="m-0 p-0"
-                            id="{{id}}"
                             style="cursor: pointer"
                             @click='handleAddItem(event, "{{ id }}","{{ value|lower }}")'>
                             <p class="border-bottom px-3 py-2 m-0 hover-bg-grey name fw-medium font-small">{{ value|lower }}</p>

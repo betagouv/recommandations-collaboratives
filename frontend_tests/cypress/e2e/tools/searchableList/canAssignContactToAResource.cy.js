@@ -1,3 +1,5 @@
+import contacts from '../../../fixtures/addressbook/contacts.json'
+
 describe('I can assign some contacts when I create a resource', () => {
     beforeEach(() => {
         cy.login("staff");
@@ -22,8 +24,14 @@ describe('I can assign some contacts when I create a resource', () => {
             .type('etiquette1', { force: true })
             .should('have.value', 'etiquette1')
 
-        // cy.get('#id_departments')
-        //     .select(1, {force:true})
+        cy.get('#id_contacts-input').focus()
+        cy.get('#id_contacts-list').children().first('p').click({force:true})
+
+        cy.get('#id_contacts-input').focus()
+        cy.get('#id_contacts-list').children().eq('1').children().first().click({force:true})
+
+        cy.get('#id_contacts-input').focus()
+        cy.get('#id_contacts-list').children().eq('2').children().first().click({force:true})
 
         cy.get('#id_expires_on')
             .type('20/12/2022', { force: true })
@@ -35,5 +43,9 @@ describe('I can assign some contacts when I create a resource', () => {
 
         cy.contains("Ressource de test")
         cy.contains("résumé de la ressource de test")
+
+        cy.contains(contacts[1].fields.first_name)
+        cy.contains(contacts[2].fields.first_name)
+        cy.contains(contacts[3].fields.first_name)
     })
 })
