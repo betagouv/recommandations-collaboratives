@@ -255,6 +255,8 @@ class Project(models.Model):
         verbose_name = "project"
         verbose_name_plural = "projects"
         permissions = (
+            # Global management
+            ("moderate_projects", "Can moderate incoming projects"),
             # Synopsis
             ("view_synopsis", "Can view the synopsis"),
             ("change_synopsis", "Can change the synopsis"),
@@ -265,7 +267,7 @@ class Project(models.Model):
             ("view_private_notes", "Can read the private notes (internal)"),
             # Tasks/Recommandations
             ("view_tasks", "Can view and list tasks"),
-            ("view_draft_tasks", "Can view and list draft tasks"),
+            ("view_draft_tasks", "Can view and list draft tasks"),  # XXX Still useful?
             ("use_tasks", "Can use tasks"),
             ("manage_tasks", "Can manage tasks"),
             # Invitation/sharing/members

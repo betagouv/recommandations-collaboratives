@@ -13,7 +13,7 @@ def remove_unused_groups(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("home", "0015_auto_20230220_1329"),
+        ("home", "0015_create_site_groups_and_permissions_20230220_1329"),
     ]
 
     operations = [

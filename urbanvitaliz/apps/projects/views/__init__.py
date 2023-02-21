@@ -36,7 +36,6 @@ from urbanvitaliz.utils import (
     build_absolute_url,
     check_if_switchtender,
     get_site_config_or_503,
-    is_staff_or_403,
     is_switchtender_or_403,
 )
 

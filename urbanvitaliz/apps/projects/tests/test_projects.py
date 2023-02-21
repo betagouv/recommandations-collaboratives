@@ -722,13 +722,12 @@ def test_accept_project_and_redirect(request, client):
     current_site = get_current_site(request)
     owner = Recipe(auth.User, username="owner@owner.co").make()
     project = Recipe(models.Project, sites=[current_site]).make()
-    Recipe(auth.Group, name="example_com_staff").make()
     baker.make(models.ProjectMember, project=project, member=owner, is_owner=True)
 
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, groups=["example_com_staff", "switchtender"]) as moderator:
+    with login(client, groups=["example_com_staff"]) as moderator:
         moderator.profile.sites.add(current_site)
         response = client.post(url)
 
@@ -878,7 +877,9 @@ def test_general_notifications_are_consumed_on_project_overview(request, client)
         location="Somewhere",
     ).make()
 
-    with login(client, groups=["example_com_advisor"], is_staff=False, username="Bob") as user:
+    with login(
+        client, groups=["example_com_advisor"], is_staff=False, username="Bob"
+    ) as user:
         notify.send(
             sender=user,
             recipient=user,

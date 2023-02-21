@@ -12,11 +12,31 @@ from tagging.fields import TagField
 from tagging.models import Tag
 from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.projects import models as projects_models
+from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 
 from .utils import compute_qs_completion
 
+from . import apps
+
+
+# We need the permission to be associated to the site and not to the surveys
+@receiver(post_migrate)
+def create_site_permissions(sender, **kwargs):
+    if sender.name != apps.SurveyConfig.name:
+        return
+
+    site_ct = ContentType.objects.get(app_label="sites", model="site")
+    auth_models.Permission.objects.get_or_create(
+        codename="manage_surveys",
+        name="Can manage the surveys",
+        content_type=site_ct,
+    )
+
 
 class Survey(models.Model):
+
     objects = models.Manager()
     on_site = CurrentSiteManager()
 

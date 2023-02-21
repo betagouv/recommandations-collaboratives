@@ -13,7 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import DetailView, RedirectView
 from urbanvitaliz.apps.projects import models as projects_models
-from urbanvitaliz.utils import get_site_config_or_503, is_staff_or_403
+from urbanvitaliz.utils import get_site_config_or_503, has_perm_or_403
 
 from .. import forms, models, signals
 
@@ -155,11 +155,11 @@ def survey_previous_question(request, session_id, question_id):
 @login_required
 def survey_signals_refresh(request, session_id):
     """Refresh a given session with new signals, on request"""
-
-    is_staff_or_403(request.user)
     session = get_object_or_404(
         models.Session, survey__site=request.site, pk=session_id
     )
+
+    has_perm_or_403(request.user, "survey.manage_survey", session.survey)
 
     update_count = 0
     for answer in session.answers.all():

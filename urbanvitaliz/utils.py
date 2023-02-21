@@ -31,10 +31,20 @@ def make_group_name_for_site(name: str, site: Site) -> str:
     return f"{prefix}_{name}"
 
 
+def get_group_for_site(name: str, site: Site) -> auth.Group:
+    """Return the Group with given name for site"""
+    group_name = make_group_name_for_site(name, site)
+    return auth.Group.objects.get(name=group_name)
+
+
 ########################################################################
 # View helpers
 ########################################################################
 def has_perm(user, permission, obj=None):
+    """
+    Check if this user has the required permission for the given
+    object on the current site.
+    """
     return user.has_perm(permission, obj)
 
 
@@ -44,9 +54,15 @@ def has_perm_or_403(user, permission, obj=None):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
-def is_staff_or_403(user):
+def is_staff_for_site(user, site=None):
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("staff", site)
+    return user.groups.filter(name=group_name).exists()
+
+
+def is_staff_for_site_or_403(user, site=None):
     """Raise a 403 error is user is not a staff member"""
-    if not user or not user.is_staff:
+    if not is_staff_for_site(user, site):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
 

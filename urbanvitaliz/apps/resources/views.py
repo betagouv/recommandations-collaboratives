@@ -27,8 +27,7 @@ from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
 
 from . import models
 from .serializers import ResourceSerializer
