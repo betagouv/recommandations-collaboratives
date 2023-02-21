@@ -101,6 +101,6 @@ def test_site_dashboard_not_available_for_non_switchtender_users(client):
 @pytest.mark.django_db
 def test_site_dashboard_available_for_switchtender_users(client):
     url = reverse("crm-site-dashboard")
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(url)
     assert response.status_code == 200

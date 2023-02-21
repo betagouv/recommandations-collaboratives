@@ -143,7 +143,7 @@ def test_create_prefilled_project_reachable_by_switchtenders(request, client):
         onboarding=onboarding,
     )
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(reverse("projects-project-prefill"))
 
     assert response.status_code == 200
@@ -171,7 +171,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
         "last_name": "doe",
         "response_0": "blah",
     }
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         response = client.post(reverse("projects-project-prefill"), data=data)
 
     project = models.Project.on_site.all()[0]
@@ -217,7 +217,7 @@ def test_created_prefilled_project_stores_initial_info(request, client):
         "impediments": "some impediment",
     }
 
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.post(reverse("projects-project-prefill"), data=data)
 
     assert response.status_code == 302
@@ -326,7 +326,7 @@ def test_project_list_not_available_for_non_staff_users(client):
 @pytest.mark.django_db
 def test_project_list_available_for_switchtender_user(client):
     url = reverse("projects-project-list")
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(url, follow=True)
 
     advisor_url = reverse("projects-project-list-advisor")
@@ -338,7 +338,7 @@ def test_project_list_available_for_switchtender_user(client):
 @pytest.mark.django_db
 def test_project_list_available_for_staff(client):
     url = reverse("projects-project-list")
-    with login(client, is_staff=True, groups=["switchtender"]):
+    with login(client, is_staff=True, groups=["example_com_advisor"]):
         response = client.get(url, follow=True)
 
     staff_url = reverse("projects-project-list-staff")
@@ -356,7 +356,7 @@ def test_project_list_excludes_project_not_in_switchtender_departments(request, 
         commune__department__code="01",
     ).make()
     url = reverse("projects-project-list")
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.departments.add(department)
         response = client.get(url, follow=True)
 
@@ -415,7 +415,7 @@ def test_project_overview_available_for_switchtender(request, client):
 
     project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-detail-overview", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -469,7 +469,7 @@ def test_project_knowledge_available_for_switchtender(request, client):
 
     project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -493,7 +493,7 @@ def test_project_knowledge_available_for_restricted_switchtender(request, client
         commune__departments__code="01",
     ).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.departments.add(other)
         response = client.get(url)
     assert response.status_code == 200
@@ -529,7 +529,7 @@ def test_project_actions_available_for_owner(request, client):
 def test_project_actions_available_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-actions", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -543,7 +543,7 @@ def test_project_actions_available_for_restricted_switchtender(request, client):
         sites=[get_current_site(request)],
     ).make()
     url = reverse("projects-project-detail-actions", args=[project.id])
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.departments.add(other)
         response = client.get(url)
     assert response.status_code == 200
@@ -580,7 +580,7 @@ def test_project_conversations_not_available_for_unassigned_switchtender(
 ):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-conversations", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(url)
     assert response.status_code == 403
 
@@ -608,7 +608,7 @@ def test_project_conversations_not_available_for_restricted_switchtender(
         sites=[get_current_site(request)],
     ).make()
     url = reverse("projects-project-detail-conversations", args=[project.id])
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.departments.add(other)
         response = client.get(url)
     assert response.status_code == 403
@@ -645,7 +645,7 @@ def test_project_internal_followup_not_available_for_owner(request, client):
 def test_project_internal_followup_available_for_assigned_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-internal-followup", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(url)
     assert response.status_code == 403
 
@@ -661,7 +661,7 @@ def test_project_internal_followup_not_available_for_restricted_switchtender(
         sites=[get_current_site(request)],
     ).make()
     url = reverse("projects-project-detail-internal-followup", args=[project.id])
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.departments.add(other)
         response = client.get(url)
     assert response.status_code == 403
@@ -682,7 +682,7 @@ def test_project_detail_contains_informations(request, client):
     task = Recipe(models.Task, project=project).make()
     note = Recipe(models.Note, project=project).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(url)
     assertContains(response, project.description)
     assertContains(response, task.content)
@@ -693,7 +693,7 @@ def test_project_detail_contains_informations(request, client):
 def test_project_detail_contains_actions_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-actions", args=[project.id])
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -722,13 +722,13 @@ def test_accept_project_and_redirect(request, client):
     current_site = get_current_site(request)
     owner = Recipe(auth.User, username="owner@owner.co").make()
     project = Recipe(models.Project, sites=[current_site]).make()
-    Recipe(auth.Group, name="project_moderator").make()
+    Recipe(auth.Group, name="example_com_staff").make()
     baker.make(models.ProjectMember, project=project, member=owner, is_owner=True)
 
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, groups=["project_moderator", "switchtender"]) as moderator:
+    with login(client, groups=["example_com_staff", "switchtender"]) as moderator:
         moderator.profile.sites.add(current_site)
         response = client.post(url)
 
@@ -746,12 +746,12 @@ def test_accept_project_and_redirect(request, client):
 def test_accept_project_without_owner_and_redirect(request, client):
     current_site = get_current_site(request)
     project = Recipe(models.Project, sites=[current_site]).make()
-    Recipe(auth.Group, name="project_moderator").make()
+    Recipe(auth.Group, name="example_com_staff").make()
 
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, groups=["project_moderator", "switchtender"]) as moderator:
+    with login(client, groups=["example_com_staff", "switchtender"]) as moderator:
         moderator.profile.sites.add(current_site)
         response = client.post(url)
 
@@ -766,8 +766,7 @@ def test_accept_project_without_owner_and_redirect(request, client):
 def test_accept_project_notifies_regional_actors(request, client):
     current_site = get_current_site(request)
 
-    st_group, created = auth.Group.objects.get_or_create(name="switchtender")
-    auth.Group.objects.get_or_create(name="project_moderator")
+    st_group = auth.Group.objects.get(name="example_com_advisor")
 
     dpt_nord = Recipe(geomatics.Department, code=59, name="Nord").make()
     commune = Recipe(
@@ -788,7 +787,7 @@ def test_accept_project_notifies_regional_actors(request, client):
         projectmember_set=[membership],
     ).make()
 
-    with login(client, groups=["switchtender", "project_moderator"]) as user:
+    with login(client, groups=["example_com_advisor", "example_com_staff"]) as user:
         user.profile.sites.add(current_site)
         client.post(reverse("projects-project-accept", args=[project.id]))
 
@@ -797,7 +796,7 @@ def test_accept_project_notifies_regional_actors(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_does_not_notify_non_regional_actors(request, client):
-    group = auth.Group.objects.get(name="switchtender")
+    group = auth.Group.objects.get(name="example_com_advisor")
 
     dpt_nord = Recipe(geomatics.Department, code=59, name="Nord").make()
     dpt_pdc = Recipe(geomatics.Department, code=62, name="Pas de Calais").make()
@@ -822,7 +821,7 @@ def test_accept_project_does_not_notify_non_regional_actors(request, client):
         projectmember_set=[owner_membership],
     ).make()
 
-    with login(client, user=nr_membership.member, groups=["switchtender"]):
+    with login(client, user=nr_membership.member, groups=["example_com_advisor"]):
         client.post(reverse("projects-project-accept", args=[project.id]))
 
     assert non_regional_actor.notifications.count() == 0
@@ -849,7 +848,7 @@ def test_delete_project_and_redirect(request, client):
     url = reverse("projects-project-delete", args=[project.id])
 
     # delete needs staff, list projects needs switchtender
-    with login(client, groups=["switchtender"], is_staff=True):
+    with login(client, groups=["example_com_advisor"], is_staff=True):
         response = client.post(url)
 
     project = models.Project.deleted_on_site.get(id=project.id)
@@ -879,7 +878,7 @@ def test_general_notifications_are_consumed_on_project_overview(request, client)
         location="Somewhere",
     ).make()
 
-    with login(client, groups=["switchtender"], is_staff=False, username="Bob") as user:
+    with login(client, groups=["example_com_advisor"], is_staff=False, username="Bob") as user:
         notify.send(
             sender=user,
             recipient=user,
@@ -932,7 +931,7 @@ def test_notifications_are_deleted_on_project_hard_delete(request):
 @pytest.mark.django_db
 def test_notification_not_sent_when_project_is_draft(request):
     switchtender = Recipe(
-        auth.User, username="switchtender", email="switchtender@example.com"
+        auth.User, username="advisor", email="advisor@example.com"
     ).make()
 
     membership = baker.make(
@@ -963,7 +962,7 @@ def test_notification_not_sent_when_project_is_draft(request):
 @pytest.mark.django_db
 def test_notification_not_sent_when_project_is_muted(request):
     switchtender = Recipe(
-        auth.User, username="switchtender", email="switchtender@example.com"
+        auth.User, username="advisor", email="advisor@example.com"
     ).make()
     membership = baker.make(
         models.ProjectMember, member__is_staff=False, is_owner=False
@@ -1292,7 +1291,7 @@ def test_switchtender_push_resource_to_project_fails_if_no_project_in_session(cl
     resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
 
     url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, groups=["switchtender"]):
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(url)
 
     assert response.status_code == 404
@@ -1339,7 +1338,7 @@ def test_switchtender_joins_project(request, client):
     project = Recipe(models.Project, sites=[current_site], commune=commune).make()
 
     url = reverse("projects-project-switchtender-join", args=[project.id])
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.sites.add(current_site)
 
         # Then POST to join projet
@@ -1410,7 +1409,7 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(
 
     join_url = reverse("projects-project-switchtender-join", args=[project.id])
     leave_url = reverse("projects-project-switchtender-leave", args=[project.id])
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.sites.add(current_site)
 
         client.post(join_url)
@@ -1445,7 +1444,7 @@ def test_switchtender_exports_csv(request, client):
     Recipe(models.Task, public=True, project=p1).make()
 
     url = reverse("projects-project-list-export-csv")
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         p1.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -1471,7 +1470,7 @@ def test_switchtender_updates_tags(request, client):
 
     data = {"tags": "blah"}
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -1523,7 +1522,7 @@ def test_switchtender_add_topics(request, client):
         "form-0-label": "blah",
     }
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         utils.assign_advisor(user, project)
 
         response = client.post(
@@ -1549,7 +1548,7 @@ def test_regional_switchtender_can_observe_project(request, client):
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.departments.set([project.commune.department.pk])
         user.profile.sites.add(current_site)
 
@@ -1572,7 +1571,7 @@ def test_non_regional_switchtender_can_observe_project(request, client):
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.sites.add(current_site)
 
         response = client.post(
@@ -1589,7 +1588,7 @@ def test_switchtender_visits_project_without_interest(request, client):
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.sites.add(current_site)
 
         response = client.get(
@@ -1610,7 +1609,7 @@ def test_switchtender_visits_new_project(request, client):
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.sites.add(current_site)
 
         Recipe(
@@ -1639,7 +1638,7 @@ def test_switchtender_observes_project_shows_interest(request, client):
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.sites.add(current_site)
 
         response = client.get(
@@ -1664,7 +1663,7 @@ def test_switchtender_advises_project_shows_interest(request, client):
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.sites.add(current_site)
 
         response = client.get(
@@ -1691,7 +1690,7 @@ def test_switchtender_stop_advising_or_observing_project_shows_no_interest(
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.sites.add(current_site)
 
         response = client.get(

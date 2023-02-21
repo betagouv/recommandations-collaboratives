@@ -36,7 +36,7 @@ def test_contributor_has_the_same_rights_as_the_owner(client):
 @pytest.mark.django_db
 def test_switchtender_can_manage_project(request, client):
     switchtender = Recipe(auth.User).make()
-    group = auth.Group.objects.get(name="switchtender")
+    group = auth.Group.objects.get(name="example_com_advisor")
     switchtender.groups.add(group)
     project = Recipe(models.Project, status="READY").make()
     project.switchtenders_on_site.create(
@@ -56,7 +56,7 @@ def test_non_switchtender_cannot_administrate_project(client):
 
 @pytest.mark.django_db
 def test_get_regional_actors_for_project(client, request):
-    group = auth.Group.objects.get(name="switchtender")
+    group = auth.Group.objects.get(name="example_com_advisor")
 
     dept62 = baker.make(geomatics.Department, code="62")
     dept80 = baker.make(geomatics.Department, code="80")
@@ -94,7 +94,7 @@ def test_get_regional_actors_for_project(client, request):
 def test_check_if_switchtends_any_project(request, client):
     current_site = get_current_site(request)
 
-    group = auth.Group.objects.get(name="switchtender")
+    group = auth.Group.objects.get(name="example_com_advisor")
 
     dept62 = baker.make(geomatics.Department, code="62")
 

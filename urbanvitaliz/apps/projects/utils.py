@@ -166,7 +166,8 @@ def can_manage_or_403(project, user, allow_draft=False):
 
 def get_project_moderators(site):
     """Return all project moderators for a given site"""
-    return auth_models.User.objects.filter(groups__name="project_moderator").filter(
+    # TODO fetch proper permission
+    return auth_models.User.objects.filter(groups__name="staff").filter(
         groups__name="switchtender", profile__sites=site
     )
 

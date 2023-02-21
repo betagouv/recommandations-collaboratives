@@ -3,17 +3,25 @@
 from django.db import migrations
 from django.contrib.auth import models as auth_models
 from urbanvitaliz.apps.home.utils import make_group_name_for_site
+from django.contrib.sites.management import create_default_site
 
 from .. import models
 
 
 def upgrade_site_groups(apps, schema_editor):
     Site = apps.get_model("sites", "Site")
+    db_alias = schema_editor.connection.alias
 
-    for site in Site.objects.all():
+    # In case of tests, since default site creation is done *after* all migrations,
+    # force a default site to prevent them from failing because of a lacking site.
+    create_default_site(
+        upgrade_site_groups, interactive=False, using=db_alias, apps=apps
+    )
+
+    for site in Site.objects.using(db_alias).all():
         for name, permissions in models.SITE_GROUP_PERMISSIONS.items():
             group_name = make_group_name_for_site(name, site)
-            auth_models.Group.objects.get_or_create(name=group_name)
+            auth_models.Group.objects.using(db_alias).get_or_create(name=group_name)
 
     group_transitions = (
         ("switchtender", "advisor"),
@@ -21,10 +29,12 @@ def upgrade_site_groups(apps, schema_editor):
     )
 
     for oldname, newname in group_transitions:
-        for user in auth_models.User.objects.filter(groups__name=oldname):
+        for user in auth_models.User.objects.using(db_alias).filter(
+            groups__name=oldname
+        ):
             for site in user.profile.sites.all():
                 group_name = make_group_name_for_site(newname, site)
-                group = auth_models.Group.objects.get(name=group_name)
+                group = auth_models.Group.objects.using(db_alias).get(name=group_name)
                 group.user_set.add(user)
 
 
@@ -32,6 +42,8 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("home", "0014_merge_0011_auto_20230117_1050_0013_auto_20220923_1557"),
+        ("sites", "0002_alter_domain_unique"),
+        ("projects", "0036_project_switchtender"),
     ]
 
     operations = [migrations.RunPython(upgrade_site_groups, lambda x, y: None)]
