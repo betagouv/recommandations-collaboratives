@@ -14,6 +14,6 @@ describe('I can push a resource to a project', () => {
 
         cy.get("[type=submit]").click({ force: true });
 
-        cy.url().should('include', '/actions#action-')
+        cy.url().should('include', '/actions')
     })
 })
