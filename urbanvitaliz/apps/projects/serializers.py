@@ -81,7 +81,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
         project_ct = ContentType.objects.get_for_model(obj)
 
-        switchtender_group = auth_models.Group.objects.get(name="switchtender")
+        switchtender_group = auth_models.Group.objects.get(name="example_com_advisor")
         switchtenders = switchtender_group.user_set.values_list("id", flat=True)
         switchtenders = [int(switchtender) for switchtender in switchtenders]
 

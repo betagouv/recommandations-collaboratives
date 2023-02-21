@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "switchtender",
+                    "example_com_advisor",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         to=settings.AUTH_USER_MODEL,
@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "unique_together": {("site", "project", "switchtender")},
+                "unique_together": {("site", "project", "example_com_advisor")},
             },
         ),
         migrations.AddField(

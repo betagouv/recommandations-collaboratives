@@ -16,8 +16,8 @@ def upgrade_site_groups(apps, schema_editor):
             auth_models.Group.objects.get_or_create(name=group_name)
 
     group_transitions = (
-        ("switchtender", "advisor"),
-        ("project_moderator", "staff"),
+        ("example_com_advisor", "advisor"),
+        ("example_com_staff", "staff"),
     )
 
     for oldname, newname in group_transitions:

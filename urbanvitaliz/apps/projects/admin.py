@@ -88,7 +88,7 @@ class ProjectMemberTabularInline(admin.TabularInline):
 class ProjectSwitchtenderTabularInline(admin.TabularInline):
     model = models.ProjectSwitchtender
     fields = (
-        "switchtender",
+        "example_com_advisor",
         "is_observer",
         "site",
     )

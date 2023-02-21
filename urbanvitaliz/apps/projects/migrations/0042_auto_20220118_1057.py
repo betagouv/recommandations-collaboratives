@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RemoveField(
             model_name="project",
-            name="switchtender",
+            name="example_com_advisor",
         ),
         migrations.AddField(
             model_name="project",
