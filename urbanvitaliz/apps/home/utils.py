@@ -14,6 +14,8 @@ from django.contrib.sites.models import Site
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.survey import models as survey_models
 
+from urbanvitaliz.utils import make_group_name_for_site
+
 from . import models
 
 
@@ -26,12 +28,6 @@ def get_current_site_sender():
         return settings.DEFAULT_FROM_EMAIL
 
     return f"{site_config.sender_name} <{site_config.sender_email}>"
-
-
-def make_group_name_for_site(name: str, site: Site) -> str:
-    """Make a group label usable by django for the given site"""
-    prefix = site.domain.translate(str.maketrans("-.", "__")).lower()
-    return f"{prefix}_{name}"
 
 
 def make_new_site(name: str, domain: str, sender_email: str, sender_name: str) -> Site:

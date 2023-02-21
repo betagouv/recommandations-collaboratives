@@ -25,6 +25,12 @@ from sesame.utils import get_query_string
 from urbanvitaliz.apps.home.models import SiteConfiguration
 
 
+def make_group_name_for_site(name: str, site: Site) -> str:
+    """Make a group label usable by django for the given site"""
+    prefix = site.domain.translate(str.maketrans("-.", "__")).lower()
+    return f"{prefix}_{name}"
+
+
 ########################################################################
 # View helpers
 ########################################################################
@@ -44,15 +50,17 @@ def is_staff_or_403(user):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
-def is_switchtender_or_403(user):
+def is_switchtender_or_403(user, site=None):
     """Raise a 403 error is user is not a switchtender"""
-    if not user or not check_if_switchtender(user):
+    if not user or not check_if_switchtender(user, site):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
-def check_if_switchtender(user):
+def check_if_switchtender(user, site=None):
     """Return true if user is a global switchtender"""
-    return auth.User.objects.filter(pk=user.id, groups__name="example_com_advisor").exists()
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("advisor", site)
+    return auth.User.objects.filter(pk=user.id, groups__name=group_name).exists()
 
 
 def send_email(
@@ -141,7 +149,8 @@ def get_site_config_or_503(site):
         return SiteConfiguration.objects.get(site=site)
     except SiteConfiguration.DoesNotExist:
         raise ImproperlyConfigured(
-            f"Please create a SiteConfiguration for '{site}' before using this feature.",
+            f"Please create a SiteConfiguration for '{site}'"
+            " before using this feature.",
         )
 
 
