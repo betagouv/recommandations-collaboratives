@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="projectswitchtender",
-            name="example_com_advisor",
+            name="switchtender",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="projects_switchtended_on_site",

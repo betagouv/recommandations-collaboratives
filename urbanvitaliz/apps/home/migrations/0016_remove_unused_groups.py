@@ -6,7 +6,7 @@ from django.contrib.auth import models
 
 
 def remove_unused_groups(apps, schema_editor):
-    groups = ["example_com_advisor", "example_com_staff"]
+    groups = ["switchtender", "project_moderator"]
     models.Group.objects.filter(name__in=groups).delete()
 
 

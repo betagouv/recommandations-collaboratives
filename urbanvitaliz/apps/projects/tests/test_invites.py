@@ -110,7 +110,7 @@ def test_assigned_switchtender_can_invite_collectivity_to_project(request, clien
     url = reverse("projects-project-access-collectivity-invite", args=[project.id])
     data = {"email": "test@example.com", "message": "hey"}
 
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["switchtender"]) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -139,7 +139,7 @@ def test_regional_actor_can_invite_collectivity_to_project(request, client):
     url = reverse("projects-project-access-collectivity-invite", args=[project.id])
     data = {"email": "test@example.com"}
 
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["switchtender"]) as user:
         user.profile.sites.add(current_site)
         user.profile.departments.set([project.commune.department.pk])
 
@@ -228,7 +228,7 @@ def test_assigned_switchtender_can_invite_advisor_to_project(request, client):
     url = reverse("projects-project-access-advisor-invite", args=[project.id])
     data = {"email": "test@example.com", "message": "hey"}
 
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["switchtender"]) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -257,7 +257,7 @@ def test_regional_actor_can_invite_advisor_to_project(request, client):
     url = reverse("projects-project-access-advisor-invite", args=[project.id])
     data = {"email": "test@example.com"}
 
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["switchtender"]) as user:
         user.profile.sites.add(current_site)
         user.profile.departments.set([project.commune.department.pk])
 

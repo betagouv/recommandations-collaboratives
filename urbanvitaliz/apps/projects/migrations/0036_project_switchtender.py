@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="project",
-            name="example_com_advisor",
+            name="switchtender",
             field=models.ForeignKey(
                 blank=True,
                 null=True,

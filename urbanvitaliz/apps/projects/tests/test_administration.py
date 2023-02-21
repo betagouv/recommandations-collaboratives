@@ -40,7 +40,7 @@ def test_project_admin_not_available_for_non_staff_users(request, client):
 def test_project_admin_not_available_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-administration", args=[project.id])
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["switchtender"]) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -65,7 +65,7 @@ def test_project_admin_wo_commune_and_redirect(request, client):
         "impediment": "some impediment",
     }
 
-    with login(client, groups=["example_com_advisor"], is_staff=True) as user:
+    with login(client, groups=["switchtender"], is_staff=True) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -87,7 +87,7 @@ def test_project_admin_with_commune(request, client):
     ).make()
     url = reverse("projects-project-administration", args=[project.id])
 
-    with login(client, groups=["example_com_advisor"], is_staff=True) as user:
+    with login(client, groups=["switchtender"], is_staff=True) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -119,7 +119,7 @@ def test_project_admin_update_commune(request, client):
         "insee": new_commune.insee,
     }
 
-    with login(client, groups=["example_com_advisor"], is_staff=True) as user:
+    with login(client, groups=["switchtender"], is_staff=True) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -159,7 +159,7 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
         args=[project.id, membership.member.email],
     )
 
-    with login(client, groups=["example_com_advisor"], is_staff=True) as user:
+    with login(client, groups=["switchtender"], is_staff=True) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -233,7 +233,7 @@ def test_advisor_cannot_remove_collectivity_member_from_project(request, client)
         args=[project.id, membership.member.email],
     )
 
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["switchtender"]) as user:
         project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )

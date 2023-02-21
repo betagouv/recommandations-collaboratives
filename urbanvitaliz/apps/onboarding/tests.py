@@ -337,12 +337,12 @@ def test_performing_onboarding_sends_notification_to_project_moderators(
         onboarding=onboarding,
     )
 
-    staff_group = auth.Group.objects.get(name="example_com_staff")
-    advisor_group = auth.Group.objects.get(name="example_com_advisor")
+    md_group = Recipe(auth.Group, name="project_moderator").make()
+    st_group, created = auth.Group.objects.get_or_create(name="switchtender")
     moderator = Recipe(
         auth.User,
         email="moderator@example.com",
-        groups=[staff_group, advisor_group],
+        groups=[md_group, st_group],
     ).make()
     moderator.profile.sites.add(current_site)
 

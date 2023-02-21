@@ -196,7 +196,7 @@ def test_resource_detail_contains_informations(request, client):
 def test_resource_detail_contains_update_for_staff(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-detail", args=[resource.id])
-    with login(client, is_staff=True, groups=["example_com_advisor"]):
+    with login(client, is_staff=True, groups=["switchtender"]):
         response = client.get(url)
     update_url = reverse("resources-resource-update", args=[resource.id])
     assertContains(response, update_url)
@@ -210,7 +210,7 @@ def test_resource_detail_does_not_contain_update_for_non_staff(request, client):
         status=models.Resource.PUBLISHED,
     ).make()
     url = reverse("resources-resource-detail", args=[resource.id])
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     update_url = reverse("resources-resource-update", args=[resource.id])
     assertNotContains(response, update_url)
@@ -231,7 +231,7 @@ def test_create_resource_not_available_for_non_switchtender_users(client):
 @pytest.mark.django_db
 def test_create_resource_available_for_switchtender_users(client):
     url = reverse("resources-resource-create")
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-create"')
@@ -247,7 +247,7 @@ def test_create_new_resource_and_redirect(client):
         "tags": "#tag",
         "content": "this is some content",
     }
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["switchtender"]):
         response = client.post(reverse("resources-resource-create"), data=data)
     resource = models.Resource.on_site.all()[0]
     assert resource.content == data["content"]
@@ -262,7 +262,7 @@ def test_create_new_resource_and_redirect(client):
 def test_update_resource_not_available_for_non_switchtenders(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-update", args=[resource.id])
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 403
 
@@ -271,7 +271,7 @@ def test_update_resource_not_available_for_non_switchtenders(request, client):
 def test_update_resource_available_for_staff(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-update", args=[resource.id])
-    with login(client, groups=["example_com_advisor"], is_staff=True):
+    with login(client, groups=["switchtender"], is_staff=True):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-update"')
@@ -294,7 +294,7 @@ def test_update_resource_and_redirect(request, client):
         "content": "this is some content",
     }
 
-    with login(client, groups=["example_com_advisor"], is_staff=True):
+    with login(client, groups=["switchtender"], is_staff=True):
         response = client.post(url, data=data)
 
     assert response.status_code == 302

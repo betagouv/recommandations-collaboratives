@@ -223,7 +223,7 @@ def test_logged_in_user_is_sent_to_home_on_login(client):
 @pytest.mark.django_db
 def test_switchtender_is_sent_to_project_list_on_login(client):
     url = reverse("login-redirect")
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 302
     list_url = reverse("projects-project-list")

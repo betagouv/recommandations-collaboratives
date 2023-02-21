@@ -7,12 +7,12 @@ from django.contrib.auth import models as auth
 
 def create_switchtender_group(apps, schema_editor):
     """Create the switchtender group for their permissions"""
-    g, _ = auth.Group.objects.get_or_create(name="example_com_advisor")
+    g, _ = auth.Group.objects.get_or_create(name="switchtender")
 
 
 def delete_switchtender_group(apps, schema_editor):
     """Delete the switchtender group"""
-    auth.Group.objects.filter(name="example_com_advisor").delete()
+    auth.Group.objects.filter(name="switchtender").delete()
 
 
 class Migration(migrations.Migration):

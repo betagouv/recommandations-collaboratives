@@ -166,8 +166,8 @@ def can_manage_or_403(project, user, allow_draft=False):
 
 def get_project_moderators(site):
     """Return all project moderators for a given site"""
-    return auth_models.User.objects.filter(groups__name="example_com_staff").filter(
-        groups__name="example_com_advisor", profile__sites=site
+    return auth_models.User.objects.filter(groups__name="project_moderator").filter(
+        groups__name="switchtender", profile__sites=site
     )
 
 
@@ -206,7 +206,7 @@ def get_national_actors(site):
 
 def get_advisors(site):
     """Return advisors for given site"""
-    return auth_models.User.objects.filter(groups__name="example_com_advisor").filter(
+    return auth_models.User.objects.filter(groups__name="switchtender").filter(
         profile__sites=site
     )
 

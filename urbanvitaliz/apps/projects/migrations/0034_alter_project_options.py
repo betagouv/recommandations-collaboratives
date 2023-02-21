@@ -7,7 +7,7 @@ from django.db import migrations
 #     """Create the switchtender group for their permissions"""
 #     db_alias = schema_editor.connection.alias
 #     Group = apps.get_model("auth", "Group")
-#     g, _ = Group.objects.using(db_alias).get_or_create(name="example_com_advisor")
+#     g, _ = Group.objects.using(db_alias).get_or_create(name="switchtender")
 #     Permission = apps.get_model("auth", "Permission")
 #     p = Permission.objects.get(codename="can_administrate_project")
 #     g.permissions.add(p)
@@ -17,7 +17,7 @@ from django.db import migrations
 #     """Delete the switchtender group"""
 #     db_alias = schema_editor.connection.alias
 #     Group = apps.get_model("auth", "Group")
-#     Group.objects.using(db_alias).filter(name="example_com_advisor").delete()
+#     Group.objects.using(db_alias).filter(name="switchtender").delete()
 
 
 class Migration(migrations.Migration):

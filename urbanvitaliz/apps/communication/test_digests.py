@@ -35,7 +35,7 @@ def test_send_digests_for_new_reco(client, request):
     membership = baker.make(projects_models.ProjectMember)
 
     switchtender = Recipe(
-        auth.User, username="example_com_advisor", email="switchtender@example.com"
+        auth.User, username="switchtender", email="switchtender@example.com"
     ).make()
 
     project = baker.make(
@@ -84,8 +84,8 @@ def test_send_digests_for_new_reco_empty(client):
 def test_send_digests_for_new_sites_by_user(request):
     current_site = get_current_site(request)
 
-    st_group, created = auth.Group.objects.get_or_create(name="example_com_advisor")
-    auth.Group.objects.get_or_create(name="example_com_staff")
+    st_group, created = auth.Group.objects.get_or_create(name="switchtender")
+    auth.Group.objects.get_or_create(name="project_moderator")
 
     # regional actor
     dpt_nord = Recipe(geomatics_models.Department, code=59, name="Nord").make()
@@ -141,8 +141,8 @@ def test_send_digests_for_new_sites_by_user(request):
 def test_send_digests_for_switchtender_by_user(request, client):
     current_site = get_current_site(request)
 
-    st_group, created = auth.Group.objects.get_or_create(name="example_com_advisor")
-    auth.Group.objects.get_or_create(name="example_com_staff")
+    st_group, created = auth.Group.objects.get_or_create(name="switchtender")
+    auth.Group.objects.get_or_create(name="project_moderator")
 
     # regional actor
     dpt_nord = Recipe(geomatics_models.Department, code=59, name="Nord").make()

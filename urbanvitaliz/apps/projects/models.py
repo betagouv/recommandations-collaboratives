@@ -324,7 +324,7 @@ class ProjectSwitchtender(models.Model):
     objects = ProjectSwitchtenderOnSiteManager()
 
     class Meta:
-        unique_together = ("site", "project", "example_com_advisor")
+        unique_together = ("site", "project", "switchtender")
 
     switchtender = models.ForeignKey(
         auth_models.User,

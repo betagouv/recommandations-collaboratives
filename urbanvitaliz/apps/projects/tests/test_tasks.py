@@ -135,7 +135,7 @@ def test_task_suggestion_not_available_for_non_switchtender(client):
 def test_task_suggestion_when_no_survey(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -145,7 +145,7 @@ def test_task_suggestion_available_with_bare_project(request, client):
     Recipe(models.TaskRecommendation, condition="").make()
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -158,7 +158,7 @@ def test_task_suggestion_available_with_filled_project(request, client):
         models.Project, sites=[get_current_site(request)], commune=commune
     ).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -178,7 +178,7 @@ def test_task_suggestion_available_with_localized_reco(request, client):
         models.Project, sites=[get_current_site(request)], commune=commune
     ).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["switchtender"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -424,7 +424,7 @@ def test_delete_task_not_available_for_non_staff_users(client):
 @pytest.mark.django_db
 def test_delete_task_from_project_and_redirect(request, client):
     task = Recipe(models.Task, site=get_current_site(request)).make()
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["switchtender"]):
         response = client.post(reverse("projects-delete-task", args=[task.id]))
     task = models.Task.deleted_on_site.get(id=task.id)
     assert task.deleted
@@ -716,7 +716,7 @@ def test_create_new_action_with_document(request, client):
     intent = "My Intent"
     content = "My Content"
 
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["switchtender"]) as user:
         utils.assign_advisor(user, project)
         png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
 
