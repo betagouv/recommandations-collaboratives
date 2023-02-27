@@ -16,21 +16,19 @@ from urbanvitaliz.apps.home.models import SITE_GROUP_PERMISSIONS
 from guardian.shortcuts import assign_perm
 
 
+def do_update_permissions():
+    # Per site permissions for Group
+    for site in Site.objects.all():
+        print("site:", site)
+        for group_name, permissions in SITE_GROUP_PERMISSIONS.items():
+            group = get_group_for_site(group_name, site)
+            for perm_name in permissions:
+                print("group:", group, "perm:", perm_name)
+                assign_perm(perm_name, group, obj=site)
+
+
 class Command(BaseCommand):
     help = "Update permissions for User and Groups"
 
     def handle(self, *args, **options):
-        # Per site permissions for Group
-        for site in Site.objects.all():
-            print("site:", site)
-            for group_name, permissions in SITE_GROUP_PERMISSIONS.items():
-                group = get_group_for_site(group_name, site)
-                for perm_name in permissions:
-                    print("group:", group, "perm:", perm_name)
-                    assign_perm(perm_name, group, obj=site)
-
-        # --- ADMIN --#
-        # Survey
-        for site in Site.objects.all():
-            group = get_group_for_site("admin", site)
-            # assign_perm("survey.manage_surveys", group, obj=site)
+        do_update_permissions()

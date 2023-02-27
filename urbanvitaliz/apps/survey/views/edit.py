@@ -30,7 +30,7 @@ from .. import forms, models
 @login_required
 def survey_details(request, survey_id=None):
     """List question sets for given survey"""
-    has_perm_or_403(request.user, "survey.manage_survey", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     survey = get_object_or_404(models.Survey, site=request.site, pk=survey_id)
 
@@ -82,7 +82,7 @@ def question_set_update(request, question_set_id=None):
 @login_required
 def question_set_create(request, survey_id=None):
     """Create new question_set"""
-    has_perm_or_403(request.user, "survey.manage_survey", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     survey = get_object_or_404(models.Survey, site=request.site, pk=survey_id)
 
@@ -105,7 +105,7 @@ def question_set_create(request, survey_id=None):
 @login_required
 def question_set_delete(request, question_set_id=None):
     """Delete question_set (mark as deleted)"""
-    has_perm_or_403(request.user, "survey.manage_survey", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question_set = get_object_or_404(
         models.QuestionSet, survey__site=request.site, pk=question_set_id
@@ -130,7 +130,7 @@ def question_set_delete(request, question_set_id=None):
 @login_required
 def question_update(request, question_id=None):
     """Update informations for question"""
-    has_perm_or_403(request.user, "survey.manage_survey", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question = get_object_or_404(
         models.Question, question_set__survey__site=request.site, pk=question_id
@@ -153,7 +153,7 @@ def question_update(request, question_id=None):
 @login_required
 def question_create(request, question_set_id=None):
     """Create new question"""
-    has_perm_or_403(request.user, "survey.manage_survey", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
 
@@ -176,7 +176,7 @@ def question_create(request, question_set_id=None):
 @login_required
 def question_delete(request, question_id=None):
     """Delete question (mark as deleted)"""
-    has_perm_or_403(request.user, "survey.manage_surveys", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question = get_object_or_404(
         models.Question, question_set__survey__site=request.site, pk=question_id
@@ -220,7 +220,7 @@ def get_answers_for_question(site, question):
 @login_required
 def question_results(request, question_id=None):
     """Show question results"""
-    has_perm_or_403(request.user, "survey.manage_surveys", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question = get_object_or_404(
         models.Question, question_set__survey__site=request.site, pk=question_id
@@ -235,7 +235,7 @@ def question_results(request, question_id=None):
 @login_required
 def question_results_as_csv(request, question_id=None):
     """Show question results"""
-    has_perm_or_403(request.user, "survey.manage_surveys", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     today = datetime.datetime.today().date()
 
@@ -283,7 +283,7 @@ def question_results_as_csv(request, question_id=None):
 @login_required
 def choice_update(request, choice_id=None):
     """Update informations for choice"""
-    has_perm_or_403(request.user, "survey.manage_surveys", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     choice = get_object_or_404(
         models.Choice,
@@ -309,7 +309,7 @@ def choice_update(request, choice_id=None):
 @login_required
 def choice_create(request, question_id=None):
     """Create new choice"""
-    has_perm_or_403(request.user, "survey.manage_surveys", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question = get_object_or_404(
         models.Question,
@@ -337,7 +337,7 @@ def choice_create(request, question_id=None):
 @login_required
 def choice_delete(request, choice_id=None):
     """Delete choice (mark as deleted)"""
-    has_perm_or_403(request.user, "survey.manage_surveys", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     choice = get_object_or_404(
         models.Choice,

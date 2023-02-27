@@ -159,7 +159,7 @@ def survey_signals_refresh(request, session_id):
         models.Session, survey__site=request.site, pk=session_id
     )
 
-    has_perm_or_403(request.user, "survey.manage_survey", session.survey)
+    has_perm_or_403(request.user, "sites.manage_surveys", request.site)
 
     update_count = 0
     for answer in session.answers.all():
