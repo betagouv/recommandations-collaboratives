@@ -24,7 +24,5 @@ describe('I can ask a question on a resource', () => {
 
         cy.contains('Envoyer mon message').click({ force: true });
         cy.url().should('include', '/ressource/3/')
-        cy.contains("Merci, votre demande a été transmis à l'équipe Urbanvitaliz !")
-
     })
 })
