@@ -37,6 +37,7 @@ from urbanvitaliz.utils import (
     check_if_switchtender,
     get_site_config_or_503,
     is_switchtender_or_403,
+    has_perm_or_403,
 )
 
 from .. import models, signals
@@ -453,7 +454,8 @@ def project_switchtender_leave(request, project_id=None):
 @login_required
 def project_delete(request, project_id=None):
     """Mark project as deleted in the DB"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.delete_projects", request.site)
+
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
         project.deleted = project.updated_on = timezone.now()

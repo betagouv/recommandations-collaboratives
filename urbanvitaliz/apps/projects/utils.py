@@ -17,7 +17,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.db import transaction
 from django.urls import reverse
-from guardian.shortcuts import assign_perm, remove_perm
+from guardian.shortcuts import assign_perm, remove_perm, get_users_with_perms
 from urbanvitaliz import utils as uv_utils
 from urbanvitaliz.apps.reminders import api
 
@@ -166,9 +166,11 @@ def can_manage_or_403(project, user, allow_draft=False):
 
 def get_project_moderators(site):
     """Return all project moderators for a given site"""
-    # TODO fetch proper permission
-    return auth_models.User.objects.filter(groups__name="staff").filter(
-        groups__name="switchtender", profile__sites=site
+    return get_users_with_perms(
+        site,
+        with_superusers=True,
+        with_group_users=True,
+        only_with_perms_in=["moderate_projects"],
     )
 
 
@@ -207,9 +209,8 @@ def get_national_actors(site):
 
 def get_advisors(site):
     """Return advisors for given site"""
-    return auth_models.User.objects.filter(groups__name="switchtender").filter(
-        profile__sites=site
-    )
+    group_name = uv_utils.make_group_name_for_site("advisor", site)
+    return auth_models.User.objects.filter(groups__name=group_name)
 
 
 def is_regional_actor_for_project(site, project, user, allow_national=False):

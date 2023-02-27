@@ -31,8 +31,12 @@ from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import CastedGenericRelation, check_if_switchtender
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
+
 
 from .utils import generate_ro_key
+from . import apps
 
 COLLABORATOR_PERMISSIONS = (
     "projects.use_public_notes",
@@ -51,6 +55,32 @@ ADVISOR_PERMISSIONS = [
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
+
+# We need the permission to be associated to the site and not to the projects
+@receiver(post_migrate)
+def create_site_permissions(sender, **kwargs):
+    if sender.name != apps.ProjectConfig.name:
+        return
+
+    site_ct = ContentType.objects.get(app_label="sites", model="site")
+
+    auth_models.Permission.objects.get_or_create(
+        codename="moderate_projects",
+        name="Can moderate incoming projects",
+        content_type=site_ct,
+    )
+
+    auth_models.Permission.objects.get_or_create(
+        codename="list_projects",
+        name="Can list projects for site",
+        content_type=site_ct,
+    )
+
+    auth_models.Permission.objects.get_or_create(
+        codename="delete_projects",
+        name="Can delete projects for site",
+        content_type=site_ct,
+    )
 
 
 class ProjectManager(models.Manager):
@@ -255,8 +285,6 @@ class Project(models.Model):
         verbose_name = "project"
         verbose_name_plural = "projects"
         permissions = (
-            # Global management
-            ("moderate_projects", "Can moderate incoming projects"),
             # Synopsis
             ("view_synopsis", "Can view the synopsis"),
             ("change_synopsis", "Can change the synopsis"),

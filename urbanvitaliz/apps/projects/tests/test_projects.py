@@ -846,8 +846,8 @@ def test_delete_project_and_redirect(request, client):
     updated_on_before = project.updated_on
     url = reverse("projects-project-delete", args=[project.id])
 
-    # delete needs staff, list projects needs switchtender
-    with login(client, groups=["example_com_advisor"], is_staff=True):
+    # delete needs staff, list projects needs advisor
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url)
 
     project = models.Project.deleted_on_site.get(id=project.id)
@@ -1096,17 +1096,17 @@ def test_recreate_reminder_after_for_same_task(request, client):
 def test_recreate_reminder_before_for_same_task(request, client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
 
-    membership = baker.make(models.ProjectMember, is_owner=True)
     task = Recipe(
         models.Task,
         site=get_current_site(request),
-        project__projectmember_set=[membership],
     ).make()
 
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
     data2 = {"days": 2}
-    with login(client, user=membership.member):
+    with login(client) as user:
+        utils.assign_collaborator(user, task.project, is_owner=True)
+
         response = client.post(url, data=data)
         response = client.post(url, data=data2)
 
@@ -1530,8 +1530,6 @@ def test_switchtender_add_topics(request, client):
             reverse("projects-project-topics", args=[project.id]),
             data=data,
         )
-
-        print(response.content)
 
     assert response.status_code == 302
     topic = models.ProjectTopic.objects.all()[0]
