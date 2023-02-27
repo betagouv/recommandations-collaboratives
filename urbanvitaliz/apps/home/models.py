@@ -29,9 +29,13 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 
 
 SITE_GROUP_PERMISSIONS = {
-    "staff": (),
+    "staff": (
+        "sites.moderate_projects",
+        "sites.list_projects",
+        "sites.delete_projects",
+    ),
     "admin": ("sites.manage_surveys",),
-    "advisor": (),
+    "advisor": ("sites.list_projects",),
 }
 
 

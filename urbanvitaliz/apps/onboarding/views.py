@@ -21,9 +21,6 @@ def onboarding(request):
     """Return the onboarding page"""
     site_config = get_site_config_or_503(request.site)
 
-    if (not request.user.is_staff) and check_if_switchtender(request.user):
-        return redirect("projects-project-prefill")
-
     # Fetch the onboarding form associated with the current site
     form = forms.OnboardingResponseWithCaptchaForm(request.POST or None)
     onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
