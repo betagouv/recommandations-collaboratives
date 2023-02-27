@@ -477,8 +477,9 @@ def test_previous_question_redirects_to_survey_when_not_more_questions(request, 
 
 
 @pytest.mark.django_db
-def test_refresh_signals_only_for_staff(client):
-    session = Recipe(models.Session).make()
+def test_refresh_signals_only_for_staff(request, client):
+    current_site = get_current_site(request)
+    session = Recipe(models.Session, survey__site=current_site).make()
     url = reverse("survey-session-refresh-signals", args=(session.id,))
     with login(client):
         response = client.get(url)

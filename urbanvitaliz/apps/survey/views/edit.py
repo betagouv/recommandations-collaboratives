@@ -45,7 +45,7 @@ def survey_details(request, survey_id=None):
 @login_required
 def question_set_details(request, question_set_id=None):
     """Return the details of given question_set"""
-    has_perm_or_403(request.user, "survey.manage_survey", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question_set = get_object_or_404(
         models.QuestionSet, survey__site=request.site, pk=question_set_id
@@ -59,7 +59,7 @@ def question_set_details(request, question_set_id=None):
 @login_required
 def question_set_update(request, question_set_id=None):
     """Update informations for question_set"""
-    has_perm_or_403(request.user, "survey.manage_survey", obj=request.site)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question_set = get_object_or_404(
         models.QuestionSet, survey__site=request.site, pk=question_set_id
