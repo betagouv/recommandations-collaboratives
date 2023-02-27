@@ -14,6 +14,7 @@ from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.projects import models as project_models
+from urbanvitaliz.utils import get_group_for_site
 
 
 class Command(BaseCommand):
@@ -39,7 +40,8 @@ class Command(BaseCommand):
 
     def send_email_digests_for_site(self, site, dry_run):
         # FIXME Get all switchtenders BY SITE
-        sw_group = auth_models.Group.objects.get(name="switchtender")
+        advisor_group = get_group_for_site("advisor", site)
+        # sw_group = auth_models.Group.objects.get(name="switchtender")
 
         print("** Sending Task Reminders **")
         # Send reminders
@@ -56,13 +58,13 @@ class Command(BaseCommand):
 
         # Digests for non switchtenders
         print("** Sending general digests **")
-        for user in auth_models.User.objects.exclude(groups__in=[sw_group]):
+        for user in auth_models.User.objects.exclude(groups__in=[advisor_group]):
             if digests.send_digest_for_non_switchtender_by_user(user, dry_run):
                 print(f"Sent general digest for {user})")
 
         # Digests for switchtenders
         print("** Sending general switchtender digests **")
-        for user in auth_models.User.objects.filter(groups__in=[sw_group]):
+        for user in auth_models.User.objects.filter(groups__in=[advisor_group]):
             if digests.send_digests_for_new_sites_by_user(user, dry_run):
                 print(f"* Sent new site digests for {user}")
 

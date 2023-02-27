@@ -10,6 +10,7 @@ created: 2021-09-28 13:17:53 CEST
 import datetime
 
 import pytest
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import models as auth_models
 from django.core.management import call_command
 from django.test import override_settings
@@ -73,10 +74,11 @@ def test_create_mail_reminder_replace_existing_ones():
 
 @pytest.mark.django_db
 @override_settings(SENDINBLUE_FORCE_DEBUG=True)
-def test_command_send_pending_reminder_with_reached_deadline(mocker):
+def test_command_send_pending_reminder_with_reached_deadline(request, mocker):
+    current_site = get_current_site(request)
     today = datetime.date.today()
     user = baker.make(auth_models.User, email="test@example.org")
-    task = baker.make(projects.Task)
+    task = baker.make(projects.Task, site=current_site)
     reminder = baker.make(
         models.Reminder, recipient=user.email, deadline=today, related=task
     )
@@ -94,10 +96,11 @@ def test_command_send_pending_reminder_with_reached_deadline(mocker):
 
 @pytest.mark.django_db
 @override_settings(SENDINBLUE_FORCE_DEBUG=True)
-def test_command_send_pending_task_reminder_with_past_deadline(mocker):
+def test_command_send_pending_task_reminder_with_past_deadline(request, mocker):
+    current_site = get_current_site(request)
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
     user = baker.make(auth_models.User, email="test@example.org")
-    task = baker.make(projects.Task)
+    task = baker.make(projects.Task, site=current_site)
     baker.make(models.Reminder, recipient=user.email, deadline=yesterday, related=task)
 
     call_command("senddigests")
