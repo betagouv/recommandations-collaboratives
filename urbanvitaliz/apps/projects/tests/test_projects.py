@@ -745,12 +745,11 @@ def test_accept_project_and_redirect(request, client):
 def test_accept_project_without_owner_and_redirect(request, client):
     current_site = get_current_site(request)
     project = Recipe(models.Project, sites=[current_site]).make()
-    Recipe(auth.Group, name="example_com_staff").make()
 
     updated_on_before = project.updated_on
     url = reverse("projects-project-accept", args=[project.id])
 
-    with login(client, groups=["example_com_staff", "switchtender"]) as moderator:
+    with login(client, groups=["example_com_staff"]) as moderator:
         moderator.profile.sites.add(current_site)
         response = client.post(url)
 
@@ -1012,24 +1011,17 @@ def test_projects_feed_available_for_all_users(request, client):
 def test_create_reminder_for_task(request, client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
 
-    membership = baker.make(
-        models.ProjectMember,
-        is_owner=True,
-        member__is_staff=False,
-        member__username="coll@ab.fr",
-        member__email="coll@ab.fr",
-    )
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
     )
     task = baker.make(models.Task, site=get_current_site(request), project=project)
 
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
 
-    with login(client, user=membership.member):
+    with login(client) as user:
+        utils.assign_collaborator(user, project, is_owner=True)
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -1043,22 +1035,16 @@ def test_create_reminder_for_task(request, client):
 @pytest.mark.django_db
 def test_create_reminder_without_delay_for_task(request, client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
-    owner_membership = baker.make(
-        models.ProjectMember,
-        is_owner=True,
-        member__is_staff=False,
-        member__email="owner@ab.fr",
-        member__username="owner@ab.fr",
-    )
+
     task = baker.make(
         models.Task,
         site=get_current_site(request),
-        project__projectmember_set=[owner_membership],
     )
 
     url = reverse("projects-remind-task", args=[task.id])
 
-    with login(client, user=owner_membership.member):
+    with login(client) as user:
+        utils.assign_collaborator(user, task.project, is_owner=True)
         response = client.post(url)
 
     assert response.status_code == 302
@@ -1070,17 +1056,17 @@ def test_create_reminder_without_delay_for_task(request, client):
 def test_recreate_reminder_after_for_same_task(request, client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
 
-    membership = baker.make(models.ProjectMember, is_owner=True)
     task = Recipe(
         models.Task,
         site=get_current_site(request),
-        project__projectmember_set=[membership],
     ).make()
 
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
     data2 = {"days": 10}
-    with login(client, user=membership.member):
+    with login(client) as user:
+        utils.assign_collaborator(user, task.project, is_owner=True)
+
         response = client.post(url, data=data)
         response = client.post(url, data=data2)
 
