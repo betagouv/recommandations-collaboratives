@@ -3,10 +3,24 @@
 import django.db.models.deletion
 from django.db import migrations, models
 from urbanvitaliz.apps.onboarding import models as onboarding_models
+import json
 
 
 def create_default_onboarding(apps, schema_editor):
-    o, _ = onboarding_models.Onboarding.objects.get_or_create(pk=1, form="{}")
+    form = [
+        {
+            "type": "text",
+            "required": False,
+            "label": "Vide",
+            "className": "form-control",
+            "name": "text-0000000000000-0",
+            "subtype": "text",
+        }
+    ]
+
+    o, _ = onboarding_models.Onboarding.objects.get_or_create(
+        pk=1, form=json.dumps(form)
+    )
 
 
 class Migration(migrations.Migration):

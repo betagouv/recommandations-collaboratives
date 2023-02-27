@@ -8,6 +8,8 @@ from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.onboarding import models as onboarding_models
+from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
@@ -31,7 +33,13 @@ baker.generators.add("dynamic_forms.models.FormField", gen_onboarding_func)
 
 
 def test_onboarding_page_is_reachable_without_login(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     url = reverse("projects-onboarding")
     response = client.get(url)
@@ -41,7 +49,13 @@ def test_onboarding_page_is_reachable_without_login(request, client):
 
 @pytest.mark.django_db
 def test_performing_onboarding_create_a_new_project(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
@@ -56,6 +70,7 @@ def test_performing_onboarding_create_a_new_project(request, client):
         "impediments": "some impediment",
     }
     response = client.post(reverse("projects-onboarding"), data=data)
+    assert response.status_code == 302
 
     project = projects_models.Project.on_site.first()
     assert project
@@ -74,7 +89,13 @@ def test_performing_onboarding_create_a_new_project(request, client):
 
 @pytest.mark.django_db
 def test_onboarding_fills_existing_user_and_profile_missing_info(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
@@ -110,7 +131,13 @@ def test_onboarding_fills_existing_user_and_profile_missing_info(request, client
 
 @pytest.mark.django_db
 def test_onbording_do_not_replace_existing_user_email_when_logged_in(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
@@ -144,7 +171,13 @@ def test_onbording_do_not_replace_existing_user_email_when_logged_in(request, cl
 
 @pytest.mark.django_db
 def test_onboarding_redirect_anonymous_to_login_if_mail_exists(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
@@ -174,7 +207,13 @@ def test_onboarding_redirect_anonymous_to_login_if_mail_exists(request, client):
 
 @pytest.mark.django_db
 def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
@@ -218,7 +257,13 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
 
 @pytest.mark.django_db
 def test_performing_onboarding_stores_initial_info(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
@@ -249,7 +294,13 @@ def test_performing_onboarding_stores_initial_info(request, client):
 def test_performing_onboarding_does_not_allow_account_stealing(request, client):
     user = baker.make(auth.User, username="existing@example.com")
 
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     data = {
         "name": "a project",
@@ -277,7 +328,13 @@ def test_performing_onboarding_sends_notification_to_project_moderators(
     request, client
 ):
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
 
     md_group = Recipe(auth.Group, name="project_moderator").make()
     st_group, created = auth.Group.objects.get_or_create(name="switchtender")
@@ -308,7 +365,13 @@ def test_performing_onboarding_sends_notification_to_project_moderators(
 
 @pytest.mark.django_db
 def test_performing_onboarding_sets_existing_postal_code(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     commune = Recipe(geomatics.Commune, postal="12345").make()
     with login(client):
@@ -336,7 +399,13 @@ def test_performing_onboarding_sets_existing_postal_code(request, client):
 
 @pytest.mark.django_db
 def test_performing_onboarding_discard_unknown_postal_code(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     with login(client):
         response = client.post(
@@ -363,7 +432,13 @@ def test_performing_onboarding_discard_unknown_postal_code(request, client):
 
 @pytest.mark.django_db
 def test_performing_onboarding_allow_select_on_multiple_communes(request, client):
-    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
 
     commune = baker.make(geomatics.Commune, postal="12345")
     baker.make(geomatics.Commune, postal="12345")

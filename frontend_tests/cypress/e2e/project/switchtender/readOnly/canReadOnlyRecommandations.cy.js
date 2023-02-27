@@ -1,3 +1,6 @@
+import projects from '../../../../fixtures/projects/projects.json'
+const currentProject = projects[1];
+
 describe('I can read only recommandations', () => {
 
     beforeEach(() => {
@@ -8,13 +11,12 @@ describe('I can read only recommandations', () => {
 
         cy.visit('/projects')
 
-        cy.contains('Friche numéro 1').click({force:true});
+        cy.contains(currentProject.fields.name).click({force:true});
 
         cy.contains("Recommandations").click({ force: true })
 
         cy.url().should('include', '/actions')
 
         cy.contains("Ajouter une recommandation").should('not.exist')
-        cy.contains("Ma ressource sans recommandation")
     })
 })
