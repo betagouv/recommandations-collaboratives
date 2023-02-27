@@ -62,17 +62,28 @@
 
 .drag-target {
     position: relative;
-    padding-top: 100px !important;
+    padding-top: 190px !important;
     transition: padding-top 50ms ease-in;
 }
+
+.drag-target-full {
+    position: relative;
+    padding-top: 190px !important;
+    transition: padding-top 50ms ease-in;
+    height: 100%;
+    border: 2px dashed #0d6efd;
+    background-color: #ebefff;
+}
+
 
 .drag-target::before {
     content: '';
     width: 100%;
-    height: 70px;
+    height: 170px;
     position: absolute;
     top: 15px;
     border: 2px dashed #0d6efd;
+    background-color: #ebefff;
     border-radius: 3px;
     z-index: 9999;
 }
@@ -80,5 +91,14 @@
 .drag-dragging {
     background-color: #ffc107 !important;
     opacity: .5;
+    cursor: grabbing;
+}
+
+.draggable {
+    cursor: grab;
+}
+
+.draggable:active {
+    cursor: grabbing;
 }
 

@@ -87,7 +87,7 @@ function AdvisorDashboard() {
 
             event.preventDefault();
 
-            this.currentlyHoveredElement.classList.remove('drag-target');
+            this.currentlyHoveredElement.classList.remove('drag-target-full');
             this.currentlyHoveredElement = null;
 
             const id = event.dataTransfer.getData("text/plain");
@@ -116,14 +116,14 @@ function AdvisorDashboard() {
         },
         onDragEnter(event) {
             if (this.currentlyHoveredElement && this.currentlyHoveredElement !== event.currentTarget) {
-                this.currentlyHoveredElement.classList.remove('drag-target');
+                this.currentlyHoveredElement.classList.remove('drag-target-full');
             }
             this.currentlyHoveredElement = event.currentTarget;
-            event.currentTarget.classList.add('drag-target');
+            event.currentTarget.classList.add('drag-target-full');
         },
         onDragLeave(event) {
             if (event.target === this.currentlyHoveredElement) {
-                event.target.classList.remove('drag-target');
+                event.target.classList.remove('drag-target-full');
             }
         },
         onDragOver(event) {
