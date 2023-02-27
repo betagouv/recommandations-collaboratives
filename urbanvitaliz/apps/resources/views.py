@@ -53,6 +53,7 @@ def resource_search(request):
 
     resources = models.Resource.search(query, categories)
     if not request.user.is_staff:
+        # FIXME le test me semble pas en phase avec le commentaire
         # If we are staff, show also PRIVATE resources
         resources = resources.filter(status__gte=models.Resource.TO_REVIEW)
 

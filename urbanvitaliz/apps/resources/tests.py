@@ -257,12 +257,13 @@ def test_create_new_resource_and_redirect(client):
 #
 # update
 
+# FIXME il est question d'advisor et de staff, vérifier le bon à utiliser
 
 @pytest.mark.django_db
-def test_update_resource_not_available_for_non_switchtenders(request, client):
+def test_update_resource_not_available_for_non_advisor(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-update", args=[resource.id])
-    with login(client, groups=["example_com_advisor"]):
+    with login(client):  # , groups=["example_com_advisor"]):
         response = client.get(url)
     assert response.status_code == 403
 
