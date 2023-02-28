@@ -3,41 +3,10 @@
 from django.db import migrations
 
 
-from .. import models
-
-from ..utils import (
-    assign_advisor,
-    assign_collaborator,
-    assign_observer,
-)
-
-
-def assign_project_permissions_to_users(apps, schema_editor):
-    for project in models.Project.objects.all():
-        for membership in project.projectmember_set.all():
-            assign_collaborator(
-                membership.member, project, is_owner=membership.is_owner
-            )
-
-        for project_advisor in models.ProjectSwitchtender.objects.filter(
-            project=project
-        ):
-            if project_advisor.is_observer:
-                assign_observer(
-                    project_advisor.switchtender, project, site=project_advisor.site
-                )
-            else:
-                assign_advisor(
-                    project_advisor.switchtender, project, site=project_advisor.site
-                )
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
         ("projects", "0078_merge_20230213_1432"),
     ]
 
-    operations = [
-        migrations.RunPython(assign_project_permissions_to_users, lambda x, y: None)
-    ]
+    operations = []
