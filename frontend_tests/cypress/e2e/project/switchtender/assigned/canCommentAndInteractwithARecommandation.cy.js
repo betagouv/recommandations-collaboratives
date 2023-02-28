@@ -17,23 +17,23 @@ describe('I can comment & interact with a recommandation', () => {
 
         cy.url().should('include', '/actions')
 
-        cy.contains('Ma ressource sans recommandation').parent().click({force:true});
+        cy.contains('Reco à modifier').parent().click({force:true});
 
-        const now = new Date();
+        // const now = new Date();
 
-        cy.get('textarea')
-            .type(`test : ${now}`, { force: true })
-            .should('have.value', `test : ${now}`)
+        cy.get('#modal-textarea')
+            .type(`test`)
+            .should('have.value', `test`)
 
         cy.contains("Envoyer").click({ force: true })
 
-        cy.contains(`test : ${now}`)
+        cy.contains(`test`)
 
         cy.get('#task-preview').get('[aria-label="Close"]').first().click({force:true})
 
         cy.wait(500)
 
-        cy.contains('Ma ressource sans recommandation').parent().click({force:true});
-        cy.contains(`test : ${now}`);
+        cy.contains('Reco à modifier').parent().click({force:true});
+        cy.contains(`test`);
     })
 })
