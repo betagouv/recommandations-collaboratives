@@ -11,6 +11,7 @@ from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
 from .models import Document, Project, Task, TaskFollowup, UserProjectStatus
 from .utils import create_reminder, get_collaborators_for_project
+from urbanvitaliz.utils import make_group_name_for_site
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
@@ -81,9 +82,12 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
         project_ct = ContentType.objects.get_for_model(obj)
 
-        switchtender_group = auth_models.Group.objects.get(name="switchtender")
-        switchtenders = switchtender_group.user_set.values_list("id", flat=True)
-        switchtenders = [int(switchtender) for switchtender in switchtenders]
+        group_name = make_group_name_for_site("advisor", request.site)
+        advisor_group = auth_models.Group.objects.get(name=group_name)
+        advisors = [
+            int(advisor)
+            for advisor in advisor_group.user_set.values_list("id", flat=True)
+        ]
 
         unread_notifications = notifications.filter(
             target_content_type=project_ct.pk, target_object_id=obj.pk
@@ -92,7 +96,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         return {
             "count": unread_notifications.count(),
             "has_collaborator_activity": unread_notifications.exclude(
-                actor_object_id__in=switchtenders
+                actor_object_id__in=advisors
             ).exists(),
         }
 

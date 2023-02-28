@@ -191,13 +191,13 @@ def test_resource_detail_contains_informations(request, client):
     assertContains(response, resource.title)
 
 
-@pytest.mark.xfail
 @pytest.mark.django_db
 def test_resource_detail_contains_update_for_authorized_user(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
+
     update_url = reverse("resources-resource-update", args=[resource.id])
     assertContains(response, update_url)
 

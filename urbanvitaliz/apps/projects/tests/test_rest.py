@@ -41,10 +41,22 @@ def test_logged_in_user_can_use_project_api(client):
 @pytest.mark.django_db
 def test_project_list_includes_project_for_advisor(request, client):
     current_site = get_current_site(request)
+    project = baker.make(models.Project, commune__name="Lille", sites=[current_site])
+    url = reverse("projects-list")
+
+    with login(client, groups=["example_com_advisor"]):
+        response = client.get(url)
+
+    assertContains(response, project.name)
+
+
+@pytest.mark.django_db
+def test_project_list_includes_project_for_staff(request, client):
+    current_site = get_current_site(request)
     project = baker.make(models.Project, sites=[current_site])
     url = reverse("projects-list")
 
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assertContains(response, project.name)

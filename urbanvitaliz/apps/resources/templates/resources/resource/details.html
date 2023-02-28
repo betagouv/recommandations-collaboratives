@@ -3,6 +3,7 @@
 {% load static %}
 {% load humanize %}
 {% load gravatar %}
+{% load guardian_tags %}
 
 {% load sass_tags %}
 
@@ -54,7 +55,6 @@
                     Poser une question
                 </a>
             </div>
-
             {% if is_switchtender %}
             <!-- Switchtender actions -->
 
@@ -76,9 +76,12 @@
                 </span>
                 {% endif %}
             </div>
+            {% endif %}
 
             <!-- Edit -->
-            {% if request.user.is_staff %}
+            {% get_obj_perms request.user for request.site as "user_site_perms" %}
+
+            {% if "manage_resources" in user_site_perms %}
             <div class="d-grid gap-2 mt-3">
                 <a class="btn btn-light btn-sm" href="{% url 'resources-resource-update' resource.id %}" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
@@ -88,7 +91,7 @@
                     Éditer
                 </a>
             </div>
-            {% endif %}
+
             {% endif %}
             <div class="mt-4">
             {% if resource.departments.count %}

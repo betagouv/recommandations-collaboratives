@@ -30,9 +30,15 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor
+from urbanvitaliz.utils import (
+    CastedGenericRelation,
+    check_if_advisor,
+    make_group_name_for_site,
+    has_perm,
+)
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
+from guardian.shortcuts import get_objects_for_user
 
 
 from .utils import generate_ro_key
@@ -40,6 +46,7 @@ from . import apps
 
 COLLABORATOR_PERMISSIONS = (
     "projects.use_public_notes",
+    "projects.view_project",
     "projects.view_tasks",
     "projects.use_tasks",
 )
@@ -47,6 +54,7 @@ COLLABORATOR_PERMISSIONS = (
 ADVISOR_PERMISSIONS = [
     "projects.use_public_notes",
     "projects.use_private_notes",
+    "projects.view_project",
     "projects.view_tasks",
     "projects.manage_tasks",
     "projects.use_tasks",
@@ -91,28 +99,34 @@ class ProjectManager(models.Manager):
 
     def in_departments(self, departments):
         """Return only project with commune in department scope (empty=full)"""
-        result = self.filter(deleted=None).exclude(commune=None)
+        return self._filter_by_departments(self.filter(deleted=None), departments)
+
+    def _filter_by_departments(self, queryset, departments):
+        """Return only project with commune in department scope (empty=full)"""
+        result = queryset.exclude(commune=None)
         if departments:
             result = result.filter(commune__department__in=departments)
         return result
 
     def for_user(self, user):
         """Return a list of projects visible to the user"""
-        result = self.filter(deleted=None)
-
         # Staff can see anything
-        if user.is_staff:
-            return result
+        site = Site.objects.get_current()
 
-        # Regional actors can see projects of their area
+        if has_perm(user, "sites.list_projects", site):
+            projects = self.filter(deleted=None)
+        else:
+            projects = self.none()
+
+        # Reduce scope of projects for regional actors to their area
         if check_if_advisor(user):
             actor_departments = user.profile.departments.all()
-            results = self.in_departments(actor_departments)
-        # Regular user, only return its own projects
-        else:
-            results = self.filter(members=user)
+            projects = self._filter_by_departments(projects, actor_departments)
 
-        return (results | self.filter(switchtenders=user)).distinct()
+        # Extend scope of projects to those where you're member or invited advisor
+        my_projects = get_objects_for_user(user, "projects.view_project", klass=Project)
+
+        return (projects | my_projects).distinct()
 
 
 class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
@@ -285,6 +299,8 @@ class Project(models.Model):
         verbose_name = "project"
         verbose_name_plural = "projects"
         permissions = (
+            # General
+            # Builtin: ("view_project", "Can view the project"),
             # Synopsis
             ("view_synopsis", "Can view the synopsis"),
             ("change_synopsis", "Can change the synopsis"),
