@@ -30,7 +30,6 @@ describe('I can go to administration area of a project and revoke an invite for 
         cy.contains('Invitations conseiller·e·s').siblings('ul').children('li').contains(userToInvite.fields.email)
 
         cy.contains('Invitations conseiller·e·s').siblings('ul').children('li').contains(userToInvite.fields.email).parent().parent().parent().siblings().find('#revoke-invite-switchtender').click({force:true})
-        cy.contains(`Jeannot@test.fr a bien été relancé par courriel.`)
         cy.contains(`L'invitation de jeannot@test.fr a bien été supprimée.`)
     })
 })
