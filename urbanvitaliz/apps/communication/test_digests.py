@@ -35,7 +35,7 @@ def test_send_digests_for_new_reco(client, request):
     membership = baker.make(projects_models.ProjectMember)
 
     switchtender = Recipe(
-        auth.User, username="switchtender", email="switchtender@example.com"
+        auth.User, username="advisor", email="advisor@example.com"
     ).make()
 
     project = baker.make(
@@ -84,8 +84,7 @@ def test_send_digests_for_new_reco_empty(client):
 def test_send_digests_for_new_sites_by_user(request):
     current_site = get_current_site(request)
 
-    st_group, created = auth.Group.objects.get_or_create(name="switchtender")
-    auth.Group.objects.get_or_create(name="project_moderator")
+    advisor_group = auth.Group.objects.get(name="example_com_advisor")
 
     # regional actor
     dpt_nord = Recipe(geomatics_models.Department, code=59, name="Nord").make()
@@ -93,7 +92,7 @@ def test_send_digests_for_new_sites_by_user(request):
         geomatics_models.Commune, name="Lille", postal="59000", department=dpt_nord
     ).make()
     regional_actor = Recipe(auth.User).make()
-    regional_actor.groups.add(st_group)
+    regional_actor.groups.add(advisor_group)
     regional_actor.profile.departments.add(dpt_nord)
     regional_actor.profile.sites.add(current_site)
 
@@ -103,7 +102,7 @@ def test_send_digests_for_new_sites_by_user(request):
         geomatics_models.Commune, name="Attin", postal="62170", department=dpt_nord
     ).make()
     non_regional_actor = Recipe(auth.User).make()
-    non_regional_actor.groups.add(st_group)
+    non_regional_actor.groups.add(advisor_group)
     non_regional_actor.profile.departments.add(dpt_npdc)
     non_regional_actor.profile.sites.add(current_site)
 
@@ -141,8 +140,7 @@ def test_send_digests_for_new_sites_by_user(request):
 def test_send_digests_for_switchtender_by_user(request, client):
     current_site = get_current_site(request)
 
-    st_group, created = auth.Group.objects.get_or_create(name="switchtender")
-    auth.Group.objects.get_or_create(name="project_moderator")
+    advisor_group = auth.Group.objects.get(name="example_com_advisor")
 
     # regional actor
     dpt_nord = Recipe(geomatics_models.Department, code=59, name="Nord").make()
@@ -155,11 +153,11 @@ def test_send_digests_for_switchtender_by_user(request, client):
     regional_actor.profile.sites.add(current_site)
     regional_actor.profile.organization = organization
     regional_actor.profile.save()
-    regional_actor.groups.add(st_group)
+    regional_actor.groups.add(advisor_group)
     regional_actor.profile.departments.add(dpt_nord)
 
     regional_actor2 = Recipe(auth.User).make()
-    regional_actor2.groups.add(st_group)
+    regional_actor2.groups.add(advisor_group)
     regional_actor2.profile.departments.add(dpt_nord)
     regional_actor2.profile.sites.add(current_site)
 
@@ -169,7 +167,7 @@ def test_send_digests_for_switchtender_by_user(request, client):
         geomatics_models.Commune, name="Attin", postal="62170", department=dpt_nord
     ).make()
     non_regional_actor = Recipe(auth.User).make()
-    non_regional_actor.groups.add(st_group)
+    non_regional_actor.groups.add(advisor_group)
     non_regional_actor.profile.departments.add(dpt_npdc)
     non_regional_actor.profile.sites.add(current_site)
 

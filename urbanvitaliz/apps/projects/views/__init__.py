@@ -34,10 +34,10 @@ from urbanvitaliz.apps.onboarding import models as onboarding_models
 
 from urbanvitaliz.utils import (
     build_absolute_url,
-    check_if_switchtender,
+    check_if_advisor,
     get_site_config_or_503,
-    is_staff_or_403,
     is_switchtender_or_403,
+    has_perm_or_403,
 )
 
 from .. import models, signals
@@ -46,6 +46,7 @@ from ..forms import SelectCommuneForm
 from ..utils import (
     assign_advisor,
     assign_observer,
+    assign_collaborator,
     can_administrate_or_403,
     can_administrate_project,
     generate_ro_key,
@@ -222,7 +223,7 @@ def select_commune(request, project_id=None):
 @login_required
 def project_list(request):
     if not (
-        check_if_switchtender(request.user)
+        check_if_advisor(request.user)
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
@@ -238,7 +239,7 @@ def project_list(request):
 def project_list_for_advisor(request):
     """Return the projects for the advisor"""
     if not (
-        check_if_switchtender(request.user)
+        check_if_advisor(request.user)
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
@@ -267,7 +268,7 @@ def project_list_for_advisor(request):
 def project_list_for_staff(request):
     """Return the projects for the staff"""
     if not (
-        check_if_switchtender(request.user)
+        check_if_advisor(request.user)
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
@@ -296,7 +297,7 @@ def project_list_for_staff(request):
 def project_maplist(request):
     """Return the projects for the switchtender as a map"""
     if not (
-        check_if_switchtender(request.user)
+        check_if_advisor(request.user)
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
@@ -338,16 +339,20 @@ def project_accept(request, project_id=None):
             project=project,
         )
 
-        if project.owner:
+        owner = project.owner
+        if owner:
+            # Update owner permissions now the project is no in DRAFT state anymore
+            assign_collaborator(owner, project, is_owner=True)
+
             # Send an email to the project owner
             params = {
-                "project": digests.make_project_digest(project, project.owner),
+                "project": digests.make_project_digest(project, owner),
             }
             send_email(
                 template_name="project_accepted",
                 recipients=[
                     {
-                        "name": normalize_user_name(project.owner),
+                        "name": normalize_user_name(owner),
                         "email": project.owner.email,
                     }
                 ],
@@ -449,7 +454,8 @@ def project_switchtender_leave(request, project_id=None):
 @login_required
 def project_delete(request, project_id=None):
     """Mark project as deleted in the DB"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.delete_projects", request.site)
+
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
         project.deleted = project.updated_on = timezone.now()

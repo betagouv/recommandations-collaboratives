@@ -11,8 +11,7 @@ import os
 import uuid
 
 from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes.fields import (GenericForeignKey,
-                                                GenericRelation)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
@@ -22,8 +21,7 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import (OrderedModel, OrderedModelManager,
-                                  OrderedModelQuerySet)
+from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -32,9 +30,71 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.utils import CastedGenericRelation, check_if_switchtender
+from urbanvitaliz.utils import (
+    CastedGenericRelation,
+    check_if_advisor,
+    make_group_name_for_site,
+    has_perm,
+)
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
+from guardian.shortcuts import get_objects_for_user
+
 
 from .utils import generate_ro_key
+from . import apps
+
+COLLABORATOR_DRAFT_PERMISSIONS = (
+    "projects.use_public_notes",
+    "projects.view_project",
+    "projects.view_tasks",
+    "projects.use_tasks",
+)
+
+COLLABORATOR_PERMISSIONS = (
+    "projects.manage_documents",
+    "projects.can_invite",
+)
+
+ADVISOR_PERMISSIONS = [
+    "projects.use_public_notes",
+    "projects.use_private_notes",
+    "projects.view_project",
+    "projects.view_tasks",
+    "projects.manage_tasks",
+    "projects.use_tasks",
+    "projects.can_invite",
+    "projects.change_synopsis",
+    "projects.manage_documents",
+]
+
+OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
+
+# We need the permission to be associated to the site and not to the projects
+@receiver(post_migrate)
+def create_site_permissions(sender, **kwargs):
+    if sender.name != apps.ProjectConfig.name:
+        return
+
+    site_ct = ContentType.objects.get(app_label="sites", model="site")
+
+    auth_models.Permission.objects.get_or_create(
+        codename="moderate_projects",
+        name="Can moderate incoming projects",
+        content_type=site_ct,
+    )
+
+    auth_models.Permission.objects.get_or_create(
+        codename="list_projects",
+        name="Can list projects for site",
+        content_type=site_ct,
+    )
+
+    auth_models.Permission.objects.get_or_create(
+        codename="delete_projects",
+        name="Can delete projects for site",
+        content_type=site_ct,
+    )
 
 
 class ProjectManager(models.Manager):
@@ -45,28 +105,34 @@ class ProjectManager(models.Manager):
 
     def in_departments(self, departments):
         """Return only project with commune in department scope (empty=full)"""
-        result = self.filter(deleted=None).exclude(commune=None)
+        return self._filter_by_departments(self.filter(deleted=None), departments)
+
+    def _filter_by_departments(self, queryset, departments):
+        """Return only project with commune in department scope (empty=full)"""
+        result = queryset.exclude(commune=None)
         if departments:
             result = result.filter(commune__department__in=departments)
         return result
 
     def for_user(self, user):
         """Return a list of projects visible to the user"""
-        result = self.filter(deleted=None)
-
         # Staff can see anything
-        if user.is_staff:
-            return result
+        site = Site.objects.get_current()
 
-        # Regional actors can see projects of their area
-        if check_if_switchtender(user):
-            actor_departments = user.profile.departments.all()
-            results = self.in_departments(actor_departments)
-        # Regular user, only return its own projects
+        if has_perm(user, "sites.list_projects", site):
+            projects = self.filter(deleted=None)
         else:
-            results = self.filter(members=user)
+            projects = self.none()
 
-        return (results | self.filter(switchtenders=user)).distinct()
+        # Reduce scope of projects for regional actors to their area
+        if check_if_advisor(user):
+            actor_departments = user.profile.departments.all()
+            projects = self._filter_by_departments(projects, actor_departments)
+
+        # Extend scope of projects to those where you're member or invited advisor
+        my_projects = get_objects_for_user(user, "projects.view_project", klass=Project)
+
+        return (projects | my_projects).distinct()
 
 
 class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
@@ -239,6 +305,8 @@ class Project(models.Model):
         verbose_name = "project"
         verbose_name_plural = "projects"
         permissions = (
+            # General
+            # Builtin: ("view_project", "Can view the project"),
             # Synopsis
             ("view_synopsis", "Can view the synopsis"),
             ("change_synopsis", "Can change the synopsis"),
@@ -249,9 +317,11 @@ class Project(models.Model):
             ("view_private_notes", "Can read the private notes (internal)"),
             # Tasks/Recommandations
             ("view_tasks", "Can view and list tasks"),
-            ("view_draft_tasks", "Can view and list draft tasks"),
+            ("view_draft_tasks", "Can view and list draft tasks"),  # XXX Still useful?
             ("use_tasks", "Can use tasks"),
             ("manage_tasks", "Can manage tasks"),
+            # Documents
+            ("manage_documents", "Can manage the documents"),
             # Invitation/sharing/members
             ("can_invite", "Can invite collaborators"),
             ("manage_members", "Can manage collaborators"),

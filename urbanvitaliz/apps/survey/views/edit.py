@@ -17,7 +17,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from urbanvitaliz.utils import is_staff_or_403
+
+from urbanvitaliz.utils import has_perm_or_403
 
 from .. import forms, models
 
@@ -29,7 +30,10 @@ from .. import forms, models
 @login_required
 def survey_details(request, survey_id=None):
     """List question sets for given survey"""
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
+
     survey = get_object_or_404(models.Survey, site=request.site, pk=survey_id)
+
     return render(request, "survey/editor/survey/details.html", locals())
 
 
@@ -41,19 +45,21 @@ def survey_details(request, survey_id=None):
 @login_required
 def question_set_details(request, question_set_id=None):
     """Return the details of given question_set"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question_set = get_object_or_404(
         models.QuestionSet, survey__site=request.site, pk=question_set_id
     )
+
     questions = question_set.questions.order_by("-priority")
+
     return render(request, "survey/editor/question_set/details.html", locals())
 
 
 @login_required
 def question_set_update(request, question_set_id=None):
     """Update informations for question_set"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question_set = get_object_or_404(
         models.QuestionSet, survey__site=request.site, pk=question_set_id
@@ -69,13 +75,14 @@ def question_set_update(request, question_set_id=None):
             return redirect(next_url)
     else:
         form = forms.EditQuestionSetForm(instance=question_set)
+
     return render(request, "survey/editor/question_set/update.html", locals())
 
 
 @login_required
 def question_set_create(request, survey_id=None):
     """Create new question_set"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     survey = get_object_or_404(models.Survey, site=request.site, pk=survey_id)
 
@@ -91,17 +98,19 @@ def question_set_create(request, survey_id=None):
             return redirect(next_url)
     else:
         form = forms.EditQuestionSetForm()
+
     return render(request, "survey/editor/question_set/create.html", locals())
 
 
 @login_required
 def question_set_delete(request, question_set_id=None):
     """Delete question_set (mark as deleted)"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question_set = get_object_or_404(
         models.QuestionSet, survey__site=request.site, pk=question_set_id
     )
+
     if request.method == "POST":
         question_set.deleted = timezone.now()
         question_set.save()
@@ -109,6 +118,7 @@ def question_set_delete(request, question_set_id=None):
             "survey-editor-survey-details", args=[question_set.survey_id]
         )
         return redirect(next_url)
+
     return render(request, "survey/editor/question_set/delete.html", locals())
 
 
@@ -120,11 +130,12 @@ def question_set_delete(request, question_set_id=None):
 @login_required
 def question_update(request, question_id=None):
     """Update informations for question"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question = get_object_or_404(
         models.Question, question_set__survey__site=request.site, pk=question_id
     )
+
     if request.method == "POST":
         form = forms.EditQuestionForm(request.POST, instance=question)
         if form.is_valid():
@@ -135,15 +146,17 @@ def question_update(request, question_id=None):
             return redirect(next_url)
     else:
         form = forms.EditQuestionForm(instance=question)
+
     return render(request, "survey/editor/question/update.html", locals())
 
 
 @login_required
 def question_create(request, question_set_id=None):
     """Create new question"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question_set = get_object_or_404(models.QuestionSet, pk=question_set_id)
+
     if request.method == "POST":
         form = forms.EditQuestionForm(request.POST)
         if form.is_valid():
@@ -156,17 +169,19 @@ def question_create(request, question_set_id=None):
             return redirect(next_url)
     else:
         form = forms.EditQuestionForm()
+
     return render(request, "survey/editor/question/create.html", locals())
 
 
 @login_required
 def question_delete(request, question_id=None):
     """Delete question (mark as deleted)"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question = get_object_or_404(
         models.Question, question_set__survey__site=request.site, pk=question_id
     )
+
     if request.method == "POST":
         question.deleted = timezone.now()
         question.save()
@@ -174,6 +189,7 @@ def question_delete(request, question_id=None):
             "survey-editor-question-set-details", args=[question.question_set.id]
         )
         return redirect(next_url)
+
     return render(request, "survey/editor/question/delete.html", locals())
 
 
@@ -204,7 +220,7 @@ def get_answers_for_question(site, question):
 @login_required
 def question_results(request, question_id=None):
     """Show question results"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question = get_object_or_404(
         models.Question, question_set__survey__site=request.site, pk=question_id
@@ -219,7 +235,7 @@ def question_results(request, question_id=None):
 @login_required
 def question_results_as_csv(request, question_id=None):
     """Show question results"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     today = datetime.datetime.today().date()
 
@@ -267,13 +283,14 @@ def question_results_as_csv(request, question_id=None):
 @login_required
 def choice_update(request, choice_id=None):
     """Update informations for choice"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     choice = get_object_or_404(
         models.Choice,
         question__question_set__survey__site=get_current_site(request),
         pk=choice_id,
     )
+
     if request.method == "POST":
         form = forms.EditChoiceForm(request.POST, instance=choice)
         if form.is_valid():
@@ -285,19 +302,21 @@ def choice_update(request, choice_id=None):
             return redirect(next_url)
     else:
         form = forms.EditChoiceForm(instance=choice)
+
     return render(request, "survey/editor/choice/update.html", locals())
 
 
 @login_required
 def choice_create(request, question_id=None):
     """Create new choice"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     question = get_object_or_404(
         models.Question,
         pk=question_id,
         question_set__survey__site=get_current_site(request),
     )
+
     if request.method == "POST":
         form = forms.EditChoiceForm(request.POST)
         if form.is_valid():
@@ -311,20 +330,21 @@ def choice_create(request, question_id=None):
             return redirect(next_url)
     else:
         form = forms.EditChoiceForm()
+
     return render(request, "survey/editor/choice/create.html", locals())
 
 
 @login_required
 def choice_delete(request, choice_id=None):
-    """Delete choice (mark as delet
-    ed)"""
-    is_staff_or_403(request.user)
+    """Delete choice (mark as deleted)"""
+    has_perm_or_403(request.user, "sites.manage_surveys", obj=request.site)
 
     choice = get_object_or_404(
         models.Choice,
         pk=choice_id,
         question__question_set__survey__site=get_current_site(request),
     )
+
     if request.method == "POST":
         choice.deleted = timezone.now()
         choice.save()
@@ -332,6 +352,7 @@ def choice_delete(request, choice_id=None):
             "survey-editor-question-set-details", args=[choice.question.question_set_id]
         )
         return redirect(next_url)
+
     return render(request, "survey/editor/choice/delete.html", locals())
 
 

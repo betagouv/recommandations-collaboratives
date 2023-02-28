@@ -17,7 +17,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.db import transaction
 from django.urls import reverse
-from guardian.shortcuts import assign_perm, remove_perm
+from guardian.shortcuts import assign_perm, remove_perm, get_users_with_perms
 from urbanvitaliz import utils as uv_utils
 from urbanvitaliz.apps.reminders import api
 
@@ -26,39 +26,31 @@ from . import models
 
 @transaction.atomic
 def assign_collaborator(user, project, is_owner=False):
-    """Make someone becomes a project collaborator"""
-    assign_perm("projects.use_public_notes", user, project)
-    assign_perm("projects.view_tasks", user, project)
-    assign_perm("projects.use_tasks", user, project)
+    """Make someone becomes a project collaborator and assign permissions"""
 
+    permissions = models.COLLABORATOR_DRAFT_PERMISSIONS
     if project.status != "DRAFT":
-        assign_perm("projects.can_invite", user, project)
+        permissions += models.COLLABORATOR_PERMISSIONS
+
+    for perm in permissions:
+        assign_perm(perm, user, project)
 
     models.ProjectMember.objects.get_or_create(
         project=project, member=user, is_owner=is_owner
     )
 
 
-ADVISOR_PERMISSIONS = [
-    "projects.use_public_notes",
-    "projects.use_private_notes",
-    "projects.view_tasks",
-    "projects.manage_tasks",
-    "projects.use_tasks",
-    "projects.can_invite",
-    "projects.change_synopsis",
-]
-
-
 @transaction.atomic
-def assign_advisor(user, project):
+def assign_advisor(user, project, site=None):
     """Make someone becomes a project advisor"""
-    for perm in ADVISOR_PERMISSIONS:
+    site = site or Site.objects.get_current()
+
+    for perm in models.ADVISOR_PERMISSIONS:
         assign_perm(perm, user, project)
 
     switchtending, created = models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,
-        site=get_current_site(Site.objects.get_current()),
+        site=site,
         project=project,
         defaults={"is_observer": False},
     )
@@ -69,27 +61,31 @@ def assign_advisor(user, project):
 
 
 @transaction.atomic
-def unassign_advisor(user, project):
+def unassign_advisor(user, project, site=None):
     """Remove someone from being a project advisor"""
-    for perm in ADVISOR_PERMISSIONS:
+    site = site or Site.objects.get_current()
+
+    for perm in models.ADVISOR_PERMISSIONS:
         remove_perm(perm, user, project)
 
     models.ProjectSwitchtender.objects.filter(
         switchtender=user,
-        site=get_current_site(Site.objects.get_current()),
+        site=site,
         project=project,
     ).delete()
 
 
 @transaction.atomic
-def assign_observer(user, project):
+def assign_observer(user, project, site=None):
     """Make someone becomes a project observer"""
-    for perm in ADVISOR_PERMISSIONS:  # XXX Should be different from an advisor
+    site = site or Site.objects.get_current()
+
+    for perm in models.OBSERVER_PERMISSIONS:
         assign_perm(perm, user, project)
 
     switchtending, created = models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,
-        site=get_current_site(Site.objects.get_current()),
+        site=site,
         project=project,
         defaults={"is_observer": True},
     )
@@ -97,6 +93,10 @@ def assign_observer(user, project):
     if not created:
         switchtending.is_observer = True
         switchtending.save()
+
+
+# XXX currently no difference, but may need different perms in the future
+unassign_observer = unassign_advisor
 
 
 def can_manage_project(project, user, allow_draft=False):
@@ -168,8 +168,11 @@ def can_manage_or_403(project, user, allow_draft=False):
 
 def get_project_moderators(site):
     """Return all project moderators for a given site"""
-    return auth_models.User.objects.filter(groups__name="project_moderator").filter(
-        groups__name="switchtender", profile__sites=site
+    return get_users_with_perms(
+        site,
+        with_superusers=True,
+        with_group_users=True,
+        only_with_perms_in=["moderate_projects"],
     )
 
 
@@ -208,9 +211,8 @@ def get_national_actors(site):
 
 def get_advisors(site):
     """Return advisors for given site"""
-    return auth_models.User.objects.filter(groups__name="switchtender").filter(
-        profile__sites=site
-    )
+    group_name = uv_utils.make_group_name_for_site("advisor", site)
+    return auth_models.User.objects.filter(groups__name=group_name)
 
 
 def is_regional_actor_for_project(site, project, user, allow_national=False):

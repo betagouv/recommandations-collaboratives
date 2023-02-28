@@ -13,6 +13,7 @@ from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
+from guardian.shortcuts import get_group_perms
 
 # Baker addons
 def gen_onboarding_func():
@@ -337,14 +338,13 @@ def test_performing_onboarding_sends_notification_to_project_moderators(
         onboarding=onboarding,
     )
 
-    md_group = Recipe(auth.Group, name="project_moderator").make()
-    st_group, created = auth.Group.objects.get_or_create(name="switchtender")
+    staff_group = auth.Group.objects.get(name="example_com_staff")
+    # st_group = auth.Group.objects.get(name="example_com_advisor")
     moderator = Recipe(
         auth.User,
         email="moderator@example.com",
-        groups=[md_group, st_group],
+        groups=[staff_group],
     ).make()
-    moderator.profile.sites.add(current_site)
 
     data = {
         "name": "a project",

@@ -12,7 +12,7 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import signals as projects_signals
 from urbanvitaliz.apps.projects.utils import generate_ro_key
-from urbanvitaliz.utils import check_if_switchtender, get_site_config_or_503
+from urbanvitaliz.utils import get_site_config_or_503
 
 from . import forms, models
 
@@ -20,9 +20,6 @@ from . import forms, models
 def onboarding(request):
     """Return the onboarding page"""
     site_config = get_site_config_or_503(request.site)
-
-    if (not request.user.is_staff) and check_if_switchtender(request.user):
-        return redirect("projects-project-prefill")
 
     # Fetch the onboarding form associated with the current site
     form = forms.OnboardingResponseWithCaptchaForm(request.POST or None)

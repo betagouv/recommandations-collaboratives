@@ -25,10 +25,26 @@ from sesame.utils import get_query_string
 from urbanvitaliz.apps.home.models import SiteConfiguration
 
 
+def make_group_name_for_site(name: str, site: Site) -> str:
+    """Make a group label usable by django for the given site"""
+    prefix = site.domain.translate(str.maketrans("-.", "__")).lower()
+    return f"{prefix}_{name}"
+
+
+def get_group_for_site(name: str, site: Site) -> auth.Group:
+    """Return the Group with given name for site"""
+    group_name = make_group_name_for_site(name, site)
+    return auth.Group.objects.get(name=group_name)
+
+
 ########################################################################
 # View helpers
 ########################################################################
 def has_perm(user, permission, obj=None):
+    """
+    Check if this user has the required permission for the given
+    object on the current site.
+    """
     return user.has_perm(permission, obj)
 
 
@@ -38,21 +54,29 @@ def has_perm_or_403(user, permission, obj=None):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
-def is_staff_or_403(user):
+def is_staff_for_site(user, site=None):
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("staff", site)
+    return user.groups.filter(name=group_name).exists()
+
+
+def is_staff_for_site_or_403(user, site=None):
     """Raise a 403 error is user is not a staff member"""
-    if not user or not user.is_staff:
+    if not is_staff_for_site(user, site):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
-def is_switchtender_or_403(user):
+def is_switchtender_or_403(user, site=None):
     """Raise a 403 error is user is not a switchtender"""
-    if not user or not check_if_switchtender(user):
+    if not user or not check_if_advisor(user, site):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
-def check_if_switchtender(user):
-    """Return true if user is a global switchtender"""
-    return auth.User.objects.filter(pk=user.id, groups__name="switchtender").exists()
+def check_if_advisor(user, site=None):
+    """Return true if user is advisor for site. Defaults to current site."""
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("advisor", site)
+    return auth.User.objects.filter(pk=user.id, groups__name=group_name).exists()
 
 
 def send_email(
@@ -100,6 +124,7 @@ def build_absolute_url(path, auto_login_user=None):
     return url
 
 
+# TODO move me to home/utils.py
 def get_site_administrators(site):
     return auth.User.objects.filter(is_staff=True, is_active=True)
 
@@ -134,12 +159,14 @@ def login(
 ################################################################
 # Site configuration
 ################################################################
+# TODO move me to home/utils.py
 def get_site_config_or_503(site):
     try:
         return SiteConfiguration.objects.get(site=site)
     except SiteConfiguration.DoesNotExist:
         raise ImproperlyConfigured(
-            f"Please create a SiteConfiguration for '{site}' before using this feature.",
+            f"Please create a SiteConfiguration for '{site}'"
+            " before using this feature.",
         )
 
 

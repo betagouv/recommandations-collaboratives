@@ -13,7 +13,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
-from urbanvitaliz.utils import check_if_switchtender
+from urbanvitaliz.utils import check_if_advisor
 
 from .. import models, signals
 from ..forms import DocumentUploadForm
@@ -43,7 +43,7 @@ def document_list(request, project_id=None):
     # check user can administrate project (member or switchtender)
     if request.user != project.members.filter(projectmember__is_owner=True).first():
         # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_switchtender(request.user):
+        if not check_if_advisor(request.user):
             can_manage_or_403(project, request.user)
 
     # Set this project as active

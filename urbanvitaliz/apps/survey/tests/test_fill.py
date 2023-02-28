@@ -477,10 +477,11 @@ def test_previous_question_redirects_to_survey_when_not_more_questions(request, 
 
 
 @pytest.mark.django_db
-def test_refresh_signals_only_for_staff(client):
-    session = Recipe(models.Session).make()
+def test_refresh_signals_only_for_staff(request, client):
+    current_site = get_current_site(request)
+    session = Recipe(models.Session, survey__site=current_site).make()
     url = reverse("survey-session-refresh-signals", args=(session.id,))
-    with login(client, is_staff=False):
+    with login(client):
         response = client.get(url)
 
     assert response.status_code == 403
@@ -500,7 +501,7 @@ def test_refresh_signals(request, client):
 
     # Answer question first
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False, username="nonstaff"):
+    with login(client, username="non_site_admin"):
         client.post(url, data={"answer": choice.value})
 
     # Update choice signal and refresh
@@ -509,7 +510,7 @@ def test_refresh_signals(request, client):
     choice.save()
 
     url = reverse("survey-session-refresh-signals", args=(session.id,))
-    with login(client, is_staff=True, username="staff"):
+    with login(client, groups=["example_com_admin"], username="site_admin"):
         client.get(url)
 
     # Fetch persisted answer

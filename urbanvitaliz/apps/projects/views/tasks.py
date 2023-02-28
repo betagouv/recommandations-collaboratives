@@ -18,10 +18,9 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import (
-    check_if_switchtender,
+    check_if_advisor,
     has_perm_or_403,
-    is_staff_or_403,
-    is_switchtender_or_403,
+    is_staff_for_site_or_403,
 )
 
 from .. import models, signals
@@ -53,7 +52,7 @@ def visit_task(request, task_id):
 
     has_perm_or_403(request.user, "projects.view_tasks", task.project)
 
-    is_switchtender = check_if_switchtender(request.user)
+    is_switchtender = check_if_advisor(request.user)
 
     if not task.visited and not is_switchtender:
         task.visited = True
@@ -204,11 +203,22 @@ def update_task(request, task_id=None):
 # Task Recommendation
 ########
 
+# liste de preflechage des recommendations
+@login_required
+def task_recommendation_list(request):
+    """List task recommendations for a project"""
+    is_staff_for_site_or_403(request.user)
 
+    recommendations = models.TaskRecommendation.on_site.all()
+
+    return render(request, "projects/tasks/recommendation_list.html", locals())
+
+
+# ajout d'un  preflechage de recommendations
 @login_required
 def task_recommendation_create(request):
     """Create a new task recommendation for a project"""
-    is_staff_or_403(request.user)
+    is_staff_for_site_or_403(request.user)
 
     if request.method == "POST":
         form = TaskRecommendationForm(request.POST)
@@ -223,10 +233,11 @@ def task_recommendation_create(request):
     return render(request, "projects/tasks/recommendation_create.html", locals())
 
 
+# mise à jour d'un  preflechage de recommendations
 @login_required
 def task_recommendation_update(request, recommendation_id):
     """Update a task recommendation"""
-    is_staff_or_403(request.user)
+    is_staff_for_site_or_403(request.user)
 
     recommendation = get_object_or_404(
         models.TaskRecommendation, site=request.site, pk=recommendation_id
@@ -243,22 +254,13 @@ def task_recommendation_update(request, recommendation_id):
     return render(request, "projects/tasks/recommendation_update.html", locals())
 
 
-@login_required
-def task_recommendation_list(request):
-    """List task recommendations for a project"""
-    is_staff_or_403(request.user)
-
-    recommendations = models.TaskRecommendation.on_site.all()
-
-    return render(request, "projects/tasks/recommendation_list.html", locals())
-
-
+# retourne pour le projet les suggestions du système
 @login_required
 def presuggest_task(request, project_id):
     """Suggest tasks"""
-    is_switchtender_or_403(request.user)
-
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    has_perm_or_403(request.user, "projects.manage_tasks", project)
 
     try:
         survey = survey_models.Survey.on_site.get(pk=1)  # XXX Hardcoded survey ID
@@ -303,8 +305,9 @@ def presuggest_task(request, project_id):
 @login_required
 def delete_task(request, task_id=None):
     """Delete a task from a project"""
-    is_switchtender_or_403(request.user)
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
+    has_perm_or_403(request.user, "projects.manage_tasks", task.project)
+
     if request.method == "POST":
         task.deleted = timezone.now()
         task.save()
@@ -317,6 +320,7 @@ def delete_task(request, task_id=None):
 def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     owner = task.project.owner
     if not owner:
@@ -350,6 +354,7 @@ def remind_task(request, task_id=None):
 def remind_task_delete(request, task_id=None):
     """Delete a reminder for a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     if request.method == "POST":
         api.remove_reminder_email(task)

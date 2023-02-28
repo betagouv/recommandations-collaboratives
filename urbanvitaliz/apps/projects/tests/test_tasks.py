@@ -41,7 +41,7 @@ def test_task_recommendation_list_not_available_for_non_staff(client):
 @pytest.mark.django_db
 def test_task_recommendation_list_available_for_staff(client):
     url = reverse("projects-task-recommendation-list")
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
@@ -58,7 +58,7 @@ def test_task_recommendation_create_not_available_for_non_staff(client):
 @pytest.mark.django_db
 def test_create_task_recommendation_available_for_staff(client):
     url = reverse("projects-task-recommendation-create")
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -69,7 +69,7 @@ def test_task_recommendation_is_created(request, client):
     resource = Recipe(resources.Resource, sites=[get_current_site(request)]).make()
 
     data = {"text": "mew", "resource": resource.pk}
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
     assert models.TaskRecommendation.on_site.count() == 1
@@ -96,7 +96,7 @@ def test_task_recommendation_update_available_for_staff(request, client):
         models.TaskRecommendation, site=get_current_site(request)
     ).make()
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -110,7 +110,7 @@ def test_task_recommendation_is_updated(request, client):
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
 
     data = {"text": "new-text", "resource": recommendation.resource.pk}
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -123,8 +123,8 @@ def test_task_recommendation_is_updated(request, client):
 
 
 @pytest.mark.django_db
-def test_task_suggestion_not_available_for_non_switchtender(client):
-    project = Recipe(models.Project).make()
+def test_task_suggestion_not_available_for_non_switchtender(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client):
         response = client.get(url)
@@ -133,38 +133,47 @@ def test_task_suggestion_not_available_for_non_switchtender(client):
 
 @pytest.mark.django_db
 def test_task_suggestion_when_no_survey(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["switchtender"]):
+    with login(client) as user:
+        utils.assign_observer(user, project, current_site)
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_task_suggestion_available_with_bare_project(request, client):
+    current_site = get_current_site(request)
+
     Recipe(models.TaskRecommendation, condition="").make()
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["switchtender"]):
+    with login(client) as user:
+        utils.assign_observer(user, project, current_site)
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_task_suggestion_available_with_filled_project(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
     Recipe(models.TaskRecommendation, condition="").make()
-    project = Recipe(
-        models.Project, sites=[get_current_site(request)], commune=commune
-    ).make()
+    project = Recipe(models.Project, sites=[current_site], commune=commune).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["switchtender"]):
+    with login(client) as user:
+        utils.assign_observer(user, project, current_site)
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_task_suggestion_available_with_localized_reco(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
     Recipe(
@@ -174,11 +183,10 @@ def test_task_suggestion_available_with_localized_reco(request, client):
             dept,
         ],
     ).make()
-    project = Recipe(
-        models.Project, sites=[get_current_site(request)], commune=commune
-    ).make()
+    project = Recipe(models.Project, sites=[current_site], commune=commune).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["switchtender"]):
+    with login(client) as user:
+        utils.assign_observer(user, project, current_site)
         response = client.get(url)
     assert response.status_code == 200
 
@@ -413,18 +421,26 @@ def test_update_task_for_project_and_redirect(request, client):
 
 
 @pytest.mark.django_db
-def test_delete_task_not_available_for_non_staff_users(client):
-    task = Recipe(models.Task).make()
+def test_delete_task_not_available_for_non_staff_users(request, client):
+    current_site = get_current_site(request)
+
+    task = Recipe(models.Task, site=current_site).make()
     url = reverse("projects-delete-task", args=[task.id])
-    with login(client):
+    with login(client) as user:
+        utils.assign_collaborator(user, task.project)
+
         response = client.get(url)
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
 def test_delete_task_from_project_and_redirect(request, client):
-    task = Recipe(models.Task, site=get_current_site(request)).make()
-    with login(client, groups=["switchtender"]):
+    current_site = get_current_site(request)
+
+    task = Recipe(models.Task, site=current_site).make()
+
+    with login(client) as user:
+        utils.assign_advisor(user, task.project, current_site)
         response = client.post(reverse("projects-delete-task", args=[task.id]))
     task = models.Task.deleted_on_site.get(id=task.id)
     assert task.deleted
@@ -716,7 +732,7 @@ def test_create_new_action_with_document(request, client):
     intent = "My Intent"
     content = "My Content"
 
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         utils.assign_advisor(user, project)
         png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
 

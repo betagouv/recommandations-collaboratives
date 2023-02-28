@@ -12,7 +12,6 @@ from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
-from urbanvitaliz.utils import check_if_switchtender
 
 from .. import models, signals
 from ..serializers import (

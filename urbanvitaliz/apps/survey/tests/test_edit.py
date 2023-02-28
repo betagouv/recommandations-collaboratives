@@ -25,7 +25,7 @@ from .. import models
 def test_survey_detail_contains_question_set_links(request, client):
     qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     url = reverse("survey-editor-survey-details", args=[qs.survey_id])
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.get(url)
     detail_url = reverse("survey-editor-question-set-details", args=[qs.id])
     assertContains(response, f'href="{detail_url}"')
@@ -42,7 +42,7 @@ def test_survey_detail_contains_question_set_links(request, client):
 def test_question_set_detail_contains_update_links(request, client):
     qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     url = reverse("survey-editor-question-set-details", args=[qs.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.get(url)
     update_url = reverse("survey-editor-question-set-update", args=[qs.id])
     assertContains(response, f'href="{update_url}"')
@@ -63,7 +63,7 @@ def test_question_set_create_and_redirect(request, client):
         "icon": "an-icon",
     }
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     qs = models.QuestionSet.objects.all()[0]
@@ -80,7 +80,7 @@ def test_question_set_create_error(request, client):
     url = reverse("survey-editor-question-set-create", args=[survey.id])
     data = {}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     assert models.QuestionSet.objects.count() == 0
@@ -102,7 +102,7 @@ def test_question_set_update_and_redirect(request, client):
         "icon": "an-icon",
     }
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     qs = models.QuestionSet.objects.get(id=qs.id)
@@ -119,7 +119,7 @@ def test_question_set_update_error(request, client):
     url = reverse("survey-editor-question-set-update", args=[qs.id])
     data = {}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     qs = models.QuestionSet.objects.get(id=qs.id)
@@ -137,7 +137,7 @@ def test_question_set_delete_and_redirect(request, client):
     qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     url = reverse("survey-editor-question-set-delete", args=[qs.id])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url)
 
     qs = models.QuestionSet.objects_deleted.get(id=qs.id)
@@ -157,7 +157,7 @@ def test_question_set_detail_contains_question_links(request, client):
     qs = Recipe(models.QuestionSet, survey__site=get_current_site(request)).make()
     question = Recipe(models.Question, question_set=qs).make()
     url = reverse("survey-editor-question-set-details", args=[qs.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.get(url)
     update_url = reverse("survey-editor-question-update", args=[question.id])
     assertContains(response, f'href="{update_url}"')
@@ -179,7 +179,7 @@ def test_question_create_and_redirect(request, client):
         "priority": 1,
     }
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     question = models.Question.objects.all()[0]
@@ -197,7 +197,7 @@ def test_question_create_error(request, client):
     url = reverse("survey-editor-question-create", args=[qs.id])
     data = {"text": ""}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     assert models.Question.objects.count() == 0
@@ -220,7 +220,7 @@ def test_question_update_and_redirect(request, client):
         "priority": 0,
     }
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     question = models.Question.objects.get(id=question.id)
@@ -240,7 +240,7 @@ def test_question_update_error(request, client):
     url = reverse("survey-editor-question-update", args=[question.id])
     data = {"text": ""}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     question = models.Question.objects.get(id=question.id)
@@ -260,7 +260,7 @@ def test_question_delete_and_redirect(request, client):
     ).make()
     url = reverse("survey-editor-question-delete", args=[question.id])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url)
 
     question = models.Question.objects_deleted.get(id=question.id)
@@ -283,7 +283,7 @@ def test_question_set_detail_contains_choice_links(request, client):
     question = Recipe(models.Question, question_set=qs).make()
     choice = Recipe(models.Choice, question=question).make()
     url = reverse("survey-editor-question-set-details", args=[qs.id])
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.get(url)
     update_url = reverse("survey-editor-choice-update", args=[choice.id])
     assertContains(response, f'href="{update_url}"')
@@ -303,7 +303,7 @@ def test_choice_create_and_redirect(request, client):
     url = reverse("survey-editor-choice-create", args=[question.id])
     data = {"value": "some value", "text": "the text of the choice"}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     choice = models.Choice.objects.all()[0]
@@ -324,7 +324,7 @@ def test_choice_set_create_error(request, client):
     url = reverse("survey-editor-choice-create", args=[question.id])
     data = {"value": "", "text": "some text"}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     assert models.Choice.objects.count() == 0
@@ -343,7 +343,7 @@ def test_choice_update_and_redirect(request, client):
     url = reverse("survey-editor-choice-update", args=[choice.id])
     data = {"value": "some value", "text": "the text of the choice"}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     choice = models.Choice.objects.get(id=choice.id)
@@ -365,7 +365,7 @@ def test_choice_update_error(request, client):
     url = reverse("survey-editor-choice-update", args=[choice.id])
     data = {"value": "", "text": "some text"}
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     choice = models.Choice.objects.get(id=choice.id)
@@ -386,7 +386,7 @@ def test_choice_delete_and_redirect(request, client):
     ).make()
     url = reverse("survey-editor-choice-delete", args=[choice.id])
 
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_admin"]):
         response = client.post(url)
 
     choice = models.Choice.objects_deleted.get(id=choice.id)
