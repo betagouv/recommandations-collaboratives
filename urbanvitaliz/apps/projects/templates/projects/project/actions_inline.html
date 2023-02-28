@@ -36,7 +36,7 @@
         <div class="d-flex align-items-center">
             {% if not disable_add_recommendation %}
             <a class="button filled me-2"
-               href="{% url 'projects-project-create-action' project.id %}">
+               href="{% url 'projects-project-create-action' project.id %}?next={{request.path}}">
                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
                 </svg>

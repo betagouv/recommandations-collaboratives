@@ -78,8 +78,8 @@ export function resourcePreviewUrl(resourceId) {
 
 // Non API routes
 // TODO : Make them into proper endpoints
-export function editTaskUrl(taskId) {
-    return `/task/${taskId}/update/`;
+export function editTaskUrl(taskId, next = null) {
+    return next ? `/task/${taskId}/update/?next=${next}` : `/task/${taskId}/update/`;
 }
 
 export function deleteTaskUrl(taskId) {

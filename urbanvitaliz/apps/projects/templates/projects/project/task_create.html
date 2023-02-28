@@ -38,7 +38,6 @@
         <p class="mb-0">Pour ajouter une nouvelle recommandation à effectuer à votre interlocuteurs, vous pouvez leur pousser une ressource existante dans notre base de connaissances, ou leur proposer une recommandation libre.</p>
     </div>
 
-
     <div x-data="action_pusher_app()" x-init="create_recommendation()" x-cloak>
         <form class="form" method="POST" action="." enctype="multipart/form-data">
             {% csrf_token %}
@@ -48,7 +47,8 @@
             {% include 'projects/project/fragments/action_pusher/resource_search.html' %}
 
             {% include 'projects/project/fragments/action_pusher/details_form.html' %}
-
+            
+            <input type="hidden" name="next" value="{{type_form.next.value}}">
             <input type="hidden" name="public" x-model="public">
         </form>
     </div>
