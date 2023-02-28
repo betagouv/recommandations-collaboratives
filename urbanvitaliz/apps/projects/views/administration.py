@@ -18,13 +18,19 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
-from urbanvitaliz.apps.invites.api import (invite_collaborator_on_project,
-                                           invite_resend, invite_revoke)
+from urbanvitaliz.apps.invites.api import (
+    invite_collaborator_on_project,
+    invite_resend,
+    invite_revoke,
+)
 from urbanvitaliz.apps.invites.forms import InviteForm
 
 from .. import forms, models
-from ..utils import (can_administrate_project, can_manage_project,
-                     is_regional_actor_for_project)
+from ..utils import (
+    can_administrate_project,
+    can_manage_project,
+    is_regional_actor_for_project,
+)
 
 ########################################################################
 # Access
@@ -131,9 +137,7 @@ def access_revoke_invite(request, project_id, invite_id):
     """Revoke an invitation for a collectivity member"""
     get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    invite = get_object_or_404(
-        invites_models.Invite, role="COLLABORATOR", pk=invite_id, accepted_on=None
-    )
+    invite = get_object_or_404(invites_models.Invite, pk=invite_id, accepted_on=None)
 
     if invite_revoke(invite):
         messages.success(

@@ -189,10 +189,7 @@ def update_task(request, task_id=None):
                     user=request.user,
                 )
 
-            return redirect(
-                reverse("projects-project-detail-actions", args=[task.project_id])
-                + f"#action-{task.id}"
-            )
+            return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
     else:
         form = UpdateTaskForm(instance=task)
     return render(request, "projects/project/task_update.html", locals())
@@ -549,7 +546,7 @@ def create_action(request, project_id=None):
                 )
 
             next_url = reverse("projects-project-detail-actions", args=[project.id])
-            return redirect(next_url + f"#action-{action.id}")
+            return redirect(next_url)
     else:
         form = PushTypeActionForm()
 

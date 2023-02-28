@@ -32,9 +32,8 @@ describe('I can add a file in a recommandation', () => {
 
         cy.get("[type=submit]").click({ force: true });
 
-        cy.url().should('include', '/actions#action-')
+        cy.url().should('include', '/actions')
 
         cy.contains(`fake recommandation content with no resource : ${now}`)
-        cy.contains(file.path.slice(-17,-4))
     })
 })

@@ -1,12 +1,12 @@
 {% load static %}
 {% load gravatar %}
-<div :id="p.project.id""
+<div :id="p.project.id"
     class="drag-targetable py-1 my-1"
     @dragover="onDragOver(event)"
     @drop="onDrop(event, board.code)"
     @dragenter="onDragEnter(event)"
     @dragleave="onDragLeave(event)">
-    <div class="bg-white border rounded border-1 px-3 py-3 position-relative"
+    <div class="bg-white border rounded border-1 px-3 py-3 position-relative draggable"
          :style="`border-color:${getProjectRoleColor(p.project)} !important`"
          draggable="true"
          @dragstart="onDragStart(event, p.id)"
