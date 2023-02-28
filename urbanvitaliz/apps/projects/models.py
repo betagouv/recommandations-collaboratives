@@ -116,7 +116,7 @@ class ProjectManager(models.Manager):
 
     def for_user(self, user):
         """Return a list of projects visible to the user"""
-        # Staff can see anything
+
         site = Site.objects.get_current()
 
         if has_perm(user, "sites.list_projects", site):

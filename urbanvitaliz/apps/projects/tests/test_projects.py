@@ -14,6 +14,7 @@ import uuid
 
 import pytest
 from django.contrib.auth import models as auth
+from django.contrib.sites import models as sites
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from guardian.shortcuts import get_user_perms
@@ -28,7 +29,7 @@ from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.utils import login
+from urbanvitaliz.utils import login, get_group_for_site
 
 from .. import models, signals, utils
 
@@ -1693,6 +1694,34 @@ def test_switchtender_stop_advising_or_observing_project_shows_no_interest(
     personal_status = models.UserProjectStatus.objects.get(project=project, user=user)
 
     assert personal_status.status == "NOT_INTERESTED"
+
+
+########################################################################
+# model level tests
+########################################################################
+
+
+@pytest.mark.django_db
+def test_project_list_excludes_non_site_projects_for_user():
+
+    current_site = sites.Site.objects.get_current()
+    other_site = Recipe(sites.Site, domain="other.site").make()
+
+    project = Recipe(
+        models.Project, commune__name="one", status="READY", sites=[current_site]
+    ).make()
+    Recipe(
+        models.Project, commune__name="dos", status="READY", sites=[other_site]
+    ).make()
+    Recipe(models.Project, commune__name="tres", status="READY", sites=[]).make()
+
+    user = Recipe(auth.User).make()
+    group = get_group_for_site("advisor", site=current_site)
+    group.user_set.add(user)
+
+    result = list(models.Project.on_site.for_user(user))
+
+    assert result == [project]
 
 
 # eof
