@@ -616,7 +616,7 @@ def test_project_conversations_not_available_for_restricted_switchtender(
 
 # internal
 @pytest.mark.django_db
-def test_project_internal_followup_not_available_for_non_switchtender(request, client):
+def test_project_internal_followup_not_available_for_common_user(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-internal-followup", args=[project.id])
     with login(client):
@@ -627,14 +627,10 @@ def test_project_internal_followup_not_available_for_non_switchtender(request, c
 @pytest.mark.django_db
 def test_project_internal_followup_not_available_for_owner(request, client):
     # project email is same as test user to be logged in
-    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        projectmember_set=[membership],
-    ).make()
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
-    with login(client, user=membership.member):
+    with login(client) as user:
+        utils.assign_collaborator(user, project, is_owner=True)
         url = reverse("projects-project-detail-internal-followup", args=[project.id])
         response = client.get(url)
 
@@ -642,12 +638,14 @@ def test_project_internal_followup_not_available_for_owner(request, client):
 
 
 @pytest.mark.django_db
-def test_project_internal_followup_available_for_assigned_switchtender(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+def test_project_internal_followup_available_for_assigned_advisor(request, client):
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-detail-internal-followup", args=[project.id])
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, current_site)
         response = client.get(url)
-    assert response.status_code == 403
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
