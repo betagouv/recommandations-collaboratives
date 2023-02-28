@@ -26,12 +26,14 @@ from . import models
 
 @transaction.atomic
 def assign_collaborator(user, project, is_owner=False):
-    """Make someone becomes a project collaborator"""
-    for perm in models.COLLABORATOR_PERMISSIONS:
-        assign_perm(perm, user, project)
+    """Make someone becomes a project collaborator and assign permissions"""
 
+    permissions = models.COLLABORATOR_DRAFT_PERMISSIONS
     if project.status != "DRAFT":
-        assign_perm("projects.can_invite", user, project)
+        permissions += models.COLLABORATOR_PERMISSIONS
+
+    for perm in permissions:
+        assign_perm(perm, user, project)
 
     models.ProjectMember.objects.get_or_create(
         project=project, member=user, is_owner=is_owner

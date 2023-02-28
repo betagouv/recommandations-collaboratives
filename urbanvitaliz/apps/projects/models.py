@@ -44,11 +44,16 @@ from guardian.shortcuts import get_objects_for_user
 from .utils import generate_ro_key
 from . import apps
 
-COLLABORATOR_PERMISSIONS = (
+COLLABORATOR_DRAFT_PERMISSIONS = (
     "projects.use_public_notes",
     "projects.view_project",
     "projects.view_tasks",
     "projects.use_tasks",
+)
+
+COLLABORATOR_PERMISSIONS = (
+    "projects.manage_documents",
+    "projects.can_invite",
 )
 
 ADVISOR_PERMISSIONS = [
@@ -60,6 +65,7 @@ ADVISOR_PERMISSIONS = [
     "projects.use_tasks",
     "projects.can_invite",
     "projects.change_synopsis",
+    "projects.manage_documents",
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
@@ -314,6 +320,8 @@ class Project(models.Model):
             ("view_draft_tasks", "Can view and list draft tasks"),  # XXX Still useful?
             ("use_tasks", "Can use tasks"),
             ("manage_tasks", "Can manage tasks"),
+            # Documents
+            ("manage_documents", "Can manage the documents"),
             # Invitation/sharing/members
             ("can_invite", "Can invite collaborators"),
             ("manage_members", "Can manage collaborators"),
