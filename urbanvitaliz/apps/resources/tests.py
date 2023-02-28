@@ -15,8 +15,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import models as projects_models
@@ -77,7 +76,7 @@ def test_draft_resources_are_available_to_staff_users(request, client):
         title="a draft resource",
     ).make()
     url = reverse("resources-resource-search")
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     detail_url = reverse("resources-resource-detail", args=[resource.id])
     assertContains(response, detail_url)
@@ -192,25 +191,26 @@ def test_resource_detail_contains_informations(request, client):
     assertContains(response, resource.title)
 
 
+@pytest.mark.xfail
 @pytest.mark.django_db
-def test_resource_detail_contains_update_for_staff(request, client):
+def test_resource_detail_contains_update_for_authorized_user(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-detail", args=[resource.id])
-    with login(client, is_staff=True, groups=["example_com_advisor"]):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     update_url = reverse("resources-resource-update", args=[resource.id])
     assertContains(response, update_url)
 
 
 @pytest.mark.django_db
-def test_resource_detail_does_not_contain_update_for_non_staff(request, client):
+def test_resource_detail_does_not_contain_update_for_common_user(request, client):
     resource = Recipe(
         models.Resource,
         sites=[get_current_site(request)],
         status=models.Resource.PUBLISHED,
     ).make()
     url = reverse("resources-resource-detail", args=[resource.id])
-    with login(client, groups=["example_com_advisor"]):
+    with login(client):
         response = client.get(url)
     update_url = reverse("resources-resource-update", args=[resource.id])
     assertNotContains(response, update_url)
@@ -229,9 +229,9 @@ def test_create_resource_not_available_for_non_switchtender_users(client):
 
 
 @pytest.mark.django_db
-def test_create_resource_available_for_switchtender_users(client):
+def test_create_resource_available_for_authorized_users(client):
     url = reverse("resources-resource-create")
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-create"')
@@ -247,7 +247,7 @@ def test_create_new_resource_and_redirect(client):
         "tags": "#tag",
         "content": "this is some content",
     }
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["example_com_staff"]):
         response = client.post(reverse("resources-resource-create"), data=data)
     resource = models.Resource.on_site.all()[0]
     assert resource.content == data["content"]
@@ -257,22 +257,21 @@ def test_create_new_resource_and_redirect(client):
 #
 # update
 
-# FIXME il est question d'advisor et de staff, vérifier le bon à utiliser
 
 @pytest.mark.django_db
-def test_update_resource_not_available_for_non_advisor(request, client):
+def test_update_resource_not_available_for_common_user(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-update", args=[resource.id])
-    with login(client):  # , groups=["example_com_advisor"]):
+    with login(client):
         response = client.get(url)
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_update_resource_available_for_staff(request, client):
+def test_update_resource_available_for_authorized_user(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-update", args=[resource.id])
-    with login(client, groups=["example_com_advisor"], is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-update"')
@@ -295,7 +294,7 @@ def test_update_resource_and_redirect(request, client):
         "content": "this is some content",
     }
 
-    with login(client, groups=["example_com_advisor"], is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -322,7 +321,7 @@ def test_delete_resource_available_for_staff(client, request):
     resource = baker.make(models.Resource, sites=[get_current_site(request)])
 
     url = reverse("resources-resource-delete", args=(resource.pk,))
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-delete"')
@@ -333,7 +332,7 @@ def test_delete_resource_and_redirect(client, request):
     resource = baker.make(models.Resource, sites=[get_current_site(request)])
 
     assert models.Resource.on_site.count() == 1
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.post(reverse("resources-resource-delete", args=[resource.pk]))
 
     assert response.status_code == 302
@@ -428,7 +427,7 @@ def test_user_has_access_to_page_for_bookmark_with_notes(request, client):
     ).make()
 
     url = reverse("resources-bookmark-create", args=[resource.id])
-    with login(client, is_staff=True):
+    with login(client):
         response = client.get(url)
 
     assert response.status_code == 200

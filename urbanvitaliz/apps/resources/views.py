@@ -27,7 +27,11 @@ from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
+from urbanvitaliz.utils import (
+    check_if_advisor,
+    has_perm,
+    has_perm_or_403,
+)
 
 from . import models
 from .serializers import ResourceSerializer
@@ -52,15 +56,15 @@ def resource_search(request):
     categories = form.selected_categories
 
     resources = models.Resource.search(query, categories)
-    if not request.user.is_staff:
-        # FIXME le test me semble pas en phase avec le commentaire
-        # If we are staff, show also PRIVATE resources
-        resources = resources.filter(status__gte=models.Resource.TO_REVIEW)
 
-    # If we are a switchtender, allow any departement to be filtered
+    # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items
+    if not has_perm(request.user, "manage_resources", request.site):
+        resources = resources.filter(status__gt=models.Resource.TO_REVIEW)
+
+    # If we are a advisor, allow any departement to be filtered
     # Otherwise, show only departments related to my projects
     departments = geomatics_models.Department.objects.none()
-    if check_if_switchtender(request.user):
+    if check_if_advisor(request.user):
         departments = geomatics_models.Department.objects.order_by("name").all()
         if limit_area:
             selected_departments = geomatics_models.Department.objects.none()
@@ -177,7 +181,7 @@ class BaseResourceDetailView(DetailView):
         # relevant contacts (=localized)
         context["contacts"] = resource.contacts
         if (
-            not check_if_switchtender(self.request.user)
+            not check_if_advisor(self.request.user)
             and not self.request.user.is_anonymous
         ):
             user_projects = projects.Project.on_site.filter(members=self.request.user)
@@ -205,7 +209,7 @@ class ResourceDetailView(BaseResourceDetailView):
         context = super().get_context_data(**kwargs)
         resource = self.object
 
-        if check_if_switchtender(self.request.user):
+        if check_if_advisor(self.request.user):
             context["projects_used_by"] = (
                 projects.Project.on_site.filter(
                     Q(tasks__resource_id=resource.pk)
@@ -248,7 +252,7 @@ class ResourceDeleteView(UserPassesTestMixin, DeleteView):
         return HttpResponseRedirect(success_url)
 
     def test_func(self):
-        return self.request.user.is_staff
+        return has_perm(self.request.user, "sites.manage_resources", self.request.site)
 
 
 ########################################################################
@@ -259,7 +263,8 @@ class ResourceDeleteView(UserPassesTestMixin, DeleteView):
 @login_required
 def resource_update(request, resource_id=None):
     """Update informations for resource"""
-    is_staff_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_resources", request.site)
+
     resource = get_object_or_404(models.Resource, pk=resource_id)
     next_url = reverse("resources-resource-detail", args=[resource.id])
     if request.method == "POST":
@@ -275,7 +280,8 @@ def resource_update(request, resource_id=None):
 @login_required
 def resource_create(request):
     """Create new resource"""
-    is_switchtender_or_403(request.user)
+    has_perm_or_403(request.user, "sites.manage_resources", request.site)
+
     if request.method == "POST":
         form = EditResourceForm(request.POST)
         if form.is_valid():
