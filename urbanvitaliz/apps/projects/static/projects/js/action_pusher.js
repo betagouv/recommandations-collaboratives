@@ -1,5 +1,5 @@
 function action_pusher_app() {
-		return {
+    return {
         isBusy: true,
         search: '',
 
@@ -20,8 +20,9 @@ function action_pusher_app() {
         selected_resources: [],
         public: true,
         draft: false,
+        next: null,
 
-        searchResources(text=null) {
+        searchResources(text = null) {
             if (!text) {
                 text = this.search;
             }
@@ -34,11 +35,11 @@ function action_pusher_app() {
 
         resultsAndSelected() {
             if (this.push_type == 'multiple') {
-                for(var resource of this.selected_resources) {
-                    var f = _.find(this.resources, function(r) { return resource == r.id; });
+                for (var resource of this.selected_resources) {
+                    var f = _.find(this.resources, function (r) { return resource == r.id; });
 
                     /* Add it to the list of results */
-                    if (! _.find(this.results, function(r) { return resource == r.id; } )) {
+                    if (!_.find(this.results, function (r) { return resource == r.id; })) {
                         this.results.push(f);
                     }
                 }
@@ -47,7 +48,7 @@ function action_pusher_app() {
             return this.results;
         },
 
-        truncate(input, size=30) {
+        truncate(input, size = 30) {
             return input.length > size ? `${input.substring(0, size)}...` : input;
         },
 
@@ -74,7 +75,7 @@ function action_pusher_app() {
             await this.getResources();
 
             if (resource_id) {
-                this.results = _.where(this.resources, {'id': resource_id });
+                this.results = _.where(this.resources, { 'id': resource_id });
 
                 if (this.results.length) {
                     this.selected_resource = resource_id;
@@ -82,7 +83,6 @@ function action_pusher_app() {
                     this.setIntent(this.results[0]);
                 }
             }
-
         },
 
         async create_recommendation() {
@@ -93,7 +93,7 @@ function action_pusher_app() {
             const selected_resource = parseInt(params.get('resource'));
 
             if (selected_resource) {
-                this.results = _.where(this.resources, {'id': selected_resource });
+                this.results = _.where(this.resources, { 'id': selected_resource });
                 if (this.results.length) {
                     this.selected_resource = selected_resource;
                     this.selected_resources = [selected_resource];
@@ -102,7 +102,7 @@ function action_pusher_app() {
             }
         },
 
-		    async getResources() {
+        async getResources() {
             var tasksFromApi = [];
 
             this.isBusy = true;
@@ -112,24 +112,24 @@ function action_pusher_app() {
 
             resourcesFromApi.forEach(t => {
                 let entry = {
-								    id: t.id,
-								    title: t.title,
+                    id: t.id,
+                    title: t.title,
                     subtitle: t.subtitle,
                     tags: t.tags,
                     url: t.web_url,
                     url_embeded: t.embeded_url
-							  };
+                };
 
                 this.resources.push(entry);
                 this.db.add(entry);
-						});
-
+            });
+            
             this.isBusy = false;
-				},
+        },
 
         set_draft(draft) {
             this.draft = draft;
-            this.public = ! this.draft;
+            this.public = !this.draft;
         }
-		}
+    }
 };
