@@ -115,7 +115,7 @@
 							Éditer
 						</a>
 						<ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-							<li><a class="dropdown-item" :href="editTaskUrl(t.id)">Modifier</a></li>
+							<li><a :id=`task-${t.id}-update-button` class="dropdown-item" :href="editTaskUrl(t.id)">Modifier</a></li>
 							<template x-if="t.content !== '' && !t.public">
 								<li><a class="dropdown-item" style="cursor: pointer;" @click="onSetTaskPublic(t.id, true)">Publier</a>
 								</li>

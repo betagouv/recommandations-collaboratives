@@ -45,6 +45,7 @@
 
                 {% include 'projects/project/fragments/action_pusher/details_form.html' with disable_draft=task.public %}
 
+                <input type="hidden" name="next" value="{{form.next.value}}">
                 <input type="hidden" name="public" x-model="public">
 
                 {{ form.media }}
