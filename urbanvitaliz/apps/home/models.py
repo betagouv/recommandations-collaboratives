@@ -33,6 +33,7 @@ SITE_GROUP_PERMISSIONS = {
         "sites.moderate_projects",
         "sites.list_projects",
         "sites.delete_projects",
+        "sites.manage_resources",
     ),
     "admin": ("sites.manage_surveys",),
     "advisor": ("sites.list_projects",),

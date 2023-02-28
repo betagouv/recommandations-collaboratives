@@ -24,7 +24,7 @@ from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.apps.resources.models import Resource
-from urbanvitaliz.utils import check_if_switchtender, get_site_administrators
+from urbanvitaliz.utils import check_if_advisor, get_site_administrators
 from watson import search as watson
 
 from . import forms, models
@@ -34,7 +34,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     template_name = "crm/site_dashboard.html"
 
     def test_func(self):
-        return check_if_switchtender(self.request.user)
+        return check_if_advisor(self.request.user)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

@@ -30,7 +30,7 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.utils import CastedGenericRelation, check_if_switchtender
+from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 
@@ -105,7 +105,7 @@ class ProjectManager(models.Manager):
             return result
 
         # Regional actors can see projects of their area
-        if check_if_switchtender(user):
+        if check_if_advisor(user):
             actor_departments = user.profile.departments.all()
             results = self.in_departments(actor_departments)
         # Regular user, only return its own projects

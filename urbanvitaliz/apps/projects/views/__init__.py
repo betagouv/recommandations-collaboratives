@@ -34,7 +34,7 @@ from urbanvitaliz.apps.onboarding import models as onboarding_models
 
 from urbanvitaliz.utils import (
     build_absolute_url,
-    check_if_switchtender,
+    check_if_advisor,
     get_site_config_or_503,
     is_switchtender_or_403,
     has_perm_or_403,
@@ -223,7 +223,7 @@ def select_commune(request, project_id=None):
 @login_required
 def project_list(request):
     if not (
-        check_if_switchtender(request.user)
+        check_if_advisor(request.user)
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
@@ -239,7 +239,7 @@ def project_list(request):
 def project_list_for_advisor(request):
     """Return the projects for the advisor"""
     if not (
-        check_if_switchtender(request.user)
+        check_if_advisor(request.user)
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
@@ -268,7 +268,7 @@ def project_list_for_advisor(request):
 def project_list_for_staff(request):
     """Return the projects for the staff"""
     if not (
-        check_if_switchtender(request.user)
+        check_if_advisor(request.user)
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
@@ -297,7 +297,7 @@ def project_list_for_staff(request):
 def project_maplist(request):
     """Return the projects for the switchtender as a map"""
     if not (
-        check_if_switchtender(request.user)
+        check_if_advisor(request.user)
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")

@@ -18,7 +18,7 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import (
-    check_if_switchtender,
+    check_if_advisor,
     has_perm_or_403,
     is_staff_for_site_or_403,
 )
@@ -52,7 +52,7 @@ def visit_task(request, task_id):
 
     has_perm_or_403(request.user, "projects.view_tasks", task.project)
 
-    is_switchtender = check_if_switchtender(request.user)
+    is_switchtender = check_if_advisor(request.user)
 
     if not task.visited and not is_switchtender:
         task.visited = True

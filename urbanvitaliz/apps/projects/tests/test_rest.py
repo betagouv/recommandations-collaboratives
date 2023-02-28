@@ -39,13 +39,12 @@ def test_logged_in_user_can_use_project_api(client):
 
 
 @pytest.mark.django_db
-def test_project_list_includes_project_for_switchtender(request, client):
-    project = baker.make(models.Project, sites=[get_current_site(request)])
+def test_project_list_includes_project_for_advisor(request, client):
+    current_site = get_current_site(request)
+    project = baker.make(models.Project, sites=[current_site])
     url = reverse("projects-list")
+
     with login(client, groups=["example_com_advisor"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
         response = client.get(url)
 
     assertContains(response, project.name)

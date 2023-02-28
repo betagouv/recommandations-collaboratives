@@ -56,7 +56,8 @@ def test_non_switchtender_cannot_administrate_project(client):
 
 @pytest.mark.django_db
 def test_get_regional_actors_for_project(client, request):
-    group = auth.Group.objects.get(name="example_com_advisor")
+    group_current_site = auth.Group.objects.get(name="example_com_advisor")
+    group_other_site, _ = auth.Group.objects.get_or_create(name="another_com_advisor")
 
     dept62 = baker.make(geomatics.Department, code="62")
     dept80 = baker.make(geomatics.Department, code="80")
@@ -64,19 +65,16 @@ def test_get_regional_actors_for_project(client, request):
 
     site = get_current_site(request)
 
-    switchtenderA = baker.make(auth.User, groups=[group])
+    switchtenderA = baker.make(auth.User, groups=[group_current_site])
     switchtenderA.profile.departments.set([dept62, dept80])
-    switchtenderA.profile.sites.set([site])
 
-    switchtenderB = baker.make(auth.User, groups=[group])
+    switchtenderB = baker.make(auth.User, groups=[group_current_site])
     switchtenderB.profile.departments.set([dept59, dept80])
-    switchtenderB.profile.sites.set([site])
 
-    switchtenderC = baker.make(auth.User, groups=[group])
+    switchtenderC = baker.make(auth.User, groups=[group_current_site])
     switchtenderC.profile.departments.set([])
-    switchtenderC.profile.sites.set([site])
 
-    switchtenderD = baker.make(auth.User, groups=[group])
+    switchtenderD = baker.make(auth.User, groups=[group_other_site])
     switchtenderD.profile.departments.set([dept59, dept62])
 
     project = baker.make(models.Project, status="READY", commune__department=dept62)

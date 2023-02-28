@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (check_if_switchtender, get_site_config_or_503,
+from urbanvitaliz.utils import (check_if_advisor, get_site_config_or_503,
                                 has_perm_or_403)
 
 from .. import models
@@ -51,7 +51,7 @@ def project_overview(request, project_id=None):
         current_site, project, request.user, allow_national=True
     )
     can_administrate = can_administrate_project(project, request.user)
-    is_switchtender = check_if_switchtender(request.user)
+    is_switchtender = check_if_advisor(request.user)
     switchtending = get_switchtender_for_project(request.user, project)
 
     try:
@@ -127,7 +127,7 @@ def project_knowledge(request, project_id=None):
     # check user can administrate project (member or switchtender)
     if request.user != project.members.filter(projectmember__is_owner=True).first():
         # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_switchtender(request.user):
+        if not check_if_advisor(request.user):
             can_manage_or_403(project, request.user)
 
     # Set this project as active
@@ -160,7 +160,7 @@ def project_actions(request, project_id=None):
     # check user can administrate project (member or switchtender)
     if request.user != project.members.filter(projectmember__is_owner=True).first():
         # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_switchtender(request.user):
+        if not check_if_advisor(request.user):
             can_manage_or_403(project, request.user)
 
     # Set this project as active
@@ -198,7 +198,7 @@ def project_actions_inline(request, project_id=None):
     # check user can administrate project (member or switchtender)
     if request.user != project.members.filter(projectmember__is_owner=True).first():
         # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_switchtender(request.user):
+        if not check_if_advisor(request.user):
             can_manage_or_403(project, request.user)
 
     # Set this project as active

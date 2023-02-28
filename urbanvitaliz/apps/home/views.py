@@ -24,7 +24,7 @@ from urbanvitaliz.apps.projects.utils import (
     can_administrate_project,
     get_active_project,
 )
-from urbanvitaliz.utils import check_if_switchtender
+from urbanvitaliz.utils import check_if_advisor
 
 from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 
@@ -36,7 +36,7 @@ class HomePageView(TemplateView):
 @method_decorator([login_required], name="dispatch")
 class LoginRedirectView(View):
     def dispatch(self, request, *args, **kwargs):
-        if check_if_switchtender(request.user) or can_administrate_project(
+        if check_if_advisor(request.user) or can_administrate_project(
             project=None, user=request.user
         ):
             return redirect("projects-project-list")

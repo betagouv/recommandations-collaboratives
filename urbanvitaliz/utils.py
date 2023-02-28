@@ -68,12 +68,12 @@ def is_staff_for_site_or_403(user, site=None):
 
 def is_switchtender_or_403(user, site=None):
     """Raise a 403 error is user is not a switchtender"""
-    if not user or not check_if_switchtender(user, site):
+    if not user or not check_if_advisor(user, site):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
-def check_if_switchtender(user, site=None):
-    """Return true if user is a global switchtender"""
+def check_if_advisor(user, site=None):
+    """Return true if user is advisor for site. Defaults to current site."""
     site = site or Site.objects.get_current()
     group_name = make_group_name_for_site("advisor", site)
     return auth.User.objects.filter(pk=user.id, groups__name=group_name).exists()
