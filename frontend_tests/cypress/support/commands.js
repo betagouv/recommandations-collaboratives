@@ -1,7 +1,5 @@
 import users from '../fixtures/users/users.json'
 
-console.log('users : ', users[4].fields.username);
-
 Cypress.Commands.add("login", (role) => {
 
     let username = ""

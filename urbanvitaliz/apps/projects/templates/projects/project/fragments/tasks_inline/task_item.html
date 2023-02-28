@@ -28,7 +28,7 @@
                     </svg>
                 </a>
             </template>
-            <a class="rounded-circle bg-white border tiny d-flex align-items-center justify-content-center px-2 py-2" :href="editTaskUrl(task.id)">
+            <a id="update-task-action-inline" class="rounded-circle bg-white border tiny d-flex align-items-center justify-content-center px-2 py-2" :href="editTaskUrl(task.id, '{{request.path}}')">
                 <svg class="bi" width="13" height="13" fill="#CCCCCC">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
                 </svg>

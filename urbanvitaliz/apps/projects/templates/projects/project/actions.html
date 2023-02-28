@@ -85,13 +85,15 @@
                                     <span x-show="column(board.status).length > 0" class="me-2 badge rounded-pill text-bg-secondary" x-text="column(board.status).length">Primary</span>
                                     <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
                                 </div>
+                                {% if user.is_staff or active_project_can_administrate %}
                                 <template x-if="board.status == 0">
-                                    <a href="{% url 'projects-project-detail-actions-inline' project.pk %}" class="btn btn-outline-primary btn-sm">
+                                    <a id="tasks-inline-button" href="{% url 'projects-project-detail-actions-inline' project.pk %}" class="btn btn-outline-primary btn-sm">
                                         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#search" />
                                         </svg>
                                     </a>
                                 </template>
+                                {% endif %}
                             </div>
 
                             <div class="px-3 py-1 pb-1 bg-light shadow-sm overflow-auto" style="max-height: 70vh;">

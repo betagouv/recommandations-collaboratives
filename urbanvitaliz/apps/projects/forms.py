@@ -109,7 +109,7 @@ class PushTypeActionForm(forms.Form):
     )
 
     push_type = forms.ChoiceField(choices=PUSH_TYPES)
-
+    next = forms.CharField(required=False)
 
 class CreateActionWithoutResourceForm(forms.ModelForm):
     """Create an action for a project, without attached resource"""
@@ -191,9 +191,11 @@ class UpdateTaskForm(forms.ModelForm):
     """Form for task update"""
 
     content = MarkdownxFormField(required=False)
+    next = forms.CharField(required=False)
 
     class Meta:
         model = models.Task
+
         fields = [
             "intent",
             "content",
