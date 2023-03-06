@@ -1,47 +1,46 @@
 {% extends "projects/project/detail.html" %}
-
 {% load humanize %}
 {% load static %}
 {% load gravatar %}
-
-{% block title %}
-{{ block.super }} > Fichiers et liens
-{% endblock %}
-
+{% load guardian_tags %}
+{% block title %}{{ block.super }} > Fichiers et liens{% endblock %}
 {% load django_vite %}
-
 {% block js %}
     {% vite_asset 'js/apps/documents.js' %}
 {% endblock %}
-
 {% block project_detail %}
-
-{% include 'projects/project/navigation.html' with files_links=True %}
-<div class="row">
-    <div class="col-8">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="text-uppercase small">{% if all_files.count > 0 %} {{all_files.count}} {% endif %} fichier{{ all_files.count|pluralize }} partagé{{ all_files.count|pluralize }}</h6>
-            {% url 'projects-documents-upload-document' project.pk as upload_action %}
-            {% include 'projects/project/fragments/files_links/file_upload_button.html' with type='project' action=upload_action small=True %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% get_obj_perms request.user for project as "user_project_perms" %}
+    {% include 'projects/project/navigation.html' with files_links=True %}
+    <div class="row">
+        <div class="col-8">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="text-uppercase small">
+                    {% if all_files.count > 0 %}{{ all_files.count }}{% endif %}
+                    fichier{{ all_files.count|pluralize }} partagé{{ all_files.count|pluralize }}
+                </h6>
+                {% if "manage_documents" in user_project_perms %}
+                    {% url 'projects-documents-upload-document' project.pk as upload_action %}
+                    {% include 'projects/project/fragments/files_links/file_upload_button.html' with type='project' action=upload_action small=True %}
+                {% endif %}
+            </div>
+            {% include 'projects/project/fragments/files_links/file_list.html' with files=all_files %}
         </div>
-        
-        {% include 'projects/project/fragments/files_links/file_list.html' with files=all_files %}
+        <div class="col-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="text-uppercase small">Liens épinglés</h6>
+                {% if "manage_documents" in user_project_perms %}
+                    {% url 'projects-documents-upload-document' project.pk as upload_action %}
+                    {% include 'projects/project/fragments/files_links/link_upload_button.html' with type='project' action=upload_action %}
+                {% endif %}
+            </div>
+            <!-- Liens épinglés -->
+            {% include 'projects/project/fragments/files_links/link_list.html' with is_pinned=True %}
+            <!-- Fichiers épinglés -->
+            <div class="d-flex align-items-center justify-content-between mb-2 mt-4 pt-2">
+                <h6 class="text-uppercase small">Fichiers épinglés</h6>
+            </div>
+            {% include 'projects/project/fragments/files_links/file_list.html' with search=False files=pinned_files is_pinned=True %}
+        </div>
     </div>
-    <div class="col-4">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="text-uppercase small">Liens épinglés</h6>
-            {% url 'projects-documents-upload-document' project.pk as upload_action %}
-            {% include 'projects/project/fragments/files_links/link_upload_button.html' with type='project' action=upload_action %}    
-        </div>
-        
-        <!-- Liens épinglés -->
-        {% include 'projects/project/fragments/files_links/link_list.html' with is_pinned=True %}
-
-        <!-- Fichiers épinglés -->
-        <div class="d-flex align-items-center justify-content-between mb-2 mt-4 pt-2">
-            <h6 class="text-uppercase small">Fichiers épinglés</h6>
-        </div>
-        {% include 'projects/project/fragments/files_links/file_list.html' with search=False files=pinned_files is_pinned=True %}
-    </div>
-</div>
 {% endblock %}
