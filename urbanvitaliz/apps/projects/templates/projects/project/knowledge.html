@@ -1,27 +1,20 @@
 {% extends "projects/project/detail.html" %}
-
 {% load humanize %}
 {% load static %}
 {% load training %}
-
-
-{% block title %}
-{{ block.super }} > Connaissance
-{% endblock %}
-
+{% load guardian_tags %}
+{% block title %}{{ block.super }} > Connaissance{% endblock %}
 {% block banner %}
     {% include 'projects/project/fragments/positioning_banner.html' %}
 {% endblock %}
-
 {% block project_detail %}
-
-{% challenge_for request.user "project-knowledge-reader" as challenge %}
-
-{% if challenge and not challenge.acquired %}
-{% challenge_acquire challenge %}
-{% endif %}
-
-<style type="text/css">
+    {% challenge_for request.user "project-knowledge-reader" as challenge %}
+    {% if challenge and not challenge.acquired %}
+        {% challenge_acquire challenge %}
+    {% endif %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% get_obj_perms request.user for project as "user_project_perms" %}
+    <style type="text/css">
 	@media print
     {
         main {
@@ -53,37 +46,34 @@
             display: none !important;
         }
 	}
-</style>
-
-
-<div class="col-12">
-
-{% include 'projects/project/navigation.html' with state_of_play=True %}
-
-<div class="row">
-
-    {% if not is_switchtender %}
-    {% if can_manage_draft and session and session.next_question and session.completion < 80 %} 
-    <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
-        <h4 class="pt-2">
-            {% if session.completion == 0 %}
-                Prochaine étape : Remplissez le parcours d’état des lieux
+    </style>
+    <div class="col-12">
+        {% include 'projects/project/navigation.html' with state_of_play=True %}
+        <div class="row">
+            <!-- TODO PERMISSIONS -->
+            {% if not is_switchtender %}
+                {% if can_manage_draft and session and session.next_question and session.completion < 80 %}
+                    <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
+                        <h4 class="pt-2">
+                            {% if session.completion == 0 %}
+                                Prochaine étape : Remplissez le parcours d’état des lieux
+                            {% else %}
+                                Continuez le parcours d’état des lieux
+                            {% endif %}
+                        </h4>
+                        <p class="m-0 text-info-custom fw-normal pb-3">
+                            Pour faire le point sur votre avancement et recevoir des conseils pertinents.
+                        </p>
+                        <a class="button filled pb-2"
+                           href="{% url 'survey-session-start' session.id %}">Compléter l'état des lieux</a>
+                    </div>
+                {% else %}
+                    <div class="col"></div>
+                {% endif %}
             {% else %}
-                Continuez le parcours d’état des lieux
+                <div class="col"></div>
             {% endif %}
-        </h4>
-        <p class="m-0 text-info-custom fw-normal pb-3">Pour faire le point sur votre avancement et recevoir des conseils pertinents.</p>
-        <a class="button filled pb-2" href="{% url 'survey-session-start' session.id %}">Compléter l'état des lieux</a>
+        </div>
+        {% include 'projects/project/fragments/survey_grid.html' %}
     </div>
-{% else %}
-<div class="col"></div>
-{% endif %}
-{% else %}
-<div class="col"></div>
-{% endif %}
-
-</div>
-{% include 'projects/project/fragments/survey_grid.html' %}
-
-</div>
 {% endblock %}

@@ -2,10 +2,14 @@
 {% load static %}
 {% load sass_tags %}
 {% load humanize %}
+{% load guardian_tags %}
 
 {% block css %}
 <link href="{% sass_src 'survey/css/survey.scss' %}" rel="stylesheet" type="text/css">
 {% endblock %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 
 {% question_set_completion session.pk question_set as completion %}
 
@@ -49,6 +53,7 @@
 
                         {% if show_question or not choices %}
                             <div>
+                                <!-- TODO PERMISSIOJNS : edit_survey -->
                                 {% if can_manage %}
                                 <a class="text-decoration-none stretched-link link-edit" href="{% url 'survey-question-details' session.id answer.question.id %}" >
                                     {% endif %}
@@ -56,6 +61,7 @@
                                     {% if can_manage %}
                                 </a>
                                 {% endif %}
+                                <!-- ENDIF -->
                         </div>
                         {% endif %}
 
@@ -113,6 +119,7 @@
                     </div>
                     {% endif %}
                         </div>
+                        <!-- TODO PERMISSIOJNS : view_survey -->
                         {% if can_manage %}
                         <div class="flex-shrink-1 next-arrow">
                             {% if can_administrate and answer.updated_recently %}
@@ -126,19 +133,23 @@
                             </svg>
                         </div>
                         {% endif %}
+                        <!-- ENDIF -->
                     </li>
+                    <!-- TODO PERMISSIOJNS : view_survey -->
                     {% if can_administrate and answer.updated_recently %}
                     <li class="small bg-light-yellow p-1">
                         <div display="">Mis à jour {{ answer.updated_on|naturalday }}{% if answer.updated_by %} par {{ answer.updated_by }}{% endif %}</div>
                     </li>
                     {% endif %}
+                    <!-- ENDIF -->
                     {% endfor %}
                 </ul>
             </p>
         </div>
-
-        {% if can_manage and completion < 100 %}
-        <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}" class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2" style="background-color: {{ question_set.color|default:'black' }} !important;">Compléter cette section</a>
-        {% endif %}
+        <!-- TODO PERMISSIOJNS : edit_survey -->
+            {% if can_manage and completion < 100 %}
+            <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}" class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2" style="background-color: {{ question_set.color|default:'black' }} !important;">Compléter cette section</a>
+            {% endif %}
+        <!-- ENDIF -->
     </div>
 </div>
