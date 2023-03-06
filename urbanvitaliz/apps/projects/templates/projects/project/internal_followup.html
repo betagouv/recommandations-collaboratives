@@ -5,6 +5,7 @@
 {% load survey %}
 {% load activity_tags %}
 {% load gravatar %}
+{% load guardian_tags %}
 
 {% load sass_tags %}
 
@@ -15,6 +16,9 @@
 
 {% block project_detail %}
 
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
+
 <div class="col-12 mx-auto">
     {% include 'projects/project/navigation.html' with internal_followup=True %}
     <div class="row">
@@ -22,7 +26,7 @@
         {% activity_stream "target" project %}
         {% regroup stream by timestamp.date as stream_by_day %}
 
-        {% if can_administrate %}
+        {% if "use_private_notes" in user_project_perms %}
         <form class="form d-flex align-items-end flex-column"
               method="POST"
               action="{% url 'projects-create-note' project.pk %}">
