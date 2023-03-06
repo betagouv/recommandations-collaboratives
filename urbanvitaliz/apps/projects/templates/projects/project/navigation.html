@@ -11,8 +11,7 @@
 {% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-{{ user_site_perms }}
-{{ user_project_perms }}
+
 <ul class="project-navigation d-flex align-items-center"
     style="font-family: 'Marianne', arial, sans-serif;
            padding: 0">
