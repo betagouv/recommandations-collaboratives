@@ -13,12 +13,18 @@ from urbanvitaliz.apps.reminders import api as reminders_api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 from urbanvitaliz.apps.training import utils as training_utils
+from urbanvitaliz.utils import is_staff_for_site
 
 from . import models
-from .utils import (create_reminder, get_collaborators_for_project,
-                    get_notification_recipients_for_project,
-                    get_project_moderators, get_regional_actors_for_project,
-                    get_switchtenders_for_project, remove_reminder)
+from .utils import (
+    create_reminder,
+    get_collaborators_for_project,
+    get_notification_recipients_for_project,
+    get_project_moderators,
+    get_regional_actors_for_project,
+    get_switchtenders_for_project,
+    remove_reminder,
+)
 
 #####
 # Projects
@@ -193,7 +199,7 @@ reminder_created = django.dispatch.Signal()
 
 @receiver(reminder_created)
 def log_reminder_created(sender, task, project, user, **kwargs):
-    if not user.is_staff:
+    if not is_staff_for_site(user):
         action.send(
             user,
             verb="a créé un rappel sur l'action",
@@ -257,13 +263,13 @@ def notify_action_created(sender, task, project, user, **kwargs):
 
 @receiver(action_visited)
 def log_action_visited(sender, task, project, user, **kwargs):
-    if not user.is_staff:
+    if not is_staff_for_site(user):
         action.send(user, verb="a visité l'action", action_object=task, target=project)
 
 
 @receiver(action_not_interested)
 def log_action_not_interested(sender, task, project, user, **kwargs):
-    if not user.is_staff:
+    if not is_staff_for_site(user):
         action.send(
             user,
             verb="n'est pas intéressé·e l'action",
@@ -274,7 +280,7 @@ def log_action_not_interested(sender, task, project, user, **kwargs):
 
 @receiver(action_blocked)
 def log_action_blocked(sender, task, project, user, **kwargs):
-    if not user.is_staff:
+    if not is_staff_for_site(user):
         action.send(
             user,
             verb="est bloqué sur l'action",
@@ -285,7 +291,7 @@ def log_action_blocked(sender, task, project, user, **kwargs):
 
 @receiver(action_already_done)
 def log_action_already_done(sender, task, project, user, **kwargs):
-    if not user.is_staff:
+    if not is_staff_for_site(user):
         action.send(
             user, verb="a déjà fait l'action", action_object=task, target=project
         )
@@ -293,13 +299,13 @@ def log_action_already_done(sender, task, project, user, **kwargs):
 
 @receiver(action_done)
 def log_action_done(sender, task, project, user, **kwargs):
-    if not user.is_staff:
+    if not is_staff_for_site(user):
         action.send(user, verb="a terminé l'action", action_object=task, target=project)
 
 
 @receiver(action_inprogress)
 def log_action_inprogress(sender, task, project, user, **kwargs):
-    if not user.is_staff:
+    if not is_staff_for_site(user):
         action.send(
             user,
             verb="travaille sur l'action",
@@ -310,7 +316,7 @@ def log_action_inprogress(sender, task, project, user, **kwargs):
 
 @receiver(action_undone)
 def log_action_undone(sender, task, project, user, **kwargs):
-    if not user.is_staff:
+    if not is_staff_for_site(user):
         action.send(
             user, verb="a redémarré l'action", action_object=task, target=project
         )

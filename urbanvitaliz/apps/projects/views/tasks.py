@@ -17,26 +17,42 @@ from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (check_if_switchtender, is_staff_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    check_if_advisor,
+    has_perm_or_403,
+    is_staff_for_site_or_403,
+)
 
 from .. import models, signals
-from ..forms import (CreateActionsFromResourcesForm,
-                     CreateActionWithoutResourceForm,
-                     CreateActionWithResourceForm, DocumentUploadForm,
-                     PushTypeActionForm, RemindTaskForm, RsvpTaskFollowupForm,
-                     TaskFollowupForm, TaskRecommendationForm,
-                     UpdateTaskFollowupForm, UpdateTaskForm)
-from ..utils import (can_manage_or_403, create_reminder, get_active_project_id,
-                     remove_reminder)
+from ..forms import (
+    CreateActionsFromResourcesForm,
+    CreateActionWithoutResourceForm,
+    PushTypeActionForm,
+    TaskFollowupForm,
+    TaskRecommendationForm,
+    UpdateTaskFollowupForm,
+    UpdateTaskForm,
+    CreateActionWithResourceForm,
+    DocumentUploadForm,
+    RemindTaskForm,
+    RsvpTaskFollowupForm,
+)
+
+from ..utils import (
+    create_reminder,
+    get_active_project_id,
+    remove_reminder,
+)
 
 
 @login_required
 def visit_task(request, task_id):
     """Visit the content of a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user, allow_draft=True)
-    is_switchtender = check_if_switchtender(request.user)
+
+    has_perm_or_403(request.user, "projects.view_tasks", task.project)
+
+    is_switchtender = check_if_advisor(request.user)
 
     if not task.visited and not is_switchtender:
         task.visited = True
@@ -56,7 +72,8 @@ def visit_task(request, task_id):
 def toggle_done_task(request, task_id):
     """Mark task as done for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     if request.method == "POST":
         if task.open:
@@ -88,7 +105,8 @@ def toggle_done_task(request, task_id):
 def refuse_task(request, task_id):
     """Mark task refused for a project (user not interested)"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     if request.method == "POST":
         task.status = models.Task.NOT_INTERESTED
@@ -105,7 +123,8 @@ def refuse_task(request, task_id):
 def already_done_task(request, task_id):
     """Mark task refused for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     if request.method == "POST":
         task.status = models.Task.ALREADY_DONE
@@ -122,7 +141,8 @@ def already_done_task(request, task_id):
 def sort_task(request, task_id, order):
     """Update an existing task for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     if order == "up":
         task.up()
@@ -143,7 +163,8 @@ def sort_task(request, task_id, order):
 def update_task(request, task_id=None):
     """Update an existing task for a project"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.manage_tasks", task.project)
 
     was_public = task.public
 
@@ -182,11 +203,22 @@ def update_task(request, task_id=None):
 # Task Recommendation
 ########
 
+# liste de preflechage des recommendations
+@login_required
+def task_recommendation_list(request):
+    """List task recommendations for a project"""
+    is_staff_for_site_or_403(request.user)
 
+    recommendations = models.TaskRecommendation.on_site.all()
+
+    return render(request, "projects/tasks/recommendation_list.html", locals())
+
+
+# ajout d'un  preflechage de recommendations
 @login_required
 def task_recommendation_create(request):
     """Create a new task recommendation for a project"""
-    is_staff_or_403(request.user)
+    is_staff_for_site_or_403(request.user)
 
     if request.method == "POST":
         form = TaskRecommendationForm(request.POST)
@@ -201,10 +233,11 @@ def task_recommendation_create(request):
     return render(request, "projects/tasks/recommendation_create.html", locals())
 
 
+# mise à jour d'un  preflechage de recommendations
 @login_required
 def task_recommendation_update(request, recommendation_id):
     """Update a task recommendation"""
-    is_staff_or_403(request.user)
+    is_staff_for_site_or_403(request.user)
 
     recommendation = get_object_or_404(
         models.TaskRecommendation, site=request.site, pk=recommendation_id
@@ -221,22 +254,13 @@ def task_recommendation_update(request, recommendation_id):
     return render(request, "projects/tasks/recommendation_update.html", locals())
 
 
-@login_required
-def task_recommendation_list(request):
-    """List task recommendations for a project"""
-    is_staff_or_403(request.user)
-
-    recommendations = models.TaskRecommendation.on_site.all()
-
-    return render(request, "projects/tasks/recommendation_list.html", locals())
-
-
+# retourne pour le projet les suggestions du système
 @login_required
 def presuggest_task(request, project_id):
     """Suggest tasks"""
-    is_switchtender_or_403(request.user)
-
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    has_perm_or_403(request.user, "projects.manage_tasks", project)
 
     try:
         survey = survey_models.Survey.on_site.get(pk=1)  # XXX Hardcoded survey ID
@@ -281,8 +305,9 @@ def presuggest_task(request, project_id):
 @login_required
 def delete_task(request, task_id=None):
     """Delete a task from a project"""
-    is_switchtender_or_403(request.user)
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
+    has_perm_or_403(request.user, "projects.manage_tasks", task.project)
+
     if request.method == "POST":
         task.deleted = timezone.now()
         task.save()
@@ -295,6 +320,7 @@ def delete_task(request, task_id=None):
 def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     owner = task.project.owner
     if not owner:
@@ -328,6 +354,7 @@ def remind_task(request, task_id=None):
 def remind_task_delete(request, task_id=None):
     """Delete a reminder for a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
 
     if request.method == "POST":
         api.remove_reminder_email(task)
@@ -339,7 +366,9 @@ def remind_task_delete(request, task_id=None):
 def followup_task(request, task_id=None):
     """Create a new followup for task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    can_manage_or_403(task.project, request.user)
+
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
+
     if request.method == "POST":
         form = TaskFollowupForm(request.POST)
         if form.is_valid():
@@ -449,7 +478,7 @@ def create_action(request, project_id=None):
     """Create action for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    can_manage_or_403(project, request.user)
+    has_perm_or_403(request.user, "projects.manage_tasks", project)
 
     if request.method == "POST":
         # Pick a different form for better data handling based
@@ -536,10 +565,11 @@ def create_action(request, project_id=None):
 @login_required
 def create_resource_action_for_current_project(request, resource_id=None):
     """Create action for given resource to project stored in session"""
-    is_switchtender_or_403(request.user)
     project_id = get_active_project_id(request)
     resource = get_object_or_404(resources.Resource, sites=request.site, pk=resource_id)
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    has_perm_or_403(request.user, "projects.manage_tasks", project)
 
     next_url = reverse("projects-project-create-action", args=[project.id])
     next_url += f"?resource={resource.id}"

@@ -1,7 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 
 
-from urbanvitaliz.utils import check_if_switchtender
+from urbanvitaliz.utils import check_if_advisor
 from django.db.models import Q
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.survey import models as survey_models
@@ -12,7 +12,7 @@ from .utils import can_administrate_project, can_manage_project, get_active_proj
 
 def is_switchtender_processor(request):
     return {
-        "is_switchtender": check_if_switchtender(request.user),
+        "is_switchtender": check_if_advisor(request.user),
         "is_administrating_project": can_administrate_project(
             project=None, user=request.user
         ),

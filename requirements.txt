@@ -44,3 +44,4 @@ multimethod==1.7
 django-vite==2.0.2
 django-phonenumber-field[phonenumbers]==6.3.0
 django-watson==1.6.2
+django-guardian==2.4.0

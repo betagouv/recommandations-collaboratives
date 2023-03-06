@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "guardian",
     "magicauth",
     "sass_processor",
     "django_vite",
@@ -152,9 +153,14 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
+    "guardian.backends.ObjectPermissionBackend",
     "sesame.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+# GUARDIAN
+GUARDIAN_USER_OBJ_PERMS_MODEL = "home.UserObjectPermissionOnSite"
+GUARDIAN_GROUP_OBJ_PERMS_MODEL = "home.GroupObjectPermissionOnSite"
 
 # SESAME Configuration
 SESAME_MAX_AGE = 60 * 60 * 24 * 10

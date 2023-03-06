@@ -39,13 +39,24 @@ def test_logged_in_user_can_use_project_api(client):
 
 
 @pytest.mark.django_db
-def test_project_list_includes_project_for_switchtender(request, client):
-    project = baker.make(models.Project, sites=[get_current_site(request)])
+def test_project_list_includes_project_for_advisor(request, client):
+    current_site = get_current_site(request)
+    project = baker.make(models.Project, commune__name="Lille", sites=[current_site])
     url = reverse("projects-list")
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+
+    with login(client, groups=["example_com_advisor"]):
+        response = client.get(url)
+
+    assertContains(response, project.name)
+
+
+@pytest.mark.django_db
+def test_project_list_includes_project_for_staff(request, client):
+    current_site = get_current_site(request)
+    project = baker.make(models.Project, sites=[current_site])
+    url = reverse("projects-list")
+
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assertContains(response, project.name)
@@ -59,7 +70,7 @@ def test_project_list_includes_project_in_switchtender_departments(request, clie
         commune__department__code="01",
     )
     url = reverse("projects-list")
-    with login(client, groups=["switchtender"]) as user:
+    with login(client, groups=["example_com_advisor"]) as user:
         user.profile.departments.add(project.commune.department)
         response = client.get(url)
 
@@ -131,7 +142,7 @@ def test_advisor_access_new_regional_project_status(request):
         commune__department__code="01",
     )
 
-    group = auth_models.Group.objects.get(name="switchtender")
+    group = auth_models.Group.objects.get(name="example_com_advisor")
     user = baker.make(auth_models.User, groups=[group])
     user.profile.departments.add(project.commune.department)
 
@@ -155,7 +166,7 @@ def test_advisor_access_makes_no_user_project_status_duplicate(request):
         commune__department__code="01",
     )
 
-    group = auth_models.Group.objects.get(name="switchtender")
+    group = auth_models.Group.objects.get(name="example_com_advisor")
     user = baker.make(auth_models.User, groups=[group])
     user.profile.departments.add(project.commune.department)
 

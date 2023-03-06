@@ -23,7 +23,7 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
 
-from .. import models
+from .. import models, utils
 
 ########################################################################
 # Task Recommendation
@@ -41,7 +41,7 @@ def test_task_recommendation_list_not_available_for_non_staff(client):
 @pytest.mark.django_db
 def test_task_recommendation_list_available_for_staff(client):
     url = reverse("projects-task-recommendation-list")
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
@@ -58,7 +58,7 @@ def test_task_recommendation_create_not_available_for_non_staff(client):
 @pytest.mark.django_db
 def test_create_task_recommendation_available_for_staff(client):
     url = reverse("projects-task-recommendation-create")
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -69,7 +69,7 @@ def test_task_recommendation_is_created(request, client):
     resource = Recipe(resources.Resource, sites=[get_current_site(request)]).make()
 
     data = {"text": "mew", "resource": resource.pk}
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
     assert models.TaskRecommendation.on_site.count() == 1
@@ -96,7 +96,7 @@ def test_task_recommendation_update_available_for_staff(request, client):
         models.TaskRecommendation, site=get_current_site(request)
     ).make()
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
 
@@ -110,7 +110,7 @@ def test_task_recommendation_is_updated(request, client):
     url = reverse("projects-task-recommendation-update", args=(recommendation.pk,))
 
     data = {"text": "new-text", "resource": recommendation.resource.pk}
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -123,8 +123,8 @@ def test_task_recommendation_is_updated(request, client):
 
 
 @pytest.mark.django_db
-def test_task_suggestion_not_available_for_non_switchtender(client):
-    project = Recipe(models.Project).make()
+def test_task_suggestion_not_available_for_non_switchtender(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client):
         response = client.get(url)
@@ -133,38 +133,47 @@ def test_task_suggestion_not_available_for_non_switchtender(client):
 
 @pytest.mark.django_db
 def test_task_suggestion_when_no_survey(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["switchtender"]):
+    with login(client) as user:
+        utils.assign_observer(user, project, current_site)
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_task_suggestion_available_with_bare_project(request, client):
+    current_site = get_current_site(request)
+
     Recipe(models.TaskRecommendation, condition="").make()
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["switchtender"]):
+    with login(client) as user:
+        utils.assign_observer(user, project, current_site)
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_task_suggestion_available_with_filled_project(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
     Recipe(models.TaskRecommendation, condition="").make()
-    project = Recipe(
-        models.Project, sites=[get_current_site(request)], commune=commune
-    ).make()
+    project = Recipe(models.Project, sites=[current_site], commune=commune).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["switchtender"]):
+    with login(client) as user:
+        utils.assign_observer(user, project, current_site)
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_task_suggestion_available_with_localized_reco(request, client):
+    current_site = get_current_site(request)
+
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
     Recipe(
@@ -174,11 +183,10 @@ def test_task_suggestion_available_with_localized_reco(request, client):
             dept,
         ],
     ).make()
-    project = Recipe(
-        models.Project, sites=[get_current_site(request)], commune=commune
-    ).make()
+    project = Recipe(models.Project, sites=[current_site], commune=commune).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
-    with login(client, groups=["switchtender"]):
+    with login(client) as user:
+        utils.assign_observer(user, project, current_site)
         response = client.get(url)
     assert response.status_code == 200
 
@@ -190,13 +198,15 @@ def test_task_suggestion_available_with_localized_reco(request, client):
 @pytest.mark.django_db
 def test_visit_task_for_project_and_redirect_for_project_owner(request, client):
     owner = Recipe(auth.User).make()
-    member = baker.prepare(models.ProjectMember, member=owner, is_owner=True)
+
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
         status="READY",
-        projectmember_set=[member],
     ).make()
+
+    utils.assign_collaborator(owner, project)
+
     task = Recipe(
         models.Task,
         project=project,
@@ -221,14 +231,15 @@ def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(
     resource = resources.Resource()
     resource.save()
 
-    owner = Recipe(auth.User).make()
-    member = baker.prepare(models.ProjectMember, member=owner, is_owner=True)
+    owner = baker.make(auth.User)
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
         status="READY",
-        projectmember_set=[member],
     ).make()
+
+    utils.assign_collaborator(owner, project, is_owner=True)
+
     task = Recipe(
         models.Task,
         site=get_current_site(request),
@@ -252,13 +263,14 @@ def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(
 def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(
     request, client
 ):
-    membership = baker.make(models.ProjectMember)
+    user = baker.make(auth.User)
     project = Recipe(
         models.Project,
         status="READY",
-        projectmember_set=[membership],
         sites=[get_current_site(request)],
     ).make()
+
+    utils.assign_collaborator(user, project)
 
     task = Recipe(
         models.Task,
@@ -267,7 +279,8 @@ def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(
         visited=True,
         site=get_current_site(request),
     ).make()
-    with login(client, user=membership.member):
+
+    with login(client, user=user):
         response = client.post(
             reverse("projects-toggle-done-task", args=[task.id]),
         )
@@ -280,13 +293,14 @@ def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(
 def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(
     request, client
 ):
-    membership = baker.make(models.ProjectMember)
+    user = baker.make(auth.User)
     project = Recipe(
         models.Project,
         status="READY",
-        projectmember_set=[membership],
         sites=[get_current_site(request)],
     ).make()
+
+    utils.assign_collaborator(user, project)
 
     task = Recipe(
         models.Task,
@@ -296,7 +310,7 @@ def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(
         site=get_current_site(request),
     ).make()
 
-    with login(client, user=membership.member):
+    with login(client, user=user):
         response = client.post(
             reverse("projects-toggle-done-task", args=[task.id]),
         )
@@ -308,18 +322,21 @@ def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(
 
 @pytest.mark.django_db
 def test_refuse_task_for_project_and_redirect_for_project_owner(request, client):
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    user = baker.make(auth.User)
+
     project = Recipe(
         models.Project,
         status="READY",
-        projectmember_set=[membership],
         sites=[get_current_site(request)],
     ).make()
+
+    utils.assign_collaborator(user, project)
+
     task = Recipe(
         models.Task, site=get_current_site(request), project=project, visited=False
     ).make()
 
-    with login(client, user=membership.member):
+    with login(client, user=user):
         response = client.post(
             reverse("projects-refuse-task", args=[task.id]),
         )
@@ -328,19 +345,23 @@ def test_refuse_task_for_project_and_redirect_for_project_owner(request, client)
     assert response.status_code == 302
 
 
+@pytest.mark.django_db
 def test_already_done_task_for_project_and_redirect_for_project_owner(request, client):
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    user = baker.make(auth.User)
+
     project = Recipe(
         models.Project,
         status="READY",
-        projectmember_set=[membership],
         sites=[get_current_site(request)],
     ).make()
+
     task = Recipe(
         models.Task, site=get_current_site(request), project=project, visited=False
     ).make()
 
-    with login(client, user=membership.member):
+    utils.assign_collaborator(user, project)
+
+    with login(client, user=user):
         response = client.post(
             reverse("projects-already-done-task", args=[task.id]),
         )
@@ -366,10 +387,8 @@ def test_update_task_not_available_for_non_staff_users(request, client):
 def test_update_task_available_for_switchtender(request, client):
     task = Recipe(models.Task, site=get_current_site(request)).make()
     url = reverse("projects-update-task", args=[task.id])
-    with login(client, groups=["switchtender"]) as user:
-        task.project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, task.project)
 
         response = client.get(url)
     assert response.status_code == 200
@@ -384,10 +403,8 @@ def test_update_task_for_project_and_redirect(request, client):
     url = reverse("projects-update-task", args=[task.id])
     data = {"content": "this is some content"}
 
-    with login(client, groups=["switchtender"]) as user:
-        task.project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, task.project)
 
         response = client.post(url, data=data)
 
@@ -404,18 +421,26 @@ def test_update_task_for_project_and_redirect(request, client):
 
 
 @pytest.mark.django_db
-def test_delete_task_not_available_for_non_staff_users(client):
-    task = Recipe(models.Task).make()
+def test_delete_task_not_available_for_non_staff_users(request, client):
+    current_site = get_current_site(request)
+
+    task = Recipe(models.Task, site=current_site).make()
     url = reverse("projects-delete-task", args=[task.id])
-    with login(client):
+    with login(client) as user:
+        utils.assign_collaborator(user, task.project)
+
         response = client.get(url)
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
 def test_delete_task_from_project_and_redirect(request, client):
-    task = Recipe(models.Task, site=get_current_site(request)).make()
-    with login(client, groups=["switchtender"]):
+    current_site = get_current_site(request)
+
+    task = Recipe(models.Task, site=current_site).make()
+
+    with login(client) as user:
+        utils.assign_advisor(user, task.project, current_site)
         response = client.post(reverse("projects-delete-task", args=[task.id]))
     task = models.Task.deleted_on_site.get(id=task.id)
     assert task.deleted
@@ -433,18 +458,18 @@ def test_delete_task_from_project_and_redirect(request, client):
 
 @pytest.mark.django_db
 def test_create_new_task_for_project_notify_collaborators(mocker, client, request):
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    owner = baker.make(auth.User)
+
     project = Recipe(
         models.Project,
         status="READY",
-        projectmember_set=[membership],
         sites=[get_current_site(request)],
     ).make()
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    utils.assign_collaborator(owner, project, is_owner=True)
+
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -456,18 +481,20 @@ def test_create_new_task_for_project_notify_collaborators(mocker, client, reques
             },
         )
 
-    assert membership.member.notifications.count() == 1
+    assert owner.notifications.count() == 1
 
 
 @pytest.mark.django_db
 def test_public_task_update_does_not_trigger_notifications(request, client):
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    owner = baker.make(auth.User)
+
     project = Recipe(
         models.Project,
         status="READY",
-        projectmember_set=[membership],
         sites=[get_current_site(request)],
     ).make()
+
+    utils.assign_collaborator(owner, project, is_owner=True)
 
     task = Recipe(
         models.Task,
@@ -480,26 +507,26 @@ def test_public_task_update_does_not_trigger_notifications(request, client):
     url = reverse("projects-update-task", args=(task.pk,))
 
     data = {"text": "new-text"}
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         response = client.post(url, data=data)
 
     assert response.status_code == 302
-    assert membership.member.notifications.count() == 0
+    assert owner.notifications.count() == 0
 
 
 @pytest.mark.django_db
 def test_draft_task_update_triggers_notifications(request, client):
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    owner = baker.make(auth.User)
+
     project = Recipe(
         models.Project,
         status="READY",
-        projectmember_set=[membership],
         sites=[get_current_site(request)],
     ).make()
+
+    utils.assign_collaborator(owner, project, is_owner=True)
 
     task = Recipe(
         models.Task,
@@ -512,14 +539,13 @@ def test_draft_task_update_triggers_notifications(request, client):
     url = reverse("projects-update-task", args=(task.pk,))
 
     data = {"content": "new-text", "public": True}
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
+
         response = client.post(url, data=data)
 
     assert response.status_code == 302
-    assert membership.member.notifications.count() == 1
+    assert owner.notifications.count() == 1
 
 
 @pytest.mark.django_db
@@ -623,10 +649,8 @@ def test_create_task_not_available_for_non_staff_users(request, client):
 def test_create_task_available_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-create-action", args=[project.id])
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         response = client.get(url)
 
@@ -637,10 +661,8 @@ def test_create_task_available_for_switchtender(request, client):
 def test_create_new_action_with_invalid_push_type(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -659,10 +681,8 @@ def test_create_new_action_as_draft(request, client):
     intent = "My Intent"
     content = "My Content"
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -684,10 +704,8 @@ def test_create_new_action_without_resource(request, client):
     intent = "My Intent"
     content = "My Content"
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -714,10 +732,8 @@ def test_create_new_action_with_document(request, client):
     intent = "My Intent"
     content = "My Content"
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project)
         png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
 
         response = client.post(
@@ -753,10 +769,8 @@ def test_create_new_action_with_single_resource(request, client):
     intent = "My Intent"
     content = "My Content"
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -791,10 +805,8 @@ def test_create_new_action_with_multiple_resources(request, client):
         status=resources.Resource.PUBLISHED,
     ).make()
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         response = client.post(
             reverse("projects-project-create-action", args=[project.id]),
@@ -823,10 +835,8 @@ def test_sort_action_up(request, client):
         models.Task, site=get_current_site(request), project=project, priority=1002
     ).make()
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         client.post(reverse("projects-sort-task", args=[taskA.id, "up"]))
 
@@ -846,10 +856,8 @@ def test_sort_action_down(request, client):
         models.Task, site=get_current_site(request), project=project, priority=900
     ).make()
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         client.post(reverse("projects-sort-task", args=[taskA.id, "down"]))
 
@@ -866,10 +874,8 @@ def test_sort_action_down_when_zero(request, client):
         models.Task, site=get_current_site(request), project=project, priority=0
     ).make()
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         client.post(reverse("projects-sort-task", args=[taskA.id, "down"]))
 
@@ -885,10 +891,8 @@ def test_sort_action_up_when_no_follower(request, client):
         models.Task, site=get_current_site(request), project=project, priority=1000
     ).make()
 
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         client.post(reverse("projects-sort-task", args=[taskA.id, "up"]))
 
@@ -986,25 +990,24 @@ def test_update_task_followup_by_creator(request, client):
 ###############################################################
 @pytest.mark.django_db
 def test_reminder_is_updated_when_a_followup_issued(request, client):
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    owner = baker.make(auth.User)
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
     )
+    utils.assign_collaborator(owner, project, is_owner=True)
+
     task = baker.make(models.Task, site=get_current_site(request), project=project)
 
-    with login(client, groups=["switchtender"]) as user:
-        task.project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project)
 
         url = reverse("projects-followup-task", args=[task.pk])
         response = client.post(url)
 
     reminder = reminders_models.Reminder.objects.first()
     assert response.status_code == 302
-    assert reminder.recipient == membership.member.email
+    assert reminder.recipient == owner.email
 
 
 ###############################################################
@@ -1016,7 +1019,9 @@ def test_unassigned_switchtender_should_see_recommendations():
 
     client = APIClient()
 
-    with login(client, groups=["switchtender"]):
+    with login(client) as user:
+        utils.assign_advisor(user, task.project)
+
         url = reverse("project-tasks-list", args=[task.project.id])
         response = client.get(url)
 

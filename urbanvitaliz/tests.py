@@ -1,10 +1,15 @@
 import pytest
 from django.contrib.auth import models as auth
 from model_bakery.recipe import Recipe
+from guardian.shortcuts import assign_perm
+from django.contrib.sites import models as sites_models
+from urbanvitaliz.apps.projects import models as projects_models
+from django.conf import settings
 
 from . import utils
 
 
+@pytest.mark.django_db
 def test_build_absolute_url():
     url = utils.build_absolute_url("somewhere")
 
@@ -24,6 +29,7 @@ def test_build_absolute_url_with_auto_login():
     assert "?sesame=" in url
 
 
+@pytest.mark.django_db
 def test_build_absolute_url_with_empty_auto_login():
     url = utils.build_absolute_url("somewhere", auto_login_user=None)
 
@@ -32,6 +38,7 @@ def test_build_absolute_url_with_empty_auto_login():
     assert "?sesame=" not in url
 
 
+@pytest.mark.django_db
 def test_build_absolute_url_keeps_anchor():
     url = utils.build_absolute_url("somewhere#around-the-rainbow")
 
@@ -60,3 +67,21 @@ def test_build_absolute_url_with_auto_login_url_sends_anchor_at_the_end():
     url = utils.build_absolute_url("somewhere#around-the-rainbow", user)
 
     assert url.endswith("#around-the-rainbow")
+
+
+@pytest.mark.django_db
+def test_has_perm_considers_current_site():
+    user = Recipe(auth.User, username="owner", email="owner@example.com").make()
+    project = Recipe(projects_models.Project).make()
+    site2 = Recipe(sites_models.Site).make()
+
+    perm_name = "projects.use_tasks"
+
+    assign_perm(perm_name, user, project)
+
+    # Should be present on current site
+    assert utils.has_perm(user, perm_name, project)
+
+    # Shoudn't be present on another site
+    with settings.SITE_ID.override(site2.pk):
+        assert not utils.has_perm(user, perm_name, project)
