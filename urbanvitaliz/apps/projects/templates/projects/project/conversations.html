@@ -4,6 +4,7 @@
 {% load humanize %}
 {% load gravatar %}
 {% load training %}
+{% load guardian_tags %}
 
 {% block title %}
 {{ block.super }} > Conversations
@@ -18,6 +19,8 @@
 {% endif %}
 
 {% challenge_for request.user "project-conversation-writer" as challenge %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 
 <div class="col-12 mx-auto">
     {% include 'projects/project/navigation.html' with conversation=True %}
@@ -68,7 +71,7 @@
                 </ul>
             </div>
 
-            {% if can_manage %}
+            {% if "use_public_notes" in user_project_perms %}
             <hr/>
 
             <!-- Post message -->
