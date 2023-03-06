@@ -4,7 +4,7 @@ const currentProject = projects[1];
 
 describe('I can create a recommandation with no resource as a switcthender from the action view', () => {
     beforeEach(() => {
-        cy.login("jean");
+        cy.login("staff");
     })
 
     it('creates a reco from action view', () => {

@@ -229,7 +229,7 @@
                                     <form class="me-2" action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
                                           method="post">
                                         {% csrf_token %}
-                                        <button class="btn btn-outline-danger btn-sm">
+                                        <button class="btn btn-outline-danger btn-sm" id="revoke-invite-switchtender">
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
                                             </svg>
@@ -238,7 +238,7 @@
                                     <form action="{% url 'projects-project-access-advisor-resend-invite' project.pk invite.pk %}"
                                           method="post">
                                         {% csrf_token %}
-                                        <button class="btn btn-outline-primary btn-sm">
+                                        <button class="btn btn-outline-primary btn-sm" id="resend-invite-switchtender">
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope-plus" />
                                             </svg>
@@ -271,7 +271,7 @@
                                     <form class="me-2" action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
                                           method="post">
                                         {% csrf_token %}
-                                        <button class="btn btn-outline-danger btn-sm">
+                                        <button class="btn btn-outline-danger btn-sm" id="revoke-invite-member">
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
                                             </svg>
@@ -280,7 +280,7 @@
                                     <form action="{% url 'projects-project-access-collectivity-resend-invite' project.pk invite.pk %}"
                                           method="post">
                                         {% csrf_token %}
-                                        <button class="btn btn-outline-primary btn-sm">
+                                        <button class="btn btn-outline-primary btn-sm" id="resend-invite-member">
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope-plus" />
                                             </svg>

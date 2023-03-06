@@ -17,6 +17,6 @@ describe('I can access the recommandations', () => {
         cy.url().should('include', '/actions')
 
         cy.contains("Ajouter une recommandation").should('not.exist')
-        cy.contains("Ma ressource sans recommandation")
+        cy.contains("Ma ressource sans recommandation 2")
     })
 })

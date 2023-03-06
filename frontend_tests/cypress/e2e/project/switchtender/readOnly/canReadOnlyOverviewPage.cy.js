@@ -4,7 +4,7 @@ const currentProject = projects[1];
 describe('I can read only overview page', () => {
 
     beforeEach(() => {
-        cy.login("jeanne");
+        cy.login("jeannot");
     })
 
     it('goes to overview and read only content', () => {
