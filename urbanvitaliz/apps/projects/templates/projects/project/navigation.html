@@ -12,6 +12,8 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
+
+
 <ul class="project-navigation d-flex align-items-center"
     style="font-family: 'Marianne', arial, sans-serif;
            padding: 0">
@@ -62,7 +64,7 @@
     </li>
     <li>
         {% with "Conversation" as label %}
-            {% if "view_public_notes" in user_project_perms %}
+            {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                 <a class="{% if conversation %} active{% endif %} align-items-center"
                    href="{% url 'projects-project-detail-conversations' project.pk %}">
                     {% if active_project_conversation_notifications_count %}
@@ -104,7 +106,7 @@
     </li>
     <li>
         {% with "Espace conseillers" as label %}
-            {% if 'view_private_notes' in user_project_perms %}
+            {% if 'view_private_notes' in user_project_perms or 'use_private_notes' in user_project_perms %}
                 <a class="{% if internal_followup %}active{% endif %} align-items-center"
                    href="{% url 'projects-project-detail-internal-followup' project.pk %}">
                     {% if active_project_private_conversation_notifications_count %}
