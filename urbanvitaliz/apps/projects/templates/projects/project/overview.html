@@ -59,7 +59,7 @@
         <div class="row">
             <div class="col-8">
                 <div class="d-flex">
-                    {% if "view_synopsis" in user_project_perms %}
+                    {% if "view_synopsis" in user_project_perms or "change_synopsis" in user_project_perms %}
                     <div class="row w-100">
                         <div class="col-12 col-lg-6 h-100 responsive-wrapper">
                             <div class="h-100">
