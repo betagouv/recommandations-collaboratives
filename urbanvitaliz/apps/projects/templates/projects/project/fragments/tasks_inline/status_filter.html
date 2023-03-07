@@ -1,45 +1,41 @@
 {% load static %}
+{% load guardian_tags %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="d-flex justify-content-between mt-3 mb-2">
     <div class="d-inline-flex overflow-hidden">
-        <!-- <div x-on:click="handlePublicFilterClick()"
-             class="border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button"
-             :class=" filterIsPublic ? 'active' : '' ">
+        <!-- <div x-on:click="handlePublicFilterClick()" class="border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button" :class=" filterIsPublic ? 'active' : '' ">
             <i style="background-color:#0d6efd" class="status-color-indicator me-2"></i>
             <h3 class="title-info m-0 p-0">Toutes</h3>
         </div> -->
-        <!-- <div x-on:click="handlePublicFilterClick()"
-             class="ms-2 rounded-pill px-2 bg-warning z-index-dropdown text-uppercase tiny fw-bold text-white px-2 py-2 d-flex align-items-center board-status-filter-button"
-             :class=" !filterIsPublic ? 'active' : '' ">
+        <!-- <div x-on:click="handlePublicFilterClick()" class="ms-2 rounded-pill px-2 bg-warning z-index-dropdown text-uppercase tiny fw-bold text-white px-2 py-2 d-flex align-items-center board-status-filter-button" :class=" !filterIsPublic ? 'active' : '' ">
             <div class="form-check form-switch d-flex align-items-center">
                 <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
                 <label class="form-check-label ms-2 me-2" for="flexSwitchCheckDefault">Brouillon</label>
               </div>
         </div> -->
-        <!-- <div x-on:click="handleStatusFilterClick('all')"
-             class="border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button"
-             :class="currentStatus === 'all' ? 'active' : '' ">
+        <!-- <div x-on:click="handleStatusFilterClick('all')" class="border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button" :class="currentStatus === 'all' ? 'active' : '' ">
             <i style="background-color:#222" class="status-color-indicator me-2"></i>
             <h3 class="title-info m-0 p-0">Toutes</h3>
         </div> -->
         <!-- <template x-for="board in boards">
-            <div x-on:click='handleStatusFilterClick(board.status)'
-                 class="ms-2 border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button"
-                 :class="currentStatus === board.status ? 'active' : '' ">
-                <i :style="`background-color: ${board.color}`"
-                   class="status-color-indicator me-2"></i>
+            <div x-on:click='handleStatusFilterClick(board.status)' class="ms-2 border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button" :class="currentStatus === board.status ? 'active' : '' ">
+                <i :style="`background-color: ${board.color}`" class="status-color-indicator me-2"></i>
                 <h3 x-text="board.title" class="title-info m-0 p-0"></h3>
             </div>
         </template> -->
     </div>
     <div class="d-flex">
         {% if not disable_add_recommendation %}
-            <a class="button filled"
-               href="{% url 'projects-project-create-action' project.id %}">
-                <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
-                </svg>
-                Ajouter une recommandation
-            </a>
-        </div>
+            {% if "manage_tasks" in user_project_perms %}
+                <a class="button filled"
+                   href="{% url 'projects-project-create-action' project.id %}">
+                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
+                    </svg>
+                    Ajouter une recommandation
+                </a>
+            </div>
+        {% endif %}
     {% endif %}
 </div>
