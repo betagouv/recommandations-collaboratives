@@ -18,6 +18,10 @@
     background-color: #E8EDFF;
 }
 
+.bg-blue-light-hover:hover {
+    background-color: #103a78 !important;
+}
+
 .bg-blue {
     background: #0063CB;
 }
@@ -27,5 +31,5 @@
 }
 
 .fill-grey {
-    fill:#929292;
+    fill: #929292;
 }
