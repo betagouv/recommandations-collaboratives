@@ -19,7 +19,7 @@
     <div x-data="ProjectShare" class="col-12">
         <div class="row">
             {% if not is_switchtender %}
-                {% if can_manage_draft and session and session.next_question and session.completion < 80 %}
+                {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
                     <div class="col box-heading d-flex justify-content-between mb-4 mt-4">
                         <div class="flex-grow-1">
                             <h3>Complétez l'exploration du site !</h3>
@@ -59,7 +59,7 @@
         <div class="row">
             <div class="col-8">
                 <div class="d-flex">
-                    {% if "view_synopsis" in user_project_perms or "change_synopsis" in user_project_perms %}
+                    {% if "use_advisor_note" in user_project_perms %}
                     <div class="row w-100">
                         <div class="col-12 col-lg-6 h-100 responsive-wrapper">
                             <div class="h-100">
@@ -140,7 +140,7 @@
                               {% endif %}
                             {% endfor %}
                         </ul>
-                        {% if "can_invite" in user_project_perms %}
+                        {% if "invite_collaborators" in user_project_perms %}
                         <div class="d-block mb-2">
                             <a style="cursor: pointer"
                                @click="openInviteMemberModal"
@@ -166,7 +166,7 @@
                                 <li>{% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}</li>
                             {% endfor %}
                         </ul>
-                        {% if switchtending or is_regional_actor or can_administrate %}
+                        {% if "invite_advisors" in user_project_perms %}
                             <div class="d-block mb-2">
                                 <a style="cursor: pointer"
                                    @click="openInviteSwitchtenderModal"

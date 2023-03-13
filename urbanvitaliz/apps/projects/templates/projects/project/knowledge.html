@@ -52,7 +52,7 @@
         <div class="row">
             <!-- TODO PERMISSIONS -->
             {% if not is_switchtender %}
-                {% if can_manage_draft and session and session.next_question and session.completion < 80 %}
+                {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
                     <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
                         <h4 class="pt-2">
                             {% if session.completion == 0 %}
