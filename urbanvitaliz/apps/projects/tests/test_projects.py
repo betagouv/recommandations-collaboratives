@@ -735,7 +735,7 @@ def test_accept_project_and_redirect(request, client):
     assert project.updated_on > updated_on_before
 
     # check updated permissions
-    assert "can_invite" in get_user_perms(owner, project)
+    assert "invite_collaborators" in get_user_perms(owner, project)
 
     assert response.status_code == 302
 

@@ -290,7 +290,7 @@ def project_create_or_update_topics(request, project_id=None):
     """Create/Update topics for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    has_perm_or_403(request.user, "projects.change_synopsis", project)
+    has_perm_or_403(request.user, "projects.change_topics", project)
 
     TopicFormset = modelformset_factory(
         models.ProjectTopic, fields=("label",), extra=6, max_num=6, can_delete=True

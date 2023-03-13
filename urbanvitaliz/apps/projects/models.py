@@ -49,23 +49,31 @@ COLLABORATOR_DRAFT_PERMISSIONS = (
     "projects.view_project",
     "projects.view_tasks",
     "projects.use_tasks",
+    "projects.use_surveys",
+    "projects.view_surveys",
 )
 
 COLLABORATOR_PERMISSIONS = (
     "projects.manage_documents",
-    "projects.can_invite",
+    "projects.invite_collaborators",
+    "projects.manage_collaborators",
 )
 
 ADVISOR_PERMISSIONS = [
+    "projects.use_advisor_note",
     "projects.use_public_notes",
     "projects.use_private_notes",
     "projects.view_project",
     "projects.view_tasks",
     "projects.manage_tasks",
     "projects.use_tasks",
-    "projects.can_invite",
-    "projects.change_synopsis",
+    "projects.invite_advisors",
+    "projects.invite_collaborators",
+    "projects.manage_advisors",
+    "projects.manage_collaborators",
+    "projects.change_topics",
     "projects.manage_documents",
+    "projects.view_surveys",
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
@@ -307,14 +315,17 @@ class Project(models.Model):
         permissions = (
             # General
             # Builtin: ("view_project", "Can view the project"),
-            # Synopsis
-            ("view_synopsis", "Can view the synopsis"),
-            ("change_synopsis", "Can change the synopsis"),
+            # Overview and topics
+            ("change_topics", "Can change the topics"),
+            ("use_advisor_note", "Can change the advisor note"),
             # Notes
             ("use_private_notes", "Can use the private notes (internal)"),
             ("use_public_notes", "Can use the public notes (conversations)"),
             ("view_public_notes", "Can read the public notes (conversations)"),
             ("view_private_notes", "Can read the private notes (internal)"),
+            # Surveys
+            ("view_surveys", "Can view the survey results"),
+            ("use_surveys", "Can use the surveys"),
             # Tasks/Recommandations
             ("view_tasks", "Can view and list tasks"),
             ("view_draft_tasks", "Can view and list draft tasks"),  # XXX Still useful?
@@ -323,8 +334,10 @@ class Project(models.Model):
             # Documents
             ("manage_documents", "Can manage the documents"),
             # Invitation/sharing/members
-            ("can_invite", "Can invite collaborators"),
-            ("manage_members", "Can manage collaborators"),
+            ("invite_collaborators", "Can invite collaborators"),
+            ("invite_advisors", "Can invite advisors"),
+            ("manage_collaborators", "Can manage collaborators"),
+            ("manage_advisors", "Can manage advisors"),
         )
 
     def __str__(self):  # pragma: nocover
