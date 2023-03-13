@@ -118,14 +118,10 @@ def create_project_prefilled(request):
                 },
             )
 
-            models.ProjectMember.objects.create(
-                member=user, project=project, is_owner=True
-            )
+            assign_collaborator(user, project, is_owner=True)
 
-            # Add the current user as switchtender
-            project.switchtenders_on_site.create(
-                switchtender=request.user, site=request.site
-            )
+            # Add the current user as an advisor
+            assign_advisor(request.user, project, request.site)
 
             markdown_content = render_to_string(
                 "projects/project/onboarding_initial_note.md",
