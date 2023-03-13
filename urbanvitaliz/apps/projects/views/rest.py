@@ -26,6 +26,8 @@ from ..serializers import (
 ########################################################################
 # REST API
 ########################################################################
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
@@ -108,6 +110,9 @@ class TaskViewSet(viewsets.ModelViewSet):
     def move(self, request, project_id, pk):
         task = self.get_object()
 
+        if not self.request.user.has_perm("projects.use_tasks", task.project):
+            raise PermissionDenied()
+
         above_id = request.POST.get("above", None)
         below_id = request.POST.get("below", None)
 
@@ -134,17 +139,10 @@ class TaskViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
 
-        user_projects = list(
-            models.Project.on_site.for_user(self.request.user).values_list(flat=True)
-        )
+        project = models.Project.on_site.get(pk=project_id)
 
-        if project_id not in user_projects:
-            project = models.Project.objects.get(pk=project_id)
-            if not (
-                self.request.method == "GET"
-                and self.request.user.has_perm("projects.use_tasks", project)
-            ):
-                raise PermissionDenied()
+        if not self.request.user.has_perm("projects.view_tasks", project):
+            raise PermissionDenied()
 
         return self.queryset.filter(project_id=project_id).order_by(
             "-created_on", "-updated_on"

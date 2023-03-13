@@ -18,10 +18,10 @@ from rest_framework.test import APIClient
 from urbanvitaliz.utils import login
 
 from .. import models
-
+from .. import utils
 
 ########################################################################
-# REST API
+# REST API: projects
 ########################################################################
 @pytest.mark.django_db
 def test_anonymous_cannot_use_project_api(client):
@@ -199,6 +199,141 @@ def test_cannot_access_other_user_project_status(request):
     url = reverse("userprojectstatus-detail", args=[other.id])
     response = client.get(url)
     assert response.status_code == 404
+
+
+########################################################################
+# tasks
+########################################################################
+
+
+@pytest.mark.django_db
+def test_project_collaborator_can_see_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    baker.make(models.Task, project=project, public=True)
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert set(e["id"] for e in response.data) == set(t.id for t in tasks)
+
+
+@pytest.mark.django_db
+def test_project_observer_can_see_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    baker.make(models.Task, project=project, public=True)
+    utils.assign_observer(user, project, site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert set(e["id"] for e in response.data) == set(t.id for t in tasks)
+
+
+@pytest.mark.django_db
+def test_project_advisor_can_see_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    baker.make(models.Task, project=project, public=True)
+    utils.assign_advisor(user, project, site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert set(e["id"] for e in response.data) == set(t.id for t in tasks)
+
+
+@pytest.mark.django_db
+def test_user_cannot_see_project_tasks_when_not_in_relation(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(models.Task, project=project, site=site, public=True)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_collaborator_can_move_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
+    response = client.post(url, data={"above": tasks[1].id})
+
+    assert response.status_code == 200
+    assert response.data == {"status": "insert above done"}
+
+
+@pytest.mark.django_db
+def test_project_observer_can_move_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    utils.assign_observer(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
+    response = client.post(url, data={"above": tasks[1].id})
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_advisor_can_move_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    utils.assign_advisor(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
+    response = client.post(url, data={"above": tasks[1].id})
+
+    assert response.status_code == 200
 
 
 # eof
