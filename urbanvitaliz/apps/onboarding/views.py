@@ -11,8 +11,9 @@ from urbanvitaliz.apps.communication.digests import normalize_user_name
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import signals as projects_signals
-from urbanvitaliz.apps.projects.utils import generate_ro_key
+from urbanvitaliz.apps.projects.utils import generate_ro_key, assign_collaborator
 from urbanvitaliz.utils import get_site_config_or_503
+
 
 from . import forms, models
 
@@ -93,9 +94,7 @@ def onboarding(request):
             onboarding_response.save()
 
             # Make her project owner
-            projects.ProjectMember.objects.create(
-                member=user, project=project, is_owner=True
-            )
+            assign_collaborator(user, project, is_owner=True)
 
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
