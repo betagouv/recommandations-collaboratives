@@ -14,7 +14,7 @@
             />
 
             <span style="color: #0063CB;" class="small d-none d-lg-none d-xl-block">{{ user.get_full_name|default:user.email }}</span>
-            <button  type="button" class="border-0 btn py-0 px-1">
+            <button  id="user-menu-button" type="button" class="border-0 btn py-0 px-1">
                 <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi" width="20px" height="20px" fill="#0063CB" stroke="#0063CB" style="padding: 3px;">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down"/>
                 </svg>

@@ -1,16 +1,18 @@
-import projects from '../../../fixtures/projects/projects.json'
-
-const currentProject = projects[1];
+import project from '../../../fixtures/projects/project.json'
+const index = 10
 
 describe('I can access and use public notes', () => {
 
     beforeEach(() => {
         cy.login("bob");
+        cy.createProject(index);
+        cy.logout();
+        cy.approveProject(index);
+        cy.login("bob");
+        cy.navigateToProject(index);
     })
 
-    it('goes to public notes', () => {
-
-        cy.visit(`/project/${currentProject.pk}`)
+    it('clicks on the "public note" button', () => {
 
         cy.contains("Conversation").click({ force: true })
 
