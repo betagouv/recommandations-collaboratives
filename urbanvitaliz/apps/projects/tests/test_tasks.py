@@ -1014,8 +1014,9 @@ def test_reminder_is_updated_when_a_followup_issued(request, client):
 # API
 ###############################################################
 @pytest.mark.django_db
-def test_unassigned_switchtender_should_see_recommendations():
-    task = Recipe(models.Task).make()
+def test_unassigned_switchtender_should_see_recommendations(request):
+    site = get_current_site(request)
+    task = Recipe(models.Task, site=site, project__sites=[site]).make()
 
     client = APIClient()
 
@@ -1029,8 +1030,9 @@ def test_unassigned_switchtender_should_see_recommendations():
 
 
 @pytest.mark.django_db
-def test_unassigned_user_should_not_see_recommendations():
-    task = Recipe(models.Task).make()
+def test_unassigned_user_should_not_see_recommendations(request):
+    site = get_current_site(request)
+    task = Recipe(models.Task, site=site, project__sites=[site]).make()
 
     client = APIClient()
 
