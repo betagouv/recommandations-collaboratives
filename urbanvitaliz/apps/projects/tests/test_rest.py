@@ -21,7 +21,7 @@ from .. import models
 from .. import utils
 
 ########################################################################
-# REST API
+# REST API: projects
 ########################################################################
 @pytest.mark.django_db
 def test_anonymous_cannot_use_project_api(client):
@@ -267,7 +267,7 @@ def test_project_advisor_can_see_project_tasks_for_site(request):
 
 
 @pytest.mark.django_db
-def test_user_cannot_see_project_tasks_when_not_collaborator(request):
+def test_user_cannot_see_project_tasks_when_not_in_relation(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     project = baker.make(models.Project, sites=[site])
@@ -279,6 +279,61 @@ def test_user_cannot_see_project_tasks_when_not_collaborator(request):
     response = client.get(url)
 
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_collaborator_can_move_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
+    response = client.post(url, data={"above": tasks[1].id})
+
+    assert response.status_code == 200
+    assert response.data == {"status": "insert above done"}
+
+
+@pytest.mark.django_db
+def test_project_observer_can_move_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    utils.assign_observer(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
+    response = client.post(url, data={"above": tasks[1].id})
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_advisor_can_move_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    utils.assign_advisor(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
+    response = client.post(url, data={"above": tasks[1].id})
+
+    assert response.status_code == 200
 
 
 # eof
