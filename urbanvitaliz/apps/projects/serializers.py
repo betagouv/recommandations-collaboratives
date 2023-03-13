@@ -11,7 +11,7 @@ from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
 from .models import Document, Project, Task, TaskFollowup, UserProjectStatus
 from .utils import create_reminder, get_collaborators_for_project
-from urbanvitaliz.utils import make_group_name_for_site
+from urbanvitaliz.utils import get_group_for_site
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
@@ -82,8 +82,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
         project_ct = ContentType.objects.get_for_model(obj)
 
-        group_name = make_group_name_for_site("advisor", request.site)
-        advisor_group = auth_models.Group.objects.get(name=group_name)
+        advisor_group = get_group_for_site("advisor", request.site)
         advisors = [
             int(advisor)
             for advisor in advisor_group.user_set.values_list("id", flat=True)
