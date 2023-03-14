@@ -37,7 +37,7 @@
             </button>
           </form>
         {% endif %}
-        {% if document.uploaded_by == user or "manage_documents" in user_project_perms %}
+        {% if document.uploaded_by == user and "manage_documents" in user_project_perms %}
           <form class="me-2"
                 method="post"
                 action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
@@ -52,6 +52,7 @@
             </button>
           </form>
         {% endif %}
+        {% if "manage_documents" in user_project_perms %}
         <a class="d-flex"
            href="{{ document.the_file.url }}"
            target="_new"
@@ -60,6 +61,7 @@
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#download" />
           </svg>
         </a>
+        {% endif %}
       </div>
     </div>
     <div class="ps-4 ms-4 d-flex align-items-center">
