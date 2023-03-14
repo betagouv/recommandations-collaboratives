@@ -9,8 +9,11 @@ module.exports = defineConfig({
       return require('./cypress/plugins/index.js')(on, config)
     },
     chromeWebSecurity: false,
-    baseUrl: 'http://localhost:8000/',
+    baseUrl: 'http://example.localhost:8000/',
     video:false,
     experimentalSessionAndOrigin:true
   },
+  "hosts": {
+    "*.localhost": "127.0.0.1"
+  }
 })
