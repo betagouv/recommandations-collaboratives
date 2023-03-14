@@ -10,7 +10,6 @@ from django.http import Http404
 from django.shortcuts import render
 from urbanvitaliz import utils
 from urbanvitaliz.apps.survey import models as survey_models
-from ..utils import can_manage_project
 
 from .. import models
 
@@ -29,7 +28,5 @@ def project_detail_from_sharing_link(request, project_ro_key):
         )
     except Exception:
         pass
-
-    can_manage = can_manage_project(project, request.user)
 
     return render(request, "projects/project/detail-ro.html", locals())

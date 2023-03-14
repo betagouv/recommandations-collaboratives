@@ -10,30 +10,30 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
+
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import (
     check_if_advisor,
     get_site_config_or_503,
-    has_perm_or_403,
     has_perm,
+    has_perm_or_403,
 )
 
 from .. import models
 from ..forms import PrivateNoteForm, ProjectTagsForm, ProjectTopicsForm, PublicNoteForm
 from ..utils import (
-    can_administrate_or_403,
     can_administrate_project,
-    can_manage_project,
     check_if_national_actor,
     get_notification_recipients_for_project,
     get_switchtender_for_project,
-    is_regional_actor_for_project,
     is_advisor_for_project,
+    is_regional_actor_for_project,
     set_active_project_id,
 )
 
@@ -286,7 +286,9 @@ def project_update_tags(request, project_id=None):
     """Create/Update tags for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    can_administrate_or_403(project, request.user)
+    # FIXME how to manage tags permissions?
+    if not is_advisor_for_project(request.user, project):
+        raise PermissionDenied()
 
     if request.method == "POST":
         form = ProjectTagsForm(request.POST, instance=project)

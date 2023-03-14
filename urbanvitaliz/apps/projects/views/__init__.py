@@ -46,8 +46,8 @@ from ..forms import SelectCommuneForm
 from ..utils import (
     assign_advisor,
     assign_observer,
+    is_advisor_for_project,
     assign_collaborator,
-    can_administrate_or_403,
     can_administrate_project,
     generate_ro_key,
     get_active_project,
@@ -425,7 +425,9 @@ def project_observer_join(request, project_id=None):
 def project_switchtender_leave(request, project_id=None):
     """Leave switchtender"""
     project = get_object_or_404(models.Project, pk=project_id)
-    can_administrate_or_403(project, request.user)
+
+    if not is_advisor_for_project(request.user, project):
+        raise PermissionDenied()
 
     if request.method == "POST":
         unassign_advisor(request.user, project)
