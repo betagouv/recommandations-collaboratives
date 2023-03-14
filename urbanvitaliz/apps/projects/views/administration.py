@@ -32,6 +32,8 @@ from ..utils import (
     can_administrate_project,
     can_manage_project,
     is_regional_actor_for_project,
+    unassign_advisor,
+    unassign_collaborator,
 )
 
 
@@ -264,7 +266,7 @@ def access_collaborator_delete(request, project_id: int, email: str):
             )
 
         elif membership in project.projectmember_set.exclude(is_owner=True):
-            project.members.remove(membership.member)
+            unassign_collaborator(membership.member, project)
             messages.success(
                 request,
                 "{0} a bien été supprimé de la liste des participants.".format(email),
@@ -349,7 +351,7 @@ def access_advisor_delete(request, project_id: int, email: str):
         site=request.site,
     )
 
-    advisor.delete()
+    unassign_advisor(request.user, project, request.site)
 
     messages.success(
         request,

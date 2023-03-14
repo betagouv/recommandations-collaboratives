@@ -45,12 +45,38 @@ def assign_collaborator(user, project, is_owner=False):
 
 
 @transaction.atomic
+def unassign_collaborator(user, project):
+    """Remove someone from being a project collaborator"""
+    permissions = (
+        models.COLLABORATOR_DRAFT_PERMISSIONS + models.COLLABORATOR_PERMISSIONS
+    )
+
+    for perm in permissions:
+        try:
+            remove_perm(perm, user, project)
+        except auth_models.Permission.DoesNotExist:
+            pass
+
+    models.ProjectMember.objects.filter(
+        member=user,
+        project=project,
+    ).delete()
+
+
+@transaction.atomic
 def assign_advisor(user, project, site=None):
-    """Make someone becomes a project advisor"""
+    """
+    Make someone becomes a project advisor
+    FIXME site is not honored by "assign_perm".
+    """
     site = site or Site.objects.get_current()
 
     for perm in models.ADVISOR_PERMISSIONS:
-        assign_perm(perm, user, project)
+        try:
+            assign_perm(perm, user, project)
+        except auth_models.Permission.DoesNotExist as e:
+            print(f"Unable to find permission <{perm}>, aborting.")
+            raise e
 
     switchtending, created = models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,
@@ -66,11 +92,17 @@ def assign_advisor(user, project, site=None):
 
 @transaction.atomic
 def unassign_advisor(user, project, site=None):
-    """Remove someone from being a project advisor"""
+    """
+    Remove someone from being a project advisor
+    FIXME site is not honored by "assign_perm".
+    """
     site = site or Site.objects.get_current()
 
     for perm in models.ADVISOR_PERMISSIONS:
-        remove_perm(perm, user, project)
+        try:
+            remove_perm(perm, user, project)
+        except auth_models.Permission.DoesNotExist:
+            pass
 
     models.ProjectSwitchtender.objects.filter(
         switchtender=user,
@@ -81,11 +113,18 @@ def unassign_advisor(user, project, site=None):
 
 @transaction.atomic
 def assign_observer(user, project, site=None):
-    """Make someone becomes a project observer"""
+    """
+    Make someone becomes a project observer
+    FIXME site is not honored by "assign_perm".
+    """
     site = site or Site.objects.get_current()
 
     for perm in models.OBSERVER_PERMISSIONS:
-        assign_perm(perm, user, project)
+        try:
+            assign_perm(perm, user, project)
+        except auth_models.Permission.DoesNotExist as e:
+            print(f"Unable to find permission <{perm}>, aborting.")
+            raise e
 
     switchtending, created = models.ProjectSwitchtender.objects.get_or_create(
         switchtender=user,
