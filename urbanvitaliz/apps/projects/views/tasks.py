@@ -189,11 +189,15 @@ def update_task(request, task_id=None):
                     user=request.user,
                 )
 
+            # Redirect to `action-inline` if we're coming from `action-inline` after create
+            if form.cleaned_data["next"] and form.cleaned_data["next"] != "None":
+                return redirect(form.cleaned_data["next"])
+
             return redirect(
                 reverse("projects-project-detail-actions", args=[task.project_id])
             )
     else:
-        form = UpdateTaskForm(instance=task)
+        form = UpdateTaskForm(request.GET, instance=task)
     return render(request, "projects/project/task_update.html", locals())
 
 
@@ -547,10 +551,17 @@ def create_action(request, project_id=None):
                     user=request.user,
                 )
 
+            # Redirect to `action-inline` if we're coming from `action-inline` after create
+            if (
+                type_form.cleaned_data["next"]
+                and type_form.cleaned_data["next"] != "None"
+            ):
+                return redirect(type_form.cleaned_data["next"])
+
             next_url = reverse("projects-project-detail-actions", args=[project.id])
             return redirect(next_url)
     else:
-        form = PushTypeActionForm()
+        type_form = PushTypeActionForm(request.GET)
 
     return render(request, "projects/project/task_create.html", locals())
 
