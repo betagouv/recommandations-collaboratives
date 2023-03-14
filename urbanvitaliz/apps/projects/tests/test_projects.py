@@ -339,7 +339,7 @@ def test_project_list_available_for_switchtender_user(client):
 @pytest.mark.django_db
 def test_project_list_available_for_staff(client):
     url = reverse("projects-project-list")
-    with login(client, is_staff=True, groups=["example_com_advisor"]):
+    with login(client, groups=["example_com_staff", "example_com_advisor"]):
         response = client.get(url, follow=True)
 
     staff_url = reverse("projects-project-list-staff")

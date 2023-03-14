@@ -35,6 +35,7 @@ from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.utils import (
     build_absolute_url,
     check_if_advisor,
+    is_staff_for_site,
     get_site_config_or_503,
     is_switchtender_or_403,
     has_perm_or_403,
@@ -224,7 +225,7 @@ def project_list(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
-    if request.user.is_staff:
+    if is_staff_for_site(request.user, request.site):
         return redirect("projects-project-list-staff")
 
     return redirect("projects-project-list-advisor")
