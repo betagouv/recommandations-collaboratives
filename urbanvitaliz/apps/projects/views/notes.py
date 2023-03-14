@@ -24,7 +24,6 @@ from ..forms import (
 )
 from ..utils import (
     can_administrate_project,
-    can_manage_or_403,
 )
 
 
@@ -118,7 +117,7 @@ def update_note(request, note_id=None):
     """Update an existing note for a project"""
     note = get_object_or_404(models.Note, pk=note_id)
     project = note.project  # For template consistency
-    can_manage_or_403(project, request.user, allow_draft=True)
+
     is_advisor = can_administrate_project(project, request.user)
 
     if not note.public:

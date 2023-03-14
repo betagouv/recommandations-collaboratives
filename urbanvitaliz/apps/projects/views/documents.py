@@ -8,19 +8,24 @@ created : 2022-11-28 14:14:20 CEST
 """
 
 from django.contrib import messages
+from django.db.utils import IntegrityError
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
-from urbanvitaliz.utils import check_if_advisor
+from urbanvitaliz.utils import check_if_advisor, has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm
-from ..utils import (can_administrate_project, can_manage_or_403,
-                     can_manage_project, check_if_national_actor,
-                     get_switchtender_for_project,
-                     is_regional_actor_for_project, set_active_project_id)
+from ..utils import (
+    can_administrate_project,
+    can_manage_project,
+    check_if_national_actor,
+    get_switchtender_for_project,
+    is_regional_actor_for_project,
+    set_active_project_id,
+)
 
 
 @login_required
@@ -28,23 +33,7 @@ def document_list(request, project_id=None):
     """Manage files and links for project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    # compute permissions
-    can_manage = can_manage_project(project, request.user)
-    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-
-    current_site = get_current_site(request)
-    is_national_actor = check_if_national_actor(current_site, request.user)
-    is_regional_actor = is_regional_actor_for_project(
-        current_site, project, request.user, allow_national=True
-    )
-    can_administrate = can_administrate_project(project, request.user)
-    switchtending = get_switchtender_for_project(request.user, project)
-
-    # check user can administrate project (member or switchtender)
-    if request.user != project.members.filter(projectmember__is_owner=True).first():
-        # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_advisor(request.user):
-            can_manage_or_403(project, request.user)
+    has_perm_or_403(request.user, "manage_documents", project)
 
     # Set this project as active
     set_active_project_id(request, project.pk)
@@ -62,7 +51,8 @@ def document_list(request, project_id=None):
 def document_upload(request, project_id):
     """Upload a new document for a project"""
     project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
-    can_manage_or_403(project, request.user)
+
+    has_perm_or_403(request.user, "manage_documents", project)
 
     if request.method == "POST":
         form = DocumentUploadForm(request.POST, request.FILES)
@@ -72,8 +62,6 @@ def document_upload(request, project_id):
             instance.project = project
             instance.site = request.site
             instance.uploaded_by = request.user
-
-            from django.db.utils import IntegrityError
 
             try:
                 instance.save()
@@ -99,19 +87,18 @@ def document_delete(request, project_id, document_id):
     project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
     document = get_object_or_404(models.Document, pk=document_id, site=request.site)
 
-    can_manage_or_403(project, request.user)
+    has_perm_or_403(request.user, "manage_documents", project)
 
     if request.method == "POST":
-        if document.uploaded_by == request.user:
-            document.deleted = timezone.now()
-            document.save()
-            messages.success(
-                request,
-                "Le document a bien été supprimé",
-            )
-
-        else:
+        if document.uploaded_by != request.user:
             raise PermissionDenied()
+
+        document.deleted = timezone.now()
+        document.save()
+        messages.success(
+            request,
+            "Le document a bien été supprimé",
+        )
 
     return redirect(reverse("projects-project-detail-documents", args=[project.id]))
 
@@ -122,7 +109,7 @@ def document_pin_unpin(request, project_id, document_id):
     project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
     document = get_object_or_404(models.Document, pk=document_id, site=request.site)
 
-    can_manage_or_403(project, request.user)
+    has_perm_or_403(request.user, "manage_documents", project)
 
     if request.method == "POST":
         document.pinned = not document.pinned
