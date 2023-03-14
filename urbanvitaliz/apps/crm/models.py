@@ -10,6 +10,24 @@ from markdownx.utils import markdownify
 from taggit.managers import TaggableManager
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
+from django.dispatch import receiver
+from django.db.models.signals import post_migrate
+
+from . import apps
+
+# We need the permission to be associated to the site and not to the projects
+@receiver(post_migrate)
+def create_site_permissions(sender, **kwargs):
+    if sender.name != apps.CrmConfig.name:
+        return
+
+    site_ct = ContentType.objects.get(app_label="sites", model="site")
+
+    auth_models.Permission.objects.get_or_create(
+        codename="use_crm",
+        name="Can use the CRM for site",
+        content_type=site_ct,
+    )
 
 
 class NoteManager(models.Manager):

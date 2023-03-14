@@ -34,6 +34,7 @@ SITE_GROUP_PERMISSIONS = {
         "sites.list_projects",
         "sites.delete_projects",
         "sites.manage_resources",
+        "sites.use_crm",
     ),
     "admin": ("sites.manage_surveys",),
     "advisor": ("sites.list_projects",),
