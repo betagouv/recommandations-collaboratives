@@ -33,7 +33,11 @@ def assign_collaborator(user, project, is_owner=False):
         permissions += models.COLLABORATOR_PERMISSIONS
 
     for perm in permissions:
-        assign_perm(perm, user, project)
+        try:
+            assign_perm(perm, user, project)
+        except auth_models.Permission.DoesNotExist as e:
+            print(f"Unable to find permission <{perm}>, aborting.")
+            raise e
 
     models.ProjectMember.objects.get_or_create(
         project=project, member=user, is_owner=is_owner

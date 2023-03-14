@@ -69,7 +69,6 @@ ADVISOR_PERMISSIONS = [
     "projects.use_tasks",
     "projects.invite_advisors",
     "projects.invite_collaborators",
-    "projects.manage_advisors",
     "projects.manage_collaborators",
     "projects.change_topics",
     "projects.manage_documents",

@@ -16,6 +16,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
+from guardian.shortcuts import get_user_perms
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.api import (
@@ -24,6 +25,7 @@ from urbanvitaliz.apps.invites.api import (
     invite_revoke,
 )
 from urbanvitaliz.apps.invites.forms import InviteForm
+from urbanvitaliz.utils import has_perm_or_403, is_staff_for_site
 
 from .. import forms, models
 from ..utils import (
@@ -32,18 +34,36 @@ from ..utils import (
     is_regional_actor_for_project,
 )
 
+
 ########################################################################
 # Access
 ########################################################################
 
 
-@staff_member_required
+@login_required
 def project_administration(request, project_id):
     """Handle ACL for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    can_administrate = can_administrate_project(project, request.user)
-    can_manage = can_manage_project(project, request.user)
+    required_perms = (
+        "invite_collaborators",
+        "invite_advisors",
+        "manage_collaborators",
+        "manage_advisors",
+        "change_project",
+    )
+
+    has_any_required_perm = any(
+        user_perm in required_perms
+        for user_perm in get_user_perms(request.user, project)
+    )
+
+    is_regional_actor = is_regional_actor_for_project(
+        request.site, project, request.user, allow_national=True
+    )
+
+    if not (is_regional_actor or has_any_required_perm):
+        raise PermissionDenied("L'information demandée n'est pas disponible")
 
     # Fetch pending invites
     pending_invites = []
@@ -55,6 +75,11 @@ def project_administration(request, project_id):
     invite_form = InviteForm()
 
     if request.method == "POST":
+        # Allow staff of current site or users with perm
+        is_staff_for_site(request.user, request.site) or has_perm_or_403(
+            request.user, "change_project", project
+        )
+
         form = forms.ProjectForm(request.POST, instance=project)
         if form.is_valid():
             instance = form.save(commit=False)
@@ -131,13 +156,18 @@ def access_invite(request, role, project):
     return redirect(reverse("projects-project-detail-overview", args=[project.pk]))
 
 
-@staff_member_required
+@login_required
 @require_http_methods(["POST"])
 def access_revoke_invite(request, project_id, invite_id):
     """Revoke an invitation for a collectivity member"""
-    get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     invite = get_object_or_404(invites_models.Invite, pk=invite_id, accepted_on=None)
+
+    if invite.role == "SWITCHTENDER":
+        has_perm_or_403(request.user, "manage_advisors", project)
+    else:
+        has_perm_or_403(request.user, "manage_collaborators", project)
 
     if invite_revoke(invite):
         messages.success(
@@ -160,28 +190,38 @@ def access_revoke_invite(request, project_id, invite_id):
 ##############################################################################
 # Collectivity
 ##############################################################################
+
+
 @login_required
 @require_http_methods(["POST"])
-def access_collectivity_invite(request, project_id):
+def access_collaborator_invite(request, project_id):
     """Invite a collectivity member"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    if not (
-        can_manage_project(project, request.user)
-        or is_regional_actor_for_project(
-            get_current_site(request), project, request.user, allow_national=True
-        )
-    ):
-        raise PermissionDenied
+    # can also be a regional actor.
+    # FIXME: should we still use allow_national or move to is_staff_for_site?
+    is_regional_actor = is_regional_actor_for_project(
+        request.site, project, request.user, allow_national=True
+    )
+
+    is_regional_actor or has_perm_or_403(request.user, "invite_collaborators", project)
 
     return access_invite(request, "COLLABORATOR", project)
 
 
-@staff_member_required
+@login_required
 @require_http_methods(["POST"])
-def access_collectivity_resend_invite(request, project_id, invite_id):
+def access_collaborator_resend_invite(request, project_id, invite_id):
     """Resend invitation for a collectivity member"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    # can also be regional actor
+    # FIXME: should we still use allow_national or move to is_staff_for_site?
+    is_regional_actor = is_regional_actor_for_project(
+        request.site, project, request.user, allow_national=True
+    )
+
+    is_regional_actor or has_perm_or_403(request.user, "invite_collaborators", project)
 
     invite = get_object_or_404(
         invites_models.Invite, role="COLLABORATOR", pk=invite_id, accepted_on=None
@@ -190,26 +230,26 @@ def access_collectivity_resend_invite(request, project_id, invite_id):
     if invite_resend(invite):
         messages.success(
             request,
-            "{0} a bien été relancé par courriel.".format(invite.email),
+            f"{invite.email} a bien été relancé par courriel.",
             extra_tags=["auth"],
         )
     else:
         messages.error(
             request,
-            "Désolé, nous n'avons pas pu relancer {0} par courriel.".format(
-                invite.email
-            ),
+            f"Désolé, nous n'avons pas pu relancer {invite.email} par courriel.",
             extra_tags=["auth"],
         )
 
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
-@staff_member_required
+@login_required
 @require_http_methods(["POST"])
-def access_collectivity_delete(request, project_id: int, email: str):
+def access_collaborator_delete(request, project_id: int, email: str):
     """Delete a collectivity member from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    has_perm_or_403(request.user, "manage_collaborators", project)
 
     membership = get_object_or_404(
         models.ProjectMember, project=project, member__username=email
@@ -245,26 +285,36 @@ def access_advisor_invite(request, project_id):
     """Invite an advisor"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    if not (
-        can_administrate_project(project, request.user)
-        or is_regional_actor_for_project(
-            get_current_site(request), project, request.user, allow_national=True
-        )
-    ):
-        raise PermissionDenied
+    # can also be regional actor
+    # FIXME: should we still use allow_national or move to is_staff_for_site?
+    is_regional_actor = is_regional_actor_for_project(
+        request.site, project, request.user, allow_national=True
+    )
 
-    return access_invite(request, "SWITCHTENDER", project)
+    is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
+
+    return access_invite(
+        request, "SWITCHTENDER", project
+    )  # should we keep switchtender?
 
 
-@staff_member_required
+@login_required
 @require_http_methods(["POST"])
 def access_advisor_resend_invite(request, project_id, invite_id):
     """Resend invitation for an advisor"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
+    # can also be regional actor
+    # FIXME: should we still use allow_national or move to is_staff_for_site?
+    is_regional_actor = is_regional_actor_for_project(
+        request.site, project, request.user, allow_national=True
+    )
+
+    is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
+
     invite = get_object_or_404(
         invites_models.Invite, role="SWITCHTENDER", pk=invite_id, accepted_on=None
-    )
+    )  # should we keep switchtender?
 
     if invite_resend(invite):
         messages.success(
@@ -284,11 +334,13 @@ def access_advisor_resend_invite(request, project_id, invite_id):
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
-@staff_member_required
+@login_required
 @require_http_methods(["POST"])
 def access_advisor_delete(request, project_id: int, email: str):
     """Delete an advisor from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    has_perm_or_403(request.user, "manage_advisors", project)
 
     advisor = get_object_or_404(
         models.ProjectSwitchtender,
