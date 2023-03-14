@@ -7,7 +7,7 @@ from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.survey import models as survey_models
 
 
-from .utils import can_administrate_project, can_manage_project, get_active_project
+from .utils import can_administrate_project, get_active_project
 
 
 def is_switchtender_processor(request):
@@ -86,9 +86,6 @@ def active_project_processor(request):
 
         context.update(
             {
-                "active_project_can_manage": can_manage_project(
-                    active_project, request.user
-                ),
                 "active_project_can_administrate": can_administrate_project(
                     active_project, request.user
                 ),

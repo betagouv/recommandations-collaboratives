@@ -9,9 +9,9 @@ import csv
 import datetime
 
 from actstream.models import Action, actor_stream, target_stream
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
 from django.db.models import Count, Q
@@ -24,8 +24,14 @@ from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.apps.resources.models import Resource
-from urbanvitaliz.utils import check_if_advisor, get_site_administrators
+from urbanvitaliz.utils import (
+    check_if_advisor,
+    get_site_administrators,
+    has_perm,
+    has_perm_or_403,
+)
 from watson import search as watson
+
 
 from . import forms, models
 
@@ -34,7 +40,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     template_name = "crm/site_dashboard.html"
 
     def test_func(self):
-        return check_if_advisor(self.request.user)
+        return has_perm(self.request.user, "use_crm", self.request.site)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -53,8 +59,10 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         return context
 
 
-@staff_member_required
+@login_required
 def crm_search(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     if request.method == "POST":
         search_form = forms.CRMSearchForm(request.POST)
 
@@ -68,8 +76,10 @@ def crm_search(request):
     return render(request, "crm/search_results.html", locals())
 
 
-@staff_member_required
+@login_required
 def organization_details(request, organization_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     organization = get_object_or_404(Organization, pk=organization_id)
 
     participants = User.objects.filter(
@@ -120,8 +130,10 @@ def organization_details(request, organization_id):
     return render(request, "crm/organization_details.html", locals())
 
 
-@staff_member_required
+@login_required
 def user_details(request, user_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     crm_user = get_object_or_404(User, pk=user_id)
 
     actions = actor_stream(crm_user)
@@ -146,8 +158,10 @@ def user_details(request, user_id):
     return render(request, "crm/user_details.html", locals())
 
 
-@staff_member_required
+@login_required
 def user_project_interest(request, user_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     crm_user = get_object_or_404(User, pk=user_id)
 
     actions = actor_stream(crm_user)
@@ -161,8 +175,10 @@ def user_project_interest(request, user_id):
     return render(request, "crm/user_project_interest.html", locals())
 
 
-@staff_member_required
+@login_required
 def user_notifications(request, user_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     crm_user = get_object_or_404(User, pk=user_id)
 
     search_form = forms.CRMSearchForm()
@@ -174,8 +190,10 @@ def user_notifications(request, user_id):
     return render(request, "crm/user_notifications.html", locals())
 
 
-@staff_member_required
+@login_required
 def project_details(request, project_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     project = get_object_or_404(Project, pk=project_id)
 
     actions = target_stream(project)
@@ -224,8 +242,10 @@ def handle_create_note_for_object(
     return False, render(request, "crm/note_create.html", locals())
 
 
-@staff_member_required
+@login_required
 def create_note_for_user(request, user_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     user = get_object_or_404(User, pk=user_id)
 
     created, response = handle_create_note_for_object(
@@ -249,8 +269,10 @@ def create_note_for_user(request, user_id):
     return response
 
 
-@staff_member_required
+@login_required
 def create_note_for_project(request, project_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     project = get_object_or_404(Project, pk=project_id)
 
     _, response = handle_create_note_for_object(
@@ -260,8 +282,10 @@ def create_note_for_project(request, project_id):
     return response
 
 
-@staff_member_required
+@login_required
 def create_note_for_organization(request, organization_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     organization = get_object_or_404(Organization, pk=organization_id)
 
     _, response = handle_create_note_for_object(
@@ -289,8 +313,10 @@ def update_note_for_object(request, note, return_view_name):
     return render(request, "crm/note_update.html", locals())
 
 
-@staff_member_required
+@login_required
 def update_note_for_user(request, user_id, note_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     user = get_object_or_404(User, pk=user_id)
     user_ct = ContentType.objects.get_for_model(user)
     note = get_object_or_404(
@@ -304,8 +330,10 @@ def update_note_for_user(request, user_id, note_id):
     return update_note_for_object(request, note, "crm-user-details")
 
 
-@staff_member_required
+@login_required
 def update_note_for_project(request, project_id, note_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     project = get_object_or_404(Project, pk=project_id)
     project_ct = ContentType.objects.get_for_model(project)
     note = get_object_or_404(
@@ -319,8 +347,10 @@ def update_note_for_project(request, project_id, note_id):
     return update_note_for_object(request, note, "crm-project-details")
 
 
-@staff_member_required
+@login_required
 def update_note_for_organization(request, organization_id, note_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     organization = get_object_or_404(Organization, pk=organization_id)
     organization_ct = ContentType.objects.get_for_model(organization)
     note = get_object_or_404(
@@ -334,8 +364,10 @@ def update_note_for_organization(request, organization_id, note_id):
     return update_note_for_object(request, note, "crm-organization-details")
 
 
-@staff_member_required
+@login_required
 def project_list_by_tags(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     tags = (
         Project.tags.filter(project__sites=request.site)
         .exclude(project__exclude_stats=True)
@@ -347,8 +379,10 @@ def project_list_by_tags(request):
     return render(request, "crm/tags_for_projects.html", locals())
 
 
-@staff_member_required
+@login_required
 def project_list_by_tags_as_csv(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     tags = (
         Project.tags.filter(project__sites=request.site)
         .exclude(project__exclude_stats=True)

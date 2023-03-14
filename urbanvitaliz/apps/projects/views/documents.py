@@ -20,7 +20,6 @@ from .. import models, signals
 from ..forms import DocumentUploadForm
 from ..utils import (
     can_administrate_project,
-    can_manage_project,
     check_if_national_actor,
     get_switchtender_for_project,
     is_regional_actor_for_project,

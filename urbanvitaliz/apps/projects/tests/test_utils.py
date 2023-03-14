@@ -19,42 +19,6 @@ from .. import models, utils
 
 
 @pytest.mark.django_db
-def test_contributor_has_the_same_rights_as_the_owner(client):
-    membership_owner = baker.make(models.ProjectMember, is_owner=True)
-    membership_contrib = baker.make(models.ProjectMember)
-
-    project = Recipe(
-        models.Project,
-        projectmember_set=[membership_owner, membership_contrib],
-        status="READY",
-    ).make()
-
-    assert utils.can_manage_project(project, membership_owner.member)
-    assert utils.can_manage_project(project, membership_contrib.member)
-
-
-@pytest.mark.django_db
-def test_switchtender_can_manage_project(request, client):
-    switchtender = Recipe(auth.User).make()
-    group = auth.Group.objects.get(name="example_com_advisor")
-    switchtender.groups.add(group)
-    project = Recipe(models.Project, status="READY").make()
-    project.switchtenders_on_site.create(
-        switchtender=switchtender, site=get_current_site(request)
-    )
-
-    assert utils.can_manage_project(project, switchtender)
-
-
-@pytest.mark.django_db
-def test_non_switchtender_cannot_administrate_project(client):
-    someone = Recipe(auth.User).make()
-    project = Recipe(models.Project, status="READY").make()
-
-    assert not utils.can_manage_project(project, someone)
-
-
-@pytest.mark.django_db
 def test_get_regional_actors_for_project(client, request):
     group_current_site = auth.Group.objects.get(name="example_com_advisor")
     group_other_site, _ = auth.Group.objects.get_or_create(name="another_com_advisor")

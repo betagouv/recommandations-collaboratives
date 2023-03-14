@@ -320,7 +320,7 @@ def delete_task(request, task_id=None):
 def remind_task(request, task_id=None):
     """Set a reminder for a task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
-    has_perm_or_403(request.user, "projects.use_tasks", task.project)
+    has_perm_or_403(request.user, "use_tasks", task.project)
 
     owner = task.project.owner
     if not owner:

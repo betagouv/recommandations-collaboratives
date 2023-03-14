@@ -285,7 +285,7 @@ def test_user_cannot_see_project_tasks_when_not_in_relation(request):
 def test_project_collaborator_can_move_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(models.Project, status="READY", sites=[site])
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )

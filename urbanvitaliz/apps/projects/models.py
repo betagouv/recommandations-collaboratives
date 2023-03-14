@@ -45,21 +45,23 @@ from .utils import generate_ro_key
 from . import apps
 
 COLLABORATOR_DRAFT_PERMISSIONS = (
+    "projects.view_public_notes",
     "projects.use_public_notes",
     "projects.view_project",
     "projects.view_tasks",
-    "projects.use_tasks",
     "projects.use_surveys",
     "projects.view_surveys",
 )
 
 COLLABORATOR_PERMISSIONS = (
+    "projects.use_tasks",
     "projects.manage_documents",
     "projects.invite_collaborators",
     "projects.manage_collaborators",
 )
 
 ADVISOR_PERMISSIONS = [
+    "projects.view_public_notes",
     "projects.use_advisor_note",
     "projects.use_public_notes",
     "projects.use_private_notes",

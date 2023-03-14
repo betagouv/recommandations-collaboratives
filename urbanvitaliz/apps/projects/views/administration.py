@@ -30,7 +30,6 @@ from urbanvitaliz.utils import has_perm_or_403, is_staff_for_site
 from .. import forms, models
 from ..utils import (
     can_administrate_project,
-    can_manage_project,
     is_regional_actor_for_project,
     unassign_advisor,
     unassign_collaborator,

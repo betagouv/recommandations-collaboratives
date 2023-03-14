@@ -14,10 +14,11 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
 from django.db import transaction
+from django.db.models import Q
 from django.urls import reverse
-from guardian.shortcuts import assign_perm, remove_perm, get_users_with_perms
+from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
+
 from urbanvitaliz import utils as uv_utils
 from urbanvitaliz.apps.reminders import api
 
@@ -142,24 +143,6 @@ def assign_observer(user, project, site=None):
 unassign_observer = unassign_advisor
 
 
-def can_manage_project(project, user, allow_draft=False):
-    """
-    Check if user is allowed to manage this project.
-    Managing means editing most things, except internal data.
-    Project managers are mostly team members of the project.
-    """
-    if user.is_anonymous:
-        return False
-
-    if is_member(user, project, allow_draft):
-        return True
-
-    if can_administrate_project(project, user):
-        return True
-
-    return False
-
-
 def can_administrate_project(project, user):
     """
     Check if user is allowed to administrate the given project.
@@ -172,18 +155,11 @@ def can_administrate_project(project, user):
     if user.is_superuser:
         return True
 
+    # FIXME replace by checking permissions
     if project:
         return project.switchtenders_on_site.filter(switchtender=user).exists()
     else:
         return models.Project.on_site.filter(switchtenders=user).exists()
-
-
-def can_administrate_or_403(project, user):
-    """Raise a 403 error is user is not an assigned switchtender or admin"""
-    if can_administrate_project(project, user):
-        return True
-
-    raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
 def is_member(user, project, allow_draft):
@@ -199,14 +175,6 @@ def in_allowed_departments(user, project):
     if not allowed:  # empty list means full access
         return True
     return project.commune and (project.commune.department_id in allowed)
-
-
-def can_manage_or_403(project, user, allow_draft=False):
-    """Raise a 403 error is user is not a owner or admin"""
-    if can_manage_project(project, user, allow_draft=allow_draft):
-        return True
-
-    raise PermissionDenied("L'information demandée n'est pas disponible")
 
 
 def get_project_moderators(site):
@@ -285,12 +253,17 @@ def get_switchtenders_for_project(project):
 
 def get_switchtender_for_project(user, project):
     """Return a switchtending position for the given user on the given project"""
+    # NOTE currently do not take observer into account
     try:
         return models.ProjectSwitchtender.objects.get(
-            switchtender=user, project=project
+            switchtender=user, project=project, site=get_current_site(request=None)
         )
     except models.ProjectSwitchtender.DoesNotExist:
         return None
+
+
+def is_advisor_for_project(user, project):
+    return get_switchtender_for_project(user, project) is not None
 
 
 def get_collaborators_for_project(project):

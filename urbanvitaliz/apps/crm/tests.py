@@ -15,7 +15,7 @@ def test_crm_organization_not_available_for_non_staff_logged_users(client):
     with login(client):
         response = client.get(url)
 
-    assert response.status_code == 302
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
@@ -24,7 +24,7 @@ def test_crm_user_not_available_for_non_staff_logged_users(client):
     with login(client):
         response = client.get(url)
 
-    assert response.status_code == 302
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
@@ -33,7 +33,7 @@ def test_crm_project_not_available_for_non_staff_logged_users(client):
     with login(client):
         response = client.get(url)
 
-    assert response.status_code == 302
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
@@ -41,7 +41,7 @@ def test_crm_organization_available_for_staff(client):
     org = baker.make(addressbook_models.Organization)
 
     url = reverse("crm-organization-details", args=[org.pk])
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
@@ -52,7 +52,7 @@ def test_crm_project_available_for_staff(client):
     project = baker.make(projects_models.Project)
 
     url = reverse("crm-project-details", args=[project.pk])
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
@@ -63,7 +63,7 @@ def test_crm_user_available_for_staff(client):
     user = baker.make(auth_models.User)
 
     url = reverse("crm-user-details", args=[user.pk])
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
@@ -76,7 +76,7 @@ def test_crm_project_create_note(client):
     data = {"tags": ["canard"], "content": "hola"}
 
     url = reverse("crm-project-note-create", args=[project.pk])
-    with login(client, is_staff=True):
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url, data)
 
     assert response.status_code == 302
@@ -91,7 +91,7 @@ def test_crm_project_create_note(client):
 
 
 @pytest.mark.django_db
-def test_site_dashboard_not_available_for_non_switchtender_users(client):
+def test_site_dashboard_not_available_for_non_staff_users(client):
     url = reverse("crm-site-dashboard")
     with login(client):
         response = client.get(url)
@@ -99,8 +99,8 @@ def test_site_dashboard_not_available_for_non_switchtender_users(client):
 
 
 @pytest.mark.django_db
-def test_site_dashboard_available_for_switchtender_users(client):
+def test_site_dashboard_available_for_staff_users(client):
     url = reverse("crm-site-dashboard")
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
