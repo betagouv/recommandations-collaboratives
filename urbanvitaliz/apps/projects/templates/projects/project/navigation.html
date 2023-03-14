@@ -12,7 +12,6 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
-
 <ul class="project-navigation d-flex align-items-center"
     style="font-family: 'Marianne', arial, sans-serif;
            padding: 0">
@@ -124,7 +123,7 @@
             {% endif %}
         {% endwith %}
     </li>
-    {% if "moderate_projects" in user_site_perms %}
+    {% if "invite_collaborators" or "invite_advisors" or "manage_advisors" or "manage_collaborators" or "change_project" in user_site_perms %}
         <li>
             <a class="{% if administration_panel %} active{% endif %} align-items-center"
                href="{% url 'projects-project-administration' project.pk %}">
