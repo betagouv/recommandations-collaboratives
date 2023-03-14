@@ -4,7 +4,7 @@ const currentProject = projects[1];
 
 describe('I can create a recommandation with no resource as a switcthender', () => {
     beforeEach(() => {
-        cy.login("jeanne");
+        cy.login("jean");
     })
 
     it('creates a reco', () => {
@@ -12,8 +12,6 @@ describe('I can create a recommandation with no resource as a switcthender', () 
         cy.visit('/projects')
 
         cy.contains(currentProject.fields.name).click({force:true});
-        cy.contains('Conseiller le projet').click({force:true});
-
         cy.contains("Recommandations").click({ force: true })
 
         cy.url().should('include', '/actions')

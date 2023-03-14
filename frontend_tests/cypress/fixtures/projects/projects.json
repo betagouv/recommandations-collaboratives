@@ -248,5 +248,35 @@
             "status": 0,
             "deleted": null
         }
+    },
+    {
+        "model": "projects.project",
+        "pk": 6,
+        "fields": {
+            "status": "DRAFT",
+            "ro_key": "af408518b67048a9bef11802765d08cs",
+            "last_name": "Johnna",
+            "first_name": "Doa",
+            "publish_to_cartofriches": false,
+            "exclude_stats": true,
+            "muted": false,
+            "org_name": "Fake org",
+            "created_on": "2022-03-29T14:31:39Z",
+            "updated_on": "2022-09-19T13:08:07.795Z",
+            "tags": "",
+            "name": "Friche à refuser",
+            "phone": "01 01 01 01 01",
+            "description": "Friche à refuser",
+            "advisors_note": "Eos non sit quis repudiandae in nesciunt sed. Error modi quia ipsam temporibus. Dolorum nesciunt eveniet voluptate suscipit. Maiores voluptatum voluptatem cum et id quod incidunt. Dolor consequuntur itaque minima. Expedita earum id doloribus numquam est quaerat quo architecto.",
+            "advisors_note_on": "2022-08-29T14:51:12Z",
+            "advisors_note_by": 7,
+            "location": "861 chemin rural 53",
+            "commune": 1,
+            "impediments": "La seconde friche",
+            "deleted": null,
+            "sites": [
+                1
+            ]
+        }
     }
 ]

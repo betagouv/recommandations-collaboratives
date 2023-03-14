@@ -1,4 +1,4 @@
-import projects from '../../../../fixtures/projects/projects.json'
+import projects from '../../../fixtures/projects/projects.json'
 
 const currentProject = projects[1];
 

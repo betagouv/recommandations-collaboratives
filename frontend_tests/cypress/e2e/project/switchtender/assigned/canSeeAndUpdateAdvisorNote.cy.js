@@ -4,7 +4,7 @@ const currentProject = projects[1];
 describe('I can see and update an advisor note', () => {
 
     beforeEach(() => {
-        cy.login("jeanne");
+        cy.login("jean");
     })
 
     it('goes to project overview and update advisor note', () => {

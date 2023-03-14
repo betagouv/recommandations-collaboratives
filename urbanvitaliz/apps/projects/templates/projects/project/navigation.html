@@ -13,7 +13,6 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
 
-
 <ul class="project-navigation d-flex align-items-center"
     style="font-family: 'Marianne', arial, sans-serif;
            padding: 0">
@@ -25,7 +24,7 @@
             </a>
         </li>
     {% endif %}
-    {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
+    {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
         <li class="position-relative survey">
             <a class="text-nowrap {% if state_of_play %} active{% endif %}"
                href="{% url 'projects-project-detail-knowledge' project.pk %}">
@@ -43,7 +42,7 @@
     {% endif %}
     <li>
         {% with "Recommandations" as label %}
-            {% if "view_tasks" in user_project_perms %}
+            {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %}
                 <a class="{% if recommandations %} active{% endif %} align-items-center"
                    href="{% url 'projects-project-detail-actions' project.pk %}">
                     {% if active_project_action_notifications_count %}
