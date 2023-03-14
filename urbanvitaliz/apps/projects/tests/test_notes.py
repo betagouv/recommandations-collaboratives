@@ -195,7 +195,7 @@ def test_private_note_hidden_from_project_members(request, client):
 
 
 @pytest.mark.django_db
-def test_public_note_available_to_readers(request, client):
+def test_advisor_public_note_available_to_collaborators(request, client):
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
@@ -212,6 +212,7 @@ def test_public_note_available_to_readers(request, client):
         )
 
     note = models.Note.objects.first()
+    assert note.content == note_content
 
     with login(client, username="collaborator") as user:
         assign_collaborator(user, project)

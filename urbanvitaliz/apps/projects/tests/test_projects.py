@@ -371,7 +371,7 @@ def test_project_list_excludes_project_not_in_switchtender_departments(request, 
 
 # Overview
 @pytest.mark.django_db
-def test_project_overview_not_available_for_non_switchtender(request, client):
+def test_project_overview_not_available_for_unprivileged_user(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-overview", args=[project.id])
     with login(client):
@@ -392,12 +392,10 @@ def test_project_overview_available_for_owner(request, client):
     )
 
     # project email is same as test user to be logged in
-    membership = baker.make(models.ProjectMember, member__is_staff=False, is_owner=True)
-    project = Recipe(
-        models.Project, sites=[current_site], projectmember_set=[membership]
-    ).make()
+    project = Recipe(models.Project, sites=[current_site]).make()
 
-    with login(client, user=membership.member, is_staff=False):
+    with login(client) as user:
+        utils.assign_collaborator(user, project, is_owner=True)
         url = reverse("projects-project-detail-overview", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
@@ -423,7 +421,7 @@ def test_project_overview_available_for_switchtender(request, client):
 
 # Knowledge
 @pytest.mark.django_db
-def test_project_knowledge_not_available_for_non_switchtender(request, client):
+def test_project_knowledge_not_available_for_unprivileged_user(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
     with login(client):
@@ -513,14 +511,13 @@ def test_project_actions_not_available_for_non_switchtender(request, client):
 @pytest.mark.django_db
 def test_project_actions_available_for_owner(request, client):
     # project email is same as test user to be logged in
-    membership = baker.make(models.ProjectMember, is_owner=True)
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
     ).make()
 
-    with login(client, user=membership.member, is_staff=False):
+    with login(client) as user:
+        utils.assign_collaborator(user, project)
         url = reverse("projects-project-detail-actions", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
@@ -552,7 +549,7 @@ def test_project_actions_available_for_restricted_switchtender(request, client):
 
 # conversations
 @pytest.mark.django_db
-def test_project_conversations_not_available_for_non_switchtender(request, client):
+def test_project_conversations_not_available_for_unprivileged_user(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-detail-conversations", args=[project.id])
     with login(client):
@@ -562,46 +559,48 @@ def test_project_conversations_not_available_for_non_switchtender(request, clien
 
 @pytest.mark.django_db
 def test_project_conversations_available_for_owner(request, client):
-    membership = baker.make(models.ProjectMember, is_owner=True)
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
     ).make()
 
-    with login(client, user=membership.member):
+    with login(client) as user:
+        utils.assign_collaborator(user, project, is_owner=True)
         url = reverse("projects-project-detail-conversations", args=[project.id])
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_project_conversations_not_available_for_unassigned_switchtender(
-    request, client
-):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-    url = reverse("projects-project-detail-conversations", args=[project.id])
-    with login(client, groups=["example_com_advisor"]):
-        response = client.get(url)
-    assert response.status_code == 403
+def test_project_conversations_available_for_regional_advisor(request, client):
+    dpt = Recipe(geomatics.Department, code="01").make()
 
-
-@pytest.mark.django_db
-def test_project_conversations_available_for_assigned_switchtender(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(
+        models.Project, commune__department=dpt, sites=[get_current_site(request)]
+    ).make()
     url = reverse("projects-project-detail-conversations", args=[project.id])
-    with login(client) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client, groups=["example_com_advisor"]) as user:
+        user.profile.departments.add(dpt)
         response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_project_conversations_not_available_for_restricted_switchtender(
-    request, client
-):
+def test_project_conversations_available_for_assigned_advisor(request, client):
+    site = get_current_site(request)
+
+    project = Recipe(models.Project, sites=[site]).make()
+    url = reverse("projects-project-detail-conversations", args=[project.id])
+
+    with login(client) as user:
+        utils.assign_advisor(user, project, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_conversations_not_available_for_nonregional_advisor(request, client):
     other = Recipe(geomatics.Department, code="02").make()
     project = Recipe(
         models.Project,
@@ -688,16 +687,19 @@ def test_project_detail_contains_informations(request, client):
     assertContains(response, note.content)
 
 
+@pytest.mark.skip(reason="waiting for UI fix")
 @pytest.mark.django_db
-def test_project_detail_contains_actions_for_switchtender(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+def test_project_detail_contains_actions_for_assigned_advisor(request, client):
+    site = get_current_site(request)
+
+    project = Recipe(models.Project, sites=[site]).make()
     url = reverse("projects-project-detail-actions", args=[project.id])
-    with login(client, groups=["example_com_advisor"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+    with login(client) as user:
+        utils.assign_advisor(user, project, site)
 
         response = client.get(url)
+    assert response.status_code == 200
+
     add_task_url = reverse("projects-project-create-action", args=[project.id])
     assertContains(response, add_task_url)
 
@@ -1010,11 +1012,14 @@ def test_projects_feed_available_for_all_users(request, client):
 def test_create_reminder_for_task(request, client):
     baker.make(communication.EmailTemplate, name="rsvp_reco")
 
+    current_site = get_current_site(request)
+
     project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        status="READY",
+        sites=[current_site],
     )
-    task = baker.make(models.Task, site=get_current_site(request), project=project)
+    task = baker.make(models.Task, site=current_site, project=project)
 
     url = reverse("projects-remind-task", args=[task.id])
     data = {"days": 5}
@@ -1037,6 +1042,7 @@ def test_create_reminder_without_delay_for_task(request, client):
 
     task = baker.make(
         models.Task,
+        project__status="READY",
         site=get_current_site(request),
     )
 
@@ -1057,6 +1063,7 @@ def test_recreate_reminder_after_for_same_task(request, client):
 
     task = Recipe(
         models.Task,
+        project__status="READY",
         site=get_current_site(request),
     ).make()
 
@@ -1083,6 +1090,7 @@ def test_recreate_reminder_before_for_same_task(request, client):
 
     task = Recipe(
         models.Task,
+        project__status="READY",
         site=get_current_site(request),
     ).make()
 

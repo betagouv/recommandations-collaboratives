@@ -285,12 +285,17 @@ def get_switchtenders_for_project(project):
 
 def get_switchtender_for_project(user, project):
     """Return a switchtending position for the given user on the given project"""
+    # NOTE currently do not take observer into account
     try:
         return models.ProjectSwitchtender.objects.get(
-            switchtender=user, project=project
+            switchtender=user, project=project, site=get_current_site(request=None)
         )
     except models.ProjectSwitchtender.DoesNotExist:
         return None
+
+
+def is_advisor_for_project(user, project):
+    return get_switchtender_for_project(user, project) is not None
 
 
 def get_collaborators_for_project(project):

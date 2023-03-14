@@ -20,6 +20,7 @@ from guardian.shortcuts import assign_perm, remove_perm
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.projects.utils import assign_collaborator
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.utils import login
@@ -196,14 +197,13 @@ def test_logged_user_can_send_message_to_team(mocker, client):
 @pytest.mark.django_db
 def test_project_owner_is_sent_to_action_page_on_login(request, client):
     url = reverse("login-redirect")
-    membership = baker.make(projects_models.ProjectMember, is_owner=True)
     project = baker.make(
         projects_models.Project,
         sites=[get_current_site(request)],
-        projectmember_set=[membership],
     )
 
-    with login(client, user=membership.member):
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
         response = client.get(url)
 
     assert response.status_code == 302

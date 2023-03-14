@@ -18,7 +18,7 @@ from urbanvitaliz.utils import login
 from django.test import RequestFactory
 from notifications.signals import notify
 
-from .. import models
+from .. import models, utils
 from .. import context_processors
 
 
@@ -26,24 +26,27 @@ from .. import context_processors
 def test_active_project_processor(request, client):
     current_site = get_current_site(request)
 
-    user = baker.make(auth_models.User, is_staff=False)
-    project = baker.make(
-        models.Project, members=[user], sites=[current_site], status="READY"
-    )
+    project = baker.make(models.Project, sites=[current_site], status="READY")
 
     objects = (
         baker.make(models.Document, project=project, the_link="http://nowhe.re"),
         baker.make(models.Note, project=project, public=True),
         baker.make(models.Note, project=project, public=False),
         baker.make(models.Task, project=project, public=False),
+        # NOTE should we also add a Task w/ public=True ?
     )
 
-    for obj in objects:
-        notify.send(
-            sender=user, recipient=user, verb="verb", action_object=obj, target=project
-        )
+    with login(client) as user:
+        utils.assign_collaborator(user, project)
+        for obj in objects:
+            notify.send(
+                sender=user,
+                recipient=user,
+                verb="verb",
+                action_object=obj,
+                target=project,
+            )
 
-    with login(client, user=user):
         response = client.get(
             reverse("projects-project-detail-overview", args=[project.pk])
         )

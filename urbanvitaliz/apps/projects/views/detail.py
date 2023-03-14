@@ -16,19 +16,24 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import check_if_advisor, get_site_config_or_503, has_perm_or_403
+from urbanvitaliz.utils import (
+    check_if_advisor,
+    get_site_config_or_503,
+    has_perm_or_403,
+    has_perm,
+)
 
 from .. import models
 from ..forms import PrivateNoteForm, ProjectTagsForm, ProjectTopicsForm, PublicNoteForm
 from ..utils import (
     can_administrate_or_403,
     can_administrate_project,
-    can_manage_or_403,
     can_manage_project,
     check_if_national_actor,
     get_notification_recipients_for_project,
     get_switchtender_for_project,
     is_regional_actor_for_project,
+    is_advisor_for_project,
     set_active_project_id,
 )
 
@@ -44,70 +49,64 @@ def project_overview(request, project_id=None):
     """Return the details of given project for switchtender"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    # compute permissions
-    can_manage = can_manage_project(project, request.user)
-    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-
-    current_site = get_current_site(request)
-    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        current_site, project, request.user, allow_national=True
+        request.site, project, request.user, allow_national=True
     )
-    can_administrate = can_administrate_project(project, request.user)
-    is_switchtender = check_if_advisor(request.user)
-    switchtending = get_switchtender_for_project(request.user, project)
+
+    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
+        request.user, "view_project", project
+    )
 
     try:
         onboarding_response = dict(project.onboarding.response)
     except models.Project.onboarding.RelatedObjectDoesNotExist:
         onboarding_response = None
 
-    # check user can administrate project (member or switchtender)
-    if request.user != project.owner:
-        # bypass if user is switchtender, all are allowed to view at least
-        if not is_switchtender:
-            can_manage_or_403(project, request.user)
-
     # Set this project as active
     set_active_project_id(request, project.pk)
 
     # Make sure we track record of user's interest for this project
     if not request.user.is_hijacked:
-        if is_regional_actor or can_administrate:
-            pus, created = models.UserProjectStatus.objects.get_or_create(
-                site=request.site,
-                user=request.user,
-                project=project,
-                defaults={"status": "TODO"},
-            )
+        mark_notifications_as_seen(request.user, project)
 
-            if not created and pus.status == "NEW":
-                pus.status = "TODO"
-                pus.save()
-
-    # Mark some notifications as seen (general ones)
-    if not request.user.is_hijacked:
-        project_ct = ContentType.objects.get_for_model(project)
-        general_notifications = request.user.notifications.unread().filter(
-            Q(verb="est devenu·e aiguilleur·se sur le projet")  # XXX For compatibility
-            | Q(verb="est devenu·e conseiller·e sur le projet")
-            | Q(verb="a été validé")
-            | Q(verb="a validé le projet")
-            | Q(verb="a soumis pour modération le projet")
-            | Q(verb="a mis à jour le questionnaire")
-            | Q(verb="a ajouté un document")
-            | Q(verb="a envoyé un message")
-            | Q(verb="a rejoint l'équipe sur le projet")  # XXX For compatibility
-            | Q(verb="a rejoint l'équipe projet"),
-            target_content_type=project_ct.pk,
-            target_object_id=project.pk,
-        )
-
-        general_notifications.mark_all_as_read()
+        if is_regional_actor or is_advisor_for_project(request.user, project):
+            update_user_project_status(request.site, request.user, project)
 
     invite_form = InviteForm()
 
     return render(request, "projects/project/overview.html", locals())
+
+
+def update_user_project_status(site, user, project):
+    pus, created = models.UserProjectStatus.objects.get_or_create(
+        site=site,
+        user=user,
+        project=project,
+        defaults={"status": "TODO"},
+    )
+    if not created and pus.status == "NEW":
+        pus.status = "TODO"
+        pus.save()
+
+
+def mark_notifications_as_seen(user, project):
+    # Mark some notifications as seen (general ones)
+    project_ct = ContentType.objects.get_for_model(project)
+    notifications = user.notifications.unread().filter(
+        Q(verb="est devenu·e aiguilleur·se sur le projet")  # XXX For compatibility
+        | Q(verb="est devenu·e conseiller·e sur le projet")
+        | Q(verb="a été validé")
+        | Q(verb="a validé le projet")
+        | Q(verb="a soumis pour modération le projet")
+        | Q(verb="a mis à jour le questionnaire")
+        | Q(verb="a ajouté un document")
+        | Q(verb="a envoyé un message")
+        | Q(verb="a rejoint l'équipe sur le projet")  # XXX For compatibility
+        | Q(verb="a rejoint l'équipe projet"),
+        target_content_type=project_ct.pk,
+        target_object_id=project.pk,
+    )
+    notifications.mark_all_as_read()
 
 
 @login_required
@@ -115,23 +114,13 @@ def project_knowledge(request, project_id=None):
     """Return the details of given project for switchtender"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    # compute permissions
-    can_manage = can_manage_project(project, request.user)
-    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-
-    current_site = get_current_site(request)
-    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        current_site, project, request.user, allow_national=True
+        request.site, project, request.user, allow_national=True
     )
-    can_administrate = can_administrate_project(project, request.user)
-    switchtending = get_switchtender_for_project(request.user, project)
 
-    # check user can administrate project (member or switchtender)
-    if request.user != project.members.filter(projectmember__is_owner=True).first():
-        # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_advisor(request.user):
-            can_manage_or_403(project, request.user)
+    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
+        request.user, "view_surveys", project
+    )
 
     # Set this project as active
     set_active_project_id(request, project.pk)
@@ -149,22 +138,13 @@ def project_actions(request, project_id=None):
     """Action page for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    # compute permissions
-    can_manage = can_manage_project(project, request.user)
-    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-    current_site = get_current_site(request)
-    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        current_site, project, request.user, allow_national=True
+        request.site, project, request.user, allow_national=True
     )
-    can_administrate = can_administrate_project(project, request.user)
-    switchtending = get_switchtender_for_project(request.user, project)
 
-    # check user can administrate project (member or switchtender)
-    if request.user != project.members.filter(projectmember__is_owner=True).first():
-        # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_advisor(request.user):
-            can_manage_or_403(project, request.user)
+    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
+        request.user, "view_tasks", project
+    )
 
     # Set this project as active
     set_active_project_id(request, project.pk)
@@ -186,23 +166,13 @@ def project_actions_inline(request, project_id=None):
     """Inline Action page for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    # compute permissions
-    can_manage = can_manage_project(project, request.user)
-    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-
-    current_site = get_current_site(request)
-    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        current_site, project, request.user, allow_national=True
+        request.site, project, request.user, allow_national=True
     )
-    can_administrate = can_administrate_project(project, request.user)
-    switchtending = get_switchtender_for_project(request.user, project)
 
-    # check user can administrate project (member or switchtender)
-    if request.user != project.members.filter(projectmember__is_owner=True).first():
-        # bypass if user is switchtender, all are allowed to view at least
-        if not check_if_advisor(request.user):
-            can_manage_or_403(project, request.user)
+    has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
+        request.user, "view_tasks", project
+    )
 
     # Set this project as active
     set_active_project_id(request, project.pk)
@@ -212,21 +182,14 @@ def project_actions_inline(request, project_id=None):
 
 @login_required
 def project_conversations(request, project_id=None):
-    """Action page for given project"""
+    """Conversation page for project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    can_manage_or_403(project, request.user, allow_draft=request.user == project.owner)
-
-    # compute permissions
-    can_manage = can_manage_project(project, request.user)
-    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-
-    current_site = get_current_site(request)
-    is_national_actor = check_if_national_actor(current_site, request.user)
     is_regional_actor = is_regional_actor_for_project(
-        current_site, project, request.user, allow_national=True
+        request.site, project, request.user, allow_national=True
     )
-    can_administrate = can_administrate_project(project, request.user)
+
+    is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
 
     # Set this project as active
     set_active_project_id(request, project.pk)
@@ -255,16 +218,6 @@ def project_internal_followup(request, project_id=None):
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     has_perm_or_403(request.user, "projects.use_private_notes", project)
-
-    # compute permissions
-    can_manage = can_manage_project(project, request.user)
-    can_manage_draft = can_manage_project(project, request.user, allow_draft=True)
-
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-    is_national_actor = check_if_national_actor(request.site, request.user)
-    can_administrate = can_administrate_project(project, request.user)
 
     # Set this project as active
     set_active_project_id(request, project.pk)
