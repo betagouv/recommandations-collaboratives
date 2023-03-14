@@ -1,4 +1,9 @@
-{% if switchtending %}
+{% load guardian_tags %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
+
+{% if "list_projects" in user_site_perms %}
 {% if switchtending.is_observer %}
 
 <div class="mt-3 pt-3 p-3 border" style="background-color: #f6f6f6">

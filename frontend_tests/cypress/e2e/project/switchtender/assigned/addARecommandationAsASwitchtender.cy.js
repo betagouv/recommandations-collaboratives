@@ -12,7 +12,6 @@ describe('I can create a recommandation with no resource as a switcthender', () 
         cy.visit('/projects')
 
         cy.contains(currentProject.fields.name).click({force:true});
-
         cy.contains("Recommandations").click({ force: true })
 
         cy.url().should('include', '/actions')

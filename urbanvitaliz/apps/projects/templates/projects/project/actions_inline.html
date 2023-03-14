@@ -5,6 +5,7 @@
 {% load gravatar %}
 {% load sass_tags %}
 {% load django_vite %}
+{% load guardian_tags %}
 
 {% block js %}
     {% vite_asset 'js/apps/project.js' %}
@@ -24,6 +25,10 @@
 {% endblock %}
 
 {% block project_detail %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
+
 <div class="col-12 mx-auto">
 
     {% include 'projects/project/navigation.html' with recommandations=True %}
@@ -35,6 +40,7 @@
         </div>
         <div class="d-flex align-items-center">
             {% if not disable_add_recommendation %}
+                {% if "manage_tasks" in user_project_perms %}
             <a class="button filled me-2"
                href="{% url 'projects-project-create-action' project.id %}?next={{request.path}}">
                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
@@ -42,6 +48,7 @@
                 </svg>
                 Ajouter une recommandation
             </a>
+                {% endif %}
             {% endif %}
             <a class="button" href="{% url 'projects-project-detail-actions' project.pk %}">Revenir sur la vue du kanban</a>
         </div>

@@ -1,7 +1,11 @@
 {% load static %}
 {% load gravatar %}
-<div class="{% if not is_advisor_note %} pe-4 {% endif %} pt-4 {% if full_width %}w-100{% else %}w-50{% endif %} h-100">
-    <div class="d-flex align-items-center justify-content-between" style="margin-bottom: 6px;">
+{% load guardian_tags %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
+<div class="{% if not is_advisor_note %} pe-4{% endif %} pt-4 {% if full_width %}w-100{% else %}w-50{% endif %} h-100">
+    <div class="d-flex align-items-center justify-content-between"
+         style="margin-bottom: 6px">
         <h6 style="font-size: 14px;" class="text-uppercase fw-bold m-0 p-0">
             {% if onboarding_information %}
                 {% if title %}
@@ -14,15 +18,17 @@
             {% endif %}
         </h6>
         {% if is_advisor_note %}
-            <span class="ms-2 me-4 text-danger tiny d-flex align-items-center" href="{% url "projects-project-topics" project.id %}#advisor-note">
+            <span class="ms-2 me-4 text-danger tiny d-flex align-items-center"
+                  href="{% url "projects-project-topics" project.id %}#advisor-note">
                 <svg class="bi ms-2 " width="10" height="10" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
                 </svg>
                 <span>Non visible par la collectivité</span>
             </span>
         {% endif %}
-        {% if can_administrate and is_editable %}
-            <a class="ms-2 tiny d-flex align-items-center" href="{% url "projects-project-topics" project.id %}#advisor-note">
+        {% if "use_advisor_note" in user_project_perms and is_editable %}
+            <a class="ms-2 tiny d-flex align-items-center"
+               href="{% url "projects-project-topics" project.id %}#advisor-note">
                 <span>Éditer</span>
                 <svg class="bi ms-2 " width="10" height="10" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />

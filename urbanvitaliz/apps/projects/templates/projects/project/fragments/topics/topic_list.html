@@ -1,10 +1,14 @@
 {% load static %}
+{% load guardian_tags %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="w-100 mb-3 h-100 responsive-wrapper">
-    <div class="d-flex align-items-center justify-content-between w-100" style="margin-bottom: 7px;">
+    <div class="d-flex align-items-center justify-content-between w-100"
+         style="margin-bottom: 7px">
         <h6 class="d-flex align-items-center justify-content-center text-uppercase fw-bold font-small mb-0">
             <span>Sujets diagnostiqués</span>
         </h6>
-        {% if can_administrate and project.topics_on_site.count != 0 %}
+        {% if "change_topics" in user_project_perms and project.topics_on_site.count != 0  %}
             <a class="d-flex align-items-center"
                href="{% url "projects-project-topics" project.id %}">
                 <span class="tiny">Éditer</span>
@@ -15,13 +19,18 @@
         {% endif %}
     </div>
     {% if project.topics_on_site.count == 0 %}
-        <div class="project-card-details pt-4 py-4 d-flex flex-column align-items-center justify-content-center h-100" style="min-height: 100px;">
+        <div class="project-card-details pt-4 py-4 d-flex flex-column align-items-center justify-content-center h-100"
+             style="min-height: 100px">
             <span class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">Les sujets n'ont pas encore été identifiés</span>
-            <a class="button mt-3"
-               href="{% url "projects-project-topics" project.id %}">Identifier les sujets</a>
+            {% if "change_topics" in user_project_perms %}
+                <a class="button mt-3"
+                   href="{% url "projects-project-topics" project.id %}">Identifier les sujets</a>
+            {% endif %}
         </div>
     {% else %}
-        <ul class="list-unstyled mb-0 p-4 h-100" style="background-color: #f6f6f6;min-height: 100px;">
+        <ul class="list-unstyled mb-0 p-4 h-100"
+            style="background-color: #f6f6f6;
+                   min-height: 100px">
             {% for topic in project.topics_on_site.all %}
                 {% include 'projects/project/fragments/topics/topic_list_item.html' %}
             {% endfor %}

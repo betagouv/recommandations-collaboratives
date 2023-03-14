@@ -1,11 +1,16 @@
 {% load static %}
 {% load humanize %}
-
+{% load guardian_tags %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 {% if document %}
-<div class="mb-3">
-  <div class="rounded border py-2 px-3 mb-2 d-flex align-items-center justify-content-between">
+  <div class="mb-3">
+    <div class="rounded border py-2 px-3 mb-2 d-flex align-items-center justify-content-between">
       <div class="d-flex align-items-center">
-        <a href="{{ document.the_file.url }}" class="d-flex align-items-center text-decoration-none" target="_new" download>
+        <a href="{{ document.the_file.url }}"
+           class="d-flex align-items-center text-decoration-none"
+           target="_new"
+           download>
           <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
           </svg>
@@ -17,47 +22,68 @@
         </a>
       </div>
       <div class="d-flex align-items-center">
-            <form method="POST" action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
-                {% csrf_token %}
-                <button class="btn btn-link d-flex p-0 me-2">
-                    <svg class="bi align-baseline fill-blue" width="20" height="20">
-                        {% if document.pinned == True %}
-                        <use id="file-is-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
-                        {% else %}
-                        <use id="file-is-not-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star" />
-                        {% endif %}
-                    </svg>
-                </button>
-            </form>
-          {% if document.uploaded_by == user or can_administrate %}
-              <form class="me-2" method="post" action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
-                {% csrf_token %}
-                <button id="file-delete-button" class="d-flex" style="border: 0; background: 0;">
-                  <svg class="bi align-baseline fill-grey" width="20" height="20">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
-                  </svg>
-                </button>
-              </form>
-          {% endif %}
-        <a class="d-flex" href="{{ document.the_file.url }}" target="_new" download>
+        {% if "manage_documents" in user_project_perms %}
+          <form method="POST"
+                action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-link d-flex p-0 me-2">
+              <svg class="bi align-baseline fill-blue" width="20" height="20">
+                {% if document.pinned == True %}
+                  <use id="file-is-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
+                {% else %}
+                  <use id="file-is-not-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star" />
+                {% endif %}
+              </svg>
+            </button>
+          </form>
+        {% endif %}
+        {% if document.uploaded_by == user and "manage_documents" in user_project_perms %}
+          <form class="me-2"
+                method="post"
+                action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
+            {% csrf_token %}
+            <button id="file-delete-button"
+                    class="d-flex"
+                    style="border: 0;
+                           background: 0">
+              <svg class="bi align-baseline fill-grey" width="20" height="20">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
+              </svg>
+            </button>
+          </form>
+        {% endif %}
+        {% if "manage_documents" in user_project_perms %}
+        <a class="d-flex"
+           href="{{ document.the_file.url }}"
+           target="_new"
+           download>
           <svg class="bi align-baseline fill-blue" width="20" height="20">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#download" />
           </svg>
         </a>
+        {% endif %}
+      </div>
     </div>
-  </div>
     <div class="ps-4 ms-4 d-flex align-items-center">
-      <span class="tiny"><strong>{% if document.uploaded_by.get_full_name %}{{ document.uploaded_by.get_full_name }}{% else %}{{ document.uploaded_by.email }}{% endif %}.</strong>
-          {% if document.uploaded_by.profile.organization %}
-          <span class="tiny text-grey-dark">Équipe {{ document.uploaded_by.profile.organization.name }}</strong></span>
-          {% endif %}
-      </span>
-      <span class="ms-4 tiny d-flex align-items-center"><svg class="bi align-baseline me-2" width="12" height="12" fill="#222">
-        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />
-      </svg> {{ document.created_on|naturalday }}</span>
-      {% if document.attached_object %}
-        <span class="ms-4 tiny d-flex">De :  <a href="{{document.attached_object.get_absolute_url}}"> {{ document.attached_object }}</a>
+      <span class="tiny"><strong>
+        {% if document.uploaded_by.get_full_name %}
+          {{ document.uploaded_by.get_full_name }}
+        {% else %}
+          {{ document.uploaded_by.email }}
+        {% endif %}
+      .</strong>
+      {% if document.uploaded_by.profile.organization %}
+        <span class="tiny text-grey-dark">Équipe {{ document.uploaded_by.profile.organization.name }}</strong></span>
       {% endif %}
-    </div>
-  </div>
+    </span>
+    <span class="ms-4 tiny d-flex align-items-center">
+      <svg class="bi align-baseline me-2" width="12" height="12" fill="#222">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />
+      </svg>
+    {{ document.created_on|naturalday }}</span>
+    {% if document.attached_object %}
+    <span class="ms-4 tiny d-flex">De :  <a href="{{ document.attached_object.get_absolute_url }}">{{ document.attached_object }}</a>
   {% endif %}
+</div>
+</div>
+{% endif %}

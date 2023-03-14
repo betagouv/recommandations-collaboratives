@@ -1,50 +1,57 @@
 {% load static %}
 {% load gravatar %}
-
-
+{% load guardian_tags %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 {% if is_switchtender or can_administrate %}
-	<div class="d-flex mt-1 mb-0 mx-2 align-items-center justify-content-between">
-{% else %}
-	<div class="d-flex mt-1 mb-4 mx-2 align-items-center justify-content-between">
-{% endif %}
-	{% if is_switchtender %}
-	<h2 class="text-secondary text-uppercase fw-bolder mb-0" style="font-size: 12px;">
-		Recommandations proposées à la collectivité
-	</h2>
-	{% endif %}
-
-	<div class="d-flex align-items-center">
-		<div class="d-flex align-items-center ms-2">
-			<span class="text-muted me-2">Équipe de suivi :</span>
-			{% for switchtender in project.switchtenders.all %}
-			<img class="rounded-circle d-inline-block ms-1" width="20px" height="20px"
-				src="{% gravatar_url switchtender.email 25 %}" data-bs-toggle="tooltip" data-bs-placement="bottom"
-				title="{{ switchtender.get_full_name|default:'Conseiller inconnu' }} - {{ switchtender.profile.organization.name|default:'Organisation iconnue' }}"
-				tabindex="0" />
-			{% endfor %}
-		</div>
-
-		{% if can_administrate %}
-		<span class="ms-4">
-			<a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'projects-project-create-action' project.id %}">
-				<svg class="bi me-1" width="16" height="16" fill="currentColor">
-					<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
-				</svg>
-				Ajouter une recommandation
-			</a>
-		</span>
-		{% endif %}
-		<div x-data class="ms-2" style="width: 24px; height: 24px;">
-			<div x-show="$store.app.isLoading" class="spinner-border spinner-border spinner-border-sm text-primary" role="status">
-			</div>
-		</div>
-	</div>
-</div>
-{% if can_administrate %}
-<div class="mb-4 mx-2 d-flex flex-column">
-	<a href="{% url 'projects-project-tasks-suggest' project.pk %}">
-		Examiner les recommandations suggérées automatiquement pour ce projet
-	</a>
-	<span class="mb-4 ml-4 pl-4 text-muted">Pour éventuellement les proposer à la collectivité</span>
-</div>
-{% endif %}
+    <div class="d-flex mt-1 mb-0 mx-2 align-items-center justify-content-between">
+    {% else %}
+        <div class="d-flex mt-1 mb-4 mx-2 align-items-center justify-content-between">
+        {% endif %}
+        {% if is_switchtender %}
+            <h2 class="text-secondary text-uppercase fw-bolder mb-0"
+                style="font-size: 12px">
+                Recommandations proposées à la collectivité
+            </h2>
+        {% endif %}
+        <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center ms-2">
+                <span class="text-muted me-2">Équipe de suivi :</span>
+                {% for switchtender in project.switchtenders.all %}
+                    <img class="rounded-circle d-inline-block ms-1"
+                         width="20px"
+                         height="20px"
+                         src="{% gravatar_url switchtender.email 25 %}"
+                         data-bs-toggle="tooltip"
+                         data-bs-placement="bottom"
+                         title="{{ switchtender.get_full_name|default:'Conseiller inconnu' }} - {{ switchtender.profile.organization.name|default:'Organisation iconnue' }}"
+                         tabindex="0"/>
+                {% endfor %}
+            </div>
+            {% if "manage_tasks" in user_project_perms %}
+                <span class="ms-4">
+                    <a class="btn btn-outline-primary w-100 btn-sm"
+                       href="{% url 'projects-project-create-action' project.id %}">
+                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
+                        </svg>
+                        Ajouter une recommandation
+                    </a>
+                </span>
+            {% endif %}
+            <div x-data class="ms-2" style="width: 24px; height: 24px;">
+                <div x-show="$store.app.isLoading"
+                     class="spinner-border spinner-border spinner-border-sm text-primary"
+                     role="status">
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if can_administrate %}
+        <div class="mb-4 mx-2 d-flex flex-column">
+            <a href="{% url 'projects-project-tasks-suggest' project.pk %}">
+                Examiner les recommandations suggérées automatiquement pour ce projet
+            </a>
+            <span class="mb-4 ml-4 pl-4 text-muted">Pour éventuellement les proposer à la collectivité</span>
+        </div>
+    {% endif %}

@@ -12,6 +12,19 @@ describe('I can access actions tab in a project as a member', () => {
         cy.visit(`/project/${currentProject.pk}`)
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
+    })
+})
 
+describe('I can access actions tab in a project as an advisor', () => {
+
+    beforeEach(() => {
+        cy.login("jean");
+    })
+
+    it('goes to the action page of my project', () => {
+
+        cy.visit(`/project/${currentProject.pk}`)
+        cy.contains('Recommandations').click({ force: true })
+        cy.url().should('include', '/actions')
     })
 })

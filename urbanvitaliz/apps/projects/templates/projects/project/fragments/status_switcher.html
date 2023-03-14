@@ -1,21 +1,35 @@
 {% load static %}
+{% load guardian_tags %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="StatusSwitcher($refs.commentTextRef, $refs.commentTextFormRef)">
     <div @issue-followup="handleIssueFollowup($event)">
         <div class="d-flex flex-column">
             <h2 class="text-secondary text-uppercase fw-bolder m-3"
                 style="font-size: 12px">État d'avancement actuel</h2>
-            <span class="status-switcher-item mx-3"
-                  style="background-color: #14A2F1;
-                         color: white;cursor: pointer;"
-                  @click="handleStatusWrapper"
-                  x-text="statusText(currentTask.status)"></span>
-            <div class="d-flex align-items-center justify-content-center">
-                <span class="py-2 tiny fw-bold text-center text-decoration-underline"
+            {% if "use_tasks" in user_project_perms %}
+                <span class="status-switcher-item mx-3"
+                      style="background-color: #14A2F1;
+                             color: white;
+                             cursor: pointer"
                       @click="handleStatusWrapper"
-                      style="color: #335B7E; !important; cursor: pointer;"
-                      class="m-3" x-text="openStatusWrapper ? 'Fermer' : 'Modifier le statut'">
-                </span>
-            </div>
+                      x-text="statusText(currentTask.status)"></span>
+                <div class="d-flex align-items-center justify-content-center">
+                    <span class="py-2 tiny fw-bold text-center text-decoration-underline"
+                          @click="handleStatusWrapper"
+                          style="color: #335B7E;
+                                 !important;
+                                 cursor: pointer"
+                          class="m-3"
+                          x-text="openStatusWrapper ? 'Fermer' : 'Modifier le statut'">
+                    </span>
+                </div>
+            {% else %}
+                <span class="status-switcher-item mx-3"
+                      style="background-color: #14A2F1;
+                             color: white"
+                      x-text="statusText(currentTask.status)"></span>
+            {% endif %}
         </div>
         <template x-if="openStatusWrapper">
             <ul class="d-flex align-items-center status-switcher list-unstyled mt-0 m-3">

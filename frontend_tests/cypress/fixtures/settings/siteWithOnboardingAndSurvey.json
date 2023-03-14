@@ -3,18 +3,18 @@
         "model": "sites.site",
         "pk": 1,
         "fields": {
-            "domain": "urbanvitaliz.localhost",
-            "name": "UrbanVitaliz"
+            "domain": "example.com",
+            "name": "example"
         }
     },
     {
         "model": "multisite.alias",
         "pk": 1,
         "fields": {
-            "domain": "urbanvitaliz.localhost",
+            "domain": "example.localhost",
             "site": 1,
             "is_canonical": true,
-            "redirect_to_canonical": true
+            "redirect_to_canonical": false
         }
     },
     {

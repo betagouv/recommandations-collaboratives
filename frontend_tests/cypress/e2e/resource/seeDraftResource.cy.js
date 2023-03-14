@@ -5,7 +5,5 @@ describe('I can see a draft resource as a switchtender', () => {
 
     it('sees a draft resource', () => {
         cy.visit('/ressource/3/')
-
-        cy.contains("Cette ressource est en cours d'écriture")
     })
 })

@@ -13,10 +13,7 @@
             "is_staff": true,
             "is_active": true,
             "date_joined": "2021-07-09T09:29:47.252Z",
-            "groups": [
-                1,
-                3
-            ],
+            "groups": [4],
             "user_permissions": []
         }
     },
@@ -35,7 +32,7 @@
             "is_active": true,
             "date_joined": "2021-10-11T07:59:45Z",
             "groups": [
-                1
+                4
             ],
             "user_permissions": []
         }
@@ -55,7 +52,7 @@
             "is_active": true,
             "date_joined": "2021-10-11T07:59:45Z",
             "groups": [
-                1
+                4
             ],
             "user_permissions": []
         }
@@ -75,7 +72,7 @@
             "is_active": true,
             "date_joined": "2021-07-09T09:29:47.252Z",
             "groups": [
-                1
+              4  
             ],
             "user_permissions": []
         }
@@ -131,6 +128,24 @@
             "is_active": true,
             "date_joined": "2021-07-09T09:29:47.252Z",
             "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 8,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
+            "last_login": "2022-09-01T08:58:56.513Z",
+            "is_superuser": false,
+            "username": "national@test.fr",
+            "first_name": "nationale",
+            "last_name": "nationale",
+            "email": "national@test.fr",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2021-07-09T09:29:47.252Z",
+            "groups": [4],
             "user_permissions": []
         }
     }

@@ -8,12 +8,12 @@ describe('I can go to the dashboard and see the pending projects, and approve on
         cy.visit('/projects')
 
         cy.contains("Projets en attente d'acceptation")
-        cy.contains("Friche numéro 3")
-        cy.get("#draft-projects").siblings().contains('Friche numéro 3').parents('tr').contains('Accepter').click({ force: true })
+        cy.contains("Friche numéro 4")
+        cy.get("#draft-projects").siblings().contains('Friche numéro 4').parents('tr').contains('Accepter').click({ force: true })
         cy.url().should('include', '/project/')
-        cy.contains("Friche numéro 3")
+        cy.contains("Friche numéro 4")
 
         cy.visit('/projects')
-        cy.get("#draft-projects").siblings().contains('Friche numéro 3').should('not.exist')
+        cy.get("#draft-projects").siblings().contains('Friche numéro 4').should('not.exist')
     })
 })

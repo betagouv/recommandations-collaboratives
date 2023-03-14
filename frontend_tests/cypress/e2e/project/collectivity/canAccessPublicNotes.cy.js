@@ -8,7 +8,7 @@ describe('I can access and use public notes', () => {
         cy.login("bob");
     })
 
-    it('goes to public notes', () => {
+    it('clicks on the "public note" button', () => {
 
         cy.visit(`/project/${currentProject.pk}`)
 
