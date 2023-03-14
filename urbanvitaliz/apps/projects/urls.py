@@ -11,8 +11,16 @@ created : 2021-05-26 15:54:25 CEST
 from django.urls import path
 
 from . import views
-from .views import (administration, detail, documents, export, feeds, notes,
-                    sharing, tasks)
+from .views import (
+    administration,
+    detail,
+    documents,
+    export,
+    feeds,
+    notes,
+    sharing,
+    tasks,
+)
 
 urlpatterns = [
     path(
@@ -241,12 +249,12 @@ urlpatterns = [
     ),
     path(
         r"project/<int:project_id>/administration/access/collectivity/invite",
-        administration.access_collectivity_invite,
+        administration.access_collaborator_invite,
         name="projects-project-access-collectivity-invite",
     ),
     path(
         r"project/<int:project_id>/administration/access/collectivity/invite/<uuid:invite_id>/resend",
-        administration.access_collectivity_resend_invite,
+        administration.access_collaborator_resend_invite,
         name="projects-project-access-collectivity-resend-invite",
     ),
     path(
@@ -266,7 +274,7 @@ urlpatterns = [
     ),
     path(
         r"project/<int:project_id>/administration/access/collectivity/<str:email>/delete",
-        administration.access_collectivity_delete,
+        administration.access_collaborator_delete,
         name="projects-project-access-collectivity-delete",
     ),
     path(

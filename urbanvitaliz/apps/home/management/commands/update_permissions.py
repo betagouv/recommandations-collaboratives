@@ -10,7 +10,6 @@ created: 2023-02-21 18:57:48 CET
 from django.core.management.base import BaseCommand
 from django.contrib.sites.models import Site
 
-
 from urbanvitaliz.utils import get_group_for_site
 from urbanvitaliz.apps.home.models import SITE_GROUP_PERMISSIONS
 from urbanvitaliz.apps.projects.models import Project, ProjectSwitchtender
