@@ -157,6 +157,91 @@ def test_resource_list_contains_only_resource_with_area(request, client):
     assertNotContains(response, detail_url)
 
 
+@pytest.mark.django_db
+def test_resource_list_contains_only_resource_with_draft_selected(request, client):
+    current_site = get_current_site(request)
+
+    resource1 = Recipe(
+        models.Resource,
+        sites=[current_site],
+        title="selected resource",
+        status=models.Resource.DRAFT,
+    ).make()
+    resource2 = Recipe(
+        models.Resource,
+        sites=[current_site],
+        title="unselected resource",
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    url = reverse("resources-resource-search")
+    url = f"{url}?draft=true&query=resource"
+    with login(client, is_staff=True) as user:
+        response = client.get(url)
+
+    detail_url = reverse("resources-resource-detail", args=[resource1.id])
+    assertContains(response, detail_url)
+    detail_url = reverse("resources-resource-detail", args=[resource2.id])
+    assertNotContains(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_resource_list_contains_only_resource_with_to_review_selected(request, client):
+    current_site = get_current_site(request)
+
+    resource1 = Recipe(
+        models.Resource,
+        sites=[current_site],
+        title="selected resource",
+        status=models.Resource.TO_REVIEW,
+    ).make()
+    resource2 = Recipe(
+        models.Resource,
+        sites=[current_site],
+        title="unselected resource",
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    url = reverse("resources-resource-search")
+    url = f"{url}?to_review=true&query=resource"
+    with login(client, is_staff=True) as user:
+        response = client.get(url)
+
+    detail_url = reverse("resources-resource-detail", args=[resource1.id])
+    assertContains(response, detail_url)
+    detail_url = reverse("resources-resource-detail", args=[resource2.id])
+    assertNotContains(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_resource_list_contains_only_resource_with_expired_selected(request, client):
+    current_site = get_current_site(request)
+
+    resource1 = Recipe(
+        models.Resource,
+        sites=[current_site],
+        title="selected resource",
+        status=models.Resource.PUBLISHED,
+        expires_on="1970-01-01",
+    ).make()
+    resource2 = Recipe(
+        models.Resource,
+        sites=[current_site],
+        title="unselected resource",
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    url = reverse("resources-resource-search")
+    url = f"{url}?expired=true&query=resource"
+    with login(client, is_staff=True) as user:
+        response = client.get(url)
+
+    detail_url = reverse("resources-resource-detail", args=[resource1.id])
+    assertContains(response, detail_url)
+    detail_url = reverse("resources-resource-detail", args=[resource2.id])
+    assertNotContains(response, detail_url)
+
+
 #
 # details
 
