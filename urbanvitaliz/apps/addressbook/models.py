@@ -18,8 +18,15 @@ class OrganizationManager(models.Manager):
         return super().get_queryset().order_by(Lower("name"))
 
 
+class OrganizationOnSiteManager(CurrentSiteManager, OrganizationManager):
+    pass
+
+
 class Organization(models.Model):
     objects = OrganizationManager()
+    on_site = OrganizationOnSiteManager()
+
+    sites = models.ManyToManyField(Site, related_name="organizations")
 
     name = models.CharField(max_length=90, verbose_name="Nom")
     departments = models.ManyToManyField(
@@ -37,7 +44,7 @@ class ContactManager(models.Manager):
         return super().get_queryset().order_by(Lower("last_name"), Lower("first_name"))
 
 
-class ContactOnSiteManager(CurrentSiteManager, models.Manager):
+class ContactOnSiteManager(CurrentSiteManager, ContactManager):
     pass
 
 

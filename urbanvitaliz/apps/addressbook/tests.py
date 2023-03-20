@@ -1,6 +1,8 @@
 import pytest
+from django.contrib.sites import models as sites_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
 from urbanvitaliz.utils import login
@@ -32,6 +34,59 @@ def test_create_organization_available_for_switchtender(client):
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
+def test_create_new_organization_and_redirect(request, client):
+    site = get_current_site(request)
+    url = reverse("addressbook-organization-create")
+
+    with login(client, groups=["switchtender"]):
+        data = {"name": "my organization"}
+        response = client.post(url, data=data)
+
+    organization = models.Organization.objects.first()
+    assert organization.name == data["name"]
+    assert site in list(organization.sites.all())
+
+    new_url = reverse("addressbook-organization-list")
+    assertRedirects(response, new_url)
+
+
+@pytest.mark.django_db
+def test_create_existing_organization_and_redirect(request, client):
+    site = get_current_site(request)
+
+    organization = Recipe(models.Organization, name="my organization").make()
+
+    url = reverse("addressbook-organization-create")
+
+    with login(client, groups=["switchtender"]):
+        data = {"name": "my organization"}
+        response = client.post(url, data=data)
+
+    # no new organization created
+    assert models.Organization.objects.count() == 1
+
+    updated = models.Organization.objects.first()
+    assert updated.name == data["name"]
+    assert site in list(organization.sites.all())
+
+    new_url = reverse("addressbook-organization-list")
+    assertRedirects(response, new_url)
+
+
+@pytest.mark.django_db
+def test_organization_create_error(client):
+    url = reverse("addressbook-organization-create")
+
+    data = {}
+    with login(client, groups=["switchtender"]):
+        response = client.post(url, data=data)
+
+    assert models.Organization.objects.count() == 0
+
+    assert response.status_code == 200
+
+
 # Listing
 
 
@@ -52,31 +107,22 @@ def test_organization_list_available_for_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_organization_create_and_redirect(client):
-    url = reverse("addressbook-organization-create")
+def test_organization_list_contains_only_site_organizations(request, client):
+    current_site = get_current_site(request)
+    site_organization = baker.make(models.Organization, sites=[current_site])
+    site = baker.make(sites_models.Site)
+    other_organization = baker.make(models.Organization, sites=[site])
+    space_organization = baker.make(models.Organization)
 
+    url = reverse("addressbook-organization-list")
     with login(client, groups=["switchtender"]):
-        data = {"name": "my organization"}
-        response = client.post(url, data=data)
-
-    organization = models.Organization.objects.all()[0]
-    assert organization.name == data["name"]
-
-    new_url = reverse("addressbook-organization-list")
-    assertRedirects(response, new_url)
-
-
-@pytest.mark.django_db
-def test_organization_create_error(client):
-    url = reverse("addressbook-organization-create")
-
-    data = {}
-    with login(client, groups=["switchtender"]):
-        response = client.post(url, data=data)
-
-    assert models.Organization.objects.count() == 0
+        response = client.get(url)
 
     assert response.status_code == 200
+
+    assertContains(response, site_organization.name)
+    assertContains(response, other_organization.name)
+    assertContains(response, space_organization.name)
 
 
 #
