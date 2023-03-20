@@ -9,6 +9,9 @@ def update_organization_with_its_current_site(apps, schema_editor):
     Organization = apps.get_model("addressbook", "Organization")
     for organization in Organization.objects.all():
         contact = organization.contacts.first()
+        if not contact:
+            continue
+
         organization.sites.add(contact.site)
 
 
