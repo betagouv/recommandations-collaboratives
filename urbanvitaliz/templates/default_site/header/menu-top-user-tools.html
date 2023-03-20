@@ -4,13 +4,10 @@
 
 <!-- User -->
 
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
-
-{{user.is_staff_for_site}}
 
 <div id="user-info" class="pe-2 ps-2 ms-2 me-2">
     {% if user.is_authenticated %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" %}
         <div x-data="{ open: false }"
              x-on:click.outside="open = false"
              class="dropdown">
