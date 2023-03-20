@@ -10,7 +10,7 @@
                 <a class="mb-1 bg-white rounded-circle border tiny d-flex align-items-center justify-content-center px-2 py-2"
                    @click="moveAbove(task, column(board.status)[i - 1])"
                    style="cursor: pointer">
-                    <svg class="aling-middle bi" width="13px" height="13px" fill="#c6c6c6">
+                    <svg class="bi" width="13px" height="13px" fill="#c6c6c6">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
                     </svg>
                 </a>
@@ -19,7 +19,7 @@
                 <a class="mb-1 bg-white rounded-circle border tiny d-flex align-items-center justify-content-center px-2 py-2"
                    @click="moveBelow(task, column(board.status)[i + 1])"
                    style="cursor: pointer">
-                    <svg class="aling-middle bi" width="13px" height="13px" fill="#c6c6c6">
+                    <svg class="bi" width="13px" height="13px" fill="#c6c6c6">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
                     </svg>
                 </a>
