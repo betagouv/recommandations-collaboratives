@@ -1,4 +1,8 @@
 {% load static %}
+{% load guardian_tags %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 
 <template x-if="t.public || canAdministrate">
 	<div :id="t.uuid" class="drag-targetable py-3" @dragover="onDragOver(event)"
@@ -30,7 +34,7 @@
 			<div class="p-2">
 				<div class="d-flex flex-row">
 					<div class="mt-1 d-flex flex-column justify-content-between">
-						{% if can_manage and not disable_edit %}
+						{% if "use_tasks" in user_project_perms and not disable_edit %}
 							<div>
 								<template x-if="i > 0">
 									<a class="d-block p-1" @click="moveAbove(t, column(board.status)[i - 1])" style="cursor: pointer;">
@@ -108,7 +112,7 @@
 							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
 						</svg>
 					</div>
-					{% if can_administrate and not disable_edit %}
+					{% if "manage_tasks" in user_project_perms and not disable_edit %}
 					<div class="dropdown">
 						<a :id=`task-${t.id}-edit-button` class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button"
 							id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
@@ -134,7 +138,6 @@
 							<li>
 								<a :id=`task-${t.id}-delete-button` class="dropdown-item text-danger" style="cursor: pointer;" @click="openDeleteTaskConfirmationModal(t)">Supprimer</a>
 							</li>
-
 						</ul>
 					</div>
 					{% endif %}
