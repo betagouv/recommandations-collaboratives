@@ -132,6 +132,14 @@
                 </span>
 
                 <span class="form-check form-switch form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="{{ form.draft.name }}"
+                           id="check-draft"
+                           {% if form.draft.value %}checked{% endif %}
+                    >
+                    <label class="form-draft-label text-secondary" for="check-expired">Brouillons</label>
+                </span>
+
+                <span class="form-check form-switch form-check-inline">
                     <input class="form-check-input" type="checkbox" name="{{ form.to_review.name }}"
                            id="check-to-review"
                            {% if form.to_review.value %}checked{% endif %}
