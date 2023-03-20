@@ -20,15 +20,18 @@ class OrganizationForm(forms.ModelForm):
 
 @login_required
 def organization_create(request):
-    """Create a new Organization"""
+    """Create a new Organization or add existing one to current site"""
     is_switchtender_or_403(request.user)
 
     if request.method == "POST":
         form = OrganizationForm(request.POST)
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-            form.save_m2m()
+            name = form.cleaned_data.get("name")
+            departments = form.cleaned_data.get("departments")
+            organization, _ = models.Organization.objects.get_or_create(name=name)
+            organization.sites.add(request.site)
+            organization.departments.add(*departments)
+            organization.save()
             return redirect(reverse("addressbook-organization-list"))
     else:
         form = OrganizationForm()
