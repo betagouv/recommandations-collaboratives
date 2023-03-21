@@ -59,6 +59,14 @@
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
+.common-input.with-icon input {
+    padding-left: 35px;
+}
+
+/* .common-input.with-icon input::placeholder {
+    padding-left: 25px;
+} */
+
 .placeholder-grey::placeholder {
     color: #cfcccc;
     font-weight: 300;
