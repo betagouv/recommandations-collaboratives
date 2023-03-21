@@ -17,15 +17,83 @@
 
 {% block css %}
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+<style type="text/css">
+	@media print
+    {
+        main {
+            padding-top: 0 !important;
+        }
+        .navbar {
+            display: none !important;
+        }
+        footer {
+            display: none !important;
+        }
+
+        .flag {
+            display: none !important;
+        }
+
+        #resource-main-content {
+            display: flex !important;
+            flex-direction: column !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #resource-main, #resource-footer {
+            width: 100% !important;
+            padding: 0 10px !important;
+            margin: 0 !i;
+        }
+        
+        #ask-question{
+            display: none !important;
+        }
+
+        .container-fluid {
+            padding: 0 !important;
+        }
+
+        .breadcrumb {
+            display: none !important;
+        }
+
+        #category-list li{
+            background: none !important;
+            color: #222 !important;
+            margin: 0 3px !important;
+            padding: 0 !important;
+            font-size: 12px !important;
+        }
+
+        #resource-details {
+            margin: 0 !important;
+            padding: 0 !important;
+            margin-bottom: 25px !important;
+            font-size: 10px !important;
+            font-weight: 300 !important;
+        }
+
+        #category-list li span{
+            color: #222 !important;
+            font-size: 12px !important;
+        }
+
+        #contact-list {
+            background-color: red;
+        }
+	}
+</style>
 {% endblock %}
 
 {% block content %}
 
-<div class="row py-5">
-    <div class="col-9 px-5 mx-auto font-marianne">
+<div class="row py-5" id="resource-main-content">
+    <div class="col-9 px-5 mx-auto font-marianne" id="resource-main">
 
         {% include 'resources/resource/fragments/breadcrumb.html' %}
-        <div class="d-flex align-items-center mb-3">
+        <div class="d-flex align-items-center mb-3" id="resource-details">
             {% include 'resources/resource/fragments/category_list.html' %}
             {% include 'resources/resource/fragments/author.html' %}
         </div>
@@ -41,11 +109,11 @@
 
     </div>
 
-    <div class="col-3 mx-auto">
+    <div class="col-3 mx-auto" id="resource-footer">
         <!-- Sidebar -->
         <div class="admin-sidebar">
             <!-- User actions -->
-            <div class="d-grid gap-2 mt-3">
+            <div id="ask-question" class="d-grid gap-2 mt-3">
                 <a class="button blue d-flex justify-content-center align-items-center" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource {{ resource.title|truncatewords:4 }}" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
