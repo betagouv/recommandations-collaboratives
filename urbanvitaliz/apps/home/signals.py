@@ -7,7 +7,7 @@ from hijack.signals import hijack_started
 
 @receiver(user_logged_in)
 def post_login(sender, user, request, **kwargs):
-    if not user.is_staff:
+    if not (user.is_staff or hasattr(user, "is_hijacked")):
         action.send(user, verb="s'est connecté")
 
 

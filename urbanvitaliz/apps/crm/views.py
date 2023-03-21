@@ -18,6 +18,7 @@ from django.db.models import Count, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
+from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
 from notifications import models as notifications_models
 from notifications import notify
@@ -202,6 +203,24 @@ def project_details(request, project_id):
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/project_details.html", locals())
+
+
+@require_http_methods(["POST"])
+@staff_member_required
+def project_toggle_annotation(request, project_id=None):
+    project = get_object_or_404(Project, pk=project_id)
+
+    form = forms.ProjectAnnotationForm(request.POST)
+    if form.is_valid():
+        tag = form.cleaned_data.get("tag")
+        annotation, _ = models.ProjectAnnotations.objects.get_or_create(project=project)
+        if tag in annotation.tags.names():
+            annotation.tags.remove(tag)
+        else:
+            annotation.tags.add(tag)
+
+    url = reverse("crm-project-details", args=[project.id])
+    return redirect(url)
 
 
 def handle_create_note_for_object(

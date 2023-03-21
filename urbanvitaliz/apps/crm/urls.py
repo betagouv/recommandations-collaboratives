@@ -49,6 +49,11 @@ urlpatterns = [
         name="crm-project-details",
     ),
     path(
+        r"crm/project/<int:project_id>/annotation/toggle/",
+        views.project_toggle_annotation,
+        name="crm-project-toggle-annotation",
+    ),
+    path(
         r"crm/org/<int:organization_id>/create-note",
         views.create_note_for_organization,
         name="crm-organization-note-create",
