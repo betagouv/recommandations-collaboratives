@@ -582,9 +582,9 @@ class NotificationFormatter:
 
     # ------ Real Formatters -----#
     def format_note_created(self, notification):
-        """An note was written by a switchtender"""
+        """A note was written by a switchtender"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} a rédigé un message"
+        summary = f"{subject} a rédigé un message dans l'espace conseillers"
         excerpt = self._represent_note_excerpt(notification.action_object)
 
         return FormattedNotification(summary=summary, excerpt=excerpt)
