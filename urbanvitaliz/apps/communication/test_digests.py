@@ -234,7 +234,10 @@ def test_notification_formatter():
         (
             "a rédigé un message",
             note,
-            ("Bobi Joe (DuckCorp) a rédigé un message", "my content"),
+            (
+                "Bobi Joe (DuckCorp) a rédigé un message dans l'espace conseillers",
+                "my content",
+            ),
         ),
         (
             "a commenté l'action",
