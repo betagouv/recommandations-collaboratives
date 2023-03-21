@@ -31,7 +31,7 @@ from ..utils import (
     can_administrate_project,
     check_if_national_actor,
     get_notification_recipients_for_project,
-    get_switchtender_for_project,
+    get_advisor_for_project,
     is_advisor_for_project,
     is_regional_actor_for_project,
     set_active_project_id,
@@ -53,7 +53,7 @@ def project_overview(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    advising = get_switchtender_for_project(request.user, project)
+    advising = get_advisor_for_project(request.user, project)
 
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
         request.user, "view_project", project
@@ -120,7 +120,7 @@ def project_knowledge(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    advising = get_switchtender_for_project(request.user, project)
+    advising = get_advisor_for_project(request.user, project)
 
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
         request.user, "view_surveys", project
@@ -146,7 +146,7 @@ def project_actions(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    advising = get_switchtender_for_project(request.user, project)
+    advising = get_advisor_for_project(request.user, project)
 
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
         request.user, "view_tasks", project
@@ -176,7 +176,7 @@ def project_actions_inline(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    advising = get_switchtender_for_project(request.user, project)
+    advising = get_advisor_for_project(request.user, project)
 
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
         request.user, "view_tasks", project
@@ -197,7 +197,7 @@ def project_conversations(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    advising = get_switchtender_for_project(request.user, project)
+    advising = get_advisor_for_project(request.user, project)
 
     is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
 
@@ -229,7 +229,7 @@ def project_internal_followup(request, project_id=None):
 
     has_perm_or_403(request.user, "projects.use_private_notes", project)
 
-    advising = get_switchtender_for_project(request.user, project)
+    advising = get_advisor_for_project(request.user, project)
 
     # Set this project as active
     set_active_project_id(request, project.pk)
@@ -255,7 +255,7 @@ def project_create_or_update_topics(request, project_id=None):
     """Create/Update topics for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    advising = get_switchtender_for_project(request.user, project)
+    advising = get_advisor_for_project(request.user, project)
 
     has_perm_or_403(request.user, "projects.change_topics", project)
 
@@ -300,7 +300,7 @@ def project_update_tags(request, project_id=None):
     """Create/Update tags for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    advising = get_switchtender_for_project(request.user, project)
+    advising = get_advisor_for_project(request.user, project)
 
     # FIXME how to manage tags permissions?
     if not is_advisor_for_project(request.user, project):

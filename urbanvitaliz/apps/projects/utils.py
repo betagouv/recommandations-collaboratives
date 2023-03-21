@@ -251,8 +251,8 @@ def get_switchtenders_for_project(project):
     ).distinct()
 
 
-def get_switchtender_for_project(user, project):
-    """Return a switchtending position for the given user on the given project"""
+def get_advisor_for_project(user, project):
+    """Return a advisor position for the given user on the given project"""
     # NOTE currently do not take observer into account
     try:
         return models.ProjectSwitchtender.objects.get(
@@ -263,7 +263,7 @@ def get_switchtender_for_project(user, project):
 
 
 def is_advisor_for_project(user, project):
-    return get_switchtender_for_project(user, project) is not None
+    return get_advisor_for_project(user, project) is not None
 
 
 def get_collaborators_for_project(project):

@@ -21,7 +21,6 @@ from ..forms import DocumentUploadForm
 from ..utils import (
     can_administrate_project,
     check_if_national_actor,
-    get_switchtender_for_project,
     is_regional_actor_for_project,
     set_active_project_id,
 )
