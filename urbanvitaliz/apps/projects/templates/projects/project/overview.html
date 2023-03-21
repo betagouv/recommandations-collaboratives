@@ -166,7 +166,7 @@
                                 <li>{% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}</li>
                             {% endfor %}
                         </ul>
-                        {% if "invite_advisors" in user_project_perms %}
+                        {% if "invite_advisors" in user_project_perms or is_regional_actor %}
                             <div class="d-block mb-2">
                                 <a style="cursor: pointer"
                                    @click="openInviteSwitchtenderModal"

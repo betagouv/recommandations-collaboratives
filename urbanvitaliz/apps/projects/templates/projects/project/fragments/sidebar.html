@@ -4,18 +4,6 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="d-grid gap-2 my-3">
-    {% if "list_projects" in user_site_perms or "view_project" in user_project_perms and not disable_can_share %}
-        <span class="d-inline-block">
-            <a href="{% url 'projects-project-access-collectivity-invite' project.id %}"
-               class="btn btn-primary w-100 btn-sm">
-                <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
-                </svg>
-                &nbsp;
-                Partager
-            </a>
-        </span>
-    {% endif %}
     {% if "change_project" in user_project_perms and not is_switchtender %}
         {% if not disable_can_edit %}
             <span class="d-inline-block">

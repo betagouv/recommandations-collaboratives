@@ -112,7 +112,7 @@
 																<span class="ms-2 text-muted" x-text="`le ${formatDate(f.timestamp)}`"
 																	style="line-height: 20px"></span>
 															</div>
-															<template x-if="canManage && f.who.email === userEmail">
+															<template x-if="canUseTasks && f.who.email === userEmail">
 																<a class="text-muted" @click="onEditComment(f)">Editer</a>
 															</template>
 														</div>
@@ -145,7 +145,7 @@
 																		<span class="ms-2 text-muted" x-text="`le ${formatDate(f.timestamp)}`"
 																			style="line-height: 20px"></span>
 																	</div>
-																	<template x-if="canManage && f.who.email === userEmail">
+																	<template x-if="canUseTasks && f.who.email === userEmail">
 																		<a class="text-muted" style="cursor: pointer;" @click="onEditComment(f)">Editer</a>
 																	</template>
 																</div>

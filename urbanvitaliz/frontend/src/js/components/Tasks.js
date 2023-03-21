@@ -1,6 +1,6 @@
 import { TASK_STATUSES } from '../config/statuses';
 
-import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, resourcePreviewUrl , followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
+import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, resourcePreviewUrl, followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
 import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
 import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
 import { toArchiveTooltip, reminderTooltip, isOldReminder } from '../utils/tooltip'
@@ -57,7 +57,8 @@ export default function TasksApp(app, projectId) {
         isOldReminder,
         currentlyHoveredElement: null,
         canAdministrate: false,
-        canManage: false,
+        canUseTasks: false,
+        canManageTasks: false,
         isSwitchtender: false,
         userEmail: null,
         currentTaskId: null,
@@ -89,7 +90,7 @@ export default function TasksApp(app, projectId) {
             return a.order - b.order;
         },
         filterFn(d) {
-            return this.canAdministrate || d.public;
+            return this.isSwitchtender ? true : (this.canAdministrate || d.public);
         },
         findByUuid(uuid) {
             return this.data.find(d => d.uuid === uuid);
@@ -113,12 +114,11 @@ export default function TasksApp(app, projectId) {
             const canAdministrate = document.getElementById("canAdministrate").textContent;
             this.canAdministrate = JSON.parse(canAdministrate);
         },
-
-        loadCanManage() {
-            const canManage = document.getElementById("canManage").textContent;
-            this.canManage = JSON.parse(canManage);
+        loadUserProjectPerms() {
+            const userProjectPerms = document.getElementById("userProjectPerms").textContent;
+            this.canUseTasks = (userProjectPerms.indexOf("use_tasks") > -1);
+            this.canManageTasks = (userProjectPerms.indexOf("manage_tasks") > -1);
         },
-
         loadIsSwitchtender() {
             const isSwitchtender = document.getElementById("isSwitchtender").textContent;
             this.isSwitchtender = JSON.parse(isSwitchtender);

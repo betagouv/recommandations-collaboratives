@@ -4,10 +4,9 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
-<template x-if="t.public || canAdministrate">
 	<div :id="t.uuid" class="drag-targetable py-3" @dragover="onDragOver(event)"
 		@drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
-		<div class="rounded bg-white shadow position-relative" :draggable="canManage" @dragstart="onDragStart(event, t.uuid)"
+		<div class="rounded bg-white shadow position-relative" :draggable="canUseTasks" @dragstart="onDragStart(event, t.uuid)"
 			@dragend="onDragEnd(event)">
 			<template x-if="t.notifications.count > 0">
 				<span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold"
@@ -145,4 +144,3 @@
 			</div>
 		</div>
 	</div>
-</template>
