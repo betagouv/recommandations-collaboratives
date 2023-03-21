@@ -90,7 +90,7 @@ export default function TasksApp(app, projectId) {
             return a.order - b.order;
         },
         filterFn(d) {
-            return this.canAdministrate || d.public;
+            return this.isSwitchtender ? true : (this.canAdministrate || d.public);
         },
         findByUuid(uuid) {
             return this.data.find(d => d.uuid === uuid);
