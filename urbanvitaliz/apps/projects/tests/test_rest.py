@@ -146,8 +146,6 @@ def test_advisor_access_new_regional_project_status(request):
     user = baker.make(auth_models.User, groups=[group])
     user.profile.departments.add(project.commune.department)
 
-    site = get_current_site(request)
-
     client = APIClient()
     client.force_authenticate(user=user)
     url = reverse("userprojectstatus-list")
@@ -241,6 +239,27 @@ def test_project_observer_can_see_project_tasks_for_site(request):
     client.force_authenticate(user=user)
     url = reverse("project-tasks-list", args=[project.id])
     response = client.get(url)
+
+    assert response.status_code == 200
+    assert set(e["id"] for e in response.data) == set(t.id for t in tasks)
+
+
+@pytest.mark.django_db
+def test_regional_actor_can_see_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    baker.make(models.Task, project=project, public=True)
+    utils.assign_observer(user, project, site)
+
+    client = APIClient()
+    with login(client, groups=["example_com_advisor"]) as user:
+        url = reverse("project-tasks-list", args=[project.id])
+        response = client.get(url)
 
     assert response.status_code == 200
     assert set(e["id"] for e in response.data) == set(t.id for t in tasks)

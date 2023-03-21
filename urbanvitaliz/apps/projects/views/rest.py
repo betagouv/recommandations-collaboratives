@@ -141,7 +141,10 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         project = models.Project.on_site.get(pk=project_id)
 
-        if not self.request.user.has_perm("projects.view_tasks", project):
+        if not (
+            self.request.user.has_perm("projects.view_tasks", project)
+            or self.request.user.has_perm("sites.list_projects", self.request.site)
+        ):
             raise PermissionDenied()
 
         return self.queryset.filter(project_id=project_id).order_by(
