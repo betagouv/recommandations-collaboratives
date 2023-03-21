@@ -271,10 +271,11 @@ def test_update_note_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_update_note_available_for_switchtender(request, client):
-    note = Recipe(models.Note).make()
-    url = reverse("projects-update-note", args=[note.id])
+def test_switchtender_can_update_own_note(request, client):
     with login(client, groups=["switchtender"]) as user:
+        note = Recipe(models.Note, created_by=user).make()
+        url = reverse("projects-update-note", args=[note.id])
+
         note.project.switchtenders_on_site.create(
             switchtender=user, site=get_current_site(request)
         )
@@ -286,19 +287,33 @@ def test_update_note_available_for_switchtender(request, client):
 
 
 @pytest.mark.django_db
-def test_update_public_note_for_project_collaborator_and_redirect(request, client):
+def test_switchtender_cant_update_other_switchtender_note(request, client):
+    note = Recipe(models.Note).make()
+    url = reverse("projects-update-note", args=[note.id])
+    with login(client, groups=["switchtender"]) as user:
+        note.project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_collaborator_can_update_own_public_note(request, client):
     membership = baker.make(models.ProjectMember)
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
         projectmember_set=[membership],
     ).make()
-    with login(client, user=membership.member):
-        note = Recipe(models.Note, project=project, public=True).make()
+
+    with login(client, user=membership.member) as user:
+        note = Recipe(models.Note, created_by=user, project=project, public=True).make()
         response = client.post(
             reverse("projects-update-note", args=[note.id]),
             data={"content": "this is some content"},
         )
+
     note = models.Note.fetch()[0]
     assert note.project == project
     assert note.public is True
@@ -306,7 +321,26 @@ def test_update_public_note_for_project_collaborator_and_redirect(request, clien
 
 
 @pytest.mark.django_db
-def test_update_private_note_for_project_collaborator(request, client):
+def test_collaborator_cant_update_others_public_note(request, client):
+    membership = baker.make(models.ProjectMember)
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        projectmember_set=[membership],
+    ).make()
+
+    with login(client, user=membership.member):
+        note = Recipe(models.Note, project=project, public=True).make()
+        response = client.post(
+            reverse("projects-update-note", args=[note.id]),
+            data={"content": "this is some content"},
+        )
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_collaborator_cant_update_private_note(request, client):
     membership = baker.make(models.ProjectMember)
     project = Recipe(
         models.Project,
@@ -319,28 +353,6 @@ def test_update_private_note_for_project_collaborator(request, client):
         response = client.get(url)
 
     assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_update_note_for_project_and_redirect(request, client):
-    note = Recipe(models.Note).make()
-    updated_on_before = note.updated_on
-    url = reverse("projects-update-note", args=[note.id])
-    data = {"content": "this is some content"}
-
-    with login(client, groups=["switchtender"]) as user:
-        note.project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
-
-        response = client.post(url, data=data)
-
-    note = models.Note.objects.get(id=note.id)
-    assert note.content == data["content"]
-    assert note.updated_on > updated_on_before
-    assert note.project.updated_on == note.updated_on
-
-    assert response.status_code == 302
 
 
 @pytest.mark.django_db
