@@ -13,7 +13,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 from rest_framework.test import APIClient
 from urbanvitaliz.utils import login
 
@@ -63,11 +63,18 @@ def test_project_list_includes_project_for_staff(request, client):
 
 
 @pytest.mark.django_db
-def test_project_list_includes_project_in_switchtender_departments(request, client):
+def test_project_list_includes_only_projects_in_switchtender_departments(
+    request, client
+):
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
         commune__department__code="01",
+    )
+    unwanted_project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        commune__department__code="02",
     )
     url = reverse("projects-list")
     with login(client, groups=["example_com_advisor"]) as user:
@@ -75,6 +82,7 @@ def test_project_list_includes_project_in_switchtender_departments(request, clie
         response = client.get(url)
 
     assertContains(response, project.name)
+    assertNotContains(response, unwanted_project.name)
 
 
 @pytest.mark.django_db
@@ -174,8 +182,6 @@ def test_advisor_access_makes_no_user_project_status_duplicate(request):
         site=get_current_site(request),
         user=user,
     )
-
-    site = get_current_site(request)
 
     client = APIClient()
     client.force_authenticate(user=user)
