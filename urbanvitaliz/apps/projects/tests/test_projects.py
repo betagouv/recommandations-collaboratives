@@ -19,12 +19,13 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
-from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.invites import models as invites_models
+from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -1371,6 +1372,46 @@ def test_switchtender_leaves_project(request, client):
 
     assert response.status_code == 302
     assert project.switchtenders.count() == 0
+
+
+@pytest.mark.django_db
+def test_switchtender_joins_trigger_notification_to_all(request, client):
+    current_site = get_current_site(request)
+
+    commune = Recipe(geomatics.Commune).make()
+    dept = Recipe(geomatics.Department).make()
+
+    membership = baker.make(models.ProjectMember, is_owner=True)
+    switchtender = baker.make(auth.User)
+    auth.Group.objects.get(name="switchtender").user_set.add(switchtender)
+
+    Recipe(
+        models.TaskRecommendation,
+        condition="",
+        departments=[
+            dept,
+        ],
+    ).make()
+    project = Recipe(
+        models.Project,
+        status="BLAH",
+        projectmember_set=[membership],
+        commune=commune,
+        sites=[current_site],
+    ).make()
+
+    project.switchtenders_on_site.create(
+        switchtender=switchtender, site=get_current_site(request)
+    )
+
+    url = reverse("projects-project-switchtender-join", args=[project.id])
+
+    with login(client, groups=["switchtender"]) as user:
+        user.profile.sites.add(current_site)
+
+        client.post(url)
+        assert membership.member.notifications.count() == 1
+        assert switchtender.notifications.count() == 1
 
 
 @pytest.mark.django_db

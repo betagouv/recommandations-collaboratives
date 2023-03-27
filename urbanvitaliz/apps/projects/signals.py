@@ -90,9 +90,9 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    recipients = get_collaborators_for_project(project).exclude(id=sender.id)
+    recipients = get_notification_recipients_for_project(project).exclude(id=sender.id)
 
-    # Notify regional actors
+    # Notify all actors of project
     notify.send(
         sender=sender,
         recipient=recipients,
