@@ -8,15 +8,16 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
 
+
 from .. import models, signals
 from ..forms import DocumentUploadForm, NoteForm, PublicNoteForm, StaffNoteForm
-from ..utils import (can_administrate_or_403, can_administrate_project,
-                     can_manage_or_403)
+from ..utils import can_administrate_or_403, can_administrate_project, can_manage_or_403
 
 
 @login_required
@@ -102,7 +103,11 @@ def update_note(request, note_id=None):
     """Update an existing note for a project"""
     note = get_object_or_404(models.Note, pk=note_id)
     project = note.project  # For template consistency
+
     can_manage_or_403(project, request.user, allow_draft=True)
+    if note.created_by != request.user:
+        raise PermissionDenied("Vous ne pouvez éditer que vos propres messages.")
+
     is_advisor = can_administrate_project(project, request.user)
 
     if not note.public:

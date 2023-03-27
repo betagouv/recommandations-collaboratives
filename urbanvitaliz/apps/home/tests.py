@@ -260,4 +260,31 @@ def test_user_can_access_followus(client):
     assert response.status_code == 200
 
 
+#######################################################################
+# Signals
+#######################################################################
+
+
+@pytest.mark.django_db
+def test_user_signin_should_be_logged(request, client):
+    with login(client) as user:
+        assert user.actor_actions.count() == 1
+
+
+@pytest.mark.django_db
+def test_user_signin_shouldnt_be_logged_if_hijacked(request, client):
+    hijacked = baker.make(auth.User, username="hijacked")
+
+    with login(
+        client,
+        username="hijacker",
+        is_staff=True,
+    ):
+        url = reverse("hijack:acquire")
+        response = client.post(url, data={"user_pk": hijacked.pk})
+
+    assert response.status_code == 302
+    assert hijacked.actor_actions.count() == 0
+
+
 # eof

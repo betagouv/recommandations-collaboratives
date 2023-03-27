@@ -234,7 +234,10 @@ def test_notification_formatter():
         (
             "a rédigé un message",
             note,
-            ("Bobi Joe (DuckCorp) a rédigé un message", "my content"),
+            (
+                "Bobi Joe (DuckCorp) a rédigé un message dans l'espace conseillers",
+                "my content",
+            ),
         ),
         (
             "a commenté l'action",
@@ -271,9 +274,9 @@ def test_notification_formatter():
             ),
         ),
         (
-            "a ajouté un document",
+            "a ajouté un lien ou un document",
             project,
-            ("Bobi Joe (DuckCorp) a ajouté un document", None),
+            ("Bobi Joe (DuckCorp) a ajouté un lien ou un document", None),
         ),
         (
             "action inconnue",

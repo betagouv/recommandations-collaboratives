@@ -90,9 +90,9 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    recipients = get_collaborators_for_project(project).exclude(id=sender.id)
+    recipients = get_notification_recipients_for_project(project).exclude(id=sender.id)
 
-    # Notify regional actors
+    # Notify all actors of project
     notify.send(
         sender=sender,
         recipient=recipients,
@@ -473,7 +473,7 @@ def project_document_uploaded(sender, instance, **kwargs):
     # Add a trace
     action.send(
         instance.uploaded_by,
-        verb="a ajouté un document",
+        verb="a ajouté un lien ou un document",
         action_object=instance,
         target=project,
     )
@@ -486,7 +486,7 @@ def project_document_uploaded(sender, instance, **kwargs):
     notify.send(
         sender=instance.uploaded_by,
         recipient=recipients,
-        verb="a ajouté un document",
+        verb="a ajouté un lien ou un document",
         action_object=instance,
         target=instance.project,
     )
