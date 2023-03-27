@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
@@ -38,8 +39,30 @@ def test_crm_project_not_available_for_non_staff_logged_users(client):
 
 
 @pytest.mark.django_db
+def test_toggle_missing_project_annotation(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(models.projects_models.Project, sites=[site])
+
+    url = reverse("crm-project-toggle-annotation", args=[project.id])
+    data = {"tag": "a nice tag"}
+
+    with login(client, is_staff=True):
+        response = client.post(url, data=data)
+
+    annotation = models.ProjectAnnotations.objects.first()
+    assert data["tag"] in annotation.tags.names()
+
+    url = reverse("crm-project-details", args=[annotation.project.id])
+    assertRedirects(response, url)
+
+
+@pytest.mark.django_db
 def test_toggle_on_project_annotation(request, client):
-    annotation = baker.make(models.ProjectAnnotations)
+    site = get_current_site(request)
+
+    project = baker.make(models.projects_models.Project, sites=[site])
+    annotation = baker.make(models.ProjectAnnotations, site=site, project=project)
 
     url = reverse("crm-project-toggle-annotation", args=[annotation.project.id])
     data = {"tag": "a nice tag"}
@@ -56,8 +79,12 @@ def test_toggle_on_project_annotation(request, client):
 
 @pytest.mark.django_db
 def test_toggle_off_project_annotation(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(models.projects_models.Project, sites=[site])
+    annotation = baker.make(models.ProjectAnnotations, site=site, project=project)
+
     data = {"tag": "précédent"}
-    annotation = baker.make(models.ProjectAnnotations)
     annotation.tags.add(data["tag"])
 
     url = reverse("crm-project-toggle-annotation", args=[annotation.project.id])

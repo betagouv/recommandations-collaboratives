@@ -213,7 +213,9 @@ def project_toggle_annotation(request, project_id=None):
     form = forms.ProjectAnnotationForm(request.POST)
     if form.is_valid():
         tag = form.cleaned_data.get("tag")
-        annotation, _ = models.ProjectAnnotations.objects.get_or_create(project=project)
+        annotation, _ = models.ProjectAnnotations.objects.get_or_create(
+            project=project, site=request.site
+        )
         if tag in annotation.tags.names():
             annotation.tags.remove(tag)
         else:
