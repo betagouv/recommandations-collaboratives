@@ -611,6 +611,8 @@ def test_user_cannot_delete_someone_else_bookmark(request, client):
 ################################################################################
 # Multisite
 ################################################################################
+
+
 @pytest.mark.django_db
 def test_search_resources_honors_multisite(request):
     other_site = Recipe(Site).make()
