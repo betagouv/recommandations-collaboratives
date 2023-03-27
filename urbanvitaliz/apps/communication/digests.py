@@ -575,7 +575,7 @@ class NotificationFormatter:
                 "a soumis pour modération le projet": self.format_project_submitted,
                 "a commenté l'action": self.format_action_commented,
                 "a recommandé l'action": self.format_action_recommended,
-                "a ajouté un document": self.format_document_uploaded,
+                "a ajouté un lien ou un document": self.format_document_uploaded,
             },
             notification,
         )
@@ -592,7 +592,7 @@ class NotificationFormatter:
     def format_document_uploaded(self, notification):
         """A document was uploaded by a user"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} a ajouté un document"
+        summary = f"{subject} a ajouté un lien ou un document"
 
         return FormattedNotification(summary=summary, excerpt=None)
 
