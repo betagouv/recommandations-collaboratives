@@ -567,7 +567,8 @@ class NotificationFormatter:
 
         return self._format_or_default(
             {
-                "a rédigé un message": self.format_note_created,
+                "a rédigé un message": self.format_public_note_created,
+                "a rédigé un message dans l'espace conseillers": self.format_private_note_created,
                 "est devenu·e aiguilleur·se sur le projet": self.format_action_became_switchtender,
                 # added for transition from switchtender (aiguilleur) to advisor (conseiller)
                 "est devenu·e conseiller·e sur le projet": self.format_action_became_switchtender,
@@ -581,7 +582,15 @@ class NotificationFormatter:
         )
 
     # ------ Real Formatters -----#
-    def format_note_created(self, notification):
+    def format_public_note_created(self, notification):
+        """A public note was written by a user"""
+        subject = self._represent_user(notification.actor)
+        summary = f"{subject} a rédigé un message"
+        excerpt = self._represent_note_excerpt(notification.action_object)
+
+        return FormattedNotification(summary=summary, excerpt=excerpt)
+
+    def format_private_note_created(self, notification):
         """A note was written by a switchtender"""
         subject = self._represent_user(notification.actor)
         summary = f"{subject} a rédigé un message dans l'espace conseillers"

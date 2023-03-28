@@ -275,6 +275,8 @@ class UserProjectStatus(models.Model):
     class Meta:
         unique_together = ("site", "user", "project")
 
+    # FIXME Ajouter "updated_on"
+
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
     user = models.ForeignKey(
         auth_models.User, on_delete=models.CASCADE, related_name="project_states"

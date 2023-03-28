@@ -99,65 +99,6 @@ def test_create_note_available_for_switchtender(request, client):
 
 
 @pytest.mark.django_db
-def test_create_note_available_for_project_collaborators(request, client):
-    membership = baker.make(models.ProjectMember)
-    project = Recipe(
-        models.Project,
-        status="READY",
-        sites=[get_current_site(request)],
-        projectmember_set=[membership],
-    ).make()
-
-    with login(client, user=membership.member):
-        url = reverse("projects-create-note", args=[project.id])
-        response = client.get(url)
-
-    assert response.status_code == 200
-    assertContains(response, 'form id="form-projects-add-note"')
-
-
-@pytest.mark.django_db
-def test_switchtender_creates_new_note_for_project_and_redirect(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-
-    with login(client, groups=["switchtender"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
-
-        response = client.post(
-            reverse("projects-create-note", args=[project.id]),
-            data={"content": "this is some content"},
-        )
-    note = models.Note.fetch()[0]
-    assert note.project == project
-    assert response.status_code == 302
-
-
-@pytest.mark.django_db
-def test_create_public_note_for_project_collaborator_and_redirect(request, client):
-    membership = baker.make(models.ProjectMember)
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-        projectmember_set=[membership],
-    ).make()
-
-    with login(client, user=membership.member):
-        response = client.post(
-            reverse("projects-create-note", args=[project.id]),
-            data={"content": "this is some content"},
-        )
-
-    note = models.Note.fetch()[0]
-    assert note.project == project
-    assert note.public is True
-    assert note.created_by is not None
-    assert response.status_code == 302
-
-
-@pytest.mark.django_db
 def test_create_private_note_not_available_for_project_collaborator(request, client):
     membership = baker.make(models.ProjectMember)
     project = Recipe(
@@ -172,9 +113,68 @@ def test_create_private_note_not_available_for_project_collaborator(request, cli
             reverse("projects-create-note", args=[project.id]),
             data={"content": "this is some content", "public": False},
         )
+
+    assert response.status_code == 403
+
+
+# check test exists on conversation
+# @pytest.mark.django_db
+# def test_switchtender_creates_new_public_note_for_project_and_redirect(request, client):
+#     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+#     with login(client, groups=["switchtender"]) as user:
+#         project.switchtenders_on_site.create(
+#             switchtender=user, site=get_current_site(request)
+#         )
+
+#         response = client.post(
+#             reverse("projects-create-note", args=[project.id]),
+#             data={"content": "this is some content", "public": True},
+#         )
+
+#     # note is created
+#     note = models.Note.fetch()[0]
+#     assert note.project == project
+#     assert note.public is True
+
+#     # stream and notifications
+#     actions = action_object_stream(note)
+#     assert actions.count() == 1
+#     assert actions[0].verb == "a envoyé un message"
+
+#     # redirects
+#     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_switchtender_creates_new_private_note_for_project_and_redirect(
+    request, client
+):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    with login(client, groups=["switchtender"]) as user:
+        project.switchtenders_on_site.create(
+            switchtender=user, site=get_current_site(request)
+        )
+
+        response = client.post(
+            reverse("projects-create-note", args=[project.id]),
+            data={
+                "content": "this is some content",
+            },
+        )
+
+    # note is created
     note = models.Note.fetch()[0]
     assert note.project == project
-    assert note.public is True
+    assert note.public is False
+
+    # stream and notifications
+    actions = action_object_stream(note)
+    assert actions.count() == 1
+    assert actions[0].verb == "a envoyé un message dans l'espace conseillers"
+
+    # redirects
     assert response.status_code == 302
 
 
@@ -392,3 +392,6 @@ def test_delete_note_removes_activity(request, client):
         client.post(reverse("projects-delete-note", args=[note.id]))
 
     assert action_object_stream(note).count() == 0
+
+
+# eof

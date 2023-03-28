@@ -15,13 +15,9 @@ from rest_framework.response import Response
 from urbanvitaliz.utils import check_if_switchtender
 
 from .. import models, signals
-from ..serializers import (
-    ProjectSerializer,
-    TaskFollowupSerializer,
-    TaskNotificationSerializer,
-    TaskSerializer,
-    UserProjectStatusSerializer,
-)
+from ..serializers import (ProjectSerializer, TaskFollowupSerializer,
+                           TaskNotificationSerializer, TaskSerializer,
+                           UserProjectStatusSerializer)
 
 
 ########################################################################
@@ -233,6 +229,17 @@ class UserProjectStatusViewSet(
 
     serializer_class = UserProjectStatusSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def perform_update(self, serializer):
+        old_one = self.get_object()
+
+        serializer.save()
+        new_one = serializer.instance
+
+        if new_one:
+            signals.project_userprojectstatus_updated.send(
+                sender=self, old_one=old_one, new_one=new_one
+            )
 
 
 # eof
