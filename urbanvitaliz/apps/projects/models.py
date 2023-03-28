@@ -129,7 +129,7 @@ class ProjectManager(models.Manager):
         site = Site.objects.get_current()
 
         if has_perm(user, "sites.list_projects", site):
-            projects = self.filter(deleted=None)
+            projects = self.filter(sites=site, deleted=None)
         else:
             projects = self.none()
 
