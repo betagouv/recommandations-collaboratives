@@ -124,11 +124,21 @@
             {% endwith %}
         {% endif %}
     </li>
-    {% if "invite_collaborators" or "invite_advisors" or "manage_advisors" or "manage_collaborators" or "change_project" in user_site_perms %}
+    {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms %}
         <li>
             <a class="{% if administration_panel %} active{% endif %} align-items-center"
                href="{% url 'projects-project-administration' project.pk %}">
                 <span class="text-nowrap">Administration</span>
+            </a>
+        </li>
+    {% else %}
+        <li>
+            <a class="disabled align-items-center" href="#">
+                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                </svg>
+                &nbsp;
+                <span>Administration</span>
             </a>
         </li>
     {% endif %}
