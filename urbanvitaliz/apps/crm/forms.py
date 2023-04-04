@@ -20,3 +20,11 @@ class CRMNoteForm(forms.ModelForm):
         fields = ["kind", "title", "content", "tags", "sticky"]
 
     content = MarkdownxFormField()
+
+
+class ProjectAnnotationForm(forms.Form):
+
+    tag = forms.CharField(required=True)
+
+
+# eof

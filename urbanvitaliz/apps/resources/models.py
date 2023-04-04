@@ -149,7 +149,7 @@ class Resource(models.Model):
 
     @property
     def public(self):
-        return self.status >= self.TO_REVIEW
+        return self.status > self.TO_REVIEW
 
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"

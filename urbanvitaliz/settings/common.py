@@ -297,4 +297,7 @@ STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 # Phonenumbers
 PHONENUMBER_DEFAULT_REGION = "FR"
 
+# Hijack
+HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
+
 # eof

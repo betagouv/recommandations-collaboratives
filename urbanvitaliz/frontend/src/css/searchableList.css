@@ -1,0 +1,43 @@
+.searchable-list-wrapper {
+    position: absolute;
+    top: 40px;
+    width: 100%;
+}
+
+.searchable-list-wrapper ul{
+
+    width: 100%;
+
+    transition: all 0.25s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+
+    background-color: white;
+    /* border: solid 2px #0d6efd !important; */
+    opacity: 1;
+
+    transform: translate3d(0,0,0);
+
+    max-height: 40vh;
+    overflow-y: scroll;
+    border-radius: 0.25rem;
+}
+
+.searchable-list-wrapper .item-selected {
+    background-color: #f6f6f6;
+    user-select: none;
+}
+
+.searchable-list-wrapper.hide ul {
+    opacity: 0;
+    transform: translate3d(0,-20px,0);
+    z-index: -1;
+}
+
+.searchable-list-wrapper.show ul {
+    opacity: 1;
+    transform: translate3d(0,0,0);
+    z-index: 10000;
+}

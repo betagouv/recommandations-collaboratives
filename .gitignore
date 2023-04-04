@@ -13,6 +13,8 @@ __pycache__
 .#*
 .coverage
 .coverage.*
+*~
+.*~
 development.py
 htmlcov
 media

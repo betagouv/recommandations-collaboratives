@@ -19,13 +19,13 @@ from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
+from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects.utils import assign_collaborator
-from urbanvitaliz.apps.onboarding import models as onboarding_models
-from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.utils import login
 
-from . import adapters, utils, models
+from . import adapters, models, utils
 
 
 ####
@@ -134,7 +134,6 @@ def test_create_user_fails_for_known_email(request):
 
 @pytest.mark.django_db
 def test_user_can_access_contact_form(client):
-
     url = reverse("home-contact") + "?next=/"
     response = client.get(url)
 
@@ -143,7 +142,6 @@ def test_user_can_access_contact_form(client):
 
 @pytest.mark.django_db
 def test_non_logged_user_can_send_message_to_team(mocker, client):
-
     mocker.patch("django.core.mail.send_mail")
 
     data = {
@@ -170,7 +168,6 @@ def test_non_logged_user_can_send_message_to_team(mocker, client):
 
 @pytest.mark.django_db
 def test_logged_user_can_send_message_to_team(mocker, client):
-
     mocker.patch("django.core.mail.send_mail")
 
     data = {"subject": "a subject", "content": "some content"}
@@ -454,7 +451,6 @@ def test_guardian_supports_remove_bulk_perm_for_group_with_site_framework(
 
 @pytest.mark.django_db
 def test_make_new_site_fails_for_existing_domain(client):
-
     before = models.SiteConfiguration.objects.count()
 
     site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender")
@@ -465,7 +461,6 @@ def test_make_new_site_fails_for_existing_domain(client):
 
 @pytest.mark.django_db
 def test_make_new_site(client):
-
     site = utils.make_new_site(
         "New example", "new-example.com", "sender@example.com", "Sender"
     )
@@ -479,6 +474,29 @@ def test_make_new_site(client):
         "new_example_com_admin",
     ):
         assert auth_models.Group.objects.get(name=name)
+
+
+#######################################################################
+# Signals
+#######################################################################
+
+
+@pytest.mark.django_db
+def test_user_signin_should_be_logged(request, client):
+    with login(client) as user:
+        assert user.actor_actions.count() == 1
+
+
+@pytest.mark.django_db
+def test_user_signin_shouldnt_be_logged_if_hijacked(request, client):
+    hijacked = baker.make(auth_models.User, username="hijacked")
+
+    with login(client, username="hijacker", is_staff=True):
+        url = reverse("hijack:acquire")
+        response = client.post(url, data={"user_pk": hijacked.pk})
+
+    assert response.status_code == 302
+    assert hijacked.actor_actions.count() == 0
 
 
 # eof

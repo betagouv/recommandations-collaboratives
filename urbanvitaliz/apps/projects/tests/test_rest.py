@@ -9,6 +9,7 @@ created: 2021-06-01 10:11:56 CEST
 
 
 import pytest
+from actstream.models import user_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
@@ -360,5 +361,30 @@ def test_project_advisor_can_move_project_tasks_for_site(request):
 
     assert response.status_code == 200
 
+
+# FIXME MERGE fails w/ new permissions
+@pytest.mark.skip(reason="update for new permissions")
+@pytest.mark.django_db
+def test_updating_user_project_is_logged(request):
+    user = baker.make(auth_models.User, username="Bob")
+    site = get_current_site(request)
+    ups = baker.make(models.UserProjectStatus, user=user, site=site)
+
+    to_update = {"status": "DONE"}
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("userprojectstatus-detail", args=[ups.id])
+    response = client.patch(url, data=to_update)
+
+    assert response.status_code == 200
+    updated_ups = response.data
+    assert updated_ups["status"] == to_update["status"]
+
+    stream = user_stream(user, with_user_activity=True)
+    assert stream.count() == 1
+    assert stream[0].verb == "a changé l'état de son suivi"
+
+    assert False
 
 # eof

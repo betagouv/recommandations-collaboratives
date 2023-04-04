@@ -567,7 +567,8 @@ class NotificationFormatter:
 
         return self._format_or_default(
             {
-                "a rédigé un message": self.format_note_created,
+                "a rédigé un message": self.format_public_note_created,
+                "a rédigé un message dans l'espace conseillers": self.format_private_note_created,
                 "est devenu·e aiguilleur·se sur le projet": self.format_action_became_switchtender,
                 # added for transition from switchtender (aiguilleur) to advisor (conseiller)
                 "est devenu·e conseiller·e sur le projet": self.format_action_became_switchtender,
@@ -575,16 +576,24 @@ class NotificationFormatter:
                 "a soumis pour modération le projet": self.format_project_submitted,
                 "a commenté l'action": self.format_action_commented,
                 "a recommandé l'action": self.format_action_recommended,
-                "a ajouté un document": self.format_document_uploaded,
+                "a ajouté un lien ou un document": self.format_document_uploaded,
             },
             notification,
         )
 
     # ------ Real Formatters -----#
-    def format_note_created(self, notification):
-        """An note was written by a switchtender"""
+    def format_public_note_created(self, notification):
+        """A public note was written by a user"""
         subject = self._represent_user(notification.actor)
         summary = f"{subject} a rédigé un message"
+        excerpt = self._represent_note_excerpt(notification.action_object)
+
+        return FormattedNotification(summary=summary, excerpt=excerpt)
+
+    def format_private_note_created(self, notification):
+        """A note was written by a switchtender"""
+        subject = self._represent_user(notification.actor)
+        summary = f"{subject} a rédigé un message dans l'espace conseillers"
         excerpt = self._represent_note_excerpt(notification.action_object)
 
         return FormattedNotification(summary=summary, excerpt=excerpt)
@@ -592,7 +601,7 @@ class NotificationFormatter:
     def format_document_uploaded(self, notification):
         """A document was uploaded by a user"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} a ajouté un document"
+        summary = f"{subject} a ajouté un lien ou un document"
 
         return FormattedNotification(summary=summary, excerpt=None)
 

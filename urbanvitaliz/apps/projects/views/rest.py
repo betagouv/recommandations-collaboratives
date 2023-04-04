@@ -213,7 +213,7 @@ class UserProjectStatusViewSet(
 
     def get_queryset(self):
         project_statuses = models.UserProjectStatus.objects.filter(
-            user=self.request.user
+            user=self.request.user, project__deleted=None
         )
 
         ids = list(project_statuses.values_list("project__id", flat=True))
@@ -235,6 +235,17 @@ class UserProjectStatusViewSet(
 
     serializer_class = UserProjectStatusSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def perform_update(self, serializer):
+        old_one = self.get_object()
+
+        serializer.save()
+        new_one = serializer.instance
+
+        if new_one:
+            signals.project_userprojectstatus_updated.send(
+                sender=self, old_one=old_one, new_one=new_one
+            )
 
 
 # eof

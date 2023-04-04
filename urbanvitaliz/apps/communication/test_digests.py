@@ -216,10 +216,11 @@ def test_notification_formatter():
         content="A very nice content",
         resource=resource,
     ).make()
-    note = Recipe(
-        projects_models.Note,
-        content="my content",
+    public_note = Recipe(projects_models.Note, content="my content", public=True).make()
+    private_note = Recipe(
+        projects_models.Note, content="my content", public=False
     ).make()
+
     followup = Recipe(projects_models.TaskFollowup, task=task, comment="Hello!").make()
     project = Recipe(
         projects_models.Project,
@@ -231,8 +232,19 @@ def test_notification_formatter():
     tests = [
         (
             "a rédigé un message",
-            note,
-            ("Bobi Joe (DuckCorp) a rédigé un message", "my content"),
+            public_note,
+            (
+                "Bobi Joe (DuckCorp) a rédigé un message",
+                "my content",
+            ),
+        ),
+        (
+            "a rédigé un message dans l'espace conseillers",
+            private_note,
+            (
+                "Bobi Joe (DuckCorp) a rédigé un message dans l'espace conseillers",
+                "my content",
+            ),
         ),
         (
             "a commenté l'action",
@@ -269,9 +281,9 @@ def test_notification_formatter():
             ),
         ),
         (
-            "a ajouté un document",
+            "a ajouté un lien ou un document",
             project,
-            ("Bobi Joe (DuckCorp) a ajouté un document", None),
+            ("Bobi Joe (DuckCorp) a ajouté un lien ou un document", None),
         ),
         (
             "action inconnue",

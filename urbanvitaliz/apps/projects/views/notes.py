@@ -15,16 +15,8 @@ from django.utils import timezone
 from urbanvitaliz.utils import has_perm_or_403
 
 from .. import models, signals
-
-from ..forms import (
-    NoteForm,
-    DocumentUploadForm,
-    PublicNoteForm,
-    StaffNoteForm,
-)
-from ..utils import (
-    can_administrate_project,
-)
+from ..forms import DocumentUploadForm, NoteForm, PublicNoteForm, StaffNoteForm
+from ..utils import can_administrate_project
 
 
 @login_required
@@ -57,7 +49,7 @@ def create_public_note(request, project_id=None):
                     document.save()
 
             signals.note_created.send(
-                sender=create_note,
+                sender=create_public_note,
                 note=instance,
                 project=project,
                 user=request.user,
@@ -67,23 +59,21 @@ def create_public_note(request, project_id=None):
 
 
 @login_required
-def create_note(request, project_id=None):
-    """Create a new note for a project"""
+def create_private_note(request, project_id=None):
+    """Create a new private note for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     if not (
         request.user.has_perm("projects.use_private_notes", project)
-        or request.user.has_perm("projects.use_public_notes", project)
+# FIXME MERGE it does not make sense to me, check w/ glib
+#        or request.user.has_perm("projects.use_public_notes", project)
     ):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
     is_advisor = can_administrate_project(project, request.user)
 
     if request.method == "POST":
-        if is_advisor:
-            form = StaffNoteForm(request.POST)
-        else:
-            form = NoteForm(request.POST)
+        form = NoteForm(request.POST)
 
         if form.is_valid():
             instance = form.save(commit=False)
@@ -92,10 +82,11 @@ def create_note(request, project_id=None):
 
             if not request.user.has_perm("projects.use_private_notes", project):
                 instance.public = True
+
             instance.save()
 
             signals.note_created.send(
-                sender=create_note,
+                sender=create_private_note,
                 note=instance,
                 project=project,
                 user=request.user,
@@ -105,10 +96,7 @@ def create_note(request, project_id=None):
                 reverse("projects-project-detail-internal-followup", args=[project_id])
             )
     else:
-        if is_advisor:
-            form = StaffNoteForm()
-        else:
-            form = NoteForm()
+        form = NoteForm()
     return render(request, "projects/project/note_create.html", locals())
 
 
@@ -117,6 +105,11 @@ def update_note(request, note_id=None):
     """Update an existing note for a project"""
     note = get_object_or_404(models.Note, pk=note_id)
     project = note.project  # For template consistency
+
+    # FIXME MERGE check w/ glib
+    # can_manage_or_403(project, request.user, allow_draft=True)
+    # if note.created_by != request.user:
+    #     raise PermissionDenied("Vous ne pouvez éditer que vos propres messages.")
 
     is_advisor = can_administrate_project(project, request.user)
 
@@ -178,3 +171,6 @@ def delete_note(request, note_id=None):
     return redirect(
         reverse("projects-project-detail-internal-followup", args=[note.project_id])
     )
+
+
+# eof

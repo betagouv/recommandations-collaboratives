@@ -59,11 +59,14 @@ class MethodologyPageView(TemplateView):
 class WhoWeArePageView(TemplateView):
     template_name = "home/whoweare.html"
 
+
 class LegalsPageView(TemplateView):
     template_name = "home/legals.html"
 
+
 class TermsOfUsePageView(TemplateView):
     template_name = "home/terms_of_use.html"
+
 
 class PrivacyPageView(TemplateView):
     template_name = "home/privacy.html"
@@ -88,7 +91,7 @@ class StatisticsView(TemplateView):
         context["reco_following_pc"] = 90
         context["collectivity_supported"] = the_projects.count()
         context["collectivity_with_reco"] = (
-            projects.Task.objects.exclude(
+            projects.Task.on_site.exclude(
                 Q(status=projects.Task.NOT_INTERESTED)
                 | Q(status=projects.Task.ALREADY_DONE)
             )

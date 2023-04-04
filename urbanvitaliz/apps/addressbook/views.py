@@ -20,15 +20,18 @@ class OrganizationForm(forms.ModelForm):
 
 @login_required
 def organization_create(request):
-    """Create a new Organization"""
+    """Create a new Organization or add existing one to current site"""
     is_switchtender_or_403(request.user)
 
     if request.method == "POST":
         form = OrganizationForm(request.POST)
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-            form.save_m2m()
+            name = form.cleaned_data.get("name")
+            departments = form.cleaned_data.get("departments")
+            organization, _ = models.Organization.on_site.get_or_create(name=name)
+            organization.sites.add(request.site)
+            organization.departments.add(*departments)
+            organization.save()
             return redirect(reverse("addressbook-organization-list"))
     else:
         form = OrganizationForm()
@@ -40,7 +43,9 @@ def organization_update(request, organization_id=None):
     """Update an Organization"""
     is_switchtender_or_403(request.user)
 
-    organization = get_object_or_404(models.Organization, pk=organization_id)
+    organization = get_object_or_404(
+        models.Organization, sites=request.site, pk=organization_id
+    )
     if request.method == "POST":
         form = OrganizationForm(request.POST, instance=organization)
         if form.is_valid():
@@ -55,9 +60,9 @@ def organization_update(request, organization_id=None):
 
 @login_required
 def organization_list(request):
-    """Return the Organization list"""
+    """Return the Organization list for current site"""
     is_switchtender_or_403(request.user)
-    organizations = models.Organization.objects.order_by("name")
+    organizations = models.Organization.on_site.order_by("name")
     return render(request, "addressbook/organization_list.html", locals())
 
 
@@ -66,7 +71,9 @@ def organization_details(request, organization_id):
     """Return the details for a given Organization"""
     is_switchtender_or_403(request.user)
 
-    organization = get_object_or_404(models.Organization, pk=organization_id)
+    organization = get_object_or_404(
+        models.Organization, sites=request.site, pk=organization_id
+    )
     contacts = models.Contact.on_site.filter(organization=organization)
     return render(request, "addressbook/organization_details.html", locals())
 

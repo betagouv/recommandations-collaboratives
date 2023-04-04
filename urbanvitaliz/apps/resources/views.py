@@ -10,7 +10,7 @@ import datetime
 
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
@@ -99,15 +99,25 @@ def resource_search(request):
             if limit_area:
                 resources = resources.limit_area(departments)
 
-    # filter out expired
+    # staff can search resources
+    staff_redux = Q()
+
+    # keep draft "only" if requested
+    draft = form.cleaned_data.get("draft", False)
+    if draft:
+        staff_redux |= Q(status=models.Resource.DRAFT)
+
+    # keep expired "only" if requested
     expired = form.cleaned_data.get("expired", False)
     if expired:
-        resources = resources.filter(Q(expires_on__lte=datetime.date.today()))
+        staff_redux |= Q(expires_on__lte=datetime.date.today())
 
-    # filter out 'to be reviewed'
+    # keep 'to be reviewed' "only" if requested
     to_review = form.cleaned_data.get("to_review", False)
     if to_review:
-        resources = resources.filter(status=models.Resource.TO_REVIEW)
+        staff_redux |= Q(status=models.Resource.TO_REVIEW)
+
+    resources = resources.filter(staff_redux)
 
     return render(request, "resources/resource/list.html", locals())
 
@@ -124,6 +134,7 @@ class SearchForm(forms.Form):
 
     limit_area = forms.CharField(required=False, empty_value=None)
 
+    draft = forms.BooleanField(required=False, initial=False)
     expired = forms.BooleanField(required=False, initial=False)
     to_review = forms.BooleanField(required=False, initial=False)
 
@@ -200,14 +211,18 @@ class BaseResourceDetailView(DetailView):
         return context
 
 
-class ResourceDetailView(BaseResourceDetailView):
+class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
     model = models.Resource
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
 
+    def test_func(self):
+        resource = self.get_object()
+        return resource.public or self.request.user.is_staff
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        resource = self.object
+        resource = self.get_object()
 
         if check_if_advisor(self.request.user):
             context["projects_used_by"] = (

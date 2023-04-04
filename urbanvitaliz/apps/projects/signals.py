@@ -31,6 +31,10 @@ from .utils import (
 #####
 project_submitted = django.dispatch.Signal()
 project_validated = django.dispatch.Signal()
+
+# not using default signal but our own for easier processing
+project_userprojectstatus_updated = django.dispatch.Signal()
+
 project_switchtender_joined = django.dispatch.Signal()
 project_observer_joined = django.dispatch.Signal()
 project_switchtender_leaved = django.dispatch.Signal()
@@ -96,9 +100,9 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    recipients = get_collaborators_for_project(project).exclude(id=sender.id)
+    recipients = get_notification_recipients_for_project(project).exclude(id=sender.id)
 
-    # Notify regional actors
+    # Notify all actors of project
     notify.send(
         sender=sender,
         recipient=recipients,
@@ -378,7 +382,7 @@ def delete_task_history(
     suppress_actions=True,
     after=None,
 ):
-    """Remove all logging history and notification is a task is deleted"""
+    """Remove all logging history and notification if a task is deleted"""
     task_ct = ContentType.objects.get_for_model(task)
     notifications = notifications_models.Notification.on_site.filter(
         action_object_content_type_id=task_ct.pk, action_object_object_id=task.pk
@@ -436,16 +440,21 @@ note_created = django.dispatch.Signal()
 def notify_note_created(sender, note, project, user, **kwargs):
     if note.public is False:
         recipients = get_switchtenders_for_project(project).exclude(id=user.id)
+
+        verb = "a envoyé un message dans l'espace conseillers"
         action.send(
-            user, verb="a rédigé une note interne", action_object=note, target=project
+            user,
+            verb=verb,
+            action_object=note,
+            target=project,
         )
     else:
         recipients = get_notification_recipients_for_project(project).exclude(
             id=user.id
         )
-        action.send(
-            user, verb="a envoyé un message", action_object=note, target=project
-        )
+
+        verb = "a envoyé un message"
+        action.send(user, verb=verb, action_object=note, target=project)
 
     if project.status == "DRAFT" or project.muted:
         return
@@ -453,7 +462,7 @@ def notify_note_created(sender, note, project, user, **kwargs):
     notify.send(
         sender=user,
         recipient=recipients,
-        verb="a rédigé un message",
+        verb=verb,
         action_object=note,
         target=project,
         private=True,
@@ -468,6 +477,21 @@ def note_created_challenged(sender, note, project, user, **kwargs):
 
 
 ################################################################
+# UserProjectStatus
+################################################################
+@receiver(project_userprojectstatus_updated)
+def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs):
+    if old_one and new_one:
+        if old_one.status != new_one.status:
+            action.send(
+                new_one.user,
+                verb="a changé l'état de son suivi",
+                action_object=new_one,
+                target=new_one.project,
+            )
+
+
+################################################################
 # File Upload
 ################################################################
 @receiver(document_uploaded)
@@ -479,7 +503,7 @@ def project_document_uploaded(sender, instance, **kwargs):
     # Add a trace
     action.send(
         instance.uploaded_by,
-        verb="a ajouté un document",
+        verb="a ajouté un lien ou un document",
         action_object=instance,
         target=project,
     )
@@ -492,7 +516,7 @@ def project_document_uploaded(sender, instance, **kwargs):
     notify.send(
         sender=instance.uploaded_by,
         recipient=recipients,
-        verb="a ajouté un document",
+        verb="a ajouté un lien ou un document",
         action_object=instance,
         target=instance.project,
     )

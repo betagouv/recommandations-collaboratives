@@ -29,7 +29,7 @@ class NoteForm(forms.ModelForm):
 
     class Meta:
         model = models.Note
-        fields = ["content", "tags"]
+        fields = ["content"]
 
     content = MarkdownxFormField()
 
@@ -110,6 +110,7 @@ class PushTypeActionForm(forms.Form):
 
     push_type = forms.ChoiceField(choices=PUSH_TYPES)
     next = forms.CharField(required=False)
+
 
 class CreateActionWithoutResourceForm(forms.ModelForm):
     """Create an action for a project, without attached resource"""

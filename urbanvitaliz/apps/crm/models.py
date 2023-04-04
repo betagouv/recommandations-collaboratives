@@ -29,6 +29,46 @@ def create_site_permissions(sender, **kwargs):
         content_type=site_ct,
     )
 
+#
+# ProjectAnnotations
+
+
+class ProjectAnnotationsManager(models.Manager):
+    """Manager for all project annotations"""
+
+    pass
+
+
+class ProjectAnnotationsOnSiteManager(CurrentSiteManager, ProjectAnnotationsManager):
+    """Manager for on site project annotations"""
+
+    pass
+
+
+class ProjectAnnotations(models.Model):
+    """Represents a collection of annotations to a project"""
+
+    objects = ProjectAnnotationsManager()
+    on_site = ProjectAnnotationsOnSiteManager()
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    project = models.OneToOneField(
+        projects_models.Project,
+        on_delete=models.CASCADE,
+        related_name="crm_annotations",
+    )
+    tags = TaggableManager(blank=True)
+
+    created_on = models.DateTimeField(default=timezone.now)
+    updated_on = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "project annotation"
+        verbose_name_plural = "project annotations"
+
+    def __str__(self):
+        return f"CRM annotations for {self.project.name}"
+
 
 class NoteManager(models.Manager):
     pass

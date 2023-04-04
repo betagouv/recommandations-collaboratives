@@ -147,7 +147,7 @@ def project_list_export_csv(request):
                 ),  # conversations collectivite. -1 to remove a message from the system
                 notes.filter(public=False).count(),  # suivi interne conseillers
                 switchtenders.exclude(
-                    is_staff=True
+                    groups=["example_com_staff"]
                 ).count(),  # non staff switchtender count
                 [tag for tag in project.tags.names()],
                 build_absolute_url(
