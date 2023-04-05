@@ -1391,17 +1391,16 @@ def test_switchtender_leaves_project(request, client):
 
 
 # FIXME MERGE move to new permissions
-@pytest.mark.skip(reason="to be rewritten for new permissions")
 @pytest.mark.django_db
-def test_switchtender_joins_trigger_notification_to_all(request, client):
+def test_advisor_joins_trigger_notification_to_all(request, client):
     current_site = get_current_site(request)
 
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
 
     membership = baker.make(models.ProjectMember, is_owner=True)
-    switchtender = baker.make(auth.User)
-    auth.Group.objects.get(name="switchtender").user_set.add(switchtender)
+    advisor = baker.make(auth.User)
+#    auth.Group.objects.get(name="switchtender").user_set.add(switchtender)
 
     Recipe(
         models.TaskRecommendation,
@@ -1413,23 +1412,25 @@ def test_switchtender_joins_trigger_notification_to_all(request, client):
     project = Recipe(
         models.Project,
         status="BLAH",
-        projectmember_set=[membership],
+        projectmember_set=[membership],  # move to assign_collaborator?
         commune=commune,
         sites=[current_site],
     ).make()
 
-    project.switchtenders_on_site.create(
-        switchtender=switchtender, site=get_current_site(request)
-    )
+#    project.switchtenders_on_site.create(
+#        switchtender=switchtender, site=get_current_site(request)
+#    )
+
+    utils.assign_advisor(advisor, project, current_site)
 
     url = reverse("projects-project-switchtender-join", args=[project.id])
 
     with login(client, groups=["example_com_advisor"]) as user:
-        user.profile.sites.add(current_site)
+#        user.profile.sites.add(current_site)
 
         client.post(url)
         assert membership.member.notifications.count() == 1
-        assert switchtender.notifications.count() == 1
+        assert advisor.notifications.count() == 1
 
 
 @pytest.mark.django_db
