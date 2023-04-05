@@ -1,6 +1,7 @@
 tmp
 tags
 TAGS
+cscope.*
 .venv
 .vscode
 dist
