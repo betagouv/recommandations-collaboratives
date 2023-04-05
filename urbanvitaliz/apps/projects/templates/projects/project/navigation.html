@@ -1,6 +1,8 @@
 {% load static %}
 {% load sass_tags %}
 {% load guardian_tags %}
+{% load projects_extra %}
+
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
@@ -9,8 +11,12 @@
           rel="stylesheet"
           type="text/css">
 {% endblock %}
+
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
+{% is_staff_for_current_site request.user as is_staff %}
+
+
 <ul class="project-navigation d-flex align-items-center"
     style="font-family: 'Marianne', arial, sans-serif;
            padding: 0">
@@ -124,7 +130,7 @@
             {% endwith %}
         {% endif %}
     </li>
-    {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms %}
+    {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %}
         <li>
             <a class="{% if administration_panel %} active{% endif %} align-items-center"
                href="{% url 'projects-project-administration' project.pk %}">
