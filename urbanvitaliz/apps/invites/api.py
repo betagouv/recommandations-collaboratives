@@ -81,6 +81,7 @@ def invite_resend(invite):
     try:
         user = auth_models.User.objects.get(username=invite.email)
     except auth_models.User.DoesNotExist:
+        print(">>>>> fuck you goddamned mother fucker")
         user = None
 
     return invite_send(invite, invited_user=user)
@@ -93,3 +94,6 @@ def invite_revoke(invite):
         return True
 
     return False
+
+
+# eof

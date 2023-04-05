@@ -19,21 +19,14 @@ from django.views.decorators.http import require_http_methods
 from guardian.shortcuts import get_user_perms
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
-from urbanvitaliz.apps.invites.api import (
-    invite_collaborator_on_project,
-    invite_resend,
-    invite_revoke,
-)
+from urbanvitaliz.apps.invites.api import (invite_collaborator_on_project,
+                                           invite_resend, invite_revoke)
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.utils import has_perm_or_403, is_staff_for_site
 
 from .. import forms, models
-from ..utils import (
-    is_regional_actor_for_project,
-    unassign_advisor,
-    unassign_collaborator,
-)
-
+from ..utils import (is_regional_actor_for_project, unassign_advisor,
+                     unassign_collaborator)
 
 ########################################################################
 # Access
@@ -360,11 +353,11 @@ def access_advisor_delete(request, project_id: int, email: str):
         site=request.site,
     )
 
-    unassign_advisor(request.user, project, request.site)
+    unassign_advisor(advisor, project, request.site)
 
     messages.success(
         request,
-        "{0} a bien été supprimé de la liste des conseiller·e·s.".format(email),
+        f"{email} a bien été supprimé de la liste des conseiller·e·s.",
         extra_tags=["auth"],
     )
 

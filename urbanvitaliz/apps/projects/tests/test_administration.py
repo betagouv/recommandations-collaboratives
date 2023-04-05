@@ -13,14 +13,15 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.invites import models as invites_models
+from urbanvitaliz.apps.projects.utils import (assign_advisor,
+                                              assign_collaborator)
 from urbanvitaliz.utils import login
-from urbanvitaliz.apps.projects.utils import assign_collaborator, assign_advisor
-from guardian.shortcuts import assign_perm
 
 from .. import models
 
@@ -158,7 +159,7 @@ def test_accepted_project_update_accessible_for_collaborator(request, client):
 
 
 #####################################################################
-# Collectivity ACLs
+# Removing collaborators from project
 #####################################################################
 
 
@@ -198,93 +199,6 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
 
 
 @pytest.mark.django_db
-def test_collaborator_can_remove_member_from_project(request, client):
-    collaborator = baker.make(
-        auth_models.User,
-        email="owner@ab.fr",
-        username="owner@ab.fr",
-    )
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    ).make()
-    assign_collaborator(collaborator, project)
-
-    url = reverse(
-        "projects-project-access-collectivity-delete",
-        args=[project.id, collaborator.email],
-    )
-
-    with login(client) as user:
-        assign_collaborator(user, project)
-        response = client.post(url)
-
-    assert response.status_code == 302
-
-    project = models.Project.on_site.get(id=project.id)
-    assert collaborator not in project.members.all()
-
-
-@pytest.mark.django_db
-def test_advisor_can_remove_member_from_project(request, client):
-    site = get_current_site(request)
-    collaborator = baker.make(
-        auth_models.User,
-        email="owner@ab.fr",
-        username="owner@ab.fr",
-    )
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
-    assign_collaborator(collaborator, project)
-
-    url = reverse(
-        "projects-project-access-collectivity-delete",
-        args=[project.id, collaborator.email],
-    )
-
-    with login(client) as user:
-        assign_advisor(user, project, site)
-        response = client.post(url)
-
-    assert response.status_code == 302
-
-    project = models.Project.on_site.get(id=project.id)
-    assert collaborator not in project.members.all()
-
-
-@pytest.mark.django_db
-def test_unprivileged_user_cannot_remove_member_from_project(request, client):
-    collaborator = baker.make(
-        auth_models.User,
-        email="owner@ab.fr",
-        username="owner@ab.fr",
-    )
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    ).make()
-    assign_collaborator(collaborator, project)
-
-    url = reverse(
-        "projects-project-access-collectivity-delete",
-        args=[project.id, collaborator.email],
-    )
-
-    with login(client) as user:
-        response = client.post(url)
-
-    assert response.status_code == 403
-
-    project = models.Project.on_site.get(id=project.id)
-    assert collaborator in project.members.all()
-
-
-@pytest.mark.django_db
 def test_collaborator_can_remove_other_collaborator_from_project(request, client):
     site = get_current_site(request)
     collaborator = baker.make(
@@ -316,56 +230,90 @@ def test_collaborator_can_remove_other_collaborator_from_project(request, client
 
 
 @pytest.mark.django_db
-def test_cannot_revoke_accepted_invitation(request, client):
+def test_advisor_can_remove_collaborator_from_project(request, client):
+    site = get_current_site(request)
+    collaborator = baker.make(
+        auth_models.User,
+        email="owner@ab.fr",
+        username="owner@ab.fr",
+    )
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[site],
         status="READY",
     ).make()
-
-    invite = Recipe(
-        invites_models.Invite,
-        project=project,
-        accepted_on=timezone.now(),
-        site=get_current_site(request),
-    ).make()
+    assign_collaborator(collaborator, project)
 
     url = reverse(
-        "projects-project-access-revoke-invite",
-        args=[project.id, invite.pk],
+        "projects-project-access-collectivity-delete",
+        args=[project.id, collaborator.email],
     )
 
-    with login(client):
+    with login(client) as user:
+        assign_advisor(user, project, site)
         response = client.post(url)
 
-    assert response.status_code == 404
+    assert response.status_code == 302
 
-    assert invites_models.Invite.on_site.count() == 1
+    project = models.Project.on_site.get(id=project.id)
+    assert collaborator not in project.members.all()
 
 
 @pytest.mark.django_db
-def test_unprivileged_user_cannot_revoke_invitation(request, client):
+def test_staff_can_remove_collaborator_from_project(request, client):
+    site = get_current_site(request)
+    collaborator = baker.make(
+        auth_models.User,
+        email="owner@ab.fr",
+        username="owner@ab.fr",
+    )
+    project = Recipe(
+        models.Project,
+        sites=[site],
+        status="READY",
+    ).make()
+    assign_collaborator(collaborator, project)
+
+    url = reverse(
+        "projects-project-access-collectivity-delete",
+        args=[project.id, collaborator.email],
+    )
+
+    with login(client, groups=["example_com_staff"]) as user:
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    project = models.Project.on_site.get(id=project.id)
+    assert collaborator not in project.members.all()
+
+
+@pytest.mark.django_db
+def test_unprivileged_user_cannot_remove_collaborator_from_project(request, client):
+    collaborator = baker.make(
+        auth_models.User,
+        email="owner@ab.fr",
+        username="owner@ab.fr",
+    )
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
         status="READY",
     ).make()
-
-    invite = Recipe(
-        invites_models.Invite, site=get_current_site(request), project=project
-    ).make()
+    assign_collaborator(collaborator, project)
 
     url = reverse(
-        "projects-project-access-revoke-invite",
-        args=[project.id, invite.pk],
+        "projects-project-access-collectivity-delete",
+        args=[project.id, collaborator.email],
     )
 
-    with login(client):
+    with login(client) as user:
         response = client.post(url)
 
     assert response.status_code == 403
 
-    assert invites_models.Invite.on_site.first() == invite
+    project = models.Project.on_site.get(id=project.id)
+    assert collaborator in project.members.all()
 
 
 #####################################################################
@@ -431,6 +379,112 @@ def test_advisor_cannot_remove_advisor_from_project(request, client):
 
     project = models.Project.on_site.get(id=project.id)
     assert advisor in project.switchtenders.all()
+
+
+@pytest.mark.django_db
+def test_staff_can_remove_advisor_from_project_on_site(request, client):
+    site = get_current_site(request)
+    advisor = baker.make(
+        auth_models.User,
+        email="advisor@ab.fr",
+        username="advisor@ab.fr",
+    )
+    project = Recipe(
+        models.Project,
+        sites=[site],
+        status="READY",
+    ).make()
+    assign_advisor(advisor, project, site)
+
+    url = reverse(
+        "projects-project-access-advisor-delete",
+        args=[project.id, advisor.email],
+    )
+
+    with login(client, groups=["example_com_staff"]) as user:
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    assert (
+        models.ProjectSwitchtender.objects.filter(
+            project=project, site=site, switchtender=advisor
+        ).count()
+        == 0
+    )
+
+
+########################################################################
+# resend invitations
+########################################################################
+
+
+@pytest.mark.django_db
+def test_staff_can_resend_advisor_invitation(request, client, mailoutbox):
+    site = get_current_site(request)
+    invited_email = "invite@party.com"
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+    )
+
+    invite = baker.make(
+        invites_models.Invite,
+        site=site,
+        project=project,
+        role="SWITCHTENDER",
+        email=invited_email,
+        inviter__first_name="john",
+    )
+
+    url = reverse(
+        "projects-project-access-advisor-resend-invite",
+        args=[project.id, invite.pk],
+    )
+    data = {"email": invited_email, "message": "resent"}
+
+    with login(client, groups=["example_com_staff"]) as user:
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    assert len(mailoutbox) == 1
+    assert invited_email in mailoutbox[0].to
+
+
+@pytest.mark.django_db
+def test_staff_can_resend_collaborator_invitation(request, client, mailoutbox):
+    site = get_current_site(request)
+    invited_email = "invite@party.com"
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+    )
+
+    invite = baker.make(
+        invites_models.Invite,
+        site=site,
+        project=project,
+        role="COLLABORATOR",
+        email=invited_email,
+        inviter__first_name="john",
+    )
+
+    url = reverse(
+        "projects-project-access-collectivity-resend-invite",
+        args=[project.id, invite.pk],
+    )
+    data = {"email": invited_email, "message": "resent"}
+
+    with login(client, groups=["example_com_staff"]) as user:
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    assert len(mailoutbox) == 1
+    assert invited_email in mailoutbox[0].to
 
 
 # eof
