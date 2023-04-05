@@ -1,10 +1,14 @@
 {% load gravatar %}
 {% load static %}
 {% load guardian_tags %}
+{% load projects_extra %}
+
 <!-- User -->
 <div id="user-info" class="pe-2 ps-2 ms-2 me-2">
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
+        {% is_staff_for_current_site request.user as is_staff %}
+        
         <div x-data="{ open: false }"
              x-on:click.outside="open = false"
              class="dropdown">
@@ -42,7 +46,7 @@
                         <hr class="dropdown-divider">
                     </li>
                 {% endif %}
-                {% if is_staff_for_site %}
+                {% if is_staff %}
                     <li class="small dropdown-item border-0 d-inline-block position-relative">
                         <svg class="bi me-2 d-inline" width="16" height="16">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#signpost-fill"/>
