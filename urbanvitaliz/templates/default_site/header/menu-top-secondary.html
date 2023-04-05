@@ -90,7 +90,7 @@
         </div>
     </li>
     <!-- Address Book -->
-    {% if request.user.is_staff %}
+    {% if "use_addressbook" in user_site_perms %}
     <li style="margin-right: 35px ;padding-bottom:20px; border-bottom:solid 2px transparent; {% if 'addressbook' in url_name %}border-bottom:solid 2px #0063CB;{% endif %}">
         <a href="{% url 'addressbook-organization-list' %}" class="nav-link link-dark {% if url_name == 'addressbook-organization-list' %}active{% endif %}">
             <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
