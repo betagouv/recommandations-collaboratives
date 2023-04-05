@@ -28,9 +28,11 @@ from urbanvitaliz.utils import login
 from . import adapters, models, utils
 
 
-####
-# utils
-####
+########################################################################
+# utility functions
+########################################################################
+
+
 @pytest.mark.django_db
 def test_get_current_site_sender_with_configuration(request):
     current_site = get_current_site(request)
@@ -58,6 +60,8 @@ def test_get_current_site_sender_without_configuration(request):
 ################################################
 # signup with sites
 ################################################
+
+
 @pytest.mark.django_db
 def test_create_user_assign_current_site_via_allauth(client, request):
     site = get_current_site(request)

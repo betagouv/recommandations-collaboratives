@@ -145,7 +145,6 @@ def test_create_prefilled_project_reachable_by_switchtenders(request, client):
     )
 
     with login(client, groups=["example_com_advisor"]) as user:
-        # utils.assign_advisor(user, project, site)
         response = client.get(reverse("projects-project-prefill"))
 
     assert response.status_code == 200
@@ -174,7 +173,6 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
         "response_0": "blah",
     }
     with login(client, groups=["example_com_advisor"]) as user:
-        # utils.assign_advisor(user, project, site)
         response = client.post(reverse("projects-project-prefill"), data=data)
 
     project = models.Project.on_site.all()[0]
@@ -221,7 +219,6 @@ def test_created_prefilled_project_stores_initial_info(request, client):
     }
 
     with login(client, groups=["example_com_advisor"]) as user:
-        # utils.assign_advisor(user, project, site)
         response = client.post(reverse("projects-project-prefill"), data=data)
 
     assert response.status_code == 302
@@ -332,7 +329,6 @@ def test_project_list_available_for_switchtender_user(request, client):
     site = get_current_site(request)
     url = reverse("projects-project-list")
     with login(client, groups=["example_com_advisor"]) as user:
-        # utils.assign_advisor(user, project, site)
         response = client.get(url, follow=True)
 
     advisor_url = reverse("projects-project-list-advisor")
@@ -346,7 +342,6 @@ def test_project_list_available_for_staff(request, client):
     site = get_current_site(request)
     url = reverse("projects-project-list")
     with login(client, groups=["example_com_staff", "example_com_advisor"]) as user:
-        # utils.assign_advisor(user, project, site)
         response = client.get(url, follow=True)
 
     staff_url = reverse("projects-project-list-staff")
