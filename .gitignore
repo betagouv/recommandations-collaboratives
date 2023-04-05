@@ -1,6 +1,7 @@
 tmp
 tags
 TAGS
+cscope.*
 .venv
 .vscode
 dist
@@ -11,6 +12,7 @@ __pycache__
 *.swp
 *.swo
 .#*
+*~
 .coverage
 .coverage.*
 development.py
