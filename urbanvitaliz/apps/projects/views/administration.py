@@ -164,10 +164,11 @@ def access_revoke_invite(request, project_id, invite_id):
 
     invite = get_object_or_404(invites_models.Invite, pk=invite_id, accepted_on=None)
 
-    if invite.role == "SWITCHTENDER":
-        has_perm_or_403(request.user, "manage_advisors", project)
-    else:
-        has_perm_or_403(request.user, "manage_collaborators", project)
+    if not is_staff_for_site(request.user):
+        if invite.role == "SWITCHTENDER":
+            has_perm_or_403(request.user, "manage_advisors", project)
+        else:
+            has_perm_or_403(request.user, "manage_collaborators", project)
 
     if invite_revoke(invite):
         messages.success(
@@ -204,7 +205,10 @@ def access_collaborator_invite(request, project_id):
         request.site, project, request.user, allow_national=True
     )
 
-    is_regional_actor or has_perm_or_403(request.user, "invite_collaborators", project)
+    if not is_staff_for_site(request.user):
+        is_regional_actor or has_perm_or_403(
+            request.user, "invite_collaborators", project
+        )
 
     return access_invite(request, "COLLABORATOR", project)
 
@@ -221,7 +225,10 @@ def access_collaborator_resend_invite(request, project_id, invite_id):
         request.site, project, request.user, allow_national=True
     )
 
-    is_regional_actor or has_perm_or_403(request.user, "invite_collaborators", project)
+    if not is_staff_for_site(request.user):
+        is_regional_actor or has_perm_or_403(
+            request.user, "invite_collaborators", project
+        )
 
     invite = get_object_or_404(
         invites_models.Invite, role="COLLABORATOR", pk=invite_id, accepted_on=None
@@ -249,7 +256,8 @@ def access_collaborator_delete(request, project_id: int, email: str):
     """Delete a collectivity member from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    has_perm_or_403(request.user, "manage_collaborators", project)
+    if not is_staff_for_site(request.user):
+        has_perm_or_403(request.user, "manage_collaborators", project)
 
     membership = get_object_or_404(
         models.ProjectMember, project=project, member__username=email
@@ -291,7 +299,8 @@ def access_advisor_invite(request, project_id):
         request.site, project, request.user, allow_national=True
     )
 
-    is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
+    if not is_staff_for_site(request.user):
+        is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
 
     return access_invite(
         request, "SWITCHTENDER", project
@@ -310,7 +319,8 @@ def access_advisor_resend_invite(request, project_id, invite_id):
         request.site, project, request.user, allow_national=True
     )
 
-    is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
+    if not is_staff_for_site(request.user):
+        is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
 
     invite = get_object_or_404(
         invites_models.Invite, role="SWITCHTENDER", pk=invite_id, accepted_on=None
@@ -340,7 +350,8 @@ def access_advisor_delete(request, project_id: int, email: str):
     """Delete an advisor from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    has_perm_or_403(request.user, "manage_advisors", project)
+    if not is_staff_for_site(request.user):
+        has_perm_or_403(request.user, "manage_advisors", project)
 
     advisor = get_object_or_404(
         models.ProjectSwitchtender,
