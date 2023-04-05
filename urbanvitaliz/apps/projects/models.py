@@ -17,8 +17,11 @@ from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
+from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
 from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
@@ -30,19 +33,10 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.utils import (
-    CastedGenericRelation,
-    check_if_advisor,
-    make_group_name_for_site,
-    has_perm,
-)
-from django.db.models.signals import post_migrate
-from django.dispatch import receiver
-from guardian.shortcuts import get_objects_for_user
+from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor, has_perm
 
-
-from .utils import generate_ro_key
 from . import apps
+from .utils import generate_ro_key
 
 COLLABORATOR_DRAFT_PERMISSIONS = (
     "projects.view_public_notes",
