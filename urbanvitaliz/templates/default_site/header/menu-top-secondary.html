@@ -1,6 +1,12 @@
 {% load static %}
+{% load guardian_tags %}
 
 {% with request.resolver_match.url_name as url_name %}
+
+{% if user.is_authenticated %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% endif %}
+
 <ul class="list-unstyled mb-0 d-flex justify-content-center align-items-center" style="padding-left: 15px;">
     <!-- Projects -->
     {% if active_project %}
@@ -71,15 +77,15 @@
             <a href="{% url 'resources-resource-search' %}" class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">
                 <span class="ms-1 align-middle">Ressources</span>
             </a>
-            {% if user.is_staff %}
-            <button x-on:click="open = !open" type="button" class="border-0 btn py-0 px-1">
-                <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi" width="20px" height="20px" fill="currentColor" stroke="currentColor" style="padding: 3px;">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down"/>
-                </svg>
-            </button>
-            <ul x-show="open" :class="{'show':open}" class="dropdown-menu py-0 mt-2 top-100">
-                <li><a class="dropdown-item px-4 py-2" href="{% url 'resources-resource-create' %}">Créer</a></li>
-            </ul>
+            {% if "manage_resources" in user_site_perms %}
+                <button x-on:click="open = !open" type="button" class="border-0 btn py-0 px-1">
+                    <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi" width="20px" height="20px" fill="currentColor" stroke="currentColor" style="padding: 3px;">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down"/>
+                    </svg>
+                </button>
+                <ul x-show="open" :class="{'show':open}" class="dropdown-menu py-0 mt-2 top-100">
+                    <li><a class="dropdown-item px-4 py-2" href="{% url 'resources-resource-create' %}">Créer</a></li>
+                </ul>
             {% endif %}
         </div>
     </li>
