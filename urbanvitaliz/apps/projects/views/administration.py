@@ -8,9 +8,7 @@ created : 2021-05-26 15:56:20 CEST
 """
 from actstream import action
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -62,7 +60,9 @@ def project_administration(request, project_id):
         request.site, project, request.user, allow_national=True
     )
 
-    if not (is_regional_actor or has_any_required_perm):
+    if not (
+        is_regional_actor or has_any_required_perm or is_staff_for_site(request.user)
+    ):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
     # Fetch pending invites
