@@ -26,28 +26,40 @@ def assign_user_permissions_by_projects():
     """Per project permission for user"""
     for project in Project.objects.all():
         print("Updating perms for project:", project.name)
-        for membership in project.projectmember_set.all():
-            assign_collaborator(
-                membership.member, project, is_owner=membership.is_owner
-            )
+        for site in Site.objects.all():
+            print("\t* Updating permissions for collaborators...")
+            for membership in project.projectmember_set.all():
+                assign_collaborator(
+                    membership.member, project, is_owner=membership.is_owner
+                )
 
-        for project_advisor in ProjectSwitchtender.objects.filter(project=project):
-            if project_advisor.is_observer:
-                print(
-                    "\t* Assigning permissions for OBSERVER:",
-                    project_advisor.switchtender,
-                )
-                assign_observer(
-                    project_advisor.switchtender, project, site=project_advisor.site
-                )
-            else:
-                print(
-                    "\t* Assigning permissions for ADVISOR:",
-                    project_advisor.switchtender,
-                )
-                assign_advisor(
-                    project_advisor.switchtender, project, site=project_advisor.site
-                )
+            print("\t* Updating permissions for advisors/observers...")
+            print(f"\t== On site {site} ==")
+
+            with settings.SITE_ID.override(site.id):
+                for project_advisor in ProjectSwitchtender.objects.filter(
+                    project=project
+                ):
+                    if project_advisor.is_observer:
+                        print(
+                            "\t\t* OBSERVER:",
+                            project_advisor.switchtender,
+                        )
+                        assign_observer(
+                            project_advisor.switchtender,
+                            project,
+                            site=project_advisor.site,
+                        )
+                    else:
+                        print(
+                            "\t\t* ADVISOR:",
+                            project_advisor.switchtender,
+                        )
+                        assign_advisor(
+                            project_advisor.switchtender,
+                            project,
+                            site=project_advisor.site,
+                        )
 
 
 def assign_group_permissions_by_sites():
