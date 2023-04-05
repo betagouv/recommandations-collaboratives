@@ -18,6 +18,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from urbanvitaliz.apps.crm import models as crm_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.utils import build_absolute_url, is_switchtender_or_403
+from urbanvitaliz.utils import get_group_for_site
 
 from .. import models
 from ..utils import (format_switchtender_identity,
@@ -80,6 +81,8 @@ def project_list_export_csv(request):
             "impact_mise_en_relation",
         ]
     )
+
+    staff_group = get_group_for_site("staff", request.site)
 
     for project in projects:
         switchtenders = get_switchtenders_for_project(project)
@@ -146,8 +149,12 @@ def project_list_export_csv(request):
                     0, conversations.filter(created_by__in=collaborators).count() - 1
                 ),  # conversations collectivite. -1 to remove a message from the system
                 notes.filter(public=False).count(),  # suivi interne conseillers
+                # FIXME MERGE cet version échoue, elle n'attends pas une liste mais un int
+                # switchtenders.exclude(
+                #     groups=["example_com_staff"]
+                # ).count(),  # non staff switchtender count
                 switchtenders.exclude(
-                    groups=["example_com_staff"]
+                    groups__in=[staff_group]
                 ).count(),  # non staff switchtender count
                 [tag for tag in project.tags.names()],
                 build_absolute_url(

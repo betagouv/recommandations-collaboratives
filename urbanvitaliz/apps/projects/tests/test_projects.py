@@ -1478,9 +1478,10 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(
 
 
 # FIXME MERGE new permissions
-@pytest.mark.skip(reason="update for new permissions")
 @pytest.mark.django_db
 def test_switchtender_exports_csv(request, client):
+    site=get_current_site(request)
+
     # Expected project
     p1 = Recipe(
         models.Project,
@@ -1499,9 +1500,11 @@ def test_switchtender_exports_csv(request, client):
 
     url = reverse("projects-project-list-export-csv")
     with login(client, groups=["example_com_advisor"]) as user:
-        p1.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+#        p1.switchtenders_on_site.create(
+#            switchtender=user, site=get_current_site(request)
+#        )
+        utils.assign_advisor(user, p1, site)
+
 
         response = client.get(url)
 
