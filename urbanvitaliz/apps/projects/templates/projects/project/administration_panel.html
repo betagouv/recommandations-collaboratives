@@ -18,7 +18,7 @@
 
     {% include 'projects/project/navigation.html' with administration_panel=True %}
     <div class="row">
-        {% if "change_project" in user_project_perms %}
+        {% if "change_project" in user_project_perms or is_staff %}
             <div class="col-12">
                 <h6 class="text-uppercase fw-bold d-block mb-3 font-small">informations générales</h6>
                 <form method="post"
