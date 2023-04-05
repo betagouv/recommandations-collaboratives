@@ -11,6 +11,8 @@ from django import template
 
 from .. import models
 
+from urbanvitaliz import utils as uv_utils
+
 register = template.Library()
 
 
@@ -22,6 +24,12 @@ def current_project(session):
         return models.Project.on_site.get(id=project_id)
     except Exception:  # pragma: nocover noqa
         return
+
+
+@register.simple_tag
+def is_staff_for_current_site(user):
+    """Return True if the given user is staff for the active site"""
+    return uv_utils.is_staff_for_site(user)
 
 
 # eof

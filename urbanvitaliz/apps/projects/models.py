@@ -68,6 +68,7 @@ ADVISOR_PERMISSIONS = [
     "projects.manage_collaborators",
     "projects.change_topics",
     "projects.manage_documents",
+    "projects.use_surveys",
     "projects.view_surveys",
 ]
 
