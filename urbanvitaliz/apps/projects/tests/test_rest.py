@@ -18,8 +18,8 @@ from pytest_django.asserts import assertContains, assertNotContains
 from rest_framework.test import APIClient
 from urbanvitaliz.utils import login
 
-from .. import models
-from .. import utils
+from .. import models, utils
+
 
 ########################################################################
 # REST API: projects
@@ -363,7 +363,6 @@ def test_project_advisor_can_move_project_tasks_for_site(request):
 
 
 # FIXME MERGE fails w/ new permissions
-@pytest.mark.skip(reason="update for new permissions")
 @pytest.mark.django_db
 def test_updating_user_project_is_logged(request):
     user = baker.make(auth_models.User, username="Bob")
@@ -385,6 +384,5 @@ def test_updating_user_project_is_logged(request):
     assert stream.count() == 1
     assert stream[0].verb == "a changé l'état de son suivi"
 
-    assert False
 
 # eof

@@ -15,7 +15,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import models as projects_models
@@ -272,7 +273,7 @@ def test_draft_resource_not_visible_to_non_staff(request, client):
 
 
 # FIXME MERGE new permissions
-@pytest.mark.skip(reason="update for new permissions")
+# @pytest.mark.skip(reason="update for new permissions")
 @pytest.mark.django_db
 def test_draft_resource_visible_to_staff(request, client):
     resource = Recipe(
@@ -285,14 +286,13 @@ def test_draft_resource_visible_to_staff(request, client):
 
 
 # FIXME MERGE new permissions
-@pytest.mark.skip(reason="update for new permissions")
+# @pytest.mark.skip(reason="update for new permissions")
 @pytest.mark.django_db
 def test_resource_detail_contains_update_for_authorized_user(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
-
     update_url = reverse("resources-resource-update", args=[resource.id])
     assertContains(response, update_url)
 
@@ -554,7 +554,6 @@ def test_user_bookmarks_a_resource(request, client):
 
 @pytest.mark.django_db
 def test_user_refresh_bookmark_of_a_resource(request, client):
-
     with login(client) as user:
         bookmark = Recipe(
             models.Bookmark,
@@ -578,7 +577,6 @@ def test_user_refresh_bookmark_of_a_resource(request, client):
 
 @pytest.mark.django_db
 def test_user_deletes_a_personal_bookmark(request, client):
-
     with login(client) as user:
         bookmark = Recipe(
             models.Bookmark,
