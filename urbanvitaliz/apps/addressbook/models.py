@@ -6,11 +6,32 @@ Views for addressbook application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-07-20 15:56:20 CEST
 """
+from django.contrib.auth import models as auth_models
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.functions import Lower
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 from urbanvitaliz.apps.geomatics import models as geomatics_models
+
+from . import apps
+
+
+# We need the permission to be associated to the site and not to the projects
+@receiver(post_migrate)
+def create_site_permissions(sender, **kwargs):
+    if sender.name != apps.AddressbookConfig.name:
+        return
+
+    site_ct = ContentType.objects.get(app_label="sites", model="site")
+
+    auth_models.Permission.objects.get_or_create(
+        codename="use_addressbook",
+        name="Can use the addressbook for site",
+        content_type=site_ct,
+    )
 
 
 class OrganizationManager(models.Manager):
