@@ -1,7 +1,6 @@
 {% load static %}
 {% load guardian_tags %}
 
->>>>>>> feature/new-permissions
 {% with request.resolver_match.url_name as url_name %}
 
 {% if user.is_authenticated %}
@@ -16,149 +15,49 @@
                 <div x-data="{ open: false }" x-on:click.outside="open = false" class="btn-group">
                     <a style="text-decoration: none; color: inherit;" class="ms-1 align-middle" href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{active_project.name}}</strong><span class="text-secondary small ms-2 text-break text-truncate">({{ active_project.commune.name }})</span></strong></a>
                 </div>
-            </li>
-            <li style="margin-right: 15px;
-                       padding-bottom:20px;
-                       border-bottom:solid 2px transparent;
-                       {% if 'projects-project-detail' in url_name %} border-bottom:solid 2px #0063CB;
-                       {% endif %}">
-                <div id="project-selector" class="nav-item">
-                    <div x-data="{ open: false }"
-                         x-on:click.outside="open = false"
-                         class="btn-group">
-                        {% if request.session.projects|length > 0 %}
-                            <span class="ms-1 align-middle">Mes projets</span>
-                            <button x-on:click="open = !open"
-                                    type="button"
-                                    class="border-0 btn py-0 px-1">
-                                <svg data-toggle="tooltip"
-                                     data-placement="top"
-                                     title="Notifications désactivées"
-                                     class="align-middle bi"
-                                     width="20px"
-                                     height="20px"
-                                     fill="currentColor"
-                                     stroke="currentColor"
-                                     style="padding: 3px">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chevron-down"/>
-                                </svg>
-                            </button>
-                            <ul x-show="open"
-                                :class="{'show':open}"
-                                class="dropdown-menu py-0 mt-2 top-100"
-                                style="width: 20vw">
-                                {% for project in request.session.projects %}
-                                    <li class="list-group-item px-3 py-2 my-0 list-group-item-action dropdown-item border-0 border-bottom">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="text-break text-truncate">
-                                                <a class="stretched-link text-reset text-decoration-none"
-                                                   href="{% url "projects-project-detail" project.id %}">{{ project.name|capfirst }}</a>
-                                            </span>
-                                            {% if project.actions_open > 0 %}
-                                                <div>
-                                                    <span class="align-middle badge bg-primary rounded-pill">{{ project.actions_open }}</span>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                        <span class="text-secondary small text-break text-truncate">{{ project.location|truncatechars:40|capfirst }}</span>
-                                    </li>
-                                {% endfor %}
-                                {% if not is_switchtender %}
-                                    <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center"
-                                        style="background: #0063CB">
-                                        <span class="text-break text-truncate">
-                                            <svg data-toggle="tooltip"
-                                                 data-placement="top"
-                                                 title="Notifications désactivées"
-                                                 class="align-middle bi"
-                                                 width="20px"
-                                                 height="20px"
-                                                 fill="currentColor"
-                                                 stroke="currentColor"
-                                                 style="padding: 3px">
-                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus"/>
-                                            </svg>
-                                            <a href="{% url 'projects-onboarding' %}"
-                                               class="stretched-link text-reset text-decoration-none"
-                                               style="color: white !important"
-                                               href="">Créer un nouveau projet</a>
-                                        </span>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        {% endif %}
-                    </div>
-                </div>
-            </li>
-        {% endif %}
-        <!-- Dashboard -->
-        {% if is_switchtender or is_administrating_project %}
-            <li class="nav-item dropdown nav-item-admin"
-                style="margin-right: 35px;
-                       padding-bottom:20px;
-                       border-bottom:solid 2px transparent;
-                       {% if url_name == 'projects-project-list' %}border-bottom:solid 2px #0063CB;
-                       {% endif %}">
-                <div class="btn-group">
-                    <a href="{% url 'projects-project-list' %}"
-                       class="nav-link link-dark {% if url_name == 'projects-project-list' %}active{% endif %}">
-                        <span class="ms-1 align-middle">Tableau de bord</span>
-                    </a>
-                </div>
-            </li>
-        {% endif %}
-        <!-- Methodology -->
-        {% if not user.is_authenticated %}
-            <li style="margin-right: 35px;
-                       padding-bottom:20px;
-                       border-bottom:solid 2px transparent;
-                       {% if 'methodology' in url_name %}border-bottom:solid 2px #0063CB;
-                       {% endif %}">
-                <div class="btn-group">
-                    <a href="{% url 'methodology' %}" class="nav-link link-dark">
-                        <span class="me-2 ms-1 align-middle">Méthodologie</span>
-                    </a>
-                </div>
-            </li>
-        {% endif %}
-        <!-- Ressources -->
-        <li style="margin-right: 15px;
-                   padding-bottom:20px;
-                   border-bottom:solid 2px transparent;
-                   {% if url_name == 'resources-resource-search' %}border-bottom:solid 2px #0063CB;
-                   {% endif %}">
-            <div x-data="{ open: false }"
-                 x-on:click.outside="open = false"
-                 class="btn-group d-flex justify-content-center align-items-center">
-                <a href="{% url 'resources-resource-search' %}"
-                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">
-                    <span class="ms-1 align-middle">Ressources</span>
-                </a>
-                {% if user.is_staff %}
-                    <button x-on:click="open = !open"
-                            type="button"
-                            class="border-0 btn py-0 px-1">
-                        <svg data-toggle="tooltip"
-                             data-placement="top"
-                             title="Notifications désactivées"
-                             class="align-middle bi"
-                             width="20px"
-                             height="20px"
-                             fill="currentColor"
-                             stroke="currentColor"
-                             style="padding: 3px">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chevron-down"/>
+        </div>
+    </li>
+    <li style="margin-right: 15px;padding-bottom:20px; border-bottom:solid 2px transparent; {% if 'projects-project-detail' in url_name %} border-bottom:solid 2px #0063CB;{% endif %}">
+        <div id="project-selector" class="nav-item">
+                <div x-data="{ open: false }" x-on:click.outside="open = false" class="btn-group">
+                    {% if request.session.projects|length > 0 %}
+                    <span class="ms-1 align-middle">Mes projets</span>
+                    <button id="projects-list-button" x-on:click="open = !open" type="button" class="border-0 btn py-0 px-1">
+                        <svg data-toggle="tooltip" data-placement="top" title="Notifications désactivées" class="align-middle bi" width="20px" height="20px" fill="currentColor" stroke="currentColor" style="padding: 3px;">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down"/>
                         </svg>
                     </button>
-                    <ul x-show="open"
-                        :class="{'show':open}"
-                        class="dropdown-menu py-0 mt-2 top-100">
-                        <li>
-                            <a class="dropdown-item px-4 py-2"
-                               href="{% url 'resources-resource-create' %}">Créer</a>
+                    <ul x-show="open" :class="{'show':open}" class="dropdown-menu py-0 mt-2 top-100" style="width: 20vw;">
+                        {% for project in request.session.projects %}
+                        <li class="list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-break text-truncate">
+                                    <a class="stretched-link text-reset text-decoration-none" href="{% url "projects-project-detail" project.id %}">{{ project.name|capfirst }}</a>
+                                </span>
+                                {% if project.actions_open > 0 %}
+                                <div>
+                                    <span class="align-middle badge bg-primary rounded-pill">
+                                        {{ project.actions_open }}
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <span class="text-secondary small text-break text-truncate">{{ project.location|truncatechars:40|capfirst }}</span>
                         </li>
+                        {% endfor %}
                     </ul>
-                {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+    </li>
+    {% endif %}
+    <!-- Dashboard -->
+    {% if is_switchtender or is_administrating_project %}
+        <li class="nav-item dropdown nav-item-admin" style="margin-right: 35px;padding-bottom:20px; border-bottom:solid 2px transparent; {% if url_name == 'projects-project-list' %}border-bottom:solid 2px #0063CB;{% endif %}">
+            <div class="btn-group">
+                <a href="{% url 'projects-project-list' %}" class="nav-link link-dark {% if url_name == 'projects-project-list' %}active{% endif %}">
+                    <span class="ms-1 align-middle">Tableau de bord</span>
+                </a>
             </div>
         </li>
     {% endif %}
@@ -200,3 +99,4 @@
     {% endif %}
 </ul>
 {% endwith %}
+
