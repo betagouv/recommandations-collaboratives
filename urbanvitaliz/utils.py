@@ -50,6 +50,9 @@ def has_perm(user, permission, obj=None):
     Check if this user has the required permission for the given
     object on the current site.
     """
+    if is_staff_for_site(user):
+        return True
+
     return user.has_perm(permission, obj)
 
 
