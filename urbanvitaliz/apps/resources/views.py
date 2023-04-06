@@ -10,7 +10,7 @@ import datetime
 
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
@@ -207,14 +207,18 @@ class BaseResourceDetailView(DetailView):
         return context
 
 
-class ResourceDetailView(BaseResourceDetailView):
+class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
     model = models.Resource
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
 
+    def test_func(self):
+        resource = self.get_object()
+        return resource.public or self.request.user.is_staff
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        resource = self.object
+        resource = self.get_object()
 
         if check_if_switchtender(self.request.user):
             context["projects_used_by"] = (
