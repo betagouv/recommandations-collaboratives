@@ -100,172 +100,72 @@ def test_create_note_available_for_advisor(request, client):
 
 @pytest.mark.django_db
 def test_create_private_note_not_available_for_project_collaborator(request, client):
-    membership = baker.make(models.ProjectMember)
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
         status="READY",
-        projectmember_set=[membership],
     ).make()
 
     with login(client) as user:
         assign_collaborator(user, project)
 
-        url = reverse("projects-create-note", args=[project.id])
-        # FIXME MERGE should we test on get like on feature ?
-        response = client.get(reverse("projects-create-note", args=[project.id]))
-        # response = client.post(
-        #     reverse("projects-create-note", args=[project.id]),
-        #     data={"content": "this is some content", "public": False},
-        # )
+        response = client.post(
+            reverse("projects-create-note", args=[project.id]),
+            data={"content": "this is some content"},
+        )
 
     assert response.status_code == 403
 
 
-# check test exists on conversation
-# @pytest.mark.django_db
-# def test_switchtender_creates_new_public_note_for_project_and_redirect(request, client):
-#     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+@pytest.mark.django_db
+def test_switchtender_creates_new_private_note_for_project_and_redirect(
+    request, client
+):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
 
-#     with login(client, groups=["example_com_advisor"]) as user:
-#         project.switchtenders_on_site.create(
-#             switchtender=user, site=get_current_site(request)
-#         )
+    with login(client) as user:
+        assign_advisor(user, project)
 
-#         response = client.post(
-#             reverse("projects-create-note", args=[project.id]),
-#             data={"content": "this is some content", "public": True},
-#         )
+        response = client.post(
+            reverse("projects-create-note", args=[project.id]),
+            data={"content": "this is some content"},
+        )
+    assert response.status_code == 302
 
-#     # note is created
-#     note = models.Note.fetch()[0]
-#     assert note.project == project
-#     assert note.public is True
+    note = models.Note.fetch()[0]
+    assert note.project == project
+    assert note.public is False
 
-#     # stream and notifications
-#     actions = action_object_stream(note)
-#     assert actions.count() == 1
-#     assert actions[0].verb == "a envoyé un message"
-
-#     # redirects
-#     assert response.status_code == 302
+    # stream and notifications
+    actions = action_object_stream(note)
+    assert actions.count() == 1
+    assert actions[0].verb == "a envoyé un message dans l'espace conseillers"
 
 
-# FIXME MERGE do the following hand merge together
+@pytest.mark.django_db
+def test_create_public_note_for_project_collaborator_and_redirect(request, client):
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+    ).make()
 
-# @pytest.mark.django_db
-# def test_switchtender_creates_new_private_note_for_project_and_redirect(
-#     request, client
-# ):
-#     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    with login(client) as user:
+        assign_collaborator(user, project)
+        response = client.post(
+            reverse("projects-conversation-create-message", args=[project.id]),
+            data={"content": "this is some content"},
+        )
+    assert response.status_code == 302
 
-#     with login(client) as user:
-#         assign_advisor(user, project)
+    note = models.Note.fetch()[0]
+    assert note.project == project
+    assert note.public is True
 
-#         response = client.post(
-#             reverse("projects-create-note", args=[project.id]),
-# <<<<<<< HEAD
-#             data={"content": "this is some content"},
-#         )
-#     note = models.Note.fetch()[0]
-#     assert note.project == project
-#     assert response.status_code == 302
-
-
-# @pytest.mark.django_db
-# def test_create_public_note_for_project_collaborator_and_redirect(request, client):
-#     project = Recipe(
-#         models.Project,
-#         sites=[get_current_site(request)],
-#         status="READY",
-#     ).make()
-
-#     with login(client) as user:
-#         assign_collaborator(user, project)
-#         response = client.post(
-#             reverse("projects-create-note", args=[project.id]),
-#             data={"content": "this is some content"},
-# ||||||| 10cca89b
-#             data={"content": "this is some content"},
-#         )
-#     note = models.Note.fetch()[0]
-#     assert note.project == project
-#     assert response.status_code == 302
-
-
-# @pytest.mark.django_db
-# def test_create_public_note_for_project_collaborator_and_redirect(request, client):
-#     membership = baker.make(models.ProjectMember)
-#     project = Recipe(
-#         models.Project,
-#         sites=[get_current_site(request)],
-#         status="READY",
-#         projectmember_set=[membership],
-#     ).make()
-
-#     with login(client, user=membership.member):
-#         response = client.post(
-#             reverse("projects-create-note", args=[project.id]),
-#             data={"content": "this is some content"},
-# =======
-#             data={
-#                 "content": "this is some content",
-#             },
-# >>>>>>> develop
-#         )
-
-#     # note is created
-#     note = models.Note.fetch()[0]
-#     assert note.project == project
-#     assert note.public is False
-
-#     # stream and notifications
-#     actions = action_object_stream(note)
-#     assert actions.count() == 1
-#     assert actions[0].verb == "a envoyé un message dans l'espace conseillers"
-
-# <<<<<<< HEAD
-# @pytest.mark.django_db
-# def test_create_private_note_not_available_for_project_collaborator(request, client):
-#     project = Recipe(
-#         models.Project,
-#         sites=[get_current_site(request)],
-#         status="READY",
-#     ).make()
-
-#     with login(client) as user:
-#         assign_collaborator(user, project)
-
-#         response = client.post(
-#             reverse("projects-create-note", args=[project.id]),
-#             data={"content": "this is some content", "public": False},
-#         )
-#     note = models.Note.fetch()[0]
-#     assert note.project == project
-#     assert note.public is True
-# ||||||| 10cca89b
-# @pytest.mark.django_db
-# def test_create_private_note_not_available_for_project_collaborator(request, client):
-#     membership = baker.make(models.ProjectMember)
-#     project = Recipe(
-#         models.Project,
-#         sites=[get_current_site(request)],
-#         status="READY",
-#         projectmember_set=[membership],
-#     ).make()
-
-#     with login(client, user=membership.member):
-#         response = client.post(
-#             reverse("projects-create-note", args=[project.id]),
-#             data={"content": "this is some content", "public": False},
-#         )
-#     note = models.Note.fetch()[0]
-#     assert note.project == project
-#     assert note.public is True
-# =======
-#     # redirects
-# >>>>>>> develop
-#     assert response.status_code == 302
+    # stream and notifications
+    actions = action_object_stream(note)
+    assert actions.count() == 1
+    assert actions[0].verb == "a envoyé un message"
 
 
 @pytest.mark.django_db
@@ -363,8 +263,6 @@ def test_switchtender_can_update_own_note(request, client):
     url = reverse("projects-update-note", args=[note.id])
     with login(client) as user:
         assign_advisor(user, note.project, site)
-        # FIXME MERGE check if still required
-        # note.project.switchtenders_on_site.create(switchtender=user, site=site)
 
         response = client.get(url)
     assert response.status_code == 200
@@ -409,19 +307,16 @@ def test_collaborator_can_update_own_public_note(request, client):
 
 
 @pytest.mark.django_db
-def test_collaborator_cant_update_others_public_note(request, client):
-    membership = baker.make(models.ProjectMember)
+def test_collaborator_cannot_update_others_public_note(request, client):
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
     ).make()
+
     with login(client) as user:
         assign_collaborator(user, project)
         note = Recipe(models.Note, project=project, public=False).make()
-        url = reverse("projects-update-note", args=[note.id])
 
-        # FIXME MERGE keep post or get is enough?
-        # response = client.get(url)
         response = client.post(
             reverse("projects-update-note", args=[note.id]),
             data={"content": "this is some content"},
@@ -432,7 +327,6 @@ def test_collaborator_cant_update_others_public_note(request, client):
 
 @pytest.mark.django_db
 def test_collaborator_cant_update_private_note(request, client):
-    # FIXME MERGE check validity of hand merging
     note = Recipe(models.Note, public=False).make()
     with login(client) as user:
         assign_collaborator(user, note.project)

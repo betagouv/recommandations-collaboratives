@@ -26,7 +26,6 @@ from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.apps.resources.models import Resource
 from urbanvitaliz.utils import (
-    check_if_advisor,
     get_site_administrators,
     has_perm,
     has_perm_or_403,
@@ -223,9 +222,11 @@ def project_details(request, project_id):
     return render(request, "crm/project_details.html", locals())
 
 
-# FIXME MERGE check this function is properly merged automatically
+@login_required
 @require_http_methods(["POST"])
 def project_toggle_annotation(request, project_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
     project = get_object_or_404(Project, pk=project_id)
 
     form = forms.ProjectAnnotationForm(request.POST)

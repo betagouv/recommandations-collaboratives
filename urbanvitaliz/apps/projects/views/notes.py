@@ -63,12 +63,7 @@ def create_private_note(request, project_id=None):
     """Create a new private note for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    if not (
-        request.user.has_perm("projects.use_private_notes", project)
-# FIXME MERGE it does not make sense to me, check w/ glib
-#        or request.user.has_perm("projects.use_public_notes", project)
-    ):
-        raise PermissionDenied("L'information demandée n'est pas disponible")
+    has_perm_or_403(request.user, "projects.use_private_notes", project)
 
     is_advisor = can_administrate_project(project, request.user)
 
@@ -79,9 +74,6 @@ def create_private_note(request, project_id=None):
             instance = form.save(commit=False)
             instance.project = project
             instance.created_by = request.user
-
-            if not request.user.has_perm("projects.use_private_notes", project):
-                instance.public = True
 
             instance.save()
 
@@ -105,11 +97,6 @@ def update_note(request, note_id=None):
     """Update an existing note for a project"""
     note = get_object_or_404(models.Note, pk=note_id)
     project = note.project  # For template consistency
-
-    # FIXME MERGE check w/ glib
-    # can_manage_or_403(project, request.user, allow_draft=True)
-    # if note.created_by != request.user:
-    #     raise PermissionDenied("Vous ne pouvez éditer que vos propres messages.")
 
     is_advisor = can_administrate_project(project, request.user)
 

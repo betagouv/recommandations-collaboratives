@@ -21,9 +21,11 @@ from urbanvitaliz.utils import build_absolute_url, is_switchtender_or_403
 from urbanvitaliz.utils import get_group_for_site
 
 from .. import models
-from ..utils import (format_switchtender_identity,
-                     get_collaborators_for_project,
-                     get_switchtenders_for_project)
+from ..utils import (
+    format_switchtender_identity,
+    get_collaborators_for_project,
+    get_switchtenders_for_project,
+)
 
 
 @login_required
@@ -149,10 +151,6 @@ def project_list_export_csv(request):
                     0, conversations.filter(created_by__in=collaborators).count() - 1
                 ),  # conversations collectivite. -1 to remove a message from the system
                 notes.filter(public=False).count(),  # suivi interne conseillers
-                # FIXME MERGE cet version échoue, elle n'attends pas une liste mais un int
-                # switchtenders.exclude(
-                #     groups=["example_com_staff"]
-                # ).count(),  # non staff switchtender count
                 switchtenders.exclude(
                     groups__in=[staff_group]
                 ).count(),  # non staff switchtender count

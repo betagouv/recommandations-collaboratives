@@ -362,7 +362,6 @@ def test_project_advisor_can_move_project_tasks_for_site(request):
     assert response.status_code == 200
 
 
-# FIXME MERGE fails w/ new permissions
 @pytest.mark.django_db
 def test_updating_user_project_is_logged(request):
     user = baker.make(auth_models.User, username="Bob")

@@ -586,9 +586,7 @@ def test_project_conversations_available_for_owner(request, client):
 def test_project_conversations_available_for_regional_advisor(request, client):
     dpt = Recipe(geomatics.Department, code="01").make()
     site = get_current_site(request)
-    project = Recipe(
-        models.Project, commune__department=dpt, sites=[site]
-    ).make()
+    project = Recipe(models.Project, commune__department=dpt, sites=[site]).make()
     url = reverse("projects-project-detail-conversations", args=[project.id])
     with login(client, groups=["example_com_advisor"]) as user:
         utils.assign_advisor(user, project, site)
@@ -611,7 +609,6 @@ def test_project_conversations_available_for_assigned_advisor(request, client):
     assert response.status_code == 200
 
 
-# FIXME MERGE failing test w/ new permission
 @pytest.mark.django_db
 def test_project_conversations_not_available_for_nonregional_advisor(request, client):
     other = Recipe(geomatics.Department, code="02").make()
@@ -1371,9 +1368,7 @@ def test_switchtender_leaves_project(request, client):
         ],
     ).make()
     site = get_current_site(request)
-    project = Recipe(
-        models.Project, sites=[site], commune=commune
-    ).make()
+    project = Recipe(models.Project, sites=[site], commune=commune).make()
 
     url = reverse("projects-project-switchtender-leave", args=[project.id])
     with login(client) as user:
@@ -1390,7 +1385,6 @@ def test_switchtender_leaves_project(request, client):
     assert project.switchtenders.count() == 0
 
 
-# FIXME MERGE move to new permissions
 @pytest.mark.django_db
 def test_advisor_joins_trigger_notification_to_all(request, client):
     current_site = get_current_site(request)
@@ -1398,9 +1392,8 @@ def test_advisor_joins_trigger_notification_to_all(request, client):
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
 
-    membership = baker.make(models.ProjectMember, is_owner=True)
+    collaborator = baker.make(auth.User)
     advisor = baker.make(auth.User)
-#    auth.Group.objects.get(name="switchtender").user_set.add(switchtender)
 
     Recipe(
         models.TaskRecommendation,
@@ -1409,28 +1402,24 @@ def test_advisor_joins_trigger_notification_to_all(request, client):
             dept,
         ],
     ).make()
+
     project = Recipe(
         models.Project,
-        status="BLAH",
-        projectmember_set=[membership],  # move to assign_collaborator?
+        status="READY",
         commune=commune,
         sites=[current_site],
     ).make()
 
-#    project.switchtenders_on_site.create(
-#        switchtender=switchtender, site=get_current_site(request)
-#    )
-
+    utils.assign_collaborator(collaborator, project, is_owner=True)
     utils.assign_advisor(advisor, project, current_site)
 
     url = reverse("projects-project-switchtender-join", args=[project.id])
 
-    with login(client, groups=["example_com_advisor"]) as user:
-#        user.profile.sites.add(current_site)
-
+    with login(client, groups=["example_com_advisor"]):
         client.post(url)
-        assert membership.member.notifications.count() == 1
-        assert advisor.notifications.count() == 1
+
+    assert collaborator.notifications.count() == 1
+    assert advisor.notifications.count() == 1
 
 
 @pytest.mark.django_db
@@ -1477,10 +1466,9 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(
 #################################################################
 
 
-# FIXME MERGE new permissions
 @pytest.mark.django_db
 def test_switchtender_exports_csv(request, client):
-    site=get_current_site(request)
+    site = get_current_site(request)
 
     # Expected project
     p1 = Recipe(
@@ -1500,11 +1488,7 @@ def test_switchtender_exports_csv(request, client):
 
     url = reverse("projects-project-list-export-csv")
     with login(client, groups=["example_com_advisor"]) as user:
-#        p1.switchtenders_on_site.create(
-#            switchtender=user, site=get_current_site(request)
-#        )
         utils.assign_advisor(user, p1, site)
-
 
         response = client.get(url)
 
