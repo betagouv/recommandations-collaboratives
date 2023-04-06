@@ -3,16 +3,22 @@
 {% load guardian_tags %}
 {% load sass_tags %}
 {% load django_vite %}
+{% load projects_extra %}
+
 {% block js %}
     <script src="{% static 'projects/js/access_update.js' %}"></script>
     {% vite_asset 'js/apps/projectAdministration.js' %}
 {% endblock %}
+
 {% block project_detail %}
+
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
+    {% is_staff_for_current_site request.user as is_staff %}
+
     {% include 'projects/project/navigation.html' with administration_panel=True %}
     <div class="row">
-        {% if "change_project" in user_project_perms %}
+        {% if "change_project" in user_project_perms or is_staff %}
             <div class="col-12">
                 <h6 class="text-uppercase fw-bold d-block mb-3 font-small">informations générales</h6>
                 <form method="post"
@@ -114,7 +120,7 @@
             <h6 class="text-uppercase fw-bold d-block mb-3 font-small">Gestion des utilisateurs</h6>
             <div class="col">
                 <p class="text-info-custom mb-2">Équipe de suvi</p>
-                {% if "invite_advisors" in user_project_perms %}
+                {% if "invite_advisors" in user_project_perms or is_staff %}
                     <a style="cursor: pointer"
                        @click="openInviteSwitchtenderModal"
                        data-toggle="modal"
@@ -156,7 +162,7 @@
                                         </button>
                                     </form>
                                 {% else %}
-                                    {% if "manage_advisors" in user_project_perms %}
+                                    {% if "manage_advisors" in user_project_perms or is_staff %}
                                         <form id="form-projects-access-remove-user"
                                             action="{% url 'projects-project-access-advisor-delete' project.pk advisor.switchtender.email %}"
                                             method="post">
@@ -176,7 +182,7 @@
             </div>
             <div class="col">
                 <p class="text-info-custom mb-2">Membres de la collectivité</p>
-                {% if "invite_collaborators" in user_project_perms %}
+                {% if "invite_collaborators" in user_project_perms or is_staff %}
                     <a style="cursor: pointer"
                        @click="openInviteMemberModal"
                        data-toggle="modal"
@@ -208,7 +214,7 @@
                                         {% csrf_token %}
                                         <button class="button small">Faire devenir référent</button>
                                     </form> -->
-                                    {% if "manage_collaborators" in user_project_perms %}
+                                    {% if is_staff %}
                                     <form id="form-projects-access-remove-user"
                                           action="{% url 'projects-project-access-collectivity-delete' project.pk member.email %}"
                                           method="post">
@@ -249,8 +255,9 @@
                             {% if invite.role == "SWITCHTENDER" %}
                                 <li class="d-flex justify-content-between align-items-start mb-1">
                                     {% include 'projects/project/fragments/user_invited.html' with user_invited=invite %}
-                                    {% if "manage_advisors" in user_project_perms %}
                                         <div class="d-flex align-items-center">
+                                        {% if "manage_advisors" in user_project_perms or is_staff %}
+
                                             <form class="me-2"
                                                 action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
                                                 method="post">
@@ -261,7 +268,8 @@
                                                     </svg>
                                                 </button>
                                             </form>
-                                            
+                                        {% endif %}
+                                        {% if "invite_advisors" in user_project_perms or is_staff %}
                                             <form action="{% url 'projects-project-access-advisor-resend-invite' project.pk invite.pk %}"
                                                 method="post">
                                                 {% csrf_token %}
@@ -272,8 +280,8 @@
                                                     </svg>
                                                 </button>
                                             </form>
+                                            {% endif %}
                                         </div>
-                                    {% endif %}
                                 </li>
                             {% endif %}
                         {% endfor %}
@@ -299,8 +307,8 @@
                             {% if invite.role == "COLLABORATOR" %}
                                 <li class="d-flex justify-content-between align-items-start mb-1">
                                     {% include 'projects/project/fragments/user_invited.html' with user_invited=invite %}
-                                    {% if "manage_collaborators" in user_project_perms %}
                                     <div class="d-flex align-items-center">
+                                        {% if "manage_collaborators" in user_project_perms or is_staff %}
                                         <form class="me-2"
                                               action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
                                               method="post">
@@ -311,6 +319,8 @@
                                                 </svg>
                                             </button>
                                         </form>
+                                        {% endif %}
+                                        {% if "invite_collaborators" in user_project_perms or is_staff %}
                                         <form action="{% url 'projects-project-access-collectivity-resend-invite' project.pk invite.pk %}"
                                               method="post">
                                             {% csrf_token %}
@@ -320,8 +330,8 @@
                                                 </svg>
                                             </button>
                                         </form>
+                                        {% endif %}
                                     </div>
-                                    {% endif %}
                                 </li>
                             {% endif %}
                         {% endfor %}

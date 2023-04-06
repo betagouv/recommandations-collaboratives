@@ -7,6 +7,7 @@
 {% load sass_tags %}
 {% load django_vite %}
 {% load leaflet_tags %}
+{% load guardian_tags %}
 
 {% block js %}
 <script src="{% static 'projects/js/board.js' %}"></script>
@@ -56,6 +57,9 @@
 
 
 {% block content %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+
 <div class="col-11 py-5 mx-auto">
     <div class="row">
         <div class="d-flex flex-column border p-0 m-0">
@@ -156,30 +160,29 @@
                             {% endif %}
                         </td>
                         <td>
-                            <div class="btn-group" role="group" aria-label="actions">
-                                <form method="POST" action="{% url "projects-project-accept" project.id %}">
-                                    {% csrf_token %}
-                                    <button class="btn btn-primary btn-sm">
-                                        <svg class="bi" width="16" height="16" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check2-circle" />
-                                        </svg>
-                                        Accepter
-                                    </button>
-                                </form>
-
-                                {% if user.is_staff %}
-                                &nbsp;
-                                <form method="POST" action="{% url "projects-project-delete" project.id %}">
-                                    {% csrf_token %}
-                                    <button class="btn btn-secondary btn-sm">
-                                        <svg class="bi" width="16" height="16" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-circle" />
-                                        </svg>
-                                        Supprimer
-                                    </button>
-                                </form>
-                                {% endif %}
-                            </div>
+                            {% if "moderate_projects" in user_site_perms %}
+                                <div class="btn-group" role="group" aria-label="actions">
+                                    <form method="POST" action="{% url "projects-project-accept" project.id %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-primary btn-sm">
+                                            <svg class="bi" width="16" height="16" fill="currentColor">
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check2-circle" />
+                                            </svg>
+                                            Accepter
+                                        </button>
+                                    </form>
+                                    &nbsp;
+                                    <form method="POST" action="{% url "projects-project-delete" project.id %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-secondary btn-sm">
+                                            <svg class="bi" width="16" height="16" fill="currentColor">
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-circle" />
+                                            </svg>
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}

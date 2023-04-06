@@ -26,10 +26,14 @@
     }
 }
 
+#user-info .dropdown-menu {
+    transform: translate3d(-20px,0,0);
+}
+
 @media (max-width: 991.98px) {
 
     #user-info .dropdown-menu {
-        transform: translate3d(-100px,0,0);
+        transform: translate3d(-100px,0,0) !important;
     }
 
     .offcanvas-collapse .nav-item-admin span {
