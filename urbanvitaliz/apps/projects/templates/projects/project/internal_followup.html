@@ -60,10 +60,10 @@
                                 <p class="mb-0 me-1 small text-secondary">{{action.actor.get_full_name|capfirst|default:action.actor}}</p>
                                 <p class="mb-0 small text-secondary">- {{action.action_object.updated_on}}</p>
                             </div>
-                            {% if action.actor == request.user %}
+                            {% if request.user == action.actor  %}
                             <br/>
                             <span class="ms-2">
-                                <a class="d-flex align-items-center" href="{% url 'projects-update-note' action.action_object.pk %}"> 
+                                <a class="d-flex align-items-center" href="{% url 'projects-update-note' action.action_object.pk %}">
                                     <svg class="align-middle bi me-1" width="15px" height="15px" fill="currentColor">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
                                     </svg>

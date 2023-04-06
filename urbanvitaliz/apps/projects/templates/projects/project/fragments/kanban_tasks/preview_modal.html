@@ -118,7 +118,7 @@
 														</div>
 													</div>
 												</template>
-												<template x-if="isStatusUpdate(f) && f.status">
+												<template x-if="isStatusUpdate(f) && f.status || isStatusUpdate(f) && f.status == 0">
 													<div class="my-3" :class="hasNotification(f.id) && 'text-warning'">
 														<div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
 															<span class="ms-1 fst-italic" x-text="`${f.who.first_name} ${f.who.last_name}`"
