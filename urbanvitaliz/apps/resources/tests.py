@@ -263,8 +263,9 @@ def test_public_resource_detail_available_for_all_users(request, client):
 
 @pytest.mark.django_db
 def test_draft_resource_not_visible_to_non_staff(request, client):
+    site = get_current_site(request)
     resource = Recipe(
-        models.Resource, status=models.Resource.DRAFT, sites=[get_current_site(request)]
+        models.Resource, sites=[site], status=models.Resource.DRAFT
     ).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client):
@@ -276,8 +277,9 @@ def test_draft_resource_not_visible_to_non_staff(request, client):
 # @pytest.mark.skip(reason="update for new permissions")
 @pytest.mark.django_db
 def test_draft_resource_visible_to_staff(request, client):
+    site = get_current_site(request)
     resource = Recipe(
-        models.Resource, status=models.Resource.DRAFT, sites=[get_current_site(request)]
+        models.Resource, sites=[site], status=models.Resource.DRAFT
     ).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client, groups=["example_com_staff"]):
@@ -289,7 +291,8 @@ def test_draft_resource_visible_to_staff(request, client):
 # @pytest.mark.skip(reason="update for new permissions")
 @pytest.mark.django_db
 def test_resource_detail_contains_update_for_authorized_user(request, client):
-    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
+    site = get_current_site(request)
+    resource = Recipe(models.Resource, sites=[site]).make()
     url = reverse("resources-resource-detail", args=[resource.id])
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
