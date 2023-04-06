@@ -1,110 +1,165 @@
 {% extends "base.html" %}
-
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
-
 {% block js %}
-{% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}
-
 {% block css %}
-<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
-
 {% block content %}
-<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    <aside class="w-25 crm-aside">
+    <div x-data="Crm"
+         class="d-flex px-0"
+         style="font-family: 'Marianne', arial, sans-serif">
+        <aside class="w-25 crm-aside">
             {% if active_project %}
-                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
-            {% else %}
-                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
-            {% endif %}
-            
-            {% include 'crm/back_button.html' %}
-            {% include 'crm/search.html' %}
-
-            <div class="pt-3 mb-4 px-4 crm-border-bottom">
-                <h5 class="crm-user-decoration d-inline-block relative">Conseiller·es <strong>({{ project.switchtenders.all|length }})</strong></h5>
-                <ul class="mb-2 px-0" class="list-unstyled">
-                    {% regroup project.switchtenders.all by profile.organization as grouped_st %}
-
-                    {% for group in grouped_st %}
-                    <div class="mb-4">
-                        {% if group.grouper %}
-                            <a class="d-flex align-items-center"
-                                href="{% url 'crm-organization-details' group.grouper.pk %}">
-                                <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
-                                </svg>
-                                <strong>{{ group.grouper }}</strong>
-                            </a>
-                        {% endif %}
-                        <ul class="list-unstyled mx-4 mb-4">
-                            {% for switchtender in group.list %}
-                                    {% include 'crm/user_item.html' with user=switchtender %}
+                <div x-ref="sidebar"
+                     class="d-flex flex-column justify-content-start crm-sticky">
+                {% else %}
+                    <div x-ref="sidebar"
+                         class="d-flex flex-column justify-content-start crm-sticky no-project">
+                    {% endif %}
+                    {% include 'crm/back_button.html' %}
+                    {% include 'crm/search.html' %}
+                    <div class="pt-3 mb-4 px-4 crm-border-bottom">
+                        <h5 class="crm-user-decoration d-inline-block relative">
+                            Conseiller·es <strong>({{ project.switchtenders.all|length }})</strong>
+                        </h5>
+                        <ul class="mb-2 px-0" class="list-unstyled">
+                            {% regroup project.switchtenders.all by profile.organization as grouped_st %}
+                            {% for group in grouped_st %}
+                                <div class="mb-4">
+                                    {% if group.grouper %}
+                                        <a class="d-flex align-items-center"
+                                           href="{% url 'crm-organization-details' group.grouper.pk %}">
+                                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
+                                            </svg>
+                                            <strong>{{ group.grouper }}</strong>
+                                        </a>
+                                    {% endif %}
+                                    <ul class="list-unstyled mx-4 mb-4">
+                                        {% for switchtender in group.list %}
+                                            {% include 'crm/user_item.html' with user=switchtender %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% empty %}
+                                Pas de participant
                             {% endfor %}
                         </ul>
                     </div>
-                    {% empty %}
-                        Pas de participant
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="px-4 crm-border-bottom pb-2">
-                <h5 class="crm-user-decoration d-inline-block relative">Collectivité <strong>({{ project.members.all|length }})</strong></h5>
-                <ul class="list-unstyled">
-                    {% for member in project.members.all %}
-                        {% include 'crm/user_item.html' with user=member %}
-                    {% empty %}
-                    <li>
-                        no one
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    </aside>
-    <div class="w-75 d-flex flex-column justify-content-start">
-        {% if active_project %}
-            <div class="crm-header px-4 py-4 mb-3 d-flex justify-content-between align-items-center">
-        {% else %}
-            <div class="crm-header no-project px-4 py-4 d-flex justify-content-between align-items-center">
-                {% endif %}
-                <div>
-                    <h3 class="d-flex mb-0 align-items-center">
-                        <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
-                        </svg>
-                        <span>{{ project.name }}</span>
-                    </h3>
-                    <div class="mt-1 d-flex small">
-                        {% for tag in project.tags.all %}
-                        <span class="mx-1 badge rounded-pill bg-dark">{{ tag }}</span>
-                        {% endfor %}
+                    <div class="px-4 crm-border-bottom pb-2">
+                        <h5 class="crm-user-decoration d-inline-block relative">
+                            Collectivité <strong>({{ project.members.all|length }})</strong>
+                        </h5>
+                        <ul class="list-unstyled">
+                            {% for member in project.members.all %}
+                                {% include 'crm/user_item.html' with user=member %}
+                            {% empty %}
+                                <li>no one</li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
-            <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
-                <span>Voir le projet</span>
-            </a>
+            </aside>
+
+            <div class="w-75 d-flex flex-column justify-content-start">
+                {% if active_project %}
+                    <div class="crm-header px-4 py-4 mb-3 d-flex justify-content-between align-items-center">
+                    {% else %}
+                        <div class="crm-header no-project px-4 py-4 d-flex justify-content-between align-items-center">
+                        {% endif %}
+                        <div>
+                            <h3 class="d-flex mb-0 align-items-center">
+                                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
+                                </svg>
+                                <span>{{ project.name }}</span>
+                            </h3>
+                            <div class="mt-1 d-flex small">
+                                {% for tag in project.tags.all %}<span class="mx-1 badge rounded-pill bg-dark">{{ tag }}</span>{% endfor %}
+                            </div>
+                            <hr/>
+                            <div class="d-flex align-items-center small">
+                                <form class="me-2"
+                                      action="{% url 'crm-project-toggle-annotation' project.pk %}"
+                                      method="post">
+                                    {% csrf_token %}
+                                    <div>
+                                        <input class="button" hidden name="tag" value="diag" id="id_tag">
+                                    </div>
+                                    {% if 'diag' in project.crm_annotations.tags.names %}
+                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-blue" type="submit">diagnostique</button>
+                                    {% else %}
+                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-grey text-grey-dark" type="submit">diagnostique</button>
+                                    {% endif %}
+                                </form>
+                                <form class="me-2"
+                                      action="{% url 'crm-project-toggle-annotation' project.pk %}"
+                                      method="post">
+                                    {% csrf_token %}
+                                    <div>
+                                        <input class="button" hidden name="tag" value="edl" id="id_tag">
+                                    </div>
+
+                                    {% if 'edl' in project.crm_annotations.tags.names %}
+                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-blue" type="submit">État des lieux</button>
+                                    {% else %}
+                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-grey text-grey-dark" type="submit">État des lieux</button>
+                                    {% endif %}
+                                </form>
+                                <form class="me-2"
+                                      action="{% url 'crm-project-toggle-annotation' project.pk %}"
+                                      method="post">
+                                    {% csrf_token %}
+                                    <div>
+                                        <input class="button" hidden name="tag" value="contact" id="id_tag">
+                                    </div>
+                                    {% if 'contact' in project.crm_annotations.tags.names %}
+                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-blue" type="submit">Mise en relation</button>
+                                    {% else %}
+                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-grey text-grey-dark" type="submit">Mise en relation</button>
+                                    {% endif %}
+                                </form>
+                                <form class="me-2"
+                                      action="{% url 'crm-project-toggle-annotation' project.pk %}"
+                                      method="post">
+                                    {% csrf_token %}
+                                    <div>
+                                        <input class="button" hidden name="tag" value="general" id="id_tag">
+                                    </div>
+                                    {% if 'general' in project.crm_annotations.tags.names %}
+                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-blue" type="submit">Général positif</button>
+                                    {% else %}
+                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-grey text-grey-dark " type="submit">Général positif</button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </div>
+                        <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
+                            <span>Voir le projet</span>
+                        </a>
+                    </div>
+                    <div class="px-4 pt-4 crm-notes-wrapper"">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <a class="btn btn-secondary mb-4"
+                               href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
+                        </div>
+                        {% for note in sticky_notes.all %}
+                            {% include 'crm/note.html' with pinned=True update_url_name='crm-project-note-update' get_user_profile=True %}
+                        {% endfor %}
+                        {% for note in notes.all %}
+                            {% include 'crm/note.html' with update_url_name='crm-project-note-update' get_user_profile=True %}
+                        {% endfor %}
+                    </div>
+                    <div class="px-4 pt-4 bg-light crm-timeline-min-height">
+                        <h4>Activité</h4>
+                        {% include 'crm/timeline.html' %}
+                    </div>
+                </div>
             </div>
-
-
-            <div class="px-4 pt-4 crm-notes-wrapper"">
-                <a class="btn btn-secondary mb-4" href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
-
-                {% for note in sticky_notes.all %}
-                {% include 'crm/note.html' with pinned=True update_url_name='crm-project-note-update' get_user_profile=True %}
-                {% endfor %}
-
-                {% for note in notes.all %}
-                {% include 'crm/note.html' with update_url_name='crm-project-note-update' get_user_profile=True %}
-                {% endfor %}
-            </div>
-        <div class="px-4 pt-4 bg-light crm-timeline-min-height">
-            <h4>Activité</h4>
-            {% include 'crm/timeline.html' %}
-        </div>
-    </div>
-</div>
-{% endblock %}
+        {% endblock %}

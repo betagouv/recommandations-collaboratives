@@ -1,7 +1,7 @@
 {% load static %}
 
 {% if contacts.count %}
-<div class="mt-4">
+<div id="contact-list" class="mt-4">
     {% if user.is_anonymous %}
     <div class="flag blue">
         <span class="title text-blue text-uppercase fw-bold mb-2 d-block">Contacts</span>
