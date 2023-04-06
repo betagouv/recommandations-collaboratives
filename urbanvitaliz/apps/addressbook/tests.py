@@ -5,8 +5,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.utils import login
 
 from . import models
@@ -19,7 +18,7 @@ from . import models
 
 
 @pytest.mark.django_db
-def test_create_organization_not_available_for_non_switchtender_users(client):
+def test_create_organization_not_available_for_non_advisor(client):
     Recipe(models.Organization).make()
     url = reverse("addressbook-organization-create")
     with login(client):
@@ -28,7 +27,7 @@ def test_create_organization_not_available_for_non_switchtender_users(client):
 
 
 @pytest.mark.django_db
-def test_create_organization_available_for_switchtender(client):
+def test_create_organization_available_for_advisor(client):
     Recipe(models.Organization).make()
     url = reverse("addressbook-organization-create")
     with login(client, groups=["example_com_advisor"]):
@@ -51,6 +50,14 @@ def test_create_new_organization_and_redirect(request, client):
 
     new_url = reverse("addressbook-organization-list")
     assertRedirects(response, new_url)
+
+
+@pytest.mark.django_db
+def test_organization_list_not_available_for_non_advisor(client):
+    url = reverse("addressbook-organization-list")
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db

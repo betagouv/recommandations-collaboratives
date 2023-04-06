@@ -21,7 +21,7 @@ class OrganizationForm(forms.ModelForm):
 @login_required
 def organization_create(request):
     """Create a new Organization"""
-    has_perm_or_403(request.user, "use_addressbook")
+    has_perm_or_403(request.user, "use_addressbook", request.site)
 
     if request.method == "POST":
         form = OrganizationForm(request.POST)
@@ -41,7 +41,7 @@ def organization_create(request):
 @login_required
 def organization_update(request, organization_id=None):
     """Update an Organization"""
-    has_perm_or_403(request.user, "use_addressbook")
+    has_perm_or_403(request.user, "use_addressbook", request.site)
 
     organization = get_object_or_404(
         models.Organization, sites=request.site, pk=organization_id
@@ -70,7 +70,7 @@ def organization_list(request):
 @login_required
 def organization_details(request, organization_id):
     """Return the details for a given Organization"""
-    has_perm_or_403(request.user, "use_addressbook")
+    has_perm_or_403(request.user, "use_addressbook", request.site)
 
     organization = get_object_or_404(
         models.Organization, sites=request.site, pk=organization_id
@@ -102,7 +102,7 @@ class ContactForm(forms.ModelForm):
 @login_required
 def contact_create(request, organization_id: int):
     """Create a new Contact"""
-    has_perm_or_403(request.user, "use_addressbook")
+    has_perm_or_403(request.user, "use_addressbook", request.site)
 
     organization = get_object_or_404(models.Organization, pk=organization_id)
 
@@ -124,7 +124,7 @@ def contact_create(request, organization_id: int):
 @login_required
 def contact_update(request, contact_id=None):
     """Update a Contact"""
-    has_perm_or_403(request.user, "use_addressbook")
+    has_perm_or_403(request.user, "use_addressbook", request.site)
 
     contact = get_object_or_404(models.Contact, site=request.site, pk=contact_id)
     if request.method == "POST":

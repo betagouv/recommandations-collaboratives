@@ -20,7 +20,7 @@ from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.api import (invite_collaborator_on_project,
                                            invite_resend, invite_revoke)
 from urbanvitaliz.apps.invites.forms import InviteForm
-from urbanvitaliz.utils import has_perm_or_403, is_staff_for_site
+from urbanvitaliz.utils import has_perm_or_403
 
 from .. import forms, models
 from ..utils import (is_regional_actor_for_project, unassign_advisor,
@@ -53,9 +53,7 @@ def project_administration(request, project_id):
         request.site, project, request.user, allow_national=True
     )
 
-    if not (
-        is_regional_actor or has_any_required_perm or is_staff_for_site(request.user)
-    ):
+    if not (is_regional_actor or has_any_required_perm):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
     # Fetch pending invites
@@ -69,9 +67,7 @@ def project_administration(request, project_id):
 
     if request.method == "POST":
         # Allow staff of current site or users with perm
-        is_staff_for_site(request.user, request.site) or has_perm_or_403(
-            request.user, "change_project", project
-        )
+        has_perm_or_403(request.user, "change_project", project)
 
         form = forms.ProjectForm(request.POST, instance=project)
         if form.is_valid():
@@ -157,11 +153,10 @@ def access_revoke_invite(request, project_id, invite_id):
 
     invite = get_object_or_404(invites_models.Invite, pk=invite_id, accepted_on=None)
 
-    if not is_staff_for_site(request.user):
-        if invite.role == "SWITCHTENDER":
-            has_perm_or_403(request.user, "manage_advisors", project)
-        else:
-            has_perm_or_403(request.user, "manage_collaborators", project)
+    if invite.role == "SWITCHTENDER":
+        has_perm_or_403(request.user, "manage_advisors", project)
+    else:
+        has_perm_or_403(request.user, "manage_collaborators", project)
 
     if invite_revoke(invite):
         messages.success(
@@ -198,10 +193,7 @@ def access_collaborator_invite(request, project_id):
         request.site, project, request.user, allow_national=True
     )
 
-    if not is_staff_for_site(request.user):
-        is_regional_actor or has_perm_or_403(
-            request.user, "invite_collaborators", project
-        )
+    is_regional_actor or has_perm_or_403(request.user, "invite_collaborators", project)
 
     return access_invite(request, "COLLABORATOR", project)
 
@@ -213,15 +205,11 @@ def access_collaborator_resend_invite(request, project_id, invite_id):
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     # can also be regional actor
-    # FIXME: should we still use allow_national or move to is_staff_for_site?
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
     )
 
-    if not is_staff_for_site(request.user):
-        is_regional_actor or has_perm_or_403(
-            request.user, "invite_collaborators", project
-        )
+    is_regional_actor or has_perm_or_403(request.user, "invite_collaborators", project)
 
     invite = get_object_or_404(
         invites_models.Invite, role="COLLABORATOR", pk=invite_id, accepted_on=None
@@ -249,8 +237,7 @@ def access_collaborator_delete(request, project_id: int, email: str):
     """Delete a collectivity member from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    if not is_staff_for_site(request.user):
-        has_perm_or_403(request.user, "manage_collaborators", project)
+    has_perm_or_403(request.user, "manage_collaborators", project)
 
     membership = get_object_or_404(
         models.ProjectMember, project=project, member__username=email
@@ -287,13 +274,11 @@ def access_advisor_invite(request, project_id):
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     # can also be regional actor
-    # FIXME: should we still use allow_national or move to is_staff_for_site?
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
     )
 
-    if not is_staff_for_site(request.user):
-        is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
+    is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
 
     return access_invite(
         request, "SWITCHTENDER", project
@@ -312,8 +297,7 @@ def access_advisor_resend_invite(request, project_id, invite_id):
         request.site, project, request.user, allow_national=True
     )
 
-    if not is_staff_for_site(request.user):
-        is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
+    is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
 
     invite = get_object_or_404(
         invites_models.Invite, role="SWITCHTENDER", pk=invite_id, accepted_on=None
@@ -343,8 +327,7 @@ def access_advisor_delete(request, project_id: int, email: str):
     """Delete an advisor from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    if not is_staff_for_site(request.user):
-        has_perm_or_403(request.user, "manage_advisors", project)
+    has_perm_or_403(request.user, "manage_advisors", project)
 
     ps = get_object_or_404(
         models.ProjectSwitchtender,
