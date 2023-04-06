@@ -346,14 +346,14 @@ def access_advisor_delete(request, project_id: int, email: str):
     if not is_staff_for_site(request.user):
         has_perm_or_403(request.user, "manage_advisors", project)
 
-    advisor = get_object_or_404(
+    ps = get_object_or_404(
         models.ProjectSwitchtender,
         project=project,
         switchtender__username=email,
         site=request.site,
     )
 
-    unassign_advisor(advisor, project, request.site)
+    unassign_advisor(ps.switchtender, project, request.site)
 
     messages.success(
         request,

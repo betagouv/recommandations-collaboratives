@@ -10,8 +10,8 @@ created: 2021-09-28 13:17:53 CEST
 import datetime
 
 import pytest
-from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import models as auth_models
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
 from django.test import override_settings
 from model_bakery import baker

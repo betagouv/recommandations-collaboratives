@@ -38,6 +38,7 @@ def send_in_blue_email(template_name, recipients, params=None, test=False):
 def send_debug_email(template_name, recipients, params=None, test=False):
     """As an alternative, use the default django send_mail, mostly used for debugging and
     displaying email on the terminal"""
+
     if type(recipients) is not list:
         recipients = [recipients]
 

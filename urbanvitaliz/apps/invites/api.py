@@ -1,7 +1,7 @@
 from django.contrib.auth import models as auth_models
 from urbanvitaliz import utils
+from urbanvitaliz.apps.communication import api as communication_api
 from urbanvitaliz.apps.communication import digests
-from urbanvitaliz.apps.communication.api import send_email
 
 from . import models
 
@@ -66,22 +66,22 @@ def invite_send(invite, invited_user=None):
         if invite.inviter.profile.organization:
             params["sender"]["organization"] = invite.inviter.profile.organization.name
 
-    if send_email(
+    res = communication_api.send_email(
         template_name="sharing invitation",
-        recipients=[{"email": invite.email}],
+        recipients=[invite.email],
+        # recipients=[{"email": invite.email}],
         params=params,
-    ):
-        return True
+    )
 
-    return False
+    return res and True  # to be sure we return a bool
 
 
 def invite_resend(invite):
     """Resend the invitation email"""
     try:
+        # FIXME username ou email ?
         user = auth_models.User.objects.get(username=invite.email)
-    except auth_models.User.DoesNotExist:
-        print(">>>>> fuck you goddamned mother fucker")
+    except auth_models.User.DoesNotExist as e:
         user = None
 
     return invite_send(invite, invited_user=user)

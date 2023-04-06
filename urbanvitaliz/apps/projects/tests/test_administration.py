@@ -11,12 +11,14 @@ created: 2022-12-26 11:54:56 CEST
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
+from urbanvitaliz.apps.communication import api as communication_api
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.projects.utils import (assign_advisor,
@@ -420,9 +422,18 @@ def test_staff_can_remove_advisor_from_project_on_site(request, client):
 
 
 @pytest.mark.django_db
-def test_staff_can_resend_advisor_invitation(request, client, mailoutbox):
+def test_staff_can_resend_advisor_invitation(request, client, mocker):
     site = get_current_site(request)
-    invited_email = "invite@party.com"
+    invited = baker.make(
+        auth_models.User,
+        username="invited@party.com",
+        email="invited@party.com",
+    )
+    inviter = baker.make(
+        auth_models.User,
+        username="inviter@example.com",
+        email="inviter@example.com",
+    )
     project = baker.make(
         models.Project,
         sites=[site],
@@ -434,29 +445,37 @@ def test_staff_can_resend_advisor_invitation(request, client, mailoutbox):
         site=site,
         project=project,
         role="SWITCHTENDER",
-        email=invited_email,
-        inviter__first_name="john",
+        email=invited.username,
+        inviter=inviter,
     )
+
+    mocker.patch("urbanvitaliz.apps.communication.api.send_email")
 
     url = reverse(
         "projects-project-access-advisor-resend-invite",
         args=[project.id, invite.pk],
     )
-    data = {"email": invited_email, "message": "resent"}
-
     with login(client, groups=["example_com_staff"]) as user:
-        response = client.post(url, data=data)
+        response = client.post(url)
 
     assert response.status_code == 302
 
-    assert len(mailoutbox) == 1
-    assert invited_email in mailoutbox[0].to
+    assert communication_api.send_email.assert_called_once()
 
 
 @pytest.mark.django_db
-def test_staff_can_resend_collaborator_invitation(request, client, mailoutbox):
+def test_staff_can_resend_collaborator_invitation(request, client, mocker):
     site = get_current_site(request)
-    invited_email = "invite@party.com"
+    invited = baker.make(
+        auth_models.User,
+        username="invited@party.com",
+        email="invited@party.com",
+    )
+    inviter = baker.make(
+        auth_models.User,
+        username="inviter@example.com",
+        email="inviter@example.com",
+    )
     project = baker.make(
         models.Project,
         sites=[site],
@@ -468,23 +487,22 @@ def test_staff_can_resend_collaborator_invitation(request, client, mailoutbox):
         site=site,
         project=project,
         role="COLLABORATOR",
-        email=invited_email,
-        inviter__first_name="john",
+        email=invited.username,
+        inviter=inviter,
     )
+
+    mocker.patch("urbanvitaliz.apps.communication.api.send_email")
 
     url = reverse(
-        "projects-project-access-collectivity-resend-invite",
+        "projects-project-access-advisor-resend-invite",
         args=[project.id, invite.pk],
     )
-    data = {"email": invited_email, "message": "resent"}
-
     with login(client, groups=["example_com_staff"]) as user:
-        response = client.post(url, data=data)
+        response = client.post(url)
 
     assert response.status_code == 302
 
-    assert len(mailoutbox) == 1
-    assert invited_email in mailoutbox[0].to
+    assert communication_api.send_email.assert_called_once()
 
 
 # eof
