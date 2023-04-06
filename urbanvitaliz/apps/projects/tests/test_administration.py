@@ -319,7 +319,7 @@ def test_unprivileged_user_cannot_remove_collaborator_from_project(request, clie
 
 
 #####################################################################
-# Adivsor ACLs
+# Advisor ACLs
 #####################################################################
 
 
@@ -460,7 +460,7 @@ def test_staff_can_resend_advisor_invitation(request, client, mocker):
 
     assert response.status_code == 302
 
-    assert communication_api.send_email.assert_called_once()
+    communication_api.send_email.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -494,7 +494,7 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker):
     mocker.patch("urbanvitaliz.apps.communication.api.send_email")
 
     url = reverse(
-        "projects-project-access-advisor-resend-invite",
+        "projects-project-access-collectivity-resend-invite",
         args=[project.id, invite.pk],
     )
     with login(client, groups=["example_com_staff"]) as user:
@@ -502,7 +502,7 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker):
 
     assert response.status_code == 302
 
-    assert communication_api.send_email.assert_called_once()
+    communication_api.send_email.assert_called_once()
 
 
 # eof

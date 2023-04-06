@@ -68,21 +68,19 @@ def invite_send(invite, invited_user=None):
 
     res = communication_api.send_email(
         template_name="sharing invitation",
-        recipients=[invite.email],
-        # recipients=[{"email": invite.email}],
+        recipients=[{"email": invite.email}],
         params=params,
     )
 
-    return res and True  # to be sure we return a bool
+    return bool(res)
 
 
 def invite_resend(invite):
     """Resend the invitation email"""
     try:
-        # FIXME username ou email ?
         user = auth_models.User.objects.get(username=invite.email)
-    except auth_models.User.DoesNotExist as e:
-        user = None
+    except auth_models.User.DoesNotExist:
+        user = None  # FIXME pourquoi est ce que l'on continue ici?
 
     return invite_send(invite, invited_user=user)
 
