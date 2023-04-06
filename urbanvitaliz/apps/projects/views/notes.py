@@ -14,10 +14,10 @@ from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.utils import check_if_switchtender, is_switchtender_or_403
 
-
 from .. import models, signals
 from ..forms import DocumentUploadForm, NoteForm, PublicNoteForm, StaffNoteForm
-from ..utils import can_administrate_or_403, can_administrate_project, can_manage_or_403
+from ..utils import (can_administrate_or_403, can_administrate_project,
+                     can_manage_or_403)
 
 
 @login_required
@@ -49,7 +49,7 @@ def create_public_note(request, project_id=None):
                     document.save()
 
             signals.note_created.send(
-                sender=create_note,
+                sender=create_public_note,
                 note=instance,
                 project=project,
                 user=request.user,
@@ -59,29 +59,22 @@ def create_public_note(request, project_id=None):
 
 
 @login_required
-def create_note(request, project_id=None):
-    """Create a new note for a project"""
+def create_private_note(request, project_id=None):
+    """Create a new private note for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    can_manage_or_403(project, request.user, allow_draft=True)
-    is_advisor = can_administrate_project(project, request.user)
+    can_administrate_or_403(project, request.user)
 
     if request.method == "POST":
-        if is_advisor:
-            form = StaffNoteForm(request.POST)
-        else:
-            form = NoteForm(request.POST)
+        form = NoteForm(request.POST)
 
         if form.is_valid():
             instance = form.save(commit=False)
             instance.project = project
             instance.created_by = request.user
-
-            if not is_advisor:
-                instance.public = True
             instance.save()
 
             signals.note_created.send(
-                sender=create_note,
+                sender=create_private_note,
                 note=instance,
                 project=project,
                 user=request.user,
@@ -91,10 +84,7 @@ def create_note(request, project_id=None):
                 reverse("projects-project-detail-internal-followup", args=[project_id])
             )
     else:
-        if is_advisor:
-            form = StaffNoteForm()
-        else:
-            form = NoteForm()
+        form = NoteForm()
     return render(request, "projects/project/note_create.html", locals())
 
 

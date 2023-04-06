@@ -211,7 +211,7 @@ urlpatterns = [
     ),
     path(
         r"project/<int:project_id>/note/",
-        notes.create_note,
+        notes.create_private_note,
         name="projects-create-note",
     ),
     path(
