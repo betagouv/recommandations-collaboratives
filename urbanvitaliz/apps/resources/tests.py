@@ -273,8 +273,6 @@ def test_draft_resource_not_visible_to_non_staff(request, client):
     assert response.status_code == 403
 
 
-# FIXME MERGE new permissions
-# @pytest.mark.skip(reason="update for new permissions")
 @pytest.mark.django_db
 def test_draft_resource_visible_to_staff(request, client):
     site = get_current_site(request)
@@ -287,8 +285,6 @@ def test_draft_resource_visible_to_staff(request, client):
     assert response.status_code == 200
 
 
-# FIXME MERGE new permissions
-# @pytest.mark.skip(reason="update for new permissions")
 @pytest.mark.django_db
 def test_resource_detail_contains_update_for_authorized_user(request, client):
     site = get_current_site(request)

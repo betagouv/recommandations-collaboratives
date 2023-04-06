@@ -27,11 +27,8 @@ from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import (
-    check_if_advisor,
-    has_perm,
-    has_perm_or_403,
-)
+from urbanvitaliz.utils import (check_if_advisor, has_perm, has_perm_or_403,
+                                is_staff_for_site)
 
 from . import models
 from .serializers import ResourceSerializer
@@ -218,7 +215,7 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
     def test_func(self):
         resource = self.get_object()
-        return resource.public or self.request.user.is_staff
+        return resource.public or is_staff_for_site(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

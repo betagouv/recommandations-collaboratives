@@ -63,7 +63,7 @@ def organization_list(request):
     """Return the Organization list"""
     has_perm_or_403(request.user, "use_addressbook", request.site)
 
-    organizations = models.Organization.objects.order_by("name")
+    organizations = models.Organization.on_site.order_by("name")
     return render(request, "addressbook/organization_list.html", locals())
 
 
