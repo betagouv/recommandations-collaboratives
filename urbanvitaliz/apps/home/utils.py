@@ -7,7 +7,6 @@ authors: raphael@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-08 09:56:53 CEST
 """
 
-from django.db import transaction
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
@@ -59,7 +58,7 @@ def make_new_site(name: str, domain: str, sender_email: str, sender_name: str) -
 
     for name, permissions in models.SITE_GROUP_PERMISSIONS.items():
         group_name = make_group_name_for_site(name, site)
-        group = auth_models.Group.objects.create(name=group_name)
+        auth_models.Group.objects.create(name=group_name)
         # TODO add permission for group
 
     return site

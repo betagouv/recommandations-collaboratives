@@ -9,8 +9,10 @@ created: 2021-11-15 14:44:55 CET
 
 from actstream.managers import ActionManager
 from django.contrib.auth import models as auth
+from django.contrib.auth.models import Permission
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
+from guardian.ctypes import get_content_type
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -27,7 +29,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 
-
 SITE_GROUP_PERMISSIONS = {
     "staff": (
         "sites.moderate_projects",
@@ -38,7 +39,7 @@ SITE_GROUP_PERMISSIONS = {
         "sites.use_addressbook",
     ),
     "admin": ("sites.manage_surveys",),
-    "advisor": ("sites.list_projects", "sites.use_addressbook"),
+    "advisor": ("sites.list_projects",),
 }
 
 
@@ -193,6 +194,7 @@ class GroupObjectPermissionOnSite(
 
 
 ### Monkey patch guardian behaviour so it returns current site permission
+### and honours current site admins
 
 # Users
 def get_user_filters_with_sites(self, obj):
@@ -226,6 +228,34 @@ ObjectPermissionChecker.original_get_group_filters = (
     ObjectPermissionChecker.get_group_filters
 )
 ObjectPermissionChecker.get_group_filters = get_group_filters_with_sites
+
+# Permission getter, patched to honour staff group
+
+
+def get_user_perms(self, obj):
+    # XXX This introduces a security flaw where one can pass an object from another
+    # site than the current one. This leads to a false positive and gives cross-site
+    # privilege elevation.
+    # For the sake of simplicity, we decided to keep it as is, given we're in control
+    # of all calls.
+
+    # FIXME Refactor to move that (circular import)
+    from urbanvitaliz import utils as uv_utils
+
+    ctype = get_content_type(obj)
+
+    if uv_utils.is_staff_for_site(self.user):
+        return list(
+            Permission.objects.filter(
+                content_type=ctype,
+            ).values_list("codename", flat=True)
+        )
+    else:
+        return ObjectPermissionChecker.original_get_user_perms(self, obj)
+
+
+ObjectPermissionChecker.original_get_user_perms = ObjectPermissionChecker.get_user_perms
+ObjectPermissionChecker.get_user_perms = get_user_perms
 
 
 # eof

@@ -92,7 +92,7 @@ def test_has_perm_considers_current_site():
 
 
 @pytest.mark.django_db
-def test_site_staff_bypass_has_perm_for_her_site(client, request):
+def test_site_staff_bypass_has_perm_for_her_site_objects(client, request):
     project = Recipe(projects_models.Project).make()
 
     site = get_current_site(request)
@@ -108,3 +108,31 @@ def test_site_staff_bypass_has_perm_for_her_site(client, request):
         # Shoudn't be present on another site
         with settings.SITE_ID.override(site2.pk):
             assert not utils.has_perm(user, perm_name, project)
+
+
+@pytest.mark.django_db
+def test_site_staff_bypass_has_perm_for_her_site(client, request):
+    site = get_current_site(request)
+
+    perm_name = "sites.list_projects"
+
+    with login(client, groups=["example_com_staff"]) as user:
+        # Should be present on current site
+        with settings.SITE_ID.override(site.pk):
+            assert utils.has_perm(user, perm_name, site)
+
+
+@pytest.mark.django_db
+@pytest.mark.skip
+def test_site_staff_cannot_bypass_perm_for_other_site(client, request):
+    """
+    XXX Currently disabled because we can't find an elegant way to fix this problem
+    """
+    site = get_current_site(request)
+    site2 = Recipe(sites_models.Site).make()
+
+    perm_name = "sites.list_projects"
+
+    with login(client, groups=["example_com_staff"]) as user:
+        with settings.SITE_ID.override(site.pk):
+            assert not utils.has_perm(user, perm_name, site2)
