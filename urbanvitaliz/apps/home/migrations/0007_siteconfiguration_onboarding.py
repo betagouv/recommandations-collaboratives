@@ -18,9 +18,10 @@ def create_default_onboarding(apps, schema_editor):
         }
     ]
 
-    o, _ = onboarding_models.Onboarding.objects.get_or_create(
-        pk=1, form=json.dumps(form)
-    )
+    try:
+        onboarding_models.Onboarding.objects.get(pk=1)
+    except onboarding_models.Onboarding.DoesNotExist:
+        onboarding_models.Onboarding.objects.create(form=json.dumps(form))
 
 
 class Migration(migrations.Migration):
