@@ -67,7 +67,7 @@ def test_create_conversation_message_available_for_project_collaborators(
             url,
             data={"content": "this is some content"},
         )
-    note = models.Note.objects.all()[0]
+    note = models.Note.on_site.all()[0]
     assert note.project == project
     assert response.status_code == 302
 
@@ -132,7 +132,7 @@ def test_switchtender_creates_new_private_note_for_project_and_redirect(
         )
     assert response.status_code == 302
 
-    note = models.Note.fetch()[0]
+    note = models.Note.on_site.all()[0]
     assert note.project == project
     assert note.public is False
 
@@ -158,7 +158,7 @@ def test_create_public_note_for_project_collaborator_and_redirect(request, clien
         )
     assert response.status_code == 302
 
-    note = models.Note.fetch()[0]
+    note = models.Note.on_site.all()[0]
     assert note.project == project
     assert note.public is True
 
@@ -235,7 +235,7 @@ def test_create_conversation_message_with_attachment_for_project_collaborator(
 
     assert response.status_code == 302
 
-    note = models.Note.objects.first()
+    note = models.Note.on_site.first()
     assert note
     document = models.Document.on_site.first()
     assert document
@@ -248,8 +248,8 @@ def test_create_conversation_message_with_attachment_for_project_collaborator(
 
 
 @pytest.mark.django_db
-def test_update_note_not_available_for_non_staff_users(client):
-    note = Recipe(models.Note).make()
+def test_update_note_not_available_for_non_staff_users(request, client):
+    note = Recipe(models.Note, site=get_current_site(request)).make()
     url = reverse("projects-update-note", args=[note.id])
     with login(client):
         response = client.get(url)
@@ -258,8 +258,10 @@ def test_update_note_not_available_for_non_staff_users(client):
 
 @pytest.mark.django_db
 def test_switchtender_can_update_own_note(request, client):
-    note = Recipe(models.Note).make()
     site = get_current_site(request)
+
+    note = Recipe(models.Note, site=site).make()
+
     url = reverse("projects-update-note", args=[note.id])
     with login(client) as user:
         assign_advisor(user, note.project, site)
@@ -272,7 +274,7 @@ def test_switchtender_can_update_own_note(request, client):
 
 @pytest.mark.django_db
 def test_switchtender_cant_update_other_switchtender_note(request, client):
-    note = Recipe(models.Note).make()
+    note = Recipe(models.Note, site=get_current_site(request)).make()
     url = reverse("projects-update-note", args=[note.id])
     with login(client, groups=["example_com_advisor"]) as user:
         note.project.switchtenders_on_site.create(
@@ -284,23 +286,28 @@ def test_switchtender_cant_update_other_switchtender_note(request, client):
 
 @pytest.mark.django_db
 def test_collaborator_can_update_own_public_note(request, client):
-    membership = baker.make(models.ProjectMember)
-
+    current_site = get_current_site(request)
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
     ).make()
     with login(client) as user:
         assign_collaborator(user, project)
 
-        note = Recipe(models.Note, created_by=user, project=project, public=True).make()
+        note = Recipe(
+            models.Note,
+            created_by=user,
+            project=project,
+            public=True,
+            site=current_site,
+        ).make()
 
         response = client.post(
             reverse("projects-update-note", args=[note.id]),
             data={"content": "this is some content"},
         )
 
-    note = models.Note.fetch()[0]
+    note = models.Note.on_site.all()[0]
     assert note.project == project
     assert note.public is True
     assert response.status_code == 302
@@ -308,14 +315,17 @@ def test_collaborator_can_update_own_public_note(request, client):
 
 @pytest.mark.django_db
 def test_collaborator_cannot_update_others_public_note(request, client):
+    current_site = get_current_site(request)
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
     ).make()
 
     with login(client) as user:
         assign_collaborator(user, project)
-        note = Recipe(models.Note, project=project, public=False).make()
+        note = Recipe(
+            models.Note, project=project, public=False, site=current_site
+        ).make()
 
         response = client.post(
             reverse("projects-update-note", args=[note.id]),
@@ -327,7 +337,7 @@ def test_collaborator_cannot_update_others_public_note(request, client):
 
 @pytest.mark.django_db
 def test_collaborator_cant_update_private_note(request, client):
-    note = Recipe(models.Note, public=False).make()
+    note = Recipe(models.Note, public=False, site=get_current_site(request)).make()
     with login(client) as user:
         assign_collaborator(user, note.project)
         url = reverse("projects-update-note", args=[note.id])
@@ -338,15 +348,16 @@ def test_collaborator_cant_update_private_note(request, client):
 
 @pytest.mark.django_db
 def test_delete_note_for_project_and_redirect(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-    note = Recipe(models.Note, project=project).make()
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
+    note = Recipe(models.Note, project=project, site=current_site).make()
     url = reverse("projects-delete-note", args=[note.id])
 
     with login(client) as user:
         assign_advisor(user, project)
         response = client.post(url)
 
-    assert models.Note.objects.count() == 0
+    assert models.Note.on_site.count() == 0
 
     assert response.status_code == 302
 
@@ -363,7 +374,7 @@ def test_delete_note_removes_activity(request, client):
             data={"content": "content", "public": True},
         )
 
-    note = models.Note.objects.first()
+    note = models.Note.on_site.first()
     assert note
 
     assert action_object_stream(note).count()

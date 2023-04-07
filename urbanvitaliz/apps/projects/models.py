@@ -432,10 +432,19 @@ class NoteManager(models.Manager):
         return self.get_queryset().filter(public=True)
 
 
+class NoteOnSiteManager(CurrentSiteManager, NoteManager):
+    pass
+
+
 class Note(models.Model):
     """Représente un suivi de project"""
 
     objects = NoteManager()
+    on_site = NoteOnSiteManager()
+
+    site = models.ForeignKey(
+        Site, on_delete=models.CASCADE, related_name="ptroject_notes"
+    )
 
     project = models.ForeignKey(
         "Project", on_delete=models.CASCADE, related_name="notes"
@@ -506,10 +515,6 @@ class Note(models.Model):
 
     def __str__(self):  # pragma: nocover
         return f"Note: #{self.id}"
-
-    @classmethod
-    def fetch(cls):
-        return cls.objects.filter(deleted=None)
 
 
 class TaskQuerySet(OrderedModelQuerySet):

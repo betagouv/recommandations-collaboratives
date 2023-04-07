@@ -111,6 +111,7 @@ def onboarding(request):
                 project=project,
                 content=f"# Demande initiale\n\n{project.description}\n\n{ markdown_content }",
                 public=True,
+                site=request.site,
             ).save()
 
             # All green, notify

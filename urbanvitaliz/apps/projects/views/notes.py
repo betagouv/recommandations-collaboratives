@@ -33,6 +33,7 @@ def create_public_note(request, project_id=None):
             instance = form.save(commit=False)
             instance.project = project
             instance.created_by = request.user
+            instance.site = request.site
             instance.public = True
             instance.save()
 
@@ -74,6 +75,7 @@ def create_private_note(request, project_id=None):
             instance = form.save(commit=False)
             instance.project = project
             instance.created_by = request.user
+            instance.site = request.site
 
             instance.save()
 
@@ -95,7 +97,7 @@ def create_private_note(request, project_id=None):
 @login_required
 def update_note(request, note_id=None):
     """Update an existing note for a project"""
-    note = get_object_or_404(models.Note, pk=note_id)
+    note = get_object_or_404(models.Note, pk=note_id, site=request.site)
     project = note.project  # For template consistency
 
     is_advisor = can_administrate_project(project, request.user)
@@ -139,7 +141,7 @@ def update_note(request, note_id=None):
 @login_required
 def delete_note(request, note_id=None):
     """Delete existing note for a project"""
-    note = get_object_or_404(models.Note, pk=note_id)
+    note = get_object_or_404(models.Note, pk=note_id, site=request.site)
 
     has_perm_or_403(request.user, "projects.use_private_notes", note.project)
 

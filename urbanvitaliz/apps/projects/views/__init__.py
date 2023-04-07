@@ -136,6 +136,7 @@ def create_project_prefilled(request):
                 project=project,
                 content=f"# Demande initiale\n\n{project.description}\n\n{ markdown_content }",
                 public=True,
+                site=request.site,
             ).save()
 
             invite, _ = invites_models.Invite.objects.get_or_create(
