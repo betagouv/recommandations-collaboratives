@@ -57,7 +57,7 @@
                                     {% endif %}
                                     {% if show_answers or show_conclusion %}
                                         <ul class="list-unstyled">
-                                            {% if can_manage and not show_question %}
+                                            {% if "use_surveys" in user_project_perms and not show_question %}
                                                 <a class="link-edit stretched-link text-decoration-none"
                                                    href="{% url 'survey-question-details' session.id answer.question.id %}">
                                                 {% endif %}
@@ -65,7 +65,7 @@
                                                     {% if show_answers %}<li>{{ choice.text }}</li>{% endif %}
                                                     {% if show_conclusion  %}<li class="">{{ choice.conclusion|default:choice.text|capfirst }}</li>{% endif %}
                                                 {% endfor %}
-                                                {% if can_manage and not show_question %}</a>{% endif %}
+                                                {% if "use_surveys" in user_project_perms and not show_question %}</a>{% endif %}
                                             </ul>
                                         {% endif %}
                                         {% if show_comment and answer.comment or not choices %}
