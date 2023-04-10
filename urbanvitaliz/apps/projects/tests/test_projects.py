@@ -292,7 +292,7 @@ def test_project_fails_unknown_sharing_link(request, client):
 
 
 @pytest.mark.django_db
-def test_existing_user_receives_email_on_login(client, settings, mailoutbox):
+def test_existing_user_receives_email_on_login(client, settings, mailoutbox):  # noqa
     user = Recipe(auth.User, email="jdoe@example.com").make()
     url = reverse("magicauth-login")
 

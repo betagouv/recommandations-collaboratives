@@ -134,7 +134,9 @@ class ProjectManager(models.Manager):
             projects = self._filter_by_departments(projects, actor_departments)
 
         # Extend scope of projects to those where you're member or invited advisor
-        my_projects = get_objects_for_user(user, "projects.view_project", klass=Project)
+        my_projects = get_objects_for_user(
+            user, "projects.view_project", klass=Project
+        ).filter(deleted=None, sites=site)
 
         return (projects | my_projects).distinct()
 
