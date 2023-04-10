@@ -48,7 +48,7 @@
                 {% for action in actions %}
                 <div class="my-3 mb-4 py-1 border-start border-4 ps-3">
 
-                    {% if action.verb == 'a rédigé une note interne' %}
+                    {% if action.verb == "a envoyé un message dans l'espace conseillers" %}
                     <div class="p-2 mb-2 bg-light overflow-hidden">
                         {{ action.action_object.content_rendered|safe }}
                         <div class="d-flex align-items-center justify-content-between mt-3">
