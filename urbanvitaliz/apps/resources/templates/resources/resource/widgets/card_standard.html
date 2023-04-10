@@ -55,8 +55,7 @@
                     </svg>
                 </span>
                 {% endif %}
-
-                {% if resource.task_recommendations.count %}
+                {% if resource.task_recommendations.count and not is_is_switchtender %}
                 <span class="ms-1 align-middle" data-bs-toggle="tooltip" data-bs-placement="top" title="Voir les préfléchages">
                     <a class="ms-1 text-reset text-decoration-none" href="{% url "projects-task-recommendation-list" %}">
                         {% if request.user.email == "anouk.jeanneau@beta.gouv.fr" %}
