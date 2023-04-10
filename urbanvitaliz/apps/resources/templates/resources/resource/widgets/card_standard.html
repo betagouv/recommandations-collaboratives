@@ -1,4 +1,9 @@
 {% load static %}
+
+{% load projects_extra %}
+
+{% is_staff_for_current_site request.user as is_staff %}
+
 <!-- Card -->
 <div class="card-resource card h-100" style="min-height: 300px;">
     <!-- <hr class="middle-hr" /> -->
@@ -55,7 +60,7 @@
                     </svg>
                 </span>
                 {% endif %}
-                {% if resource.task_recommendations.count and not is_is_switchtender %}
+                {% if resource.task_recommendations.count and is_staff %}
                 <span class="ms-1 align-middle" data-bs-toggle="tooltip" data-bs-placement="top" title="Voir les préfléchages">
                     <a class="ms-1 text-reset text-decoration-none" href="{% url "projects-task-recommendation-list" %}">
                         {% if request.user.email == "anouk.jeanneau@beta.gouv.fr" %}
