@@ -13,6 +13,7 @@ import io
 import uuid
 
 import pytest
+from django.conf import settings
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites
 from django.contrib.sites.shortcuts import get_current_site
@@ -29,7 +30,7 @@ from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.utils import login, get_group_for_site
+from urbanvitaliz.utils import get_group_for_site, login
 
 from .. import models, signals, utils
 
@@ -291,10 +292,14 @@ def test_project_fails_unknown_sharing_link(request, client):
 
 
 @pytest.mark.django_db
-def test_existing_user_receives_email_on_login(client, mailoutbox):
+def test_existing_user_receives_email_on_login(client, settings, mailoutbox):
     user = Recipe(auth.User, email="jdoe@example.com").make()
     url = reverse("magicauth-login")
+
+    settings.DEBUG = True
     response = client.post(url, data={"email": user.email})
+    settings.DEBUG = False
+
     assert response.status_code == 302
     assert len(mailoutbox) == 1
     assert user.email in mailoutbox[0].to
