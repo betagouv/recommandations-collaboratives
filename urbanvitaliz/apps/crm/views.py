@@ -373,7 +373,7 @@ def crm_list_tags(request):
     note_tags = dict(
         (tag["name"], tag["occurence"])
         for tag in (
-            Note.tags.filter(note__site=request.site)
+            models.Note.tags.filter(note__site=request.site)
             .distinct()
             .annotate(occurrences=Count("note", distinct=True))
             .values("name", "occurences")
