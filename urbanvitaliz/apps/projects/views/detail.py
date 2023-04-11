@@ -15,27 +15,19 @@ from django.db.models import Q
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
-
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (
-    check_if_advisor,
-    get_site_config_or_503,
-    has_perm,
-    has_perm_or_403,
-)
+from urbanvitaliz.utils import (check_if_advisor, get_site_config_or_503,
+                                has_perm, has_perm_or_403)
 
 from .. import models
-from ..forms import PrivateNoteForm, ProjectTagsForm, ProjectTopicsForm, PublicNoteForm
-from ..utils import (
-    can_administrate_project,
-    check_if_national_actor,
-    get_notification_recipients_for_project,
-    get_advisor_for_project,
-    is_advisor_for_project,
-    is_regional_actor_for_project,
-    set_active_project_id,
-)
+from ..forms import (PrivateNoteForm, ProjectTagsForm, ProjectTopicsForm,
+                     PublicNoteForm)
+from ..utils import (can_administrate_project, check_if_national_actor,
+                     get_advisor_for_project,
+                     get_notification_recipients_for_project,
+                     is_advisor_for_project, is_regional_actor_for_project,
+                     set_active_project_id)
 
 
 @login_required
@@ -248,6 +240,21 @@ def project_internal_followup(request, project_id=None):
     private_note_form = PrivateNoteForm()
 
     return render(request, "projects/project/internal_followup.html", locals())
+
+
+@login_required
+def project_internal_followup_tracking(request, project_id=None):
+    """Advisors chat for given project"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    has_perm_or_403(request.user, "projects.use_private_notes", project)
+
+    advising = get_advisor_for_project(request.user, project)
+
+    # Set this project as active
+    set_active_project_id(request, project.pk)
+
+    return render(request, "projects/project/internal_followup_tracking.html", locals())
 
 
 @login_required

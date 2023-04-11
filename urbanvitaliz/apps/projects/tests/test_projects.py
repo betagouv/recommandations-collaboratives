@@ -22,7 +22,8 @@ from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -630,6 +631,7 @@ def test_project_conversations_not_available_for_nonregional_advisor(request, cl
     assert response.status_code == 403
 
 
+#
 # internal
 @pytest.mark.django_db
 def test_project_internal_followup_not_available_for_common_user(request, client):
@@ -679,6 +681,74 @@ def test_project_internal_followup_not_available_for_restricted_switchtender(
         user.profile.departments.add(other)
         response = client.get(url)
     assert response.status_code == 403
+
+
+#
+# internal tracking
+@pytest.mark.django_db
+def test_project_internal_followup_tracking_not_available_for_common_user(
+    request, client
+):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    url = reverse(
+        "projects-project-detail-internal-followup-tracking", args=[project.id]
+    )
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_internal_followup_tracking_not_available_for_owner(request, client):
+    # project email is same as test user to be logged in
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+
+    with login(client) as user:
+        utils.assign_collaborator(user, project, is_owner=True)
+        url = reverse(
+            "projects-project-detail-internal-followup-tracking", args=[project.id]
+        )
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_internal_followup_tracking_available_for_assigned_advisor(
+    request, client
+):
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
+    url = reverse(
+        "projects-project-detail-internal-followup-tracking", args=[project.id]
+    )
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, current_site)
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_internal_followup_tracking_not_available_for_restricted_switchtender(
+    request, client
+):
+    other = Recipe(geomatics.Department, code="02").make()
+    project = Recipe(
+        models.Project,
+        commune__departments__code="01",
+        sites=[get_current_site(request)],
+    ).make()
+    url = reverse(
+        "projects-project-detail-internal-followup-tracking", args=[project.id]
+    )
+    with login(client, groups=["example_com_advisor"]) as user:
+        user.profile.departments.add(other)
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+#
+# project details overview
 
 
 @pytest.mark.django_db
