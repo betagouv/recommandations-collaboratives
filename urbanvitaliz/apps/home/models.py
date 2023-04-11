@@ -12,11 +12,12 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.models import Permission
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
-from guardian.ctypes import get_content_type
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.encoding import force_text
 from guardian.core import ObjectPermissionChecker
+from guardian.ctypes import get_content_type
 from guardian.managers import BaseObjectPermissionManager
 from guardian.models import (
     BaseGenericObjectPermission,
@@ -250,12 +251,24 @@ def get_user_perms(self, obj):
                 content_type=ctype,
             ).values_list("codename", flat=True)
         )
-    else:
-        return ObjectPermissionChecker.original_get_user_perms(self, obj)
+
+    return ObjectPermissionChecker.original_get_user_perms(self, obj)
 
 
 ObjectPermissionChecker.original_get_user_perms = ObjectPermissionChecker.get_user_perms
 ObjectPermissionChecker.get_user_perms = get_user_perms
+
+# Override cache key identity using site
+def get_local_cache_key_with_site(self, obj):
+    ctype = get_content_type(obj)
+    site = Site.objects.get_current()
+    return (ctype.id, force_text(obj.pk), force_text(site.pk))
+
+
+ObjectPermissionChecker.original_get_local_cache_key = (
+    ObjectPermissionChecker.get_local_cache_key
+)
+ObjectPermissionChecker.get_local_cache_key = get_local_cache_key_with_site
 
 
 # eof
