@@ -9,13 +9,11 @@
 
 <ul class="list-group">
     {% for date, actions in stream_by_day|slice:limit %}
-    <li class="list-group-item border-0">
+    <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0">
         <span class="small text-secondary">{{ date|naturalday|capfirst }}</span>
 
         {% for action in actions %}
-        <div class="my-3 mb-4 py-1 border-start border-4 ps-3">
-            <!-- {{action.verb}} -->
-
+        <div class="{% if cropped %}my-1 mb-0 {% else %} my-3 mb-4 {% endif %} py-1 border-start border-4 ps-3">
             {% if action.verb == "a envoyé un message dans l'espace conseillers" %}
             <div class="p-2 mb-2 bg-light overflow-hidden">
                 {{ action.action_object.content_rendered|safe }}
