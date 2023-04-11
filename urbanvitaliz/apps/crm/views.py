@@ -365,8 +365,8 @@ def crm_list_tags(request):
             Project.tags.filter(project__sites=request.site)
             .exclude(project__exclude_stats=True)
             .distinct()
+            .values("name")
             .annotate(occurrences=Count("project", distinct=True))
-            .values("name", "occurences")
         )
     )
 
@@ -375,8 +375,8 @@ def crm_list_tags(request):
         for tag in (
             models.Note.tags.filter(note__site=request.site)
             .distinct()
+            .values("name")
             .annotate(occurrences=Count("note", distinct=True))
-            .values("name", "occurences")
         )
     )
 
