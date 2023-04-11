@@ -48,7 +48,7 @@
             margin: 0 !i;
         }
         
-        #ask-question{
+        #ask-question, #push-resource, #edit-resource {
             display: none !important;
         }
 
@@ -127,7 +127,7 @@
             <!-- Switchtender actions -->
 
             <!-- Push Resource -->
-            <div class="d-grid gap-2 mt-3">
+            <div id="push-resource" class="d-grid gap-2 mt-3">
                 {% if active_project %}
                 {% if not resource.status == 0  %}
                 <form action="{% url "projects-create-resource-action" resource.id %}" method="GET">
@@ -150,7 +150,7 @@
             {% get_obj_perms request.user for request.site as "user_site_perms" %}
 
             {% if "manage_resources" in user_site_perms %}
-            <div class="d-grid gap-2 mt-3">
+            <div id="edit-resource" class="d-grid gap-2 mt-3">
                 <a class="btn btn-light btn-sm" href="{% url 'resources-resource-update' resource.id %}" role="button">
                     <svg class="bi" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
@@ -159,7 +159,14 @@
                     Éditer
                 </a>
             </div>
-
+            <div class="d-flex w-100 mt-2">
+                <a onclick="window.print()" class="button grey inherit filled w-100 text-center py-1">
+                    <svg class="bi align-middle me-2" width="18" height="18">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#printer" />
+                    </svg>
+                    <span>Impression ressource</span>
+                </a>
+            </div>
             {% endif %}
             <div class="mt-4">
             {% if resource.departments.count %}
