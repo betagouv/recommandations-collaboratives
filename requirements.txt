@@ -13,7 +13,7 @@ git+https://github.com/glibersat/django-notifications.git@feature/sites-framewor
 git+https://github.com/glibersat/django-activity-stream.git@main#egg=django-activity-stream
 
 django-multisite
-git+http://github.com/django-ordered-model/django-ordered-model@master#egg=django-ordered-model
+django-ordered-model==3.6
 
 git+https://github.com/jazzband/django-dbtemplates.git@master#egg=django-dbtemplates
 
