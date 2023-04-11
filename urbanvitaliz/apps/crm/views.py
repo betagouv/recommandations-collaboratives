@@ -359,10 +359,14 @@ def update_note_for_organization(request, organization_id, note_id):
 @staff_member_required
 def crm_list_tags(request):
     """Return a page containing all tags with their count"""
+    tags = compute_tag_occurences(request.site)
+    return render(request, "crm/tagcloud.html", locals())
+
+def compute_tag_occurences(site):
     project_tags = dict(
-        (tag["name"], tag["occurences"])
+        (tag["name"], tag["occurrences"])
         for tag in (
-            Project.tags.filter(project__sites=request.site)
+            Project.tags.filter(project__sites=site)
             .exclude(project__exclude_stats=True)
             .distinct()
             .values("name")
@@ -371,18 +375,16 @@ def crm_list_tags(request):
     )
 
     note_tags = dict(
-        (tag["name"], tag["occurences"])
+        (tag["name"], tag["occurrences"])
         for tag in (
-            models.Note.tags.filter(note__site=request.site)
+            models.Note.tags.filter(note__site=site)
             .distinct()
             .values("name")
             .annotate(occurrences=Count("note", distinct=True))
         )
     )
 
-    tags = Counter(**project_tags) + Counter(**note_tags)
-
-    return render(request, "crm/tagcloud.html", locals())
+    return Counter(**project_tags) + Counter(**note_tags)
 
 
 @staff_member_required
