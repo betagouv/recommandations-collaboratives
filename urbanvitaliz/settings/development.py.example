@@ -20,6 +20,12 @@ INSTALLED_APPS += ("debug_toolbar",)
 
 MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
 
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": lambda r: r.environ.get("SERVER_NAME", None)
+    != "testserver"
+    and (r.META.get("REMOTE_ADDR", None) in INTERNAL_IPS)
+}
+
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -30,16 +36,16 @@ DATABASES = {
         "USER": os.environ.get("DB_USER", None),
         "PASSWORD": os.environ.get("DB_PASSWORD", None),
         "HOST": os.environ.get("DB_HOST", None),
-        "PORT": os.environ.get("DB_PORT", None)
+        "PORT": os.environ.get("DB_PORT", None),
     }
 }
 
 # EMAIL
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
-SENDINBLUE_API_KEY = os.environ.get('SENDINBLUE_API_KEY')
+SENDINBLUE_API_KEY = os.environ.get("SENDINBLUE_API_KEY")
 SENDINBLUE_FORCE_DEBUG = True
 
 # Recaptcha
