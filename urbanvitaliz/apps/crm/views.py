@@ -360,7 +360,7 @@ def update_note_for_organization(request, organization_id, note_id):
 def crm_list_tags(request):
     """Return a page containing all tags with their count"""
     project_tags = dict(
-        (tag["name"], tag["occurence"])
+        (tag["name"], tag["occurences"])
         for tag in (
             Project.tags.filter(project__sites=request.site)
             .exclude(project__exclude_stats=True)
@@ -371,7 +371,7 @@ def crm_list_tags(request):
     )
 
     note_tags = dict(
-        (tag["name"], tag["occurence"])
+        (tag["name"], tag["occurences"])
         for tag in (
             models.Note.tags.filter(note__site=request.site)
             .distinct()
