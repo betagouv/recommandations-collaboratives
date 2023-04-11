@@ -1,18 +1,11 @@
 from actstream import action
-from actstream.models import actor_stream
-from django.contrib.auth.signals import user_logged_in
-from django.dispatch import receiver
-from hijack.signals import hijack_started
+from allauth.account.signals import user_logged_in as allauth_user_logged_in
+from magicauth.signals import user_logged_in as magicauth_user_logged_in
 
 
-@receiver(user_logged_in)
-def post_login(sender, user, request, **kwargs):
-    if not (user.is_staff or hasattr(user, "is_hijacked")):
-        action.send(user, verb="s'est connecté")
+def log_connection_on_user_login(sender, user, request, **kwargs):
+    action.send(user, verb="s'est connecté")
 
 
-@receiver(hijack_started)
-def delete_login_trace(sender, hijacker, hijacked, request, **kwargs):
-    last_login = actor_stream(hijacked).last()
-    if last_login:
-        last_login.delete()
+allauth_user_logged_in.connect(log_connection_on_user_login)
+magicauth_user_logged_in.connect(log_connection_on_user_login)

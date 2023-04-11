@@ -21,8 +21,9 @@ from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.utils import login
+from magicauth import models as magicauth_models
 
-from . import adapters, models, utils
+from . import adapters, utils
 
 
 ####
@@ -266,9 +267,37 @@ def test_user_can_access_followus(client):
 
 
 @pytest.mark.django_db
-def test_user_signin_should_be_logged(request, client):
+def test_admin_signin_should_not_be_logged(request, client):
     with login(client) as user:
-        assert user.actor_actions.count() == 1
+        assert user.actor_actions.count() == 0
+
+
+@pytest.mark.django_db
+def test_allauth_signin_should_be_logged(request, client):
+    user = baker.make(auth.User, email="truc@truc.fr")
+    password = "mon mot de passe"
+    user.set_password(password)
+    user.save()
+
+    url = reverse("account_login")
+    response = client.post(
+        url, data={"login": user.email, "password": password, "remember": False}
+    )
+
+    assert response.status_code == 302
+    assert user.actor_actions.count() == 1
+
+
+@pytest.mark.django_db
+def test_magicauth_signin_should_be_logged(request, client):
+    user = baker.make(auth.User)
+    token = baker.make(magicauth_models.MagicToken, user=user)
+
+    url = reverse("magicauth-validate-token", args=[token.key])
+    response = client.get(url)
+
+    assert response.status_code == 302
+    assert user.actor_actions.count() == 1
 
 
 @pytest.mark.django_db

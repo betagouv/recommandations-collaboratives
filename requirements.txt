@@ -4,7 +4,7 @@ django-markdownx==3.0.1
 markdown-link-attr-modifier==0.2.0
 
 # django-magicauth fork: Multiple Auth backend support
-git+http://github.com/glibersat/django-magicauth@master#egg=django-magicauth
+git+http://github.com/glibersat/django-magicauth@55eab0b91c95012944933b342748540b2c1b31bf#egg=django-magicauth
 
 # Notifications Fork: Sites framework support
 git+https://github.com/glibersat/django-notifications.git@feature/sites-framework#egg=django-notifications-hq
