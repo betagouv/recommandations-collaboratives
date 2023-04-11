@@ -43,67 +43,7 @@
         </form>
         {% endif %}
 
-        <ul class="list-group">
-            {% for date, actions in stream_by_day|slice:":20" %}
-            <li class="list-group-item border-0">
-
-                <span class="small text-secondary">{{ date|naturalday|capfirst }}</span>
-
-                {% for action in actions %}
-                <div class="my-3 mb-4 py-1 border-start border-4 ps-3">
-
-                    {% if action.verb == "a envoyé un message dans l'espace conseillers" %}
-                    <div class="p-2 mb-2 bg-light overflow-hidden">
-                        {{ action.action_object.content_rendered|safe }}
-                        <div class="d-flex align-items-center justify-content-between mt-3">
-                            <div class="d-flex align-items-center">
-                                <p class="mb-0 me-1 small text-secondary">{{action.actor.get_full_name|capfirst|default:action.actor}}</p>
-                                <p class="mb-0 small text-secondary">- {{action.action_object.updated_on}}</p>
-                            </div>
-                            {% if request.user == action.actor  %}
-                            <br/>
-                            <span class="ms-2">
-                                <a class="d-flex align-items-center" href="{% url 'projects-update-note' action.action_object.pk %}">
-                                    <svg class="align-middle bi me-1" width="15px" height="15px" fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
-                                    </svg>
-                                    éditer
-                                </a>
-                            </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if action.target %}
-                    <span class="align-items-center link-dark text-decoration-none">
-                        <img
-                            src="{% gravatar_url action.actor.email 32 %}"
-                            alt="{{ action.actor.get_full_name }}"
-                            class="me-1 rounded-circle"
-                            style="width: 16px; height: 16px;"
-                        />
-                    </span>
-                    <span class="align-middle small">
-                        {{ action.actor.get_full_name|capfirst|default:action.actor }} <strong>{{ action.verb }}</strong> {{ action.action_object }}
-                    </span>
-                    {% else %}
-                    {% if action.action_object %}
-                    {{ action.actor|capfirst }} <strong>{{ action.verb }}</strong> <a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
-                    {% else %}
-                    <a href="{{ action.actor.get_absolute_url }}">{{ action.actor|capfirst }}</a> <strong>{{ action.verb }}</strong>
-                    {% endif %}
-                    {% endif %}
-                </div>
-                {% endfor %}
-
-            </li>
-            {% empty %}
-            <div class="mt-4 bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
-                <p class="m-0 text-info-custom text-grey text-center fw-normal">Cet espace est réservé aux échanges entre les conseillers, et n'est pas visible par la collectivité. Quelles sont vos actualités sur le dossier ?</p>
-            </div>
-            {% endfor %}
-        </ul>
+        {% include 'projects/project/fragments/timeline/activity_stream.html' with limit=100 %}
     </div>
 
     <div class="col-4">

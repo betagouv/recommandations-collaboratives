@@ -1,13 +1,7 @@
-{% extends "projects/project/detail.html" %}
-
 {% load humanize %}
 {% load static %}
 {% load gravatar %}
 {% load activity_tags %}
-
-{% block project_detail %}
-
-{% include 'projects/project/navigation.html' with overview=True %}
 
 <div class="pt-4 w-100 h-100">
     <div class="d-flex align-items-center justify-content-between" style="margin-bottom: 6px">
@@ -17,9 +11,8 @@
     </div>
     <div class="project-card-details h-100 p-4 d-flex flex-column justify-content-between">
         <article class="overflow-hidden">
-            {% include 'projects/project/fragments/timeline/activity_stream.html' with limit=100 %}
+            {% include 'projects/project/fragments/timeline/activity_stream.html' with limit=3 %}
         </article>
+        <a class="button small filled blue" href="{% url 'projects-project-detail-internal-followup-tracking' project.pk %}">Voir plus</a>
     </div>
 </div>
-
-{% endblock %}

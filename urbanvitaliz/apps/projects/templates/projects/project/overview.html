@@ -83,6 +83,9 @@
                             {% include 'projects/project/fragments/information_card.html' with full_width=True project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
                         {% endif %}
                     </div>
+                    <div>
+                        {% include 'projects/project/fragments/timeline/project_timeline.html' %}
+                    </div>
                 </div>
             </div>
             <div class="col-4 bg-grey-light p-4">
