@@ -11,16 +11,8 @@ created : 2021-05-26 15:54:25 CEST
 from django.urls import path
 
 from . import views
-from .views import (
-    administration,
-    detail,
-    documents,
-    export,
-    feeds,
-    notes,
-    sharing,
-    tasks,
-)
+from .views import (administration, detail, documents, export, feeds, notes,
+                    sharing, tasks)
 
 urlpatterns = [
     path(
@@ -86,6 +78,11 @@ urlpatterns = [
         r"project/<int:project_id>/suivi",
         detail.project_internal_followup,
         name="projects-project-detail-internal-followup",
+    ),
+    path(
+        r"project/<int:project_id>/activite",
+        detail.project_internal_followup_tracking,
+        name="projects-project-detail-internal-followup-tracking",
     ),
     path(
         r"project/<int:project_id>/actions",
