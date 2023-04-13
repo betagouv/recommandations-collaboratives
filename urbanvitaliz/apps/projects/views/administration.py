@@ -14,17 +14,23 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
-from guardian.shortcuts import get_user_perms
+from guardian.shortcuts import get_perms
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
-from urbanvitaliz.apps.invites.api import (invite_collaborator_on_project,
-                                           invite_resend, invite_revoke)
+from urbanvitaliz.apps.invites.api import (
+    invite_collaborator_on_project,
+    invite_resend,
+    invite_revoke,
+)
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.utils import has_perm_or_403
 
 from .. import forms, models
-from ..utils import (is_regional_actor_for_project, unassign_advisor,
-                     unassign_collaborator)
+from ..utils import (
+    is_regional_actor_for_project,
+    unassign_advisor,
+    unassign_collaborator,
+)
 
 ########################################################################
 # Access
@@ -45,8 +51,7 @@ def project_administration(request, project_id):
     )
 
     has_any_required_perm = any(
-        user_perm in required_perms
-        for user_perm in get_user_perms(request.user, project)
+        user_perm in required_perms for user_perm in get_perms(request.user, project)
     )
 
     is_regional_actor = is_regional_actor_for_project(
