@@ -1,0 +1,15 @@
+#wordCloud svg text, #wordCloud .is-word {
+    transition: all 0.25s ease;
+}
+
+#wordCloud svg:hover text{
+    fill: white !important;
+    stroke: 1;
+    stroke: #222;
+}
+
+#wordCloud .is-word:hover {
+    fill: #222 !important
+}
+
+

@@ -37,7 +37,8 @@ module.exports = {
                 map: resolve('./src/js/apps/map.js'),
                 documents: resolve('./src/js/apps/documents.js'),
                 searchableList: resolve('./src/js/apps/searchableList.js'),
-                consent: resolve('./src/js/apps/consent.js')
+                consent: resolve('./src/js/apps/consent.js'),
+                tagCloud: resolve('./src/js/apps/tagCloud.js')
             },
             output: {
                 chunkFileNames: undefined,
