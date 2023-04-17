@@ -9,8 +9,6 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
-{{user_site_perms}}
-
 <div class="col-11 py-5 mx-auto">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
