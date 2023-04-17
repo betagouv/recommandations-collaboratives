@@ -12,7 +12,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from urbanvitaliz.utils import has_perm_or_403
+from urbanvitaliz.utils import has_perm_or_403, has_perm
 
 from .. import models, signals
 from ..forms import DocumentUploadForm, NoteForm, PublicNoteForm, StaffNoteForm
@@ -103,7 +103,11 @@ def update_note(request, note_id=None):
     is_advisor = can_administrate_project(project, request.user)
 
     if not note.public:
-        has_perm_or_403(request.user, "projects.use_private_notes", project)
+        is_my_note = note.created_by == request.user
+        if not (
+            is_my_note and has_perm(request.user, "projects.use_private_notes", project)
+        ):
+            raise PermissionDenied("Vous n'avez pas de le droit de modifier cette note")
     else:
         has_perm_or_403(request.user, "projects.use_public_notes", project)
 

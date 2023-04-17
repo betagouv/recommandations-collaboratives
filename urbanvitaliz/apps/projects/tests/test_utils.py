@@ -12,8 +12,8 @@ import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
-from model_bakery.recipe import Recipe
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.projects.utils import assign_advisor
 
 from .. import models, utils
 
@@ -67,7 +67,7 @@ def test_check_if_switchtends_any_project(request, client):
     userB = baker.make(auth.User)
 
     project = baker.make(models.Project, sites=[current_site], status="READY")
-    project.switchtenders_on_site.create(switchtender=userA, site=current_site)
+    assign_advisor(userA, project, current_site)
 
     assert utils.can_administrate_project(project=None, user=userA)
     assert not utils.can_administrate_project(project=None, user=userB)

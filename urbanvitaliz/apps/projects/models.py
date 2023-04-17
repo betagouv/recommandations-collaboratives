@@ -11,7 +11,8 @@ import os
 import uuid
 
 from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+                                                GenericRelation)
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
@@ -24,7 +25,8 @@ from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -33,7 +35,8 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor, has_perm
+from urbanvitaliz.utils import (CastedGenericRelation, check_if_advisor,
+                                has_perm)
 
 from . import apps
 from .utils import generate_ro_key
@@ -57,6 +60,7 @@ COLLABORATOR_PERMISSIONS = (
 ADVISOR_PERMISSIONS = [
     "projects.view_public_notes",
     "projects.use_advisor_note",
+    "projects.use_project_tags",
     "projects.use_public_notes",
     "projects.use_private_notes",
     "projects.view_project",
@@ -316,6 +320,7 @@ class Project(models.Model):
             # Overview and topics
             ("change_topics", "Can change the topics"),
             ("use_advisor_note", "Can change the advisor note"),
+            ("use_project_tags", "Can use tags on projects"),
             # Notes
             ("use_private_notes", "Can use the private notes (internal)"),
             ("use_public_notes", "Can use the public notes (conversations)"),

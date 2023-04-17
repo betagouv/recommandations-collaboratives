@@ -257,13 +257,13 @@ def test_update_note_not_available_for_non_staff_users(request, client):
 
 
 @pytest.mark.django_db
-def test_switchtender_can_update_own_note(request, client):
+def test_advisor_can_update_own_note(request, client):
     site = get_current_site(request)
 
-    note = Recipe(models.Note, site=site).make()
-
-    url = reverse("projects-update-note", args=[note.id])
     with login(client) as user:
+        note = Recipe(models.Note, site=site, created_by=user).make()
+        url = reverse("projects-update-note", args=[note.id])
+
         assign_advisor(user, note.project, site)
 
         response = client.get(url)
@@ -273,14 +273,15 @@ def test_switchtender_can_update_own_note(request, client):
 
 
 @pytest.mark.django_db
-def test_switchtender_cant_update_other_switchtender_note(request, client):
-    note = Recipe(models.Note, site=get_current_site(request)).make()
+def test_advisor_cant_update_other_advisor_note(request, client):
+    current_site = get_current_site(request)
+    note = Recipe(models.Note, site=current_site).make()
     url = reverse("projects-update-note", args=[note.id])
+
     with login(client, groups=["example_com_advisor"]) as user:
-        note.project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+        assign_advisor(user, note.project, current_site)
         response = client.get(url)
+
     assert response.status_code == 403
 
 

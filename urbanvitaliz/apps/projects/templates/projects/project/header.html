@@ -22,23 +22,19 @@
                     </p>
                 {% endif %}
             </div>
-            <!-- TODO PERMISSIONS view_tags -->
-            {% if user.is_staff %}
+            {% if "use_project_tags" in user_project_perms %}
                 <div class="d-flex justify-content-between">
                     <ul class="d-flex list-unstyled m-0 p-0 flex-wrap mb-3">
                         {% for tag in project.tags.all %}<li class="mx-1 my-1 badge rounded-pill bg-dark">{{ tag }}</li>{% endfor %}
-                        <!-- TODO PERMISSIONS use_tags -->
                         <a class="d-flex align-items-center"
                        href="{% url "projects-project-tags" project.id %}">
                         <svg class="bi ms-2 " width="15" height="15" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
                         </svg>
-                        <!-- ENDIF -->
                     </a>
                     </ul>
                 </div>
             {% endif %}
-            <!-- ENDIF -->
         </div>
         <div class="flex-shrink-0 ps-2">
             {% if 'actions' not in url_name and 'conversations' not in url_name and 'internal-followup' not in url_name %}

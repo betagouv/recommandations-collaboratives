@@ -8,35 +8,32 @@ created: 2023-02-21 18:57:48 CET
 """
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.contrib.sites.models import Site
-
-from urbanvitaliz.utils import get_group_for_site
+from django.core.management.base import BaseCommand
+from guardian.shortcuts import assign_perm
 from urbanvitaliz.apps.home.models import SITE_GROUP_PERMISSIONS
 from urbanvitaliz.apps.projects.models import Project, ProjectSwitchtender
-from urbanvitaliz.apps.projects.utils import (
-    assign_collaborator,
-    assign_observer,
-    assign_advisor,
-)
-from guardian.shortcuts import assign_perm
+from urbanvitaliz.apps.projects.utils import (assign_advisor,
+                                              assign_collaborator,
+                                              assign_observer)
+from urbanvitaliz.utils import get_group_for_site
 
 
 def assign_user_permissions_by_projects():
     """Per project permission for user"""
     for project in Project.objects.all():
         print("Updating perms for project:", project.name)
-        for site in Site.objects.all():
+        for site in project.sites.all():
             print("\t* Updating permissions for collaborators...")
-            for membership in project.projectmember_set.all():
-                assign_collaborator(
-                    membership.member, project, is_owner=membership.is_owner
-                )
-
-            print("\t* Updating permissions for advisors/observers...")
-            print(f"\t== On site {site} ==")
-
             with settings.SITE_ID.override(site.id):
+                for membership in project.projectmember_set.all():
+                    assign_collaborator(
+                        membership.member, project, is_owner=membership.is_owner
+                    )
+
+                print("\t* Updating permissions for advisors/observers...")
+                print(f"\t== On site {site} ==")
+
                 for project_advisor in ProjectSwitchtender.objects.filter(
                     project=project
                 ):
