@@ -3,8 +3,6 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load projects_extra %}
-
 
 {% block title %}{{ block.super }} > Connaissance{% endblock %}
 {% load django_vite %}
@@ -18,7 +16,6 @@
 
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-{% is_staff_for_current_site request.user as is_staff %}
 
     <div x-data="ProjectShare" class="col-12">
         <div class="row">
