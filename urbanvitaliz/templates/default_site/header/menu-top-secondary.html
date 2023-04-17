@@ -62,7 +62,7 @@
         </li>
     {% endif %}
     <!-- Methodology -->
-    {% if not user.is_authenticated %}
+    {% if not user.is_authenticated and not hide_methodology %}
     <li style="margin-right: 35px ;padding-bottom:20px; border-bottom:solid 2px transparent; {% if 'methodology' in url_name %}border-bottom:solid 2px #0063CB;{% endif %}">
         <div class="btn-group">
             <a href="{% url 'methodology' %}" class="nav-link link-dark">
