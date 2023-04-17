@@ -7,6 +7,7 @@ created : 2022-07-20 12:27:25 CEST
 
 import csv
 import datetime
+from collections import Counter
 
 from actstream.models import Action, actor_stream, target_stream
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -387,7 +388,39 @@ def update_note_for_organization(request, organization_id, note_id):
 
 
 @login_required
+def crm_list_tags(request):
+    """Return a page containing all tags with their count"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    project_tags = dict(
+        (tag["name"], tag["occurence"])
+        for tag in (
+            Project.tags.filter(project__sites=request.site)
+            .exclude(project__exclude_stats=True)
+            .distinct()
+            .annotate(occurrences=Count("project", distinct=True))
+            .values("name", "occurences")
+        )
+    )
+
+    note_tags = dict(
+        (tag["name"], tag["occurence"])
+        for tag in (
+            models.Note.tags.filter(note__site=request.site)
+            .distinct()
+            .annotate(occurrences=Count("note", distinct=True))
+            .values("name", "occurences")
+        )
+    )
+
+    tags = Counter(**project_tags) + Counter(**note_tags)
+
+    return render(request, "crm/tagcloud.html", locals())
+
+
+@login_required
 def project_list_by_tags(request):
+    """Return a page containing for each tag the projects using it"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
     tags = (
