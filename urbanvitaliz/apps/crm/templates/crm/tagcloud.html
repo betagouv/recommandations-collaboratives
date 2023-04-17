@@ -1,1 +1,20 @@
-OH MON BEAU NUAGE
+{% extends "base.html" %}
+
+{% load django_vite %}
+{% load static %}
+
+{% block js %}
+    {% vite_asset 'js/apps/tagCloud.js' %}
+{% endblock %}
+
+
+{% block content %}
+
+{{ tags|json_script:"tagsArray" }}
+
+<div class="d-flex justify-content-between align-items-center w-100 h-100">
+    <div id="wordCloud" class="mt-4 pt-4 mx-auto" x-data='WordCloud(tagsArray)'>
+    </div>
+</div>
+
+{% endblock %}
