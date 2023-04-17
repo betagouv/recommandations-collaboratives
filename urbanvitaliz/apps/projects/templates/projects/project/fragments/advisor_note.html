@@ -2,6 +2,7 @@
 {% load guardian_tags %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
+
 {% if project.advisors_note %}
     <div class="advisor-item h-100">
         {% include 'projects/project/fragments/information_card.html' with is_advisor_note=True full_width=True project=project is_editable=True title="Note interne" description=project.advisors_note_rendered updated_on=project.advisors_note_on card_user=project.advisors_note_by %}
@@ -11,7 +12,7 @@
     <div class="project-card-details py-4 d-flex flex-column align-items-center justify-content-center h-100"
          style="min-height: 100px">
         <span class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">Aucune note interne n'a été faite pour le moment</span>
-        {% if "change_synopsis" in user_project_perms %}
+        {% if "use_advisor_note" in user_project_perms %}
         <a class="button mt-3 text-center"
            href="{% url "projects-project-topics" project.id %}#advisor-note">Écrire une note interne</a>
     {% endif %}
