@@ -1581,15 +1581,14 @@ def test_switchtender_exports_csv(request, client):
 # Tags
 #################################################################
 @pytest.mark.django_db
-def test_switchtender_updates_tags(request, client):
+def test_advisor_updates_tags(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    site = get_current_site(request)
 
     data = {"tags": "blah"}
 
     with login(client, groups=["example_com_advisor"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+        utils.assign_advisor(user, project, site)
 
         response = client.post(
             reverse("projects-project-tags", args=[project.id]), data=data
