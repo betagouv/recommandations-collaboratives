@@ -392,30 +392,33 @@ def crm_list_tags(request):
     """Return a page containing all tags with their count"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
+    tags = compute_tag_occurences(request.site)
+    return render(request, "crm/tagcloud.html", locals())
+
+
+def compute_tag_occurences(site):
     project_tags = dict(
-        (tag["name"], tag["occurence"])
+        (tag["name"], tag["occurrences"])
         for tag in (
-            Project.tags.filter(project__sites=request.site)
+            Project.tags.filter(project__sites=site)
             .exclude(project__exclude_stats=True)
             .distinct()
+            .values("name")
             .annotate(occurrences=Count("project", distinct=True))
-            .values("name", "occurences")
         )
     )
 
     note_tags = dict(
-        (tag["name"], tag["occurence"])
+        (tag["name"], tag["occurrences"])
         for tag in (
-            models.Note.tags.filter(note__site=request.site)
+            models.Note.tags.filter(note__site=site)
             .distinct()
+            .values("name")
             .annotate(occurrences=Count("note", distinct=True))
-            .values("name", "occurences")
         )
     )
 
-    tags = Counter(**project_tags) + Counter(**note_tags)
-
-    return render(request, "crm/tagcloud.html", locals())
+    return Counter(**project_tags) + Counter(**note_tags)
 
 
 @login_required

@@ -1,5 +1,7 @@
+import collections
 import pytest
 from django.contrib.auth import models as auth_models
+from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
@@ -8,7 +10,7 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
-from . import models
+from . import models, views
 
 
 @pytest.mark.django_db
@@ -167,3 +169,28 @@ def test_site_dashboard_available_for_staff_users(client):
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
+
+
+########################################################################
+# tag cloud
+########################################################################
+
+
+@pytest.mark.django_db
+def test_compute_tag_cloud():
+    site = baker.make(site_models.Site)
+    project = baker.make(models.projects_models.Project, sites=[site])
+    project.tags.add("tag0", "tag1")
+    note = baker.make(models.Note, site=site)
+    note.tags.add("tag0", "tag2")
+    tags = views.compute_tag_occurences(site)
+    assert tags == collections.Counter(
+        {
+            "tag0": 2,
+            "tag1": 1,
+            "tag2": 1,
+        }
+    )
+
+
+# eof

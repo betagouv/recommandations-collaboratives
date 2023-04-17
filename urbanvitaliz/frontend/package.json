@@ -17,6 +17,8 @@
     "@tiptap/starter-kit": "^2.0.0-beta.218",
     "alpinejs": "^3.10.2",
     "axios": "^0.27.2",
+    "d3": "^7.8.4",
+    "d3-cloud": "^1.2.5",
     "js-cookie": "^3.0.1",
     "leaflet": "^1.9.1",
     "leaflet-control-geocoder": "^2.4.0",
