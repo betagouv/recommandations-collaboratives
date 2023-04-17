@@ -370,6 +370,9 @@ class Session(models.Model):
         for qs in self.survey.question_sets.all():
             completions.append(compute_qs_completion(self, qs))
 
+        if not completions:
+            return 0
+
         return math.ceil(statistics.mean(completions))
 
     @property

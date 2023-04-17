@@ -1,11 +1,9 @@
 from django.contrib.contenttypes.models import ContentType
-
-
-from urbanvitaliz.utils import check_if_advisor
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.survey import models as survey_models
-
+from urbanvitaliz.utils import check_if_advisor, get_site_config_or_503
 
 from .utils import can_administrate_project, get_active_project
 
@@ -27,11 +25,11 @@ def active_project_processor(request):
 
     if active_project:
         try:
-            survey = survey_models.Survey.on_site.get(pk=1)  # XXX Hardcoded survey ID
+            site_config = get_site_config_or_503(request.site)
             session, created = survey_models.Session.objects.get_or_create(
-                project=active_project, survey=survey
+                project=active_project, survey=site_config.project_survey
             )
-        except survey_models.Survey.DoesNotExist:
+        except (survey_models.Survey.DoesNotExist, ImproperlyConfigured):
             session = None
 
         # Retrieve notification count
