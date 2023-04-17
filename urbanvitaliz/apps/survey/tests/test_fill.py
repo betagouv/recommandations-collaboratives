@@ -18,6 +18,7 @@ from pytest_django.asserts import assertRedirects
 from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.projects import models as projects
+from urbanvitaliz.apps.projects.utils import assign_advisor
 from urbanvitaliz.utils import login
 
 from .. import models
@@ -312,7 +313,8 @@ def test_question_redirects_to_next_question(request, client):
 
 @pytest.mark.django_db
 def test_answered_question_triggers_notification(request, client):
-    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=current_site).make()
     session = Recipe(models.Session, survey=survey).make()
 
     qs = Recipe(models.QuestionSet, survey=survey).make()
@@ -325,11 +327,9 @@ def test_answered_question_triggers_notification(request, client):
     url = reverse("survey-question-details", args=(session.id, q1.id))
 
     st = Recipe(auth_models.User).make()
-    with login(client, is_staff=False) as user:
-        session.project.switchtenders_on_site.create(
-            switchtender=st, site=get_current_site(request)
-        )
+    assign_advisor(st, session.project, current_site)
 
+    with login(client, is_staff=False) as user:
         client.post(url, data={"answer": choice.value, "comment": my_comment})
 
     assert user.notifications.unread().count() == 0
@@ -352,11 +352,9 @@ def test_answered_question_debounces_notification(request, client):
     url = reverse("survey-question-details", args=(session.id, q1.id))
 
     st = Recipe(auth_models.User).make()
+    assign_advisor(st, session.project, current_site)
 
     with login(client, is_staff=False) as user:
-        projects.ProjectSwitchtender.objects.create(
-            project=session.project, switchtender=st, site=current_site
-        )
         client.post(url, data={"answer": choice.value, "comment": my_comment})
         client.post(url, data={"answer": choice.value, "comment": my_comment})
 

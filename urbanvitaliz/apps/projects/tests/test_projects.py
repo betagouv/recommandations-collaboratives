@@ -22,8 +22,7 @@ from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -1582,14 +1581,14 @@ def test_switchtender_exports_csv(request, client):
 #################################################################
 @pytest.mark.django_db
 def test_switchtender_updates_tags(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+
+    project = Recipe(models.Project, sites=[current_site]).make()
 
     data = {"tags": "blah"}
 
     with login(client, groups=["example_com_advisor"]) as user:
-        project.switchtenders_on_site.create(
-            switchtender=user, site=get_current_site(request)
-        )
+        utils.assign_advisor(user, project, current_site)
 
         response = client.post(
             reverse("projects-project-tags", args=[project.id]), data=data
