@@ -1,0 +1,18 @@
+{% load humanize %}
+{% load static %}
+{% load gravatar %}
+{% load activity_tags %}
+
+<div class="pt-4 pe-4 w-100 h-100">
+    <div class="d-flex align-items-center justify-content-between" style="margin-bottom: 6px">
+        <h6 style="font-size: 14px;" class="text-uppercase fw-bold m-0 p-0">
+            Activité du projet
+        </h6>
+    </div>
+    <div class="p-0 h-100 d-inline-flex flex-column justify-content-between align-items-center">
+        <article class="overflow-hidden timeline-blur">
+            {% include 'projects/project/fragments/timeline/activity_stream.html' with limit=3 cropped=True %}
+        </article>
+        <a class="button filled grey small timeline-button inherit fw-bold" href="{% url 'projects-project-detail-internal-followup-tracking' project.pk %}">Voir toute l'activité du projet</a>
+    </div>
+</div>

@@ -1,1 +1,25 @@
 {% extends "projects/project/detail.html" %}
+
+{% load humanize %}
+{% load static %}
+{% load gravatar %}
+{% load activity_tags %}
+
+{% block project_detail %}
+
+{% include 'projects/project/navigation.html' with overview=True %}
+
+<div class="pt-4 w-100 h-100">
+    <div class="d-flex align-items-center justify-content-between" style="margin-bottom: 6px">
+        <h6 style="font-size: 14px;" class="text-uppercase fw-bold m-0 p-0">
+            Activité du projet
+        </h6>
+    </div>
+    <div class="project-card-details h-100 p-4 d-flex flex-column justify-content-between">
+        <article class="overflow-hidden">
+            {% include 'projects/project/fragments/timeline/activity_stream.html' with limit=100 %}
+        </article>
+    </div>
+</div>
+
+{% endblock %}

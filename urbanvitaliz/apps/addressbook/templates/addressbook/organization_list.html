@@ -1,8 +1,13 @@
 {% extends "base.html" %}
+{% load guardian_tags %}
+
+
 
 {% load static %}
 
 {% block content %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
 
 <div class="col-11 py-5 mx-auto">
     <!-- Breadcrumb -->
@@ -29,7 +34,7 @@
             </svg>
             Organisations
         </h2>
-        {% if user.is_staff %}
+        {% if "use_addressbook" in user_site_perms %}
         <a class="btn btn-light mb-1 d-inline-block float-end"  href="{% url 'addressbook-organization-create' %}">
             <svg class="bi me-1" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>

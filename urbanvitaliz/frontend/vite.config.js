@@ -29,6 +29,7 @@ module.exports = {
                 crm: resolve('./src/js/apps/crm.js'),
                 project: resolve('./src/js/apps/project.js'),
                 tasks: resolve('./src/js/apps/tasks.js'),
+                embedResource: resolve('./src/js/apps/embedResource.js'),
                 advisorDashboard: resolve('./src/js/apps/advisorDashboard.js'),
                 auth: resolve('./src/js/apps/auth.js'),
                 projectDetails : resolve('./src/js/apps/projectDetails.js'),

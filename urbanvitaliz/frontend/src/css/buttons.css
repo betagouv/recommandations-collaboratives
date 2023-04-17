@@ -58,6 +58,12 @@
     color: #CE0500;
 }
 
+.button.grey.filled {
+    background-color: #f6f6f6;
+    color: #222;
+    border-color: #f6f6f6;
+}
+
 .button.red:hover {
     background-color: #ffe7e7;
     color: #CE0500 !important;
@@ -100,4 +106,8 @@
 .border-form {
     border: 1px solid #E5E5E5;
     border-radius: 4px;
+}
+
+.button.inherit {
+    text-transform: none;
 }

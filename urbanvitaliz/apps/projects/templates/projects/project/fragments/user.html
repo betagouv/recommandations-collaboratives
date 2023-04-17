@@ -1,6 +1,11 @@
 {% load gravatar %}
 {% load static %}
 
+{% load guardian_tags %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
+
 <div class="d-flex flex-column align-items-start mb-2">
         <!-- member -->
     {% if member %}
@@ -13,7 +18,7 @@
                             {{ member.last_name }}
                         </strong>
                     </span>
-                    {% if request.user.is_staff %}
+                    {% if 'use_crm' in user_site_perms %}
                     <a class="small" href="{% url 'crm-user-details' member.pk %}">
                         <svg class="bi me-1" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />

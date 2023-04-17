@@ -3,6 +3,7 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
+
 {% block title %}{{ block.super }} > Connaissance{% endblock %}
 {% load django_vite %}
 {% block js %}
@@ -83,6 +84,11 @@
                             {% include 'projects/project/fragments/information_card.html' with full_width=True project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
                         {% endif %}
                     </div>
+                    {% if 'use_private_notes' in user_project_perms %}
+                        <div>
+                            {% include 'projects/project/fragments/timeline/project_timeline.html' %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-4 bg-grey-light p-4">
