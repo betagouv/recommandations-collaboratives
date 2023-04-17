@@ -1580,7 +1580,7 @@ def test_switchtender_exports_csv(request, client):
 # Tags
 #################################################################
 @pytest.mark.django_db
-def test_switchtender_updates_tags(request, client):
+def test_advisor_updates_tags(request, client):
     current_site = get_current_site(request)
 
     project = Recipe(models.Project, sites=[current_site]).make()

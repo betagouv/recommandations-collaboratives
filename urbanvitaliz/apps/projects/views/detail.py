@@ -309,9 +309,7 @@ def project_update_tags(request, project_id=None):
 
     advising = get_advisor_for_project(request.user, project)
 
-    # FIXME how to manage tags permissions?
-    if not is_advisor_for_project(request.user, project):
-        raise PermissionDenied()
+    has_perm_or_403(request.user, "projects.use_project_tags", project)
 
     if request.method == "POST":
         form = ProjectTagsForm(request.POST, instance=project)
@@ -325,3 +323,6 @@ def project_update_tags(request, project_id=None):
         form = ProjectTagsForm(instance=project)
 
     return render(request, "projects/project/tags.html", locals())
+
+
+# eof
