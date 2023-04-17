@@ -1,5 +1,9 @@
 {% load gravatar %}
 {% load static %}
+{% load guardian_tags %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 
 <div class="d-flex align-items-start justify-content-between mb-2">
     {% with advisor.switchtender as user %}
@@ -10,7 +14,7 @@
                 <strong class="text-nowrap text-capitalize">
                     {{ user.get_full_name }}
                 </strong>
-                {% if request.user.is_staff %}
+                {% if 'use_crm' in user_site_perms %}
                 &nbsp;
                 <a class="small" href="{% url 'crm-user-details' user.pk %}">
                     <svg class="bi me-1" width="16" height="16" fill="currentColor">

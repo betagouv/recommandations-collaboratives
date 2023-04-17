@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load guardian_tags %}
+
 
 {% block content %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
+
+{{user_site_perms}}
 
 <div class="col-11 py-5 mx-auto">
     <!-- Breadcrumb -->
@@ -54,7 +61,7 @@
                     Ajouter un contact
                 </a>
             </div>
-            {% if user.is_staff %}
+            {% if 'use_crm' in user_site_perms %}
             <div class="d-grid gap-2 mb-3">
                 <a class="btn btn-outline-primary w-100 btn-sm" href="{% url 'crm-organization-details' organization.pk %}">
                     <svg class="bi me-1" width="16" height="16" fill="currentColor">
