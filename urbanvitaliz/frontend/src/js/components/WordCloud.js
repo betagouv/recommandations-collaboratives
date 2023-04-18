@@ -9,18 +9,17 @@ function WordCloud(wordsData, crmSearchUrl) {
 
             const wordsReadyForClouds = Object.entries(jsonWords).map((entry) => {
                 const [key, value] = entry;
+
                 return {
                     text:key,
-                    size:value*20
+                    size: 20 + value
                 }
             });
-
-            const fill = d3.scaleOrdinal(d3.schemeCategory10);
 
             const layout = cloud()
                 .size([800, 300])
                 .words(wordsReadyForClouds)
-                .padding(0)
+                .padding(1)
                 .rotate(0)
                 .spiral("rectangular")
                 .font("Marianne")
@@ -41,7 +40,6 @@ function WordCloud(wordsData, crmSearchUrl) {
                     .attr('class', 'is-word')
                     .style("font-size", function(d) { return d.size + "px"; })
                     .style("font-family", "Marianne")
-                    .style("fill", function(d, i) { return fill(i); })
                     .attr("text-anchor", "middle")
                     .attr("transform", function(d) {
                       return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
