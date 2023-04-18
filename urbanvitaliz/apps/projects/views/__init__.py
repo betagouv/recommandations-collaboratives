@@ -30,20 +30,33 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
-from urbanvitaliz.utils import (build_absolute_url, check_if_advisor,
-                                get_site_config_or_503, has_perm_or_403,
-                                is_staff_for_site, is_staff_for_site_or_403,
-                                is_switchtender_or_403)
+from urbanvitaliz.utils import (
+    build_absolute_url,
+    check_if_advisor,
+    get_site_config_or_503,
+    has_perm_or_403,
+    is_staff_for_site,
+    is_staff_for_site_or_403,
+    is_switchtender_or_403,
+)
 
 from .. import models, signals
 from ..forms import SelectCommuneForm
-from ..utils import (assign_advisor, assign_collaborator, assign_observer,
-                     can_administrate_project, generate_ro_key,
-                     get_active_project, is_advisor_for_project,
-                     is_project_moderator, is_project_moderator_or_403,
-                     is_regional_actor_for_project_or_403,
-                     refresh_user_projects_in_session, set_active_project_id,
-                     unassign_advisor)
+from ..utils import (
+    assign_advisor,
+    assign_collaborator,
+    assign_observer,
+    can_administrate_project,
+    generate_ro_key,
+    get_active_project,
+    is_advisor_for_project,
+    is_project_moderator,
+    is_project_moderator_or_403,
+    is_regional_actor_for_project_or_403,
+    refresh_user_projects_in_session,
+    set_active_project_id,
+    unassign_advisor,
+)
 
 ########################################################################
 # On boarding
@@ -235,8 +248,14 @@ def project_list_for_advisor(request):
 @login_required
 @ensure_csrf_cookie
 def project_list_for_staff(request):
-    """Return the projects for the staff"""
-    is_staff_for_site_or_403(request.user, request.site)
+    """Return the projects for the staff (and for other people as a fallback until the new
+    dashboard is fully completed)"""
+    if not (
+        check_if_advisor(request.user, request.site)
+        or can_administrate_project(project=None, user=request.user)
+        or is_staff_for_site(request.user, request.site)
+    ):
+        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
     project_moderator = is_project_moderator(request.user, request.site)
 

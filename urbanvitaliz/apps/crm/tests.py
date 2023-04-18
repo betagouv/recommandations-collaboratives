@@ -185,7 +185,7 @@ def test_compute_tag_cloud():
     note = baker.make(models.Note, site=site)
     note.tags.add("tag0", "tag2")
     tags = views.compute_tag_occurences(site)
-    assert tags == collections.Counter(
+    assert tags == collections.OrderedDict(
         {
             "tag0": 2,
             "tag1": 1,
