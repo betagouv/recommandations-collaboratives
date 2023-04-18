@@ -1,0 +1,48 @@
+{% load static %}
+{% load humanize %}
+{% load gravatar %}
+
+{% regroup project.notes.private by created_on.date as notes_by_day %}
+            <div class="message-window flex-grow-1" style="overflow-y: auto; overflow-x: hidden; max-height: 40vh; display:flex; flex-direction:column-reverse;">
+                <ul class="list-group">
+                    {% for date, notes in notes_by_day|slice:":20" reversed %}
+                    <li class="list-group-item border-0 m-0 p-0">
+                        <div class="small my-2 text-center w-100 text-secondary">{{ date|naturalday|capfirst }}</div>
+                        {% for note in notes reversed  %}
+                            {% if request.user == note.created_by %}
+                                <div class="rounded-3 p-3 text-secondary bg-blue-light my-2" style="margin-left: 2vw;">
+                            {% else %}
+                                <div class="bg-grey-light rounded-3 p-3 text-secondary my-2" style="margin-right: 2vw;">
+                            {% endif %}
+                                {{ note.content_rendered|safe }}
+                                {% if note.document.count %}
+                                    {% for document in note.document.all %}
+                                            {% include 'projects/project/fragments/files_links/file_list_item_embedded.html' with document=document %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% if note.created_by %}
+                            <div>
+                                <span class="align-items-center link-dark text-decoration-none">
+                                    <img
+                                        src="{% gravatar_url note.created_by.email 16 %}"
+                                        alt="{{ note.created_by.get_full_name }}"
+                                        class="me-1 rounded-circle"
+                                        style="width: 16px; height: 16px;"
+                                    />
+                                </span>
+                                <span class="align-middle small text-dark">
+                                    {{ note.created_by.get_full_name|capfirst|default:note.created_by }}
+                                </span>
+                                {% if note.created_by == request.user %}
+                                <span class="align-middle small text-dark">
+                                    - <a href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                                </span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>

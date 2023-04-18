@@ -26,7 +26,10 @@
         {% activity_stream "target" project %}
         {% regroup stream by timestamp.date as stream_by_day %}
 
+        {% include "projects/project/fragments/private_conversation.html" %}
+
         {% if "use_private_notes" in user_project_perms %}
+        <hr/>
         <form class="form d-flex align-items-end flex-column"
               method="POST"
               action="{% url 'projects-create-note' project.pk %}">
@@ -43,7 +46,6 @@
         </form>
         {% endif %}
 
-        {% include 'projects/project/fragments/timeline/activity_stream.html' with limit=100 %}
     </div>
 
     <div class="col-4">
@@ -51,7 +53,6 @@
 
         {% include "projects/project/fragments/switchtender-list.html" with switchtenders=project.switchtenders.all %}
     </div>
-
 </div>
 </div>
 
