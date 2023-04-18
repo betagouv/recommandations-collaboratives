@@ -17,6 +17,11 @@
     {% is_staff_for_current_site request.user as is_staff %}
 
     {% include 'projects/project/navigation.html' with administration_panel=True %}
+
+    {{ project_form.postcode.value|json_script:"projectPostcode" }}
+    {{ project_form.insee.value|json_script:"projectInsee" }}
+    
+
     <div class="row">
         {% if "change_project" in user_project_perms %}
             <div class="col-12">
@@ -73,7 +78,7 @@
                     </div>
                     <div class="row mb-3"
                          x-data="CitySearch()"
-                         x-init="{% if project_form.postcode.value and project_form.insee.value %}getPostcode({{ project_form.postcode.value }},{{ project_form.insee.value }}){% elif project_form.postcode.value %} setPostcode({{ project_form.postcode.value }}){% endif %}">
+                         x-init="getPostcode(projectPostcode,projectInsee)">
                         <div class="col-auto">
                             <div class="mb-3">
                                 <label class="text-info-custom text-grey-dark" for="input-project-address">{{ project_form.postcode.label }}</label>

@@ -7,9 +7,16 @@
 
 {% block project_detail %}
 
-{% include 'projects/project/navigation.html' with overview=True %}
 
-<div class="pt-4 w-100 h-100">
+<div class="w-100 h-100">
+    <div class="d-flex" style="">
+        <a href="{% url 'projects-project-detail' project.id %}" class="button grey filled my-2 mb-4" style="cursor: pointer; color: #222;">
+            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-return-left" />
+            </svg>
+            <span>revenir au projet</span>
+        </a>
+    </div>
     <div class="d-flex align-items-center justify-content-between" style="margin-bottom: 6px">
         <h6 style="font-size: 14px;" class="text-uppercase fw-bold m-0 p-0">
             Activité du projet
