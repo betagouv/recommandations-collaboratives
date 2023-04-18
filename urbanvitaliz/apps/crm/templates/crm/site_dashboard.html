@@ -92,10 +92,12 @@
                 </h5>
                 <ul class="list">
                     <li><a href="{% url 'crm-project-list-by-tags' %}">Tags / Projects</a></li>
+                    <li><a href="{% url 'crm-list-tags' %}">Index des tags</a></li>
                 </ul>
             </div>
         </div>
     </aside>
+    
     <div class="w-75 d-flex flex-column justify-content-start">
         {% if active_project %}
             <div class="crm-header px-4 py-3 pt-4 mb-3">
