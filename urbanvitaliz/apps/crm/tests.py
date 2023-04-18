@@ -1,4 +1,5 @@
 import collections
+
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
@@ -179,7 +180,7 @@ def test_site_dashboard_available_for_staff_users(client):
 @pytest.mark.django_db
 def test_compute_tag_cloud():
     site = baker.make(site_models.Site)
-    project = baker.make(models.projects_models.Project, sites=[site])
+    project = baker.make(models.ProjectAnnotations, site=site)
     project.tags.add("tag0", "tag1")
     note = baker.make(models.Note, site=site)
     note.tags.add("tag0", "tag2")

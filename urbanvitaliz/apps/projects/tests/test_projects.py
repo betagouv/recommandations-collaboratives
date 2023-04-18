@@ -22,7 +22,8 @@ from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -372,6 +373,19 @@ def test_project_list_excludes_project_not_in_switchtender_departments(request, 
 
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertNotContains(response, detail_url)
+
+
+@pytest.mark.django_db
+def test_draft_project_list_available_for_staff(request, client):
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site], status="DRAFT")
+
+    url = reverse("projects-project-list-staff")
+    with login(client, groups=["example_com_staff"]) as user:
+        response = client.get(url, follow=True)
+
+    assert response.status_code == 200
+    assertContains(response, reverse("projects-project-detail", args=[project.id]))
 
 
 ########################################################################

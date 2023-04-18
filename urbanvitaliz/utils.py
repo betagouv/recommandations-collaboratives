@@ -60,6 +60,9 @@ def has_perm_or_403(user, permission, obj=None):
 
 
 def is_staff_for_site(user, site=None):
+    if user.is_superuser:
+        return True
+
     site = site or Site.objects.get_current()
     group_name = make_group_name_for_site("staff", site)
     return user.groups.filter(name=group_name).exists()
@@ -79,6 +82,9 @@ def is_switchtender_or_403(user, site=None):
 
 def check_if_advisor(user, site=None):
     """Return true if user is advisor for site. Defaults to current site."""
+    if user.is_superuser:
+        return True
+
     site = site or Site.objects.get_current()
     group_name = make_group_name_for_site("advisor", site)
     return auth.User.objects.filter(pk=user.id, groups__name=group_name).exists()

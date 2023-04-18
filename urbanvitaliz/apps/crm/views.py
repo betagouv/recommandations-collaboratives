@@ -10,9 +10,9 @@ import datetime
 from collections import Counter
 
 from actstream.models import Action, actor_stream, target_stream
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
 from django.db.models import Count, Q
@@ -26,13 +26,9 @@ from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.apps.resources.models import Resource
-from urbanvitaliz.utils import (
-    get_site_administrators,
-    has_perm,
-    has_perm_or_403,
-)
+from urbanvitaliz.utils import (get_site_administrators, has_perm,
+                                has_perm_or_403)
 from watson import search as watson
-
 
 from . import forms, models
 
@@ -400,11 +396,10 @@ def compute_tag_occurences(site):
     project_tags = dict(
         (tag["name"], tag["occurrences"])
         for tag in (
-            Project.tags.filter(project__sites=site)
-            .exclude(project__exclude_stats=True)
+            models.ProjectAnnotations.tags.filter(projectannotations__site=site)
             .distinct()
             .values("name")
-            .annotate(occurrences=Count("project", distinct=True))
+            .annotate(occurrences=Count("projectannotations", distinct=True))
         )
     )
 

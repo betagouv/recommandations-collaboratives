@@ -30,36 +30,20 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import forms as onboarding_forms
 from urbanvitaliz.apps.onboarding import models as onboarding_models
-
-
-from urbanvitaliz.utils import (
-    build_absolute_url,
-    check_if_advisor,
-    is_staff_for_site,
-    get_site_config_or_503,
-    is_switchtender_or_403,
-    has_perm_or_403,
-)
+from urbanvitaliz.utils import (build_absolute_url, check_if_advisor,
+                                get_site_config_or_503, has_perm_or_403,
+                                is_staff_for_site, is_staff_for_site_or_403,
+                                is_switchtender_or_403)
 
 from .. import models, signals
-
 from ..forms import SelectCommuneForm
-from ..utils import (
-    assign_advisor,
-    assign_observer,
-    is_advisor_for_project,
-    assign_collaborator,
-    can_administrate_project,
-    generate_ro_key,
-    get_active_project,
-    is_project_moderator,
-    is_project_moderator_or_403,
-    is_regional_actor_for_project_or_403,
-    refresh_user_projects_in_session,
-    set_active_project_id,
-    unassign_advisor,
-)
-
+from ..utils import (assign_advisor, assign_collaborator, assign_observer,
+                     can_administrate_project, generate_ro_key,
+                     get_active_project, is_advisor_for_project,
+                     is_project_moderator, is_project_moderator_or_403,
+                     is_regional_actor_for_project_or_403,
+                     refresh_user_projects_in_session, set_active_project_id,
+                     unassign_advisor)
 
 ########################################################################
 # On boarding
@@ -220,16 +204,15 @@ def select_commune(request, project_id=None):
 
 @login_required
 def project_list(request):
-    if not (
-        check_if_advisor(request.user)
-        or can_administrate_project(project=None, user=request.user)
-    ):
-        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
-
     if is_staff_for_site(request.user, request.site):
         return redirect("projects-project-list-staff")
 
-    return redirect("projects-project-list-advisor")
+    if check_if_advisor(request.user, request.site) or can_administrate_project(
+        project=None, user=request.user
+    ):
+        return redirect("projects-project-list-advisor")
+
+    raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
 
 @login_required
@@ -237,22 +220,10 @@ def project_list(request):
 def project_list_for_advisor(request):
     """Return the projects for the advisor"""
     if not (
-        check_if_advisor(request.user)
+        check_if_advisor(request.user, request.site)
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
-
-    project_moderator = is_project_moderator(request.user, request.site)
-
-    draft_projects = []
-    if is_project_moderator:
-        draft_projects = (
-            models.Project.on_site.in_departments(
-                request.user.profile.departments.all()
-            )
-            .filter(status="DRAFT")
-            .order_by("-created_on")
-        )
 
     unread_notifications = notifications_models.Notification.on_site.unread().filter(
         recipient=request.user, public=True
@@ -265,22 +236,14 @@ def project_list_for_advisor(request):
 @ensure_csrf_cookie
 def project_list_for_staff(request):
     """Return the projects for the staff"""
-    if not (
-        check_if_advisor(request.user)
-        or can_administrate_project(project=None, user=request.user)
-    ):
-        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+    is_staff_for_site_or_403(request.user, request.site)
 
     project_moderator = is_project_moderator(request.user, request.site)
 
     draft_projects = []
-    if is_project_moderator:
-        draft_projects = (
-            models.Project.on_site.in_departments(
-                request.user.profile.departments.all()
-            )
-            .filter(status="DRAFT")
-            .order_by("-created_on")
+    if project_moderator:
+        draft_projects = models.Project.on_site.filter(status="DRAFT").order_by(
+            "-created_on"
         )
 
     unread_notifications = notifications_models.Notification.on_site.unread().filter(

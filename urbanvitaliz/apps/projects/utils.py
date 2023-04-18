@@ -18,7 +18,6 @@ from django.db import transaction
 from django.db.models import Q
 from django.urls import reverse
 from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
-
 from urbanvitaliz import utils as uv_utils
 from urbanvitaliz.apps.reminders import api
 
@@ -145,8 +144,8 @@ unassign_observer = unassign_advisor
 
 def can_administrate_project(project, user):
     """
-    Check if user is allowed to administrate the given project.
-    If project is None, check if this user can at least administer one
+    Check if user is allowed to administrate the given project on current site.
+    If project is None, check if this user can at least administer one on site.
     Administrators are mostly switchtenders/advisors
     """
     if user.is_anonymous:
@@ -181,7 +180,6 @@ def get_project_moderators(site):
     """Return all project moderators for a given site"""
     return get_users_with_perms(
         site,
-        with_superusers=True,
         with_group_users=True,
         only_with_perms_in=["moderate_projects"],
     )
@@ -189,7 +187,7 @@ def get_project_moderators(site):
 
 def is_project_moderator(user, site):
     """Check if this user is allowed to moderate new projects"""
-    return (user in get_project_moderators(site)) or user.is_superuser
+    return uv_utils.has_perm(user, "moderate_projects", site)
 
 
 def is_project_moderator_or_403(user, site):
