@@ -7,7 +7,8 @@ created : 2022-07-20 12:27:25 CEST
 
 import csv
 import datetime
-from collections import Counter
+from collections import Counter, OrderedDict
+from operator import itemgetter
 
 from actstream.models import Action, actor_stream, target_stream
 from django.contrib.auth.decorators import login_required
@@ -413,7 +414,8 @@ def compute_tag_occurences(site):
         )
     )
 
-    return Counter(**project_tags) + Counter(**note_tags)
+    tags = Counter(**project_tags) + Counter(**note_tags)
+    return OrderedDict(sorted(tags.items()))
 
 
 @login_required
