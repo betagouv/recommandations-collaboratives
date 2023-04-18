@@ -12,9 +12,43 @@
 
 {{ tags|json_script:"tagsArray" }}
 
-<div class="d-flex justify-content-between align-items-center w-100 h-100">
-    <div id="wordCloud" class="mt-4 pt-4 mx-auto" x-data='WordCloud(tagsArray)'>
+
+
+<div class="col-11 py-5 mx-auto">
+
+    {% url 'crm-search' as crmSearchUrl %}
+    
+    <div class="d-flex flex-column font-marianne">
+        <h2 class="">
+            <svg class="bi align-middle" width="25" height="25" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#tags"/>
+            </svg>&nbsp;
+            <span>Index des tags du CRM</span></h2>
+        <div id="wordCloud" class="mb-4 pt-4 mx-auto fw-bold" x-data="WordCloud(tagsArray, '{{crmSearchUrl}}')">
+        </div>
     </div>
+
+    <section class="w-100 d-flex flex-column justify-content-center font-marianne">
+        <div class="d-flex justify-content-center">
+            <table class="w-100 my-auto table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Occurences</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for key, value in tags.items %}
+                        <tr>
+                            <td><a href="{% url 'crm-search' %}">{{key}}</a></td>
+                            <td>{{value}}</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
 </div>
 
 {% endblock %}
