@@ -8,12 +8,15 @@ function CitySearch() {
         isLoading: false,
         postal: null,
         cities: null,
-        setPostcode(postcode) {
-            this.postal = postcode
-        },
+    
         getPostcode(postcode, insee) {
-            this.postal = postcode;
-            this.fetchCities(insee)
+
+            const postCodeString = JSON.parse(postcode.textContent)
+            const inseeString = JSON.parse(insee.textContent)
+
+            if (postCodeString) this.postal = postCodeString
+            if (inseeString) this.fetchCities(inseeString)
+
         },
         fetchCities(currentInsee = null) {
 
