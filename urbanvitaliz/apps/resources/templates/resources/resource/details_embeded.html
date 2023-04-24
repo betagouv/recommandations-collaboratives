@@ -35,18 +35,19 @@
 
 <div class="row">
     <div class="col-10 px-2 mx-auto" x-data="PrintTaskResource">
-        {% if contacts.count > 0 %}
         <div class="d-flex justify-content-end pb-2 mb-2 task-preview-cta">
-            <a style="border: solid 2px #222;
-                          border-bottom-left-radius: 2px;
-                          border-bottom-right-radius: 2px;
-                          border-top: none !important" href="#task-contacts"
-                class="me-2 px-2 py-1 bg-white text-decoration-none d-flex align-items-center text-black fw-medium">
-                <span>👩‍💼 Voir les contacts</span>
-                <svg class="bi align-middle" width="24" height="24">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-down-short" />
-                </svg>
-            </a>
+            {% if contacts.count > 0 %}
+                <a style="border: solid 2px #222;
+                            border-bottom-left-radius: 2px;
+                            border-bottom-right-radius: 2px;
+                            border-top: none !important" href="#task-contacts"
+                    class="me-2 px-2 py-1 bg-white text-decoration-none d-flex align-items-center text-black fw-medium">
+                    <span>👩‍💼 Voir les contacts</span>
+                    <svg class="bi align-middle" width="24" height="24">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-down-short" />
+                    </svg>
+                </a>
+            {% endif %}
             <a @click="handlePrintResourceIframe" style="border: solid 2px #222;
                           border-bottom-left-radius: 2px;
                           border-bottom-right-radius: 2px;
@@ -58,7 +59,6 @@
                 <span>Imprimer</span>
             </a>
         </div>
-        {% endif %}
         {% if contacts.count == 0 %} <div class="mt-4"></div>{% endif %}
         {% include 'resources/resource/fragments/resource_content.html' with resource=resource %}
         <div id="task-contacts">{% include 'resources/resource/fragments/contact_list.html' %}</div>
