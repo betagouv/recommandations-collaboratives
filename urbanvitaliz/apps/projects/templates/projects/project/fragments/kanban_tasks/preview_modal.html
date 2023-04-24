@@ -46,7 +46,7 @@
 								<h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
 									Conversation
 								</h2>
-								<div class="flex-fill overflow-auto h-100">
+								<div id="followups-scroll-container" class="flex-fill overflow-auto h-100">
 									<template x-if="currentTask.resource_id">
 										<div class="rounded bg-light p-2 m-3 message"
 											:class="canAdministrate && currentTask.content === '' && 'border border-warning'">
@@ -91,7 +91,7 @@
 									</template>
 									<template x-if="currentTaskFollowups">
 										<template x-for="f in currentTaskFollowups" x-key="f.timestamp"
-											x-effect="currentTaskFollowups">
+											x-effect="currentTaskFollowups" id="followups-container">
 											<div>
 												<template x-if="!isStatusUpdate(f)">
 													<div class="rounded bg-light p-2 m-3 message"

@@ -201,6 +201,9 @@ export default function TasksApp(app, projectId) {
             }
 
             await markAllAsRead(this.currentTaskId);
+
+            this.followupScrollToLastMessage();
+            
             await this.getData();
         },
         async onSetTaskPublic(id, value) {
@@ -237,8 +240,10 @@ export default function TasksApp(app, projectId) {
                     await this.getData();
                 }
             }
+
             this.pendingComment = "";
             this.currentlyEditing = null;
+            this.followupScrollToLastMessage();
         },
 
         // Reminiders
@@ -313,6 +318,10 @@ export default function TasksApp(app, projectId) {
         },
         formatDateDisplay(date) {
             return new Date(date).toLocaleDateString('fr-FR');
+        },
+        followupScrollToLastMessage() {
+            const scrollContainer = document.getElementById("followups-scroll-container");
+            if (scrollContainer) scrollContainer.scrollTop = scrollContainer.scrollHeight;
         }
     };
 
