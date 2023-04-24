@@ -1,10 +1,13 @@
 {% extends "base.html" %}
+{% load django_vite %}
 
 {% load static %}
 {% load humanize %}
 {% load crm_tags %}
 
 {% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+
 <script src="{% static "/js/d3.min.js" %}"></script>
 <script src="{% static "/js/nv.d3.min.js" %}"></script>
 
@@ -59,40 +62,46 @@
 
 {% block content %}
 
-<div class="col-11 py-5 mx-auto">
-    <h2>Relation Projets-Tags</h2>
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+        {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True %}
+    <div class="w-75 d-flex flex-column justify-content-start">
 
-    <a href="{% url 'crm-project-list-by-tags-csv' %}" class="btn btn-primary">Export CSV</a>
+        <div class="d-flex justify-content-between align-items-center px-4 pt-4">
+            <h2>Relation Projets-Tags</h2>
 
-    <div id="chart-new">
-        <svg class="w-100" style=" min-height: 300px"> </svg>
+            <a href="{% url 'crm-project-list-by-tags-csv' %}" class="btn btn-primary">Export CSV</a>
+        </div>  
+
+        <div id="chart-new">
+            <svg class="w-100" style=" min-height: 300px"> </svg>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Tag</th>
+                    <th>Utilisation</th>
+                    <th>Projets</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for tag in tags %}
+                <tr>
+                    <td>{{ tag.name }}</td>
+                    <td>{{ tag.project__count }}</td>
+                    <td>
+                        {% projects_for_tag tag.name as projects %}
+                        {% for project in projects.all %}
+                        <a href="{% url 'crm-project-details' project.pk %}">{{ project }}</a>
+                        {% endfor %}
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Tag</th>
-                <th>Utilisation</th>
-                <th>Projets</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for tag in tags %}
-            <tr>
-                <td>{{ tag.name }}</td>
-                <td>{{ tag.project__count }}</td>
-                <td>
-                    {% projects_for_tag tag.name as projects %}
-                    {% for project in projects.all %}
-                    <a href="{% url 'crm-project-details' project.pk %}">{{ project }}</a>
-                    {% endfor %}
-                </td>
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </div>
 
 {% endblock %}
