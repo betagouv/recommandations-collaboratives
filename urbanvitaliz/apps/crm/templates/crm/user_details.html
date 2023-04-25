@@ -13,10 +13,15 @@
 
 {% block css %}
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+<style>
+    html, body {
+        scroll-padding-top: 240px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif">
     {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=True user_projects=True %}
 
     <div class="w-75 d-flex flex-column justify-content-start">

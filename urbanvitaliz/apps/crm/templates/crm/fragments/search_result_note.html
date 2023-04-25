@@ -1,0 +1,79 @@
+{% load static %}
+
+<div class="d-flex align-items-center justify-content-between mb-2">
+    <div class="d-flex justify-content-center align-items-center">
+        <svg class="bi" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#stickies-fill" />
+        </svg>  
+        {% if get_user_profile and note.related and note.content_type.name == "utilisateur" %}
+            <div class="position-relative d-flex justify-content-center align-items-center me-3 border border-dark rounded bg-white px-2 py-1">
+                <svg class="bi me-2" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
+                </svg>
+                <a href="{% url 'crm-user-details' note.related.pk %}">{{note.related.first_name}} {{note.related.last_name}}</a>
+            </div>
+        {% endif %}
+            <a class="d-flex align-items-center" href="{{note.get_absolute_url}}#note-{{note.pk}}">
+                {% if note.related.name %}
+                    <span class="fw-normal">{{ note.related.name }}</span>
+                {% endif %}
+                {% if note.related.get_full_name %}
+                    <span class="fw-normal">{{ note.related.get_full_name }}</span>
+                {% endif %}
+            
+                <span class="mx-2">|</span>
+                <span class="crm-note-tag-title d-flex align-items-center">
+                    {% if note.kind == 0 %}
+                    <svg class="bi me-1" width="18" height="18" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-outbound" />
+                    </svg>
+                    {% else %}
+                    {% if note.kind == 1 %}
+                    <svg class="bi me-1" width="18" height="18" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope-paper-heart" />
+                    </svg>
+                    {% else %}
+                    {% if note.kind == 2 %}
+                    <svg class="bi me-1" width="18" height="18" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-workspace" />
+                    </svg>
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
+                    {% if note.title %}
+                        <span class="tiny">{{ note.title }}</span>
+                    {% else %}
+                        <span class="tiny">Note sans titre</span>
+                    {% endif %}
+                </span>
+            </a>
+
+    </div>
+    <div class="d-flex justify-content-center align-items-center">
+        <span class="d-flex align-items-center {% if note.title %} ms-3 {% else %} ms-0{% endif %} " style="font-size: 0.8rem; color: grey;">
+            <svg class="bi me-1" width="15" height="15" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
+            </svg>
+            {{note.created_by.get_full_name|default:note.created_by.email}}
+        </span>
+        <span class="d-flex align-items-center" style="margin-left: 15px; font-size: 0.8rem; color: grey;">
+            <svg class="bi me-1" width="15" height="15" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-fill" />
+            </svg>
+            {% if note.updated_on|date != note.created_on|date %}
+            {{note.updated_on}}&nbsp;|&nbsp;{{note.created_on|date:"n"}} {{note.created_on|date:"N"}}
+            {% else %}
+            {{note.created_on}}
+            {% endif %}
+        </span>
+    </div>
+</div>
+<div class="d-flex mb-2">
+    {% for tag in note.tags.all %}
+    <span class="mx-1 badge rounded-pill small bg-dark">{{ tag }}</span>
+    {% endfor %}
+</div>
+<article class="d-flex tiny crm-notes-wrapper pt-3 pb-0 mb-0 px-2">
+    <p>{{ note.content_rendered|safe|truncatechars_html:75 }}</p>
+</article>
+
