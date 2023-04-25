@@ -10,18 +10,15 @@ created : 2022-11-28 14:14:20 CEST
 from django.contrib import messages
 from django.db.utils import IntegrityError
 from django.contrib.auth.decorators import login_required
-from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
-from urbanvitaliz.utils import check_if_advisor, has_perm_or_403
+from urbanvitaliz.utils import has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm
 from ..utils import (
-    can_administrate_project,
-    check_if_national_actor,
-    is_regional_actor_for_project,
     set_active_project_id,
 )
 
@@ -41,6 +38,16 @@ def document_list(request, project_id=None):
     )
     pinned_files = all_files.filter(pinned=True)
     links = models.Document.on_site.filter(project_id=project.pk).exclude(the_link=None)
+
+    # Mark this project notifications as read
+    if not request.user.is_hijacked:
+        project_ct = ContentType.objects.get_for_model(project)
+        note_ct = ContentType.objects.get_for_model(models.Document)
+        request.user.notifications.unread().filter(
+            action_object_content_type=note_ct,
+            target_content_type=project_ct.pk,
+            target_object_id=project.pk,
+        ).mark_all_as_read()
 
     return render(request, "projects/project/documents.html", locals())
 
