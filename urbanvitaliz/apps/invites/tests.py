@@ -16,7 +16,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertNotContains
 from urbanvitaliz.apps.projects import models as projects_models
-from urbanvitaliz.utils import login
+from urbanvitaliz.utils import login, has_perm
 
 from . import api, models
 
@@ -293,6 +293,7 @@ def test_user_cannot_access_member_invitation_for_someone_else(
     assert current_site not in user.profile.sites.all()
     assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
+    assert not has_perm(user, "view_project", invite.project)
 
 
 @pytest.mark.django_db
@@ -319,6 +320,7 @@ def test_logged_in_user_accepts_invite_switchtender_with_matching_existing_accou
     assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
     assert user == invite.project.switchtenders_on_site.first().switchtender
+    assert has_perm(user, "view_project", invite.project)
 
 
 @pytest.mark.django_db
@@ -348,6 +350,7 @@ def test_user_cannot_access_switchtender_invitation_for_someone_else(
     assert current_site not in user.profile.sites.all()
     assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
+    assert not has_perm(user, "view_project", invite.project)
 
 
 @pytest.mark.django_db
@@ -374,6 +377,7 @@ def test_logged_in_user_accepts_invite_collaborator_with_matching_existing_accou
     assert current_site in user.profile.sites.all()
     assert user in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
+    assert has_perm(user, "view_project", invite.project)
 
 
 @pytest.mark.django_db
@@ -401,6 +405,7 @@ def test_logged_in_user_accepts_invite_collaborator_with_mismatched_existing_acc
     assert invite.accepted_on is None
     assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
+    assert not has_perm(user, "view_project", invite.project)
 
 
 @pytest.mark.django_db
@@ -466,6 +471,7 @@ def test_anonymous_accepts_invite_as_switchtender(
     assert user.profile.organization.name == data["organization"]
     assert user.profile.organization_position == data["position"]
     assert current_site in user.profile.sites.all()
+    assert has_perm(user, "view_project", invite.project)
 
 
 @pytest.mark.django_db
@@ -504,6 +510,7 @@ def test_anonymous_accepts_invite_as_collaborator(
     assert user.profile.organization.name == data["organization"]
     assert user.profile.organization_position == data["position"]
     assert current_site in user.profile.sites.all()
+    assert has_perm(user, "view_project", invite.project)
 
 
 # eof

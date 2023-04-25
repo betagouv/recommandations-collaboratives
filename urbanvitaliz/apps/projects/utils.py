@@ -39,9 +39,11 @@ def assign_collaborator(user, project, is_owner=False):
             print(f"Unable to find permission <{perm}>, aborting.")
             raise e
 
-    models.ProjectMember.objects.get_or_create(
+    _, created = models.ProjectMember.objects.get_or_create(
         project=project, member=user, is_owner=is_owner
     )
+
+    return created
 
 
 @transaction.atomic
@@ -88,6 +90,8 @@ def assign_advisor(user, project, site=None):
     if not created:
         switchtending.is_observer = False
         switchtending.save()
+
+    return created
 
 
 @transaction.atomic
@@ -136,6 +140,8 @@ def assign_observer(user, project, site=None):
     if not created:
         switchtending.is_observer = True
         switchtending.save()
+
+    return created
 
 
 # XXX currently no difference, but may need different perms in the future
