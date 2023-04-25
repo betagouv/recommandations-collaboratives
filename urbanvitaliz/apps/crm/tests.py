@@ -4,6 +4,8 @@ import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
+from pytest_django.asserts import assertContains, assertNotContains
+from django.conf import settings
 from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
@@ -149,6 +151,31 @@ def test_crm_project_create_note(client):
 
     note = models.Note.objects.first()
     assert list(note.tags.names()) == data["tags"]
+
+
+@pytest.mark.django_db
+def test_crm_search(request, client):
+    current_site = get_current_site(request)
+    second_site = baker.make(site_models.Site)
+
+    project_on_site = baker.make(
+        projects_models.Project, name="Mon petit canard", sites=[current_site]
+    )
+    project_no_site = baker.make(projects_models.Project, name="Mon petit poussin")
+    project_another_site = baker.make(
+        projects_models.Project, name="Mon petit poulet", sites=[second_site]
+    )
+
+    data = {"query": "petit"}
+
+    url = reverse("crm-search")
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data)
+
+    assert response.status_code == 200
+    assertContains(response, project_on_site.name)
+    assertNotContains(response, project_no_site.name)
+    assertNotContains(response, project_another_site.name)
 
 
 ########################################################################
