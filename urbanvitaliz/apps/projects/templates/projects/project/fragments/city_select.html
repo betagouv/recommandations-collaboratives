@@ -1,5 +1,8 @@
-<div class="col-12" x-data="citySearch()" 
-    x-init="{% if form.postcode.value and form.insee.value %}getPostcode({{form.postcode.value}},{{form.insee.value}}) {% endif %}">
+{{ form.postcode.value|json_script:"projectPostcode" }}
+{{ form.insee.value|json_script:"projectInsee" }}
+
+<div class="col-12" x-data="CitySearch()"
+    x-init="getPostcode(projectPostcode,projectInsee)">
     <div class="row g-3">
         <div class="col-auto">
             <div class="mb-3">
@@ -14,12 +17,8 @@
 
         <div class="mb-3 col-auto">
                 <label class="text-info-custom text-grey-dark" for="input-project-address">Commune</label>
-                <select style="padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;" x-ref="insee" name="insee" class="form-select" :disabled="cities && !cities.length">
-                    <template x-if="cities && cities.length == 0 && postal">
-                        <option selected>Aucune commune trouvée, vérifiez le code postal ?</option>
-                    </template>
-                    
-                    <template x-if="cities">
+                <select required :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' : 'padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' " style="" x-ref="insee" name="insee" class="form-select">
+                    <template x-if="cities && cities.length > 0">
                         <template
                             x-for="city in cities"
                             :key="city.insee"
@@ -28,6 +27,9 @@
                         </template>
                     </template>
                 </select>
+                <template x-if="cities && cities.length == 0 && postal">
+                    <span class="text-danger text-end">Aucune commune trouvée, vérifiez le code postal ?</span>
+                </template>
         </div>
     </div>
 </div>

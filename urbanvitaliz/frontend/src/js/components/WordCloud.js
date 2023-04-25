@@ -44,7 +44,7 @@ function WordCloud(wordsData, crmSearchUrl) {
                     .attr("transform", function(d) {
                       return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
                     }).append('a')
-                    .attr('href',function(d) { return crmSearchUrl })
+                    .attr('href',function(d) { return `${crmSearchUrl}?query=${d.text}` })
                     .attr("text-anchor", "middle")
                     .style('text-decoration', 'none')
                     .text(function(d) { return d.text; });

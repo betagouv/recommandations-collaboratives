@@ -96,25 +96,20 @@
                         </div>
                         <div class="mb-3 col-auto">
                             <label class="text-info-custom text-grey-dark" for="input-project-address">Commune</label>
-                            <select style="padding: 12px 10px;
-                                           border-radius: 0.25rem"
-                                    x-ref="insee"
-                                    name="insee"
-                                    class="form-select"
-                                    x-bind:disabled="!cities">
-                                <template x-if="cities && cities.length == 0 && postal">
-                                    <option selected>
-                                        Aucune commune trouvée, vérifiez le code postal ?
-                                    </option>
-                                </template>
-                                <template x-if="cities">
-                                    <template x-for="city in cities" :key="city.insee">
-                                        <option :value="city.insee" x-text="city.name">
-                                        </option>
+                            <select required :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' : 'padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' " style="" x-ref="insee" name="insee" class="form-select">
+                                <template x-if="cities && cities.length > 0">
+                                    <template
+                                        x-for="city in cities"
+                                        :key="city.insee"
+                                    >
+                                        <option :value="city.insee" x-text="city.name"></option>
                                     </template>
                                 </template>
                             </select>
-                        </div>
+                            <template x-if="cities && cities.length == 0 && postal">
+                                <span class="text-danger text-end">Aucune commune trouvée, vérifiez le code postal ?</span>
+                            </template>
+                    </div>
                     </div>
                     <button type="submit" class="button filled">Modifier les informations du projet</button>
                 </form>

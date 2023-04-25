@@ -1,0 +1,200 @@
+{% load static %}
+{% load leaflet_tags %}
+{% load l10n %}
+
+{% block js %}
+{% leaflet_js %}
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+
+<!-- Leaflet -->
+<script type="text/javascript">
+ function map_init (map, options) {
+     var icon = L.icon({iconUrl: '{% static "home/img/statistics/marker.png" %}', iconSize: [18, 18]});
+
+     {% regroup request.user.tasks_created.all by project as project_list %}
+     {% for project in project_list %}
+     {% if project.0.commune %}
+     L.marker([{{project.0.commune.latitude|unlocalize}}, {{project.0.commune.longitude|unlocalize}}], {icon: icon}).addTo(map);
+     {% endif %}
+     {% endfor %}
+
+     var zoom = 5;
+     map.setView(new L.LatLng(47, 2.5), zoom);
+     map.setMinZoom(zoom - 2);
+     map.setMaxZoom(zoom + 4);
+
+     map.addControl(new L.Control.Fullscreen());
+ }
+
+</script>
+{% endblock %}
+
+{% block css %}
+{% leaflet_css %}
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+{% endblock %}
+
+<aside class="w-25 crm-aside">
+
+    {% if active_project %}
+        <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
+    {% else %}
+        <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
+    {% endif %}
+
+    {% if back_button %}
+        {% include 'crm/back_button.html' %}
+    {% endif %}
+
+    {% if search %}
+        {% include 'crm/search.html' %}
+    {% endif %}
+
+
+    {% if map %}
+        <div class="pt-3 px-4 crm-border-bottom pb-4">
+            <h5 class="d-inline-block relative">
+                <svg class="bi align-middle" width="24" height="24">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                </svg>
+                <span>Mes projets aiguillés</span>
+            </h5>
+            <div class="border-top border-left border-right">
+                {% leaflet_map "friches" callback="window.map_init" %}
+            </div>
+
+            {% regroup request.user.tasks_created.all by project as project_list %}
+            <ul class="list-group">
+                {% for project in project_list|slice:":30" %}
+                <li class="list-group-item"><a href="{{project.grouper.get_absolute_url }}">{{ project.grouper }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if tools %}
+        <div class="pt-3 px-4 crm-border-bottom pb-4">
+            <h5 class="d-inline-block relative">
+                <svg class="bi align-middle" width="24" height="24">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#tools"/>
+                </svg>
+                <span>Boite à outils</span>
+            </h5>
+            <ul class="list">
+                <li><a href="{% url 'crm-project-list-by-tags' %}">Tags / Projects</a></li>
+                <li><a href="{% url 'crm-list-tags' %}">Index des tags</a></li>
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if organization_members %}
+        <div class="pt-3 px-4 crm-border-bottom">
+            <h5 class="crm-user-decoration d-inline-block relative">Participants <strong>({{ participants|length }})</strong></h5>
+            <ul class="list-unstyled">
+                {% for participant in participants %}
+                {% include 'crm/user_item.html' with user=participant %}
+                {% empty %}
+                <li>Désolé, aucune personne n'est encore assignée</li>
+                {%endfor%}
+            </ul>
+        </div>
+    {% endif %}
+    {% if followed_projects %}
+        <div class="px-4 mt-4 crm-border crm-border-bottom pb-2">
+            <h5 class="crm-project-decoration d-inline-block">Projets suivis <strong>({{ advised_projects|length }})</strong></h5>
+            <ul class="list-unstyled">
+                {% for project in advised_projects %}
+                {% include 'crm/project_item.html' %}
+                {% empty %}
+                <li>Désolé, pas encore de projet pour cette organisation</li>
+                {%endfor%}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if unfollowed_projects %}
+        <div class="px-4 mt-4 crm-border-bottom pb-2">
+            <h5 class="crm-project-decoration d-inline-block relative">Projets régionaux non suivis <strong>({{ unadvised_projects|length }})</strong></h5>
+            <ul class="list-unstyled">
+                {% for project in unadvised_projects %}
+                {% include 'crm/project_item.html' %}
+                {% empty %}
+                <li>Aucun projet régionaux non suivis</li>
+                {%endfor%}
+            </ul>
+        </div>
+    {% endif %}
+    
+    {% if project_advisors %}
+        <div class="pt-3 mb-4 px-4 crm-border-bottom">
+            <h5 class="crm-user-decoration d-inline-block relative">
+                Conseiller·es <strong>({{ project.switchtenders.all|length }})</strong>
+            </h5>
+            <ul class="mb-2 px-0" class="list-unstyled">
+                {% regroup project.switchtenders.all by profile.organization as grouped_st %}
+                {% for group in grouped_st %}
+                    <div class="mb-4">
+                        {% if group.grouper %}
+                            <a class="d-flex align-items-center"
+                            href="{% url 'crm-organization-details' group.grouper.pk %}">
+                                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
+                                </svg>
+                                <strong>{{ group.grouper }}</strong>
+                            </a>
+                        {% endif %}
+                        <ul class="list-unstyled mx-4 mb-4">
+                            {% for switchtender in group.list %}
+                                {% include 'crm/user_item.html' with user=switchtender %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% empty %}
+                    Pas de participant
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+
+    {% if project_members %}
+        <div class="px-4 crm-border-bottom pb-2">
+            <h5 class="crm-user-decoration d-inline-block relative">
+                Collectivité <strong>({{ project.members.all|length }})</strong>
+            </h5>
+            <ul class="list-unstyled">
+                {% for member in project.members.all %}
+                    {% include 'crm/user_item.html' with user=member %}
+                {% empty %}
+                    <li>no one</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if user_advised_projects %}
+        <div class="pt-3 crm-border-bottom pb-2 px-4">
+            <h5 class="crm-project-decoration d-inline-block relative">Projets conseillés <strong>({{ crm_user.projects_switchtended_on_site.all|length }})</strong></h5>
+            <ul class="list-unstyled">
+                {% for switchtending in crm_user.projects_switchtended_on_site.all %}
+                {% include 'crm/project_item.html' with project=switchtending.project %}
+                {% empty %}
+                - aucun -
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if user_projects %}
+        <div class="pt-3 crm-border-bottom pb-2 px-4">
+            <h5 class="crm-project-decoration d-inline-block relative">Participe aux projets <strong>({{ crm_user.projectmember_set.all|length }})</strong></h5>
+            <ul class="list-unstyled">
+                {% for membership in crm_user.projectmember_set.all %}
+                {% include 'crm/project_item.html' with project=membership.project %}
+                {% empty %}
+                - aucun -
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+</aside>

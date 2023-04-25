@@ -57,7 +57,6 @@ COLLABORATOR_PERMISSIONS = (
 ADVISOR_PERMISSIONS = [
     "projects.view_public_notes",
     "projects.use_advisor_note",
-    "projects.use_project_tags",
     "projects.use_public_notes",
     "projects.use_private_notes",
     "projects.view_project",
@@ -98,6 +97,12 @@ def create_site_permissions(sender, **kwargs):
     auth_models.Permission.objects.get_or_create(
         codename="delete_projects",
         name="Can delete projects for site",
+        content_type=site_ct,
+    )
+
+    auth_models.Permission.objects.get_or_create(
+        codename="use_project_tags",
+        name="Can use tags on projects",
         content_type=site_ct,
     )
 
@@ -317,7 +322,6 @@ class Project(models.Model):
             # Overview and topics
             ("change_topics", "Can change the topics"),
             ("use_advisor_note", "Can change the advisor note"),
-            ("use_project_tags", "Can use tags on projects"),
             # Notes
             ("use_private_notes", "Can use the private notes (internal)"),
             ("use_public_notes", "Can use the public notes (conversations)"),

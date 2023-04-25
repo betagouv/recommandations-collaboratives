@@ -22,7 +22,7 @@
                     </p>
                 {% endif %}
             </div>
-            {% if "use_project_tags" in user_project_perms %}
+            {% if "use_project_tags" in user_site_perms %}
                 <div class="d-flex justify-content-between">
                     <ul class="d-flex list-unstyled m-0 p-0 flex-wrap mb-3">
                         {% for tag in project.tags.all %}<li class="mx-1 my-1 badge rounded-pill bg-dark">{{ tag }}</li>{% endfor %}

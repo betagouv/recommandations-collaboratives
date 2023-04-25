@@ -20,13 +20,11 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
 <div class="col-12 mx-auto">
-    {% include 'projects/project/navigation.html' with internal_followup=True %}
+    {% include 'projects/project/navigation.html' with internal_followup=True full_page=True %}
     <div class="row">
     <div class="col-8">
         {% activity_stream "target" project %}
         {% regroup stream by timestamp.date as stream_by_day %}
-
-        {% include "projects/project/fragments/private_conversation.html" %}
 
         {% if "use_private_notes" in user_project_perms %}
         <hr/>
@@ -45,6 +43,8 @@
             <button class="btn mt-2 btn-primary flex-align-end" type="submit">Envoyer</button>
         </form>
         {% endif %}
+
+        {% include "projects/project/fragments/private_conversation.html" with reversed=True %}
 
     </div>
 

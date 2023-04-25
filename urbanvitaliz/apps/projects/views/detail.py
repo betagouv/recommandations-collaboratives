@@ -17,17 +17,24 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.utils import (check_if_advisor, get_site_config_or_503,
-                                has_perm, has_perm_or_403)
+from urbanvitaliz.utils import (
+    check_if_advisor,
+    get_site_config_or_503,
+    has_perm,
+    has_perm_or_403,
+)
 
 from .. import models
-from ..forms import (PrivateNoteForm, ProjectTagsForm, ProjectTopicsForm,
-                     PublicNoteForm)
-from ..utils import (can_administrate_project, check_if_national_actor,
-                     get_advisor_for_project,
-                     get_notification_recipients_for_project,
-                     is_advisor_for_project, is_regional_actor_for_project,
-                     set_active_project_id)
+from ..forms import PrivateNoteForm, ProjectTagsForm, ProjectTopicsForm, PublicNoteForm
+from ..utils import (
+    can_administrate_project,
+    check_if_national_actor,
+    get_advisor_for_project,
+    get_notification_recipients_for_project,
+    is_advisor_for_project,
+    is_regional_actor_for_project,
+    set_active_project_id,
+)
 
 
 @login_required
@@ -309,7 +316,7 @@ def project_update_tags(request, project_id=None):
 
     advising = get_advisor_for_project(request.user, project)
 
-    has_perm_or_403(request.user, "projects.use_project_tags", project)
+    has_perm_or_403(request.user, "sites.use_project_tags", request.site)
 
     if request.method == "POST":
         form = ProjectTagsForm(request.POST, instance=project)

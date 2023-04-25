@@ -11,55 +11,19 @@
 
 {% block css %}
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+<style>
+    html, body {
+        scroll-padding-top: 240px;
+    }
+</style>
 {% endblock %}
-
 
 
 {% block content %}
 <div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    <aside class="w-25 crm-aside">
+    
+    {% include "crm/fragments/sidebar.html" with search=True back_button=True organization_members=True followed_projects=True unfollowed_projects=True %}
 
-            {% if active_project %}
-                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
-            {% else %}
-                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
-            {% endif %}
-
-            {% include 'crm/back_button.html' %}
-            {% include 'crm/search.html' %}
-
-            <div class="pt-3 px-4 crm-border-bottom">
-                <h5 class="crm-user-decoration d-inline-block relative">Participants <strong>({{ participants|length }})</strong></h5>
-                <ul class="list-unstyled">
-                    {% for participant in participants %}
-                    {% include 'crm/user_item.html' with user=participant %}
-                    {% empty %}
-                    <li>Désolé, aucune personne n'est encore assignée</li>
-                    {%endfor%}
-                </ul>
-            </div>
-            <div class="px-4 mt-4 crm-border crm-border-bottom pb-2">
-                <h5 class="crm-project-decoration d-inline-block">Projets suivis <strong>({{ advised_projects|length }})</strong></h5>
-                <ul class="list-unstyled">
-                    {% for project in advised_projects %}
-                    {% include 'crm/project_item.html' %}
-                    {% empty %}
-                    <li>Désolé, pas encore de projet pour cette organisation</li>
-                    {%endfor%}
-                </ul>
-            </div>
-            <div class="px-4 mt-4 crm-border-bottom pb-2">
-                <h5 class="crm-project-decoration d-inline-block relative">Projets régionaux non suivis <strong>({{ unadvised_projects|length }})</strong></h5>
-                <ul class="list-unstyled">
-                    {% for project in unadvised_projects %}
-                    {% include 'crm/project_item.html' %}
-                    {% empty %}
-                    <li>Aucun projet régionaux non suivis</li>
-                    {%endfor%}
-                </ul>
-            </div>
-        </div>
-    </aside>
     <div class="w-75 d-flex flex-column justify-content-start">
         {% if active_project %}
             <div class="crm-header px-4 py-3 pt-4 mb-3">

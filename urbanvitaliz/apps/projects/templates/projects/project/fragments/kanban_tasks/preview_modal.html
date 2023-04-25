@@ -4,6 +4,19 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
+<script>
+
+	var isHijacked = {{request.user.is_hijacked|lower}};
+	var isMember=
+
+	{% if request.user in project.members.all %}
+		true;
+	{% else %}
+		false;
+	{% endif %}
+
+</script>
+
 <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true" x-init="initPreviewModal()"
 	x-data="{ get currentTask() { return this.findById(this.currentTaskId)}}">
 	<div class="modal-dialog modal-xl">
@@ -46,7 +59,7 @@
 								<h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
 									Conversation
 								</h2>
-								<div class="flex-fill overflow-auto h-100">
+								<div id="followups-scroll-container" class="flex-fill overflow-auto h-100">
 									<template x-if="currentTask.resource_id">
 										<div class="rounded bg-light p-2 m-3 message"
 											:class="canAdministrate && currentTask.content === '' && 'border border-warning'">
@@ -91,7 +104,7 @@
 									</template>
 									<template x-if="currentTaskFollowups">
 										<template x-for="f in currentTaskFollowups" x-key="f.timestamp"
-											x-effect="currentTaskFollowups">
+											x-effect="currentTaskFollowups" id="followups-container">
 											<div>
 												<template x-if="!isStatusUpdate(f)">
 													<div class="rounded bg-light p-2 m-3 message"

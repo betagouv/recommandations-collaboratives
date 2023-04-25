@@ -1,6 +1,6 @@
 {% load static %}
 
-<div x-data="Note" x-ref="note" class="relative crm-note" :class="isOpen ? 'open' : 'closed'">
+<div x-data="Note" x-ref="note" class="relative crm-note" :class="isOpen ? 'open' : 'closed'" id="note-{{note.pk}}">
 <div class="d-flex align-items-center justify-content-between mb-2">
     <div class="d-flex justify-content-center align-items-center">
         {% if pinned %}

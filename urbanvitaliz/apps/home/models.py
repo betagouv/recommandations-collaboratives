@@ -38,6 +38,7 @@ SITE_GROUP_PERMISSIONS = {
         "sites.manage_resources",
         "sites.use_crm",
         "sites.use_addressbook",
+        "sites.use_project_tags",
     ),
     "admin": ("sites.manage_surveys",),
     "advisor": ("sites.list_projects",),

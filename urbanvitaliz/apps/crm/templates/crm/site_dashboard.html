@@ -5,99 +5,25 @@
 {% load activity_tags %}
 {% load humanize %}
 {% load gravatar %}
-{% load leaflet_tags %}
-{% load l10n %}
 {% load django_vite %}
 
 {% block js %}
 
 {% vite_asset 'js/apps/crm.js' %}
-{% leaflet_js %}
 
-<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
 
-<!-- Leaflet -->
-<script type="text/javascript">
- function map_init (map, options) {
-     var icon = L.icon({iconUrl: '{% static "home/img/statistics/marker.png" %}', iconSize: [18, 18]});
-
-     {% regroup request.user.tasks_created.all by project as project_list %}
-     {% for project in project_list %}
-     {% if project.0.commune %}
-     L.marker([{{project.0.commune.latitude|unlocalize}}, {{project.0.commune.longitude|unlocalize}}], {icon: icon}).addTo(map);
-     {% endif %}
-     {% endfor %}
-
-     var zoom = 5;
-     map.setView(new L.LatLng(47, 2.5), zoom);
-     map.setMinZoom(zoom - 2);
-     map.setMaxZoom(zoom + 4);
-
-     map.addControl(new L.Control.Fullscreen());
- }
-
-</script>
 {% endblock %}
 
 {% block title %}
 | Tableau de bord
 {% endblock %}
 
-{% block css %}
-{% leaflet_css %}
-<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
-{% endblock %}
-
-
-
 {% block content %}
 
 <div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    <aside class="w-25 crm-aside">
 
-            {% if active_project %}
-                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
-            {% else %}
-                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
-            {% endif %}
+    {% include "crm/fragments/sidebar.html" with search=True back_button=True map=True tools=True %}
 
-            {% include 'crm/back_button.html' %}
-            {% include 'crm/search.html' %}
-
-            <div class="pt-3 px-4 crm-border-bottom pb-4">
-                <h5 class="d-inline-block relative">
-                    <svg class="bi align-middle" width="24" height="24">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
-                    </svg>
-                    <span>Mes projets aiguillés</span>
-                </h5>
-                <div class="border-top border-left border-right">
-                    {% leaflet_map "friches" callback="window.map_init" %}
-                </div>
-    
-                {% regroup request.user.tasks_created.all by project as project_list %}
-                <ul class="list-group">
-                    {% for project in project_list|slice:":30" %}
-                    <li class="list-group-item"><a href="{{project.grouper.get_absolute_url }}">{{ project.grouper }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <div class="pt-3 px-4 crm-border-bottom pb-4">
-                <h5 class="d-inline-block relative">
-                    <svg class="bi align-middle" width="24" height="24">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#tools"/>
-                    </svg>
-                    <span>Boite à outils</span>
-                </h5>
-                <ul class="list">
-                    <li><a href="{% url 'crm-project-list-by-tags' %}">Tags / Projects</a></li>
-                    <li><a href="{% url 'crm-list-tags' %}">Index des tags</a></li>
-                </ul>
-            </div>
-        </div>
-    </aside>
-    
     <div class="w-75 d-flex flex-column justify-content-start">
         {% if active_project %}
             <div class="crm-header px-4 py-3 pt-4 mb-3">

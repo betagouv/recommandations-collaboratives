@@ -3,16 +3,16 @@
 {% load gravatar %}
 
 {% regroup project.notes.private by created_on.date as notes_by_day %}
-            <div class="message-window flex-grow-1" style="overflow-y: auto; overflow-x: hidden; max-height: 40vh; display:flex; flex-direction:column-reverse;">
+            <div class="message-window flex-grow-1" style="overflow-y: auto; overflow-x: hidden; display:flex; flex-direction:column-reverse;">
                 <ul class="list-group">
-                    {% for date, notes in notes_by_day|slice:":20" reversed %}
+                    {% for date, notes in notes_by_day|slice:":20" %}
                     <li class="list-group-item border-0 m-0 p-0">
-                        <div class="small my-2 text-center w-100 text-secondary">{{ date|naturalday|capfirst }}</div>
-                        {% for note in notes reversed  %}
+                        <div class="small my-2 text-center w-100">{{ date|naturalday|capfirst }}</div>
+                        {% for note in notes  %}
                             {% if request.user == note.created_by %}
-                                <div class="rounded-3 p-3 text-secondary bg-blue-light my-2" style="margin-left: 2vw;">
+                                <div class="rounded-3 p-3 bg-orange-light my-2 overflow-hidden" style="margin-left: 2vw;">
                             {% else %}
-                                <div class="bg-grey-light rounded-3 p-3 text-secondary my-2" style="margin-right: 2vw;">
+                                <div class="bg-orange-light rounded-3 p-3 my-2 overflow-hidden" style="margin-right: 2vw;">
                             {% endif %}
                                 {{ note.content_rendered|safe }}
                                 {% if note.document.count %}

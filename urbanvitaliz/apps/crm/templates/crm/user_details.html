@@ -13,44 +13,17 @@
 
 {% block css %}
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+<style>
+    html, body {
+        scroll-padding-top: 240px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    <aside class="w-25 crm-aside">
-            {% if active_project %}
-                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
-            {% else %}
-                <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
-            {% endif %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif">
+    {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=True user_projects=True %}
 
-            {% include 'crm/back_button.html' %}
-            {% include 'crm/search.html' %}
-            
-            <div class="pt-3 crm-border-bottom pb-2 px-4">
-                <h5 class="crm-project-decoration d-inline-block relative">Projets conseillés <strong>({{ crm_user.projects_switchtended_on_site.all|length }})</strong></h5>
-                <ul class="list-unstyled">
-                    {% for switchtending in crm_user.projects_switchtended_on_site.all %}
-                    {% include 'crm/project_item.html' with project=switchtending.project %}
-                    {% empty %}
-                    - aucun -
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <div class="pt-3 crm-border-bottom pb-2 px-4">
-                <h5 class="crm-project-decoration d-inline-block relative">Participe aux projets <strong>({{ crm_user.projectmember_set.all|length }})</strong></h5>
-                <ul class="list-unstyled">
-                    {% for membership in crm_user.projectmember_set.all %}
-                    {% include 'crm/project_item.html' with project=membership.project %}
-                    {% empty %}
-                    - aucun -
-                    {% endfor %}
-                </ul>
-            </div>
-
-        </div>
-    </aside>
     <div class="w-75 d-flex flex-column justify-content-start">
         {% if active_project %}
                 <div class="crm-header px-4 py-4 mb-3">

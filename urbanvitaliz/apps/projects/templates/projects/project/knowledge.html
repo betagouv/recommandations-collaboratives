@@ -51,7 +51,7 @@
         {% include 'projects/project/navigation.html' with state_of_play=True %}
         <div class="row">
             <!-- TODO PERMISSIONS -->
-            {% if not is_switchtender %}
+            {% if request.user in project.members.all %}
                 {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
                     <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
                         <h4 class="pt-2">

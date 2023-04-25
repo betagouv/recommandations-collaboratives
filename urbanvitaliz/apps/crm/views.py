@@ -8,7 +8,6 @@ created : 2022-07-20 12:27:25 CEST
 import csv
 import datetime
 from collections import Counter, OrderedDict
-from operator import itemgetter
 
 from actstream.models import Action, actor_stream, target_stream
 from django.contrib.auth.decorators import login_required
@@ -26,9 +25,7 @@ from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
-from urbanvitaliz.apps.resources.models import Resource
-from urbanvitaliz.utils import (get_site_administrators, has_perm,
-                                has_perm_or_403)
+from urbanvitaliz.utils import get_site_administrators, has_perm, has_perm_or_403
 from watson import search as watson
 
 from . import forms, models
@@ -61,15 +58,48 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
 def crm_search(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    if request.method == "POST":
-        search_form = forms.CRMSearchForm(request.POST)
+    search_form = forms.CRMSearchForm(request.POST or request.GET or None)
 
-        if search_form.is_valid():
-            query = search_form.cleaned_data["query"]
-            search_results = watson.search(query, exclude=(Resource,))
+    if search_form.is_valid():
+        site = request.site
+        query = search_form.cleaned_data["query"]
+        project_results = watson.filter(
+            Project.objects.filter(sites=request.site), query, ranking=True
+        )
 
-    else:
-        search_form = forms.CRMSearchForm()
+        search_results = list(project_results)
+
+        all_sites_search_results = watson.search(
+            query,
+            models=(
+                Project,
+                models.ProjectAnnotations,
+                User,
+                Organization,
+                models.Note,
+            ),
+        )
+
+        def filter_current_site(entry):
+            """Since watson does not support related model field filtering,
+            take care of that afterwards"""
+            obj = entry.object
+
+            if hasattr(obj, "sites"):
+                if request.site in obj.sites.all():
+                    return True
+
+            if hasattr(obj, "site"):
+                if request.site == obj.site:
+                    return True
+
+            if hasattr(obj, "profile"):
+                if request.site in obj.profile.sites.all():
+                    return True
+
+            return False
+
+        search_results = list(filter(filter_current_site, all_sites_search_results))
 
     return render(request, "crm/search_results.html", locals())
 
@@ -389,6 +419,8 @@ def crm_list_tags(request):
     """Return a page containing all tags with their count"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
+    search_form = forms.CRMSearchForm()
+
     tags = compute_tag_occurences(request.site)
     return render(request, "crm/tagcloud.html", locals())
 
@@ -430,6 +462,8 @@ def project_list_by_tags(request):
         .order_by("-project__count")
         .distinct()
     )
+
+    search_form = forms.CRMSearchForm()
 
     return render(request, "crm/tags_for_projects.html", locals())
 

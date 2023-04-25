@@ -222,7 +222,6 @@ class Resource(models.Model):
 
     @classmethod
     def search(cls, query="", categories=None):
-        # A very basic search strategy to be replaced by postgres full text search
         categories = categories or []
         resources = cls.on_site.all()
         if categories:
