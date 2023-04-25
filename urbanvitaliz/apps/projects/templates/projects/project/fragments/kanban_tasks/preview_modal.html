@@ -4,6 +4,19 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
+<script>
+
+	var isHijacked = {{request.user.is_hijacked|lower}};
+	var isMember=
+
+	{% if request.user in project.members.all %}
+		true;
+	{% else %}
+		false;
+	{% endif %}
+
+</script>
+
 <div class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true" x-init="initPreviewModal()"
 	x-data="{ get currentTask() { return this.findById(this.currentTaskId)}}">
 	<div class="modal-dialog modal-xl">

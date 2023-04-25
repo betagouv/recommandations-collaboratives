@@ -175,7 +175,6 @@ export default function TasksApp(app, projectId) {
                 location.hash = '';
             }
 
-
             element.addEventListener("hidePrevented.bs.modal", cleanup);
             element.addEventListener('hidden.bs.modal', cleanup);
             if (this.currentTaskId) this.openPreviewModal();
@@ -196,9 +195,7 @@ export default function TasksApp(app, projectId) {
             this.loadFollowups(this.currentTaskId);
             this.loadNotifications(this.currentTaskId);
 
-            if (!this.canAdministrate) {
-                await patchTask(this.currentTaskId, { visited: true });
-            }
+            if (isMember && !isHijacked) await patchTask(this.currentTaskId, { visited: true });
 
             await markAllAsRead(this.currentTaskId);
 
