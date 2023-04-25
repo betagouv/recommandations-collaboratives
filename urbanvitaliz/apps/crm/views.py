@@ -418,6 +418,8 @@ def crm_list_tags(request):
     """Return a page containing all tags with their count"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
+    search_form = forms.CRMSearchForm()
+
     tags = compute_tag_occurences(request.site)
     return render(request, "crm/tagcloud.html", locals())
 
@@ -459,6 +461,8 @@ def project_list_by_tags(request):
         .order_by("-project__count")
         .distinct()
     )
+
+    search_form = forms.CRMSearchForm()
 
     return render(request, "crm/tags_for_projects.html", locals())
 
