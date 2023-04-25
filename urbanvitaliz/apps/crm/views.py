@@ -93,6 +93,10 @@ def crm_search(request):
                 if request.site == obj.site:
                     return True
 
+            if hasattr(obj, "profile"):
+                if request.site in obj.profile.sites.all():
+                    return True
+
             return False
 
         search_results = list(filter(filter_current_site, all_sites_search_results))
