@@ -7,6 +7,7 @@ from django.utils import timezone
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects import signals as projects_signals
+from urbanvitaliz.apps.projects.utils import assign_collaborator, assign_advisor
 
 from . import forms, models
 
@@ -68,18 +69,12 @@ def invite_accept(request, invite_id):
 
             # Now, grant the user her new rights
             if invite.role == "SWITCHTENDER":
-                _, created = projects_models.ProjectSwitchtender.objects.get_or_create(
-                    switchtender=user, project=project, site=current_site
-                )
-                if created:
+                if assign_advisor(user, project, current_site):
                     projects_signals.project_switchtender_joined.send(
                         sender=request.user, project=project
                     )
             else:
-                _, created = projects_models.ProjectMember.objects.get_or_create(
-                    project=project, member=user
-                )
-                if created:
+                if assign_collaborator(user, project):
                     projects_signals.project_member_joined.send(
                         sender=request.user, project=project
                     )
