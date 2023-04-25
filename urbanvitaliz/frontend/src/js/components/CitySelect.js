@@ -8,7 +8,6 @@ function CitySearch() {
         isLoading: false,
         postal: null,
         cities: null,
-    
         getPostcode(postcode, insee) {
 
             const postCodeString = JSON.parse(postcode.textContent)

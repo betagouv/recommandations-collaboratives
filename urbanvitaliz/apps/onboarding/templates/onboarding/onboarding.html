@@ -1,42 +1,15 @@
 {% extends "base.html" %}
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/onboarding.js' %}
+{% endblock %}
 
 {% load static %}
 
 {% block title %} | Solliciter l'équipe {{ request.site.name }}{% endblock %}
 
 {% block og_title %} | Solliciter l'équipe {{ request.site.name }}{% endblock %}
-
-{% block js %}
-<script>
-    function citySearch() {
-        return {
-            // other default properties
-            isLoading: false,
-            postal: null,
-            cities: null,
-            getPostcode(postcode, insee) {
-                this.postal = postcode;
-                this.fetchCities(insee)
-            },
-            fetchCities(currentInsee = null) {
-                if (this.postal == "")
-                    return
-
-                this.isLoading = true;
-                fetch(`{% url 'communes-list' %}?postal=${this.postal}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        this.isLoading = false;
-                        this.cities = data;
-                    }).finally(() => {
-                        if (currentInsee) this.$refs.insee.value = currentInsee;
-                    });
-            }
-        }
-    }
-</script>
-
-{% endblock %}
 
 {% block content %}
 
