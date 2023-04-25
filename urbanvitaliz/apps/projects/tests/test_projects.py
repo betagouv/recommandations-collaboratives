@@ -22,8 +22,7 @@ from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -1594,7 +1593,7 @@ def test_switchtender_exports_csv(request, client):
 # Tags
 #################################################################
 @pytest.mark.django_db
-def test_advisor_updates_tags(request, client):
+def test_advisor_cannot_updates_tags(request, client):
     current_site = get_current_site(request)
 
     project = Recipe(models.Project, sites=[current_site]).make()
@@ -1602,6 +1601,26 @@ def test_advisor_updates_tags(request, client):
     data = {"tags": "blah"}
 
     with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, current_site)
+
+        response = client.post(
+            reverse("projects-project-tags", args=[project.id]), data=data
+        )
+
+    assert response.status_code == 403
+    project = models.Project.objects.all()[0]
+    assert list(project.tags.names()) == []
+
+
+@pytest.mark.django_db
+def test_staff_updates_tags(request, client):
+    current_site = get_current_site(request)
+
+    project = Recipe(models.Project, sites=[current_site]).make()
+
+    data = {"tags": "blah"}
+
+    with login(client, groups=["example_com_staff"]) as user:
         utils.assign_advisor(user, project, current_site)
 
         response = client.post(
