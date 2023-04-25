@@ -8,7 +8,6 @@ created : 2022-07-20 12:27:25 CEST
 import csv
 import datetime
 from collections import Counter, OrderedDict
-from operator import itemgetter
 
 from actstream.models import Action, actor_stream, target_stream
 from django.contrib.auth.decorators import login_required
@@ -26,9 +25,7 @@ from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
-from urbanvitaliz.apps.resources.models import Resource
-from urbanvitaliz.utils import (get_site_administrators, has_perm,
-                                has_perm_or_403)
+from urbanvitaliz.utils import get_site_administrators, has_perm, has_perm_or_403
 from watson import search as watson
 
 from . import forms, models
@@ -65,9 +62,41 @@ def crm_search(request):
         search_form = forms.CRMSearchForm(request.POST)
 
         if search_form.is_valid():
+            site = request.site
             query = search_form.cleaned_data["query"]
-            search_results = watson.search(query, exclude=(Resource,))
+            project_results = watson.filter(
+                Project.objects.filter(sites=request.site), query, ranking=True
+            )
 
+            search_results = list(project_results)
+
+            all_sites_search_results = watson.search(
+                query,
+                models=(
+                    Project,
+                    models.ProjectAnnotations,
+                    User,
+                    Organization,
+                    models.Note,
+                ),
+            )
+
+            def filter_current_site(entry):
+                """Since watson does not support related model field filtering,
+                take care of that afterwards"""
+                obj = entry.object
+
+                if hasattr(obj, "sites"):
+                    if request.site in obj.sites.all():
+                        return True
+
+                if hasattr(obj, "site"):
+                    if request.site == obj.site:
+                        return True
+
+                return False
+
+            search_results = list(filter(filter_current_site, all_sites_search_results))
     else:
         search_form = forms.CRMSearchForm()
 

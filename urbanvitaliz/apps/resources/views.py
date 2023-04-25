@@ -27,8 +27,12 @@ from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.utils import (check_if_advisor, has_perm, has_perm_or_403,
-                                is_staff_for_site)
+from urbanvitaliz.utils import (
+    check_if_advisor,
+    has_perm,
+    has_perm_or_403,
+    is_staff_for_site,
+)
 
 from . import models
 from .serializers import ResourceSerializer
@@ -56,7 +60,7 @@ def resource_search(request):
 
     # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items
     if not has_perm(request.user, "manage_resources", request.site):
-        resources = resources.filter(status__gt=models.Resource.TO_REVIEW)
+        resources = resources.filter(status__gt=models.Resource.DRAFT)
 
     # If we are a advisor, allow any departement to be filtered
     # Otherwise, show only departments related to my projects

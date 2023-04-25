@@ -4,6 +4,8 @@ import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
+from pytest_django.asserts import assertContains, assertNotContains
+from django.conf import settings
 from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
@@ -151,6 +153,31 @@ def test_crm_project_create_note(client):
     assert list(note.tags.names()) == data["tags"]
 
 
+@pytest.mark.django_db
+def test_crm_search(request, client):
+    current_site = get_current_site(request)
+    second_site = baker.make(site_models.Site)
+
+    project_on_site = baker.make(
+        projects_models.Project, name="Mon petit canard", sites=[current_site]
+    )
+    project_no_site = baker.make(projects_models.Project, name="Mon petit poussin")
+    project_another_site = baker.make(
+        projects_models.Project, name="Mon petit poulet", sites=[second_site]
+    )
+
+    data = {"query": "petit"}
+
+    url = reverse("crm-search")
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data)
+
+    assert response.status_code == 200
+    assertContains(response, project_on_site.name)
+    assertNotContains(response, project_no_site.name)
+    assertNotContains(response, project_another_site.name)
+
+
 ########################################################################
 # Dashboard
 ########################################################################
@@ -180,9 +207,9 @@ def test_site_dashboard_available_for_staff_users(client):
 @pytest.mark.django_db
 def test_compute_tag_cloud():
     site = baker.make(site_models.Site)
-    project = baker.make(models.ProjectAnnotations, site=site)
-    project.tags.add("tag0", "tag1")
-    note = baker.make(models.Note, site=site)
+    project_annotation = baker.make(models.ProjectAnnotations, site=site)
+    project_annotation.tags.add("tag0", "tag1")
+    note = baker.make(models.Note, site=site, related=project_annotation.project)
     note.tags.add("tag0", "tag2")
     tags = views.compute_tag_occurences(site)
     assert tags == collections.OrderedDict(
