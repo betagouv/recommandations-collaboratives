@@ -39,7 +39,7 @@
                         <tbody>
                             {% for key, value in tags.items %}
                                 <tr>
-                                    <td><a href="{% url 'crm-search' %}">{{key}}</a></td>
+                                    <td><a href="{% url 'crm-search' %}?query={{key}}">{{key}}</a></td>
                                     <td>{{value}}</a></td>
                                 </tr>
                             {% endfor %}
