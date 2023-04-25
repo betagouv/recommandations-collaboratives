@@ -58,47 +58,44 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
 def crm_search(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    if request.method == "POST":
-        search_form = forms.CRMSearchForm(request.POST)
+    search_form = forms.CRMSearchForm(request.POST or request.GET or None)
 
-        if search_form.is_valid():
-            site = request.site
-            query = search_form.cleaned_data["query"]
-            project_results = watson.filter(
-                Project.objects.filter(sites=request.site), query, ranking=True
-            )
+    if search_form.is_valid():
+        site = request.site
+        query = search_form.cleaned_data["query"]
+        project_results = watson.filter(
+            Project.objects.filter(sites=request.site), query, ranking=True
+        )
 
-            search_results = list(project_results)
+        search_results = list(project_results)
 
-            all_sites_search_results = watson.search(
-                query,
-                models=(
-                    Project,
-                    models.ProjectAnnotations,
-                    User,
-                    Organization,
-                    models.Note,
-                ),
-            )
+        all_sites_search_results = watson.search(
+            query,
+            models=(
+                Project,
+                models.ProjectAnnotations,
+                User,
+                Organization,
+                models.Note,
+            ),
+        )
 
-            def filter_current_site(entry):
-                """Since watson does not support related model field filtering,
-                take care of that afterwards"""
-                obj = entry.object
+        def filter_current_site(entry):
+            """Since watson does not support related model field filtering,
+            take care of that afterwards"""
+            obj = entry.object
 
-                if hasattr(obj, "sites"):
-                    if request.site in obj.sites.all():
-                        return True
+            if hasattr(obj, "sites"):
+                if request.site in obj.sites.all():
+                    return True
 
-                if hasattr(obj, "site"):
-                    if request.site == obj.site:
-                        return True
+            if hasattr(obj, "site"):
+                if request.site == obj.site:
+                    return True
 
-                return False
+            return False
 
-            search_results = list(filter(filter_current_site, all_sites_search_results))
-    else:
-        search_form = forms.CRMSearchForm()
+        search_results = list(filter(filter_current_site, all_sites_search_results))
 
     return render(request, "crm/search_results.html", locals())
 
