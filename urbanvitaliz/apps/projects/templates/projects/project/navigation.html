@@ -108,7 +108,7 @@
         {% endwith %}
     </li>
     <li>
-        {% if "list_projects" in user_site_perms %}
+        {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
             {% with "Espace conseillers" as label %}
                 {% if 'view_private_notes' in user_project_perms or 'use_private_notes' in user_project_perms %}
                     <a class="{% if internal_followup %}active{% endif %} align-items-center"
