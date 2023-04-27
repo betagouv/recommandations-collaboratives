@@ -4,6 +4,7 @@ import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar';
 import { makeProjectURL } from '../utils/createProjectUrl'
 import { roles } from '../config/roles';
+import List from 'list.js'
 
 // A custom dashboard made for switctenders
 // Expose a list of projects
@@ -16,6 +17,17 @@ function PersonalAdvisorDashboard() {
         data: [],
         totalNotifications: 0,
         nbNewProjects: 0,
+        errors: null,
+        formatDate,
+        gravatar_url,
+        makeProjectURL,
+        init() {
+            const options = {
+                valueNames: ['name', 'location']
+            };
+
+            console.log(new List('projectsList', options));
+        },
         async getData() {
 
             const projects = await this.$store.projects.getProjects()
@@ -28,7 +40,7 @@ function PersonalAdvisorDashboard() {
                 if (p.status === 'NEW') return this.nbNewProjects += 1
             })
 
-            return this.data = projects
+            this.data = projects
         },
         get isBusy() {
             return this.$store.app.isLoading

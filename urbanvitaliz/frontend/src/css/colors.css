@@ -2,8 +2,16 @@
     background-color: #5BB5A7;
 }
 
+.bg-green-dark {
+    background-color:#27A658;
+}
+
 .bg-grey {
     background-color: #E5E5E5;
+}
+
+.bg-yellow {
+    background-color:#FDCD6D;
 }
 
 .bg-grey-light {
@@ -37,3 +45,4 @@
 .fill-grey {
     fill: #929292;
 }
+
