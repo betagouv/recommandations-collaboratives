@@ -1,3 +1,2 @@
 import '../store/projects'
-import '../components/Projects'
-import '../../css/projectsKanban.css'
+import '../components/PersonalAdvisorDashboard'
