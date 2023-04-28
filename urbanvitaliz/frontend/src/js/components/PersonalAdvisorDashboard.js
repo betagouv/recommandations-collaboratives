@@ -6,6 +6,10 @@ import { makeProjectURL } from '../utils/createProjectUrl'
 import { roles } from '../config/roles';
 import List from 'list.js'
 
+import * as L from 'leaflet';
+import 'leaflet-control-geocoder';
+import 'leaflet-providers'
+
 // A custom dashboard made for switctenders
 // Expose a list of projects
 // Filtered by a board.code 
@@ -27,6 +31,7 @@ function PersonalAdvisorDashboard() {
             };
 
             console.log(new List('projectsList', options));
+
         },
         async getData() {
 
@@ -41,6 +46,14 @@ function PersonalAdvisorDashboard() {
             })
 
             this.data = projects
+
+            const Map = initMap(projects);
+
+            console.log('big map', Map);
+
+            //Center Map
+            Map.panTo(new L.LatLng(46.51, 1.20));
+            Map.zoomIn()
         },
         get isBusy() {
             return this.$store.app.isLoading
@@ -72,6 +85,35 @@ function PersonalAdvisorDashboard() {
             else return ''
         },
     }
+}
+
+// Map base layer 
+function initMap(projects) {
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+        maxZoom: 20,
+        attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+
+    const map = L.map('map').setView([48.51, 10.20], 2);
+
+    L.tileLayer.provider('OpenStreetMap.France').addTo(map);
+
+    initMapLayers(map, projects)
+
+    return map
+}
+
+// Crete layers composed with markers
+function initMapLayers(map, projects) {
+    projects.forEach(({project}) => {
+        if (project?.commune?.latitude && project?.commune?.longitude) {
+            L.marker([project.commune.latitude, project.commune.longitude]).addTo(map)
+        }
+    })
+}
+
+function createMarkerIcon(project) {
+    return L.divIcon({ className: 'map-marker '});
 }
 
 Alpine.data("PersonalAdvisorDashboard", PersonalAdvisorDashboard)

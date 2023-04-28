@@ -1,3 +1,3 @@
 import '../store/projects'
 import '../components/PersonalAdvisorDashboard'
-import '../../css/PersonalAdvisorDashboard.css'
+import '../../css/personalAdvisorDashboard.css'

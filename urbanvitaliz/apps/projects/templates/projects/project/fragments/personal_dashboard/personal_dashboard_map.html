@@ -1,0 +1,9 @@
+{% block css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
+    integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin="" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+{% endblock %}
+
+<div x-cloak class="p-0 dashboard-map-container">
+    <div class="h-100 w-100" x-ref="map" id="map"></div>
+</div>
