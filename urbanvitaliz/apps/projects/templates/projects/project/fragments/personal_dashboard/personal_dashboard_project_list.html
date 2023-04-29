@@ -5,7 +5,7 @@
     <ul class="list-unstyled list d-flex flex-column">
         <template x-for="item in data"
                   :key="item.project.id">
-            <div class="rounded mb-4 px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"> 
+            <div :id=`project-${item.project.id}` class="rounded mb-4 px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"> 
                 <div class="position-absolute left-0" style="top:-12px">
                     <template x-if="item.status === 'NEW'">
                         <span class="py-1 px-1 fw-bold text-uppercase tiny bg-yellow text-dark" style="border-radius: 2px;">Nouveau projet</span>

@@ -105,15 +105,18 @@ function initMap(projects) {
 
 // Crete layers composed with markers
 function initMapLayers(map, projects) {
-    projects.forEach(({project}) => {
-        if (project?.commune?.latitude && project?.commune?.longitude) {
-            L.marker([project.commune.latitude, project.commune.longitude]).addTo(map)
+    projects.forEach((item) => {
+        if (item.project?.commune?.latitude && item.project?.commune?.longitude) {
+            L.marker([item.project.commune.latitude, item.project.commune.longitude],{ icon: createMarkerIcon(item) }).addTo(map)
         }
     })
 }
 
-function createMarkerIcon(project) {
-    return L.divIcon({ className: 'map-marker '});
+function createMarkerIcon(item) {
+    return L.divIcon({ 
+        className: `map-marker ${item.status === "NEW" ? 'project-marker new-project-marker' : 'project-marker'}`,
+        html: `<a href="#project-${item.project.id}">${item.project.id}</a>`
+    });
 }
 
 Alpine.data("PersonalAdvisorDashboard", PersonalAdvisorDashboard)
