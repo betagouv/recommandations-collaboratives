@@ -3,7 +3,7 @@
 <div class="d-flex flex-column" id="projectsList">
     {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_project_filters.html' %}
     <ul class="list-unstyled list d-flex flex-column">
-        <template x-for="item in data"
+        <template x-for="item in displayedData"
                   :key="item.project.id">
             <div :id=`project-${item.project.id}` class="rounded mb-4 px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"> 
                 <div class="position-absolute left-0" style="top:-12px">

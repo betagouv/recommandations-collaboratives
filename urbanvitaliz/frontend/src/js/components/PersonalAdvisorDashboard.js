@@ -4,7 +4,6 @@ import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar';
 import { makeProjectURL } from '../utils/createProjectUrl'
 import { roles } from '../config/roles';
-import List from 'list.js'
 
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
@@ -19,33 +18,24 @@ import 'leaflet-providers'
 function PersonalAdvisorDashboard() {
     return {
         data: [],
-        totalNotifications: 0,
+        displayedData: [],
         nbNewProjects: 0,
         errors: null,
         formatDate,
         gravatar_url,
         makeProjectURL,
-        init() {
-            const options = {
-                valueNames: ['name', 'location']
-            };
-
-            console.log(new List('projectsList', options));
-
-        },
+        // filters
+        search: '',
         async getData() {
 
             const projects = await this.$store.projects.getProjects()
 
-            this.totalNotifications = 0
             this.nbNewProjects = 0
 
-            projects.forEach(p => this.totalNotifications += p.project.notifications.count)
-            projects.forEach(p => {
-                if (p.status === 'NEW') return this.nbNewProjects += 1
-            })
+            projects.forEach(p => { if (p.status === 'NEW') return this.nbNewProjects += 1 })
 
             this.data = projects
+            this.displayedData = projects
 
             const Map = initMap(projects);
 
@@ -57,6 +47,17 @@ function PersonalAdvisorDashboard() {
         },
         get isBusy() {
             return this.$store.app.isLoading
+        },
+        handleProjectsSearch(event) {
+
+            if (this.search === "") return this.displayedData = this.data
+            
+            const newProjectList = this.data.filter(item => {
+                if (item.project?.name?.toLowerCase().includes(this.search.toLowerCase())) return item
+                if (item.project?.commune?.name?.toLowerCase().includes(event.target.value.toLowerCase())) return item
+            })
+
+            this.displayedData = newProjectList
         },
         sortStatusFn(a, b) {
             if (a.status === 'NEW') {
@@ -107,13 +108,13 @@ function initMap(projects) {
 function initMapLayers(map, projects) {
     projects.forEach((item) => {
         if (item.project?.commune?.latitude && item.project?.commune?.longitude) {
-            L.marker([item.project.commune.latitude, item.project.commune.longitude],{ icon: createMarkerIcon(item) }).addTo(map)
+            L.marker([item.project.commune.latitude, item.project.commune.longitude], { icon: createMarkerIcon(item) }).addTo(map)
         }
     })
 }
 
 function createMarkerIcon(item) {
-    return L.divIcon({ 
+    return L.divIcon({
         className: `map-marker ${item.status === "NEW" ? 'project-marker new-project-marker' : 'project-marker'}`,
         html: `<a href="#project-${item.project.id}">${item.project.id}</a>`
     });

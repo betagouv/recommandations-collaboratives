@@ -1,10 +1,10 @@
 {% load static %}
 
-<div class="d-flex align-items-center mb-4">
+<div class="d-flex align-items-center mb-4 mt-4">
     <div class="input-item bg-white">
         <svg class="input-icon bi align-baseline me-2" width="17" height="17" fill="#222">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
         </svg>
-        <input type="search"class="search input-field" placeholder="Rechercher"/>
+        <input class="input-field" type="search" x-model="search" x-on:input.change="handleProjectsSearch" placeholder="Rechercher"/>
     </div>
 </div>
