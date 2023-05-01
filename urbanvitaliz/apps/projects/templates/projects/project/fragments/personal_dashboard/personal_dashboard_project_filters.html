@@ -7,4 +7,15 @@
         </svg>
         <input class="input-field" type="search" x-model="search" x-on:input.change="handleProjectsSearch" placeholder="Rechercher"/>
     </div>
+    <div class="input-item">
+        <select x-model="select" x-on:input.change="handleProjectsSelect" class="input-field px-3 fw-normal text-dark appearance-none" name="projects-select" id="projects-select" style="padding-right: 40px !important">
+            <option value="">Nouveau projets</option>
+            <option value="date">Dâte de dépot</option>
+            <option value="commune-name">Nom de la commune</option>
+            <option value="insee">Code INSEE</option>
+        </select>
+        <svg class="input-icon right black bi align-baseline me-2" width="15" height="15" fill="#000000">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
+        </svg>
+    </div>
 </div>

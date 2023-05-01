@@ -26,6 +26,7 @@ function PersonalAdvisorDashboard() {
         makeProjectURL,
         // filters
         search: '',
+        select:'',
         async getData() {
 
             const projects = await this.$store.projects.getProjects()
@@ -35,13 +36,12 @@ function PersonalAdvisorDashboard() {
             projects.forEach(p => { if (p.status === 'NEW') return this.nbNewProjects += 1 })
 
             this.data = projects
-            this.displayedData = projects
+            this.displayedData = this.data.sort(this.sortProjectStatus);
 
             const Map = initMap(projects);
 
-            console.log('big map', Map);
-
             //Center Map
+            // TODO center in middle of all projects
             Map.panTo(new L.LatLng(46.51, 1.20));
             Map.zoomIn()
         },
@@ -59,32 +59,46 @@ function PersonalAdvisorDashboard() {
 
             this.displayedData = newProjectList
         },
-        sortStatusFn(a, b) {
+        handleProjectsSelect(event){
+            switch(event.target.value) {
+                case "commune-name":
+                    return this.displayedData = this.data.sort(this.sortProjectCommuneName)
+                case "date":
+                    return this.displayedData = this.data.sort(this.sortProjectDate)
+                case "insee":
+                    return this.displayedData = this.data.sort(this.sortProjectInsee)
+                default:
+                    return this.displayedData = this.data.sort(this.sortProjectStatus)
+            }
+        },
+        sortProjectCommuneName(a, b){
+            if (a.project?.commune?.name < b.project?.commune?.name) {
+                return -1
+            } else if (a.project?.commune?.name > b.project?.commune?.name) {
+                return 1
+            } else return 0
+        },
+        sortProjectDate(a, b){
+            if (new Date(a.project?.created_on) < new Date(b.project?.created_on)) {
+                return -1
+            } else if (new Date(a.project?.created_on) > new Date(b.project?.created_on)) {
+                return 1
+            } else return 0
+        },
+        sortProjectInsee(a, b){
+            if (a.project?.commune?.insee < b.project?.commune?.insee) {
+                return -1
+            } else if (a.project?.commune?.insee > b.project?.commune?.insee) {
+                return 1
+            } else return 0
+        },
+        sortProjectStatus(a, b) {
             if (a.status === 'NEW') {
                 return -1
             } else if (b.status === 'NEW') {
                 return 1
             } else return 0
-        },
-        sortFn(a, b) {
-            if (b.project.notifications.count - a.project.notifications.count)
-                return b.project.notifications.count - a.project.notifications.count;
-            else {
-                return b.project.created_on - a.project.created_on;
-            }
-        },
-        filterFn(d) {
-            if (this.selectedDepartment && this.selectedDepartment !== "") {
-                return d.commune && (d.commune.department.code == this.selectedDepartment)
-            } else {
-                return true
-            }
-        },
-        getProjectRoleColor(project) {
-            if (project.is_observer) return roles.observer.color
-            else if (project.is_switchtender) return roles.switchtender.color
-            else return ''
-        },
+        }
     }
 }
 

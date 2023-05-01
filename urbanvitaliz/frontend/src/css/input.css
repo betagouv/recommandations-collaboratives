@@ -19,11 +19,22 @@
     opacity: 1;
 }
 
+
+.input-icon.right {
+    right: 10px;
+    left: auto;
+}
+
+.input-icon.black {
+    fill: #000 !important;
+}
+
 .input-icon {
     position: absolute;
     left: 10px;
     fill: #666666;
 }
+
 
 .input-item .input-field {
     border: none !important;
