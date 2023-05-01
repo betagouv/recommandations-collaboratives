@@ -27,6 +27,8 @@ function PersonalAdvisorDashboard() {
         // filters
         search: '',
         select:'',
+        //departments
+        departments:[],
         async getData() {
 
             const projects = await this.$store.projects.getProjects()
@@ -34,6 +36,7 @@ function PersonalAdvisorDashboard() {
             this.nbNewProjects = 0
 
             projects.forEach(p => { if (p.status === 'NEW') return this.nbNewProjects += 1 })
+            this.extractAndCreateAdvisorDepartments(projects);
 
             this.data = projects
             this.displayedData = this.data.sort(this.sortProjectStatus);
@@ -47,6 +50,18 @@ function PersonalAdvisorDashboard() {
         },
         get isBusy() {
             return this.$store.app.isLoading
+        },
+        extractAndCreateAdvisorDepartments(projects) {
+            const departments = []
+
+            projects.forEach(item => {
+                //If the department code is already in our deparments array
+                if (departments.findIndex(department => department.code === item.project?.commune?.department?.code) != -1) return
+
+                departments.push(item.project?.commune?.department)
+            })
+
+            this.departments = departments;
         },
         handleProjectsSearch(event) {
 

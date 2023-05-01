@@ -5,10 +5,13 @@
         <svg class="input-icon bi align-baseline me-2" width="17" height="17" fill="#222">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
         </svg>
-        <input class="input-field" type="search" x-model="search" x-on:input.change="handleProjectsSearch" placeholder="Rechercher"/>
+        <input class="input-field" type="search" x-model="search" x-on:input.change="handleProjectsSearch"
+            placeholder="Rechercher" />
     </div>
     <div class="input-item">
-        <select x-model="select" x-on:input.change="handleProjectsSelect" class="input-field px-3 fw-normal text-dark appearance-none" name="projects-select" id="projects-select" style="padding-right: 40px !important">
+        <select x-model="select" x-on:input.change="handleProjectsSelect"
+            class="input-field px-3 fw-normal text-dark appearance-none" name="projects-select" id="projects-select"
+            style="padding-right: 40px !important">
             <option value="">Nouveau projets</option>
             <option value="date">Dâte de dépot</option>
             <option value="commune-name">Nom de la commune</option>
@@ -17,5 +20,24 @@
         <svg class="input-icon right black bi align-baseline me-2" width="15" height="15" fill="#000000">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
         </svg>
+    </div>
+    <div class="input-item position-relative active" x-data="{ open: false }" x-on:click.outside="open = false">
+        <div class="d-flex align-items-center pe-4" x-on:click="open = !open" type="button">
+            <button class="input-field px-3 fw-normal text-dark appearance-none">Projet de mon territoire</button>
+            <svg class="input-icon right black bi align-baseline me-2" width="15" height="15" fill="#000000">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
+            </svg>
+        </div>
+        <ul x-show="open" :class="{'show':open}" class="territory-dropdown list-unstyled flex-column">
+            <template x-for="department in departments">
+                <li
+                    class="bg-white appearance-none w-100 py-2 px-2 d-flex justify-content-start align-items-center border-bottom">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" :id="${department.code}" />
+                        <label x-text="`${department.code} - ${department.name}`" class="form-check-label" :for="${department.code}"></label>
+                    </div>
+                </li>
+            </template>
+        </ul>
     </div>
 </div>
