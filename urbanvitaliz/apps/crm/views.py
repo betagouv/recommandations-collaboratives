@@ -28,7 +28,11 @@ from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.utils import get_site_administrators, has_perm, has_perm_or_403
 from watson import search as watson
 
+<<<<<<< HEAD
 from . import forms, models, filters
+=======
+from . import filters, forms, models
+>>>>>>> 5f395ee58d508083ac7f0bc0cc77b0b42d118d51
 
 
 class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
@@ -104,6 +108,11 @@ def crm_search(request):
     return render(request, "crm/search_results.html", locals())
 
 
+########################################################################
+# organizations
+########################################################################
+
+
 @login_required
 def organization_details(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
@@ -158,13 +167,20 @@ def organization_details(request, organization_id):
     return render(request, "crm/organization_details.html", locals())
 
 
+########################################################################
+# users
+########################################################################
+
+
 @login_required
 def user_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # filter
-    users = User.objects.filter(profile__sites=request.site)
-    filter = filters.UserFilter(request.GET, queryset=users)
+    # filtered users
+    users = filters.UserFilter(
+        request.GET,
+        queryset=User.objects.filter(profile__sites=request.site),
+    )
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -230,6 +246,11 @@ def user_notifications(request, user_id):
     )[:100]
 
     return render(request, "crm/user_notifications.html", locals())
+
+
+########################################################################
+# projects
+########################################################################
 
 
 @login_required
