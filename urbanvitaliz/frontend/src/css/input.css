@@ -19,6 +19,11 @@
     opacity: 1;
 }
 
+.input-active {
+    outline: #0d6efd auto 1px;
+    border-radius: 20px;
+}
+
 
 .input-icon.right {
     right: 10px;

@@ -73,3 +73,14 @@
     font-size: 15px;
 }
 
+.department-item {
+    cursor: pointer;
+}
+.department-item *{
+    cursor: pointer;
+}
+
+.department-item:hover {
+    background-color: #e6e6e6 !important;
+}
+

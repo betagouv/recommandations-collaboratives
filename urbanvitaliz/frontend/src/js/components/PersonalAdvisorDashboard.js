@@ -37,6 +37,7 @@ function PersonalAdvisorDashboard() {
 
             //Center Map
             // TODO center in middle of all projects
+            // TODO centroide
             Map.panTo(new L.LatLng(46.51, 1.20));
             Map.zoomIn()
         },
@@ -50,10 +51,12 @@ function PersonalAdvisorDashboard() {
                 //If the department code is already in our deparments array
                 if (departments.findIndex(department => department.code === item.project?.commune?.department?.code) != -1) return
 
-                departments.push(item.project?.commune?.department)
+                const deparmentItem = {...item.project?.commune?.department, active:true}
+
+                departments.push(deparmentItem)
             })
 
-            this.departments = departments;
+            return this.departments = departments;
         },
         handleProjectsSearch(event) {
 
@@ -66,7 +69,20 @@ function PersonalAdvisorDashboard() {
                 if (item.project?.commune?.name?.toLowerCase().includes(event.target.value.toLowerCase())) return item
             })
 
-            this.displayedData = newProjectList
+            return this.displayedData = newProjectList
+        },
+        handleTerritoryFilter(event) {
+
+            this.departments = this.departments.map(department => {
+                if (department.code === event.target.value) {
+                    department.active = event.target.checked
+                }
+
+                return department
+            })
+
+            //find department item from departments for each project and return if the department is active
+            return this.displayedData = this.data.filter(item => this.departments.find(department => department.code === item.project.commune.department.code).active)
         },
         handleProjectsSelect(event){
 
