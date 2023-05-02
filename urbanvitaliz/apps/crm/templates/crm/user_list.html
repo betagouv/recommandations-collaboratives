@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+{% load humanize %}
+{% load training %}
+{% load hijack %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+<style>
+ html, body {
+     scroll-padding-top: 240px;
+ }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif">
+    {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
+
+    <div class="w-75 d-flex flex-column justify-content-start">
+        <div class="crm-header px-4 py-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3>Gestion des utilisateur·rice·s {{ request.site.name }}</h3>
+            </div>
+        </div>
+
+
+        <div class="px-4 pt-4 mb-3">
+            {% with users.form as form %}
+            <form x-data="" class="row g-3" method="get" action="{% url 'crm-user-list' %}">
+                {{ form.non_field_errors }}
+
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" name="{{ form.username.name }}" id="{{ form.username.id }}" placeholder="Identifiant de connexion / courriel" aria-label="Identifiant de connexion" value="{{ form.username.value|default:"" }}" aria-describedby="button-search">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-search">Rechercher</button>
+                    </div>
+
+                    <hr/>
+
+                    <div class="form-check form-switch mb-3">
+                        <input @click="$event.target.form.submit();" class="form-check-input" type="checkbox" id="{{ form.inactive.name }}" name="{{ form.inactive.name }}" {% if form.inactive.value == True %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.inactive.name }}">Uniquement les comptes désactivés</label>
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="{{ form.role.field.name }}" class="form-label me-2">Limiter à </label>
+                        <div class="btn-group" role="group" aria-label="Role radio button">
+                            {% for choice in form.role.field.choices %}
+                            <input @click="$event.target.form.submit();" type="radio" class="btn-check" name="{{ form.role.name }}" id="btnradio-{{ choice.0 }}" autocomplete="off" value="{{ choice.0 }}" {% if choice.0|stringformat:"i" == form.role.value %}checked{% endif %}>
+                            <label class="btn btn-outline-primary" for="btnradio-{{ choice.0 }}">{{ choice.1 }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <hr/>
+
+                    <div>
+                        <label for="{{ form.ordering.name }}" class="form-label me-2">Trier par : </label>
+                        <select class="form-control" name="{{ form.ordering.name }}" id="{{ form.ordering.name }}">
+                            {% for choice in form.ordering.field.choices %}
+                            <option @click="$event.target.form.submit();" value="{{ choice.0 }}" {% if choice.0 == form.ordering.value.0 %}selected{%endif %}>
+                                {{ choice.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+
+            </form>
+            {% endwith %}
+        </div>
+
+        <div class="mb-3" class="table-responsive">
+            <table class="table table-striped table-hover caption-top">
+                <caption class="ms-2">{{ users.qs.count }} résultat{{ users.qs.count|pluralize }}</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Identifiant de connexion</th>
+                        <th scope="col">Prénom</th>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Organisation</th>
+                        <th scope="col">Inscription</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users.qs %}
+                    <tr>
+                        <td><a href="{% url 'crm-user-details' user.pk %}">{{ user.username|truncatechars:48 }}</a></td>
+                        <td>{{ user.first_name }}</td>
+                        <td>{{ user.last_name }}</td>
+                        <td>{{ user.profile.organization|default:"-" }}</td>
+                        <td>{{ user.date_joined|date }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            -- Aucun résultat --
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
