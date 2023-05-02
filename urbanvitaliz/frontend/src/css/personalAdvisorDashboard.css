@@ -1,5 +1,21 @@
+/* used to be able to use position sticky on children */
+body,
+main {
+    overflow-x: initial !important;
+}
+
 [x-cloak] {
     display: none;
+}
+
+.personal-dashboard-container-inner {
+    position: relative;
+    background-color: #e6e6e6;
+    background: #F6F6F6;
+    border-width: 1px 1px 0px 0px;
+    border-style: solid;
+    border-color: #E5E5E5;
+    border-radius: 0px 4px 0px 0px;
 }
 
 .positioning-dropdown {
@@ -44,10 +60,30 @@
 }
 
 .dashboard-map-container {
-    height: 300px;
+    position: sticky;
+    top: 62.5px;
+    height: 140px;
     width: 100%;
+    z-index: 100;
 }
 
+.personal-dashboard-map {
+    z-index: 1;
+}
+
+.map-increase-height-button {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 110;
+    width: 15px;
+    height: 15px;
+    padding: 15px;
+}
 
 .new-project-marker {
     background-color: #FDCD6D !important;
@@ -76,11 +112,11 @@
 .department-item {
     cursor: pointer;
 }
-.department-item *{
+
+.department-item * {
     cursor: pointer;
 }
 
 .department-item:hover {
     background-color: #e6e6e6 !important;
 }
-

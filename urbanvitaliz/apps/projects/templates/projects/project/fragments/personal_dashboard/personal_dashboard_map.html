@@ -1,3 +1,10 @@
+{% load static %}
+
 <div x-cloak class="p-0 dashboard-map-container">
-    <div class="h-100 w-100" x-ref="map" id="map"></div>
+    <div class="h-100 w-100" x-ref="map" id="map" class="personal-dashboard-map"></div>
+    <div class="map-increase-height-button">
+        <svg class="input-icon right black bi align-baseline" width="15" height="15" fill="#000000" style="z-index:1">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrows-fullscreen" />
+        </svg>
+    </div>
 </div>

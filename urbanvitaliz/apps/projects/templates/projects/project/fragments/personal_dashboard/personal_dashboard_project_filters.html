@@ -2,25 +2,25 @@
 
 <div class="d-flex align-items-center mb-4 mt-4 w-100 justify-content-between">
     <div class="d-flex align-items-center">
-        <div class="input-item bg-white">
+        <div class="input-item">
             <svg class="input-icon bi align-baseline me-2" width="17" height="17" fill="#222">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
             </svg>
-            <input class="input-field" type="search" x-model="search" x-on:input.change="handleProjectsSearch"
+            <input class="input-field bg-white" type="search" x-model="search" x-on:input.change="handleProjectsSearch"
                 placeholder="Rechercher" />
         </div>
         <div class="d-flex align-items-center ms-4">
             <span class="text-custom-info text-grey-dark fw-light me-2">Filter : </span>
-            <div class="input-item">
+            <div class="input-item bg-white">
                 <select x-model="select" x-on:input.change="handleProjectsSelect"
                     class="input-field px-3 fw-normal text-dark appearance-none" name="projects-select" id="projects-select"
-                    style="padding-right: 40px !important">
+                    style="padding-right: 40px !important; z-index: 2; background-color: transparent;">
                     <option value="">Nouveau projets</option>
                     <option value="date">Dâte de dépot</option>
                     <option value="commune-name">Nom de la commune</option>
                     <option value="insee">Code INSEE</option>
                 </select>
-                <svg class="input-icon right black bi align-baseline me-2" width="15" height="15" fill="#000000">
+                <svg class="input-icon right black bi align-baseline me-2" width="15" height="15" fill="#000000" style="z-index:1">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
                 </svg>
             </div>
@@ -29,8 +29,8 @@
     <div class="d-flex align-items-center">
         <span class="text-custom-info text-grey-dark fw-light me-2">Trier : </span>
         <div class="input-item position-relative active" x-data="{ open: false }" x-on:click.outside="open = false">
-            <div class="d-flex align-items-center pe-4" x-on:click="open = !open" type="button" :class="{'input-active':open}">
-                <button class="input-field px-3 fw-normal text-dark appearance-none">Projet de mon territoire</button>
+            <div class="d-flex align-items-center pe-4 bg-white" x-on:click="open = !open" type="button" :class="{'input-active':open}" style="border-radius: 20px;">
+                <button class="input-field bg-white px-3 fw-normal text-dark appearance-none">Projet de mon territoire</button>
                 <svg class="input-icon right black bi align-baseline me-2" width="15" height="15" fill="#000000">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
                 </svg>
