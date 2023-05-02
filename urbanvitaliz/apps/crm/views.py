@@ -28,11 +28,7 @@ from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.utils import get_site_administrators, has_perm, has_perm_or_403
 from watson import search as watson
 
-<<<<<<< HEAD
 from . import forms, models, filters
-=======
-from . import filters, forms, models
->>>>>>> 5f395ee58d508083ac7f0bc0cc77b0b42d118d51
 
 
 class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):

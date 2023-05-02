@@ -11,7 +11,7 @@ import django_filters
 from django import forms
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
-from urbanvitaliz.utils import get_group_for_site
+from urbanvitaliz.utils import make_group_name_for_site
 
 from . import models
 
@@ -28,6 +28,7 @@ class UserFilter(django_filters.FilterSet):
     # filters
     role = django_filters.ChoiceFilter(
         label="Rôle",
+        empty_label="Tou·te·s",
         choices=ROLE_CHOICES,
         method="role_filter",
         widget=forms.widgets.RadioSelect,
