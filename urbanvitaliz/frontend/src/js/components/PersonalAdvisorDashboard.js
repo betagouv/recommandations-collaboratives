@@ -20,14 +20,14 @@ function PersonalAdvisorDashboard() {
         makeProjectURL,
         // filters
         search: '',
-        select:'',
+        select: '',
         //departments
-        departments:[],
+        departments: [],
         // map
-        map:null,
-        mapIsWide:false,
+        map: null,
+        mapIsWide: false,
         //options
-        bodyScrollTopPadding:215,
+        bodyScrollTopPadding: 215,
         init() {
             this.handleBodyTopPaddingScroll(this.bodyScrollTopPadding);
         },
@@ -35,19 +35,13 @@ function PersonalAdvisorDashboard() {
 
             const projects = await this.$store.projects.getProjects()
 
-            this.nbNewProjects = projects.filter(p =>  p.status === 'NEW').length
+            this.nbNewProjects = projects.filter(p => p.status === 'NEW').length
             this.extractAndCreateAdvisorDepartments(projects);
 
             this.data = projects
             this.displayedData = this.data.sort(this.sortProjectStatus);
 
             this.map = initMap(projects);
-
-            //Center Map
-            // TODO center in middle of all projects
-            // TODO centroide
-            this.map.panTo(new L.LatLng(46.51, 1.20));
-            this.map.zoomIn()
         },
         get isBusy() {
             return this.$store.app.isLoading
@@ -59,7 +53,7 @@ function PersonalAdvisorDashboard() {
                 //If the department code is already in our deparments array
                 if (departments.findIndex(department => department.code === item.project?.commune?.department?.code) != -1) return
 
-                const deparmentItem = {...item.project?.commune?.department, active:true}
+                const deparmentItem = { ...item.project?.commune?.department, active: true }
 
                 departments.push(deparmentItem)
             })
@@ -71,7 +65,7 @@ function PersonalAdvisorDashboard() {
             if (this.search === "") {
                 return this.displayedData = this.data
             }
-            
+
             const newProjectList = this.data.filter(item => {
                 if (item.project?.name?.toLowerCase().includes(this.search.toLowerCase())) return item
                 if (item.project?.commune?.name?.toLowerCase().includes(event.target.value.toLowerCase())) return item
@@ -79,7 +73,7 @@ function PersonalAdvisorDashboard() {
 
             return this.displayedData = newProjectList
         },
-        handleTerritoryFilter(event) {
+        handleTerritoryFilter(event) {
 
             this.departments = this.departments.map(department => {
                 if (department.code === event.target.value) {
@@ -92,11 +86,11 @@ function PersonalAdvisorDashboard() {
             //find department item from departments for each project and return if the department is active
             return this.displayedData = this.data.filter(item => this.departments.find(department => department.code === item.project.commune.department.code).active)
         },
-        handleProjectsSelect(event){
+        handleProjectsSelect(event) {
 
             let sortCriterion;
 
-            switch(event.target.value) {
+            switch (event.target.value) {
                 case "commune-name":
                     sortCriterion = this.sortProjectCommuneName
                     break;
@@ -113,21 +107,21 @@ function PersonalAdvisorDashboard() {
 
             return this.displayedData = this.data.sort(sortCriterion)
         },
-        sortProjectCommuneName(a, b){
+        sortProjectCommuneName(a, b) {
             if (a.project?.commune?.name < b.project?.commune?.name) {
                 return -1
             } else if (a.project?.commune?.name > b.project?.commune?.name) {
                 return 1
             } else return 0
         },
-        sortProjectDate(a, b){
+        sortProjectDate(a, b) {
             if (new Date(a.project?.created_on) < new Date(b.project?.created_on)) {
                 return -1
             } else if (new Date(a.project?.created_on) > new Date(b.project?.created_on)) {
                 return 1
             } else return 0
         },
-        sortProjectInsee(a, b){
+        sortProjectInsee(a, b) {
             if (a.project?.commune?.insee < b.project?.commune?.insee) {
                 return -1
             } else if (a.project?.commune?.insee > b.project?.commune?.insee) {
@@ -144,10 +138,10 @@ function PersonalAdvisorDashboard() {
         handleMapOpen() {
             //resize map
             //rezoom to centroide
-            //handle body top padding scroll
             //450 -> header + map.height
             //todo calculate it
             this.handleBodyTopPaddingScroll(455)
+            this.map()
             return this.mapIsWide = !this.mapIsWide
         },
         handleBodyTopPaddingScroll(height) {
@@ -169,16 +163,23 @@ function initMap(projects) {
 
     L.tileLayer.provider('OpenStreetMap.France').addTo(map);
 
-    initMapLayers(map, projects)
+    const markers = createMapMarkers(map, projects)
+
+    var markersLayer = new L.FeatureGroup();
+
+    //Create a layer in order to zoom-in at the center of each markers
+    markers.forEach(marker => markersLayer.addLayer(marker))
+    markersLayer.addTo(map);
+    map.fitBounds(markersLayer.getBounds());
 
     return map
 }
 
 // Crete layers composed with markers
-function initMapLayers(map, projects) {
-    projects.forEach((item) => {
+function createMapMarkers(map, projects) {
+    return projects.map((item) => {
         if (item.project?.commune?.latitude && item.project?.commune?.longitude) {
-            L.marker([item.project.commune.latitude, item.project.commune.longitude], { icon: createMarkerIcon(item) }).addTo(map)
+            return L.marker([item.project.commune.latitude, item.project.commune.longitude], { icon: createMarkerIcon(item) }).addTo(map)
         }
     })
 }
