@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs'
+import api from '../utils/api'
 import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar';
 import { makeProjectURL } from '../utils/createProjectUrl'
@@ -156,6 +157,16 @@ function PersonalAdvisorDashboard() {
             this.bodyScrollTopPadding = height
             window.document.body.style.scrollPaddingTop = `${this.bodyScrollTopPadding}px`;
             window.document.documentElement.style.scrollPaddingTop = `${this.bodyScrollTopPadding}px`;
+        },
+        async handlePositioningAction(url, id) {
+          
+            try {
+                await api.post(url.replace('0', id))
+                await this.getData();
+
+            } catch (err) {
+                console.error('Something went wrong : ', err)
+            }
         }
     }
 }
@@ -173,7 +184,6 @@ function initMap(projects) {
 
     const markers = createMapMarkers(map, projects)
     const markersLayer = createMarkersLayer(map, markers)
-
 
     return { map, markersLayer }
 }
@@ -205,6 +215,10 @@ function createMarkerIcon(item) {
         className: `map-marker ${item.status === "NEW" ? 'project-marker new-project-marker' : 'project-marker'}`,
         html: `<a href="#project-${item.project.id}">${item.project.id}</a>`
     });
+}
+
+export function makeProjectPositioningActionURL(url, id) {
+    return url.replace('0', id);
 }
 
 Alpine.data("PersonalAdvisorDashboard", PersonalAdvisorDashboard)
