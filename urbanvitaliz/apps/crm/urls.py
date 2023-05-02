@@ -34,6 +34,11 @@ urlpatterns = [
         name="crm-organization-details",
     ),
     path(
+        r"crm/users/",
+        views.user_list,
+        name="crm-user-list",
+    ),
+    path(
         r"crm/user/<int:user_id>/",
         views.user_details,
         name="crm-user-details",

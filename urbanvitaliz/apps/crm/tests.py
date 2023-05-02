@@ -1,19 +1,24 @@
 import collections
 
 import pytest
+from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
-from pytest_django.asserts import assertContains, assertNotContains
-from django.conf import settings
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
-from . import models, views
+from . import filters, models, views
+
+########################################################################
+# organization
+########################################################################
 
 
 @pytest.mark.django_db
@@ -25,13 +30,138 @@ def test_crm_organization_not_available_for_non_staff_logged_users(client):
     assert response.status_code == 403
 
 
+########################################################################
+# users
+########################################################################
+
+
 @pytest.mark.django_db
-def test_crm_user_not_available_for_non_staff_logged_users(client):
-    url = reverse("crm-user-details", args=[1])
+def test_crm_user_list_not_available_for_non_staff(client):
+    url = reverse("crm-user-list")
     with login(client):
         response = client.get(url)
 
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_user_list_contains_users(request, client):
+    site = get_current_site(request)
+
+    staff = baker.make(auth_models.User)
+    staff.profile.sites.add(site)
+    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    staff.groups.add(gstaff)
+
+    advisor = baker.make(auth_models.User)
+    advisor.profile.sites.add(site)
+    gadvisor = auth_models.Group.objects.get(name="example_com_advisor")
+    advisor.groups.add(gadvisor)
+
+    a_user = baker.make(auth_models.User)
+    a_user.profile.sites.add(site)
+
+    url = reverse("crm-user-list")
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    for user in [staff, advisor, a_user]:
+        expected = reverse("crm-user-details", args=[user.id])
+        assertContains(response, expected)
+
+
+@pytest.mark.django_db
+def test_crm_user_list_contains_only_selected_user(request, client):
+    site = get_current_site(request)
+
+    expected = baker.make(auth_models.User)
+    expected.profile.sites.add(site)
+
+    unexpected = baker.make(auth_models.User)
+    unexpected.profile.sites.add(site)
+
+    url = reverse("crm-user-list") + f"?username={expected.username}"
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-user-details", args=[expected.id])
+    assertContains(response, expected)
+
+    unexpected = reverse("crm-user-details", args=[unexpected.id])
+    assertNotContains(response, unexpected)
+
+
+@pytest.mark.django_db
+def test_crm_user_list_contains_only_inactive_user(request, client):
+    site = get_current_site(request)
+
+    active = baker.make(auth_models.User, is_active=True)
+    active.profile.sites.add(site)
+
+    inactive = baker.make(auth_models.User, is_active=False)
+    inactive.profile.sites.add(site)
+
+    url = reverse("crm-user-list") + f"?inactive=true"
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-user-details", args=[inactive.id])
+    assertContains(response, expected)
+
+    unexpected = reverse("crm-user-details", args=[active.id])
+    assertNotContains(response, unexpected)
+
+
+@pytest.mark.django_db
+def test_crm_user_list_contains_only_selected_role(request, client):
+    site = get_current_site(request)
+
+    staff = baker.make(auth_models.User)
+    staff.profile.sites.add(site)
+    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    staff.groups.add(gstaff)
+
+    advisor = baker.make(auth_models.User)
+    advisor.profile.sites.add(site)
+    gadvisor = auth_models.Group.objects.get(name="example_com_advisor")
+    advisor.groups.add(gadvisor)
+
+    a_user = baker.make(auth_models.User)
+    a_user.profile.sites.add(site)
+
+    url = reverse("crm-user-list") + f"?role=2"  # role 2 is staff
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-user-details", args=[staff.id])
+    assertContains(response, expected)
+
+    unexpected = reverse("crm-user-details", args=[advisor.id])
+    assertNotContains(response, unexpected)
+
+    unexpected = reverse("crm-user-details", args=[a_user.id])
+    assertNotContains(response, unexpected)
+
+
+########################################################################
+# project
+########################################################################
 
 
 @pytest.mark.django_db
