@@ -1,1 +1,96 @@
 {% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+{% load humanize %}
+{% load training %}
+{% load hijack %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+<style>
+ html, body {
+     scroll-padding-top: 240px;
+ }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif">
+    {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
+
+    <div class="w-75 d-flex flex-column justify-content-start">
+        <div class="crm-header px-4 py-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3>Gestion des utilisateur·rice·s {{ request.site.name }}</h3>
+            </div>
+        </div>
+
+
+        <div class="px-4 py-4 mb-3">
+            {% with filter.form as form %}
+            <form x-data="" class="row g-3" method="get" action="{% url 'crm-user-list' %}">
+                {{ form.non_field_errors }}
+
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" name="{{ form.username.name }}" id="{{ form.username.id }}" placeholder="Identifiant de connexion / courriel" aria-label="Identifiant de connexion" value="{{ form.username.value }}" aria-describedby="button-search">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-search">Rechercher</button>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input @click="$event.target.form.submit();" class="form-check-input" type="checkbox" id="{{ form.is_active.name }}" name="{{ form.is_active.name }}" {% if form.is_active.value == True %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.is_active.name }}">Uniquement les comptes désactivés</label>
+                    </div>
+
+                    <div>
+                        <label for="{{ form.role.field.name }}" class="form-label me-2">Limiter à </label>
+                        <div class="btn-group" role="group" aria-label="Role radio button">
+                            {% for choice in form.role.field.choices %}
+                            <input @click="$event.target.form.submit();" type="radio" class="btn-check" name="{{ form.role.name }}" id="btnradio-{{ choice.0 }}" autocomplete="off" value="{{ choice.0 }}" {% if choice.0|stringformat:"i" == form.role.value %}checked{% endif %}>
+                            <label class="btn btn-outline-primary" for="btnradio-{{ choice.0 }}">{{ choice.1 }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+
+            </form>
+            {% endwith %}
+        </div>
+
+        <div class="mb-3">
+            <table class="m-2 table table-striped table-hover caption-top">
+                <caption>{{ filter.qs.count }} résultat{{ filter.qs.coun|pluralize }}</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Identifiant de connexion</th>
+                        <th scope="col">Prénom</th>
+                        <th scope="col">Nom</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in filter.qs %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.first_name }}</td>
+                        <td>{{ user.last_name }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">
+                            -- Aucun résultat --
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

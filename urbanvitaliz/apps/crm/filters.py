@@ -8,6 +8,7 @@ created: Tue May  2 11:45:15 2023
 """
 
 import django_filters
+from django import forms
 from django.contrib.auth import models as auth_models
 
 from . import models
@@ -17,19 +18,22 @@ class UserFilter(django_filters.FilterSet):
     """Filter for the list of users"""
 
     ROLE_CHOICES = [
-        (0, "Tou·te·s"),
         (1, "Conseiller·ère"),
         (2, "Équipe"),
         (3, "Administrateur·rice"),
     ]
 
     # filters
+    role = django_filters.ChoiceFilter(
+        label="Rôle",
+        choices=ROLE_CHOICES,
+        method="role_filter",
+        widget=forms.widgets.RadioSelect,
+    )
 
-    username = django_filters.CharFilter(max_length=255, field_name="username")
-
-    role = django_filters.ChoiceFilter(choices=self.ROLE_CHOICES, method="role_filter")
-
-    active = django_filters.BooleanFilter(field_name="is_active", default=True)
+    is_active = django_filters.BooleanFilter(
+        label="Compte actif", field_name="is_active", widget=forms.widgets.CheckboxInput
+    )
 
     # orders
 
@@ -44,6 +48,7 @@ class UserFilter(django_filters.FilterSet):
             "last_name": "Nom de famille",
             "created_on": "Date de création",
         },
+        widget=django_filters.widgets.LinkWidget,
     )
 
     class Meta:
