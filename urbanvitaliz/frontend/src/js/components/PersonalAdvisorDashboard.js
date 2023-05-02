@@ -27,9 +27,7 @@ function PersonalAdvisorDashboard() {
 
             const projects = await this.$store.projects.getProjects()
 
-            this.nbNewProjects = 0
-
-            projects.forEach(p => { if (p.status === 'NEW') return this.nbNewProjects += 1 })
+            this.nbNewProjects = projects.filter(p =>  p.status === 'NEW').length
             this.extractAndCreateAdvisorDepartments(projects);
 
             this.data = projects
