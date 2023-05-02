@@ -144,12 +144,13 @@ function PersonalAdvisorDashboard() {
         handleMapOpen() {
             //450 -> header + map.height
             //todo calculate it
-            this.handleBodyTopPaddingScroll(455)
             
             setTimeout(() => this.map.invalidateSize(), 251)
             setTimeout(() => zoomToCentroid(this.map, this.markersLayer), 251)
 
-            return this.mapIsWide = !this.mapIsWide
+            this.mapIsWide = !this.mapIsWide
+
+            this.handleBodyTopPaddingScroll(this.mapIsWide ? 455 : 215)
         },
         handleBodyTopPaddingScroll(height) {
             this.bodyScrollTopPadding = height
