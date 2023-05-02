@@ -33,13 +33,13 @@
 
 
         <div class="px-4 py-4 mb-3">
-            {% with filter.form as form %}
+            {% with users.form as form %}
             <form x-data="" class="row g-3" method="get" action="{% url 'crm-user-list' %}">
                 {{ form.non_field_errors }}
 
                 <div class="col-md-6">
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" name="{{ form.username.name }}" id="{{ form.username.id }}" placeholder="Identifiant de connexion / courriel" aria-label="Identifiant de connexion" value="{{ form.username.value }}" aria-describedby="button-search">
+                        <input type="text" class="form-control" name="{{ form.username.name }}" id="{{ form.username.id }}" placeholder="Identifiant de connexion / courriel" aria-label="Identifiant de connexion" value="{{ form.username.value|default:"" }}" aria-describedby="button-search">
                         <button class="btn btn-outline-secondary" type="submit" id="button-search">Rechercher</button>
                     </div>
 
@@ -66,7 +66,7 @@
 
         <div class="mb-3">
             <table class="m-2 table table-striped table-hover caption-top">
-                <caption>{{ filter.qs.count }} résultat{{ filter.qs.count|pluralize }}</caption>
+                <caption>{{ users.qs.count }} résultat{{ users.qs.count|pluralize }}</caption>
                 <thead>
                     <tr>
                         <th scope="col">Identifiant de connexion</th>
@@ -75,9 +75,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for user in filter.qs %}
+                    {% for user in users.qs %}
                     <tr>
-                        <td>{{ user.username }}</td>
+                        <td><a href="{% url 'crm-user-details' user.pk %}">{{ user.username }}</a></td>
                         <td>{{ user.first_name }}</td>
                         <td>{{ user.last_name }}</td>
                     </tr>

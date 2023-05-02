@@ -71,7 +71,7 @@ def test_crm_user_list_contains_users(request, client):
 
     for user in [staff, advisor, a_user]:
         expected = reverse("crm-user-details", args=[user.id])
-        assertContains(response, user.username)
+        assertContains(response, expected)
 
 
 @pytest.mark.django_db
@@ -84,7 +84,7 @@ def test_crm_user_list_contains_only_selected_user(request, client):
     unexpected = baker.make(auth_models.User)
     unexpected.profile.sites.add(site)
 
-    url = reverse("crm-user-list") + f"?username={expected.username[:10]}"
+    url = reverse("crm-user-list") + f"?username={expected.username}"
 
     with login(client) as user:
         assign_perm("use_crm", user, site)
@@ -118,10 +118,10 @@ def test_crm_user_list_contains_only_inactive_user(request, client):
     assert response.status_code == 200
 
     expected = reverse("crm-user-details", args=[inactive.id])
-    assertContains(response, inactive.username)
+    assertContains(response, expected)
 
     unexpected = reverse("crm-user-details", args=[active.id])
-    assertNotContains(response, active.username)
+    assertNotContains(response, unexpected)
 
 
 @pytest.mark.django_db

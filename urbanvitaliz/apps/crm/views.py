@@ -179,6 +179,8 @@ def user_list(request):
         queryset=User.objects.filter(profile__sites=request.site),
     )
 
+    print(users.qs)
+
     # required by default on crm
     search_form = forms.CRMSearchForm()
 

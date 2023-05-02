@@ -28,6 +28,7 @@ class UserFilter(django_filters.FilterSet):
     # filters
     role = django_filters.ChoiceFilter(
         label="Rôle",
+        empty_label="Tou·te·s",
         choices=ROLE_CHOICES,
         method="role_filter",
         widget=forms.widgets.RadioSelect,
@@ -57,7 +58,7 @@ class UserFilter(django_filters.FilterSet):
 
     class Meta:
         model = auth_models.User
-        fields = []
+        fields = ["username", "is_active", "role", "ordering"]
 
     def inactive_filter(self, queryset, name, value):
         if name != "inactive" or not value:
@@ -66,7 +67,7 @@ class UserFilter(django_filters.FilterSet):
 
     def role_filter(self, queryset, name, value):
         """Filter user having the provided role or all if role is unknown"""
-        mapping = {1: "advisor", 2: "staff", 3: "admin"}
+        mapping = {"1": "advisor", "2": "staff", "3": "admin"}
 
         if name != "role":
             return queryset
@@ -79,7 +80,7 @@ class UserFilter(django_filters.FilterSet):
         # filter on group name
         site = site_models.Site.objects.get_current()
         group_name = make_group_name_for_site(name, site)
-        return queryset.filter(group__name=group_name)
+        return queryset.filter(groups__name=group_name)
 
 
 # eof
