@@ -11,7 +11,7 @@ import django_filters
 from django import forms
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
-from urbanvitaliz.utils import get_group_for_site
+from urbanvitaliz.utils import make_group_name_for_site
 
 from . import models
 
@@ -33,8 +33,10 @@ class UserFilter(django_filters.FilterSet):
         widget=forms.widgets.RadioSelect,
     )
 
-    is_active = django_filters.BooleanFilter(
-        label="Compte actif", field_name="is_active", widget=forms.widgets.CheckboxInput
+    inactive = django_filters.BooleanFilter(
+        label="Compte inactif",
+        method="inactive_filter",
+        widget=forms.widgets.CheckboxInput,
     )
 
     # orders
@@ -57,13 +59,19 @@ class UserFilter(django_filters.FilterSet):
         model = auth_models.User
         fields = []
 
+    def inactive_filter(self, queryset, name, value):
+        if name != "inactive" or not value:
+            return queryset
+        return queryset.filter(is_active=False)
+
     def role_filter(self, queryset, name, value):
         """Filter user having the provided role or all if role is unknown"""
+        mapping = {1: "advisor", 2: "staff", 3: "admin"}
+
         if name != "role":
             return queryset
 
         # get requested group name
-        mapping = {1: "advisor", 2: "staff", 3: "admin"}
         name = mapping.get(value)
         if not name:
             return queryset

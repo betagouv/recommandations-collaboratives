@@ -45,6 +45,36 @@ def test_crm_user_list_not_available_for_non_staff(client):
 
 
 @pytest.mark.django_db
+def test_crm_user_list_contains_users(request, client):
+    site = get_current_site(request)
+
+    staff = baker.make(auth_models.User)
+    staff.profile.sites.add(site)
+    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    staff.groups.add(gstaff)
+
+    advisor = baker.make(auth_models.User)
+    advisor.profile.sites.add(site)
+    gadvisor = auth_models.Group.objects.get(name="example_com_advisor")
+    advisor.groups.add(gadvisor)
+
+    a_user = baker.make(auth_models.User)
+    a_user.profile.sites.add(site)
+
+    url = reverse("crm-user-list")
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    for user in [staff, advisor, a_user]:
+        expected = reverse("crm-user-details", args=[user.id])
+        assertContains(response, user.username)
+
+
+@pytest.mark.django_db
 def test_crm_user_list_contains_only_selected_user(request, client):
     site = get_current_site(request)
 
@@ -70,7 +100,7 @@ def test_crm_user_list_contains_only_selected_user(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_user_list_contains_only_active_user(request, client):
+def test_crm_user_list_contains_only_inactive_user(request, client):
     site = get_current_site(request)
 
     active = baker.make(auth_models.User, is_active=True)
@@ -79,7 +109,7 @@ def test_crm_user_list_contains_only_active_user(request, client):
     inactive = baker.make(auth_models.User, is_active=False)
     inactive.profile.sites.add(site)
 
-    url = reverse("crm-user-list") + f"?active=true"
+    url = reverse("crm-user-list") + f"?inactive=true"
 
     with login(client) as user:
         assign_perm("use_crm", user, site)
@@ -87,11 +117,11 @@ def test_crm_user_list_contains_only_active_user(request, client):
 
     assert response.status_code == 200
 
-    expected = reverse("crm-user-details", args=[active.id])
-    assertContains(response, expected)
+    expected = reverse("crm-user-details", args=[inactive.id])
+    assertContains(response, inactive.username)
 
-    unexpected = reverse("crm-user-details", args=[inactive.id])
-    assertNotContains(response, unexpected)
+    unexpected = reverse("crm-user-details", args=[active.id])
+    assertNotContains(response, active.username)
 
 
 @pytest.mark.django_db
