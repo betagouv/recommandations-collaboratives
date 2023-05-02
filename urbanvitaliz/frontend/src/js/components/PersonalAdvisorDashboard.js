@@ -69,16 +69,25 @@ function PersonalAdvisorDashboard() {
             this.displayedData = newProjectList
         },
         handleProjectsSelect(event){
+
+            let sortCriterion;
+
             switch(event.target.value) {
                 case "commune-name":
-                    return this.displayedData = this.data.sort(this.sortProjectCommuneName)
+                    sortCriterion = this.sortProjectCommuneName
+                    break;
                 case "date":
-                    return this.displayedData = this.data.sort(this.sortProjectDate)
+                    sortCriterion = this.sortProjectDate
+                    break;
                 case "insee":
-                    return this.displayedData = this.data.sort(this.sortProjectInsee)
+                    sortCriterion = this.sortProjectInsee
+                    break;
                 default:
-                    return this.displayedData = this.data.sort(this.sortProjectStatus)
+                    sortCriterion = this.sortProjectStatus
+                    break;
             }
+
+            return this.displayedData = this.data.sort(sortCriterion)
         },
         sortProjectCommuneName(a, b){
             if (a.project?.commune?.name < b.project?.commune?.name) {
