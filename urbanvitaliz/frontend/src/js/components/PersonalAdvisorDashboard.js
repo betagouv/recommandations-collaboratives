@@ -26,6 +26,7 @@ function PersonalAdvisorDashboard() {
         // map
         map: null,
         mapIsWide: false,
+        markersLayer: "",
         //options
         bodyScrollTopPadding: 215,
         init() {
@@ -41,7 +42,12 @@ function PersonalAdvisorDashboard() {
             this.data = projects
             this.displayedData = this.data.sort(this.sortProjectStatus);
 
-            this.map = initMap(projects);
+            const { map, markersLayer } = initMap(projects)
+
+            this.map = map
+            this.markersLayer = markersLayer
+
+            zoomToCentroid(this.map, this.markersLayer);
         },
         get isBusy() {
             return this.$store.app.isLoading
@@ -136,12 +142,13 @@ function PersonalAdvisorDashboard() {
             } else return 0
         },
         handleMapOpen() {
-            //resize map
-            //rezoom to centroide
             //450 -> header + map.height
             //todo calculate it
             this.handleBodyTopPaddingScroll(455)
-            this.map()
+            
+            setTimeout(() => this.map.invalidateSize(), 251)
+            setTimeout(() => zoomToCentroid(this.map, this.markersLayer), 251)
+
             return this.mapIsWide = !this.mapIsWide
         },
         handleBodyTopPaddingScroll(height) {
@@ -164,15 +171,23 @@ function initMap(projects) {
     L.tileLayer.provider('OpenStreetMap.France').addTo(map);
 
     const markers = createMapMarkers(map, projects)
+    const markersLayer = createMarkersLayer(map, markers)
 
-    var markersLayer = new L.FeatureGroup();
 
-    //Create a layer in order to zoom-in at the center of each markers
+    return { map, markersLayer }
+}
+
+//Create a layer in order to zoom-in at the center of each markers
+function createMarkersLayer(map, markers) {
+    const markersLayer = new L.FeatureGroup();
     markers.forEach(marker => markersLayer.addLayer(marker))
     markersLayer.addTo(map);
-    map.fitBounds(markersLayer.getBounds());
 
-    return map
+    return markersLayer
+}
+
+function zoomToCentroid(map, markersLayer) {
+    map.fitBounds(markersLayer.getBounds());
 }
 
 // Crete layers composed with markers
