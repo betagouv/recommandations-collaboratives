@@ -242,7 +242,8 @@ def project_list_for_advisor(request):
         recipient=request.user, public=True
     )
 
-    return render(request, "projects/project/advisor_dashboard.html", locals())
+    return render(request, "projects/project/personal_advisor_dashboard.html", locals())
+
 
 
 @login_required
