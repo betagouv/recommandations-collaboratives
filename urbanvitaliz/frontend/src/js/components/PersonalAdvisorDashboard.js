@@ -57,7 +57,9 @@ function PersonalAdvisorDashboard() {
         },
         handleProjectsSearch(event) {
 
-            if (this.search === "") return this.displayedData = this.data
+            if (this.search === "") {
+                return this.displayedData = this.data
+            }
             
             const newProjectList = this.data.filter(item => {
                 if (item.project?.name?.toLowerCase().includes(this.search.toLowerCase())) return item
