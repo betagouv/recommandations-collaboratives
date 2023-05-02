@@ -59,30 +59,48 @@ main {
     color: #222 !important;
 }
 
-.dashboard-map-container {
+.personal-dashboard-map-container {
     position: sticky;
     top: 62.5px;
     height: 140px;
     width: 100%;
     z-index: 100;
+
+    transition: height 0.25s ease;
 }
 
-.personal-dashboard-map {
+.personal-dashboard-map-container.is-wide {
+    height: 380px;
+}
+
+.personal-dashboard-map-container .leaflet-container {
     z-index: 1;
 }
 
 .map-increase-height-button {
     position: absolute;
-    right: 10px;
-    bottom: 10px;
-    background-color: white;
+    right: 15px;
+    bottom: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
+
     z-index: 110;
-    width: 15px;
-    height: 15px;
-    padding: 15px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 6px;
+    border:2px solid #ccc;
+
+    cursor: pointer;
+}
+
+.map-increase-height-button:hover {
+    background-color: #f4f4f4;
+}
+
+.map-increase-height-button svg {
+    stroke: #222;
+    stroke-width: 1;
 }
 
 .new-project-marker {

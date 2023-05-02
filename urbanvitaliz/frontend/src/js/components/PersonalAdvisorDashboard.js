@@ -23,6 +23,14 @@ function PersonalAdvisorDashboard() {
         select:'',
         //departments
         departments:[],
+        // map
+        map:null,
+        mapIsWide:false,
+        //options
+        bodyScrollTopPadding:215,
+        init() {
+            this.handleBodyTopPaddingScroll(this.bodyScrollTopPadding);
+        },
         async getData() {
 
             const projects = await this.$store.projects.getProjects()
@@ -33,13 +41,13 @@ function PersonalAdvisorDashboard() {
             this.data = projects
             this.displayedData = this.data.sort(this.sortProjectStatus);
 
-            const Map = initMap(projects);
+            this.map = initMap(projects);
 
             //Center Map
             // TODO center in middle of all projects
             // TODO centroide
-            Map.panTo(new L.LatLng(46.51, 1.20));
-            Map.zoomIn()
+            this.map.panTo(new L.LatLng(46.51, 1.20));
+            this.map.zoomIn()
         },
         get isBusy() {
             return this.$store.app.isLoading
@@ -132,6 +140,20 @@ function PersonalAdvisorDashboard() {
             } else if (b.status === 'NEW') {
                 return 1
             } else return 0
+        },
+        handleMapOpen() {
+            //resize map
+            //rezoom to centroide
+            //handle body top padding scroll
+            //450 -> header + map.height
+            //todo calculate it
+            this.handleBodyTopPaddingScroll(455)
+            return this.mapIsWide = !this.mapIsWide
+        },
+        handleBodyTopPaddingScroll(height) {
+            this.bodyScrollTopPadding = height
+            window.document.body.style.scrollPaddingTop = `${this.bodyScrollTopPadding}px`;
+            window.document.documentElement.style.scrollPaddingTop = `${this.bodyScrollTopPadding}px`;
         }
     }
 }
