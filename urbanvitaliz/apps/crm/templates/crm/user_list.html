@@ -46,8 +46,8 @@
                     <hr/>
 
                     <div class="form-check form-switch mb-3">
-                        <input @click="$event.target.form.submit();" class="form-check-input" type="checkbox" id="{{ form.is_active.name }}" name="{{ form.is_active.name }}" {% if form.is_active.value == True %}checked{% endif %}>
-                        <label class="form-check-label" for="{{ form.is_active.name }}">Uniquement les comptes désactivés</label>
+                        <input @click="$event.target.form.submit();" class="form-check-input" type="checkbox" id="{{ form.inactive.name }}" name="{{ form.inactive.name }}" {% if form.inactive.value == True %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.inactive.name }}">Uniquement les comptes désactivés</label>
                     </div>
 
                     <div class="mb-2">
@@ -87,20 +87,22 @@
                         <th scope="col">Identifiant de connexion</th>
                         <th scope="col">Prénom</th>
                         <th scope="col">Nom</th>
+                        <th scope="col">Organisation</th>
                         <th scope="col">Inscription</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in users.qs %}
                     <tr>
-                        <td><a href="{% url 'crm-user-details' user.pk %}">{{ user.username }}</a></td>
+                        <td><a href="{% url 'crm-user-details' user.pk %}">{{ user.username|truncatechars:48 }}</a></td>
                         <td>{{ user.first_name }}</td>
                         <td>{{ user.last_name }}</td>
+                        <td>{{ user.profile.organization|default:"-" }}</td>
                         <td>{{ user.date_joined|date }}</td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3">
+                        <td colspan="5">
                             -- Aucun résultat --
                         </td>
                     </tr>
