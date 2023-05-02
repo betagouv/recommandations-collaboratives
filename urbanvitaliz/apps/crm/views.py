@@ -25,7 +25,8 @@ from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
-from urbanvitaliz.utils import get_site_administrators, has_perm, has_perm_or_403
+from urbanvitaliz.utils import (get_site_administrators, has_perm,
+                                has_perm_or_403)
 from watson import search as watson
 
 from . import forms, models
@@ -156,6 +157,20 @@ def organization_details(request, organization_id):
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/organization_details.html", locals())
+
+
+@login_required
+def user_list(request, user_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    # filter
+    users = auth_models.User.objects.filter(profile__sites=request.site)
+    filter = filters.UserFilter(request.GET, queryset=users)
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/user_list.html", locals())
 
 
 @login_required
