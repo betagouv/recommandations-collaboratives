@@ -68,15 +68,10 @@ class UserFilter(django_filters.FilterSet):
         """Filter user having the provided role or all if role is unknown"""
         mapping = {"1": "advisor", "2": "staff", "3": "admin"}
 
-        if name != "role":
+        if name != "role" or value not in mapping.keys():
             return queryset
 
-        # get requested group name
-        name = mapping.get(value)
-        if not name:
-            return queryset
-
-        # filter on group name
+        name = mapping[value]
         site = site_models.Site.objects.get_current()
         group_name = make_group_name_for_site(name, site)
         return queryset.filter(groups__name=group_name)
