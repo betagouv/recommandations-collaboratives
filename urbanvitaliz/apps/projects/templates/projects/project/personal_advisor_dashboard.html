@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% load static %}
+
+{% block js %}
+    {% vite_asset 'js/apps/advisorDashboard.js' %}
+{% endblock %}
+
+
+
+{% block content %}
+<div class="font-marianne p-0">
+    <div x-data="PersonalAdvisorDashboard" x-init="getData();">
+        {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_header.html' %}
+        <div class="personal-dashboard-container-inner px-3 pt-3">
+        {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_map.html' %}
+        {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_project_list.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

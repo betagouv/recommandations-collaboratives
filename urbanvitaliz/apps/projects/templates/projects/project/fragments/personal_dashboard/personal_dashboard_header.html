@@ -1,0 +1,40 @@
+{% load static %}
+
+<header class="d-flex mb-2 w-100 px-3 pt-4 mt-3">
+    <div class="d-flex justify-content-between align-items-start w-100">
+        <div class="d-flex flex-column">
+            <div class="d-flex align-items-center">
+                <h2 class="mb-1 d-flex align-items-center">Tableau de bord</h2>
+                <div x-show="isBusy" class="ms-2" style="width: 24px; height: 24px">
+                    <div class="spinner-border spinner-border spinner-border-sm text-primary"
+                         role="status"></div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center mb-4 text-muted text-small">
+                <div class="d-flex align-items-center me-1">
+                    <svg class="align-middle bi me-2"
+                         width="18px"
+                         height="18px"
+                         fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder" />
+                    </svg>
+                    <span x-text="`${data.length} projets`"></span>
+                </div>
+                <template x-if="nbNewProjects > 0">
+                    <div class="d-flex align-items-center me-1 text-blue">
+                        <span class="fw-medium" x-text="nbNewProjects > 1 ? `(${nbNewProjects} nouveaux)` : `(${nbNewProjects} nouveau)`"></span>
+                    </div>
+                </template>
+                <template x-if="errors">
+                    <div class="d-flex align-items-center me-2">
+                        <span class="text-danger" x-text="errors"></span>>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <div class="d-flex align-items-center">
+            <a class="button filled blue small inherit" href="{% url 'projects-project-prefill' %}">Créer un projet</a>
+            <a class="button filled blue small inherit ms-2" href="{% url 'projects-project-prefill' %}">Exporter en CSV</a>
+        </div>
+    </div>
+</header>

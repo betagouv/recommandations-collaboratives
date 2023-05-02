@@ -1,0 +1,100 @@
+{% load static %}
+
+<div class="d-flex flex-column" id="projectsList">
+    {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_project_filters.html' %}
+    <ul class="list-unstyled list d-flex flex-column">
+        <template x-for="item in displayedData"
+                  :key="item.project.id">
+            <div :id=`project-${item.project.id}` class="rounded mb-4 px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"> 
+                <div class="position-absolute left-0" style="top:-12px">
+                    <template x-if="item.status === 'NEW'">
+                        <span class="py-1 px-1 fw-bold text-uppercase tiny bg-yellow text-dark" style="border-radius: 2px;">Nouveau projet</span>
+                    </template>
+                    <template x-if="item.project.is_switchtender">
+                        <span class="py-1 px-1 fw-bold text-uppercase tiny bg-green-dark text-white" style="border-radius: 2px;">Conseiller</span>
+                    </template>
+                    <template x-if="item.project.is_observer">
+                        <span class="py-1 px-1 fw-bold text-uppercase tiny bg-blue text-white" style="border-radius: 2px;">Observateur</span>
+                    </template>
+                </div>
+                <header class="d-flex align-items-center justify-content-between w-100 mb-1">
+                    <div class="d-flex align-items-center">
+                        <span :class="item.status === 'NEW' ? 'bg-yellow text-dark' : 'bg-dark text-white'" class="px-2 py-0 rounded me-2 font-small" x-text="item.project.id"></span>
+                        <a class="text-decoration-none d-flex align-items-center" :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', item.project.id)">
+                            <template x-if="item.project.commune">
+                                <span class="fw-bold title-info text-dark me-2 location" x-text="item.project.commune.name">1</span>
+                            </template>
+                            <span class="text-info-custom text-grey-dark name" x-text="item.project.name">2</span>
+                        </a>
+                    </div>
+                    <div class="d-flex align-items-center me-1">
+                        <template x-for="switchtender in item.project.switchtenders">
+                            {% include 'projects/project/fragments/advisor_gravatar_list_item.html' with wide_margin=True %}
+                        </template>
+                    </div>
+                </header>
+                <div class="d-flex align-items-center">
+                    <template x-if="item.project.commune">
+                        <div class="fw-normal text-uppercase small d-flex align-items-center me-3">
+                            <svg class="align-middle bi me-1"
+                                width="18px"
+                                height="18px"
+                                fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#geo-alt" />
+                            </svg>
+                            <span class="text-grey-dark tiny" x-text="`INSEE: ${item.project.commune.insee}`"></span>
+                        </div>
+                    </template>
+                    <div class="text-dark d-flex align-items-center">
+                        <svg class="align-middle bi me-1"
+                             width="18px"
+                             height="15px"
+                             fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#calendar-event" />
+                        </svg>
+                        <span x-text="item.status === 'NEW' ? `Déposé le ${formatDate(item.project.created_on)}`: `Modifié le ${formatDate(item.project.updated_on)}` "
+                              class="align-middle text-grey-dark tiny"></span>
+                    </div>
+                </div>
+                <footer class="d-flex align-items-center justify-content-between w-100">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center tiny me-3">
+                            <svg class="align-middle bi me-1"
+                                width="18px"
+                                height="15px"
+                                fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#calendar-event" />
+                            </svg>
+                            <span class="text-grey-dark me-1" x-text="item.project.recommendation_count > 1 ? `${item.project.recommendation_count} recommandations` : `${item.project.recommendation_count} recommandation`"></span>
+                            <span class="text-green fw-medium" x-text="item.project.recommendation_count > 1 ? `(${item.project.recommendation_count} nouvelles)` : `(${item.project.recommendation_count} nouvelle)`"></span>
+                        </div>
+                        <div class="d-flex align-items-center tiny me-3">
+                            <svg class="align-middle bi me-1"
+                                width="18px"
+                                height="15px"
+                                fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
+                            </svg>
+                            <span class="text-grey-dark me-1" x-text="item.project.recommendation_count > 1 ? `${item.project.recommendation_count} messages conversation` : `${item.project.recommendation_count} message conversation`"></span>
+                            <span class="text-green fw-medium" x-text="item.project.recommendation_count > 1 ? `(${item.project.recommendation_count} nouveaux)` : `(${item.project.recommendation_count} nouveau)`"></span>
+                        </div>
+                        <div class="d-flex align-items-center tiny">
+                            <svg class="align-middle bi me-1"
+                                width="18px"
+                                height="16px"
+                                fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
+                            </svg>
+                            <span class="text-grey-dark me-1" x-text="item.project.recommendation_count > 1 ? `${item.project.recommendation_count} messages conseillers` : `${item.project.recommendation_count} message conseillers`"></span>
+                            <span class="text-green fw-medium" x-text="item.project.recommendation_count > 1 ? `(${item.project.recommendation_count} nouveaux)` : `(${item.project.recommendation_count} nouveau)`"></span>
+                        </div>
+                    </div>
+                    <div x-data="{ open: false }" x-on:click.outside="open = false" class="btn-group position-relative">
+                        <button :class="{'active':open}"  class="button grey small filled border px-2" x-on:click="open = !open" type="button">...</button>
+                        {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_project_positioning.html' %}
+                    </div>
+                </footer>
+            </div>
+        </template>
+    </ul>
+</div>
