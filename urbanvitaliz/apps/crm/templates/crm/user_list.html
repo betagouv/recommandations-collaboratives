@@ -32,7 +32,7 @@
         </div>
 
 
-        <div class="px-4 py-4 mb-3">
+        <div class="px-4 pt-4 mb-3">
             {% with users.form as form %}
             <form x-data="" class="row g-3" method="get" action="{% url 'crm-user-list' %}">
                 {{ form.non_field_errors }}
@@ -43,12 +43,14 @@
                         <button class="btn btn-outline-secondary" type="submit" id="button-search">Rechercher</button>
                     </div>
 
+                    <hr/>
+
                     <div class="form-check form-switch mb-3">
                         <input @click="$event.target.form.submit();" class="form-check-input" type="checkbox" id="{{ form.is_active.name }}" name="{{ form.is_active.name }}" {% if form.is_active.value == True %}checked{% endif %}>
                         <label class="form-check-label" for="{{ form.is_active.name }}">Uniquement les comptes désactivés</label>
                     </div>
 
-                    <div>
+                    <div class="mb-2">
                         <label for="{{ form.role.field.name }}" class="form-label me-2">Limiter à </label>
                         <div class="btn-group" role="group" aria-label="Role radio button">
                             {% for choice in form.role.field.choices %}
@@ -57,6 +59,19 @@
                             {% endfor %}
                         </div>
                     </div>
+
+                    <hr/>
+
+                    <div>
+                        <label for="{{ form.ordering.name }}" class="form-label me-2">Trier par : </label>
+                        <select class="form-control" name="{{ form.ordering.name }}" id="{{ form.ordering.name }}">
+                            {% for choice in form.ordering.field.choices %}
+                            <option @click="$event.target.form.submit();" value="{{ choice.0 }}" {% if choice.0 == form.ordering.value.0 %}selected{%endif %}>
+                                {{ choice.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
 
 
@@ -64,14 +79,15 @@
             {% endwith %}
         </div>
 
-        <div class="mb-3">
-            <table class="m-2 table table-striped table-hover caption-top">
-                <caption>{{ users.qs.count }} résultat{{ users.qs.count|pluralize }}</caption>
+        <div class="mb-3" class="table-responsive">
+            <table class="table table-striped table-hover caption-top">
+                <caption class="ms-2">{{ users.qs.count }} résultat{{ users.qs.count|pluralize }}</caption>
                 <thead>
                     <tr>
                         <th scope="col">Identifiant de connexion</th>
                         <th scope="col">Prénom</th>
                         <th scope="col">Nom</th>
+                        <th scope="col">Inscription</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,6 +96,7 @@
                         <td><a href="{% url 'crm-user-details' user.pk %}">{{ user.username }}</a></td>
                         <td>{{ user.first_name }}</td>
                         <td>{{ user.last_name }}</td>
+                        <td>{{ user.date_joined|date }}</td>
                     </tr>
                     {% empty %}
                     <tr>

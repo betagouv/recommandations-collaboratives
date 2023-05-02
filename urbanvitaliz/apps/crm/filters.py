@@ -44,14 +44,13 @@ class UserFilter(django_filters.FilterSet):
         # tuple-mapping retains order
         fields=(
             ("last_name", "last_name"),
-            ("created_on", "created_on"),
+            ("date_joined", "date_joined"),
         ),
         # labels do not need to retain order
         field_labels={
             "last_name": "Nom de famille",
-            "created_on": "Date de création",
+            "date_joined": "Date de création",
         },
-        widget=django_filters.widgets.LinkWidget,
     )
 
     class Meta:
