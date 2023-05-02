@@ -26,6 +26,7 @@ module.exports = {
             input: {
                 main: resolve('./src/js/main.js'),
                 onboarding: resolve('./src/js/apps/onboarding.js'),
+                advisorCreateProject: resolve('./src/js/apps/advisorCreateProject.js'),
                 home: resolve('./src/js/apps/home.js'),
                 crm: resolve('./src/js/apps/crm.js'),
                 project: resolve('./src/js/apps/project.js'),
