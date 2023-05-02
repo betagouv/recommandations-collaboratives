@@ -39,7 +39,7 @@
 
                 <div class="col-md-6">
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" name="{{ form.username.name }}" id="{{ form.username.id }}" placeholder="Identifiant de connexion / courriel" aria-label="Identifiant de connexion" value="{{ form.username.value }}" aria-describedby="button-search">
+                        <input type="text" class="form-control" name="{{ form.username.name }}" id="{{ form.username.id }}" placeholder="Identifiant de connexion / courriel" aria-label="Identifiant de connexion" value="{{ form.username.value|default:"" }}" aria-describedby="button-search">
                         <button class="btn btn-outline-secondary" type="submit" id="button-search">Rechercher</button>
                     </div>
 

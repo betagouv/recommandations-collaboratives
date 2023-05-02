@@ -56,7 +56,7 @@ class UserFilter(django_filters.FilterSet):
 
     class Meta:
         model = auth_models.User
-        fields = []
+        fields = ["username", "is_active", "role", "ordering"]
 
     def role_filter(self, queryset, name, value):
         """Filter user having the provided role or all if role is unknown"""
