@@ -1,19 +1,13 @@
 import Alpine from 'alpinejs'
-import api from '../utils/api'
 import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar';
 import { makeProjectURL } from '../utils/createProjectUrl'
-import { roles } from '../config/roles';
 
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-providers'
-
-// A custom dashboard made for switctenders
-// Expose a list of projects
-// Filtered by a board.code 
-// Drag n drops utils added
-// TODO exctract drag n drop logics
+import 'leaflet/dist/leaflet.css'
+import 'leaflet-control-geocoder/dist/Control.Geocoder.css'
 
 function PersonalAdvisorDashboard() {
     return {
