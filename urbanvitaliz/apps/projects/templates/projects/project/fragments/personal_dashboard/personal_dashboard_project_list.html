@@ -5,16 +5,16 @@
     <ul class="list-unstyled list d-flex flex-column">
         <template x-for="item in displayedData"
                   :key="item.project.id">
-            <div :id=`project-${item.project.id}` class="rounded mb-4 px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"> 
+            <div :id=`project-${item.project.id}` class="rounded bg-white mb-4 px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"> 
                 <div class="position-absolute left-0" style="top:-12px">
                     <template x-if="item.status === 'NEW'">
                         <span class="py-1 px-1 fw-bold text-uppercase tiny bg-yellow text-dark" style="border-radius: 2px;">Nouveau projet</span>
                     </template>
-                    <template x-if="item.project.is_switchtender">
-                        <span class="py-1 px-1 fw-bold text-uppercase tiny bg-green-dark text-white" style="border-radius: 2px;">Conseiller</span>
-                    </template>
                     <template x-if="item.project.is_observer">
                         <span class="py-1 px-1 fw-bold text-uppercase tiny bg-blue text-white" style="border-radius: 2px;">Observateur</span>
+                    </template>
+                    <template x-if="item.project.is_switchtender && !item.project.is_observer">
+                        <span class="py-1 px-1 fw-bold text-uppercase tiny bg-green-dark text-white" style="border-radius: 2px;">Conseiller</span>
                     </template>
                 </div>
                 <header class="d-flex align-items-center justify-content-between w-100 mb-1">
