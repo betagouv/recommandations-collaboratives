@@ -66,7 +66,24 @@ main {
     width: 100%;
     z-index: 100;
 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    overflow: hidden;
     transition: height 0.25s ease;
+}
+
+.project-item {
+    transition: opacity 0.25s ease;
+}
+
+.project-item-is-loading {
+    opacity: 0.3;
+}
+
+.project-item-loader {
+    position: absolute;
+    top: calc(50% - 12px);
+    left: calc(50% - 12px);
 }
 
 .personal-dashboard-map-container.is-wide {
@@ -75,6 +92,7 @@ main {
 
 .personal-dashboard-map-container .leaflet-container {
     z-index: 1;
+    border-radius: 4px;
 }
 
 .personal-dashboard-map-container .leaflet-container::after {
