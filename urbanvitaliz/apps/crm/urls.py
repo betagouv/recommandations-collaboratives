@@ -39,6 +39,11 @@ urlpatterns = [
         name="crm-user-list",
     ),
     path(
+        r"crm/user/<int:user_id>/update/",
+        views.user_update,
+        name="crm-user-update",
+    ),
+    path(
         r"crm/user/<int:user_id>/",
         views.user_details,
         name="crm-user-details",

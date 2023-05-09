@@ -179,12 +179,42 @@ def user_list(request):
         queryset=User.objects.filter(profile__sites=request.site),
     )
 
-    print(users.qs)
-
     # required by default on crm
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/user_list.html", locals())
+
+
+@login_required
+def user_update(request, user_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    user = get_object_or_404(User, pk=user_id)
+    profile = user.profile
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    if request.method == "POST":
+        update_form = forms.CRMProfileForm(request.POST, instance=profile)
+        if update_form.is_valid():
+            # update profile object
+            update_form.save()
+            # update user object
+            user.first_name = update_form.cleaned_data.get("first_name")
+            user.last_name = update_form.cleaned_data.get("last_name")
+            user.save()
+            return redirect(reverse("crm-user-details", args=[user.id]))
+    else:
+        update_form = forms.CRMProfileForm(
+            instance=profile,
+            initial={
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            },
+        )
+
+    return render(request, "crm/user_update.html", locals())
 
 
 @login_required
