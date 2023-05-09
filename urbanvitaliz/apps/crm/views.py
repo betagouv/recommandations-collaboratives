@@ -24,9 +24,11 @@ from django.views.generic.base import TemplateView
 from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
+from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
-from urbanvitaliz.utils import (get_site_administrators, has_perm,
-                                has_perm_or_403)
+from urbanvitaliz.utils import (get_group_for_site, get_site_administrators,
+                                has_perm, has_perm_or_403,
+                                make_group_name_for_site)
 from watson import search as watson
 
 from . import filters, forms, models
@@ -189,21 +191,24 @@ def user_list(request):
 def user_update(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    user = get_object_or_404(User, pk=user_id)
-    profile = user.profile
+    crm_user = get_object_or_404(User, pk=user_id)
+    profile = crm_user.profile
+
+    group_name = make_group_name_for_site("advisor", request.site)
+    crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
     if request.method == "POST":
-        update_form = forms.CRMProfileForm(request.POST, instance=profile)
-        if update_form.is_valid():
+        form = forms.CRMProfileForm(request.POST, instance=profile)
+        if form.is_valid():
             # update profile object
-            update_form.save()
+            form.save()
             # update user object
-            user.first_name = update_form.cleaned_data.get("first_name")
-            user.last_name = update_form.cleaned_data.get("last_name")
-            user.save()
-            return redirect(reverse("crm-user-details", args=[user.id]))
+            crm_user.first_name = form.cleaned_data.get("first_name")
+            crm_user.last_name = form.cleaned_data.get("last_name")
+            crm_user.save()
+            return redirect(reverse("crm-user-details", args=[crm_user.id]))
     else:
-        update_form = forms.CRMProfileForm(
+        form = forms.CRMProfileForm(
             instance=profile,
             initial={
                 "first_name": user.first_name,
@@ -215,6 +220,85 @@ def user_update(request, user_id=None):
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/user_update.html", locals())
+
+
+@login_required
+def user_deactivate(request, user_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    crm_user = get_object_or_404(User, pk=user_id)
+
+    if request.method == "POST":
+        crm_user.is_active = False
+        crm_user.save()
+        return redirect(reverse("crm-user-details", args=[crm_user.id]))
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/user_deactivate.html", locals())
+
+
+@login_required
+def user_reactivate(request, user_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    crm_user = get_object_or_404(User, pk=user_id)
+
+    if request.method == "POST":
+        crm_user.is_active = True
+        crm_user.save()
+        return redirect(reverse("crm-user-details", args=[crm_user.id]))
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/user_reactivate.html", locals())
+
+
+@login_required
+def user_set_advisor(request, user_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    crm_user = get_object_or_404(User, pk=user_id)
+    profile = user.profile
+
+    if request.method == "POST":
+        form = forms.CRMAdvisorForm(request.POST, instance=profile)
+        if update_form.is_valid():
+            # assign user as advisor on current site
+            update_form.save_m2m()
+            group = get_group_for_site("advisor", request.site)
+            crm_user.groups.add(group)
+            return redirect(reverse("crm-user-details", args=[crm_user.id]))
+    else:
+        form = forms.CRMProfileForm(instance=profile)
+
+    departments = geomatics.Department.objects.all()
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/set_advisor.html", locals())
+
+
+@login_required
+def user_unset_advisor(request, user_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    crm_user = get_object_or_404(User, pk=user_id)
+    profile = user.profile
+
+    if request.method == "POST":
+        profile.departments.clear()
+        group = get_group_for_site("advisor", request.site)
+        crm_user.groups.remove(group)
+        return redirect(reverse("crm-user-details", args=[crm_user.id]))
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/unset_advisor.html", locals())
 
 
 @login_required

@@ -33,10 +33,17 @@ urlpatterns = [
         views.organization_details,
         name="crm-organization-details",
     ),
+    #
+    # users
     path(
         r"crm/users/",
         views.user_list,
         name="crm-user-list",
+    ),
+    path(
+        r"crm/user/<int:user_id>/",
+        views.user_details,
+        name="crm-user-details",
     ),
     path(
         r"crm/user/<int:user_id>/update/",
@@ -44,9 +51,24 @@ urlpatterns = [
         name="crm-user-update",
     ),
     path(
-        r"crm/user/<int:user_id>/",
-        views.user_details,
-        name="crm-user-details",
+        r"crm/user/<int:user_id>/advisor/set/",
+        views.user_set_advisor,
+        name="crm-user-set-advisor",
+    ),
+    path(
+        r"crm/user/<int:user_id>/advisor/unset/",
+        views.user_unset_advisor,
+        name="crm-user-unset-advisor",
+    ),
+    path(
+        r"crm/user/<int:user_id>/deactivate/",
+        views.user_deactivate,
+        name="crm-user-deactivate",
+    ),
+    path(
+        r"crm/user/<int:user_id>/reactivate/",
+        views.user_reactivate,
+        name="crm-user-reactivate",
     ),
     path(
         r"crm/user/<int:user_id>/project_interest",
@@ -58,6 +80,8 @@ urlpatterns = [
         views.user_notifications,
         name="crm-user-notifications",
     ),
+    #
+    # projects
     path(
         r"crm/project/<int:project_id>/",
         views.project_details,

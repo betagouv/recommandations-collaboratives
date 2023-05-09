@@ -20,6 +20,14 @@ class CRMProfileForm(forms.ModelForm):
         ]
 
 
+class CRMAdvisorForm(forms.ModelForm):
+    """Update an advisor profile department list"""
+
+    class Meta:
+        model = home_models.UserProfile
+        fields = ["departments"]
+
+
 class CRMSearchForm(forms.Form):
     query = forms.CharField(
         max_length=200,

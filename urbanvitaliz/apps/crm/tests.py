@@ -170,7 +170,7 @@ def test_crm_user_list_contains_only_selected_role(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_user_update_user_profile_information(request, client):
+def test_crm_update_user_profile_information(request, client):
     site = get_current_site(request)
 
     organization = baker.make(addressbook_models.Organization)
@@ -205,6 +205,74 @@ def test_crm_user_update_user_profile_information(request, client):
     assert profile.phone_no == data["phone_no"]
     assert profile.organization == organization
     assert profile.organization_position == data["organization_position"]
+
+
+@pytest.mark.django_db
+def test_crm_user_deactivate_page(request, client):
+    site = get_current_site(request)
+
+    end_user = baker.make(auth_models.User, is_active=False)
+
+    url = reverse("crm-user-deactivate", args=[end_user.id])
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_user_deactivate_processing(request, client):
+    site = get_current_site(request)
+
+    end_user = baker.make(auth_models.User, is_active=True)
+
+    url = reverse("crm-user-deactivate", args=[end_user.id])
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    # user data is updated
+    end_user.refresh_from_db()
+    assert end_user.is_active is False
+
+
+@pytest.mark.django_db
+def test_crm_user_reactivate_page(request, client):
+    site = get_current_site(request)
+
+    end_user = baker.make(auth_models.User, is_active=False)
+
+    url = reverse("crm-user-reactivate", args=[end_user.id])
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_user_reactivate_processing(request, client):
+    site = get_current_site(request)
+
+    end_user = baker.make(auth_models.User, is_active=False)
+
+    url = reverse("crm-user-reactivate", args=[end_user.id])
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    # user data is updated
+    end_user.refresh_from_db()
+    assert end_user.is_active is True
 
 
 ########################################################################
