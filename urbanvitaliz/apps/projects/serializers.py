@@ -9,7 +9,7 @@ from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
-from .models import Document, Project, Task, TaskFollowup, UserProjectStatus
+from .models import Document, Project, Task, TaskFollowup, UserProjectStatus, Note
 from .utils import create_reminder, get_collaborators_for_project
 from urbanvitaliz.utils import get_group_for_site
 
@@ -47,6 +47,8 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "commune",
             "notifications",
             "recommendation_count",
+            "public_message_count",
+            "private_message_count",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
@@ -68,6 +70,16 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_recommendation_count(self, obj):
         return Task.on_site.published().filter(project=obj).count()
+
+    public_message_count = serializers.SerializerMethodField()
+
+    def get_public_message_count(self, obj):
+        return Note.on_site.public().filter(project=obj).count()
+
+    private_message_count = serializers.SerializerMethodField()
+
+    def get_private_message_count(self, obj):
+        return Note.on_site.private().filter(project=obj).count()
 
     commune = CommuneSerializer(read_only=True)
 
@@ -92,11 +104,20 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             target_content_type=project_ct.pk, target_object_id=obj.pk
         ).unread()
 
+        unread_public_messages = unread_notifications.filter(verb="a envoyé un message")
+        unread_private_messages = unread_notifications.filter(
+            verb="a envoyé un message dans l'espace conseillers"
+        )
+        new_recommendations = unread_notifications.filter(verb="a recommandé l'action")
+
         return {
             "count": unread_notifications.count(),
             "has_collaborator_activity": unread_notifications.exclude(
                 actor_object_id__in=advisors
             ).exists(),
+            "unread_public_messages": unread_public_messages.count(),
+            "unread_private_messages": unread_private_messages.count(),
+            "new_recommendations": new_recommendations.count(),
         }
 
 
@@ -204,7 +225,8 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
     def get_comments_count(self, obj):
         return obj.followups.exclude(comment="").count()
 
-    # FIXME : We should not send all the tasks to non switchtender users (filter queryset on current_user)
+    # FIXME : We should not send all the tasks to non switchtender users (filter
+    # queryset on current_user)
 
 
 class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):
