@@ -79,6 +79,7 @@ def test_crm_user_list_contains_site_users(request, client):
     unexpected = reverse("crm-user-details", args=[other.id])
     assertNotContains(response, unexpected)
 
+
 @pytest.mark.django_db
 def test_crm_user_list_contains_only_selected_user(request, client):
     site = get_current_site(request)
@@ -193,7 +194,7 @@ def test_crm_user_update_user_profile_information(request, client):
     assert response.status_code == 302
 
     # user data is updated
-    end_user.refresh_from_db()  # to be sure
+    end_user.refresh_from_db()
 
     assert end_user.first_name == data["first_name"]
     assert end_user.last_name == data["last_name"]

@@ -192,9 +192,6 @@ def user_update(request, user_id=None):
     user = get_object_or_404(User, pk=user_id)
     profile = user.profile
 
-    # required by default on crm
-    search_form = forms.CRMSearchForm()
-
     if request.method == "POST":
         update_form = forms.CRMProfileForm(request.POST, instance=profile)
         if update_form.is_valid():
@@ -213,6 +210,9 @@ def user_update(request, user_id=None):
                 "last_name": user.last_name,
             },
         )
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
 
     return render(request, "crm/user_update.html", locals())
 
