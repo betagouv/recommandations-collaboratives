@@ -630,10 +630,11 @@ def project_list_by_tags_as_csv(request):
 
     today = datetime.datetime.today().date()
 
+    content_disposition = f'attachment; filename="tags-for-projects-{today}.csv"'
     response = HttpResponse(
         content_type="text/csv",
         headers={
-            "Content-Disposition": f'attachment; filename="tags-for-projects-{today}.csv"'
+            "Content-Disposition": content_disposition,
         },
     )
 
