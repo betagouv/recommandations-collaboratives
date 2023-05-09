@@ -265,8 +265,7 @@ def user_set_advisor(request, user_id=None):
     if request.method == "POST":
         form = forms.CRMAdvisorForm(request.POST, instance=profile)
         if form.is_valid():
-            # FIXME test required _save_m2m instead of save_m2m ?!?
-            form._save_m2m()
+            form.save()
             group = get_group_for_site("advisor", request.site)
             crm_user.groups.add(group)
             return redirect(reverse("crm-user-details", args=[crm_user.id]))

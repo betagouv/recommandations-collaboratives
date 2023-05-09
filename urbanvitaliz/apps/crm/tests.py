@@ -80,7 +80,7 @@ def test_crm_user_list_contains_site_users(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_user_list_contains_only_selected_user(request, client):
+def test_crm_user_list_filters_only_selected_user(request, client):
     site = get_current_site(request)
 
     expected = baker.make(auth_models.User)
@@ -105,7 +105,7 @@ def test_crm_user_list_contains_only_selected_user(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_user_list_contains_only_user_matching_partial(request, client):
+def test_crm_user_list_filters_only_user_matching_partial(request, client):
     site = get_current_site(request)
 
     expected = baker.make(auth_models.User, username="doe@example.com")
@@ -130,7 +130,7 @@ def test_crm_user_list_contains_only_user_matching_partial(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_user_list_contains_only_inactive_user(request, client):
+def test_crm_user_list_filters_only_inactive_user(request, client):
     site = get_current_site(request)
 
     active = baker.make(auth_models.User, is_active=True)
@@ -155,7 +155,7 @@ def test_crm_user_list_contains_only_inactive_user(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_user_list_contains_only_selected_role(request, client):
+def test_crm_user_list_filters_only_selected_role(request, client):
     site = get_current_site(request)
 
     staff = baker.make(auth_models.User)
