@@ -41,7 +41,7 @@ function PersonalAdvisorDashboard() {
             this.nbNewProjects = projects.filter(p => p.status === 'NEW').length
             this.extractAndCreateAdvisorDepartments(projects);
 
-            this.data = projects.map(project => ({...project, isLoading:false}))
+            this.data = projects.map(project => ({ ...project, isLoading: false }))
             this.displayedData = this.data.sort(this.sortProjectDate)
 
             const { map, markersLayer } = initMap(projects)
@@ -57,6 +57,49 @@ function PersonalAdvisorDashboard() {
         },
         get isBusy() {
             return this.$store.app.isLoading
+        },
+        getProjectStatusColor(item) {
+            if (item.status === "NEW") {
+                return 'text-new-project'
+            } else if (item.project.is_switchtender && !item.project.is_observer) {
+                return 'text-green'
+            } else if (item.project.is_observer && item.project.is_switchtender) {
+                return 'text-blue'
+            }
+        },
+        getNewRecommendations(item) {
+            const newRecommendations = item.project.notifications.new_recommendations
+
+            if (newRecommendations > 1) {
+                return `(${newRecommendations} nouvelles)`
+            } else if (newRecommendations === 1) {
+                return `(${newRecommendations} nouvelle)`
+            }
+
+            return null
+        },
+        getUnreadPublicMessages(item) {
+
+            const unreadPublicMessages = item.project.notifications.unread_public_messages
+
+            if (unreadPublicMessages > 1) {
+                return `(${unreadPublicMessages} nouveaux)`
+            } else if (unreadPublicMessages === 1) {
+                return `(${unreadPublicMessages} nouveau)`
+            }
+
+            return null
+        },
+        getUnreadPrivateMessages(item) {
+            const unreadPrivateMessages = item.project.notifications.unread_private_messages
+
+            if (unreadPrivateMessages > 1) {
+                return `(${unreadPrivateMessages} nouveaux)`
+            } else if (unreadPrivateMessages === 1) {
+                return `(${unreadPrivateMessages} nouveau)`
+            }
+
+            return null
         },
         extractAndCreateAdvisorDepartments(projects) {
             const departments = []
@@ -183,7 +226,7 @@ function PersonalAdvisorDashboard() {
                 await api.post(url.replace('0', id))
                 const updatedProjects = await this.$store.projects.getProjects()
 
-                const updatedProject = updatedProjects.find(({project}) => project.id === id)
+                const updatedProject = updatedProjects.find(({ project }) => project.id === id)
                 this.displayedData = this.displayedData.map(item => item.project.id === id ? updatedProject : item)
 
                 projectUpdated.isLoading = false
