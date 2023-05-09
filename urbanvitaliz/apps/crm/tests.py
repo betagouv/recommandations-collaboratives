@@ -11,6 +11,7 @@ from model_bakery import baker
 from pytest_django.asserts import (assertContains, assertNotContains,
                                    assertRedirects)
 from urbanvitaliz.apps.addressbook import models as addressbook_models
+from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
@@ -157,6 +158,48 @@ def test_crm_user_list_contains_only_selected_role(request, client):
 
     unexpected = reverse("crm-user-details", args=[a_user.id])
     assertNotContains(response, unexpected)
+
+
+#
+# update
+
+
+@pytest.mark.django_db
+def test_crm_user_update_user_profile_information(request, client):
+    site = get_current_site(request)
+
+    organization = baker.make(addressbook_models.Organization)
+
+    end_user = baker.make(auth_models.User)
+    profile = end_user.profile
+
+    url = reverse("crm-user-update", args=[end_user.id])
+    data = {
+        "first_name": "John",
+        "last_name": "DOE",
+        "phone_no": "01 23 45 67 89",
+        "organization": organization.id,
+        "organization_position": "staff",
+    }
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    # user data is updated
+    end_user.refresh_from_db()  # to be sure
+
+    assert end_user.first_name == data["first_name"]
+    assert end_user.last_name == data["last_name"]
+
+    # profile is updated
+    profile.refresh_from_db()
+
+    assert profile.phone_no == data["phone_no"]
+    assert profile.organization == organization
+    assert profile.organization_position == data["organization_position"]
 
 
 ########################################################################
