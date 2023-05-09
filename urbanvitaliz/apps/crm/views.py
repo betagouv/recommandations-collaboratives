@@ -24,7 +24,6 @@ from django.views.generic.base import TemplateView
 from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
-from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.utils import (get_group_for_site, get_site_administrators,
                                 has_perm, has_perm_or_403,
@@ -211,8 +210,8 @@ def user_update(request, user_id=None):
         form = forms.CRMProfileForm(
             instance=profile,
             initial={
-                "first_name": user.first_name,
-                "last_name": user.last_name,
+                "first_name": crm_user.first_name,
+                "last_name": crm_user.last_name,
             },
         )
 
@@ -261,25 +260,23 @@ def user_set_advisor(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     crm_user = get_object_or_404(User, pk=user_id)
-    profile = user.profile
+    profile = crm_user.profile
 
     if request.method == "POST":
         form = forms.CRMAdvisorForm(request.POST, instance=profile)
-        if update_form.is_valid():
-            # assign user as advisor on current site
-            update_form.save_m2m()
+        if form.is_valid():
+            # FIXME test required _save_m2m instead of save_m2m ?!?
+            form._save_m2m()
             group = get_group_for_site("advisor", request.site)
             crm_user.groups.add(group)
             return redirect(reverse("crm-user-details", args=[crm_user.id]))
     else:
         form = forms.CRMProfileForm(instance=profile)
 
-    departments = geomatics.Department.objects.all()
-
     # required by default on crm
     search_form = forms.CRMSearchForm()
 
-    return render(request, "crm/set_advisor.html", locals())
+    return render(request, "crm/user_set_advisor.html", locals())
 
 
 @login_required
@@ -287,7 +284,7 @@ def user_unset_advisor(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     crm_user = get_object_or_404(User, pk=user_id)
-    profile = user.profile
+    profile = crm_user.profile
 
     if request.method == "POST":
         profile.departments.clear()
@@ -298,7 +295,7 @@ def user_unset_advisor(request, user_id=None):
     # required by default on crm
     search_form = forms.CRMSearchForm()
 
-    return render(request, "crm/unset_advisor.html", locals())
+    return render(request, "crm/user_unset_advisor.html", locals())
 
 
 @login_required

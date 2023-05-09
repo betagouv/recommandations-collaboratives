@@ -1,21 +1,19 @@
 import collections
 
 import pytest
-from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.addressbook import models as addressbook_models
-from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects_models
-from urbanvitaliz.utils import login
+from urbanvitaliz.utils import get_group_for_site, login
 
-from . import filters, models, views
+from . import models, views
 
 ########################################################################
 # organization
@@ -115,7 +113,7 @@ def test_crm_user_list_contains_only_inactive_user(request, client):
     inactive = baker.make(auth_models.User, is_active=False)
     inactive.profile.sites.add(site)
 
-    url = reverse("crm-user-list") + f"?inactive=true"
+    url = reverse("crm-user-list") + "?inactive=true"
 
     with login(client) as user:
         assign_perm("use_crm", user, site)
@@ -147,7 +145,7 @@ def test_crm_user_list_contains_only_selected_role(request, client):
     a_user = baker.make(auth_models.User)
     a_user.profile.sites.add(site)
 
-    url = reverse("crm-user-list") + f"?role=2"  # role 2 is staff
+    url = reverse("crm-user-list") + "?role=2"  # role 2 is staff
 
     with login(client) as user:
         assign_perm("use_crm", user, site)
@@ -166,7 +164,7 @@ def test_crm_user_list_contains_only_selected_role(request, client):
 
 
 #
-# update
+# update user / profile information
 
 
 @pytest.mark.django_db
@@ -207,8 +205,24 @@ def test_crm_update_user_profile_information(request, client):
     assert profile.organization_position == data["organization_position"]
 
 
+#
+# user deactivation
+
+
 @pytest.mark.django_db
-def test_crm_user_deactivate_page(request, client):
+def test_crm_user_deactivate_page_requires_permission(request, client):
+    end_user = baker.make(auth_models.User, is_active=False)
+
+    url = reverse("crm-user-deactivate", args=[end_user.id])
+
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_user_deactivate_page_with_permission(request, client):
     site = get_current_site(request)
 
     end_user = baker.make(auth_models.User, is_active=False)
@@ -241,8 +255,24 @@ def test_crm_user_deactivate_processing(request, client):
     assert end_user.is_active is False
 
 
+#
+# user reactivation
+
+
 @pytest.mark.django_db
-def test_crm_user_reactivate_page(request, client):
+def test_crm_user_reactivate_page_requires_permission(request, client):
+    end_user = baker.make(auth_models.User, is_active=False)
+
+    url = reverse("crm-user-reactivate", args=[end_user.id])
+
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_user_reactivate_page_with_permission(request, client):
     site = get_current_site(request)
 
     end_user = baker.make(auth_models.User, is_active=False)
@@ -273,6 +303,124 @@ def test_crm_user_reactivate_processing(request, client):
     # user data is updated
     end_user.refresh_from_db()
     assert end_user.is_active is True
+
+
+#
+# user set advisor status
+
+
+@pytest.mark.django_db
+def test_crm_user_set_advisor_page_requires_permission(request, client):
+    end_user = baker.make(auth_models.User, is_active=False)
+
+    url = reverse("crm-user-set-advisor", args=[end_user.id])
+
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_user_set_advisor_page_with_permission(request, client):
+    site = get_current_site(request)
+
+    end_user = baker.make(auth_models.User, is_active=False)
+
+    url = reverse("crm-user-set-advisor", args=[end_user.id])
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_user_set_advisor_processing(request, client):
+    site = get_current_site(request)
+
+    departments = baker.make(geomatics.Department, _quantity=4)
+
+    end_user = baker.make(auth_models.User)
+
+    url = reverse("crm-user-set-advisor", args=[end_user.id])
+
+    selected = [d.code for d in departments[1:3]]
+    data = {"departments": selected}
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    # user data is updated
+    end_user.refresh_from_db()
+
+    group = get_group_for_site("advisor", site)
+    assert group in end_user.groups.all()
+
+    user_dpts = (d.code for d in end_user.profile.departments.all())
+    assert set(user_dpts) == set(selected)
+
+
+#
+# user unset advisor status
+
+
+@pytest.mark.django_db
+def test_crm_user_unset_advisor_page_requires_permission(request, client):
+    end_user = baker.make(auth_models.User, is_active=False)
+
+    url = reverse("crm-user-unset-advisor", args=[end_user.id])
+
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_user_unset_advisor_page_with_permission(request, client):
+    site = get_current_site(request)
+
+    end_user = baker.make(auth_models.User, is_active=False)
+
+    url = reverse("crm-user-unset-advisor", args=[end_user.id])
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_user_unset_advisor_processing(request, client):
+    site = get_current_site(request)
+
+    departments = baker.make(geomatics.Department, _quantity=2)
+
+    end_user = baker.make(auth_models.User)
+    end_user.profile.departments.set(departments)
+    group = get_group_for_site("advisor", site)
+    end_user.groups.add(group)
+
+    url = reverse("crm-user-unset-advisor", args=[end_user.id])
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    # user data is updated
+    end_user.refresh_from_db()
+
+    assert end_user.groups.count() == 0
+
+    assert end_user.profile.departments.count() == 0
 
 
 ########################################################################
