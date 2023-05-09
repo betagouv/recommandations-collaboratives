@@ -10,13 +10,15 @@
 <ul class="list-unstyled mb-0 d-flex justify-content-center align-items-center" style="padding-left: 15px;">
     <!-- Projects -->
     {% if active_project %}
-    <li style="margin-right: 15px;padding-bottom:20px; border-bottom:solid 2px transparent;">
-        <div id="project-selector" class="nav-item">
-                <div x-data="{ open: false }" x-on:click.outside="open = false" class="btn-group">
-                    <a style="text-decoration: none; color: inherit;" class="ms-1 align-middle" href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{active_project.name}}</strong><span class="text-secondary small ms-2 text-break text-truncate">({{ active_project.commune.name }})</span></strong></a>
-                </div>
-        </div>
-    </li>
+    {% if not 'projects-project-list-advisor' in url_name %}
+        <li style="margin-right: 15px;padding-bottom:20px; border-bottom:solid 2px transparent;">
+            <div id="project-selector" class="nav-item">
+                    <div x-data="{ open: false }" x-on:click.outside="open = false" class="btn-group">
+                        <a style="text-decoration: none; color: inherit;" class="ms-1 align-middle" href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{active_project.name}}</strong><span class="text-secondary small ms-2 text-break text-truncate">({{ active_project.commune.name }})</span></strong></a>
+                    </div>
+            </div>
+        </li>
+    {% endif %}
             <li style="margin-right: 15px;
                        padding-bottom:20px;
                        border-bottom:solid 2px transparent;
