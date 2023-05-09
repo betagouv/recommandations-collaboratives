@@ -7,7 +7,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import (assertContains, assertNotContains,
+                                   assertRedirects)
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects_models
@@ -89,6 +90,31 @@ def test_crm_user_list_contains_only_selected_user(request, client):
     unexpected.profile.sites.add(site)
 
     url = reverse("crm-user-list") + f"?username={expected.username}"
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-user-details", args=[expected.id])
+    assertContains(response, expected)
+
+    unexpected = reverse("crm-user-details", args=[unexpected.id])
+    assertNotContains(response, unexpected)
+
+
+@pytest.mark.django_db
+def test_crm_user_list_contains_only_user_matching_partial(request, client):
+    site = get_current_site(request)
+
+    expected = baker.make(auth_models.User, username="doe@example.com")
+    expected.profile.sites.add(site)
+
+    unexpected = baker.make(auth_models.User, username="smith@example.com")
+    unexpected.profile.sites.add(site)
+
+    url = reverse("crm-user-list") + "?username=doe"
 
     with login(client) as user:
         assign_perm("use_crm", user, site)

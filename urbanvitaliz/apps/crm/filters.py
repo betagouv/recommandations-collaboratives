@@ -23,7 +23,10 @@ class UserFilter(django_filters.FilterSet):
         (3, "Administrateur·rice"),
     ]
 
-    username = django_filters.CharFilter(field_name="username")
+    username = django_filters.CharFilter(
+        field_name="username",
+        lookup_expr="icontains",
+    )
 
     # filters
     role = django_filters.ChoiceFilter(
@@ -59,9 +62,7 @@ class UserFilter(django_filters.FilterSet):
 
     class Meta:
         model = auth_models.User
-        fields = {
-            "username": ["exact", "icontains"],
-        }
+        fields = ["username", "role", "is_active"]
 
     def inactive_filter(self, queryset, name, value):
         if name != "inactive" or not value:
