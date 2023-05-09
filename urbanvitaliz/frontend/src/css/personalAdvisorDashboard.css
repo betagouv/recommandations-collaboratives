@@ -72,6 +72,16 @@ main {
     transition: height 0.25s ease;
 }
 
+.personal-dashboard-container-inner .project-link {
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border 0.25s ease;
+}
+
+.personal-dashboard-container-inner .project-link:hover {
+    border-bottom: 1px solid #222;
+}
+
 .project-item {
     transition: opacity 0.25s ease;
 }
