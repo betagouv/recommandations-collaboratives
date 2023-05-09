@@ -25,8 +25,7 @@ from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
-from urbanvitaliz.utils import (get_site_administrators, has_perm,
-                                has_perm_or_403)
+from urbanvitaliz.utils import get_site_administrators, has_perm, has_perm_or_403
 from watson import search as watson
 
 from . import filters, forms, models
@@ -546,10 +545,11 @@ def project_list_by_tags_as_csv(request):
 
     today = datetime.datetime.today().date()
 
+    content_disposition = f'attachment; filename="tags-for-projects-{today}.csv"'
     response = HttpResponse(
         content_type="text/csv",
         headers={
-            "Content-Disposition": f'attachment; filename="tags-for-projects-{today}.csv"'
+            "Content-Disposition": content_disposition,
         },
     )
 
