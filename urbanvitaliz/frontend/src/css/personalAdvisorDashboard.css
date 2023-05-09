@@ -8,6 +8,7 @@ main {
     display: none;
 }
 
+
 .personal-dashboard-container-inner {
     position: relative;
     background-color: #e6e6e6;
@@ -60,8 +61,7 @@ main {
 }
 
 .personal-dashboard-map-container {
-    position: sticky;
-    top: 62.5px;
+    position: relative;
     height: 140px;
     width: 100%;
     z-index: 100;
