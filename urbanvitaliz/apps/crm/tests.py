@@ -45,7 +45,7 @@ def test_crm_user_list_not_available_for_non_staff(client):
 
 
 @pytest.mark.django_db
-def test_crm_user_list_contains_users(request, client):
+def test_crm_user_list_contains_site_users(request, client):
     site = get_current_site(request)
 
     staff = baker.make(auth_models.User)
@@ -61,6 +61,8 @@ def test_crm_user_list_contains_users(request, client):
     a_user = baker.make(auth_models.User)
     a_user.profile.sites.add(site)
 
+    other = baker.make(auth_models.User)
+
     url = reverse("crm-user-list")
 
     with login(client) as user:
@@ -73,6 +75,8 @@ def test_crm_user_list_contains_users(request, client):
         expected = reverse("crm-user-details", args=[user.id])
         assertContains(response, expected)
 
+    unexpected = reverse("crm-user-details", args=[other.id])
+    assertNotContains(response, unexpected)
 
 @pytest.mark.django_db
 def test_crm_user_list_contains_only_selected_user(request, client):
