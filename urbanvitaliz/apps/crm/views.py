@@ -25,8 +25,13 @@ from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
-from urbanvitaliz.utils import (get_site_administrators, has_perm,
-                                has_perm_or_403)
+from urbanvitaliz.utils import (
+    get_group_for_site,
+    get_site_administrators,
+    has_perm,
+    has_perm_or_403,
+    make_group_name_for_site,
+)
 from watson import search as watson
 
 from . import filters, forms, models
@@ -179,8 +184,6 @@ def user_list(request):
         queryset=User.objects.filter(profile__sites=request.site),
     )
 
-    print(users.qs)
-
     # required by default on crm
     search_form = forms.CRMSearchForm()
 
@@ -188,10 +191,124 @@ def user_list(request):
 
 
 @login_required
+def user_update(request, user_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    crm_user = get_object_or_404(User, pk=user_id)
+    profile = crm_user.profile
+
+    group_name = make_group_name_for_site("advisor", request.site)
+    crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
+
+    if request.method == "POST":
+        form = forms.CRMProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            # update profile object
+            form.save()
+            # update user object
+            crm_user.first_name = form.cleaned_data.get("first_name")
+            crm_user.last_name = form.cleaned_data.get("last_name")
+            crm_user.save()
+            return redirect(reverse("crm-user-details", args=[crm_user.id]))
+    else:
+        form = forms.CRMProfileForm(
+            instance=profile,
+            initial={
+                "first_name": crm_user.first_name,
+                "last_name": crm_user.last_name,
+            },
+        )
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/user_update.html", locals())
+
+
+@login_required
+def user_deactivate(request, user_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    crm_user = get_object_or_404(User, pk=user_id)
+
+    if request.method == "POST":
+        crm_user.is_active = False
+        crm_user.save()
+        return redirect(reverse("crm-user-details", args=[crm_user.id]))
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/user_deactivate.html", locals())
+
+
+@login_required
+def user_reactivate(request, user_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    crm_user = get_object_or_404(User, pk=user_id)
+
+    if request.method == "POST":
+        crm_user.is_active = True
+        crm_user.save()
+        return redirect(reverse("crm-user-details", args=[crm_user.id]))
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/user_reactivate.html", locals())
+
+
+@login_required
+def user_set_advisor(request, user_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    crm_user = get_object_or_404(User, pk=user_id)
+    profile = crm_user.profile
+
+    if request.method == "POST":
+        form = forms.CRMAdvisorForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            group = get_group_for_site("advisor", request.site)
+            crm_user.groups.add(group)
+            return redirect(reverse("crm-user-details", args=[crm_user.id]))
+    else:
+        form = forms.CRMAdvisorForm(instance=profile)
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/user_set_advisor.html", locals())
+
+
+@login_required
+def user_unset_advisor(request, user_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    crm_user = get_object_or_404(User, pk=user_id)
+    profile = crm_user.profile
+
+    if request.method == "POST":
+        profile.departments.clear()
+        group = get_group_for_site("advisor", request.site)
+        crm_user.groups.remove(group)
+        return redirect(reverse("crm-user-details", args=[crm_user.id]))
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/user_unset_advisor.html", locals())
+
+
+@login_required
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     crm_user = get_object_or_404(User, pk=user_id)
+
+    group_name = make_group_name_for_site("advisor", request.site)
+    crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
     actions = actor_stream(crm_user)
 
@@ -516,10 +633,11 @@ def project_list_by_tags_as_csv(request):
 
     today = datetime.datetime.today().date()
 
+    content_disposition = f'attachment; filename="tags-for-projects-{today}.csv"'
     response = HttpResponse(
         content_type="text/csv",
         headers={
-            "Content-Disposition": f'attachment; filename="tags-for-projects-{today}.csv"'
+            "Content-Disposition": content_disposition,
         },
     )
 
