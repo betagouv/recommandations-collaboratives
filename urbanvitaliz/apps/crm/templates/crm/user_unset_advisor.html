@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+{% load humanize %}
+{% load training %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+<style>
+ html, body {
+     scroll-padding-top: 240px;
+ }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif">
+    {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
+
+    <div class="w-75 d-flex flex-column justify-content-start">
+        <div class="crm-header px-4 py-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3>Gérer le compte « {{ crm_user.username }} »</h3>
+            </div>
+        </div>
+
+        <div class="m-4">
+            <p class="fw-bolder">
+                En validant, {{ crm_user.get_full_name }} (<i>{{ crm_user.username }}</i>) ne pourra plus conseiller de nouveaux projets
+                sur son territoire.
+            </p>
+            <p>
+                Ceci siginfie que cette personne :
+                <ul>
+                    <li>ne <strong>verra plus</strong> les nouveaux projets à conseiller ;</li>
+                    <li>pourra <strong>continuer de conseiller</strong> les dossiers sur lesquels elle s'est positionnée.</li>
+                </ul>
+            </p>
+            <p class="fst-italic">
+                Cette action est réversible à tout moment.
+            </p>
+            <div class="mt-4">
+                <form method="POST" action="{% url 'crm-user-unset-advisor' crm_user.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" href="{% url 'crm-user-deactivate' crm_user.pk %}" class="btn btn-primary">Oui, rétrograder l'utilisateur·rice</button>
+                    <a href="{% url 'crm-user-update' crm_user.pk %}" class="btn btn-outline-secondary">Non, annuler</a>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

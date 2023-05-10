@@ -25,9 +25,13 @@ from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
-from urbanvitaliz.utils import (get_group_for_site, get_site_administrators,
-                                has_perm, has_perm_or_403,
-                                make_group_name_for_site)
+from urbanvitaliz.utils import (
+    get_group_for_site,
+    get_site_administrators,
+    has_perm,
+    has_perm_or_403,
+    make_group_name_for_site,
+)
 from watson import search as watson
 
 from . import filters, forms, models
@@ -270,7 +274,7 @@ def user_set_advisor(request, user_id=None):
             crm_user.groups.add(group)
             return redirect(reverse("crm-user-details", args=[crm_user.id]))
     else:
-        form = forms.CRMProfileForm(instance=profile)
+        form = forms.CRMAdvisorForm(instance=profile)
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -302,6 +306,9 @@ def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     crm_user = get_object_or_404(User, pk=user_id)
+
+    group_name = make_group_name_for_site("advisor", request.site)
+    crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
     actions = actor_stream(crm_user)
 
