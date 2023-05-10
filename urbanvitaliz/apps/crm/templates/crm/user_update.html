@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+{% load humanize %}
+{% load training %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+<style>
+ html, body {
+     scroll-padding-top: 240px;
+ }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif">
+    {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
+
+    <div class="w-75 d-flex flex-column justify-content-start">
+        <div class="crm-header px-4 py-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3>Gérer le compte « {{ crm_user.username }} »</h3>
+            </div>
+
+            {% if crm_user.is_active %}
+            <div class="d-flex justify-content-end">
+                <a href="{% url 'crm-user-deactivate' crm_user.pk %}" class="btn btn-danger">Suspendre ce compte</a>
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+                Ce compte a été suspendu. Ceci signifie que la personne ne peut plus se connecter à {{ request.site.name }}.
+                Vous pouvez néanmoins le réactiver si vous le souhaitez.
+                <div class="d-flex justify-content-end mt-2">
+                    <form method="POST" action="{% url 'crm-user-reactivate' crm_user.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Réactiver ce compte</a>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+
+        <div class="px-4 pt-4 mb-3">
+            <span class="me-2">Type de compte</span>
+            <div class="btn-group btn-group-sm">
+                {% if crm_user_is_advisor %}
+                <div class="dropdown">
+                    <a class="btn btm-sm btn-outline-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        Conseiller·ère
+                    </a>
+
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="{% url 'crm-user-set-advisor' crm_user.pk %}">Mettre à jour ses départements</a></li>
+                        <li><a class="dropdown-item" href="{% url 'crm-user-unset-advisor' crm_user.pk %}">Rétrograder en tant qu'utilisateur standard</a></li>
+                    </ul>
+
+                </div>
+
+                {% else %}
+                <div class="dropdown">
+                    <a class="btn btm-sm btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        Standard
+                    </a>
+
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="{% url 'crm-user-set-advisor' crm_user.pk %}">Promouvoir en tant que conseiller·e</a></li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if crm_user_is_advisor %}
+            <div class="mt-2">
+                <i>Départements de conseil :</i>
+                {% for dpt in crm_user.profile.departments.all %}
+                {{ dpt }} ({{ dpt.code }})
+                {% if not forloop.last %}, {% endif %}
+                {% empty %}
+                <strong>France entière</strong>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        <hr/>
+
+        <div class="px-4 pt-4 mb-3">
+            <form method="POST" action="{% url 'crm-user-update' crm_user.pk %}">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="input-group mb-3">
+                    <label for="{{ form.first_name.name }}" class="col-sm-2 col-form-label">
+                        Identifiant de connexion<br/>
+                        <i class="small">Pour le changer, contactez un·e administrateur·trice Reco-co.</i>
+                    </label>
+                    <div class="col-sm-5">
+                        <input readonly type="text" class="form-control" id="{{ form.first_name.name }}" name="{{form.first_name.name }}" value="{{ crm_user.username }}">
+                    </div>
+                </div>
+
+
+                <div class="input-group mb-3">
+                    <label for="{{ form.first_name.name }}" class="col-sm-2 col-form-label">Prénom</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="{{ form.first_name.name }}" name="{{form.first_name.name }}" value="{{ form.first_name.value|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label for="{{ form.last_name.name }}" class="col-sm-2 col-form-label">Nom</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="{{ form.last_name.name }}" name="{{form.last_name.name }}" value="{{ form.last_name.value|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label for="{{ form.phone_no.name }}" class="col-sm-2 col-form-label">Numéro de téléphone</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="{{ form.phone_no.name }}" name="{{form.phone_no.name }}" value="{{ form.phone_no.value|default:'' }}">
+                    </div>
+                </div>
+
+
+                <hr/>
+
+                <div class="input-group mb-3">
+                    <label for="{{ form.organization.name }}" class="col-sm-2 col-form-label">Structure de rattachement</label>
+                    <div class=" col-sm-5">
+                        <select class="form-control" name="{{ form.organization.name }}" id="{{ form.organization.name }}">
+                            {% for choice in form.organization.field.choices %}
+                            <option value="{{ choice.0 }}" {% if choice.0 == form.organization.value %}selected{%endif %}>
+                                {{ choice.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label for="{{ form.organization_position.name }}" class="col-sm-2 col-form-label">Rôle dans la structure</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" id="{{ form.organization_position.name }}" name="{{form.organization_position.name }}" value="{{ form.organization_position.value|default:'' }}">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Modifier</button>
+            </form>
+        </div>
+
+
+
+    </div>
+</div>
+{% endblock %}

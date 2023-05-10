@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+{% load humanize %}
+{% load training %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+<style>
+ html, body {
+     scroll-padding-top: 240px;
+ }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif">
+    {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
+
+    <div class="w-75 d-flex flex-column justify-content-start">
+        <div class="crm-header px-4 py-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3>Gérer le compte « {{ crm_user.username }} »</h3>
+            </div>
+        </div>
+
+        <div class="m-4">
+            <p class="fw-bolder">
+                Quels sont les départements que conseille {{ crm_user.get_full_name }} (<i>{{ crm_user.username }}</i>) ?
+                <p class="small">
+                    En assignant ces départements, cette personne pourra :
+                    <ul class="small">
+                        <li><strong>lister et naviguer</strong> dans les projets des départements sélectionnés ;</li>
+                        <li><strong>se positionner</strong> en tant que conseiller·e ou observateur·trice.</li>
+                    </ul>
+                </p>
+
+                <p class="small">Si vous souhaitez lui permettre de conseiller au <strong>niveau national</strong>,
+                ne sélectionnez <strong>aucun</strong> département.</p>
+
+            </p>
+            <form method="POST" action="{% url 'crm-user-set-advisor' crm_user.pk %}">
+                {% csrf_token %}
+                <div class="w-50 d-flex flex-column select-custom mb-4">
+                    {{form.departments.errors}}
+                    {% include 'tools/searchable_list.html' with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département"%}
+
+                    <button class="m-2 btn btn-primary">Assigner ces départements</button>
+                    <a class="m-2" href="{% url 'crm-user-update' crm_user.pk %}">Annuler et revenir à l'édition du profil</a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
