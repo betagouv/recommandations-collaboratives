@@ -13,8 +13,6 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from urbanvitaliz.utils import make_group_name_for_site
 
-from . import models
-
 
 class UserFilter(django_filters.FilterSet):
     """Filter for the list of users"""
@@ -24,6 +22,11 @@ class UserFilter(django_filters.FilterSet):
         (2, "Équipe"),
         (3, "Administrateur·rice"),
     ]
+
+    username = django_filters.CharFilter(
+        field_name="username",
+        lookup_expr="icontains",
+    )
 
     # filters
     role = django_filters.ChoiceFilter(
@@ -45,19 +48,21 @@ class UserFilter(django_filters.FilterSet):
     ordering = django_filters.OrderingFilter(
         # tuple-mapping retains order
         fields=(
+            ("username", "username"),
             ("last_name", "last_name"),
             ("date_joined", "date_joined"),
         ),
         # labels do not need to retain order
         field_labels={
+            "username": "Identifiant de connexion",
             "last_name": "Nom de famille",
-            "date_joined": "Date de création",
+            "date_joined": "Date d'inscription",
         },
     )
 
     class Meta:
         model = auth_models.User
-        fields = ["username", "is_active", "role", "ordering"]
+        fields = ["username", "role", "is_active"]
 
     def inactive_filter(self, queryset, name, value):
         if name != "inactive" or not value:
