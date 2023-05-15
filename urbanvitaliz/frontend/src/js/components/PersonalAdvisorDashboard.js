@@ -115,7 +115,7 @@ function PersonalAdvisorDashboard() {
                 departments.push(deparmentItem)
             })
 
-            return this.departments = departments;
+            return this.departments = departments.sort(this.sortDepartments);
         },
         handleProjectsSearch(event) {
 
@@ -196,6 +196,13 @@ function PersonalAdvisorDashboard() {
             if (a.status === 'NEW') {
                 return -1
             } else if (b.status === 'NEW') {
+                return 1
+            } else return 0
+        },
+        sortDepartments(a, b) {
+            if (a.code < b.code) {
+                return -1
+            } else if (a.code > b.code) {
                 return 1
             } else return 0
         },
@@ -289,5 +296,6 @@ function createMarkerIcon(item) {
 export function makeProjectPositioningActionURL(url, id) {
     return url.replace('0', id);
 }
+
 
 Alpine.data("PersonalAdvisorDashboard", PersonalAdvisorDashboard)
