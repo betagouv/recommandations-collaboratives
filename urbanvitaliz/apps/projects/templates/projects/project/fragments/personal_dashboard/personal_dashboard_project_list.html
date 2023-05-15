@@ -74,7 +74,7 @@
                                 fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#calendar-event" />
                             </svg>
-                            <span x-text="item.status === 'NEW' ? `Déposé le ${formatDate(item.project.created_on)}`: `Modifié le ${formatDate(item.project.updated_on)}` "
+                            <span x-text="`Déposé le ${formatDate(item.project.created_on)}`"
                                 class="align-middle text-grey-dark tiny"></span>
                         </div>
                     </div>
