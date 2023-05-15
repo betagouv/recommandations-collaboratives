@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load django_vite %}
 {% load static %}
+{% load activity_tags %}
 
 {% block js %}
     {% vite_asset 'js/apps/advisorDashboard.js' %}
@@ -10,6 +11,9 @@
 
 {% block content %}
 <div class="font-marianne p-0">
+    {% for action in  action_stream %}
+    {% display_action action %}
+    {% endfor %}
     <div x-data="PersonalAdvisorDashboard" x-init="getData();">
         {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_header.html' %}
         <div class="d-flex align-items-start">
