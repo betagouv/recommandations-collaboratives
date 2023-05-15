@@ -369,8 +369,8 @@ def user_notifications(request, user_id):
 def project_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # filtered users
-    users = filters.ProjectFilter(
+    # filtered projects
+    projects = filters.ProjectFilter(
         request.GET,
         queryset=Project.all_on_site.all(),
     )
@@ -417,7 +417,7 @@ def project_details(request, project_id):
 def project_update(request, project_id=None):
     """Update project properties"""
     has_perm_or_403(request.user, "use_crm", request.site)
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.on_site, pk=project_id)
     if request.method == "POST":
         form = forms.CRMProjectForm(request.POST, instance=project)
         if form.is_valid():
@@ -432,7 +432,7 @@ def project_update(request, project_id=None):
 def project_delete(request, project_id=None):
     """Delete project"""
     has_perm_or_403(request.user, "use_crm", request.site)
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.on_site, pk=project_id)
     if request.method == "POST":
         project.deleted = timezone.now()
         project.save()
@@ -444,7 +444,7 @@ def project_delete(request, project_id=None):
 def project_undelete(request, project_id=None):
     """Undelete project"""
     has_perm_or_403(request.user, "use_crm", request.site)
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.deleted_on_site, pk=project_id)
     if request.method == "POST":
         project.deleted = None
         project.save()

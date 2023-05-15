@@ -455,9 +455,13 @@ def test_crm_user_unset_advisor_processing(request, client):
 ########################################################################
 
 
+#
+# project list
+
+
 @pytest.mark.django_db
-def test_crm_project_not_available_for_non_staff_logged_users(client):
-    url = reverse("crm-project-details", args=[1])
+def test_crm_project_list_not_available_for_non_staff(client):
+    url = reverse("crm-project-list")
     with login(client):
         response = client.get(url)
 
@@ -465,10 +469,96 @@ def test_crm_project_not_available_for_non_staff_logged_users(client):
 
 
 @pytest.mark.django_db
-def test_crm_project_update_not_available_for_non_staff(client):
-    p = baker.make(projects_models.Project)
+def test_crm_project_list_contains_site_projects(request, client):
+    site = get_current_site(request)
+    expected = baker.make(projects_models.Project, sites=[site])
+    other = baker.make(site_models.Site)
+    unexpected = baker.make(projects_models.Project, sites=[other])
 
-    url = reverse("crm-project-update", args=[p.id])
+    url = reverse("crm-project-list")
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-project-details", args=[expected.id])
+    assertContains(response, expected)
+    unexpected = reverse("crm-project-details", args=[unexpected.id])
+    assertContains(response, unexpected)
+
+
+@pytest.mark.django_db
+def test_crm_project_list_filters_active_ones(request, client):
+    site = get_current_site(request)
+    active = baker.make(projects_models.Project, sites=[site])
+    inactive = baker.make(
+        projects_models.Project,
+        deleted=timezone.now(),
+        sites=[site],
+    )
+
+    url = reverse("crm-project-list")
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-project-details", args=[active.id])
+    assertContains(response, expected)
+    unexpected = reverse("crm-project-details", args=[inactive.id])
+    assertContains(response, unexpected)
+
+
+@pytest.mark.django_db
+def test_crm_project_list_filters_inactive_ones(request, client):
+    site = get_current_site(request)
+    active = baker.make(projects_models.Project, sites=[site])
+    inactive = baker.make(
+        projects_models.Project,
+        deleted=timezone.now(),
+        sites=[site],
+    )
+
+    url = reverse("crm-project-list") + "?inactive=True"
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    unexpected = reverse("crm-project-details", args=[active.id])
+    assertContains(response, unexpected)
+    expected = reverse("crm-project-details", args=[inactive.id])
+    assertContains(response, expected)
+
+
+@pytest.mark.django_db
+def test_crm_project_list_filters_by_name(request, client):
+    site = get_current_site(request)
+    expected = baker.make(projects_models.Project, sites=[site])
+    unexpected = baker.make(projects_models.Project, sites=[site])
+
+    url = reverse("crm-project-list") + f"?name={expected.name[5:15]}"
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-project-details", args=[expected.id])
+    assertContains(response, expected)
+    unexpected = reverse("crm-project-details", args=[unexpected.id])
+    assertContains(response, unexpected)
+
+
+#
+# update
+
+
+@pytest.mark.django_db
+def test_crm_project_update_not_available_for_non_staff(request, client):
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site])
+
+    url = reverse("crm-project-update", args=[project.id])
     with login(client):
         response = client.get(url)
 
@@ -476,38 +566,33 @@ def test_crm_project_update_not_available_for_non_staff(client):
 
 
 @pytest.mark.django_db
-def test_crm_project_delete(request, client):
-    project = baker.make(projects_models.Project)
+def test_crm_project_update_not_available_for_other_site(request, client):
+    site = baker.make(site_models.Site)
+    project = baker.make(projects_models.Project, sites=[site])
 
-    url = reverse("crm-project-delete", args=[project.id])
-
+    url = reverse("crm-project-update", args=[project.id])
     with login(client, groups=["example_com_staff"]):
-        response = client.post(url)
+        response = client.get(url)
 
-    assert response.status_code == 302
-
-    updated = projects_models.Project.deleted_objects.first()
-    assert updated.id == project.id
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
-def test_crm_project_undelete(request, client):
-    project = baker.make(projects_models.Project, deleted=timezone.now())
+def test_crm_project_update_available_for_staff(request, client):
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site])
 
-    url = reverse("crm-project-undelete", args=[project.id])
-
+    url = reverse("crm-project-update", args=[project.id])
     with login(client, groups=["example_com_staff"]):
-        response = client.post(url)
+        response = client.get(url)
 
-    assert response.status_code == 302
-
-    updated = projects_models.Project.objects.first()
-    assert updated.id == project.id
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
 def test_crm_project_update_property_exclude_stats(request, client):
-    project = baker.make(projects_models.Project, exclude_stats=False)
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site], exclude_stats=False)
 
     url = reverse("crm-project-update", args=[project.id])
     data = {"exclude_stats": True}
@@ -523,7 +608,8 @@ def test_crm_project_update_property_exclude_stats(request, client):
 
 @pytest.mark.django_db
 def test_crm_project_update_property_muted(request, client):
-    project = baker.make(projects_models.Project, muted=False)
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site], muted=False)
 
     url = reverse("crm-project-update", args=[project.id])
     data = {"muted": True}
@@ -535,6 +621,128 @@ def test_crm_project_update_property_muted(request, client):
 
     updated = projects_models.Project.objects.first()
     assert updated.muted
+
+
+#
+# delete
+
+
+@pytest.mark.django_db
+def test_crm_project_delete_not_available_for_non_staff(request, client):
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site])
+
+    url = reverse("crm-project-delete", args=[project.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_project_delete_not_available_for_staff_other_site(client):
+    project = baker.make(projects_models.Project)
+
+    url = reverse("crm-project-delete", args=[project.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_crm_project_delete_available_for_staff_on_site(request, client):
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site])
+
+    url = reverse("crm-project-delete", args=[project.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_project_delete(request, client):
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site])
+
+    url = reverse("crm-project-delete", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    updated = projects_models.Project.deleted_on_site.first()
+    assert updated.id == project.id
+
+
+#
+# undelete
+
+
+@pytest.mark.django_db
+def test_crm_project_undelete_not_available_for_non_staff(request, client):
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site])
+
+    url = reverse("crm-project-undelete", args=[project.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_project_undelete_not_available_for_staff_other_site(client):
+    project = baker.make(projects_models.Project)
+
+    url = reverse("crm-project-undelete", args=[project.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_crm_project_undelete_available_for_staff_on_site(request, client):
+    site = get_current_site(request)
+    project = baker.make(
+        projects_models.Project,
+        deleted=timezone.now(),
+        sites=[site],
+    )
+
+    url = reverse("crm-project-undelete", args=[project.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_project_undelete(request, client):
+    site = get_current_site(request)
+    project = baker.make(
+        projects_models.Project,
+        sites=[site],
+        deleted=timezone.now(),
+    )
+
+    url = reverse("crm-project-undelete", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    updated = projects_models.Project.objects.first()
+    assert updated.id == project.id
+
+
+#
+# annotation
 
 
 @pytest.mark.django_db
@@ -610,8 +818,9 @@ def test_crm_organization_available_for_staff(client):
 
 
 @pytest.mark.django_db
-def test_crm_project_available_for_staff(client):
-    project = baker.make(projects_models.Project)
+def test_crm_project_available_for_staff(request, client):
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site])
 
     url = reverse("crm-project-details", args=[project.pk])
     with login(client, groups=["example_com_staff"]):

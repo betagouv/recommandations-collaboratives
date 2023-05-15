@@ -82,4 +82,28 @@ class UserFilter(django_filters.FilterSet):
         return queryset.filter(groups__name=group_name)
 
 
+class ProjectFilter(django_filters.FilterSet):
+    """Filter for the list of projects"""
+
+    name = django_filters.CharFilter(
+        field_name="name",
+        lookup_expr="icontains",
+    )
+
+    inactive = django_filters.BooleanFilter(
+        label="Projet inactifs",
+        method="inactive_filter",
+        widget=forms.widgets.CheckboxInput,
+    )
+
+    class Meta:
+        model = auth_models.User
+        fields = []
+
+    def inactive_filter(self, queryset, name, value):
+        if name != "inactive" or not value:
+            return queryset
+        return queryset.exclude(deleted=None)
+
+
 # eof
