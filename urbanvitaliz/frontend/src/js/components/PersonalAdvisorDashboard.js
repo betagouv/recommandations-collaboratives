@@ -31,7 +31,8 @@ function PersonalAdvisorDashboard() {
         mapIsWide: false,
         markersLayer: "",
         //options
-        bodyScrollTopPadding: 215,
+        //header's height + some px
+        bodyScrollTopPadding: 80,
         init() {
             this.handleBodyTopPaddingScroll(this.bodyScrollTopPadding);
         },
@@ -222,12 +223,13 @@ function PersonalAdvisorDashboard() {
             //450 -> header + map.height
             //todo calculate it
 
+            //251 -> 0.25s for the map height transition +1 ms
             setTimeout(() => this.map.invalidateSize(), 251)
             setTimeout(() => zoomToCentroid(this.map, this.markersLayer), 251)
 
             this.mapIsWide = !this.mapIsWide
 
-            this.handleBodyTopPaddingScroll(this.mapIsWide ? 455 : 215)
+            this.handleBodyTopPaddingScroll(80)
         },
         handleBodyTopPaddingScroll(height) {
             this.bodyScrollTopPadding = height
