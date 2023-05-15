@@ -25,6 +25,7 @@ function PersonalAdvisorDashboard() {
         select: '',
         //departments
         departments: [],
+        territorySelectAll: true,
         // map
         map: null,
         mapIsWide: false,
@@ -117,6 +118,33 @@ function PersonalAdvisorDashboard() {
 
             return this.departments = departments.sort(this.sortDepartments);
         },
+        handleTerritorySelectAll() {
+            this.territorySelectAll = !this.territorySelectAll
+
+            this.departments = this.departments.map(department => ({ ...department, active: this.territorySelectAll }))
+
+            return this.filterProjectsByDepartments().sort(this.currentSort);
+        },
+        handleTerritoryFilter(selectedDepartment) {
+
+            if(this.territorySelectAll) {
+                this.territorySelectAll = false
+            }
+
+            this.departments = this.departments.map(department => {
+                if (department.code === selectedDepartment.code) {
+                    department.active = !department.active
+                }
+
+                return department
+            })
+
+            return this.filterProjectsByDepartments().sort(this.currentSort);
+        },
+        filterProjectsByDepartments() {
+            //find department item from departments for each project and return if the department is active
+            return this.displayedData = this.data.filter(item => this.departments.find(department => department.code === item.project.commune.department.code).active)
+        },
         handleProjectsSearch(event) {
 
             if (this.search === "") {
@@ -131,22 +159,6 @@ function PersonalAdvisorDashboard() {
             })
 
             return this.displayedData = newProjectList.sort(this.currentSort)
-        },
-        handleTerritoryFilter(event) {
-
-            this.departments = this.departments.map(department => {
-                if (department.code === event.target.value) {
-                    department.active = event.target.checked
-                }
-
-                return department
-            })
-
-            return this.filterProjectsByDepartments().sort(this.currentSort);
-        },
-        filterProjectsByDepartments() {
-            //find department item from departments for each project and return if the department is active
-            return this.displayedData = this.data.filter(item => this.departments.find(department => department.code === item.project.commune.department.code).active)
         },
         handleProjectsSelect(event) {
 

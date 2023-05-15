@@ -48,6 +48,10 @@ main {
     overflow: hidden;
 }
 
+.territory-dropdown li:first-child {
+    border-bottom: solid 2px #c2c2c2 !important;
+}
+
 .positioning-dropdown.show {
     display: flex;
 }

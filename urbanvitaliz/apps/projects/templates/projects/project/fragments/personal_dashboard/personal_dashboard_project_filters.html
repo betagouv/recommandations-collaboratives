@@ -21,13 +21,23 @@
                     </svg>
                 </div>
                 <ul x-show="open" :class="{'show':open}" class="territory-dropdown list-unstyled flex-column">
+                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
+                            <div class="form-check w-100 d-flex align-items-center p-0">
+                                <input x-on:input.change="handleTerritorySelectAll"
+                                    class="form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
+                                    :value="territorySelectAll" :checked="territorySelectAll" id="allTerritory" />
+                                <label class=" w-100 pe-2 py-2 d-flex align-items-center" for="allTerritory">
+                                    <span class="fw-normal">Tout selectionner</span>
+                                </label>
+                            </div>
+                        </li>
                     <template x-for="department in departments">
                         <li
                             class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
                             <div class="form-check w-100 d-flex align-items-center p-0">
-                                <input x-on:input.change="handleTerritoryFilter"
+                                <input x-on:input.change="handleTerritoryFilter(department)"
                                     class="form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
-                                    :value="department.code" :checked="department.active" :id="department.code" />
+                                    :value="department.active" :checked="department.active" :id="department.code" />
                                 <label class=" w-100 pe-2 py-2 d-flex align-items-center" :for="department.code">
                                     <span class="fw-normal" x-text="department.code"></span>
                                     <span class="mx-1 fw-light">-</span>
