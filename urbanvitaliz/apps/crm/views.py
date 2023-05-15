@@ -25,13 +25,9 @@ from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
-from urbanvitaliz.utils import (
-    get_group_for_site,
-    get_site_administrators,
-    has_perm,
-    has_perm_or_403,
-    make_group_name_for_site,
-)
+from urbanvitaliz.utils import (get_group_for_site, get_site_administrators,
+                                has_perm, has_perm_or_403,
+                                make_group_name_for_site)
 from watson import search as watson
 
 from . import filters, forms, models
@@ -370,10 +366,26 @@ def user_notifications(request, user_id):
 
 
 @login_required
+def project_list(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    # filtered users
+    users = filters.ProjectFilter(
+        request.GET,
+        queryset=Project.all_on_site.all(),
+    )
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/project_list.html", locals())
+
+
+@login_required
 def project_details(request, project_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.all_on_site, pk=project_id)
 
     actions = target_stream(project)
 
@@ -399,6 +411,45 @@ def project_details(request, project_id):
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/project_details.html", locals())
+
+
+@login_required
+def project_update(request, project_id=None):
+    """Update project properties"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+    project = get_object_or_404(Project, pk=project_id)
+    if request.method == "POST":
+        form = forms.CRMProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            return redirect("crm-project-details", project_id)
+    else:
+        form = forms.CRMProjectForm(instance=project)
+    return render(request, "crm/project_update.html", locals())
+
+
+@login_required
+def project_delete(request, project_id=None):
+    """Delete project"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+    project = get_object_or_404(Project, pk=project_id)
+    if request.method == "POST":
+        project.deleted = timezone.now()
+        project.save()
+        return redirect("crm-project-list")
+    return render(request, "crm/project_delete.html", locals())
+
+
+@login_required
+def project_undelete(request, project_id=None):
+    """Undelete project"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+    project = get_object_or_404(Project, pk=project_id)
+    if request.method == "POST":
+        project.deleted = None
+        project.save()
+        return redirect("crm-project-list")
+    return render(request, "crm/project_undelete.html", locals())
 
 
 @login_required

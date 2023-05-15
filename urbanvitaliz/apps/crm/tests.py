@@ -5,6 +5,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from pytest_django.asserts import (assertContains, assertNotContains,
@@ -461,6 +462,79 @@ def test_crm_project_not_available_for_non_staff_logged_users(client):
         response = client.get(url)
 
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_project_update_not_available_for_non_staff(client):
+    p = baker.make(projects_models.Project)
+
+    url = reverse("crm-project-update", args=[p.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_project_delete(request, client):
+    project = baker.make(projects_models.Project)
+
+    url = reverse("crm-project-delete", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    updated = projects_models.Project.deleted_objects.first()
+    assert updated.id == project.id
+
+
+@pytest.mark.django_db
+def test_crm_project_undelete(request, client):
+    project = baker.make(projects_models.Project, deleted=timezone.now())
+
+    url = reverse("crm-project-undelete", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    updated = projects_models.Project.objects.first()
+    assert updated.id == project.id
+
+
+@pytest.mark.django_db
+def test_crm_project_update_property_exclude_stats(request, client):
+    project = baker.make(projects_models.Project, exclude_stats=False)
+
+    url = reverse("crm-project-update", args=[project.id])
+    data = {"exclude_stats": True}
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    updated = projects_models.Project.objects.first()
+    assert updated.exclude_stats
+
+
+@pytest.mark.django_db
+def test_crm_project_update_property_muted(request, client):
+    project = baker.make(projects_models.Project, muted=False)
+
+    url = reverse("crm-project-update", args=[project.id])
+    data = {"muted": True}
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    updated = projects_models.Project.objects.first()
+    assert updated.muted
 
 
 @pytest.mark.django_db

@@ -83,9 +83,29 @@ urlpatterns = [
     #
     # projects
     path(
+        r"crm/project/",
+        views.project_list,
+        name="crm-project-list",
+    ),
+    path(
         r"crm/project/<int:project_id>/",
         views.project_details,
         name="crm-project-details",
+    ),
+    path(
+        r"crm/project/<int:project_id>/update/",
+        views.project_update,
+        name="crm-project-update",
+    ),
+    path(
+        r"crm/project/<int:project_id>/delete/",
+        views.project_delete,
+        name="crm-project-delete",
+    ),
+    path(
+        r"crm/project/<int:project_id>/undelete/",
+        views.project_undelete,
+        name="crm-project-undelete",
     ),
     path(
         r"crm/project/<int:project_id>/annotation/toggle/",

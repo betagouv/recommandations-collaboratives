@@ -1,6 +1,7 @@
 from django import forms
 from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.projects import models as projects_models
 
 from . import models
 
@@ -44,6 +45,14 @@ class CRMNoteForm(forms.ModelForm):
         fields = ["kind", "title", "content", "tags", "sticky"]
 
     content = MarkdownxFormField()
+
+
+class CRMProjectForm(forms.ModelForm):
+    """Update project properties"""
+
+    class Meta:
+        model = projects_models.Project
+        fields = ["exclude_stats", "muted"]
 
 
 class ProjectAnnotationForm(forms.Form):

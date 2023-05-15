@@ -11,7 +11,8 @@ import os
 import uuid
 
 from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+                                                GenericRelation)
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
@@ -24,7 +25,8 @@ from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
+from ordered_model.models import (OrderedModel, OrderedModelManager,
+                                  OrderedModelQuerySet)
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -33,7 +35,8 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor, has_perm
+from urbanvitaliz.utils import (CastedGenericRelation, check_if_advisor,
+                                has_perm)
 
 from . import apps
 from .utils import generate_ro_key
@@ -108,10 +111,7 @@ def create_site_permissions(sender, **kwargs):
 
 
 class ProjectManager(models.Manager):
-    """Manager for projects"""
-
-    def get_queryset(self):
-        return super().get_queryset().filter(deleted=None)
+    """Manager for all projects"""
 
     def in_departments(self, departments):
         """Return only project with commune in department scope (empty=full)"""
@@ -151,7 +151,18 @@ class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
     pass
 
 
-class DeletedProjectManager(models.Manager):
+class ActiveProjectManager(ProjectManager):
+    """Manager for active projects"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
+class ActiveProjectOnSiteManager(CurrentSiteManager, ActiveProjectManager):
+    pass
+
+
+class DeletedProjectManager(ProjectManager):
     """Manager for deleted projects"""
 
     def get_queryset(self):
@@ -175,11 +186,13 @@ class Project(models.Model):
         ("REJECTED", "Rejeté"),
     )
 
-    objects = ProjectManager()
+    objects = ActiveProjectManager()
     objects_deleted = DeletedProjectManager()
 
-    on_site = ProjectOnSiteManager()
+    on_site = ActiveProjectOnSiteManager()
     deleted_on_site = DeletedProjectOnSiteManager()
+
+    all_on_site = ProjectOnSiteManager()
 
     sites = models.ManyToManyField(Site)
 
@@ -236,9 +249,9 @@ class Project(models.Model):
         # XXX Uncomment me once status is written
         return False
 
-    exclude_stats = models.BooleanField(default=False)
+    exclude_stats = models.BooleanField(default=False, blank=True)
     muted = models.BooleanField(
-        default=False, verbose_name="Ne pas envoyer de notifications"
+        default=False, blank=True, verbose_name="Ne pas envoyer de notifications"
     )
 
     org_name = models.CharField(
