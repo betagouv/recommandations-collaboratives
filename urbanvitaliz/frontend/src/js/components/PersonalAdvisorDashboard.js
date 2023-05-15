@@ -128,7 +128,7 @@ function PersonalAdvisorDashboard() {
         },
         handleTerritoryFilter(selectedDepartment) {
 
-            if(this.territorySelectAll) {
+            if (this.territorySelectAll) {
                 this.territorySelectAll = false
             }
 
@@ -175,8 +175,11 @@ function PersonalAdvisorDashboard() {
                 case "insee":
                     sortCriterion = this.sortProjectInsee
                     break;
-                default:
+                case "status":
                     sortCriterion = this.sortProjectStatus
+                    break;
+                default:
+                    sortCriterion = this.sortProjectDate
                     break;
             }
 
