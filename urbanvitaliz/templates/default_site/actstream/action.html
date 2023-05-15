@@ -15,16 +15,33 @@
                 <strong class="text-dark fw-bold">{{ action.actor.first_name|default:action.actor.email }}
                 {{ action.actor.last_name|default:"" }}</strong>
                 <i>{{ action.actor.profile.organization_position|default:'' }}</i>
-                <span class="d-inline-flex">
-                    {{ action.verb }}
-                </span>
-                {% if action.action_object %}
-                    {% if action.action_object.get_absolute_url %}
-                        <a class="text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
+                <span class="d-inline">
+
+                    {% if action.verb == "a envoyé un message dans l'espace conseillers" %}
+                        a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message</a> dans l'espace conseillers
+                    {% elif action.verb == "a envoyé un message" %}
+                        a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message</a> dans la conversation
+                    {% elif action.verb == "a recommandé l'action" %}
+                        a recommandé l'action <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">{{ action.action_object.intent }}</a>
+                    {% elif action.verb == "a invité un·e collaborateur·rice à rejoindre le projet" %}
+                        {% if action.action_object.role %}
+                            <span>a invité <strong class="d-inline-block fw-bold text-dark">{{action.action_object.email}}</strong> en tant que
+                                <strong class="text-dark">
+                                    {% if action.action_object.role == "SWITCHTENDER" %}conseiller·e{% else %}collectivité{% endif %}</strong>
+                            </span>
+                        {% endif %}
                     {% else %}
-                        {{ action.action_object }}
+                        {{action.verb}}
+                        {% if action.action_object %}
+                            {% if action.action_object.get_absolute_url %}
+                                <a class="text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
+                            {% else %}
+                                {{ action.action_object }}
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
-                {% endif %}
+                </span>
+                
 
                 {% if action.action_object and action.target and action.action_object != action.target %}
                     {% if action.action_object and action.target %}
