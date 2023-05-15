@@ -22,6 +22,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.cache import never_cache
 from notifications import models as notifications_models
 
 from urbanvitaliz.apps.communication import digests
@@ -240,6 +241,7 @@ def project_list(request):
 
 @login_required
 @ensure_csrf_cookie
+@never_cache
 def project_list_for_advisor(request):
     """Return the projects for the advisor"""
     if not (
