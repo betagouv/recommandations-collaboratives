@@ -13,7 +13,6 @@ import io
 import uuid
 
 import pytest
-from django.conf import settings
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites
 from django.contrib.sites.shortcuts import get_current_site
@@ -145,7 +144,7 @@ def test_create_prefilled_project_reachable_by_switchtenders(request, client):
         onboarding=onboarding,
     )
 
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(reverse("projects-project-prefill"))
 
     assert response.status_code == 200
@@ -219,7 +218,7 @@ def test_created_prefilled_project_stores_initial_info(request, client):
         "impediments": "some impediment",
     }
 
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["example_com_advisor"]):
         response = client.post(reverse("projects-project-prefill"), data=data)
 
     assert response.status_code == 302
@@ -331,9 +330,9 @@ def test_project_list_not_available_for_non_staff_users(client):
 
 @pytest.mark.django_db
 def test_project_list_available_for_switchtender_user(request, client):
-    site = get_current_site(request)
+    get_current_site(request)
     url = reverse("projects-project-list")
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["example_com_advisor"]):
         response = client.get(url, follow=True)
 
     advisor_url = reverse("projects-project-list-advisor")
@@ -344,9 +343,9 @@ def test_project_list_available_for_switchtender_user(request, client):
 
 @pytest.mark.django_db
 def test_project_list_available_for_staff(request, client):
-    site = get_current_site(request)
+    get_current_site(request)
     url = reverse("projects-project-list")
-    with login(client, groups=["example_com_staff", "example_com_advisor"]) as user:
+    with login(client, groups=["example_com_staff", "example_com_advisor"]):
         response = client.get(url, follow=True)
 
     staff_url = reverse("projects-project-list-staff")
@@ -380,7 +379,7 @@ def test_draft_project_list_available_for_staff(request, client):
     project = baker.make(models.Project, sites=[site], status="DRAFT")
 
     url = reverse("projects-project-list-staff")
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url, follow=True)
 
     assert response.status_code == 200
@@ -798,7 +797,7 @@ def test_project_detail_contains_actions_for_assigned_advisor(request, client):
         response = client.get(url)
     assert response.status_code == 200
 
-    add_task_url = reverse("projects-project-create-action", args=[project.id])
+    add_task_url = reverse("projects-project-create-task", args=[project.id])
     assertContains(response, add_task_url)
 
 
@@ -1408,7 +1407,7 @@ def test_switchtender_create_action_for_resource_push(request, client):
         response = client.post(url)
 
     newurl = (
-        reverse("projects-project-create-action", args=[project.id])
+        reverse("projects-project-create-task", args=[project.id])
         + f"?resource={resource.id}"
     )
     assertRedirects(response, newurl)
