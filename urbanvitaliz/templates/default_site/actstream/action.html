@@ -1,24 +1,48 @@
 {% load i18n %}
+ 
 
-<div class="d-block">
-    ACTION!
-{% if action.actor.get_absolute_url %}<a href="{{ action.actor.get_absolute_url }}">{{ action.actor }}</a>
-{% else %}{{ action.actor }}{% endif %}
-{{ action.verb }}
+<div class="d-block font-marianne">
+    <div class="d-flex align-items-start mb-2">
+        <img class="align-middle rounded-circle d-inline-block  p-1 {% if not transparent_background %} bg-white {% endif %}"
+             width="35px"
+             :src='gravatar_url("{{action.actor}}", 25, "{{action.actor.first_name}}" + " " + "{{action.actor.last_name}}")'
+             data-bs-toggle="tooltip"
+             data-bs-placement="bottom"
+             style="z-index: 1000"
+             tabindex="0">
+        <div class="mt-1 ms-1 font-very-small">
+            <span class="text-grey-dark fw-light">
+                <strong class="text-dark fw-bold">{{ action.actor.first_name|default:action.actor.email }}
+                {{ action.actor.last_name|default:"" }}</strong>
+                <i>{{ action.actor.profile.organization_position|default:'' }}</i>
+                <span class="d-inline-flex">
+                    {{ action.verb }}
+                </span>
+                {% if action.action_object %}
+                    {% if action.action_object.get_absolute_url %}
+                        <a class="text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
+                    {% else %}
+                        {{ action.action_object }}
+                    {% endif %}
+                {% endif %}
 
-{% if action.action_object %}
+                {% if action.action_object and action.target and action.action_object != action.target %}
+                    {% if action.action_object and action.target %}
+                        sur le projet
+                    {% endif %}
+                    {% if action.target %}
+                        {% if action.target.get_absolute_url %}
+                            <a class="text-decoration-none hover-underline text-dark fw-bold"  href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                        {% else %}
+                            {{ action.target }}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </span>
+        </div>
+    </div>
 
-{% if action.action_object.get_absolute_url %}<a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
-{% else %}{{ action.action_object }}{% endif %}
-{% endif %}
 
-{% if action.action_object and action.target %}to{% endif %}
 
-{% if action.target %}
-{% if action.target.get_absolute_url %}<a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-{% else %}{{ action.target }}{% endif %}
-{% endif %}
-{{ action.timestamp|timesince }} {% trans "ago" %}
 
-    CUT!
 </div>
