@@ -1,0 +1,24 @@
+{% load i18n %}
+
+<div class="d-block">
+    ACTION!
+{% if action.actor.get_absolute_url %}<a href="{{ action.actor.get_absolute_url }}">{{ action.actor }}</a>
+{% else %}{{ action.actor }}{% endif %}
+{{ action.verb }}
+
+{% if action.action_object %}
+
+{% if action.action_object.get_absolute_url %}<a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
+{% else %}{{ action.action_object }}{% endif %}
+{% endif %}
+
+{% if action.action_object and action.target %}to{% endif %}
+
+{% if action.target %}
+{% if action.target.get_absolute_url %}<a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+{% else %}{{ action.target }}{% endif %}
+{% endif %}
+{{ action.timestamp|timesince }} {% trans "ago" %}
+
+    CUT!
+</div>
