@@ -95,9 +95,14 @@
                                 </form>
                             </div>
                         </div>
-                        <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
-                            <span>Voir le projet</span>
-                        </a>
+                        <div>
+                            <div class="btn-group btn-group-sm">
+                                <a class="btn btn-outline-primary" href="{{ project.get_absolute_url }}">
+                                    <span>Voir le projet</span>
+                                </a>
+                                <a href="{% url 'crm-project-update' project.pk %}" class="btn btn-outline-secondary" aria-current="page">Gérer le projet</a>
+                            </div>
+                        </div>
                     </div>
                     <div class="px-4 pt-4 crm-notes-wrapper"">
                         <div class="d-flex justify-content-between align-items-start">
