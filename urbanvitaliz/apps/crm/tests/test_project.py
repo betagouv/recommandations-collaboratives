@@ -95,7 +95,7 @@ def test_crm_project_list_filters_by_project_name(request, client):
     expected = baker.make(projects_models.Project, sites=[site])
     unexpected = baker.make(projects_models.Project, sites=[site])
 
-    url = reverse("crm-project-list") + f"?name={expected.name[5:15]}"
+    url = reverse("crm-project-list") + f"?query={expected.name[5:15]}"
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
@@ -117,7 +117,7 @@ def test_crm_project_list_filters_by_commune_name(request, client):
         projects_models.Project, sites=[site], commune__name="ignorée"
     )
 
-    url = reverse("crm-project-list") + f"?commune={expected.commune.name}"
+    url = reverse("crm-project-list") + f"?query={expected.commune.name}"
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
@@ -197,7 +197,7 @@ def test_crm_project_update_property_exclude_stats(request, client):
     with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
 
     updated = projects_models.Project.objects.first()
     assert updated.exclude_stats is True
@@ -214,7 +214,7 @@ def test_crm_project_update_property_muted(request, client):
     with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
 
     updated = projects_models.Project.objects.first()
     assert updated.muted is True
