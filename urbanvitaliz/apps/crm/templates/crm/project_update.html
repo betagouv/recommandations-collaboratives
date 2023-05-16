@@ -47,14 +47,17 @@
             {% endif %}
         </div>
         <div class="px-4 pt-4 mb-3">
-            <div class="btn-group">
-                <a class="btn btn-outline-primary" href="{{ project.get_absolute_url }}">
-                    <span>Éditer les informations du projet</span>
-                </a>
-                <a class="btn btn-outline-primary" href="{% url 'projects-project-administration' project.pk %}">
-                    <span>Gérer les membres et conseillers</span>
-                </a>
-            </div>
+                <ul class="d-flex m-0 p-0 align-items-center list-unstyled row">
+                    <li class="me-2 col-2">
+                        {% url 'projects-project-administration' project.pk as url %}
+                        {% include 'crm/fragments/crm_icon_button.html' with name="Éditer les informations" icon="pencil" link_url=url %}
+                    </li>
+
+                    <li class="me-2 col-2">
+                        {% url 'projects-project-administration' project.pk as url %}
+                        {% include 'crm/fragments/crm_icon_button.html' with name="Gérer les membres" icon="person" link_url=url anchor="#user-management" %}
+                    </li>
+                </ul>
         </div>
 
         <div class="px-4 pt-4 mb-3">
