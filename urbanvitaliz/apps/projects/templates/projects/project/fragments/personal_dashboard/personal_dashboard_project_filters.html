@@ -27,7 +27,7 @@
                                     class="form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
                                     :value="territorySelectAll" :checked="territorySelectAll" id="allTerritory" />
                                 <label class=" w-100 pe-2 py-2 d-flex align-items-center" for="allTerritory">
-                                    <span class="fw-normal">Tout selectionner</span>
+                                    <span class="fw-normal">Tout (dé)sélectionner</span>
                                 </label>
                             </div>
                         </li>
@@ -57,10 +57,10 @@
             <select x-model="select" x-on:input.change="handleProjectsSelect"
                 class="input-field px-3 fw-normal text-dark appearance-none" name="projects-select" id="projects-select"
                 style="padding-right: 40px !important; z-index: 2; background-color: transparent;">
-                <option value="date">Date de dépot</option>
+                <option value="date">Date de dépôt</option>
                 <option value="commune-name">Nom de la commune</option>
                 <option value="insee">Code INSEE</option>
-                <option value="status">Statut</option>
+                <option value="recent-activities">Activité récente</option>
             </select>
             <svg class="input-icon right black bi align-baseline me-2" width="15" height="15" fill="#000000"
                 style="z-index:1">

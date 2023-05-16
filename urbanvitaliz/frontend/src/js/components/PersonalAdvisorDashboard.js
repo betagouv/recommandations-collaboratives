@@ -41,9 +41,11 @@ function PersonalAdvisorDashboard() {
             const projects = await this.$store.projects.getProjects()
 
             this.nbNewProjects = projects.filter(p => p.status === 'NEW').length
-            this.extractAndCreateAdvisorDepartments(projects);
 
+            this.extractAndCreateAdvisorDepartments(projects);
             this.data = projects.map(project => ({ ...project, isLoading: false }))
+            this.data = this.createProjectListWithNewActivities(projects);
+
             this.displayedData = this.data.sort(this.sortProjectDate)
 
             const { map, markersLayer } = initMap(projects)
@@ -102,6 +104,22 @@ function PersonalAdvisorDashboard() {
             }
 
             return null
+        },
+        createProjectListWithNewActivities(projects) {
+            const projectsWithNewActivities = projects.map(item => {
+
+                let newActivities = 0;
+
+                if (item.project.is_observer || item.project.is_switchtender) {
+                    newActivities = item.project.notifications.new_recommendations + item.project.notifications.unread_private_messages + item.project.notifications.unread_public_messages
+                }
+
+                const project = { ...item.project, newActivities }
+
+                return { ...item, project }
+            })
+
+            return projectsWithNewActivities;
         },
         extractAndCreateAdvisorDepartments(projects) {
             const departments = []
@@ -175,8 +193,8 @@ function PersonalAdvisorDashboard() {
                 case "insee":
                     sortCriterion = this.sortProjectInsee
                     break;
-                case "status":
-                    sortCriterion = this.sortProjectStatus
+                case "recent-activities":
+                    sortCriterion = this.sortProjectRecentActivities
                     break;
                 default:
                     sortCriterion = this.sortProjectDate
@@ -215,6 +233,28 @@ function PersonalAdvisorDashboard() {
                 return 1
             } else return 0
         },
+        sortProjectRecentActivities(a, b) {
+            if (a.project.newActivities === a.project.newActivities && new Date(a.project.updated_on) === new Date(b.project.updated_on)) {
+                if (new Date(a.project?.created_on) > new Date(b.project?.created_on)) {
+                    return -1
+                } else if (a.project.created_on < b.project.created_on) {
+                    return 1
+                } else return 0
+            }
+            else if (a.project.newActivities === b.project.newActivities) {
+                if (new Date(a.project?.updated_on) > new Date(b.project?.updated_on)) {
+                    return -1
+                } else if (a.project.updated_on < b.project.updated_on) {
+                    return 1
+                } else return 0
+            } else {
+                if (a.project.newActivities > b.project.newActivities) {
+                    return -1
+                } else if (a.project.newActivities < b.project.newActivities) {
+                    return 1
+                } else return 0
+            }
+        },
         sortDepartments(a, b) {
             if (a.code < b.code) {
                 return -1
@@ -223,9 +263,6 @@ function PersonalAdvisorDashboard() {
             } else return 0
         },
         handleMapOpen() {
-            //450 -> header + map.height
-            //todo calculate it
-
             //251 -> 0.25s for the map height transition +1 ms
             setTimeout(() => this.map.invalidateSize(), 251)
             setTimeout(() => zoomToCentroid(this.map, this.markersLayer), 251)
