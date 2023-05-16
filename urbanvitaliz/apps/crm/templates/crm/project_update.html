@@ -46,10 +46,19 @@
             </div>
             {% endif %}
         </div>
-
+        <div class="px-4 pt-4 mb-3">
+            <div class="btn-group">
+                <a class="btn btn-outline-primary" href="{{ project.get_absolute_url }}">
+                    <span>Éditer les informations du projet</span>
+                </a>
+                <a class="btn btn-outline-primary" href="{% url 'projects-project-administration' project.pk %}">
+                    <span>Gérer les membres et conseillers</span>
+                </a>
+            </div>
+        </div>
 
         <div class="px-4 pt-4 mb-3">
-
+            <h4>Réglages internes</h4>
             <!-- Notification -->
             <div class="form-check form-switch">
                 <label class="form-check-label" for="flexSwitchCheckDefault">
@@ -59,7 +68,7 @@
                     <span class="align-middle me-2">Notifications</span>
                 </label>
 
-                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                <input @click="$event.target.form.submit();" class="form-check-input" name="{{ form.muted.name }}" type="checkbox" role="switch" id="notifications">
             </div>
 
             <!-- Statistiques -->
