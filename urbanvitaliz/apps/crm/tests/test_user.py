@@ -1,5 +1,3 @@
-import collections
-
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
@@ -7,31 +5,15 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains
+
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import get_group_for_site, login
 
-from . import models, views
-
 ########################################################################
-# organization
-########################################################################
-
-
-@pytest.mark.django_db
-def test_crm_organization_not_available_for_non_staff_logged_users(client):
-    url = reverse("crm-organization-details", args=[1])
-    with login(client):
-        response = client.get(url)
-
-    assert response.status_code == 403
-
-
-########################################################################
-# users
+# users list
 ########################################################################
 
 
@@ -189,12 +171,55 @@ def test_crm_user_list_filters_only_selected_role(request, client):
     assertNotContains(response, unexpected)
 
 
-#
-# update user / profile information
+########################################################################
+# details
+########################################################################
 
 
 @pytest.mark.django_db
-def test_crm_update_user_profile_information(request, client):
+def test_crm_user_details_available_for_staff(client):
+    user = baker.make(auth_models.User)
+
+    url = reverse("crm-user-details", args=[user.pk])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+########################################################################
+# update user / profile information
+########################################################################
+
+
+@pytest.mark.django_db
+def test_crm_user_update_not_available_for_non_staff(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    user.profile.sites.add(site)
+
+    url = reverse("crm-user-update", args=[user.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_user_update_available_for_staff(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User)
+
+    url = reverse("crm-user-update", args=[user.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_user_update_profile_information(request, client):
     site = get_current_site(request)
 
     organization = baker.make(addressbook_models.Organization)
@@ -231,8 +256,9 @@ def test_crm_update_user_profile_information(request, client):
     assert profile.organization_position == data["organization_position"]
 
 
-#
+########################################################################
 # user deactivation
+########################################################################
 
 
 @pytest.mark.django_db
@@ -281,8 +307,9 @@ def test_crm_user_deactivate_processing(request, client):
     assert end_user.is_active is False
 
 
-#
+########################################################################
 # user reactivation
+########################################################################
 
 
 @pytest.mark.django_db
@@ -331,8 +358,9 @@ def test_crm_user_reactivate_processing(request, client):
     assert end_user.is_active is True
 
 
-#
+########################################################################
 # user set advisor status
+########################################################################
 
 
 @pytest.mark.django_db
@@ -391,8 +419,9 @@ def test_crm_user_set_advisor_processing(request, client):
     assert set(user_dpts) == set(selected)
 
 
-#
+########################################################################
 # user unset advisor status
+########################################################################
 
 
 @pytest.mark.django_db
@@ -450,13 +479,17 @@ def test_crm_user_unset_advisor_processing(request, client):
 
 
 ########################################################################
-# project
+# user project interest
 ########################################################################
 
 
 @pytest.mark.django_db
-def test_crm_project_not_available_for_non_staff_logged_users(client):
-    url = reverse("crm-project-details", args=[1])
+def test_crm_user_project_interest_not_accessible_wo_perm(request, client):
+    site = get_current_site(request)
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(site)
+
+    url = reverse("crm-user-project-interest", args=[o.id])
     with login(client):
         response = client.get(url)
 
@@ -464,181 +497,106 @@ def test_crm_project_not_available_for_non_staff_logged_users(client):
 
 
 @pytest.mark.django_db
-def test_toggle_missing_project_annotation(request, client):
+def test_crm_user_project_interest_not_accessible_other_site(request, client):
     site = get_current_site(request)
+    other = baker.make(site_models.Site)
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(other)
 
-    project = baker.make(models.projects_models.Project, sites=[site])
+    url = reverse("crm-user-project-interest", args=[o.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
 
-    url = reverse("crm-project-toggle-annotation", args=[project.id])
-    data = {"tag": "a nice tag"}
-
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(url, data=data)
-
-    annotation = models.ProjectAnnotations.objects.first()
-    assert data["tag"] in annotation.tags.names()
-
-    url = reverse("crm-project-details", args=[annotation.project.id])
-    assertRedirects(response, url)
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
-def test_toggle_on_project_annotation(request, client):
+def test_crm_user_project_interest_accessible_w_perm(request, client):
     site = get_current_site(request)
+    other = baker.make(site_models.Site)
 
-    project = baker.make(models.projects_models.Project, sites=[site])
-    annotation = baker.make(models.ProjectAnnotations, site=site, project=project)
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(site)
 
-    url = reverse("crm-project-toggle-annotation", args=[annotation.project.id])
-    data = {"tag": "a nice tag"}
+    expected = baker.make(projects_models.UserProjectStatus, site=site, user=o)
+    other_site = baker.make(projects_models.UserProjectStatus, site=other, user=o)
+    unexpected = baker.make(projects_models.UserProjectStatus, site=site)
 
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(url, data=data)
-
-    updated = models.ProjectAnnotations.objects.first()
-    assert data["tag"] in updated.tags.names()
-
-    url = reverse("crm-project-details", args=[annotation.project.id])
-    assertRedirects(response, url)
-
-
-@pytest.mark.django_db
-def test_toggle_off_project_annotation(request, client):
-    site = get_current_site(request)
-
-    project = baker.make(models.projects_models.Project, sites=[site])
-    annotation = baker.make(models.ProjectAnnotations, site=site, project=project)
-
-    data = {"tag": "précédent"}
-    annotation.tags.add(data["tag"])
-
-    url = reverse("crm-project-toggle-annotation", args=[annotation.project.id])
-
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(url, data=data)
-
-    updated = models.ProjectAnnotations.objects.first()
-    assert data["tag"] not in updated.tags.names()
-
-    url = reverse("crm-project-details", args=[annotation.project.id])
-    assertRedirects(response, url)
-
-
-@pytest.mark.django_db
-def test_crm_organization_available_for_staff(client):
-    org = baker.make(addressbook_models.Organization)
-
-    url = reverse("crm-organization-details", args=[org.pk])
-    with login(client, groups=["example_com_staff"]):
+    url = reverse("crm-user-project-interest", args=[o.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
         response = client.get(url)
 
     assert response.status_code == 200
 
-
-@pytest.mark.django_db
-def test_crm_project_available_for_staff(client):
-    project = baker.make(projects_models.Project)
-
-    url = reverse("crm-project-details", args=[project.pk])
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_crm_user_available_for_staff(client):
-    user = baker.make(auth_models.User)
-
-    url = reverse("crm-user-details", args=[user.pk])
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_crm_project_create_note(client):
-    project = baker.make(projects_models.Project)
-
-    data = {"tags": ["canard"], "content": "hola"}
-
-    url = reverse("crm-project-note-create", args=[project.pk])
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(url, data)
-
-    assert response.status_code == 302
-
-    note = models.Note.objects.first()
-    assert list(note.tags.names()) == data["tags"]
-
-
-@pytest.mark.django_db
-def test_crm_search(request, client):
-    current_site = get_current_site(request)
-    second_site = baker.make(site_models.Site)
-
-    project_on_site = baker.make(
-        projects_models.Project, name="Mon petit canard", sites=[current_site]
-    )
-    project_no_site = baker.make(projects_models.Project, name="Mon petit poussin")
-    project_another_site = baker.make(
-        projects_models.Project, name="Mon petit poulet", sites=[second_site]
-    )
-
-    data = {"query": "petit"}
-
-    url = reverse("crm-search")
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(url, data)
-
-    assert response.status_code == 200
-    assertContains(response, project_on_site.name)
-    assertNotContains(response, project_no_site.name)
-    assertNotContains(response, project_another_site.name)
+    assertContains(response, expected.project.name[:10])
+    assertNotContains(response, unexpected.project.name)
+    assertNotContains(response, other_site.project.name)
 
 
 ########################################################################
-# Dashboard
+# user notifications
 ########################################################################
 
 
 @pytest.mark.django_db
-def test_site_dashboard_not_available_for_non_staff_users(client):
-    url = reverse("crm-site-dashboard")
+def test_crm_user_notification_not_accessible_wo_perm(request, client):
+    site = get_current_site(request)
+
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(site)
+
+    url = reverse("crm-user-notifications", args=[o.id])
     with login(client):
         response = client.get(url)
+
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_site_dashboard_available_for_staff_users(client):
-    url = reverse("crm-site-dashboard")
-    with login(client, groups=["example_com_staff"]):
+def test_crm_user_notification_not_accessible_other_site(request, client):
+    site = get_current_site(request)
+    other = baker.make(site_models.Site)
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(other)
+
+    url = reverse("crm-user-notifications", args=[o.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
         response = client.get(url)
-    assert response.status_code == 200
 
-
-########################################################################
-# tag cloud
-########################################################################
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
-def test_compute_tag_cloud():
-    site = baker.make(site_models.Site)
-    project_annotation = baker.make(models.ProjectAnnotations, site=site)
-    project_annotation.tags.add("tag0", "tag1")
-    note = baker.make(models.Note, site=site, related=project_annotation.project)
-    note.tags.add("tag0", "tag2")
-    tags = views.compute_tag_occurences(site)
-    assert tags == collections.OrderedDict(
-        {
-            "tag0": 2,
-            "tag1": 1,
-            "tag2": 1,
-        }
-    )
+def test_crm_user_notification_accessible_w_perm(request, client):
+    site = get_current_site(request)
+    # other = baker.make(site_models.Site)
+
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(site)
+
+    # on_site = baker.make(
+    #     notifications_models.Notification, site=site, recipient=o, emailed=True
+    # )
+    # other_site = baker.make(
+    #     notifications_models.Notification, site=other, recipient=o, emailed=True
+    # )
+    # other_user = baker.make(
+    #     notifications_models.Notification, site=site, emailed=True
+    # )
+
+    url = reverse("crm-user-notifications", args=[o.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    # assertContains(response, on_site.verb[:16])
+    # assertNotContains(response, other_site.verb[:16])
+    # assertNotContains(response, other_user.verb[:16])
 
 
 # eof

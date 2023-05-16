@@ -8,6 +8,7 @@ created: 2021-06-29 11:30:42 CEST
 """
 
 from django import template
+
 from urbanvitaliz.apps.projects.models import Project
 
 register = template.Library()

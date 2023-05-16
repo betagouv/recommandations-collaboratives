@@ -4,8 +4,9 @@ import django.db.models.deletion
 import django.db.models.manager
 import django.utils.timezone
 import taggit.managers
-import urbanvitaliz.apps.crm.models
 from django.db import migrations, models
+
+import urbanvitaliz.apps.crm.models
 
 
 class Migration(migrations.Migration):

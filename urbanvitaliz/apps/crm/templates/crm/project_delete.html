@@ -26,27 +26,26 @@
     <div class="w-75 d-flex flex-column justify-content-start">
         <div class="crm-header px-4 py-4 mb-3">
             <div class="d-flex justify-content-between align-items-center mb-2">
-                <h3>Gérer le compte « {{ crm_user.username }} »</h3>
+                <h3>Gérer le projet « {{ project.name }} »</h3>
             </div>
         </div>
 
         <div class="m-4">
             <p class="fw-bolder">
-                Vous êtes sur le point de suspendre le compte de {{ crm_user.get_full_name }} (<i>{{ crm_user.username }}</i>).
+                Vous êtes sur le point de supprimer le projet « {{ project.name }} » ({{ project.commune }})
             </p>
             <p>
                 Ceci signifie que :
                 <ul>
-                    <li>Cette personne ne pourra <strong>plus</strong> se connecter à {{ request.site }}</li>
-                    <li>L'ensemble de ses contributions (messages, ...) seront toujours visibles sur le portail</li>
-                    <li>Il sera possible de réactiver le compte si nécessaire</li>
+                    <li>Ce projet ne pourra <strong>plus</strong> être vu sur aucun portail, dont {{ request.site.name }}</li>
+                    <li>Il sera possible de réactiver le projet si nécessaire</li>
                 </ul>
             </p>
             <div class="mt-4">
-                <form method="POST" action="{% url 'crm-user-deactivate' crm_user.pk %}">
+                <form method="POST" action="{% url 'crm-project-delete' project.pk %}">
                     {% csrf_token %}
-                    <button type="submit" href="{% url 'crm-user-deactivate' crm_user.pk %}" class="btn btn-danger">Oui, suspendre ce compte</button>
-                    <a href="{% url 'crm-user-details' crm_user.pk %}" class="btn btn-outline-secondary">Non, annuler la suspension</a>
+                    <button type="submit" href="{% url 'crm-project-delete' project.pk %}" class="btn btn-danger">Oui, supprimer ce projet</button>
+                    <a href="{% url 'crm-project-details' project.pk %}" class="btn btn-outline-secondary">Non, annuler la suppression</a>
                 </form>
             </div>
         </div>

@@ -253,6 +253,11 @@ urlpatterns = [
         name="projects-project-administration",
     ),
     path(
+        r"project/<int:project_id>/administration/<int:user_id>/promote/",
+        administration.promote_collaborator_as_referent,
+        name="projects-project-promote-referent",
+    ),
+    path(
         r"project/<int:project_id>/administration/access/collectivity/invite",
         administration.access_collaborator_invite,
         name="projects-project-access-collectivity-invite",
