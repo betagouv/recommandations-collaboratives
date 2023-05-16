@@ -15,14 +15,14 @@
                 <strong class="text-dark fw-bold">{{ action.actor.first_name|default:action.actor.email }}
                 {{ action.actor.last_name|default:"" }}</strong>
                 <i>{{ action.actor.profile.organization_position|default:'' }}</i>
+                <span class="d-inline-block">
                 <span class="d-inline">
-
                     {% if action.verb == "a envoyé un message dans l'espace conseillers" %}
-                        a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message</a> dans l'espace conseillers
+                        a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message dans l'espace conseillers</a> sur
                     {% elif action.verb == "a envoyé un message" %}
-                        a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message</a> dans la conversation
+                        a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message dans la conversation</a> sur 
                     {% elif action.verb == "a recommandé l'action" %}
-                        a recommandé l'action <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">{{ action.action_object.intent }}</a>
+                        a recommandé l'action <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">"{{ action.action_object.intent }}"</a> sur
                     {% elif action.verb == "a invité un·e collaborateur·rice à rejoindre le projet" %}
                         {% if action.action_object.role %}
                             <span>a invité <strong class="d-inline-block fw-bold text-dark">{{action.action_object.email}}</strong> en tant que
@@ -45,7 +45,7 @@
 
                 {% if action.action_object and action.target and action.action_object != action.target %}
                     {% if action.action_object and action.target %}
-                        sur le projet
+                        <span class="d-inline"> le projet</span>
                     {% endif %}
                     {% if action.target %}
                         {% if action.target.get_absolute_url %}
@@ -55,6 +55,7 @@
                         {% endif %}
                     {% endif %}
                 {% endif %}
+                </span>
             </span>
         </div>
     </div>
