@@ -8,13 +8,17 @@ created : 2021-05-26 15:56:20 CEST
 """
 from actstream import action
 from django.contrib import messages
+from django.contrib.auth import models as auth_models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from guardian.shortcuts import get_perms
+
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.api import (
@@ -27,6 +31,7 @@ from urbanvitaliz.utils import has_perm_or_403
 
 from .. import forms, models
 from ..utils import (
+    is_advisor_for_project,
     is_regional_actor_for_project,
     unassign_advisor,
     unassign_collaborator,
@@ -130,16 +135,18 @@ def access_invite(request, role, project):
             )
             messages.success(
                 request,
-                "Un courriel d'invitation à rejoindre le projet a été envoyé à {0}.".format(
-                    email
+                (
+                    "Un courriel d'invitation à rejoindre le projet"
+                    f" a été envoyé à {email}."
                 ),
                 extra_tags=["email"],
             )
         else:
             messages.warning(
                 request,
-                "Cet usager ({0}) n'a pu être invité, aucun courriel n'a été envoyé. Vérifiez qu'il n'est pas déjà invité ou membre".format(
-                    email
+                (
+                    f"Cet usager ({email}) n'a pu être invité, aucun courriel"
+                    " n'a été envoyé. Vérifiez qu'il n'est pas déjà invité ou membre"
                 ),
             )
 
@@ -184,6 +191,30 @@ def access_revoke_invite(request, project_id, invite_id):
 ##############################################################################
 # Collectivity
 ##############################################################################
+
+
+@login_required
+@require_http_methods(["POST"])
+def promote_collaborator_as_referent(request, project_id, user_id=None):
+    """Promote a collectivity member to referent role"""
+    project = get_object_or_404(models.Project.on_site, pk=project_id)
+
+    # FIXME what is the required permission for doing this action?
+    if not is_advisor_for_project(request.user, project):
+        raise PermissionDenied()
+
+    user = get_object_or_404(auth_models.User, id=user_id)
+    if request.site not in user.profile.sites.all():
+        # user is not on current site
+        raise Http404()
+
+    members = models.ProjectMember.objects.filter(project=project)
+
+    with transaction.atomic():
+        members.update(is_owner=False)
+        members.filter(member=user).update(is_owner=True)
+
+    return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
 @login_required
