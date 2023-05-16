@@ -92,6 +92,11 @@ class ProjectFilter(django_filters.FilterSet):
         lookup_expr="icontains",
     )
 
+    commune = django_filters.CharFilter(
+        field_name="commune",
+        lookup_expr="name__icontains",
+    )
+
     inactive = django_filters.BooleanFilter(
         label="Projet inactifs",
         method="inactive_filter",
