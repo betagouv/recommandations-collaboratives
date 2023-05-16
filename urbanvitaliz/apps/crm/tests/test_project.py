@@ -95,7 +95,7 @@ def test_crm_project_list_filters_by_project_name(request, client):
     expected = baker.make(projects_models.Project, sites=[site])
     unexpected = baker.make(projects_models.Project, sites=[site])
 
-    url = reverse("crm-project-list") + f"?name={expected.name[5:15]}"
+    url = reverse("crm-project-list") + f"?query={expected.name[5:15]}"
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
@@ -117,7 +117,7 @@ def test_crm_project_list_filters_by_commune_name(request, client):
         projects_models.Project, sites=[site], commune__name="ignorée"
     )
 
-    url = reverse("crm-project-list") + f"?commune={expected.commune.name}"
+    url = reverse("crm-project-list") + f"?query={expected.commune.name}"
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
@@ -197,7 +197,7 @@ def test_crm_project_update_property_exclude_stats(request, client):
     with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
 
     updated = projects_models.Project.objects.first()
     assert updated.exclude_stats is True
@@ -214,7 +214,7 @@ def test_crm_project_update_property_muted(request, client):
     with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
 
     updated = projects_models.Project.objects.first()
     assert updated.muted is True
@@ -338,64 +338,6 @@ def test_crm_project_undelete(request, client):
     assert updated.id == project.id
 
 
-#
-# project create note
-
-
-@pytest.mark.django_db
-def test_crm_project_create_note_not_accessible_for_non_staff(client):
-    project = baker.make(projects_models.Project)
-
-    url = reverse("crm-project-note-create", args=[project.id])
-    with login(client):
-        response = client.get(url)
-
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_crm_project_create_note_not_accessible_other_site(request, client):
-    other = baker.make(site_models.Site)
-
-    project = baker.make(projects_models.Project, sites=[other])
-
-    url = reverse("crm-project-note-create", args=[project.id])
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 404
-
-
-@pytest.mark.django_db
-def test_crm_project_create_note_accessible_for_staff(request, client):
-    site = get_current_site(request)
-
-    project = baker.make(projects_models.Project, sites=[site])
-
-    url = reverse("crm-project-note-create", args=[project.id])
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_crm_project_create_note(request, client):
-    site = get_current_site(request)
-    project = baker.make(projects_models.Project, sites=[site])
-
-    data = {"tags": ["canard"], "content": "hola"}
-
-    url = reverse("crm-project-note-create", args=[project.pk])
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(url, data)
-
-    assert response.status_code == 302
-
-    note = models.Note.objects.first()
-    assert list(note.tags.names()) == data["tags"]
-
-
 @pytest.mark.django_db
 def test_crm_search(request, client):
     current_site = get_current_site(request)
@@ -421,8 +363,9 @@ def test_crm_search(request, client):
     assertNotContains(response, project_another_site.name)
 
 
-#
+########################################################################
 # project annotations
+########################################################################
 
 
 @pytest.mark.django_db
