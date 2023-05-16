@@ -58,30 +58,35 @@
         </div>
 
         <div class="px-4 pt-4 mb-3">
-            <h4>Réglages internes</h4>
-            <!-- Notification -->
-            <div class="form-check form-switch">
-                <label class="form-check-label" for="flexSwitchCheckDefault">
-                    <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-fill"/>
-                    </svg>
-                    <span class="align-middle me-2">Notifications</span>
-                </label>
+            <form method="POST" class="form" action="{% url 'crm-project-update' project.pk %}">
+                {% csrf_token %}
+                <h4 class="mb-2">Réglages internes</h4>
+                <!-- Notification -->
+                <div class="form-check form-switch">
+                    <label class="form-check-label" for="{{ form.notifications.name }}">
+                        <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-fill"/>
+                        </svg>
+                        <span class="align-middle me-2">Notifications</span>
+                        <p class="text-secondary small">Détermine si les notifications internes et les courriels seront envoyés en cas d'événéments sur le projet.</p>
+                    </label>
 
-                <input @click="$event.target.form.submit();" class="form-check-input" name="{{ form.muted.name }}" type="checkbox" role="switch" id="notifications">
-            </div>
+                    <input @click="$event.target.form.submit();" class="form-check-input" name="{{ form.notifications.name }}" type="checkbox" role="switch" id="notifications" {% if form.notifications.value == True %}checked{% endif %}>
+                </div>
 
-            <!-- Statistiques -->
-            <div class="form-check form-switch">
-                <label class="form-check-label" for="flexSwitchCheckDefault">
-                    <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-data-fill"/>
-                    </svg>
-                    <span class="align-middle me-2">Inclu dans les statistiques</span>
-                </label>
+                <!-- Statistiques -->
+                <div class="form-check form-switch">
+                    <label class="form-check-label" for="{{ form.statistics.name }}">
+                        <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-data-fill"/>
+                        </svg>
+                        <span class="align-middle me-2">Inclu dans les statistiques</span>
+                    </label>
 
-                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-            </div>
+                    <input @click="$event.target.form.submit();"  class="form-check-input" type="checkbox" role="switch" name="{{ form.statistics.name }}" id="statistics" {% if form.statistics.value == True %}checked{% endif %}>
+                    <p class="text-secondary small">Détermine si ce projet sera comptabilisé dans la <a href="{% url 'statistics' %}">page publique de statistiques</a> et les export CSV.</p>
+                </div>
+            </form>
         </div>
         <hr/>
 

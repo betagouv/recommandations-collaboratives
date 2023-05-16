@@ -439,7 +439,6 @@ def project_update(request, project_id=None):
             if "statistics" in form.cleaned_data:
                 project.exclude_stats = not form.cleaned_data["statistics"]
             project.save()
-            return redirect("crm-project-details", project_id)
     else:
         form = forms.CRMProjectForm(
             initial={
