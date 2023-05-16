@@ -1,0 +1,13 @@
+{% load static %}
+
+<div x-cloak class="p-0 personal-dashboard-map-container" :class="{'is-wide':mapIsWide}">
+    <div class="h-100 w-100" x-ref="map" id="map" class="personal-dashboard-map"></div>
+    <div class="map-increase-height-button" x-on:click="handleMapOpen">
+        <svg :class="!mapIsWide ? 'd-block' : 'd-none'" width="15" height="15" fill="#000000" style="z-index:1">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrows-fullscreen" />
+        </svg>
+        <svg :class="!mapIsWide ? 'd-none' : 'd-block'"  width="15" height="15" fill="#000000" style="z-index:1">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#fullscreen-exit" />
+        </svg>
+    </div>
+</div>

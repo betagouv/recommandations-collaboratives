@@ -6,6 +6,16 @@
     color: #B34000;
 }
 
+.text-green {
+    color: #27A658;
+}
+
+.text-new-project {
+    background-color : #FDCD6D;
+    padding: 0px 3px;
+    color: #222;
+}
+
 .text-blue {
     color: #0063CB !important;
 }

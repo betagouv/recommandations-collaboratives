@@ -27,3 +27,7 @@
 .hover-bg-grey:hover{
     background-color: #f6f6f6;
 }
+
+.hover-underline:hover {
+    text-decoration: underline !important;
+}

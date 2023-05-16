@@ -94,10 +94,10 @@
                                                             <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`" class="align-middle"></span>
                                                         </div>
 
-                                                        <div class="d-flex justify-content-end">
+                                                        <div class="d-flex justify-content-end me-1 overflow-hidden">
                                                             <template x-for="switchtender in t.switchtenders">
                                                                 <div>
-                                                                    <img class="align-middle  rounded-circle d-inline-block" width="25px" :src="gravatar_url(switchtender.email, 25, switchtender.first_name + ' ' + switchtender.last_name)" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="`${switchtender.first_name} ${switchtender.last_name}`" style="z-index: 1000;" tabindex="0">
+                                                                    {% include 'projects/project/fragments/advisor_gravatar_list_item.html' with wide_margin=True transparent_background=True %}
                                                                 </div>
                                                             </template>
                                                         </div>

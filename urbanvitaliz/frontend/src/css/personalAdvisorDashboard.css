@@ -1,0 +1,219 @@
+/* used to be able to use position sticky on children */
+body,
+main {
+    overflow-x: initial !important;
+}
+
+[x-cloak] {
+    display: none;
+}
+
+
+.personal-dashboard-container-inner {
+    position: relative;
+    background-color: #e6e6e6;
+    background: #F6F6F6;
+    border-width: 1px 1px 0px 0px;
+    border-style: solid;
+    border-color: #E5E5E5;
+    border-radius: 0px 4px 0px 0px;
+}
+
+.positioning-dropdown {
+    position: absolute;
+    z-index: 100;
+
+    left: -200px;
+    top: 112%;
+
+    background-color: white;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.16), 0px 1px 0px -2px rgba(0, 0, 0, 0.16), 0px 1px 4px rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+
+    overflow: hidden;
+}
+
+.territory-dropdown {
+    position: absolute;
+    width: 100%;
+    z-index: 100;
+
+    left: 0;
+    top: 112%;
+
+    background-color: white;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.16), 0px 1px 0px -2px rgba(0, 0, 0, 0.16), 0px 1px 4px rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+
+    overflow: hidden;
+}
+
+.territory-dropdown li:first-child {
+    border-bottom: solid 2px #c2c2c2 !important;
+}
+
+.positioning-dropdown.show {
+    display: flex;
+}
+
+.positioning-dropdown li button:hover {
+    background-color: #e6e6e6 !important;
+}
+
+.positioning-dropdown li button:hover span {
+    color: #222 !important;
+}
+
+.personal-dashboard-map-container {
+    position: relative;
+    height: 140px;
+    width: 100%;
+    z-index: 100;
+
+    border-radius: 4px;
+    overflow: hidden;
+    transition: height 0.25s ease;
+}
+
+.personal-dashboard-container-inner .project-link {
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border 0.25s ease;
+}
+
+.personal-dashboard-container-inner .project-link:hover {
+    border-bottom: 1px solid #222;
+}
+
+.project-item {
+    transition: opacity 0.25s ease;
+}
+
+.project-item-is-loading {
+    opacity: 0.3;
+}
+
+.project-item-loader {
+    position: absolute;
+    top: calc(50% - 12px);
+    left: calc(50% - 12px);
+}
+
+.personal-dashboard-map-container.is-wide {
+    height: 380px;
+}
+
+.personal-dashboard-map-container .leaflet-container {
+    z-index: 1;
+    border-radius: 4px;
+}
+
+.personal-dashboard-map-container .leaflet-container::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    top: 0;
+    left: 0;
+
+    background: linear-gradient(to top, #fff, #fff9d400 100%);
+}
+
+.map-increase-height-button {
+    position: absolute;
+    right: 15px;
+    bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 110;
+    background-color: white;
+    padding: 10px;
+    border-radius: 6px;
+    border:2px solid #ccc;
+
+    cursor: pointer;
+}
+
+.map-increase-height-button:hover {
+    background-color: #f4f4f4;
+}
+
+.map-increase-height-button svg {
+    stroke: #222;
+    stroke-width: 1;
+}
+
+.new-project-marker {
+    background-color: #FDCD6D !important;
+}
+
+.new-project-marker:before {
+    background-color: #FDCD6D !important;
+}
+
+
+.project-marker a {
+    text-decoration: none;
+    color: white !important;
+}
+
+.new-project-marker a {
+    color: #222 !important;
+}
+
+.project-marker {
+    width: auto !important;
+    height: auto !important;
+    padding: 5px 5px;
+    border-radius: 100%;
+    background-color: #222;
+    font-weight: 700;
+    font-size: 9px;
+    border: solid 1px white;
+}
+
+.project-marker:before {
+    content: '';
+    position: absolute;
+
+    top: 68%;
+    left: calc(50% - 6px);
+
+    width: 12px;
+    height: 12px;
+    background-color: #222;
+    transform: rotate(45deg);
+    z-index: -1;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+}
+
+.department-item {
+    cursor: pointer;
+}
+
+.department-item * {
+    cursor: pointer;
+}
+
+.department-item:hover {
+    background-color: #e6e6e6 !important;
+}
+
+@media (max-width: 1139px) {
+    .projects-filters-container {
+        flex-direction: column;
+        align-items: start !important;
+    }
+    .projects-filters-select {
+        margin-top: 10px;
+    }
+
+    .responsive-flex-column {
+        flex-direction: column;
+        margin-top: 15px;
+    }
+}

@@ -1,7 +1,5 @@
 # encoding: utf-8
 
-__all__ = ["rest", "feeds", "notes", "sharing", "tasks", "documents"]
-
 """
 Views for projects application
 
@@ -14,6 +12,7 @@ from django.contrib import messages
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.dispatch import receiver
@@ -22,7 +21,9 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.cache import never_cache
 from notifications import models as notifications_models
+
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.communication.digests import normalize_user_name
@@ -36,7 +37,6 @@ from urbanvitaliz.utils import (
     get_site_config_or_503,
     has_perm_or_403,
     is_staff_for_site,
-    is_staff_for_site_or_403,
     is_switchtender_or_403,
 )
 
@@ -57,6 +57,8 @@ from ..utils import (
     set_active_project_id,
     unassign_advisor,
 )
+
+__all__ = ["rest", "feeds", "notes", "sharing", "tasks", "documents"]
 
 ########################################################################
 # On boarding
@@ -131,7 +133,11 @@ def create_project_prefilled(request):
 
             models.Note(
                 project=project,
-                content=f"# Demande initiale\n\n{project.description}\n\n{ markdown_content }",
+                content=(
+                    "# Demande initiale\n\n"
+                    f"{project.description}\n\n"
+                    f"{ markdown_content }"
+                ),
                 public=True,
                 site=request.site,
             ).save()
@@ -142,7 +148,10 @@ def create_project_prefilled(request):
                 site=request.site,
                 email=user.email,
                 defaults={
-                    "message": "Je viens de déposer votre projet sur la plateforme de manière à faciliter nos échanges."
+                    "message": (
+                        "Je viens de déposer votre projet sur la"
+                        "plateforme de manière à faciliter nos échanges."
+                    )
                 },
             )
             send_email(
@@ -161,8 +170,9 @@ def create_project_prefilled(request):
 
             messages.success(
                 request,
-                "Un courriel d'invitation à rejoindre le projet a été envoyé à {0}.".format(
-                    user.email
+                (
+                    "Un courriel d'invitation à rejoindre"
+                    f" le projet a été envoyé à {user.email}."
                 ),
                 extra_tags=["email"],
             )
@@ -230,6 +240,7 @@ def project_list(request):
 
 @login_required
 @ensure_csrf_cookie
+@never_cache
 def project_list_for_advisor(request):
     """Return the projects for the advisor"""
     if not (
@@ -242,14 +253,28 @@ def project_list_for_advisor(request):
         recipient=request.user, public=True
     )
 
-    return render(request, "projects/project/advisor_dashboard.html", locals())
+    project_ct = ContentType.objects.get_for_model(models.Project)
+    user_project_pks = list(
+        request.user.project_states.filter(
+            project__switchtenders=request.user
+        ).values_list("project__pk", flat=True)
+    )
+
+    action_stream = request.user.notifications.filter(
+        target_content_type=project_ct,
+        target_object_id__in=user_project_pks,
+    ).order_by("-timestamp")[:20]
+
+    return render(request, "projects/project/personal_advisor_dashboard.html", locals())
 
 
 @login_required
 @ensure_csrf_cookie
 def project_list_for_staff(request):
-    """Return the projects for the staff (and for other people as a fallback until the new
-    dashboard is fully completed)"""
+    """
+    Return the projects for the staff (and for other people as a fallback until the
+    new dashboard is fully completed).
+    """
     if not (
         check_if_advisor(request.user, request.site)
         or can_administrate_project(project=None, user=request.user)

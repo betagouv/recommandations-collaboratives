@@ -19,11 +19,27 @@
     opacity: 1;
 }
 
+.input-active {
+    outline: #0d6efd auto 1px;
+    border-radius: 20px;
+}
+
+
+.input-icon.right {
+    right: 10px;
+    left: auto;
+}
+
+.input-icon.black {
+    fill: #000 !important;
+}
+
 .input-icon {
     position: absolute;
     left: 10px;
     fill: #666666;
 }
+
 
 .input-item .input-field {
     border: none !important;
