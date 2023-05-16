@@ -335,7 +335,11 @@ function zoomToCentroid(map, markersLayer) {
 function createMapMarkers(map, projects) {
     return projects.map((item) => {
         if (item.project?.commune?.latitude && item.project?.commune?.longitude) {
-            return L.marker([item.project.commune.latitude, item.project.commune.longitude], { icon: createMarkerIcon(item) }).addTo(map)
+
+            let lat = item.project?.commune?.latitude + (Math.random() * 0.001)
+            let long = item.project?.commune?.longitude + (Math.random() * 0.001)
+
+            return L.marker([lat, long], { icon: createMarkerIcon(item) }).addTo(map)
         }
     })
 }
