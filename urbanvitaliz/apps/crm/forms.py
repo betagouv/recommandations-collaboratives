@@ -48,12 +48,11 @@ class CRMNoteForm(forms.ModelForm):
     content = MarkdownxFormField()
 
 
-class CRMProjectForm(forms.ModelForm):
+class CRMProjectForm(forms.Form):
     """Update project properties"""
 
-    class Meta:
-        model = projects_models.Project
-        fields = ["exclude_stats", "muted"]
+    notifications = forms.BooleanField(required=False)
+    statistics = forms.BooleanField(required=False)
 
 
 class ProjectAnnotationForm(forms.Form):
