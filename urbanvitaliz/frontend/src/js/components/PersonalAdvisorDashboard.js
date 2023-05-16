@@ -281,14 +281,14 @@ function PersonalAdvisorDashboard() {
             if (a.project.newActivities === a.project.newActivities && new Date(a.project.updated_on) === new Date(b.project.updated_on)) {
                 if (new Date(a.project?.created_on) > new Date(b.project?.created_on)) {
                     return -1
-                } else if (a.project.created_on < b.project.created_on) {
+                } else if (new Date(a.project.created_on) < new Date(b.project.created_on)) {
                     return 1
                 } else return 0
             }
             else if (a.project.newActivities === b.project.newActivities) {
                 if (new Date(a.project?.updated_on) > new Date(b.project?.updated_on)) {
                     return -1
-                } else if (a.project.updated_on < b.project.updated_on) {
+                } else if (new Date(a.project.updated_on) < new Date(b.project.updated_on)) {
                     return 1
                 } else return 0
             } else {

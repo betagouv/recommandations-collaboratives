@@ -70,7 +70,6 @@ main {
     width: 100%;
     z-index: 100;
 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     border-radius: 4px;
     overflow: hidden;
     transition: height 0.25s ease;
