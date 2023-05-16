@@ -207,7 +207,7 @@ function PersonalAdvisorDashboard() {
             return this.data.filter(item => {
                 if (item.project.name?.toLowerCase().includes(searchValue.toLowerCase())) return item
                 if (item.project.commune?.name?.toLowerCase().includes(searchValue.toLowerCase())) return item
-                if (item.project.commune.insee.includes(searchValue)) return item
+                if (item.project.commune?.insee?.includes(searchValue)) return item
                 if (item.project.id.toString().includes(searchValue) && searchValue.length < 4) return item
             })
         },

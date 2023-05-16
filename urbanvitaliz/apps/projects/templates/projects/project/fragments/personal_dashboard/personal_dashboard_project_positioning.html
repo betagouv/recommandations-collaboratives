@@ -1,17 +1,5 @@
 {% load static %}
 
-
-<!-- <li>
-        <form method="POST" action="">
-            {% csrf_token %}
-            <button class="bg-white appearance-none w-100 py-2 px-2 d-flex justify-content-start align-items-center border-bottom">
-                <svg class="align-middle bi me-2" width="18px" height="18px" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-slash" />
-                </svg>
-                <span class="text-grey-dark text-info-custom tiny">Couper les notifications</span>
-            </button>
-        </form>
-    </li> -->
 <template x-if="item.project.is_observer && item.project.is_switchtender">
     <ul x-show="open" :class="{'show':open}" class="positioning-dropdown list-unstyled flex-column">
         <li>
