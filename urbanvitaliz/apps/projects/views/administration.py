@@ -27,11 +27,10 @@ from urbanvitaliz.apps.invites.api import (
     invite_revoke,
 )
 from urbanvitaliz.apps.invites.forms import InviteForm
-from urbanvitaliz.utils import has_perm_or_403
+from urbanvitaliz.utils import has_perm_or_403, is_staff_for_site_or_403
 
 from .. import forms, models
 from ..utils import (
-    is_advisor_for_project,
     is_regional_actor_for_project,
     unassign_advisor,
     unassign_collaborator,
@@ -199,9 +198,7 @@ def promote_collaborator_as_referent(request, project_id, user_id=None):
     """Promote a collectivity member to referent role"""
     project = get_object_or_404(models.Project.on_site, pk=project_id)
 
-    # FIXME what is the required permission for doing this action?
-    if not is_advisor_for_project(request.user, project):
-        raise PermissionDenied()
+    is_staff_for_site_or_403(request.user, request.site)
 
     user = get_object_or_404(auth_models.User, id=user_id)
     if request.site not in user.profile.sites.all():

@@ -430,6 +430,7 @@ def project_update(request, project_id=None):
     """Update project properties"""
     has_perm_or_403(request.user, "use_crm", request.site)
     project = get_object_or_404(Project.on_site, pk=project_id)
+
     if request.method == "POST":
         form = forms.CRMProjectForm(request.POST, instance=project)
         if form.is_valid():
@@ -437,6 +438,9 @@ def project_update(request, project_id=None):
             return redirect("crm-project-details", project_id)
     else:
         form = forms.CRMProjectForm(instance=project)
+
+    search_form = forms.CRMSearchForm()
+
     return render(request, "crm/project_update.html", locals())
 
 

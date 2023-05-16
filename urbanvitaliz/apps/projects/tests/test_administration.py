@@ -208,8 +208,7 @@ def test_promote_referent_prevent_cross_site_promotion(request, client):
     )
 
     url = reverse("projects-project-promote-referent", args=[project.id, crm_user.id])
-    with login(client) as user:
-        assign_advisor(user, project, site)
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url)
 
     assert response.status_code == 404
@@ -229,8 +228,7 @@ def test_promote_referent_available_for_advisor(request, client):
     )
 
     url = reverse("projects-project-promote-referent", args=[project.id, crm_user.id])
-    with login(client) as user:
-        assign_advisor(user, project, site)
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url)
 
     assert response.status_code == 302
