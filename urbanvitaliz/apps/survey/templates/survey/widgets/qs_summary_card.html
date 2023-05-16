@@ -45,7 +45,7 @@
                                 {% lookup_choices_from_answer answer as choices %}
                                 {% if show_question or not choices %}
                                     <div>
-                                        <!-- TODO PERMISSIOJNS : edit_survey -->
+                                        <!-- TODO PERMISSIONS : edit_survey -->
                                         {% if "use_surveys" in user_project_perms %}
                                             <a class="text-decoration-none stretched-link link-edit"
                                                href="{% url 'survey-question-details' session.id answer.question.id %}">
@@ -91,20 +91,21 @@
                                             </div>
                                         {% endif %}
                                         {% if answer.attachment %}
-                                            <div <span class="align-middle">
-                                                <a style="position: relative;
-                                                          z-index:2;
-                                                          color: {{ question_set.color|default:'black' }} !important"
-                                                   target="_new"
-                                                   href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
-                                                <!-- <span class="text-secondary">{{ answer.attachment.size }} Ko</span> -->
-                                            </span>
+                                            <div>
+                                                <span class="align-middle">
+                                                    <a style="position: relative;
+                                                              z-index:2;
+                                                              color: {{ question_set.color|default:'black' }} !important"
+                                                       target="_new"
+                                                       href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
+                                                    <!-- <span class="text-secondary">{{ answer.attachment.size }} Ko</span> -->
+                                                </span>
                                         </div>
                                     {% endif %}
                                 </div>
                                 {% if "view_surveys" in user_project_perms %}
                                     <div class="flex-shrink-1 next-arrow">
-                                        {% if can_administrate and answer.updated_recently %}
+                                        {% if can_view_updated_answers and answer.updated_recently %}
                                             <svg class="text-danger align-middle bi"
                                                  width="14px"
                                                  height="14px"
@@ -122,7 +123,7 @@
                                     </div>
                                 {% endif %}
                             </li>
-                            {% if "view_surveys" in user_project_perms and answer.updated_recently %}
+                            {% if can_view_updated_answers and answer.updated_recently %}
                                 <li class="small bg-light-yellow p-1">
                                     <div display="">
                                         Mis à jour {{ answer.updated_on|naturalday }}

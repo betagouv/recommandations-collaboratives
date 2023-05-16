@@ -50,7 +50,7 @@
                 <span class="align-middle">Activité sur les différents projets</span>
             </h3>
             <ul class="list-group">
-                {% for action in projects_stream|slice:":50" %}
+                {% for action in projects_stream|slice:":400" %}
                 <li class="list-group-item">
 
                     <span class="text-secondary">{{ action.timestamp|naturalday|capfirst }}</span> -
@@ -78,7 +78,7 @@
             </h3>
             {% activity_stream "model_actions" user_model %}
             <ul class="list-group">
-                {% for action in stream|slice:":50" %}
+                {% for action in stream|slice:":200" %}
                 {% if action.verb == "s'est connecté" %}
                 <li class="list-group-item">
                     {{ action.timestamp|naturalday|capfirst }} - <a href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor|capfirst }}</a> {{ action.verb }}
@@ -96,7 +96,7 @@
                 <span class="align-middle">Mes dernières actions</span>
             </h3>
             <ul class="list-group">
-                {% for task in request.user.tasks_created.all|slice:":30" %}
+                {% for task in request.user.tasks_created.all|slice:":200" %}
                 <li class="list-group-item"><a href="{{ task.get_absolute_url }}">{{ task }}</a> ({{ task.project }})</li>
                 {% endfor %}
             </ul>

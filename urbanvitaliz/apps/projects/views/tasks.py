@@ -45,6 +45,103 @@ from ..utils import (
 )
 
 
+########################################################################
+# create task/push resource to project
+########################################################################
+
+
+@login_required
+def create_task(request, project_id=None):
+    """Create task for given project"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    has_perm_or_403(request.user, "projects.manage_tasks", project)
+
+    if request.method == "POST":
+        # Pick a different form for better data handling based
+        # on the 'push_type' attribute
+        type_form = PushTypeActionForm(request.POST)
+
+        type_form.is_valid()
+
+        push_type = type_form.cleaned_data.get("push_type")
+
+        try:
+            push_form_type = {
+                "noresource": CreateActionWithoutResourceForm,
+                "single": CreateActionWithResourceForm,
+                "multiple": CreateActionsFromResourcesForm,
+            }[push_type]
+        except KeyError:
+            return render(request, "projects/project/task_create.html", locals())
+
+        form = push_form_type(request.POST)
+        if form.is_valid():
+            if push_type == "multiple":
+                for resource in form.cleaned_data.get("resources", []):
+                    public = form.cleaned_data.get("public", False)
+                    action = models.Task.on_site.create(
+                        project=project,
+                        site=request.site,
+                        resource=resource,
+                        intent=resource.title,
+                        created_by=request.user,
+                        public=public,
+                    )
+                    action.top()
+
+                    # Notify other switchtenders
+                    signals.action_created.send(
+                        sender=create_task,
+                        task=action,
+                        project=project,
+                        user=request.user,
+                    )
+
+            else:
+                action = form.save(commit=False)
+                action.project = project
+                action.site = request.site
+                action.created_by = request.user
+                action.save()
+                action.top()
+
+                # Check if we have a file or link
+                document_form = DocumentUploadForm(request.POST, request.FILES)
+                if document_form.is_valid():
+                    if document_form.cleaned_data["the_file"]:
+                        document = document_form.save(commit=False)
+                        document.attached_object = action
+                        document.site = request.site
+                        document.uploaded_by = request.user
+                        document.project = action.project
+
+                        document.save()
+
+                # Notify other switchtenders
+                signals.action_created.send(
+                    sender=create_task,
+                    task=action,
+                    project=project,
+                    user=request.user,
+                )
+
+            # Redirect to `action-inline` if we're coming
+            # from `action-inline` after create
+            if (
+                type_form.cleaned_data["next"]
+                and type_form.cleaned_data["next"] != "None"
+            ):
+                return redirect(type_form.cleaned_data["next"])
+
+            next_url = reverse("projects-project-detail-actions", args=[project.id])
+            return redirect(next_url)
+    else:
+        type_form = PushTypeActionForm(request.GET)
+
+    return render(request, "projects/project/task_create.html", locals())
+
+
 @login_required
 def visit_task(request, task_id):
     """Visit the content of a task"""
@@ -180,6 +277,16 @@ def update_task(request, task_id=None):
                 task, recipient=request.user.email, origin=api.models.Reminder.STAFF
             )
 
+            document_form = DocumentUploadForm(request.POST, request.FILES)
+            if document_form.is_valid():
+                if document_form.cleaned_data["the_file"]:
+                    document = document_form.save(commit=False)
+                    document.attached_object = instance
+                    document.site = request.site
+                    document.uploaded_by = request.user
+                    document.project = instance.project
+                    document.save()
+
             # If we are going public, notify
             if was_public is False and instance.public is True:
                 signals.action_created.send(
@@ -189,7 +296,8 @@ def update_task(request, task_id=None):
                     user=request.user,
                 )
 
-            # Redirect to `action-inline` if we're coming from `action-inline` after create
+            # Redirect to `action-inline` if we're coming
+            # from `action-inline` after create
             if form.cleaned_data["next"] and form.cleaned_data["next"] != "None":
                 return redirect(form.cleaned_data["next"])
 
@@ -198,6 +306,7 @@ def update_task(request, task_id=None):
             )
     else:
         form = UpdateTaskForm(request.GET, instance=task)
+        document_form = DocumentUploadForm()
     return render(request, "projects/project/task_update.html", locals())
 
 
@@ -282,9 +391,9 @@ def presuggest_task(request, project_id):
                 continue
 
             if recommandation.departments.all().count() > 0:
-                if not (
+                if (
                     project.commune.department.code
-                    in recommandation.departments.values_list("code", flat=True)
+                    not in recommandation.departments.values_list("code", flat=True)
                 ):
                     continue
 
@@ -470,102 +579,6 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
     return render(request, "projects/task/rsvp_followup_confirm.html", locals())
 
 
-########################################################################
-# push resource to project
-########################################################################
-
-
-@login_required
-def create_action(request, project_id=None):
-    """Create action for given project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-
-    has_perm_or_403(request.user, "projects.manage_tasks", project)
-
-    if request.method == "POST":
-        # Pick a different form for better data handling based
-        # on the 'push_type' attribute
-        type_form = PushTypeActionForm(request.POST)
-
-        type_form.is_valid()
-
-        push_type = type_form.cleaned_data.get("push_type")
-
-        try:
-            push_form_type = {
-                "noresource": CreateActionWithoutResourceForm,
-                "single": CreateActionWithResourceForm,
-                "multiple": CreateActionsFromResourcesForm,
-            }[push_type]
-        except KeyError:
-            return render(request, "projects/project/task_create.html", locals())
-
-        form = push_form_type(request.POST)
-        if form.is_valid():
-            if push_type == "multiple":
-                for resource in form.cleaned_data.get("resources", []):
-                    public = form.cleaned_data.get("public", False)
-                    action = models.Task.on_site.create(
-                        project=project,
-                        site=request.site,
-                        resource=resource,
-                        intent=resource.title,
-                        created_by=request.user,
-                        public=public,
-                    )
-                    action.top()
-
-                    # Notify other switchtenders
-                    signals.action_created.send(
-                        sender=create_action,
-                        task=action,
-                        project=project,
-                        user=request.user,
-                    )
-
-            else:
-                action = form.save(commit=False)
-                action.project = project
-                action.site = request.site
-                action.created_by = request.user
-                action.save()
-                action.top()
-
-                # Check if we have a file or link
-                document_form = DocumentUploadForm(request.POST, request.FILES)
-                if document_form.is_valid():
-                    if document_form.cleaned_data["the_file"]:
-                        document = document_form.save(commit=False)
-                        document.attached_object = action
-                        document.site = request.site
-                        document.uploaded_by = request.user
-                        document.project = action.project
-
-                        document.save()
-
-                # Notify other switchtenders
-                signals.action_created.send(
-                    sender=create_action,
-                    task=action,
-                    project=project,
-                    user=request.user,
-                )
-
-            # Redirect to `action-inline` if we're coming from `action-inline` after create
-            if (
-                type_form.cleaned_data["next"]
-                and type_form.cleaned_data["next"] != "None"
-            ):
-                return redirect(type_form.cleaned_data["next"])
-
-            next_url = reverse("projects-project-detail-actions", args=[project.id])
-            return redirect(next_url)
-    else:
-        type_form = PushTypeActionForm(request.GET)
-
-    return render(request, "projects/project/task_create.html", locals())
-
-
 @login_required
 def create_resource_action_for_current_project(request, resource_id=None):
     """Create action for given resource to project stored in session"""
@@ -575,6 +588,6 @@ def create_resource_action_for_current_project(request, resource_id=None):
 
     has_perm_or_403(request.user, "projects.manage_tasks", project)
 
-    next_url = reverse("projects-project-create-action", args=[project.id])
+    next_url = reverse("projects-project-create-task", args=[project.id])
     next_url += f"?resource={resource.id}"
     return redirect(next_url)

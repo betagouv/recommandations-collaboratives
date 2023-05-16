@@ -7,13 +7,8 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-12-14 10:36:20 CEST
 """
 
-import os
 
-from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
-from django.conf import settings
-from django.contrib.auth import models as auth_models
 from markdownx.fields import MarkdownxFormField
 from urbanvitaliz.apps.resources import models as resources_models
 

@@ -280,6 +280,10 @@ def test_answered_question_is_updated_to_session(request, client):
     url = reverse("survey-question-details", args=(session.id, q1.id))
     with login(client, is_staff=False):
         client.post(url, data={"answer": choice1.value})
+
+        answer = models.Answer.objects.get(session=session, question=q1)
+        updated_on_creation = answer.updated_on
+
         client.post(url, data={"answer": choice2.value, "comment": my_comment})
 
     # Fetch persisted answer
@@ -289,6 +293,7 @@ def test_answered_question_is_updated_to_session(request, client):
     assert answer.values == [choice2.value]
     assert answer.comment == my_comment
     assert answer.signals == my_signals
+    assert answer.updated_on > updated_on_creation
 
 
 @pytest.mark.django_db
