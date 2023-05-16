@@ -82,7 +82,7 @@
                 <tbody>
                     {% for project in projects.qs %}
                     <tr>
-                        <td><a href="{% url 'crm-project-details' user.pk %}">{{ project.name|truncatechars:48 }}</a></td>
+                        <td><a href="{% url 'crm-project-details' project.pk %}">{{ project.name|truncatechars:48 }}</a></td>
                         <td>{{ project.commune }}</td>
                         <td>{{ project.created_on|date }}</td>
                         <td>{{ project.get_status_display }}</td>
