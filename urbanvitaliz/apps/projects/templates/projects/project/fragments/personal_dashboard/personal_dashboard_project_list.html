@@ -80,7 +80,7 @@
                     </div>
                     <footer class="d-flex align-items-center justify-content-between w-100">
                         <div class="d-flex align-items-center">
-                            <div class="d-flex align-items-center tiny me-3">
+                            <div class="d-flex align-items-center tiny me-3 responsive-flex-column">
                                 <svg class="align-middle bi me-1"
                                     width="18px"
                                     height="15px"
@@ -92,7 +92,7 @@
                                     <a class="text-decoration-none hover-underline" :href="makeProjectURL('{% url 'projects-project-detail-actions' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)" class="text-green fw-medium" x-text="getNewRecommendations(item)"></span></a>
                                 </template>
                             </div>
-                            <div class="d-flex align-items-center tiny me-3">
+                            <div class="d-flex align-items-center tiny me-3 responsive-flex-column">
                                 <svg class="align-middle bi me-1"
                                     width="18px"
                                     height="15px"
@@ -104,7 +104,7 @@
                                     <a class="text-decoration-none hover-underline" :href="makeProjectURL('{% url 'projects-project-detail-conversations' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)" class="text-green fw-medium" x-text="getUnreadPublicMessages(item)"></span></a>
                                 </template>
                             </div>
-                            <div class="d-flex align-items-center tiny">
+                            <div class="d-flex align-items-center tiny responsive-flex-column">
                                 <svg class="align-middle bi me-1"
                                     width="18px"
                                     height="16px"

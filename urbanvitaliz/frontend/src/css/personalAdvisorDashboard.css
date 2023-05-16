@@ -203,3 +203,18 @@ main {
 .department-item:hover {
     background-color: #e6e6e6 !important;
 }
+
+@media (max-width: 1139px) {
+    .projects-filters-container {
+        flex-direction: column;
+        align-items: start !important;
+    }
+    .projects-filters-select {
+        margin-top: 10px;
+    }
+
+    .responsive-flex-column {
+        flex-direction: column;
+        margin-top: 15px;
+    }
+}
