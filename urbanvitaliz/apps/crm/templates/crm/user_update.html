@@ -96,12 +96,12 @@
                 {% csrf_token %}
                 {{ form.non_field_errors }}
                 <div class="input-group mb-3">
-                    <label for="{{ form.first_name.name }}" class="col-sm-2 col-form-label">
+                    <label for="{{ form.username.name }}" class="col-sm-2 col-form-label">
                         Identifiant de connexion<br/>
                         <i class="small">Pour le changer, contactez un·e administrateur·trice Reco-co.</i>
                     </label>
                     <div class="col-sm-5">
-                        <input readonly type="text" class="form-control" id="{{ form.first_name.name }}" name="{{form.first_name.name }}" value="{{ crm_user.username }}">
+                        <input readonly type="text" class="form-control" id="{{ form.username.name }}" name="{{form.username.name }}" value="{{ crm_user.username }}">
                     </div>
                 </div>
 
