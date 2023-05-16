@@ -8,7 +8,6 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 
-from actstream.models import Action
 from django.contrib import messages
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
@@ -259,7 +258,7 @@ def project_list_for_advisor(request):
         request.user.project_states.values_list("project__pk", flat=True)
     )
 
-    action_stream = Action.objects.filter(
+    action_stream = request.user.notifications.filter(
         target_content_type=project_ct,
         target_object_id__in=user_project_pks,
     ).order_by("-timestamp")[:20]
