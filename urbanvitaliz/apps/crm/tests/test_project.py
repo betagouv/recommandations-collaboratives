@@ -42,7 +42,7 @@ def test_crm_project_list_contains_site_projects(request, client):
     expected = reverse("crm-project-details", args=[expected.id])
     assertContains(response, expected)
     unexpected = reverse("crm-project-details", args=[unexpected.id])
-    assertContains(response, unexpected)
+    assertNotContains(response, unexpected)
 
 
 @pytest.mark.django_db
@@ -64,7 +64,7 @@ def test_crm_project_list_filters_active_ones(request, client):
     expected = reverse("crm-project-details", args=[active.id])
     assertContains(response, expected)
     unexpected = reverse("crm-project-details", args=[inactive.id])
-    assertContains(response, unexpected)
+    assertNotContains(response, unexpected)
 
 
 @pytest.mark.django_db
@@ -84,7 +84,7 @@ def test_crm_project_list_filters_inactive_ones(request, client):
     assert response.status_code == 200
 
     unexpected = reverse("crm-project-details", args=[active.id])
-    assertContains(response, unexpected)
+    assertNotContains(response, unexpected)
     expected = reverse("crm-project-details", args=[inactive.id])
     assertContains(response, expected)
 
@@ -104,7 +104,7 @@ def test_crm_project_list_filters_by_project_name(request, client):
     expected = reverse("crm-project-details", args=[expected.id])
     assertContains(response, expected)
     unexpected = reverse("crm-project-details", args=[unexpected.id])
-    assertContains(response, unexpected)
+    assertNotContains(response, unexpected)
 
 
 @pytest.mark.django_db
@@ -126,7 +126,7 @@ def test_crm_project_list_filters_by_commune_name(request, client):
     expected = reverse("crm-project-details", args=[expected.id])
     assertContains(response, expected)
     unexpected = reverse("crm-project-details", args=[unexpected.id])
-    assertContains(response, unexpected)
+    assertNotContains(response, unexpected)
 
 
 ########################################################################
