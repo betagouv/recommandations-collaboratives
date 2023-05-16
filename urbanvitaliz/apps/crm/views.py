@@ -16,13 +16,15 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
 from django.db.models import Count, Q
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
 from notifications import models as notifications_models
 from notifications import notify
+from watson import search as watson
+
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.utils import (
@@ -32,7 +34,6 @@ from urbanvitaliz.utils import (
     has_perm_or_403,
     make_group_name_for_site,
 )
-from watson import search as watson
 
 from . import filters, forms, models
 
@@ -338,6 +339,10 @@ def user_project_interest(request, user_id):
 
     crm_user = get_object_or_404(User, pk=user_id)
 
+    if request.site not in crm_user.profile.sites.all():
+        # only for user of current site
+        raise Http404
+
     actions = actor_stream(crm_user)
 
     user_ct = ContentType.objects.get_for_model(User)
@@ -354,6 +359,10 @@ def user_notifications(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     crm_user = get_object_or_404(User, pk=user_id)
+
+    if request.site not in crm_user.profile.sites.all():
+        # only for user of current site
+        raise Http404
 
     search_form = forms.CRMSearchForm()
 

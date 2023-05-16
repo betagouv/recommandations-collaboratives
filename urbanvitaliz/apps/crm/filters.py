@@ -11,6 +11,7 @@ import django_filters
 from django import forms
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
+
 from urbanvitaliz.utils import make_group_name_for_site
 
 

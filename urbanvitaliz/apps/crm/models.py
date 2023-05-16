@@ -10,6 +10,7 @@ from django.shortcuts import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from taggit.managers import TaggableManager
+
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
 

@@ -1,20 +1,16 @@
-import collections
-
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains
+
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import get_group_for_site, login
-
-from .. import models, views
 
 ########################################################################
 # users list
@@ -200,6 +196,7 @@ def test_crm_user_details_available_for_staff(client):
 def test_crm_user_update_not_available_for_non_staff(request, client):
     site = get_current_site(request)
     user = baker.make(auth_models.User)
+    user.profile.sites.add(site)
 
     url = reverse("crm-user-update", args=[user.id])
     with login(client):
@@ -487,8 +484,10 @@ def test_crm_user_unset_advisor_processing(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_user_project_interest_not_accessible_wo_perm(client):
+def test_crm_user_project_interest_not_accessible_wo_perm(request, client):
+    site = get_current_site(request)
     o = baker.make(auth_models.User)
+    o.profile.sites.add(site)
 
     url = reverse("crm-user-project-interest", args=[o.id])
     with login(client):
@@ -498,11 +497,27 @@ def test_crm_user_project_interest_not_accessible_wo_perm(client):
 
 
 @pytest.mark.django_db
+def test_crm_user_project_interest_not_accessible_other_site(request, client):
+    site = get_current_site(request)
+    other = baker.make(site_models.Site)
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(other)
+
+    url = reverse("crm-user-project-interest", args=[o.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
 def test_crm_user_project_interest_accessible_w_perm(request, client):
     site = get_current_site(request)
     other = baker.make(site_models.Site)
 
     o = baker.make(auth_models.User)
+    o.profile.sites.add(site)
 
     expected = baker.make(projects_models.UserProjectStatus, site=site, user=o)
     other_site = baker.make(projects_models.UserProjectStatus, site=other, user=o)
@@ -518,6 +533,70 @@ def test_crm_user_project_interest_accessible_w_perm(request, client):
     assertContains(response, expected.project.name[:10])
     assertNotContains(response, unexpected.project.name)
     assertNotContains(response, other_site.project.name)
+
+
+########################################################################
+# user notifications
+########################################################################
+
+
+@pytest.mark.django_db
+def test_crm_user_notification_not_accessible_wo_perm(request, client):
+    site = get_current_site(request)
+
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(site)
+
+    url = reverse("crm-user-notifications", args=[o.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_user_notification_not_accessible_other_site(request, client):
+    site = get_current_site(request)
+    other = baker.make(site_models.Site)
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(other)
+
+    url = reverse("crm-user-notifications", args=[o.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_crm_user_notification_accessible_w_perm(request, client):
+    site = get_current_site(request)
+    # other = baker.make(site_models.Site)
+
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(site)
+
+    # on_site = baker.make(
+    #     notifications_models.Notification, site=site, recipient=o, emailed=True
+    # )
+    # other_site = baker.make(
+    #     notifications_models.Notification, site=other, recipient=o, emailed=True
+    # )
+    # other_user = baker.make(
+    #     notifications_models.Notification, site=site, emailed=True
+    # )
+
+    url = reverse("crm-user-notifications", args=[o.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    # assertContains(response, on_site.verb[:16])
+    # assertNotContains(response, other_site.verb[:16])
+    # assertNotContains(response, other_user.verb[:16])
 
 
 # eof

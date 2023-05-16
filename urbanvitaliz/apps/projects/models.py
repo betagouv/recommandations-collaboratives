@@ -11,8 +11,7 @@ import os
 import uuid
 
 from django.contrib.auth import models as auth_models
-from django.contrib.contenttypes.fields import (GenericForeignKey,
-                                                GenericRelation)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
@@ -25,8 +24,7 @@ from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import (OrderedModel, OrderedModelManager,
-                                  OrderedModelQuerySet)
+from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
@@ -35,8 +33,7 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
-from urbanvitaliz.utils import (CastedGenericRelation, check_if_advisor,
-                                has_perm)
+from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor, has_perm
 
 from . import apps
 from .utils import generate_ro_key
@@ -377,6 +374,7 @@ class UserProjectStatusOnSiteManager(CurrentSiteManager):
 class UserProjectStatus(models.Model):
     """Project status for a given user"""
 
+    # XXX would be better named on_site
     objects = UserProjectStatusOnSiteManager()
 
     USERPROJECT_STATES = (
