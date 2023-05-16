@@ -40,15 +40,17 @@
 
  //Each bar represents a single discrete quantity.
  function newFrichesData() {
-     return  [ 
+     return  [
          {
              key: "Utilisation des tags",
              values: [
                  {% for tag in tags.all %}
+                 {% if forloop.counter < 15 %}
                  {
                      "label" : "{{ tag.name }}",
                      "value" : {{ tag.project__count }}
                  } ,
+                 {% endif %}
                  {% endfor %}
              ]
          }
@@ -70,7 +72,7 @@
             <h2>Relation Projets-Tags</h2>
 
             <a href="{% url 'crm-project-list-by-tags-csv' %}" class="btn btn-primary">Export CSV</a>
-        </div>  
+        </div>
 
         <div id="chart-new">
             <svg class="w-100" style=" min-height: 300px"> </svg>

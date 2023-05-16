@@ -10,7 +10,7 @@ import datetime
 
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
@@ -286,7 +286,9 @@ def resource_update(request, resource_id=None):
     if request.method == "POST":
         form = EditResourceForm(request.POST, instance=resource)
         if form.is_valid():
-            form.save()
+            resource = form.save(commit=False)
+            resource.updated_on = timezone.now()
+            resource.save()
             return redirect(next_url)
     else:
         form = EditResourceForm(instance=resource)

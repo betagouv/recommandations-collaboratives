@@ -15,8 +15,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import models as projects_models
@@ -176,7 +175,7 @@ def test_resource_list_contains_only_resource_with_draft_selected(request, clien
 
     url = reverse("resources-resource-search")
     url = f"{url}?draft=true&query=resource"
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     detail_url = reverse("resources-resource-detail", args=[resource1.id])
@@ -204,7 +203,7 @@ def test_resource_list_contains_only_resource_with_to_review_selected(request, c
 
     url = reverse("resources-resource-search")
     url = f"{url}?to_review=true&query=resource"
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     detail_url = reverse("resources-resource-detail", args=[resource1.id])
@@ -233,7 +232,7 @@ def test_resource_list_contains_only_resource_with_expired_selected(request, cli
 
     url = reverse("resources-resource-search")
     url = f"{url}?expired=true&query=resource"
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     detail_url = reverse("resources-resource-detail", args=[resource1.id])
@@ -378,7 +377,11 @@ def test_update_resource_and_redirect(request, client):
         category__sites=[get_current_site(request)],
         sites=[get_current_site(request)],
     ).make()
+
+    updated_on_before = resource.updated_on
+
     url = reverse("resources-resource-update", args=[resource.id])
+
     data = {
         "title": "a title",
         "subtitle": "a sub title",
@@ -394,6 +397,7 @@ def test_update_resource_and_redirect(request, client):
     assert response.status_code == 302
     resource = models.Resource.on_site.get(id=resource.id)
     assert resource.content == data["content"]
+    assert resource.updated_on > updated_on_before
 
 
 #

@@ -20,7 +20,7 @@
 
     {{ project_form.postcode.value|json_script:"projectPostcode" }}
     {{ project_form.insee.value|json_script:"projectInsee" }}
-    
+
 
     <div class="row">
         {% if "change_project" in user_project_perms %}
@@ -117,7 +117,7 @@
         {% endif %}
         <hr class="mt-4"/>
         <div x-data="ProjectShare" class="row mt-2">
-            <h6 class="text-uppercase fw-bold d-block mb-3 font-small">Gestion des utilisateurs</h6>
+            <h6 id="user-management" class="text-uppercase fw-bold d-block mb-3 font-small">Gestion des utilisateurs</h6>
             <div class="col">
                 <p class="text-info-custom mb-2">Équipe de suvi</p>
                 {% if "invite_advisors" in user_project_perms %}
@@ -215,11 +215,22 @@
                                         <button class="button small">Faire devenir référent</button>
                                     </form> -->
                                     {% if is_staff %}
+                                    <form id="form-projects-access-promote-user"
+                                          class="me-2"
+                                          action="{% url 'projects-project-promote-referent' project.pk member.pk %}"
+                                          method="post">
+                                        {% csrf_token %}
+                                        <button  data-bs-toggle="tooltip" data-bs-title="Promouvoir en tant que référent·e" class="btn btn-outline-primary btn-sm">
+                                            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#award" />
+                                            </svg>
+                                        </button>
+                                    </form>
                                     <form id="form-projects-access-remove-user"
                                           action="{% url 'projects-project-access-collectivity-delete' project.pk member.email %}"
                                           method="post">
                                         {% csrf_token %}
-                                        <button class="btn btn-outline-danger btn-sm">
+                                        <button  data-bs-toggle="tooltip" data-bs-title="Retirer l'accès" class="btn btn-outline-danger btn-sm">
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x" />
                                             </svg>

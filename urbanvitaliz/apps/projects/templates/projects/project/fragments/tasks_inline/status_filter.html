@@ -29,7 +29,7 @@
         {% if not disable_add_recommendation %}
             {% if "manage_tasks" in user_project_perms %}
                 <a class="button filled"
-                   href="{% url 'projects-project-create-action' project.id %}">
+                   href="{% url 'projects-project-create-task' project.id %}">
                     <svg class="bi me-1" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
                     </svg>

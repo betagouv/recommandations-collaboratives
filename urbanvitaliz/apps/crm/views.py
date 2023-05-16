@@ -16,11 +16,12 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
 from django.db.models import Count, Q
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
+from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
@@ -119,7 +120,7 @@ def crm_search(request):
 def organization_details(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization, pk=organization_id)
+    organization = get_object_or_404(Organization.on_site, pk=organization_id)
 
     participants = User.objects.filter(
         profile__in=organization.registered_profiles.all()
@@ -338,6 +339,10 @@ def user_project_interest(request, user_id):
 
     crm_user = get_object_or_404(User, pk=user_id)
 
+    if request.site not in crm_user.profile.sites.all():
+        # only for user of current site
+        raise Http404
+
     actions = actor_stream(crm_user)
 
     user_ct = ContentType.objects.get_for_model(User)
@@ -355,6 +360,10 @@ def user_notifications(request, user_id):
 
     crm_user = get_object_or_404(User, pk=user_id)
 
+    if request.site not in crm_user.profile.sites.all():
+        # only for user of current site
+        raise Http404
+
     search_form = forms.CRMSearchForm()
 
     notifications = notifications_models.Notification.on_site.filter(
@@ -370,10 +379,25 @@ def user_notifications(request, user_id):
 
 
 @login_required
+def project_list(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    # filtered projects
+    projects = filters.ProjectFilter(
+        request.GET, queryset=Project.all_on_site.order_by("name")
+    )
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/project_list.html", locals())
+
+
+@login_required
 def project_details(request, project_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.all_on_site, pk=project_id)
 
     actions = target_stream(project)
 
@@ -402,11 +426,62 @@ def project_details(request, project_id):
 
 
 @login_required
+def project_update(request, project_id=None):
+    """Update project properties"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+    project = get_object_or_404(Project.on_site, pk=project_id)
+
+    if request.method == "POST":
+        form = forms.CRMProjectForm(request.POST)
+        if form.is_valid():
+            if "notifications" in form.cleaned_data:
+                project.muted = not form.cleaned_data["notifications"]
+            if "statistics" in form.cleaned_data:
+                project.exclude_stats = not form.cleaned_data["statistics"]
+            project.save()
+    else:
+        form = forms.CRMProjectForm(
+            initial={
+                "statistics": not project.exclude_stats,
+                "notifications": not project.muted,
+            }
+        )
+
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/project_update.html", locals())
+
+
+@login_required
+def project_delete(request, project_id=None):
+    """Delete project"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+    project = get_object_or_404(Project.on_site, pk=project_id)
+    if request.method == "POST":
+        project.deleted = timezone.now()
+        project.save()
+        return redirect("crm-project-list")
+    return render(request, "crm/project_delete.html", locals())
+
+
+@login_required
+def project_undelete(request, project_id=None):
+    """Undelete project"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+    project = get_object_or_404(Project.deleted_on_site, pk=project_id)
+    if request.method == "POST":
+        project.deleted = None
+        project.save()
+        return redirect("crm-project-list")
+    return render(request, "crm/project_undelete.html", locals())
+
+
+@login_required
 @require_http_methods(["POST"])
 def project_toggle_annotation(request, project_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.on_site, pk=project_id)
 
     form = forms.ProjectAnnotationForm(request.POST)
     if form.is_valid():
@@ -436,7 +511,6 @@ def handle_create_note_for_object(
             note.save()
             form.save_m2m()
             return True, redirect(reverse(return_view_name, args=(the_object.pk,)))
-
     else:
         form = forms.CRMNoteForm()
 
@@ -448,18 +522,20 @@ def create_note_for_user(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     user = get_object_or_404(User, pk=user_id)
+    if request.site not in user.profile.sites.all():
+        raise Http404()
 
     created, response = handle_create_note_for_object(
         request, user, "crm-user-details", "crm-user-note-update"
     )
 
     if created and user.profile and user.profile.organization:
-        administrators = get_site_administrators(request.site).exclude(
-            pk=request.user.pk
-        )  # XXX Should be replaced by crm users once new permissions are merged
+        crm_users = get_users_with_perms(
+            request.site, only_with_perms_in=["use_crm"]
+        ).exclude(pk=request.user.pk)
         notify.send(
             sender=request.user,
-            recipient=administrators,
+            recipient=crm_users,
             verb="a créé une note de CRM",
             action_object=user,
             target=user.profile.organization,
@@ -474,7 +550,7 @@ def create_note_for_user(request, user_id):
 def create_note_for_project(request, project_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.on_site, pk=project_id)
 
     _, response = handle_create_note_for_object(
         request, project, "crm-project-details", "crm-project-note-update"
@@ -487,7 +563,7 @@ def create_note_for_project(request, project_id):
 def create_note_for_organization(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization, pk=organization_id)
+    organization = get_object_or_404(Organization.on_site, pk=organization_id)
 
     _, response = handle_create_note_for_object(
         request,
@@ -519,9 +595,12 @@ def update_note_for_user(request, user_id, note_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     user = get_object_or_404(User, pk=user_id)
+    if request.site not in user.profile.sites.all():
+        raise Http404()
+
     user_ct = ContentType.objects.get_for_model(user)
     note = get_object_or_404(
-        models.Note,
+        models.Note.on_site,
         site=request.site,
         object_id=user_id,
         content_type=user_ct,
@@ -535,10 +614,10 @@ def update_note_for_user(request, user_id, note_id):
 def update_note_for_project(request, project_id, note_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.on_site, pk=project_id)
     project_ct = ContentType.objects.get_for_model(project)
     note = get_object_or_404(
-        models.Note,
+        models.Note.on_site,
         site=request.site,
         object_id=project_id,
         content_type=project_ct,
@@ -552,10 +631,10 @@ def update_note_for_project(request, project_id, note_id):
 def update_note_for_organization(request, organization_id, note_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization, pk=organization_id)
+    organization = get_object_or_404(Organization.on_site, pk=organization_id)
     organization_ct = ContentType.objects.get_for_model(organization)
     note = get_object_or_404(
-        models.Note,
+        models.Note.on_site,
         site=request.site,
         object_id=organization_id,
         content_type=organization_ct,

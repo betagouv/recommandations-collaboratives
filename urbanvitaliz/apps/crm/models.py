@@ -4,16 +4,18 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 from django.shortcuts import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from taggit.managers import TaggableManager
+
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
-from django.dispatch import receiver
-from django.db.models.signals import post_migrate
 
 from . import apps
+
 
 # We need the permission to be associated to the site and not to the projects
 @receiver(post_migrate)
@@ -28,6 +30,7 @@ def create_site_permissions(sender, **kwargs):
         name="Can use the CRM for site",
         content_type=site_ct,
     )
+
 
 #
 # ProjectAnnotations

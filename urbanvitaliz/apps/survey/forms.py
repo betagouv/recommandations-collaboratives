@@ -8,6 +8,7 @@ created : 2021-07-27 11:33:08 CEST
 """
 
 from django import forms
+from django.utils import timezone
 from markdownx.fields import MarkdownxFormField
 
 from . import models
@@ -92,6 +93,7 @@ class AnswerForm(forms.Form):
             answer.signals = signals
             answer.attachment = attachment
             answer.updated_by = user
+            answer.updated_on = timezone.now()
             answer.save()
 
         answer.choices.set(choices)

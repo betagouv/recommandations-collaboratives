@@ -384,7 +384,7 @@ def test_update_task_not_available_for_non_staff_users(request, client):
 
 
 @pytest.mark.django_db
-def test_update_task_available_for_switchtender(request, client):
+def test_update_task_available_for_advisor(request, client):
     task = Recipe(models.Task, site=get_current_site(request)).make()
     url = reverse("projects-update-task", args=[task.id])
     with login(client) as user:
@@ -414,6 +414,29 @@ def test_update_task_for_project_and_redirect(request, client):
     assert task.project.updated_on == task.updated_on
 
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_update_task_with_document(request, client):
+    task = Recipe(models.Task, site=get_current_site(request)).make()
+
+    with login(client) as user:
+        utils.assign_advisor(user, task.project)
+
+        png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+
+        response = client.post(
+            reverse("projects-update-task", args=[task.id]),
+            data={"the_file": png},
+        )
+
+    assert response.status_code == 302
+
+    document = models.Document.objects.first()
+    assert document
+
+    task = models.Task.on_site.first()
+    assert task.document.first() == document
 
 
 #
@@ -472,7 +495,7 @@ def test_create_new_task_for_project_notify_collaborators(mocker, client, reques
         utils.assign_advisor(user, project)
 
         client.post(
-            reverse("projects-project-create-action", args=[project.id]),
+            reverse("projects-project-create-task", args=[project.id]),
             data={
                 "push_type": "noresource",
                 "intent": "yeah",
@@ -639,7 +662,7 @@ def test_notifications_are_deleted_on_task_hard_delete(request):
 @pytest.mark.django_db
 def test_create_task_not_available_for_non_staff_users(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-    url = reverse("projects-project-create-action", args=[project.id])
+    url = reverse("projects-project-create-task", args=[project.id])
     with login(client):
         response = client.get(url)
     assert response.status_code == 403
@@ -648,7 +671,7 @@ def test_create_task_not_available_for_non_staff_users(request, client):
 @pytest.mark.django_db
 def test_create_task_available_for_switchtender(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-    url = reverse("projects-project-create-action", args=[project.id])
+    url = reverse("projects-project-create-task", args=[project.id])
     with login(client) as user:
         utils.assign_advisor(user, project)
 
@@ -665,7 +688,7 @@ def test_create_new_action_with_invalid_push_type(request, client):
         utils.assign_advisor(user, project)
 
         client.post(
-            reverse("projects-project-create-action", args=[project.id]),
+            reverse("projects-project-create-task", args=[project.id]),
             data={
                 "push_type": "blah",
                 "public": True,
@@ -685,7 +708,7 @@ def test_create_new_action_as_draft(request, client):
         utils.assign_advisor(user, project)
 
         response = client.post(
-            reverse("projects-project-create-action", args=[project.id]),
+            reverse("projects-project-create-task", args=[project.id]),
             data={
                 "push_type": "noresource",
                 "intent": intent,
@@ -708,7 +731,7 @@ def test_create_new_action_without_resource(request, client):
         utils.assign_advisor(user, project)
 
         response = client.post(
-            reverse("projects-project-create-action", args=[project.id]),
+            reverse("projects-project-create-task", args=[project.id]),
             data={
                 "push_type": "noresource",
                 "public": True,
@@ -737,7 +760,7 @@ def test_create_new_action_with_document(request, client):
         png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
 
         response = client.post(
-            reverse("projects-project-create-action", args=[project.id]),
+            reverse("projects-project-create-task", args=[project.id]),
             data={
                 "push_type": "noresource",
                 "public": True,
@@ -773,7 +796,7 @@ def test_create_new_action_with_single_resource(request, client):
         utils.assign_advisor(user, project)
 
         response = client.post(
-            reverse("projects-project-create-action", args=[project.id]),
+            reverse("projects-project-create-task", args=[project.id]),
             data={
                 "push_type": "single",
                 "public": True,
@@ -809,7 +832,7 @@ def test_create_new_action_with_multiple_resources(request, client):
         utils.assign_advisor(user, project)
 
         response = client.post(
-            reverse("projects-project-create-action", args=[project.id]),
+            reverse("projects-project-create-task", args=[project.id]),
             data={
                 "push_type": "multiple",
                 "public": True,

@@ -21,7 +21,7 @@
             {% if "manage_tasks" in user_project_perms %}
                 <span class="d-inline-block">
                     <a class="btn btn-outline-primary w-100 btn-sm"
-                       href="{% url 'projects-project-create-action' project.id %}">
+                       href="{% url 'projects-project-create-task' project.id %}">
                         <svg class="bi me-1" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
                         </svg>
@@ -31,7 +31,7 @@
             {% endif %}
         {% endif %}
     {% endif %}
-    
+
         {% if "use_crm" in user_site_perms and not disable_crm %}
             <span class="d-inline-block">
                 <a class="btn btn-outline-primary w-100 btn-sm"

@@ -108,10 +108,7 @@ def create_site_permissions(sender, **kwargs):
 
 
 class ProjectManager(models.Manager):
-    """Manager for projects"""
-
-    def get_queryset(self):
-        return super().get_queryset().filter(deleted=None)
+    """Manager for all projects"""
 
     def in_departments(self, departments):
         """Return only project with commune in department scope (empty=full)"""
@@ -151,7 +148,18 @@ class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
     pass
 
 
-class DeletedProjectManager(models.Manager):
+class ActiveProjectManager(ProjectManager):
+    """Manager for active projects"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
+class ActiveProjectOnSiteManager(CurrentSiteManager, ActiveProjectManager):
+    pass
+
+
+class DeletedProjectManager(ProjectManager):
     """Manager for deleted projects"""
 
     def get_queryset(self):
@@ -175,11 +183,13 @@ class Project(models.Model):
         ("REJECTED", "Rejeté"),
     )
 
-    objects = ProjectManager()
+    objects = ActiveProjectManager()
     objects_deleted = DeletedProjectManager()
 
-    on_site = ProjectOnSiteManager()
+    on_site = ActiveProjectOnSiteManager()
     deleted_on_site = DeletedProjectOnSiteManager()
+
+    all_on_site = ProjectOnSiteManager()
 
     sites = models.ManyToManyField(Site)
 
@@ -236,9 +246,9 @@ class Project(models.Model):
         # XXX Uncomment me once status is written
         return False
 
-    exclude_stats = models.BooleanField(default=False)
+    exclude_stats = models.BooleanField(default=False, blank=True)
     muted = models.BooleanField(
-        default=False, verbose_name="Ne pas envoyer de notifications"
+        default=False, blank=True, verbose_name="Ne pas envoyer de notifications"
     )
 
     org_name = models.CharField(
@@ -364,6 +374,7 @@ class UserProjectStatusOnSiteManager(CurrentSiteManager):
 class UserProjectStatus(models.Model):
     """Project status for a given user"""
 
+    # XXX would be better named on_site
     objects = UserProjectStatusOnSiteManager()
 
     USERPROJECT_STATES = (
