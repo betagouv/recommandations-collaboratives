@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+{% load humanize %}
+{% load training %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+<style>
+ html, body {
+     scroll-padding-top: 240px;
+ }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif">
+    {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
+
+    <div class="w-75 d-flex flex-column justify-content-start">
+        <div class="crm-header px-4 py-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3>Gérer le projet « {{ project.name }} »</h3>
+            </div>
+
+            {% if not project.deleted %}
+            <div class="d-flex justify-content-end">
+                <a href="{% url 'crm-project-delete' project.pk %}" class="btn btn-danger">Supprimer ce projet</a>
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+                Ce projet a été supprimé. Ceci signifie qu'il n'apparait plus sur aucun portail.
+                Vous pouvez néanmoins le réactiver si vous le souhaitez.
+                <div class="d-flex justify-content-end mt-2">
+                    <form method="POST" action="{% url 'crm-user-undelete' project.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Réactiver ce projet</a>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+
+        <div class="px-4 pt-4 mb-3">
+
+            <!-- Notification -->
+            <div class="form-check form-switch">
+                <label class="form-check-label" for="flexSwitchCheckDefault">
+                    <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-fill"/>
+                    </svg>
+                    <span class="align-middle me-2">Notifications</span>
+                </label>
+
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+            </div>
+
+            <!-- Statistiques -->
+            <div class="form-check form-switch">
+                <label class="form-check-label" for="flexSwitchCheckDefault">
+                    <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-data-fill"/>
+                    </svg>
+                    <span class="align-middle me-2">Inclu dans les statistiques</span>
+                </label>
+
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+            </div>
+        </div>
+        <hr/>
+
+        <div class="px-4 pt-4 mb-3">
+            <form method="POST" action="{% url 'crm-project-update' project.pk %}">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="input-group small mb-3">
+                    <label for="project-id" class="col-sm-2 col-form-label">
+                        Identifiant de projet<br/>
+                        <i class="small">A communiquer à un·e administrateur·trice Reco-co en cas de problème.</i>
+                    </label>
+                    <div class="col-sm-5">
+                        <input readonly type="text" class="form-control form-control-sm" id="project-id" name="project-id" value="{{ project.pk }}">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+
+
+    </div>
+</div>
+{% endblock %}
