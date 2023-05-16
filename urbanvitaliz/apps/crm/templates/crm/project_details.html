@@ -22,13 +22,27 @@
 
             {% include "crm/fragments/sidebar.html" with search=True back_button=True project_advisors=True project_members=True %}
 
-            <div class="w-75 d-flex flex-column justify-content-start">
-                {% if active_project %}
-                    <div class="crm-header px-4 py-4 mb-3 d-flex justify-content-between align-items-center">
-                    {% else %}
-                        <div class="crm-header no-project px-4 py-4 d-flex justify-content-between align-items-center">
-                        {% endif %}
-                        <div>
+        <div class="w-75 d-flex flex-column justify-content-start">
+            {% if project.deleted %}
+            <div class="d-block mx-4">
+                <div class="alert alert-danger mt-4" role="alert">
+                    <span>Ce projet a été supprimé. Ceci signifie qu'il n'est plus visible sur {{ request.site.name }}.
+                        Vous pouvez néanmoins le réactiver si vous le souhaitez.</span>
+                    <div class="d-flex justify-content-end mt-2">
+                        <form method="POST" action="{% url 'crm-project-undelete' project.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Réactiver ce projet</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if active_project %}
+            <div class="crm-header px-4 py-4 mb-3 d-flex justify-content-between align-items-center">
+                {% else %}
+                <div class="crm-header no-project px-4 py-4 d-flex justify-content-between align-items-center">
+                    {% endif %}
                             <h3 class="d-flex mb-0 align-items-center">
                                 <svg class="bi me-2" width="16" height="16" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />

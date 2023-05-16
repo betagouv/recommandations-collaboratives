@@ -3,9 +3,10 @@ from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
-
+from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
@@ -191,7 +192,7 @@ def test_crm_project_update_property_exclude_stats(request, client):
     project = baker.make(projects_models.Project, sites=[site], exclude_stats=False)
 
     url = reverse("crm-project-update", args=[project.id])
-    data = {"exclude_stats": True}
+    data = {"statistics": False}
 
     with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
@@ -199,7 +200,7 @@ def test_crm_project_update_property_exclude_stats(request, client):
     assert response.status_code == 302
 
     updated = projects_models.Project.objects.first()
-    assert updated.exclude_stats
+    assert updated.exclude_stats is True
 
 
 @pytest.mark.django_db
@@ -208,7 +209,7 @@ def test_crm_project_update_property_muted(request, client):
     project = baker.make(projects_models.Project, sites=[site], muted=False)
 
     url = reverse("crm-project-update", args=[project.id])
-    data = {"muted": True}
+    data = {"notifications": False}
 
     with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
@@ -216,7 +217,7 @@ def test_crm_project_update_property_muted(request, client):
     assert response.status_code == 302
 
     updated = projects_models.Project.objects.first()
-    assert updated.muted
+    assert updated.muted is True
 
 
 #

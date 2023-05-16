@@ -432,12 +432,20 @@ def project_update(request, project_id=None):
     project = get_object_or_404(Project.on_site, pk=project_id)
 
     if request.method == "POST":
-        form = forms.CRMProjectForm(request.POST, instance=project)
+        form = forms.CRMProjectForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect("crm-project-details", project_id)
+            if "notifications" in form.cleaned_data:
+                project.muted = not form.cleaned_data["notifications"]
+            if "statistics" in form.cleaned_data:
+                project.exclude_stats = not form.cleaned_data["statistics"]
+            project.save()
     else:
-        form = forms.CRMProjectForm(instance=project)
+        form = forms.CRMProjectForm(
+            initial={
+                "statistics": not project.exclude_stats,
+                "notifications": not project.muted,
+            }
+        )
 
     search_form = forms.CRMSearchForm()
 
@@ -515,6 +523,8 @@ def create_note_for_user(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     user = get_object_or_404(User, pk=user_id)
+    if request.site not in user.profile.sites.all():
+        raise Http404()
 
     created, response = handle_create_note_for_object(
         request, user, "crm-user-details", "crm-user-note-update"
