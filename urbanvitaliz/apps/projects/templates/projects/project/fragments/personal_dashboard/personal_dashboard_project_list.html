@@ -88,7 +88,7 @@
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#calendar-event" />
                                 </svg>
                                 <span class="text-grey-dark me-1" x-text="item.project.recommendation_count > 1 ? `${item.project.recommendation_count} recommandations` : `${item.project.recommendation_count} recommandation`"></span>
-                                <template x-if="getNewRecommendations(item)">
+                                <template x-if="getNewRecommendations(item) && (item.project.is_observer || item.project.is_switchtender)">
                                     <a class="text-decoration-none hover-underline" :href="makeProjectURL('{% url 'projects-project-detail-actions' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)" class="text-green fw-medium" x-text="getNewRecommendations(item)"></span></a>
                                 </template>
                             </div>
@@ -100,7 +100,7 @@
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
                                 </svg>
                                 <span class="text-grey-dark me-1" x-text="item.project.public_message_count <= 1 ? `${item.project.public_message_count} message conversation` : `${item.project.public_message_count} messages conversation`"></span>
-                                <template x-if="getUnreadPublicMessages(item)">
+                                <template x-if="getUnreadPublicMessages(item) && (item.project.is_observer || item.project.is_switchtender)">
                                     <a class="text-decoration-none hover-underline" :href="makeProjectURL('{% url 'projects-project-detail-conversations' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)" class="text-green fw-medium" x-text="getUnreadPublicMessages(item)"></span></a>
                                 </template>
                             </div>
@@ -112,7 +112,7 @@
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
                                 </svg>
                                 <span class="text-grey-dark me-1" x-text="item.project.private_message_count <= 1 ? `${item.project.private_message_count} message conseillers` : `${item.project.private_message_count} messages conseillers`"></span>
-                                <template x-if="getUnreadPrivateMessages(item)">
+                                <template x-if="getUnreadPrivateMessages(item) && (item.project.is_observer || item.project.is_switchtender)">
                                     <a class="text-decoration-none hover-underline" :href="makeProjectURL('{% url 'projects-project-detail-internal-followup' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)" class="text-green fw-medium" x-text="getUnreadPrivateMessages(item)"></span></a>
                                 </template>
                             </div>
