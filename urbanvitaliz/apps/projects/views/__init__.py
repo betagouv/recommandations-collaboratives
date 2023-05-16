@@ -255,7 +255,9 @@ def project_list_for_advisor(request):
 
     project_ct = ContentType.objects.get_for_model(models.Project)
     user_project_pks = list(
-        request.user.project_states.values_list("project__pk", flat=True)
+        request.user.project_states.filter(
+            project__switchtenders=request.user
+        ).values_list("project__pk", flat=True)
     )
 
     action_stream = request.user.notifications.filter(
