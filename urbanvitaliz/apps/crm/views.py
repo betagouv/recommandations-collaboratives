@@ -375,8 +375,7 @@ def project_list(request):
 
     # filtered projects
     projects = filters.ProjectFilter(
-        request.GET,
-        queryset=Project.all_on_site.all(),
+        request.GET, queryset=Project.all_on_site.order_by("name")
     )
 
     # required by default on crm

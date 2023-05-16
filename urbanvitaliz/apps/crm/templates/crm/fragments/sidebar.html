@@ -84,6 +84,7 @@
                 <li><a href="{% url 'crm-project-list-by-tags' %}">Tags / Projects</a></li>
                 <li><a href="{% url 'crm-list-tags' %}">Index des tags</a></li>
                 <li><a href="{% url 'crm-user-list' %}">Gestion des utilisateurs</a></li>
+                <li><a href="{% url 'crm-project-list' %}">Gestion des projets</a></li>
             </ul>
         </div>
     {% endif %}
@@ -125,7 +126,7 @@
             </ul>
         </div>
     {% endif %}
-    
+
     {% if project_advisors %}
         <div class="pt-3 mb-4 px-4 crm-border-bottom">
             <h5 class="crm-user-decoration d-inline-block relative">

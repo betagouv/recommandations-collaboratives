@@ -11,6 +11,7 @@ import django_filters
 from django import forms
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
+from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import make_group_name_for_site
 
 
@@ -96,9 +97,24 @@ class ProjectFilter(django_filters.FilterSet):
         widget=forms.widgets.CheckboxInput,
     )
 
+    ordering = django_filters.OrderingFilter(
+        # tuple-mapping retains order
+        fields=(
+            ("name", "name"),
+            ("commune__name", "commune"),
+            ("created_on", "created_on"),
+        ),
+        # labels do not need to retain order
+        field_labels={
+            "name": "Nom du projet",
+            "commune": "Commune",
+            "created_on": "Date de dépôt",
+        },
+    )
+
     class Meta:
-        model = auth_models.User
-        fields = []
+        model = projects_models.Project
+        fields = ["name"]
 
     def inactive_filter(self, queryset, name, value):
         if name != "inactive" or not value:
