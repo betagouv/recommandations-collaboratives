@@ -303,14 +303,15 @@ function PersonalAdvisorDashboard() {
 
 // Map base layer 
 function initMap(projects) {
-    L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
-        maxZoom: 20,
-        attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
     });
 
     const map = L.map('map').setView([48.51, 10.20], 2);
 
-    L.tileLayer.provider('OpenStreetMap.France').addTo(map);
+    L.tileLayer.provider('CartoDB.Positron').addTo(map);
 
     const markers = createMapMarkers(map, projects)
     const markersLayer = createMarkersLayer(map, markers)
