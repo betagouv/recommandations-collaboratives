@@ -58,6 +58,28 @@ function PersonalAdvisorDashboard() {
             } else {
                 setTimeout(() => this.map.invalidateSize(), 251)
             }
+
+            this.checkCurrentState();
+        },
+        checkCurrentState() {
+            const currentSearch = this.readCurrentStateFromStore('search')
+            const currentSort = this.readCurrentStateFromStore('sort')
+            const currentDepartments = this.readCurrentStateFromStore('departments')
+
+            if (currentSearch) {
+                this.search = JSON.parse(currentSearch)
+            }
+
+            if (currentSort) {
+                this.select = JSON.parse(currentSort)
+                this.currentSort = this.getCurrentSortFn(this.select)
+            }
+
+            if (currentDepartments) {
+                this.departments = JSON.parse(currentDepartments)
+            }
+            
+            return this.displayedData = this.filterProjectsByDepartments(this.searchProjects(this.search)).sort(this.currentSort);
         },
         get isBusy() {
             return this.$store.app.isLoading
@@ -142,7 +164,7 @@ function PersonalAdvisorDashboard() {
 
             this.departments = this.departments.map(department => ({ ...department, active: this.territorySelectAll }))
 
-            return this.filterProjectsByDepartments().sort(this.currentSort);
+            return this.displayedData = this.filterProjectsByDepartments(this.searchProjects(this.search)).sort(this.currentSort);
         },
         handleTerritoryFilter(selectedDepartment) {
 
@@ -158,32 +180,56 @@ function PersonalAdvisorDashboard() {
                 return department
             })
 
-            return this.filterProjectsByDepartments().sort(this.currentSort);
+            return this.displayedData = this.filterProjectsByDepartments(this.searchProjects(this.search)).sort(this.currentSort);
         },
-        filterProjectsByDepartments() {
+        filterProjectsByDepartments(projects) {
+            this.addCurrentStateToStore('departments', this.departments)
+
             //find department item from departments for each project and return if the department is active
-            return this.displayedData = this.data.filter(item => this.departments.find(department => department.code === item.project.commune.department.code).active)
+            return projects.filter(item => this.departments.find(department => department.code === item.project.commune.department.code).active)
         },
         handleProjectsSearch(event) {
 
-            if (this.search === "") {
-                return this.filterProjectsByDepartments().sort(this.currentSort);
+            const searchValue = event.target.value
+
+            if (searchValue === "") {
+                this.addCurrentStateToStore('search', searchValue)
+                return this.displayedData = this.filterProjectsByDepartments(this.data).sort(this.currentSort);
             }
 
-            const newProjectList = this.displayedData.filter(item => {
-                if (item.project.name?.toLowerCase().includes(this.search.toLowerCase())) return item
-                if (item.project.commune?.name?.toLowerCase().includes(event.target.value.toLowerCase())) return item
-                if (item.project.commune.insee.includes(event.target.value)) return item
-                if (item.project.id.toString().includes(event.target.value) && event.target.value.length < 4) return item
-            })
+            const newProjectList = this.searchProjects(searchValue)
 
-            return this.displayedData = newProjectList.sort(this.currentSort)
+            this.addCurrentStateToStore('search', searchValue)
+
+            return this.displayedData = this.filterProjectsByDepartments(newProjectList).sort(this.currentSort)
+        },
+        searchProjects(searchValue) {
+            return this.data.filter(item => {
+                if (item.project.name?.toLowerCase().includes(searchValue.toLowerCase())) return item
+                if (item.project.commune?.name?.toLowerCase().includes(searchValue.toLowerCase())) return item
+                if (item.project.commune.insee.includes(searchValue)) return item
+                if (item.project.id.toString().includes(searchValue) && searchValue.length < 4) return item
+            })
+        },
+        addCurrentStateToStore(item, value) {
+            return window.localStorage.setItem(item, JSON.stringify(value));
+        },
+        readCurrentStateFromStore(item) {
+            return localStorage.getItem(item);
         },
         handleProjectsSelect(event) {
+            this.currentSort = this.getCurrentSortFn(event.target.value)
+
+            this.select = event.target.value
+            this.addCurrentStateToStore('sort', this.select)
+
+            return this.displayedData = this.displayedData.sort(this.currentSort)
+        },
+        getCurrentSortFn(select) {
 
             let sortCriterion;
 
-            switch (event.target.value) {
+            switch (select) {
                 case "commune-name":
                     sortCriterion = this.sortProjectCommuneName
                     break;
@@ -201,9 +247,7 @@ function PersonalAdvisorDashboard() {
                     break;
             }
 
-            this.currentSort = sortCriterion
-
-            return this.displayedData = this.displayedData.sort(sortCriterion)
+            return sortCriterion
         },
         sortProjectCommuneName(a, b) {
             if (a.project?.commune?.name < b.project?.commune?.name) {
