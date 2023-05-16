@@ -119,7 +119,7 @@ def crm_search(request):
 def organization_details(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization, pk=organization_id)
+    organization = get_object_or_404(Organization.on_site, pk=organization_id)
 
     participants = User.objects.filter(
         profile__in=organization.registered_profiles.all()
