@@ -16,8 +16,9 @@ from urbanvitaliz.utils import get_group_for_site, login
 
 from .. import models, views
 
-#
+########################################################################
 # users list
+########################################################################
 
 
 @pytest.mark.django_db
@@ -190,8 +191,9 @@ def test_crm_user_details_available_for_staff(client):
     assert response.status_code == 200
 
 
-#
+########################################################################
 # update user / profile information
+########################################################################
 
 
 @pytest.mark.django_db
@@ -257,8 +259,9 @@ def test_crm_user_update_profile_information(request, client):
     assert profile.organization_position == data["organization_position"]
 
 
-#
+########################################################################
 # user deactivation
+########################################################################
 
 
 @pytest.mark.django_db
@@ -307,8 +310,9 @@ def test_crm_user_deactivate_processing(request, client):
     assert end_user.is_active is False
 
 
-#
+########################################################################
 # user reactivation
+########################################################################
 
 
 @pytest.mark.django_db
@@ -357,8 +361,9 @@ def test_crm_user_reactivate_processing(request, client):
     assert end_user.is_active is True
 
 
-#
+########################################################################
 # user set advisor status
+########################################################################
 
 
 @pytest.mark.django_db
@@ -417,8 +422,9 @@ def test_crm_user_set_advisor_processing(request, client):
     assert set(user_dpts) == set(selected)
 
 
-#
+########################################################################
 # user unset advisor status
+########################################################################
 
 
 @pytest.mark.django_db
@@ -473,6 +479,45 @@ def test_crm_user_unset_advisor_processing(request, client):
     assert end_user.groups.count() == 0
 
     assert end_user.profile.departments.count() == 0
+
+
+########################################################################
+# user project interest
+########################################################################
+
+
+@pytest.mark.django_db
+def test_crm_user_project_interest_not_accessible_wo_perm(client):
+    o = baker.make(auth_models.User)
+
+    url = reverse("crm-user-project-interest", args=[o.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_user_project_interest_accessible_w_perm(request, client):
+    site = get_current_site(request)
+    other = baker.make(site_models.Site)
+
+    o = baker.make(auth_models.User)
+
+    expected = baker.make(projects_models.UserProjectStatus, site=site, user=o)
+    other_site = baker.make(projects_models.UserProjectStatus, site=other, user=o)
+    unexpected = baker.make(projects_models.UserProjectStatus, site=site)
+
+    url = reverse("crm-user-project-interest", args=[o.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    assertContains(response, expected.project.name[:10])
+    assertNotContains(response, unexpected.project.name)
+    assertNotContains(response, other_site.project.name)
 
 
 # eof
