@@ -11,6 +11,8 @@ import django_filters
 from django import forms
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
+
+from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import make_group_name_for_site
 
 
@@ -80,6 +82,50 @@ class UserFilter(django_filters.FilterSet):
         site = site_models.Site.objects.get_current()
         group_name = make_group_name_for_site(name, site)
         return queryset.filter(groups__name=group_name)
+
+
+class ProjectFilter(django_filters.FilterSet):
+    """Filter for the list of projects"""
+
+    name = django_filters.CharFilter(
+        field_name="name",
+        lookup_expr="icontains",
+    )
+
+    commune = django_filters.CharFilter(
+        field_name="commune",
+        lookup_expr="name__icontains",
+    )
+
+    inactive = django_filters.BooleanFilter(
+        label="Projet inactifs",
+        method="inactive_filter",
+        widget=forms.widgets.CheckboxInput,
+    )
+
+    ordering = django_filters.OrderingFilter(
+        # tuple-mapping retains order
+        fields=(
+            ("name", "name"),
+            ("commune__name", "commune"),
+            ("created_on", "created_on"),
+        ),
+        # labels do not need to retain order
+        field_labels={
+            "name": "Nom du projet",
+            "commune": "Commune",
+            "created_on": "Date de dépôt",
+        },
+    )
+
+    class Meta:
+        model = projects_models.Project
+        fields = ["name"]
+
+    def inactive_filter(self, queryset, name, value):
+        if name != "inactive" or not value:
+            return queryset
+        return queryset.exclude(deleted=None)
 
 
 # eof

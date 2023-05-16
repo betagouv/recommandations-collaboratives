@@ -19,6 +19,7 @@ from urbanvitaliz.utils import (
     get_site_config_or_503,
     has_perm,
     has_perm_or_403,
+    is_staff_for_site,
 )
 
 from .. import models
@@ -29,6 +30,7 @@ from ..utils import (
     is_advisor_for_project,
     is_regional_actor_for_project,
     set_active_project_id,
+    is_member,
 )
 
 
@@ -115,6 +117,12 @@ def project_knowledge(request, project_id=None):
     )
 
     advising = get_advisor_for_project(request.user, project)
+
+    can_view_updated_answers = (
+        advising
+        or is_member(request.user, project, allow_draft=True)
+        or is_staff_for_site(request.user, request.site)
+    )
 
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
         request.user, "view_surveys", project

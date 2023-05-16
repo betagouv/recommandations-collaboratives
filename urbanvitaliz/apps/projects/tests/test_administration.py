@@ -10,19 +10,19 @@ created: 2022-12-26 11:54:56 CEST
 
 import pytest
 from django.contrib.auth import models as auth_models
+from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
-from django.test import override_settings
 from django.urls import reverse
-from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
+
 from urbanvitaliz.apps.communication import api as communication_api
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.invites import models as invites_models
-from urbanvitaliz.apps.projects.utils import (assign_advisor,
-                                              assign_collaborator)
+from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.projects.utils import assign_advisor, assign_collaborator
 from urbanvitaliz.utils import login
 
 from .. import models
@@ -160,6 +160,85 @@ def test_accepted_project_update_accessible_for_collaborator(request, client):
     assertContains(response, commune.postal)
 
 
+########################################################################
+# promote collaborator referent
+########################################################################
+
+
+@pytest.mark.django_db
+def test_promote_referent_not_available_is_post_only(request, client):
+
+    url = reverse("projects-project-promote-referent", args=[0, 0])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
+def test_promote_referent_not_available_for_unprivileged_users(request, client):
+    site = get_current_site(request)
+    project = Recipe(models.Project, sites=[site]).make()
+
+    crm_user = baker.make(auth_models.User)
+    crm_user.profile.sites.add(site)
+
+    baker.make(
+        projects_models.ProjectMember, project=project, member=crm_user, is_owner=False
+    )
+
+    url = reverse("projects-project-promote-referent", args=[project.id, crm_user.id])
+    with login(client):
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_promote_referent_prevent_cross_site_promotion(request, client):
+    site = get_current_site(request)
+    project = Recipe(models.Project, sites=[site]).make()
+
+    other = baker.make(site_models.Site)
+    crm_user = baker.make(auth_models.User)
+    crm_user.profile.sites.add(other)
+
+    baker.make(
+        projects_models.ProjectMember, project=project, member=crm_user, is_owner=False
+    )
+
+    url = reverse("projects-project-promote-referent", args=[project.id, crm_user.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_promote_referent_available_for_advisor(request, client):
+    site = get_current_site(request)
+    project = Recipe(models.Project, sites=[site]).make()
+
+    crm_user = baker.make(auth_models.User)
+    crm_user.profile.sites.add(site)
+
+    owner = baker.make(projects_models.ProjectMember, project=project, is_owner=False)
+    member = baker.make(
+        projects_models.ProjectMember, project=project, member=crm_user, is_owner=False
+    )
+
+    url = reverse("projects-project-promote-referent", args=[project.id, crm_user.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    owner.refresh_from_db()
+    assert owner.is_owner is False
+    member.refresh_from_db()
+    assert member.is_owner is True
+
+
 #####################################################################
 # Removing collaborators from project
 #####################################################################
@@ -281,7 +360,7 @@ def test_staff_can_remove_collaborator_from_project(request, client):
         args=[project.id, collaborator.email],
     )
 
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url)
 
     assert response.status_code == 302
@@ -309,7 +388,7 @@ def test_unprivileged_user_cannot_remove_collaborator_from_project(request, clie
         args=[project.id, collaborator.email],
     )
 
-    with login(client) as user:
+    with login(client):
         response = client.post(url)
 
     assert response.status_code == 403
@@ -403,7 +482,7 @@ def test_staff_can_remove_advisor_from_project_on_site(request, client):
         args=[project.id, advisor.email],
     )
 
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url)
 
     assert response.status_code == 302
@@ -455,7 +534,7 @@ def test_staff_can_resend_advisor_invitation(request, client, mocker):
         "projects-project-access-advisor-resend-invite",
         args=[project.id, invite.pk],
     )
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url)
 
     assert response.status_code == 302
@@ -497,7 +576,7 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker):
         "projects-project-access-collectivity-resend-invite",
         args=[project.id, invite.pk],
     )
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url)
 
     assert response.status_code == 302

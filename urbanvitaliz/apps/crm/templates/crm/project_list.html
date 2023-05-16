@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+{% load humanize %}
+{% load training %}
+{% load hijack %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+{% endblock %}
+
+{% block css %}
+<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+<style>
+ html, body {
+     scroll-padding-top: 240px;
+ }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif">
+    {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
+
+    <div class="w-75 d-flex flex-column justify-content-start">
+        <div class="crm-header px-4 py-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3>Gestion des projets {{ request.site.name }}</h3>
+            </div>
+        </div>
+
+
+        <div class="px-4 pt-4 mb-3">
+            {% with projects.form as form %}
+            <form x-data="" class="row g-3" method="get" action="{% url 'crm-project-list' %}">
+                {{ form.non_field_errors }}
+
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" name="{{ form.name.name }}" id="{{ form.name.id }}" placeholder="Nom du projet" aria-label="Recherche" value="{{ form.name.value|default:"" }}" aria-describedby="button-search">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-search">Rechercher</button>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input @click="$event.target.form.submit();" class="form-check-input" type="checkbox" id="{{ form.inactive.name }}" name="{{ form.inactive.name }}" {% if form.inactive.value == True %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.inactive.name }}">Uniquement les projets rejetés</label>
+                    </div>
+
+                    <hr/>
+
+                    <div>
+                        <label for="{{ form.ordering.name }}" class="form-label me-2">Trier par : </label>
+                        <select class="form-control" name="{{ form.ordering.name }}" id="{{ form.ordering.name }}">
+                            {% for choice in form.ordering.field.choices %}
+                            <option @click="$event.target.form.submit();" value="{{ choice.0 }}" {% if choice.0 == form.ordering.value.0 %}selected{%endif %}>
+                                {{ choice.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+
+            </form>
+            {% endwith %}
+        </div>
+
+        <div class="mb-3" class="table-responsive">
+            <table class="table table-striped table-hover caption-top">
+                <caption class="ms-2">{{ projects.qs.count }} résultat{{ projects.qs.count|pluralize }}</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Commune</th>
+                        <th scope="col">Déposé le</th>
+                        <th scope="col">État</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects.qs %}
+                    <tr>
+                        <td><a href="{% url 'crm-project-details' user.pk %}">{{ project.name|truncatechars:48 }}</a></td>
+                        <td>{{ project.commune }}</td>
+                        <td>{{ project.created_on|date }}</td>
+                        <td>{{ project.get_status_display }}</td>
+                        <td>
+                            {% if project.muted %}
+                            <svg  data-bs-toggle="tooltip" data-bs-title="Notifications désactivées" class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-slash"/>
+                            </svg>
+                            {% else %}
+                            <svg data-bs-toggle="tooltip" data-bs-title="Notifications actives" class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell-fill"/>
+                            </svg>
+                            {% endif %}
+                            {% if project.exclude_stats %}
+                            <svg data-bs-toggle="tooltip" data-bs-title="Exclu des statistiques" class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-x"/>
+                            </svg>
+                            {% else %}
+                            <svg data-bs-toggle="tooltip" data-bs-title="Inclu dans les statistiques" class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-data-fill"/>
+                            </svg>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            -- Aucun résultat --
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

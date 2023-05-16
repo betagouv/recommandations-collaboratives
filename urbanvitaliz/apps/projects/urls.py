@@ -11,8 +11,16 @@ created : 2021-05-26 15:54:25 CEST
 from django.urls import path
 
 from . import views
-from .views import (administration, detail, documents, export, feeds, notes,
-                    sharing, tasks)
+from .views import (
+    administration,
+    detail,
+    documents,
+    export,
+    feeds,
+    notes,
+    sharing,
+    tasks,
+)
 
 urlpatterns = [
     path(
@@ -236,13 +244,18 @@ urlpatterns = [
     ),
     path(
         r"project/<int:project_id>/action/",
-        tasks.create_action,
-        name="projects-project-create-action",
+        tasks.create_task,
+        name="projects-project-create-task",
     ),
     path(
         r"project/<int:project_id>/administration/",
         administration.project_administration,
         name="projects-project-administration",
+    ),
+    path(
+        r"project/<int:project_id>/administration/<int:user_id>/promote/",
+        administration.promote_collaborator_as_referent,
+        name="projects-project-promote-referent",
     ),
     path(
         r"project/<int:project_id>/administration/access/collectivity/invite",
