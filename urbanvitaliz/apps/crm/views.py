@@ -25,9 +25,13 @@ from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
-from urbanvitaliz.utils import (get_group_for_site, get_site_administrators,
-                                has_perm, has_perm_or_403,
-                                make_group_name_for_site)
+from urbanvitaliz.utils import (
+    get_group_for_site,
+    get_site_administrators,
+    has_perm,
+    has_perm_or_403,
+    make_group_name_for_site,
+)
 from watson import search as watson
 
 from . import filters, forms, models
@@ -525,7 +529,7 @@ def create_note_for_user(request, user_id):
 def create_note_for_project(request, project_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.on_site, pk=project_id)
 
     _, response = handle_create_note_for_object(
         request, project, "crm-project-details", "crm-project-note-update"

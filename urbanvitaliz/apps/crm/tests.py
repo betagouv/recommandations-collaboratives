@@ -8,8 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
-from pytest_django.asserts import (assertContains, assertNotContains,
-                                   assertRedirects)
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects_models
@@ -195,7 +194,32 @@ def test_crm_user_list_filters_only_selected_role(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_update_user_profile_information(request, client):
+def test_crm_user_update_not_available_for_non_staff(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User)
+
+    url = reverse("crm-user-update", args=[user.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_user_update_available_for_staff(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User)
+
+    url = reverse("crm-user-update", args=[user.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_user_update_profile_information(request, client):
     site = get_current_site(request)
 
     organization = baker.make(addressbook_models.Organization)
@@ -807,7 +831,7 @@ def test_toggle_off_project_annotation(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_organization_available_for_staff(client):
+def test_crm_organization_details_available_for_staff(client):
     org = baker.make(addressbook_models.Organization)
 
     url = reverse("crm-organization-details", args=[org.pk])
@@ -818,7 +842,7 @@ def test_crm_organization_available_for_staff(client):
 
 
 @pytest.mark.django_db
-def test_crm_project_available_for_staff(request, client):
+def test_crm_project_details_available_for_staff(request, client):
     site = get_current_site(request)
     project = baker.make(projects_models.Project, sites=[site])
 
@@ -830,7 +854,7 @@ def test_crm_project_available_for_staff(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_user_available_for_staff(client):
+def test_crm_user_details_available_for_staff(client):
     user = baker.make(auth_models.User)
 
     url = reverse("crm-user-details", args=[user.pk])
@@ -840,9 +864,53 @@ def test_crm_user_available_for_staff(client):
     assert response.status_code == 200
 
 
+#
+# project create note
+
+
 @pytest.mark.django_db
-def test_crm_project_create_note(client):
+def test_crm_project_create_note_not_accessible_for_non_staff(client):
     project = baker.make(projects_models.Project)
+
+    url = reverse("crm-project-note-create", args=[project.id])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_project_create_note_not_accessible_other_site(request, client):
+    site = get_current_site(request)
+    other = baker.make(site_models.Site)
+
+    project = baker.make(projects_models.Project, sites=[other])
+
+    url = reverse("crm-project-note-create", args=[project.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_crm_project_create_note_accessible_for_staff(request, client):
+    site = get_current_site(request)
+    other = baker.make(site_models.Site)
+
+    project = baker.make(projects_models.Project, sites=[site])
+
+    url = reverse("crm-project-note-create", args=[project.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_project_create_note(request, client):
+    site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[site])
 
     data = {"tags": ["canard"], "content": "hola"}
 
