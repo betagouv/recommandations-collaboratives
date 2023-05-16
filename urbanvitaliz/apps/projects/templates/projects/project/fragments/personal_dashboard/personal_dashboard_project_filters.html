@@ -1,0 +1,71 @@
+{% load static %}
+
+<div class="d-flex align-items-center mb-4 mt-4 w-100 justify-content-between projects-filters-container">
+    <div class="d-flex align-items-center">
+        <div class="input-item projects-filters-search">
+            <svg class="input-icon bi align-baseline me-2" width="17" height="17" fill="#222">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
+            </svg>
+            <input class="input-field bg-white" type="search" x-model="search" x-on:input.change="handleProjectsSearch"
+                placeholder="Rechercher" />
+        </div>
+        <div class="d-flex align-items-center ms-4 projects-filters-territory">
+            <span class="text-custom-info text-grey-dark fw-light me-2">Filtrer : </span>
+            <div class="input-item position-relative active" x-data="{ open: false }" x-on:click.outside="open = false">
+                <div class="d-flex align-items-center pe-4 bg-white" x-on:click="open = !open" type="button"
+                    :class="{'input-active':open}" style="border-radius: 20px;">
+                    <button class="input-field bg-white px-3 fw-normal text-dark appearance-none">Projet de mon
+                        territoire</button>
+                    <svg class="input-icon right black bi align-baseline me-2" width="15" height="15" fill="#000000">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
+                    </svg>
+                </div>
+                <ul x-show="open" :class="{'show':open}" class="territory-dropdown list-unstyled flex-column">
+                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
+                            <div class="form-check w-100 d-flex align-items-center p-0">
+                                <input x-on:input.change="handleTerritorySelectAll"
+                                    class="form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
+                                    :value="territorySelectAll" :checked="territorySelectAll" id="allTerritory" />
+                                <label class=" w-100 pe-2 py-2 d-flex align-items-center" for="allTerritory">
+                                    <span class="fw-normal">Tout (dé)sélectionner</span>
+                                </label>
+                            </div>
+                        </li>
+                    <template x-for="department in departments">
+                        <li
+                            class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
+                            <div class="form-check w-100 d-flex align-items-center p-0">
+                                <input x-on:input.change="handleTerritoryFilter(department)"
+                                    class="form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
+                                    :value="department.active" :checked="department.active" :id="department.code" />
+                                <label class=" w-100 pe-2 py-2 d-flex align-items-center" :for="department.code">
+                                    <span class="fw-normal" x-text="department.code"></span>
+                                    <span class="mx-1 fw-light">-</span>
+                                    <span class="fw-light text-grey-dark" x-text="department.name"></span>
+                                    <span class="fw-light text-dark ms-1" x-text="`(${department.nbProjects})`"></span>
+                                </label>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex align-items-center projects-filters-select">
+        <span class="text-custom-info text-grey-dark fw-light me-2">Trier : </span>
+        <div class="input-item bg-white">
+            <select x-model="select" x-on:input.change="handleProjectsSelect"
+                class="input-field px-3 fw-normal text-dark appearance-none" name="projects-select" id="projects-select"
+                style="padding-right: 40px !important; z-index: 2; background-color: transparent;">
+                <option value="date">Date de dépôt</option>
+                <option value="commune-name">Nom de la commune</option>
+                <option value="insee">Code INSEE</option>
+                <option value="recent-activities">Activité récente</option>
+            </select>
+            <svg class="input-icon right black bi align-baseline me-2" width="15" height="15" fill="#000000"
+                style="z-index:1">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
+            </svg>
+        </div>
+    </div>
+</div>

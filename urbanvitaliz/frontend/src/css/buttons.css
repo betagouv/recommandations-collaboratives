@@ -13,6 +13,10 @@
     cursor: pointer !important;
 }
 
+.button.active {
+    background-color: #d2d2d2 !important;
+}
+
 .button.small {
     padding: 5px 15px;
 }
@@ -110,4 +114,10 @@
 
 .button.inherit {
     text-transform: none;
+}
+
+.appearance-none {
+    appearance: none;
+    -webkit-appearance:none;
+    border: none;
 }

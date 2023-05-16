@@ -1,0 +1,10 @@
+{% load static %}
+
+<a class="d-block hover-crm-tool text-decoration-none" href={{link_url}}>
+    <div class="px-3 py-4 mb-2 border rounded bg-white text-center" style="padding: ;">
+        <svg class="bi d-inline" width="20" height="20">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{icon}}" />
+        </svg>
+    </div>
+    <span class="d-block text-center font-very-small">{{name}}</span>
+</a>

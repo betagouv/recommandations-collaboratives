@@ -24,6 +24,27 @@
     margin-bottom: 20px;
 }
 
-.hover-bg-grey:hover{
-    background-color: #f6f6f6;
+.hover-crm-tool {
+    transition: background 0.25s ease;
+}
+
+.hover-crm-tool div{
+    transition: background 0.25s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hover-crm-tool span{
+    transition: color 0.25s ease;
+}
+
+.hover-crm-tool:hover span{
+    color: #222 !important;
+}
+
+.hover-crm-tool:hover div {
+    background-color: #f6f6f6 !important;
+}
+
+.hover-underline:hover {
+    text-decoration: underline !important;
 }
