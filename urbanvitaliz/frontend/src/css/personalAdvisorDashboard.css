@@ -165,30 +165,115 @@ main {
 }
 
 .project-marker {
-    width: auto !important;
-    height: auto !important;
+    width: 27px !important;
+    height: 27px !important;
     padding: 5px 5px;
     border-radius: 100%;
     background-color: #222;
     font-weight: 700;
     font-size: 9px;
-    border: solid 1px white;
+    /* border: solid 1px white; */
 }
 
 .project-marker:before {
     content: '';
     position: absolute;
 
-    top: 68%;
-    left: calc(50% - 6px);
+    top: 45%;
+    left: calc(50% - 8.5px);
 
-    width: 12px;
-    height: 12px;
+    width: 17px;
+    height: 17px;
     background-color: #222;
     transform: rotate(45deg);
     z-index: -1;
-    border-bottom: solid 1px white;
-    border-right: solid 1px white;
+    border-radius: 2px;
+}
+
+.project-marker:after {
+    content: '';
+    position: absolute;
+
+    width: 11px;
+    height: 11px;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate3d(-50%,-50%,0);
+
+    border-radius: 100%;
+    background-color: white;
+    z-index: -1;
+}
+
+.personal-dashboard-map-container .leaflet-popup-content-wrapper{
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+}
+
+.personal-dashboard-map-container .leaflet-popup-content{
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+}
+
+.personal-dashboard-map-container .leaflet-popup .leaflet-popup-close-button {
+    display: none;
+}
+
+.personal-dashboard-map-container .leaflet-popup-pane {
+    transform: translate3D(7px, 0,0) !important;
+}
+
+.personal-dashboard-map-container .leaflet-popup-tip-container {
+    display: none;
+}
+
+.dashboard-marker-popup {
+    padding: 13px 15px;
+    border-radius: 4px;
+}
+
+.dashboard-marker-popup::after {
+    content: '';
+    position: absolute;
+
+    left: 50%;
+    top: 80%;
+
+    background-color: white;
+    z-index: 10;
+    transform: translate3d(-50%,0,0) rotate(45deg);
+
+    width: 16px;
+    height: 16px;
+    padding: 1px;
+    pointer-events: auto;
+}
+
+.dashboard-marker-popup::before {
+    content: '';
+    position: absolute;
+
+    left: 50%;
+    top: 80%;
+
+    background-color: white;
+    transform: translate3d(-50%,0,0) rotate(45deg);
+
+    width: 17px;
+    height: 17px;
+    padding: 1px;
+    pointer-events: auto;
+    border: solid 1px #222;
+    z-index: -1;
+}
+
+.dashboard-marker-popup.new-project::before {
+    border: solid 1px #FDCD6D;
 }
 
 .department-item {

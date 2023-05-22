@@ -78,7 +78,7 @@ function PersonalAdvisorDashboard() {
             if (currentDepartments) {
                 this.departments = JSON.parse(currentDepartments)
             }
-            
+
             return this.displayedData = this.filterProjectsByDepartments(this.searchProjects(this.search)).sort(this.currentSort);
         },
         get isBusy() {
@@ -384,16 +384,55 @@ function createMapMarkers(map, projects) {
             let lat = item.project?.commune?.latitude + (Math.random() * 0.001)
             let long = item.project?.commune?.longitude + (Math.random() * 0.001)
 
-            return L.marker([lat, long], { icon: createMarkerIcon(item) }).addTo(map)
+            return L.marker([lat, long], { icon: createMarkerIcon(item) }).addTo(map).bindPopup(markerPopupTemplate(item), {
+                maxWidth: "auto"
+            })
         }
     })
 }
 
 function createMarkerIcon(item) {
-    return L.divIcon({
-        className: `map-marker ${item.status === "NEW" ? 'project-marker new-project-marker' : 'project-marker'}`,
-        html: `<a href="#project-${item.project.id}">${item.project.id}</a>`
-    });
+    return L.divIcon({ className: `map-marker ${item.status === "NEW" ? 'project-marker new-project-marker' : 'project-marker'}` });
+}
+
+
+function markerPopupTemplate(item) {
+
+    let roleTemplate = null;
+
+    if (item.status === "NEW") {
+        roleTemplate = `
+        <div class="position-absolute left-0" style="top:-12px">
+            <span class="py-1 px-2 fw-bold text-uppercase tiny bg-yellow text-dark" style="border-radius: 2px;">Nouveau projet</span>
+        </div>
+        `
+    }
+
+    if (item.project.is_observer) {
+        roleTemplate = `
+        <div class="position-absolute left-0" style="top:-12px">
+            <span class="py-1 px-2 fw-bold text-uppercase tiny bg-blue text-white" style="border-radius: 2px;">Observateur</span>
+        </div>
+        `
+    }
+
+    if (item.project.is_switchtender && !item.project.is_observer) {
+        roleTemplate = `
+        <div class="position-absolute left-0" style="top:-12px">
+            <span class="py-1 px-2 fw-bold text-uppercase tiny bg-green-dark text-white" style="border-radius: 2px;">Conseiller</span>
+        </div>
+        `
+    }
+
+    return `
+        <div class="dashboard-marker-popup ${item.status === "NEW" && "new-project"}" style="${item.status === "NEW" ? 'border:solid 1px #FDCD6D' : 'border:solid 1px #222'}">
+            ${roleTemplate != null ? roleTemplate : ''}
+            <a class="text-nowrap project-link d-flex align-items-center" href="/project/${item.project.id}/presentation">
+                <span class="text-nowrap fw-bold title-info text-dark me-2 location">${item.project.commune.name}</span>
+                <span class="text-nowrap text-info-custom text-grey-dark name">${item.project.name}</span>
+            </a>
+        </div>
+    `
 }
 
 export function makeProjectPositioningActionURL(url, id) {
