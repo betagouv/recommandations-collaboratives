@@ -28,7 +28,7 @@ function PersonalAdvisorDashboard() {
         territorySelectAll: true,
         // map
         map: null,
-        mapIsWide: false,
+        mapIsSmall: false,
         markersLayer: "",
         //options
         //header's height + some px
@@ -311,7 +311,7 @@ function PersonalAdvisorDashboard() {
             setTimeout(() => this.map.invalidateSize(), 251)
             setTimeout(() => zoomToCentroid(this.map, this.markersLayer), 251)
 
-            this.mapIsWide = !this.mapIsWide
+            this.mapIsSmall = !this.mapIsSmall
 
             this.handleBodyTopPaddingScroll(80)
         },
