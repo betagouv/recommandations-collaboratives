@@ -62,13 +62,8 @@ function PersonalAdvisorDashboard() {
             this.checkCurrentState();
         },
         checkCurrentState() {
-            const currentSearch = this.readCurrentStateFromStore('search')
             const currentSort = this.readCurrentStateFromStore('sort')
             const currentDepartments = this.readCurrentStateFromStore('departments')
-
-            if (currentSearch) {
-                this.search = JSON.parse(currentSearch)
-            }
 
             if (currentSort) {
                 this.select = JSON.parse(currentSort)
@@ -79,7 +74,7 @@ function PersonalAdvisorDashboard() {
                 this.departments = JSON.parse(currentDepartments)
             }
 
-            return this.displayedData = this.filterProjectsByDepartments(this.searchProjects(this.search)).sort(this.currentSort);
+            return this.displayedData = this.filterProjectsByDepartments(this.data).sort(this.currentSort);
         },
         get isBusy() {
             return this.$store.app.isLoading
