@@ -260,6 +260,9 @@ function PersonalAdvisorDashboard() {
                 case "recent-activities":
                     sortCriterion = this.sortProjectRecentActivities
                     break;
+                case "role":
+                        sortCriterion = this.sortProjectRole
+                        break;
                 default:
                     sortCriterion = this.sortProjectDate
                     break;
@@ -316,6 +319,23 @@ function PersonalAdvisorDashboard() {
                     return 1
                 } else return 0
             }
+        },
+        sortProjectRole(a,b) {
+
+            if (a.project.is_switchtender && !a.project.is_observer) {
+                return -1
+            }
+            if (b.project.is_switchtender && !b.project.is_observer) {
+                return 1
+            }
+            if (a.project.is_switchtender && a.project.is_switchtender) {
+                return -1
+            }
+            if (b.project.is_switchtender && b.project.is_observer) {
+                return 1
+            }
+
+            return 0
         },
         sortDepartments(a, b) {
             if (a.code < b.code) {
