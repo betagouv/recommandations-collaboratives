@@ -10,6 +10,7 @@ created: 2021-05-26 15:54:25 CEST
 
 from django.urls import path
 
+
 from . import views
 
 urlpatterns = [
@@ -24,7 +25,11 @@ urlpatterns = [
     ),
     path(r"qui-sommes-nous", views.WhoWeArePageView.as_view(), name="whoweare"),
     path(r"confidentialite", views.PrivacyPageView.as_view(), name="privacy"),
-    path(r"conditions-generales-utilisation", views.TermsOfUsePageView.as_view(), name="termsofuse"),
+    path(
+        r"conditions-generales-utilisation",
+        views.TermsOfUsePageView.as_view(),
+        name="termsofuse",
+    ),
     path(r"mentions-legales", views.LegalsPageView.as_view(), name="legals"),
     path(r"nous-suivre", views.FollowUsPageView.as_view(), name="followus"),
     path(r"contact/", views.contact, name="home-contact"),

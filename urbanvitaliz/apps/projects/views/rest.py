@@ -7,11 +7,14 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from django.db.models import Count, Q
 from django.contrib.contenttypes.models import ContentType
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+
+from silk.profiling.profiler import silk_profile
 
 from .. import models, signals
 from ..serializers import (
@@ -211,27 +214,65 @@ class UserProjectStatusViewSet(
     API endpoint for UserProjectStatus
     """
 
+    @silk_profile(name="ups_get_queryset")
     def get_queryset(self):
+
         project_statuses = models.UserProjectStatus.objects.filter(
             user=self.request.user, project__deleted=None
         )
 
+        # get project with missing user project status
         ids = list(project_statuses.values_list("project__id", flat=True))
 
         projects = models.Project.on_site.for_user(self.request.user).exclude(
             id__in=ids
         )
 
+        # create missing user project status
         new_statuses = [
             models.UserProjectStatus(
                 user=self.request.user, site=self.request.site, project=p, status="NEW"
             )
             for p in projects
         ]
-
         models.UserProjectStatus.objects.bulk_create(new_statuses)
 
-        return project_statuses.all()
+        # fetch all user projects statuses and their annotations in a single query
+        project_statuses = list(project_statuses.prefetch_related("user__profile"))
+        project_ids = [ps.project_id for ps in project_statuses]
+
+        projects = {
+            p.id: p
+            for p in (
+                models.Project.objects.filter(id__in=project_ids)
+                .prefetch_related("commune")
+                .prefetch_related("switchtenders")
+                .annotate(
+                    recommendation_count=Count(
+                        "tasks",
+                        filter=Q(tasks__public=True, tasks__site=self.request.site),
+                    )
+                )
+                .annotate(
+                    public_message_count=Count(
+                        "notes",
+                        filter=Q(notes__public=True, notes__site=self.request.site),
+                    )
+                )
+                .annotate(
+                    private_message_count=Count(
+                        "notes",
+                        filter=Q(notes__public=False, notes__site=self.request.site),
+                    )
+                )
+            )
+        }
+
+        # update project statuses with the right project
+        for ps in project_statuses:
+            ps.project = projects[ps.project_id]
+
+        return project_statuses
 
     serializer_class = UserProjectStatusSerializer
     permission_classes = [permissions.IsAuthenticated]

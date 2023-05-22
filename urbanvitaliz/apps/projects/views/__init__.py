@@ -260,10 +260,16 @@ def project_list_for_advisor(request):
         ).values_list("project__pk", flat=True)
     )
 
-    action_stream = request.user.notifications.filter(
-        target_content_type=project_ct,
-        target_object_id__in=user_project_pks,
-    ).order_by("-timestamp")[:20]
+    action_stream = (
+        request.user.notifications.filter(
+            target_content_type=project_ct,
+            target_object_id__in=user_project_pks,
+        )
+        .prefetch_related("actor__profile__organization")
+        .prefetch_related("action_object")
+        .prefetch_related("target")
+        .order_by("-timestamp")[:20]
+    )
 
     return render(request, "projects/project/personal_advisor_dashboard.html", locals())
 
