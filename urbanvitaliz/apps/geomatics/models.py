@@ -35,7 +35,9 @@ class Department(models.Model):
 
     objects = DepartmentManager()
 
-    region = models.ForeignKey("Region", on_delete=models.CASCADE)
+    region = models.ForeignKey(
+        "Region", on_delete=models.CASCADE, related_name="departments"
+    )
 
     code = models.CharField(max_length=3, primary_key=True)
     name = models.CharField(max_length=64)

@@ -11,7 +11,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
 from . import models
-from .serializers import CommuneSerializer, DepartmentSerializer
+from .serializers import CommuneSerializer, DepartmentSerializer, RegionSerializer
 
 
 ########################################################################
@@ -26,6 +26,17 @@ class DepartmentViewSet(viewsets.ReadOnlyModelViewSet):
         return models.Department.objects.all().order_by("name")
 
     serializer_class = DepartmentSerializer
+
+
+class RegionViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows regions to be viewed or edited.
+    """
+
+    def get_queryset(self):
+        return models.Region.objects.all().order_by("name")
+
+    serializer_class = RegionSerializer
 
 
 class CommuneViewSet(viewsets.ReadOnlyModelViewSet):
