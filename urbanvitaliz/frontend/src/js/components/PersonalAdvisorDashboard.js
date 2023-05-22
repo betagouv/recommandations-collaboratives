@@ -36,7 +36,7 @@ function PersonalAdvisorDashboard() {
         init() {
             this.handleBodyTopPaddingScroll(this.bodyScrollTopPadding);
         },
-        async getData() {
+        async getData(currentUser) {
 
             const projects = await this.$store.projects.getProjects()
 
@@ -59,9 +59,16 @@ function PersonalAdvisorDashboard() {
                 setTimeout(() => this.map.invalidateSize(), 251)
             }
 
-            this.checkCurrentState();
+            const sameUser = this.isSameUser(currentUser)
+
+            if (sameUser) {
+                return this.checkCurrentState();
+            } else {
+                return this.addCurrentStateToStore('currentUser', currentUser)
+            }
         },
         checkCurrentState() {
+
             const currentSort = this.readCurrentStateFromStore('sort')
             const currentDepartments = this.readCurrentStateFromStore('departments')
 
@@ -74,7 +81,23 @@ function PersonalAdvisorDashboard() {
                 this.departments = JSON.parse(currentDepartments)
             }
 
+            //If we can't find an active department in state 
+            // then uncheck select all departments in filter
+            if (this.departments.findIndex(department => department.active) === -1 ) {
+                this.territorySelectAll = false
+            }
+
             return this.displayedData = this.filterProjectsByDepartments(this.data).sort(this.currentSort);
+        },
+        isSameUser(currentUser) {
+
+            const previousUser = this.readCurrentStateFromStore('currentUser')
+
+            if (!previousUser) {
+                this.addCurrentStateToStore('currentUser', currentUser)
+            }
+
+            return (JSON.parse(previousUser) == currentUser)
         },
         get isBusy() {
             return this.$store.app.isLoading
