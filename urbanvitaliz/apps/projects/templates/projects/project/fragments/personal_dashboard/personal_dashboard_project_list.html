@@ -41,7 +41,6 @@
                     </div>
                     <header class="d-flex align-items-center justify-content-between w-100 mb-1">
                         <div class="d-flex align-items-center">
-                            <span :class="item.status === 'NEW' ? 'bg-yellow text-dark' : 'bg-dark text-white'" class="px-2 py-0 rounded me-2 font-small" x-text="item.project.id"></span>
                             <a class="project-link d-flex align-items-center" :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', item.project.id)">
                                 <template x-if="item.project.commune">
                                     <span class="fw-bold title-info text-dark me-2 location" x-text="item.project.commune.name">1</span>
