@@ -175,7 +175,8 @@ def organization_merge(request):
     if request.method == "POST":
         name = request.POST.get("name")
         ids = request.POST.getlist("org_ids", [])
-        print(ids)
+        if not ids:
+            return redirect(reverse("crm-organization-list"))
         orgs = [get_object_or_404(qs, pk=id) for id in ids]
         # process to merging of data
         with transaction.atomic():
@@ -191,6 +192,8 @@ def organization_merge(request):
 
     # get organizations and dependencies for merge summary
     ids = request.GET.getlist("org_ids", [])
+    if not ids:
+        return redirect(reverse("crm-organization-list"))
     organizations = [get_object_or_404(qs, pk=id) for id in ids]
     departments = geomatics.Department.objects.filter(organizations__in=organizations)
     profiles = home_models.UserProfile.objects.filter(organization__in=organizations)
