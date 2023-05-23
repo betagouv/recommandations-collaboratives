@@ -35,7 +35,7 @@ main {
 
 .territory-dropdown {
     position: absolute;
-    width: 100%;
+    width: auto;
     z-index: 100;
 
     left: 0;
@@ -45,11 +45,13 @@ main {
     box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.16), 0px 1px 0px -2px rgba(0, 0, 0, 0.16), 0px 1px 4px rgba(0, 0, 0, 0.23);
     border-radius: 4px;
 
-    overflow: hidden;
+
+    max-height: 400px;
+    overflow-x: hidden;
 }
 
 .territory-dropdown li:first-child {
-    border-bottom: solid 2px #c2c2c2 !important;
+    border-bottom: solid 1px #c2c2c2 !important;
 }
 
 .positioning-dropdown.show {
@@ -66,7 +68,7 @@ main {
 
 .personal-dashboard-map-container {
     position: relative;
-    height: 140px;
+    height: 40vh;
     width: 100%;
     z-index: 100;
 
@@ -99,8 +101,8 @@ main {
     left: calc(50% - 12px);
 }
 
-.personal-dashboard-map-container.is-wide {
-    height: 380px;
+.personal-dashboard-map-container.is-small {
+    height: 140px;
 }
 
 .personal-dashboard-map-container .leaflet-container {
@@ -165,30 +167,141 @@ main {
 }
 
 .project-marker {
-    width: auto !important;
-    height: auto !important;
+    width: 27px !important;
+    height: 27px !important;
     padding: 5px 5px;
     border-radius: 100%;
     background-color: #222;
     font-weight: 700;
     font-size: 9px;
-    border: solid 1px white;
 }
 
 .project-marker:before {
     content: '';
     position: absolute;
 
-    top: 68%;
-    left: calc(50% - 6px);
+    top: 45%;
+    left: calc(50% - 8.5px);
 
-    width: 12px;
-    height: 12px;
+    width: 17px;
+    height: 17px;
     background-color: #222;
     transform: rotate(45deg);
     z-index: -1;
-    border-bottom: solid 1px white;
-    border-right: solid 1px white;
+    border-radius: 2px;
+}
+
+.project-marker:after {
+    content: '';
+    position: absolute;
+
+    width: 11px;
+    height: 11px;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate3d(-50%,-50%,0);
+
+    border-radius: 100%;
+    background-color: white;
+    z-index: -1;
+}
+
+.personal-dashboard-map-container .leaflet-popup-content-wrapper{
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+}
+
+.personal-dashboard-map-container .leaflet-popup-content{
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+}
+
+.personal-dashboard-map-container .leaflet-popup .leaflet-popup-close-button {
+    display: none;
+}
+
+.personal-dashboard-map-container .leaflet-popup-pane {
+    transform: translate3D(7px, 0,0) !important;
+}
+
+.personal-dashboard-map-container .leaflet-popup-tip-container {
+    display: none;
+}
+
+.dashboard-marker-popup {
+    padding: 13px 15px;
+    border-radius: 4px;
+}
+
+.project-card-top-information {
+    position: absolute;
+    top: -12px;
+}
+
+.project-card-top-information span{
+    padding: 0.25rem 0.5rem;
+    color: white;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 2px;
+}
+
+.project-card-top-information.advisor span{
+    background-color: #0063CB;
+}
+
+.project-card-top-information.observer span{
+    background-color: #27A658;
+}
+
+.project-card-top-information.new span{
+    background-color: #FDCD6D;
+    color: #222;
+}
+
+.dashboard-marker-popup::after {
+    content: '';
+    position: absolute;
+
+    left: 50%;
+    top: 80%;
+
+    background-color: white;
+    z-index: 10;
+    transform: translate3d(-50%,0,0) rotate(45deg);
+
+    width: 16px;
+    height: 16px;
+    padding: 1px;
+    pointer-events: auto;
+}
+
+.dashboard-marker-popup::before {
+    content: '';
+    position: absolute;
+
+    left: 50%;
+    top: 80%;
+
+    background-color: white;
+    transform: translate3d(-50%,0,0) rotate(45deg);
+
+    width: 17px;
+    height: 17px;
+    padding: 1px;
+    pointer-events: auto;
+    border: solid 1px #222;
+    z-index: -1;
+}
+
+.dashboard-marker-popup.new-project::before {
+    border: solid 1px #FDCD6D;
 }
 
 .department-item {

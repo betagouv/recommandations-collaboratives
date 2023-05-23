@@ -9,9 +9,8 @@
 {% load leaflet_tags %}
 {% load guardian_tags %}
 
+
 {% block js %}
-<script src="{% static 'projects/js/board.js' %}"></script>
-<script src="{% static 'projects/js/kanban_project.js' %}"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
 
@@ -32,6 +31,8 @@
 </script>
 
 {% vite_asset 'js/apps/map.js' %}
+{% vite_asset 'js/apps/boardProjects.js' %}
+
 {% leaflet_js %}
 
 {% endblock %}

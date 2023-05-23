@@ -30,6 +30,7 @@ module.exports = {
                 home: resolve('./src/js/apps/home.js'),
                 crm: resolve('./src/js/apps/crm.js'),
                 project: resolve('./src/js/apps/project.js'),
+                boardProjects: resolve('./src/js/apps/boardProjects.js'),
                 tasks: resolve('./src/js/apps/tasks.js'),
                 embedResource: resolve('./src/js/apps/embedResource.js'),
                 advisorDashboard: resolve('./src/js/apps/advisorDashboard.js'),

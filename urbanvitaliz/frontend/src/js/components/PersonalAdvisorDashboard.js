@@ -28,7 +28,7 @@ function PersonalAdvisorDashboard() {
         territorySelectAll: true,
         // map
         map: null,
-        mapIsWide: false,
+        mapIsSmall: false,
         markersLayer: "",
         //options
         //header's height + some px
@@ -36,7 +36,7 @@ function PersonalAdvisorDashboard() {
         init() {
             this.handleBodyTopPaddingScroll(this.bodyScrollTopPadding);
         },
-        async getData() {
+        async getData(currentUser) {
 
             const projects = await this.$store.projects.getProjects()
 
@@ -59,16 +59,18 @@ function PersonalAdvisorDashboard() {
                 setTimeout(() => this.map.invalidateSize(), 251)
             }
 
-            this.checkCurrentState();
+            const sameUser = this.isSameUser(currentUser)
+
+            if (sameUser) {
+                return this.checkCurrentState();
+            } else {
+                return this.addCurrentStateToStore('currentUser', currentUser)
+            }
         },
         checkCurrentState() {
-            const currentSearch = this.readCurrentStateFromStore('search')
+
             const currentSort = this.readCurrentStateFromStore('sort')
             const currentDepartments = this.readCurrentStateFromStore('departments')
-
-            if (currentSearch) {
-                this.search = JSON.parse(currentSearch)
-            }
 
             if (currentSort) {
                 this.select = JSON.parse(currentSort)
@@ -78,8 +80,24 @@ function PersonalAdvisorDashboard() {
             if (currentDepartments) {
                 this.departments = JSON.parse(currentDepartments)
             }
-            
-            return this.displayedData = this.filterProjectsByDepartments(this.searchProjects(this.search)).sort(this.currentSort);
+
+            //If we can't find an active department in state 
+            // then uncheck select all departments in filter
+            if (this.departments.findIndex(department => department.active) === -1 ) {
+                this.territorySelectAll = false
+            }
+
+            return this.displayedData = this.filterProjectsByDepartments(this.data).sort(this.currentSort);
+        },
+        isSameUser(currentUser) {
+
+            const previousUser = this.readCurrentStateFromStore('currentUser')
+
+            if (!previousUser) {
+                this.addCurrentStateToStore('currentUser', currentUser)
+            }
+
+            return (JSON.parse(previousUser) == currentUser)
         },
         get isBusy() {
             return this.$store.app.isLoading
@@ -167,11 +185,6 @@ function PersonalAdvisorDashboard() {
             return this.displayedData = this.filterProjectsByDepartments(this.searchProjects(this.search)).sort(this.currentSort);
         },
         handleTerritoryFilter(selectedDepartment) {
-
-            if (this.territorySelectAll) {
-                this.territorySelectAll = false
-            }
-
             this.departments = this.departments.map(department => {
                 if (department.code === selectedDepartment.code) {
                     department.active = !department.active
@@ -179,6 +192,8 @@ function PersonalAdvisorDashboard() {
 
                 return department
             })
+
+            this.territorySelectAll = this.departments.filter(department => department.active).length === this.departments.length
 
             return this.displayedData = this.filterProjectsByDepartments(this.searchProjects(this.search)).sort(this.currentSort);
         },
@@ -242,6 +257,9 @@ function PersonalAdvisorDashboard() {
                 case "recent-activities":
                     sortCriterion = this.sortProjectRecentActivities
                     break;
+                case "role":
+                        sortCriterion = this.sortProjectRole
+                        break;
                 default:
                     sortCriterion = this.sortProjectDate
                     break;
@@ -299,6 +317,23 @@ function PersonalAdvisorDashboard() {
                 } else return 0
             }
         },
+        sortProjectRole(a,b) {
+
+            if (a.project.is_switchtender && !a.project.is_observer) {
+                return -1
+            }
+            if (b.project.is_switchtender && !b.project.is_observer) {
+                return 1
+            }
+            if (a.project.is_switchtender && a.project.is_switchtender) {
+                return -1
+            }
+            if (b.project.is_switchtender && b.project.is_observer) {
+                return 1
+            }
+
+            return 0
+        },
         sortDepartments(a, b) {
             if (a.code < b.code) {
                 return -1
@@ -311,7 +346,7 @@ function PersonalAdvisorDashboard() {
             setTimeout(() => this.map.invalidateSize(), 251)
             setTimeout(() => zoomToCentroid(this.map, this.markersLayer), 251)
 
-            this.mapIsWide = !this.mapIsWide
+            this.mapIsSmall = !this.mapIsSmall
 
             this.handleBodyTopPaddingScroll(80)
         },
@@ -384,16 +419,55 @@ function createMapMarkers(map, projects) {
             let lat = item.project?.commune?.latitude + (Math.random() * 0.001)
             let long = item.project?.commune?.longitude + (Math.random() * 0.001)
 
-            return L.marker([lat, long], { icon: createMarkerIcon(item) }).addTo(map)
+            return L.marker([lat, long], { icon: createMarkerIcon(item) }).addTo(map).bindPopup(markerPopupTemplate(item), {
+                maxWidth: "auto"
+            })
         }
     })
 }
 
 function createMarkerIcon(item) {
-    return L.divIcon({
-        className: `map-marker ${item.status === "NEW" ? 'project-marker new-project-marker' : 'project-marker'}`,
-        html: `<a href="#project-${item.project.id}">${item.project.id}</a>`
-    });
+    return L.divIcon({ className: `map-marker ${item.status === "NEW" ? 'project-marker new-project-marker' : 'project-marker'}` });
+}
+
+
+function markerPopupTemplate(item) {
+
+    let roleTemplate = null;
+
+    if (item.status === "NEW") {
+        roleTemplate = `
+        <div class="project-card-top-information new">
+            <span>Nouveau projet</span>
+        </div>
+        `
+    }
+
+    if (item.project.is_observer) {
+        roleTemplate = `
+        <div class="project-card-top-information observer">
+            <span>Observateur</span>
+        </div>
+        `
+    }
+
+    if (item.project.is_switchtender && !item.project.is_observer) {
+        roleTemplate = `
+        <div class="project-card-top-information advisor">
+            <span>Conseiller</span>
+        </div>
+        `
+    }
+
+    return `
+        <div class="dashboard-marker-popup ${item.status === "NEW" && "new-project"}" style="${item.status === "NEW" ? 'border:solid 1px #FDCD6D' : 'border:solid 1px #222'}">
+            ${roleTemplate != null ? roleTemplate : ''}
+            <a class="text-nowrap project-link d-flex align-items-center" href="/project/${item.project.id}/presentation">
+                <span class="text-nowrap fw-bold title-info text-dark me-2 location">${item.project.commune.name}</span>
+                <span class="text-nowrap text-info-custom text-grey-dark name">${item.project.name}</span>
+            </a>
+        </div>
+    `
 }
 
 export function makeProjectPositioningActionURL(url, id) {

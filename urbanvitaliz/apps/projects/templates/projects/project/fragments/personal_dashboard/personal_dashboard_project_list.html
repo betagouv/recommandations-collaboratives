@@ -28,20 +28,23 @@
                         role="status"></div>
                 </div>
                 <div :class="item.isLoading && 'project-item-is-loading'" class="project-item d-flex flex-column justify-content-between align-items-start w-100">
-                    <div class="position-absolute left-0" style="top:-12px">
-                        <template x-if="item.status === 'NEW'">
-                            <span class="py-1 px-2 fw-bold text-uppercase tiny bg-yellow text-dark" style="border-radius: 2px;">Nouveau projet</span>
-                        </template>
-                        <template x-if="item.project.is_observer">
-                            <span class="py-1 px-2 fw-bold text-uppercase tiny bg-blue text-white" style="border-radius: 2px;">Observateur</span>
-                        </template>
-                        <template x-if="item.project.is_switchtender && !item.project.is_observer">
-                            <span class="py-1 px-2 fw-bold text-uppercase tiny bg-green-dark text-white" style="border-radius: 2px;">Conseiller</span>
-                        </template>
-                    </div>
+                    <template x-if="item.status === 'NEW'">
+                        <div class="project-card-top-information new left-0">
+                            <span>Nouveau projet</span>
+                        </div>
+                    </template>
+                    <template x-if="item.project.is_observer">
+                        <div class="project-card-top-information observer left-0">
+                            <span>Observateur</span>
+                        </div>
+                    </template>
+                    <template x-if="item.project.is_switchtender && !item.project.is_observer">
+                        <div class="project-card-top-information advisor left-0">
+                            <span>Conseiller</span>
+                        </div>
+                    </template>
                     <header class="d-flex align-items-center justify-content-between w-100 mb-1">
                         <div class="d-flex align-items-center">
-                            <span :class="item.status === 'NEW' ? 'bg-yellow text-dark' : 'bg-dark text-white'" class="px-2 py-0 rounded me-2 font-small" x-text="item.project.id"></span>
                             <a class="project-link d-flex align-items-center" :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', item.project.id)">
                                 <template x-if="item.project.commune">
                                     <span class="fw-bold title-info text-dark me-2 location" x-text="item.project.commune.name">1</span>

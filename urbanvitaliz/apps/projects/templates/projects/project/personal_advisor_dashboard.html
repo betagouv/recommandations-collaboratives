@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="font-marianne p-0">
-    <div x-data="PersonalAdvisorDashboard" x-init="getData();">
+    <div x-data="PersonalAdvisorDashboard" x-init='getData("{{request.user}}");'>
         {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_header.html' %}
         <div class="d-flex align-items-start">
             <div class="personal-dashboard-container-inner px-3 pt-3 w-75">
