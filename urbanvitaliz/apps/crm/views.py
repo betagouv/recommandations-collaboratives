@@ -125,7 +125,7 @@ def organization_list(request):
     query = Q(sites=request.site) | Q(registered_profiles__sites=request.site)
     organizations = filters.OrganizationFilter(
         request.GET,
-        queryset=Organization.objects.filter(query).distinct(),
+        queryset=Organization.objects.filter(query).order_by("name"),
     )
 
     # required by default on crm
@@ -162,17 +162,17 @@ def organization_merge(request, first_id=None, second_id=None):
     second = get_object_or_404(Organization, pk=second_id)
 
     if request.method == "POST":
+        # process to merging of data
         with transaction.atomic():
             update_contacts(first, second)
             update_profiles(first, second)
-            merge_organization(first, second)
+            merge_organizations(first, second)
         return redirect(reverse("crm-organization-list"))
-    else:
-        form = forms.CRMOrganizationForm(instance=organization)
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
 
+    # first request confirmation for merging
     return render(request, "crm/organization_merge.html", locals())
 
 
@@ -188,8 +188,13 @@ def update_profiles(old_org, new_org):
     profiles.update(organization=new_org)
 
 
-def merge_organization(first, second):
-    """Merge second orga into first one and delete second one"""
+def merge_organizations(first, second):
+    """Merge second organization into first one and delete second one"""
+    departments = [d for d in second.departments.all()]
+    first.departments.add(*departments)
+    sites = [s for s in second.sites.all()]
+    first.sites.add(*sites)
+    second.delete()
 
 
 @login_required
