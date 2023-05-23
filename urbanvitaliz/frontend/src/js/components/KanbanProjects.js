@@ -29,7 +29,6 @@ function boardProjectsApp() {
                 uuid: generateUUID()
             }));
 
-
             if (postProcess) {
                 await this.postProcessData(data);
             }
@@ -142,6 +141,7 @@ function boardProjectsApp() {
             this.regions = this.regions.map(
                 region => ({
                     ...region,
+                    active:this.territorySelectAll,
                     departments: region.departments.map(
                         department => ({ ...department, active: this.territorySelectAll })
                     )
@@ -181,7 +181,8 @@ function boardProjectsApp() {
 
                             return department
                         }
-                    )
+                    ),
+                    active: region.departments.length === region.departments.filter(department => department.active).length
                 })
             )
         },

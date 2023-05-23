@@ -25,11 +25,11 @@
             <template x-for="region in regions">
                 <div class="region-filter-item">
                     <li :class="{'region-is-active':region.active}" class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item pe-3">
-                                <div class="form-check w-100 d-flex align-items-center ps-3">
+                                <div class="form-check w-100 d-flex align-items-center px-0">
                                     <input x-on:input.change="handleRegionFilter(region)"
                                         class="region-checkbox form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
-                                        :value="region.active" :checked="region.active" :id="region.code" />
-                                    <label class=" w-100 pe-2 py-2 d-flex align-items-center" :for="region.code">
+                                        :value="region.active" :checked="region.active" :id=`region-${region.code}` />
+                                    <label class=" w-100 pe-2 py-2 d-flex align-items-center" :for=`region-${region.code}`>
                                         <span class="fw-light text-grey-dark text-nowrap" x-text="region.name"></span>
                                     </label>
                                 </div>
