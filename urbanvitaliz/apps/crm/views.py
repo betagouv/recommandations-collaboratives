@@ -326,7 +326,7 @@ def user_update(request, user_id=None):
             crm_user.first_name = form.cleaned_data.get("first_name")
             crm_user.last_name = form.cleaned_data.get("last_name")
             crm_user.save()
-            return redirect(reverse("crm-user-details", orgs=[crm_user.id]))
+            return redirect(reverse("crm-user-details", args=[crm_user.id]))
     else:
         form = forms.CRMProfileForm(
             instance=profile,
@@ -351,7 +351,7 @@ def user_deactivate(request, user_id=None):
     if request.method == "POST":
         crm_user.is_active = False
         crm_user.save()
-        return redirect(reverse("crm-user-details", orgs=[crm_user.id]))
+        return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -368,7 +368,7 @@ def user_reactivate(request, user_id=None):
     if request.method == "POST":
         crm_user.is_active = True
         crm_user.save()
-        return redirect(reverse("crm-user-details", orgs=[crm_user.id]))
+        return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -389,7 +389,7 @@ def user_set_advisor(request, user_id=None):
             form.save()
             group = get_group_for_site("advisor", request.site)
             crm_user.groups.add(group)
-            return redirect(reverse("crm-user-details", orgs=[crm_user.id]))
+            return redirect(reverse("crm-user-details", args=[crm_user.id]))
     else:
         form = forms.CRMAdvisorForm(instance=profile)
 
@@ -410,7 +410,7 @@ def user_unset_advisor(request, user_id=None):
         profile.departments.clear()
         group = get_group_for_site("advisor", request.site)
         crm_user.groups.remove(group)
-        return redirect(reverse("crm-user-details", orgs=[crm_user.id]))
+        return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -610,7 +610,7 @@ def project_toggle_annotation(request, project_id=None):
         else:
             annotation.tags.add(tag)
 
-    url = reverse("crm-project-details", orgs=[project.id])
+    url = reverse("crm-project-details", args=[project.id])
     return redirect(url)
 
 
@@ -626,7 +626,7 @@ def handle_create_note_for_object(
             note.site = request.site
             note.save()
             form.save_m2m()
-            return True, redirect(reverse(return_view_name, orgs=(the_object.pk,)))
+            return True, redirect(reverse(return_view_name, args=(the_object.pk,)))
     else:
         form = forms.CRMNoteForm()
 
@@ -699,7 +699,7 @@ def update_note_for_object(request, note, return_view_name):
             note.updated_on = timezone.now()
             note.save()
             form.save_m2m()
-            return redirect(reverse(return_view_name, orgs=(note.related.pk,)))
+            return redirect(reverse(return_view_name, args=(note.related.pk,)))
     else:
         form = forms.CRMNoteForm(instance=note)
 

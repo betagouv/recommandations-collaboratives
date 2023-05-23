@@ -92,10 +92,10 @@ def test_crm_project_list_filters_inactive_ones(request, client):
 @pytest.mark.django_db
 def test_crm_project_list_filters_by_project_name(request, client):
     site = get_current_site(request)
-    expected = baker.make(projects_models.Project, sites=[site])
-    unexpected = baker.make(projects_models.Project, sites=[site])
+    expected = baker.make(projects_models.Project, sites=[site], name="expected")
+    unexpected = baker.make(projects_models.Project, sites=[site], name="unexpected")
 
-    url = reverse("crm-project-list") + f"?query={expected.name[5:15]}"
+    url = reverse("crm-project-list") + f"?query={expected.name}"
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 

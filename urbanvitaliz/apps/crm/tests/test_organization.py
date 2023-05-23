@@ -1,13 +1,86 @@
 import pytest
 from django.contrib.sites import models as site_models
+from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
-
+from pytest_django.asserts import assertContains, assertNotContains
 from urbanvitaliz.apps.addressbook import models as addressbook_models
+from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.utils import login
+
+
+########################################################################
+# organization list
+########################################################################
+
+
+@pytest.mark.django_db
+def test_crm_organization_list_not_available_for_non_staff(client):
+    url = reverse("crm-organization-list")
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_organization_list_contains_site_organizations(request, client):
+    site = get_current_site(request)
+
+    from_abook = baker.make(addressbook_models.Organization)
+    from_abook.sites.add(site)
+
+    from_home = baker.make(addressbook_models.Organization)
+    profile = baker.make(auth_models.User).profile
+    profile.organization = from_home
+    profile.sites.add(site)
+    profile.save()
+
+    other = baker.make(addressbook_models.Organization)
+
+    url = reverse("crm-organization-list")
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-organization-details", args=[from_abook.id])
+    assertContains(response, expected)
+    expected = reverse("crm-organization-details", args=[from_home.id])
+    assertContains(response, expected)
+
+    unexpected = reverse("crm-organization-details", args=[other.id])
+    assertNotContains(response, unexpected)
+
+
+@pytest.mark.django_db
+def test_crm_organization_list_filters_organizations_by_name(request, client):
+    site = get_current_site(request)
+
+    expected = baker.make(addressbook_models.Organization)
+    expected.sites.add(site)
+
+    unexpected = baker.make(addressbook_models.Organization)
+    unexpected.sites.add(site)
+
+    url = reverse("crm-organization-list") + f"?name={expected.name[5:15]}"
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-organization-details", args=[expected.id])
+    assertContains(response, expected)
+
+    unexpected = reverse("crm-organization-details", args=[unexpected.id])
+    assertNotContains(response, unexpected)
 
 
 ########################################################################

@@ -149,7 +149,7 @@ class ProjectFilter(django_filters.FilterSet):
 
     def inactive_filter(self, queryset, name, value):
         if name != "inactive" or not value:
-            return queryset
+            return queryset.filter(deleted=None)
         return queryset.exclude(deleted=None)
 
 
