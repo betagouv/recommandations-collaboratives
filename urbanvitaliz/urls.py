@@ -57,6 +57,7 @@ router.register(r"resources", resources_views.ResourceViewSet, basename="resourc
 router.register(
     r"departments", geomatics_rest.DepartmentViewSet, basename="departments"
 )
+router.register(r"regions", geomatics_rest.RegionViewSet, basename="regions")
 router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
 
 
