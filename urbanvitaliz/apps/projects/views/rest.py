@@ -7,14 +7,15 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from copy import copy
+from django.http import Http404
 from django.db.models import Count, Q
 from django.contrib.contenttypes.models import ContentType
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
-
-from silk.profiling.profiler import silk_profile
+from rest_framework.views import APIView
 
 from .. import models, signals
 from ..serializers import (
@@ -23,6 +24,7 @@ from ..serializers import (
     TaskNotificationSerializer,
     TaskSerializer,
     UserProjectStatusSerializer,
+    UserProjectStatusForListSerializer,
 )
 
 
@@ -204,89 +206,122 @@ class TaskNotificationViewSet(
     permission_classes = [permissions.IsAuthenticated]
 
 
-class UserProjectStatusViewSet(
-    viewsets.GenericViewSet,
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-):
-    """
-    API endpoint for UserProjectStatus
-    """
+########################################################################
+# user project statuses
+########################################################################
 
-    @silk_profile(name="ups_get_queryset")
-    def get_queryset(self):
 
-        project_statuses = models.UserProjectStatus.objects.filter(
-            user=self.request.user, project__deleted=None
-        )
+class UserProjectStatusDetail(APIView):
+    """Retrieve or update a user project status"""
 
-        # get project with missing user project status
-        ids = list(project_statuses.values_list("project__id", flat=True))
-
-        projects = models.Project.on_site.for_user(self.request.user).exclude(
-            id__in=ids
-        )
-
-        # create missing user project status
-        new_statuses = [
-            models.UserProjectStatus(
-                user=self.request.user, site=self.request.site, project=p, status="NEW"
-            )
-            for p in projects
-        ]
-        models.UserProjectStatus.objects.bulk_create(new_statuses)
-
-        # fetch all user projects statuses and their annotations in a single query
-        project_statuses = list(project_statuses.prefetch_related("user__profile"))
-        project_ids = [ps.project_id for ps in project_statuses]
-
-        projects = {
-            p.id: p
-            for p in (
-                models.Project.objects.filter(id__in=project_ids)
-                .prefetch_related("commune")
-                .prefetch_related("switchtenders")
-                .annotate(
-                    recommendation_count=Count(
-                        "tasks",
-                        filter=Q(tasks__public=True, tasks__site=self.request.site),
-                    )
-                )
-                .annotate(
-                    public_message_count=Count(
-                        "notes",
-                        filter=Q(notes__public=True, notes__site=self.request.site),
-                    )
-                )
-                .annotate(
-                    private_message_count=Count(
-                        "notes",
-                        filter=Q(notes__public=False, notes__site=self.request.site),
-                    )
-                )
-            )
-        }
-
-        # update project statuses with the right project
-        for ps in project_statuses:
-            ps.project = projects[ps.project_id]
-
-        return project_statuses
-
-    serializer_class = UserProjectStatusSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def perform_update(self, serializer):
-        old_one = self.get_object()
+    def get_object(self, pk):
+        try:
+            return models.UserProjectStatus.objects.get(pk=pk)
+        except models.UserProjectStatus.DoesNotExist:
+            raise Http404
 
-        serializer.save()
-        new_one = serializer.instance
+    def get(self, request, pk, format=None):
+        ups = self.get_object(pk)
+        if ups.user != request.user:
+            raise Http404
+        context = {"request": request}
+        serializer = UserProjectStatusSerializer(ups, context=context)
+        return Response(serializer.data)
 
-        if new_one:
-            signals.project_userprojectstatus_updated.send(
-                sender=self, old_one=old_one, new_one=new_one
+    def patch(self, request, pk, format=None):
+        ups = self.get_object(pk)
+        if ups.user != request.user:
+            raise Http404
+        context = {"request": request, "view": self, "format": format}
+        serializer = UserProjectStatusSerializer(
+            ups, context=context, data=request.data
+        )
+        if serializer.is_valid():
+            old = copy(ups)
+            new = serializer.save()
+            if new:
+                signals.project_userprojectstatus_updated.send(
+                    sender=self, old_one=old, new_one=new
+                )
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProjectStatusList(APIView):
+    """List all user project status"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, format=None):
+        ups = fetch_the_site_ups_for_user(request.site, request.user)
+        context = {"request": request}
+
+        serializer = UserProjectStatusForListSerializer(ups, context=context, many=True)
+        return Response(serializer.data)
+
+
+def fetch_the_site_ups_for_user(site, user):
+    """Returns the complete ups tree with children"""
+    project_statuses = models.UserProjectStatus.objects.filter(
+        user=user, project__deleted=None
+    )
+
+    # get projects with missing user project status
+    ids = list(project_statuses.values_list("project__id", flat=True))
+    projects = models.Project.on_site.for_user(user).exclude(id__in=ids)
+
+    # create missing user project status
+    create_missing_ups(user, site, projects)
+
+    # fetch all projects statuses
+    project_statuses = list(project_statuses.prefetch_related("user__profile"))
+    # fetch all requested projects and their annotations in a single query
+    project_ids = [ps.project_id for ps in project_statuses]
+    projects = {p.id: p for p in fetch_site_projects_with_ids(site, project_ids)}
+
+    # update project statuses with the right project
+    for ps in project_statuses:
+        ps.project = projects[ps.project_id]
+
+    return project_statuses
+
+
+def create_missing_ups(user, site, projects):
+    """Create user projects statuses for given projects"""
+    new_statuses = [
+        models.UserProjectStatus(user=user, site=site, project=p, status="NEW")
+        for p in projects
+    ]
+    models.UserProjectStatus.objects.bulk_create(new_statuses)
+
+
+def fetch_site_projects_with_ids(site, ids):
+    """Return site projects with given ids including annotations."""
+    return (
+        models.Project.objects.filter(id__in=ids)
+        .prefetch_related("commune")
+        .prefetch_related("switchtenders")
+        .annotate(
+            recommendation_count=Count(
+                "tasks",
+                filter=Q(tasks__public=True, tasks__site=site),
             )
+        )
+        .annotate(
+            public_message_count=Count(
+                "notes",
+                filter=Q(notes__public=True, notes__site=site),
+            )
+        )
+        .annotate(
+            private_message_count=Count(
+                "notes",
+                filter=Q(notes__public=False, notes__site=site),
+            )
+        )
+    )
 
 
 # eof

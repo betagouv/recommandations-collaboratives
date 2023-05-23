@@ -36,22 +36,25 @@ router.register(
     projects_rest.TaskFollowupViewSet,
     basename="project-tasks-followups",
 )
+
 router.register(
     r"projects/(?P<project_id>[^/.]+)/tasks",
     projects_rest.TaskViewSet,
     basename="project-tasks",
 )
+
 router.register(
     r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/notifications",
     projects_rest.TaskNotificationViewSet,
     basename="project-tasks-notifications",
 )
-router.register(r"projects", projects_rest.ProjectViewSet, basename="projects")
+
 router.register(
-    r"userprojectstatus",
-    projects_rest.UserProjectStatusViewSet,
-    basename="userprojectstatus",
+    r"projects",
+    projects_rest.ProjectViewSet,
+    basename="projects",
 )
+
 
 router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
 router.register(
@@ -63,6 +66,16 @@ router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
 
 urlpatterns = [
     path("api/", include(router.urls)),
+    path(
+        "api/userprojectstatus/<int:pk>/",
+        projects_rest.UserProjectStatusDetail.as_view(),
+        name="userprojectstatus-detail",
+    ),
+    path(
+        "api/userprojectstatus/",
+        projects_rest.UserProjectStatusList.as_view(),
+        name="userprojectstatus-list",
+    ),
     path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
@@ -87,6 +100,6 @@ if settings.DEBUG:
     import debug_toolbar
 
     urlpatterns += [path(r"__debug__/", include(debug_toolbar.urls))]
-    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
+#    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
 
 # eof

@@ -106,6 +106,10 @@ def test_user_project_status_contains_only_my_projects(request):
     response = client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 1
+
+    with open("/tmp/out.json", "w") as f:
+        f.write(str(response.data))
+
     first = response.data[0]
     assert first["id"] == mine.id
     assert first["project"]["id"] == mine.project.id
@@ -366,7 +370,7 @@ def test_project_advisor_can_move_project_tasks_for_site(request):
 def test_updating_user_project_is_logged(request):
     user = baker.make(auth_models.User, username="Bob")
     site = get_current_site(request)
-    ups = baker.make(models.UserProjectStatus, user=user, site=site)
+    ups = baker.make(models.UserProjectStatus, user=user, site=site, status="DRAFT")
 
     to_update = {"status": "DONE"}
 

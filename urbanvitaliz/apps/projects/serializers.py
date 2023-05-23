@@ -248,4 +248,54 @@ class UserProjectStatusSerializer(serializers.HyperlinkedModelSerializer):
     project = ProjectSerializer(read_only=True)
 
 
+class UserProjectStatusForListSerializer(serializers.BaseSerializer):
+    class Meta:
+        model = UserProjectStatus
+        fields = []
+
+    def to_representation(self, data):
+        """Return a representation of data (optimized version)"""
+        # use our optimized queryset and not project serializer
+        commune = data.project.commune
+        if commune:
+            commune_data = {
+                "name": commune.name,
+                "insee": commune.insee,
+                "postal": commune.postal,
+                "department": {
+                    "code": commune.department.code,
+                    "name": commune.department.name,
+                },
+                "latitude": commune.latitude,
+                "longitude": commune.longitude,
+            }
+        else:
+            commune_data = None
+        return {
+            "id": data.id,
+            "status": data.status,
+            "project": {
+                "id": data.project.id,
+                "name": data.project.name,
+                "status": data.project.status,
+                "created_on": data.project.created_on,
+                "updated_on": data.project.updated_on,
+                "switchtender": [],
+                "is_switchtender": False,
+                "is_observer": False,
+                "commune": commune_data,
+                "notifications": {
+                    "count": 0,
+                    "has_collaborator_activity": False,
+                    "unread_public_messages": 0,
+                    "unread_private_messages": 0,
+                    "new_recommendations": 0,
+                },
+                "recommendation_count": data.project.recommendation_count,
+                "public_message_count": data.project.public_message_count,
+                "private_message_count": data.project.private_message_count,
+            },
+        }
+
+
 # eof
