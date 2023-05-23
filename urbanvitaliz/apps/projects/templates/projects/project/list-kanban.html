@@ -6,9 +6,8 @@
 {% load gravatar %}
 {% load sass_tags %}
 
-
 {% block project_list_content %}
-<div x-data="boardProjectsApp()">
+<div x-data="KanbanProjects()">
     <div class="topbar d-flex justify-content-between bg-light border-bottom p-2">
         <span class="fs-5 flex-grow-1">
             {% if project_moderator %}
@@ -40,12 +39,7 @@
             </div>
         </div>
 
-        <select x-model="selectedDepartment" style="width: 250px" class="form-select me-2" aria-label="sélection du département">
-            <option selected value="">Tous mes dossiers</option>
-            <template x-for="department in departments" :key="department.code">
-                <option :value="department.code" x-text="`${department.name} (${department.code})`"></option>
-            </template>
-        </select>
+        {% include 'projects/project/fragments/region_filter.html' %}
 
         {% include 'projects/project/fragments/list-toolbars.html' %}
     </div>

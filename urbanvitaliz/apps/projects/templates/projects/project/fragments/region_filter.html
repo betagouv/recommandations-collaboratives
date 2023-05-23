@@ -1,0 +1,61 @@
+{% load static %}
+
+<div class="d-flex align-items-center ms-4">
+    <span class="text-custom-info text-grey-dark fw-light me-2">Filtrer : </span>
+    <div class="input-item position-relative active" x-data="{ open: false }" x-on:click.outside="open = false">
+        <div class="d-flex align-items-center pe-4 bg-white" x-on:click="open = !open" type="button"
+            :class="{'input-active':open}" style="border-radius: 20px;">
+            <button class="input-field bg-white px-3 fw-normal text-dark appearance-none">Projets de mon
+                territoire</button>
+            <svg class="input-icon right black bi align-baseline me-2" width="15" height="15" fill="#000000">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
+            </svg>
+        </div>
+        <ul x-show="open" :class="{'show':open}" class="region-filter list-unstyled flex-column">
+            <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
+                    <div class="form-check w-100 d-flex align-items-center p-0">
+                        <input x-on:input.change="handleTerritorySelectAll"
+                            class="form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
+                            :value="territorySelectAll" :checked="territorySelectAll" id="allTerritory" />
+                        <label class=" w-100 pe-2 py-2 d-flex align-items-center" for="allTerritory">
+                            <span class="fw-normal">Tout (dé)sélectionner</span>
+                        </label>
+                    </div>
+            </li>
+            <template x-for="region in regions">
+                <div class="region-filter-item">
+                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item">
+                                <div class="form-check w-100 d-flex align-items-center ps-3">
+                                    <input x-on:input.change=""
+                                        class="region-checkbox form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
+                                        :value="region.active" :checked="region.active" :id="region.code" />
+                                    <label class=" w-100 pe-2 py-2 d-flex align-items-center" :for="region.code">
+                                        <span class="fw-normal" x-text="region.code"></span>
+                                        <span class="mx-1 fw-light">-</span>
+                                        <span class="fw-light text-grey-dark text-nowrap" x-text="region.name"></span>
+                                    </label>
+                                </div>
+                    </li>
+                    <ul class="region-departments list-unstyled flex-column">
+                        <template x-for="department in region.departments">
+                            <li
+                                class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item">
+                                <div class="form-check w-100 d-flex align-items-center p-0">
+                                    <input x-on:input.change="handleTerritoryFilter(department)"
+                                        class="form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
+                                        :value="department.active" :checked="department.active" :id="department.code" />
+                                    <label class=" w-100 pe-2 py-1 d-flex align-items-center" :for="department.code">
+                                        <span class="fw-normal" x-text="department.code"></span>
+                                        <span class="mx-1 fw-light">-</span>
+                                        <span class="fw-light text-grey-dark text-nowrap" x-text="department.name"></span>
+                                        <span class="fw-light text-dark ms-1" x-text="`(${department.nbProjects})`"></span>
+                                    </label>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
+        </ul>
+    </div>
+</div>

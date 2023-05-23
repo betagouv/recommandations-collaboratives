@@ -1,0 +1,49 @@
+.region-filter {
+    position: absolute;
+    width: auto;
+    z-index: 100;
+
+    left: 0;
+    top: 112%;
+
+    background-color: white;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.16), 0px 1px 0px -2px rgba(0, 0, 0, 0.16), 0px 1px 4px rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+
+
+    max-height: 400px;
+    overflow-x: hidden;
+}
+
+.region-filter .region-filter-item {
+    border-bottom: solid 1px #e2e1e1;
+}
+
+
+
+.region-filter-item .region-checkbox {
+    display: none;
+}
+
+.region-departments {
+    border-left: solid #e2e1e1 1px;
+    margin-left: 15px;
+}
+
+.department-item * {
+    cursor: pointer;
+}
+
+.department-item:hover {
+    background-color: #e6e6e6 !important;
+}
+
+.region-departments .department-item {
+    cursor: pointer;
+    padding-left: 5px;
+    margin-left: 0;
+}
+
+.region-filter-item .region-departments li:last-child {
+    padding-bottom: 5px;
+}
