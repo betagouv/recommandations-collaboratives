@@ -21,7 +21,7 @@
                     </svg>
                 </div>
                 <ul x-show="open" :class="{'show':open}" class="territory-dropdown list-unstyled flex-column">
-                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
+                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item">
                             <div class="form-check w-100 d-flex align-items-center p-0">
                                 <input x-on:input.change="handleTerritorySelectAll"
                                     class="form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
@@ -33,12 +33,12 @@
                         </li>
                     <template x-for="department in departments">
                         <li
-                            class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
+                            class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item">
                             <div class="form-check w-100 d-flex align-items-center p-0">
                                 <input x-on:input.change="handleTerritoryFilter(department)"
                                     class="form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
                                     :value="department.active" :checked="department.active" :id="department.code" />
-                                <label class=" w-100 pe-2 py-2 d-flex align-items-center" :for="department.code">
+                                <label class=" w-100 pe-2 py-1 d-flex align-items-center" :for="department.code">
                                     <span class="fw-normal" x-text="department.code"></span>
                                     <span class="mx-1 fw-light">-</span>
                                     <span class="fw-light text-grey-dark text-nowrap" x-text="department.name"></span>
