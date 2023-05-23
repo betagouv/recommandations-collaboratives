@@ -14,7 +14,26 @@ from django.contrib.sites import models as site_models
 from watson import search as watson
 
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.utils import make_group_name_for_site
+
+
+class OrganizationFilter(django_filters.FilterSet):
+    """Filter for the list of organization"""
+
+    name = django_filters.CharFilter(
+        field_name="name",
+        lookup_expr="icontains",
+    )
+
+    department = django_filters.CharFilter(
+        field_name="department",
+        lookup_expr="code",
+    )
+
+    class Meta:
+        model = addressbook_models.Organization
+        fields = ["name", "departments"]
 
 
 class UserFilter(django_filters.FilterSet):
@@ -130,7 +149,7 @@ class ProjectFilter(django_filters.FilterSet):
 
     def inactive_filter(self, queryset, name, value):
         if name != "inactive" or not value:
-            return queryset
+            return queryset.filter(deleted=None)
         return queryset.exclude(deleted=None)
 
 

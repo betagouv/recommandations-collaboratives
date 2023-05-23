@@ -33,6 +33,12 @@
                         </svg>
                         <a href="{% url 'crm-project-list' %}">Projets</a>
                     </li>
+                    <li class="dropdown-item border-0 d-inline-block position-relative mb-1">
+                        <svg class="bi me-2 d-inline" width="16" height="16">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+                        </svg>
+                        <a href="{% url 'crm-organization-list' %}">Organisations</a>
+                    </li>
                 </ul>
             </div>
 

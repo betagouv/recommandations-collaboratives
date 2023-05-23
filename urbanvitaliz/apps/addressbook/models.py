@@ -53,6 +53,7 @@ class Organization(models.Model):
     departments = models.ManyToManyField(
         geomatics_models.Department,
         blank=True,
+        related_name="organizations",
         verbose_name="Départements concernés",
     )
 

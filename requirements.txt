@@ -1,7 +1,7 @@
 django==3.2.19
 ipython
 django-markdownx==3.0.1
-markdown-link-attr-modifier==0.2.0
+markdown-link-attr-modifier==0.2.1
 
 # django-magicauth fork: Multiple Auth backend support
 git+http://github.com/glibersat/django-magicauth@55eab0b91c95012944933b342748540b2c1b31bf#egg=django-magicauth

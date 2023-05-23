@@ -2,7 +2,7 @@ from django import forms
 from markdownx.fields import MarkdownxFormField
 
 from urbanvitaliz.apps.home import models as home_models
-from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.addressbook import models as addressbook_models
 
 from . import models
 
@@ -20,6 +20,28 @@ class CRMProfileForm(forms.ModelForm):
             "organization_position",
             "phone_no",
         ]
+
+
+class CRMOrganizationForm(forms.ModelForm):
+    """Update an organization"""
+
+    class Meta:
+        model = addressbook_models.Organization
+        fields = ["name", "departments"]
+
+
+class CRMOrganizationMergeForm(forms.Form):
+    """Merge multiple organizations"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["org_ids"].choices = [
+            (t.id, t.name) for t in addressbook_models.Organization.objects.all()
+        ]
+
+    name = forms.CharField(max_length=200, required=True)
+    org_ids = forms.MultipleChoiceField()
 
 
 class CRMAdvisorForm(forms.ModelForm):
@@ -56,7 +78,6 @@ class CRMProjectForm(forms.Form):
 
 
 class ProjectAnnotationForm(forms.Form):
-
     tag = forms.CharField(required=True)
 
 
