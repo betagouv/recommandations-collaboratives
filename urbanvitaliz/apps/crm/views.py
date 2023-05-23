@@ -13,8 +13,10 @@ from actstream.models import Action, actor_stream, target_stream
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
+from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -25,10 +27,12 @@ from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
+from urbanvitaliz.apps.addressbook import models as addressbook_models
+from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.utils import (
     get_group_for_site,
-    get_site_administrators,
     has_perm,
     has_perm_or_403,
     make_group_name_for_site,
@@ -44,8 +48,8 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     def test_func(self):
         return has_perm(self.request.user, "use_crm", self.request.site)
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
+    def get_context_data(self, *orgs, **kwargs):
+        context = super().get_context_data(*orgs, **kwargs)
         context["search_form"] = forms.CRMSearchForm()
         context["projects_waiting"] = Project.on_site.filter(status="DRAFT").count()
         context["project_model"] = Project
@@ -56,7 +60,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
             Q(target_content_type=ctype)
             | Q(action_object_content_type=ctype)
             | Q(actor_content_type=ctype)
-        )
+        ).prefetch_related("actor", "action_object", "target")
 
         return context
 
@@ -117,10 +121,132 @@ def crm_search(request):
 
 
 @login_required
+def organization_list(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    # organization from addressbook current site or w/ user on site
+    qs = Organization.objects.filter(
+        Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+    )
+    organizations = filters.OrganizationFilter(
+        request.GET,
+        queryset=qs.order_by("name"),
+    )
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/organization_list.html", locals())
+
+
+@login_required
+def organization_update(request, organization_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    # organization from addressbook current site or w/ user on site
+    qs = Organization.objects.filter(
+        Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+    )
+    organization = get_object_or_404(qs, pk=organization_id)
+
+    if request.method == "POST":
+        form = forms.CRMOrganizationForm(request.POST, instance=organization)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse("crm-organization-details", args=[organization.id]))
+    else:
+        form = forms.CRMOrganizationForm(instance=organization)
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/organization_update.html", locals())
+
+
+@login_required
+def organization_merge(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    # organization from addressbook current site or w/ user on site
+    qs = Organization.objects.filter(
+        Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+    )
+
+    if request.method == "POST":
+        name = request.POST.get("name")
+        ids = request.POST.getlist("org_ids", [])
+        if not ids:
+            return redirect(reverse("crm-organization-list"))
+        orgs = [get_object_or_404(qs, pk=id) for id in ids]
+        # process to merging of data
+        with transaction.atomic():
+            update_contacts(orgs)
+            update_profiles(orgs)
+            merge_organizations_with_name(orgs, name)
+        return redirect(reverse("crm-organization-list"))
+
+    merge_form = forms.CRMOrganizationMergeForm(request.GET)
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    # get organizations and dependencies for merge summary
+    ids = request.GET.getlist("org_ids", [])
+    if not ids:
+        return redirect(reverse("crm-organization-list"))
+    organizations = [get_object_or_404(qs, pk=id) for id in ids]
+    departments = geomatics.Department.objects.filter(organizations__in=organizations)
+    profiles = home_models.UserProfile.objects.filter(organization__in=organizations)
+    contacts = addressbook_models.Contact.objects.filter(organization__in=organizations)
+
+    # first request confirmation for merging
+    return render(request, "crm/organization_merge.html", locals())
+
+
+def update_contacts(orgs):
+    """Update all the contacts referencing the old organization to the new one"""
+    new_org = orgs[0]
+    contacts = addressbook_models.Contact.objects.filter(organization__in=orgs)
+    contacts.update(organization=new_org)
+
+
+def update_profiles(orgs):
+    """Update all the profiles referencing the old organization to the new one"""
+    new_org = orgs[0]
+    profiles = home_models.UserProfile.objects.filter(organization__in=orgs)
+    profiles.update(organization=new_org)
+
+
+def merge_organizations_with_name(orgs, name):
+    """Merge all orgs departments into first one, and rename it, del all others"""
+    new_org = orgs[0]
+    old_orgs = orgs[1:]
+    # update old depts in new organization
+    departments = [
+        d for d in geomatics.Department.objects.filter(organizations__in=old_orgs)
+    ]
+    new_org.departments.add(*departments)
+    # update old sites in new organization
+    sites = [s for s in Site.objects.filter(organizations__in=old_orgs)]
+    new_org.sites.add(*sites)
+    # update new organization name
+    new_org.name = name
+    new_org.save()
+    # delete old orgs
+    old_ids = [o.id for o in old_orgs]
+    addressbook_models.Organization.objects.filter(id__in=old_ids).delete()
+
+
+@login_required
 def organization_details(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization.on_site, pk=organization_id)
+    # organization from addressbook current site or w/ user on site
+    query = Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+
+    organization = get_object_or_404(
+        Organization.objects.filter(query), pk=organization_id
+    )
 
     participants = User.objects.filter(
         profile__in=organization.registered_profiles.all()
@@ -182,7 +308,9 @@ def user_list(request):
     # filtered users
     users = filters.UserFilter(
         request.GET,
-        queryset=User.objects.filter(profile__sites=request.site),
+        queryset=User.objects.filter(profile__sites=request.site).prefetch_related(
+            "profile__organization"
+        ),
     )
 
     # required by default on crm
@@ -384,7 +512,8 @@ def project_list(request):
 
     # filtered projects
     projects = filters.ProjectFilter(
-        request.GET, queryset=Project.all_on_site.order_by("name")
+        request.GET,
+        queryset=Project.all_on_site.order_by("name").prefetch_related("commune"),
     )
 
     # required by default on crm
