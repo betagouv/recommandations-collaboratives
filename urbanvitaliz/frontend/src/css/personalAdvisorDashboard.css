@@ -238,6 +238,33 @@ main {
     border-radius: 4px;
 }
 
+.project-card-top-information {
+    position: absolute;
+    top: -12px;
+}
+
+.project-card-top-information span{
+    padding: 0.25rem 0.5rem;
+    color: white;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 2px;
+}
+
+.project-card-top-information.advisor span{
+    background-color: #0063CB;
+}
+
+.project-card-top-information.observer span{
+    background-color: #27A658;
+}
+
+.project-card-top-information.new span{
+    background-color: #FDCD6D;
+    color: #222;
+}
+
 .dashboard-marker-popup::after {
     content: '';
     position: absolute;

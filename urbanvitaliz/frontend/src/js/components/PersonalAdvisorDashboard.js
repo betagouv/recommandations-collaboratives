@@ -437,24 +437,24 @@ function markerPopupTemplate(item) {
 
     if (item.status === "NEW") {
         roleTemplate = `
-        <div class="position-absolute left-0" style="top:-12px">
-            <span class="py-1 px-2 fw-bold text-uppercase tiny bg-yellow text-dark" style="border-radius: 2px;">Nouveau projet</span>
+        <div class="project-card-top-information new">
+            <span>Nouveau projet</span>
         </div>
         `
     }
 
     if (item.project.is_observer) {
         roleTemplate = `
-        <div class="position-absolute left-0" style="top:-12px">
-            <span class="py-1 px-2 fw-bold text-uppercase tiny bg-blue text-white" style="border-radius: 2px;">Observateur</span>
+        <div class="project-card-top-information observer">
+            <span>Observateur</span>
         </div>
         `
     }
 
     if (item.project.is_switchtender && !item.project.is_observer) {
         roleTemplate = `
-        <div class="position-absolute left-0" style="top:-12px">
-            <span class="py-1 px-2 fw-bold text-uppercase tiny bg-green-dark text-white" style="border-radius: 2px;">Conseiller</span>
+        <div class="project-card-top-information advisor">
+            <span>Conseiller</span>
         </div>
         `
     }
