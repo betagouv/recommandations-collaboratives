@@ -112,6 +112,13 @@ urlpatterns = [
         views.project_toggle_annotation,
         name="crm-project-toggle-annotation",
     ),
+    #
+    # Organization
+    path(
+        r"crm/org/",
+        views.organization_list,
+        name="crm-organization-list",
+    ),
     path(
         r"crm/org/<int:organization_id>/create-note",
         views.create_note_for_organization,
