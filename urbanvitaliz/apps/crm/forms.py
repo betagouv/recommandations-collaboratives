@@ -3,6 +3,7 @@ from markdownx.fields import MarkdownxFormField
 
 from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.addressbook import models as addressbook_models
 
 from . import models
 
@@ -20,6 +21,14 @@ class CRMProfileForm(forms.ModelForm):
             "organization_position",
             "phone_no",
         ]
+
+
+class CRMOrganizationForm(forms.ModelForm):
+    """Update an organization"""
+
+    class Meta:
+        model = addressbook_models.Organization
+        fields = ["name", "sites", "departments"]
 
 
 class CRMAdvisorForm(forms.ModelForm):
@@ -56,7 +65,6 @@ class CRMProjectForm(forms.Form):
 
 
 class ProjectAnnotationForm(forms.Form):
-
     tag = forms.CharField(required=True)
 
 

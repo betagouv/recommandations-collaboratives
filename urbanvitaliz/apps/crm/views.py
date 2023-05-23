@@ -15,6 +15,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
+from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -117,10 +118,85 @@ def crm_search(request):
 
 
 @login_required
+def organization_list(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    # organization from addressbook current site or w/ user on site
+    query = Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+    organizations = filters.OrganizationFilter(
+        request.GET,
+        queryset=Organization.objects.filter(query).distinct(),
+    )
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/organization_list.html", locals())
+
+
+@login_required
+def organization_update(request, organization_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    organization = get_object_or_404(Organization, pk=organization_id)
+
+    if request.method == "POST":
+        form = forms.CRMOrganizationForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse("crm-organization-details", args=[organization.id]))
+    else:
+        form = forms.CRMOrganizationForm(instance=organization)
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/organization_update.html", locals())
+
+
+@login_required
+def organization_merge(request, first_id=None, second_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    first = get_object_or_404(Organization, pk=first_id)
+    second = get_object_or_404(Organization, pk=second_id)
+
+    if request.method == "POST":
+        with transaction.atomic():
+            update_contacts(first, second)
+            update_profiles(first, second)
+            merge_organization(first, second)
+        return redirect(reverse("crm-organization-list"))
+    else:
+        form = forms.CRMOrganizationForm(instance=organization)
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/organization_merge.html", locals())
+
+
+def update_contacts(old_org, new_org):
+    """Update all the contacts referencing the old org to the new one"""
+    contacts = addressbook_models.Contact.objects.filter(organization=old_org)
+    contacts.update(organization=new_org)
+
+
+def update_profiles(old_org, new_org):
+    """Update all the profiles referencing the old org to the new one"""
+    profiles = home_models.UserProfile.objects.filter(organization=old_org)
+    profiles.update(organization=new_org)
+
+
+def merge_organization(first, second):
+    """Merge second orga into first one and delete second one"""
+
+
+@login_required
 def organization_details(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization.on_site, pk=organization_id)
+    organization = get_object_or_404(Organization, pk=organization_id)
 
     participants = User.objects.filter(
         profile__in=organization.registered_profiles.all()
