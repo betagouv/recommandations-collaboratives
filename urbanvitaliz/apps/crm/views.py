@@ -186,8 +186,12 @@ def organization_merge(request):
     # required by default on crm
     search_form = forms.CRMSearchForm()
 
+    # get organizations and dependencies for merge summary
     ids = request.GET.getlist("org_ids", [])
     organizations = [get_object_or_404(qs, pk=id) for id in ids]
+    departments = geomatics.Department.objects.filter(organizations__in=organizations)
+    profiles = home_models.UserProfile.objects.filter(organization__in=organizations)
+    contacts = addressbook_models.Contact.objects.filter(organization__in=organizations)
 
     # first request confirmation for merging
     return render(request, "crm/organization_merge.html", locals())
