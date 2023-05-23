@@ -278,8 +278,8 @@ def fetch_the_site_ups_for_user(site, user):
     # fetch all projects statuses
     project_statuses = list(project_statuses.prefetch_related("user__profile"))
     # fetch all requested projects and their annotations in a single query
-    project_ids = [ps.project_id for ps in project_statuses]
-    projects = {p.id: p for p in fetch_site_projects_with_ids(site, project_ids)}
+    ids = [ps.project_id for ps in project_statuses]
+    projects = {p.id: p for p in fetch_site_projects_with_ids(site, ids)}
 
     # update project statuses with the right project
     for ps in project_statuses:
@@ -302,7 +302,8 @@ def fetch_site_projects_with_ids(site, ids):
     return (
         models.Project.objects.filter(id__in=ids)
         .prefetch_related("commune")
-        .prefetch_related("switchtenders")
+        .prefetch_related("switchtenders__profile")
+        .prefetch_related("switchtenders__profile__organization")
         .annotate(
             recommendation_count=Count(
                 "tasks",

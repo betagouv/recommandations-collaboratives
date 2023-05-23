@@ -257,8 +257,8 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
         """Return a representation of data (optimized version)"""
         # use our optimized queryset and not project serializer
         commune = data.project.commune
-        if commune:
-            commune_data = {
+        commune_data = (
+            {
                 "name": commune.name,
                 "insee": commune.insee,
                 "postal": commune.postal,
@@ -269,18 +269,34 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
                 "latitude": commune.latitude,
                 "longitude": commune.longitude,
             }
-        else:
-            commune_data = None
+            if commune
+            else None
+        )
         return {
             "id": data.id,
             "status": data.status,
             "project": {
                 "id": data.project.id,
                 "name": data.project.name,
+                "org_name": data.project.org_name,
                 "status": data.project.status,
                 "created_on": data.project.created_on,
                 "updated_on": data.project.updated_on,
-                "switchtender": [],
+                "switchtenders": [
+                    {
+                        "first_name": s.first_name,
+                        "last_name": s.last_name,
+                        "username": s.username,
+                        "profile": {
+                            "organization": {
+                                "name": s.profile.organization.name
+                                if s.profile.organization
+                                else "",
+                            }
+                        },
+                    }
+                    for s in data.project.switchtenders.all()
+                ],
                 "is_switchtender": False,
                 "is_observer": False,
                 "commune": commune_data,
