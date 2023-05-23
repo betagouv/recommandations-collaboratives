@@ -51,10 +51,17 @@
         </div>
 
         <div class="mb-3" class="table-responsive">
+            <form method="GET" action="{% url 'crm-organization-merge' %}">
             <table class="table table-striped table-hover caption-top">
-                <caption class="ms-2">{{ organizations.qs.count }} résultat{{ organizations.qs.count|pluralize }}</caption>
+                <div class="d-flex justify-content-between mx-2">
+                    <span class="ms-2 text-secondary">{{ organizations.qs.count }} résultat{{ organizations.qs.count|pluralize }}</span>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-primary">Fusionner</button>
+                    </div>
+                </div>
                 <thead>
                     <tr>
+                        <th scope="col"></th>
                         <th scope="col">Nom</th>
                         <th scope="col">Départements</th>
                     </tr>
@@ -62,6 +69,9 @@
                 <tbody>
                     {% for organization in organizations.qs %}
                     <tr>
+                        <td>
+                            <input name="org_ids" type="checkbox" value="{{ organization.pk }}">
+                        </td>
                         <td><a href="{% url 'crm-organization-details' organization.pk %}">{{ organization.name|truncatechars:48 }}</a></td>
                         <td>
                             {% for dpt in organization.departments.all %}
@@ -81,6 +91,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </form>
         </div>
     </div>
 </div>

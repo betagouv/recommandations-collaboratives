@@ -175,6 +175,7 @@ def organization_merge(request):
     if request.method == "POST":
         name = request.POST.get("name")
         ids = request.POST.getlist("org_ids", [])
+        print(ids)
         orgs = [get_object_or_404(qs, pk=id) for id in ids]
         # process to merging of data
         with transaction.atomic():
@@ -182,6 +183,8 @@ def organization_merge(request):
             update_profiles(orgs)
             merge_organizations_with_name(orgs, name)
         return redirect(reverse("crm-organization-list"))
+
+    merge_form = forms.CRMOrganizationMergeForm(request.GET)
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -302,7 +305,9 @@ def user_list(request):
     # filtered users
     users = filters.UserFilter(
         request.GET,
-        queryset=User.objects.filter(profile__sites=request.site),
+        queryset=User.objects.filter(profile__sites=request.site).prefetch_related(
+            "profile__organization"
+        ),
     )
 
     # required by default on crm
@@ -504,7 +509,8 @@ def project_list(request):
 
     # filtered projects
     projects = filters.ProjectFilter(
-        request.GET, queryset=Project.all_on_site.order_by("name")
+        request.GET,
+        queryset=Project.all_on_site.order_by("name").prefetch_related("commune"),
     )
 
     # required by default on crm
