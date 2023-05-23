@@ -68,7 +68,7 @@ main {
 
 .personal-dashboard-map-container {
     position: relative;
-    height: 380px;
+    height: 40vh;
     width: 100%;
     z-index: 100;
 
