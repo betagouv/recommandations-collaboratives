@@ -21,6 +21,11 @@ from urbanvitaliz.utils import make_group_name_for_site
 class OrganizationFilter(django_filters.FilterSet):
     """Filter for the list of organization"""
 
+    name = django_filters.CharFilter(
+        field_name="name",
+        lookup_expr="icontains",
+    )
+
     department = django_filters.CharFilter(
         field_name="department",
         lookup_expr="code",

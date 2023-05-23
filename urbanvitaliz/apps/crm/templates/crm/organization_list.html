@@ -33,13 +33,13 @@
 
 
         <div class="px-4 pt-4 mb-3">
-            {% with projects.form as form %}
-            <form x-data="" class="row g-3" method="get" action="{% url 'crm-project-list' %}">
+            {% with organizations.form as form %}
+            <form class="row g-3" method="get" action="{% url 'crm-organization-list' %}">
                 {{ form.non_field_errors }}
 
                 <div class="col-md-6">
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" name="{{ form.query.name }}" id="{{ form.query.id }}" placeholder="Nom de l'organisation" aria-label="Recherche" value="{{ form.query.value|default:"" }}" aria-describedby="button-search">
+                        <input type="text" class="form-control" name="{{ form.name.name }}" id="{{ form.name.id }}" placeholder="Nom de l'organisation" aria-label="Recherche" value="{{ form.name.value|default:"" }}" aria-describedby="button-search">
                         <button class="btn btn-outline-secondary" type="submit" id="button-search">Rechercher</button>
                     </div>
 
