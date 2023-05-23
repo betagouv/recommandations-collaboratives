@@ -58,7 +58,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
             Q(target_content_type=ctype)
             | Q(action_object_content_type=ctype)
             | Q(actor_content_type=ctype)
-        )
+        ).prefetch_related("actor", "action_object", "target")
 
         return context
 
