@@ -126,7 +126,8 @@ function boardProjectsApp() {
                     const currentRegion = {
                         code: region.code,
                         departments: foundDepartments,
-                        name: region.name
+                        name: region.name,
+                        active: true
                     }
 
                     return currentRegions.push(currentRegion)
@@ -146,10 +147,24 @@ function boardProjectsApp() {
                     )
                 })
             )
-
-            // this.filterProjectsByDepartments(this.data)
         },
-        handleTerritoryFilter(selectedDepartment) {
+        handleRegionFilter(selectedRegion) {
+            if (this.territorySelectAll) {
+                this.territorySelectAll = false
+            }
+
+            this.regions = this.regions.map(
+                region => {
+                    if (region.code === selectedRegion.code) {
+                        region.active = !region.active
+                        region.departments = region.departments.map(department => ({...department, active:region.active}))
+                    }
+
+                    return region
+                }
+            )
+        },
+        handleDepartmentFilter(selectedDepartment) {
 
             if (this.territorySelectAll) {
                 this.territorySelectAll = false
@@ -170,13 +185,6 @@ function boardProjectsApp() {
                 })
             )
         },
-        // filterProjectsByDepartments(projects) {
-        //     return projects.filter(project => {
-        //         return this.regions.find(
-        //             region => region.departments.find(
-        //                 department => department.code === project.commune.department.code)?.active)
-        //     })
-        // },
         filterProjectsByDepartments(project) {
             return this.regions.find(
                 region => region.departments.find(

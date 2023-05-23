@@ -24,9 +24,9 @@
             </li>
             <template x-for="region in regions">
                 <div class="region-filter-item">
-                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item">
+                    <li :class="{'region-is-active':region.active}" class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item pe-3">
                                 <div class="form-check w-100 d-flex align-items-center ps-3">
-                                    <input x-on:input.change=""
+                                    <input x-on:input.change="handleRegionFilter(region)"
                                         class="region-checkbox form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
                                         :value="region.active" :checked="region.active" :id="region.code" />
                                     <label class=" w-100 pe-2 py-2 d-flex align-items-center" :for="region.code">
@@ -41,7 +41,7 @@
                             <li
                                 class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item">
                                 <div class="form-check w-100 d-flex align-items-center p-0">
-                                    <input x-on:input.change="handleTerritoryFilter(department)"
+                                    <input x-on:input.change="handleDepartmentFilter(department)"
                                         class="form-check-input fw-normal ms-2 px-2 py-2 me-2" type="checkbox"
                                         :value="department.active" :checked="department.active" :id="department.code" />
                                     <label class=" w-100 pe-2 py-1 d-flex align-items-center" :for="department.code">
