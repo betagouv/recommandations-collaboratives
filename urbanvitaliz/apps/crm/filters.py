@@ -11,6 +11,7 @@ import django_filters
 from django import forms
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
+from watson import search as watson
 
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import make_group_name_for_site
@@ -87,9 +88,9 @@ class UserFilter(django_filters.FilterSet):
 class ProjectFilter(django_filters.FilterSet):
     """Filter for the list of projects"""
 
-    name = django_filters.CharFilter(
-        field_name="name",
-        lookup_expr="icontains",
+    query = django_filters.CharFilter(
+        label="Mots clés",
+        method="query_filter",
     )
 
     commune = django_filters.CharFilter(
@@ -121,6 +122,11 @@ class ProjectFilter(django_filters.FilterSet):
     class Meta:
         model = projects_models.Project
         fields = ["name"]
+
+    def query_filter(self, queryset, name, value):
+        if name != "query" or not value:
+            return queryset
+        return watson.filter(queryset, value)
 
     def inactive_filter(self, queryset, name, value):
         if name != "inactive" or not value:

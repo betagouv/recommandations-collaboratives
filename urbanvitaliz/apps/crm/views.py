@@ -15,16 +15,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
+from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
+from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
-from watson import search as watson
-
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.utils import (
@@ -34,6 +34,7 @@ from urbanvitaliz.utils import (
     has_perm_or_403,
     make_group_name_for_site,
 )
+from watson import search as watson
 
 from . import filters, forms, models
 
@@ -117,10 +118,85 @@ def crm_search(request):
 
 
 @login_required
+def organization_list(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    # organization from addressbook current site or w/ user on site
+    query = Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+    organizations = filters.OrganizationFilter(
+        request.GET,
+        queryset=Organization.objects.filter(query).distinct(),
+    )
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/organization_list.html", locals())
+
+
+@login_required
+def organization_update(request, organization_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    organization = get_object_or_404(Organization, pk=organization_id)
+
+    if request.method == "POST":
+        form = forms.CRMOrganizationForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse("crm-organization-details", args=[organization.id]))
+    else:
+        form = forms.CRMOrganizationForm(instance=organization)
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/organization_update.html", locals())
+
+
+@login_required
+def organization_merge(request, first_id=None, second_id=None):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    first = get_object_or_404(Organization, pk=first_id)
+    second = get_object_or_404(Organization, pk=second_id)
+
+    if request.method == "POST":
+        with transaction.atomic():
+            update_contacts(first, second)
+            update_profiles(first, second)
+            merge_organization(first, second)
+        return redirect(reverse("crm-organization-list"))
+    else:
+        form = forms.CRMOrganizationForm(instance=organization)
+
+    # required by default on crm
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/organization_merge.html", locals())
+
+
+def update_contacts(old_org, new_org):
+    """Update all the contacts referencing the old org to the new one"""
+    contacts = addressbook_models.Contact.objects.filter(organization=old_org)
+    contacts.update(organization=new_org)
+
+
+def update_profiles(old_org, new_org):
+    """Update all the profiles referencing the old org to the new one"""
+    profiles = home_models.UserProfile.objects.filter(organization=old_org)
+    profiles.update(organization=new_org)
+
+
+def merge_organization(first, second):
+    """Merge second orga into first one and delete second one"""
+
+
+@login_required
 def organization_details(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization.on_site, pk=organization_id)
+    organization = get_object_or_404(Organization, pk=organization_id)
 
     participants = User.objects.filter(
         profile__in=organization.registered_profiles.all()
@@ -481,7 +557,7 @@ def project_undelete(request, project_id=None):
 def project_toggle_annotation(request, project_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.on_site, pk=project_id)
 
     form = forms.ProjectAnnotationForm(request.POST)
     if form.is_valid():
@@ -511,7 +587,6 @@ def handle_create_note_for_object(
             note.save()
             form.save_m2m()
             return True, redirect(reverse(return_view_name, args=(the_object.pk,)))
-
     else:
         form = forms.CRMNoteForm()
 
@@ -531,12 +606,12 @@ def create_note_for_user(request, user_id):
     )
 
     if created and user.profile and user.profile.organization:
-        administrators = get_site_administrators(request.site).exclude(
-            pk=request.user.pk
-        )  # XXX Should be replaced by crm users once new permissions are merged
+        crm_users = get_users_with_perms(
+            request.site, only_with_perms_in=["use_crm"]
+        ).exclude(pk=request.user.pk)
         notify.send(
             sender=request.user,
-            recipient=administrators,
+            recipient=crm_users,
             verb="a créé une note de CRM",
             action_object=user,
             target=user.profile.organization,
@@ -564,7 +639,7 @@ def create_note_for_project(request, project_id):
 def create_note_for_organization(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization, pk=organization_id)
+    organization = get_object_or_404(Organization.on_site, pk=organization_id)
 
     _, response = handle_create_note_for_object(
         request,
@@ -596,9 +671,12 @@ def update_note_for_user(request, user_id, note_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     user = get_object_or_404(User, pk=user_id)
+    if request.site not in user.profile.sites.all():
+        raise Http404()
+
     user_ct = ContentType.objects.get_for_model(user)
     note = get_object_or_404(
-        models.Note,
+        models.Note.on_site,
         site=request.site,
         object_id=user_id,
         content_type=user_ct,
@@ -612,10 +690,10 @@ def update_note_for_user(request, user_id, note_id):
 def update_note_for_project(request, project_id, note_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    project = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project.on_site, pk=project_id)
     project_ct = ContentType.objects.get_for_model(project)
     note = get_object_or_404(
-        models.Note,
+        models.Note.on_site,
         site=request.site,
         object_id=project_id,
         content_type=project_ct,
@@ -629,10 +707,10 @@ def update_note_for_project(request, project_id, note_id):
 def update_note_for_organization(request, organization_id, note_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization, pk=organization_id)
+    organization = get_object_or_404(Organization.on_site, pk=organization_id)
     organization_ct = ContentType.objects.get_for_model(organization)
     note = get_object_or_404(
-        models.Note,
+        models.Note.on_site,
         site=request.site,
         object_id=organization_id,
         content_type=organization_ct,
