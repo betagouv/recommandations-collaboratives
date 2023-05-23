@@ -207,9 +207,24 @@ def test_crm_organization_merge_page_requires_permission(request, client):
 @pytest.mark.django_db
 def test_crm_organization_merge_page_with_permission(request, client):
     site = get_current_site(request)
+    a = baker.make(addressbook_models.Organization, sites=[site])
+    b = baker.make(addressbook_models.Organization, sites=[site])
 
-    org = baker.make(addressbook_models.Organization)
-    org.sites.add(site)
+    url = reverse("crm-organization-merge") + f"?org_ids={a.id}&org_ids={b.id}"
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    assertContains(response, a.name)
+    assertContains(response, b.name)
+
+
+@pytest.mark.django_db
+def test_crm_organization_merge_page_with_empty_list(request, client):
+    site = get_current_site(request)
 
     url = reverse("crm-organization-merge")
 
@@ -217,7 +232,8 @@ def test_crm_organization_merge_page_with_permission(request, client):
         assign_perm("use_crm", user, site)
         response = client.get(url)
 
-    assert response.status_code == 200
+    # empty list redirects to list
+    assert response.status_code == 302
 
 
 @pytest.mark.django_db
@@ -252,6 +268,22 @@ def test_crm_organization_merge_processing(request, client):
     assert org.name == data["name"]
     org_dpts = (d.code for d in org.departments.all())
     assert set(org_dpts) == set(d.code for d in departments)
+
+
+@pytest.mark.django_db
+def test_crm_organization_merge_empty_list(request, client):
+    site = get_current_site(request)
+
+    url = reverse("crm-organization-merge")
+
+    data = {"name": "A clean new name", "org_ids": []}
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url, data=data)
+
+    # no failure, just a redirection
+    assert response.status_code == 302
 
 
 # eof
