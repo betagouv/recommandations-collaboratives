@@ -28,7 +28,7 @@ class CRMOrganizationForm(forms.ModelForm):
 
     class Meta:
         model = addressbook_models.Organization
-        fields = ["name", "sites", "departments"]
+        fields = ["name", "departments"]
 
 
 class CRMAdvisorForm(forms.ModelForm):

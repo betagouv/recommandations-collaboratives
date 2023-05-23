@@ -28,11 +28,6 @@ urlpatterns = [
         views.crm_list_tags,
         name="crm-list-tags",
     ),
-    path(
-        r"crm/org/<int:organization_id>/",
-        views.organization_details,
-        name="crm-organization-details",
-    ),
     #
     # users
     path(
@@ -118,6 +113,21 @@ urlpatterns = [
         r"crm/org/",
         views.organization_list,
         name="crm-organization-list",
+    ),
+    path(
+        r"crm/org/<int:organization_id>/",
+        views.organization_details,
+        name="crm-organization-details",
+    ),
+    path(
+        r"crm/org/<int:organization_id>/update/",
+        views.organization_update,
+        name="crm-organization-update",
+    ),
+    path(
+        r"crm/org/merge/",
+        views.organization_merge,
+        name="crm-organization-merge",
     ),
     path(
         r"crm/org/<int:organization_id>/create-note",

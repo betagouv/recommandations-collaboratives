@@ -122,10 +122,12 @@ def organization_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     # organization from addressbook current site or w/ user on site
-    query = Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+    qs = Organization.objects.filter(
+        Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+    )
     organizations = filters.OrganizationFilter(
         request.GET,
-        queryset=Organization.objects.filter(query).order_by("name"),
+        queryset=qs.order_by("name"),
     )
 
     # required by default on crm
@@ -138,15 +140,19 @@ def organization_list(request):
 def organization_update(request, organization_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization, pk=organization_id)
+    # organization from addressbook current site or w/ user on site
+    qs = Organization.objects.filter(
+        Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+    )
+    org = get_object_or_404(qs, pk=organization_id)
 
     if request.method == "POST":
-        form = forms.CRMOrganizationForm(request.POST, instance=profile)
+        form = forms.CRMOrganizationForm(request.POST, instance=org)
         if form.is_valid():
             form.save()
-            return redirect(reverse("crm-organization-details", args=[organization.id]))
+            return redirect(reverse("crm-organization-details", args=[org.id]))
     else:
-        form = forms.CRMOrganizationForm(instance=organization)
+        form = forms.CRMOrganizationForm(instance=org)
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -155,18 +161,23 @@ def organization_update(request, organization_id=None):
 
 
 @login_required
-def organization_merge(request, first_id=None, second_id=None):
+def organization_merge(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    first = get_object_or_404(Organization, pk=first_id)
-    second = get_object_or_404(Organization, pk=second_id)
+    # organization from addressbook current site or w/ user on site
+    qs = Organization.objects.filter(
+        Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+    )
 
     if request.method == "POST":
+        name = request.POST.get("name")
+        ids = request.POST.get("org_ids")
+        orgs = [get_object_or_404(qs, pk=id) for id in ids]
         # process to merging of data
         with transaction.atomic():
-            update_contacts(first, second)
-            update_profiles(first, second)
-            merge_organizations(first, second)
+            update_contacts(orgs)
+            update_profiles(orgs)
+            merge_organizations_with_name(orgs, name)
         return redirect(reverse("crm-organization-list"))
 
     # required by default on crm
@@ -176,32 +187,50 @@ def organization_merge(request, first_id=None, second_id=None):
     return render(request, "crm/organization_merge.html", locals())
 
 
-def update_contacts(old_org, new_org):
+def update_contacts(orgs):
     """Update all the contacts referencing the old org to the new one"""
-    contacts = addressbook_models.Contact.objects.filter(organization=old_org)
+    new_org = orgs[0]
+    contacts = addressbook_models.Contact.objects.filter(organization__in=orgs)
     contacts.update(organization=new_org)
 
 
-def update_profiles(old_org, new_org):
+def update_profiles(orgs):
     """Update all the profiles referencing the old org to the new one"""
-    profiles = home_models.UserProfile.objects.filter(organization=old_org)
+    new_org = args[0]
+    profiles = home_models.UserProfile.objects.filter(organization__in=orgs)
     profiles.update(organization=new_org)
 
 
-def merge_organizations(first, second):
-    """Merge second organization into first one and delete second one"""
-    departments = [d for d in second.departments.all()]
-    first.departments.add(*departments)
-    sites = [s for s in second.sites.all()]
-    first.sites.add(*sites)
-    second.delete()
+def merge_organizations_with_name(orgs, name):
+    """Merge all orgs departments into first one, and rename it, del all others"""
+    new_org = args[0]
+    old_orgs = args[1:]
+    # update old depts in new org
+    departments = [
+        d.id for d in geomatics.Departments.objects.filter(organizations__in=old_orgs)
+    ]
+    new_org.departments.add(*departments)
+    # update old sites in new org
+    sites = [d.id for d in sites.Site.objects.filter(organizations__in=old_orgs)]
+    new_org.sites.add(*sites)
+    # update new org name
+    new_org.name = name
+    new_org.save()
+    # delete old orgs
+    old_ids = [o.id for o in old_orgs]
+    addressbook_models.Organization.objects.filter(id__in=old_ids).delete()
 
 
 @login_required
 def organization_details(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization, pk=organization_id)
+    # organization from addressbook current site or w/ user on site
+    query = Q(sites=request.site) | Q(registered_profiles__sites=request.site)
+
+    organization = get_object_or_404(
+        Organization.objects.filter(query), pk=organization_id
+    )
 
     participants = User.objects.filter(
         profile__in=organization.registered_profiles.all()
