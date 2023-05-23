@@ -120,6 +120,16 @@ urlpatterns = [
         name="crm-organization-list",
     ),
     path(
+        r"crm/org/<int:organization_id>/update/",
+        views.organization_update,
+        name="crm-organization-update",
+    ),
+    path(
+        r"crm/org/<int:organization_id>/merge/",
+        views.organization_merge,
+        name="crm-organization-merge",
+    ),
+    path(
         r"crm/org/<int:organization_id>/create-note",
         views.create_note_for_organization,
         name="crm-organization-note-create",

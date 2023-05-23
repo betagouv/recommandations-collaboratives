@@ -26,10 +26,11 @@ from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
+from urbanvitaliz.apps.addressbook import models as addressbook_models
+from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.utils import (
     get_group_for_site,
-    get_site_administrators,
     has_perm,
     has_perm_or_403,
     make_group_name_for_site,
@@ -125,7 +126,9 @@ def organization_list(request):
     query = Q(sites=request.site) | Q(registered_profiles__sites=request.site)
     organizations = filters.OrganizationFilter(
         request.GET,
-        queryset=Organization.objects.filter(query).order_by("name"),
+        queryset=Organization.objects.filter(query)
+        .order_by("name")
+        .prefetch_related("departments"),
     )
 
     # required by default on crm
@@ -141,7 +144,7 @@ def organization_update(request, organization_id=None):
     organization = get_object_or_404(Organization, pk=organization_id)
 
     if request.method == "POST":
-        form = forms.CRMOrganizationForm(request.POST, instance=profile)
+        form = forms.CRMOrganizationForm(request.POST, instance=organization)
         if form.is_valid():
             form.save()
             return redirect(reverse("crm-organization-details", args=[organization.id]))
