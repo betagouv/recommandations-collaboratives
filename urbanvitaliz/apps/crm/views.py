@@ -186,6 +186,9 @@ def organization_merge(request):
     # required by default on crm
     search_form = forms.CRMSearchForm()
 
+    ids = request.GET.getlist("org_ids", [])
+    organizations = [get_object_or_404(qs, pk=id) for id in ids]
+
     # first request confirmation for merging
     return render(request, "crm/organization_merge.html", locals())
 
