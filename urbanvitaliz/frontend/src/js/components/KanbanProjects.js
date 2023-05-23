@@ -1,7 +1,7 @@
 import Alpine from 'alpinejs'
 import { generateUUID } from '../utils/uuid'
 
-import api from '../utils/api'
+import api, {regionsUrl} from '../utils/api'
 
 Alpine.data("KanbanProjects", boardProjectsApp)
 
@@ -93,7 +93,7 @@ function boardProjectsApp() {
         },
         async postProcessData(data) {
             const departments = this.extractAndCreateAdvisorDepartments(data)
-            const regionsData = await api.get('/api/regions/');
+            const regionsData = await api.get(regionsUrl());
             this.constructRegionsFilter(departments, regionsData.data)
         },
         extractAndCreateAdvisorDepartments(projects) {
@@ -103,7 +103,9 @@ function boardProjectsApp() {
 
                 const foundDepartment = departments.find(department => department.code === project?.commune?.department?.code)
 
-                if (foundDepartment) return foundDepartment.nbProjects++;
+                if (foundDepartment) {
+                    return foundDepartment.nbProjects++;
+                }
 
                 const deparmentItem = { ...project?.commune?.department, active: true, nbProjects: 1 }
 
