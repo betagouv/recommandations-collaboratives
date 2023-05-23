@@ -115,6 +115,11 @@ urlpatterns = [
         name="crm-organization-list",
     ),
     path(
+        r"crm/org/merge/",
+        views.organization_merge,
+        name="crm-organization-merge",
+    ),
+    path(
         r"crm/org/<int:organization_id>/",
         views.organization_details,
         name="crm-organization-details",
@@ -123,11 +128,6 @@ urlpatterns = [
         r"crm/org/<int:organization_id>/update/",
         views.organization_update,
         name="crm-organization-update",
-    ),
-    path(
-        r"crm/org/merge/",
-        views.organization_merge,
-        name="crm-organization-merge",
     ),
     path(
         r"crm/org/<int:organization_id>/create-note",

@@ -13,6 +13,7 @@ from actstream.models import Action, actor_stream, target_stream
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.syndication.views import Feed
 from django.db import transaction
@@ -26,10 +27,12 @@ from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
 from urbanvitaliz.apps.addressbook.models import Organization
+from urbanvitaliz.apps.addressbook import models as addressbook_models
+from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.utils import (
     get_group_for_site,
-    get_site_administrators,
     has_perm,
     has_perm_or_403,
     make_group_name_for_site,
@@ -45,8 +48,8 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     def test_func(self):
         return has_perm(self.request.user, "use_crm", self.request.site)
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
+    def get_context_data(self, *orgs, **kwargs):
+        context = super().get_context_data(*orgs, **kwargs)
         context["search_form"] = forms.CRMSearchForm()
         context["projects_waiting"] = Project.on_site.filter(status="DRAFT").count()
         context["project_model"] = Project
@@ -144,15 +147,15 @@ def organization_update(request, organization_id=None):
     qs = Organization.objects.filter(
         Q(sites=request.site) | Q(registered_profiles__sites=request.site)
     )
-    org = get_object_or_404(qs, pk=organization_id)
+    organization = get_object_or_404(qs, pk=organization_id)
 
     if request.method == "POST":
-        form = forms.CRMOrganizationForm(request.POST, instance=org)
+        form = forms.CRMOrganizationForm(request.POST, instance=organization)
         if form.is_valid():
             form.save()
-            return redirect(reverse("crm-organization-details", args=[org.id]))
+            return redirect(reverse("crm-organization-details", args=[organization.id]))
     else:
-        form = forms.CRMOrganizationForm(instance=org)
+        form = forms.CRMOrganizationForm(instance=organization)
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -171,7 +174,7 @@ def organization_merge(request):
 
     if request.method == "POST":
         name = request.POST.get("name")
-        ids = request.POST.get("org_ids")
+        ids = request.POST.getlist("org_ids", [])
         orgs = [get_object_or_404(qs, pk=id) for id in ids]
         # process to merging of data
         with transaction.atomic():
@@ -188,32 +191,32 @@ def organization_merge(request):
 
 
 def update_contacts(orgs):
-    """Update all the contacts referencing the old org to the new one"""
+    """Update all the contacts referencing the old organization to the new one"""
     new_org = orgs[0]
     contacts = addressbook_models.Contact.objects.filter(organization__in=orgs)
     contacts.update(organization=new_org)
 
 
 def update_profiles(orgs):
-    """Update all the profiles referencing the old org to the new one"""
-    new_org = args[0]
+    """Update all the profiles referencing the old organization to the new one"""
+    new_org = orgs[0]
     profiles = home_models.UserProfile.objects.filter(organization__in=orgs)
     profiles.update(organization=new_org)
 
 
 def merge_organizations_with_name(orgs, name):
     """Merge all orgs departments into first one, and rename it, del all others"""
-    new_org = args[0]
-    old_orgs = args[1:]
-    # update old depts in new org
+    new_org = orgs[0]
+    old_orgs = orgs[1:]
+    # update old depts in new organization
     departments = [
-        d.id for d in geomatics.Departments.objects.filter(organizations__in=old_orgs)
+        d for d in geomatics.Department.objects.filter(organizations__in=old_orgs)
     ]
     new_org.departments.add(*departments)
-    # update old sites in new org
-    sites = [d.id for d in sites.Site.objects.filter(organizations__in=old_orgs)]
+    # update old sites in new organization
+    sites = [s for s in Site.objects.filter(organizations__in=old_orgs)]
     new_org.sites.add(*sites)
-    # update new org name
+    # update new organization name
     new_org.name = name
     new_org.save()
     # delete old orgs
@@ -320,7 +323,7 @@ def user_update(request, user_id=None):
             crm_user.first_name = form.cleaned_data.get("first_name")
             crm_user.last_name = form.cleaned_data.get("last_name")
             crm_user.save()
-            return redirect(reverse("crm-user-details", args=[crm_user.id]))
+            return redirect(reverse("crm-user-details", orgs=[crm_user.id]))
     else:
         form = forms.CRMProfileForm(
             instance=profile,
@@ -345,7 +348,7 @@ def user_deactivate(request, user_id=None):
     if request.method == "POST":
         crm_user.is_active = False
         crm_user.save()
-        return redirect(reverse("crm-user-details", args=[crm_user.id]))
+        return redirect(reverse("crm-user-details", orgs=[crm_user.id]))
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -362,7 +365,7 @@ def user_reactivate(request, user_id=None):
     if request.method == "POST":
         crm_user.is_active = True
         crm_user.save()
-        return redirect(reverse("crm-user-details", args=[crm_user.id]))
+        return redirect(reverse("crm-user-details", orgs=[crm_user.id]))
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -383,7 +386,7 @@ def user_set_advisor(request, user_id=None):
             form.save()
             group = get_group_for_site("advisor", request.site)
             crm_user.groups.add(group)
-            return redirect(reverse("crm-user-details", args=[crm_user.id]))
+            return redirect(reverse("crm-user-details", orgs=[crm_user.id]))
     else:
         form = forms.CRMAdvisorForm(instance=profile)
 
@@ -404,7 +407,7 @@ def user_unset_advisor(request, user_id=None):
         profile.departments.clear()
         group = get_group_for_site("advisor", request.site)
         crm_user.groups.remove(group)
-        return redirect(reverse("crm-user-details", args=[crm_user.id]))
+        return redirect(reverse("crm-user-details", orgs=[crm_user.id]))
 
     # required by default on crm
     search_form = forms.CRMSearchForm()
@@ -604,7 +607,7 @@ def project_toggle_annotation(request, project_id=None):
         else:
             annotation.tags.add(tag)
 
-    url = reverse("crm-project-details", args=[project.id])
+    url = reverse("crm-project-details", orgs=[project.id])
     return redirect(url)
 
 
@@ -620,7 +623,7 @@ def handle_create_note_for_object(
             note.site = request.site
             note.save()
             form.save_m2m()
-            return True, redirect(reverse(return_view_name, args=(the_object.pk,)))
+            return True, redirect(reverse(return_view_name, orgs=(the_object.pk,)))
     else:
         form = forms.CRMNoteForm()
 
@@ -693,7 +696,7 @@ def update_note_for_object(request, note, return_view_name):
             note.updated_on = timezone.now()
             note.save()
             form.save_m2m()
-            return redirect(reverse(return_view_name, args=(note.related.pk,)))
+            return redirect(reverse(return_view_name, orgs=(note.related.pk,)))
     else:
         form = forms.CRMNoteForm(instance=note)
 

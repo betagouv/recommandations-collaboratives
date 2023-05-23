@@ -21,30 +21,37 @@
 
 {% block content %}
 <div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    
+
     {% include "crm/fragments/sidebar.html" with search=True back_button=True organization_members=True followed_projects=True unfollowed_projects=True %}
 
     <div class="w-75 d-flex flex-column justify-content-start">
-        {% if active_project %}
-            <div class="crm-header px-4 py-3 pt-4 mb-3">
-        {% else %}
-            <div class="crm-header no-project px-4 py-3 pt-4">
-        {% endif %}
-            <h3 class="d-flex align-items-center">
-                <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
-                </svg>
-                <span>{{ organization.name }}</span>
-            </h3>
-            <ul class="d-flex align-items-center list-unstyled flex-wrap" style="padding-left: 0;">
-                {% for department in org_departments %}
-                <li class="me-2 crm-region-tag">
-                    <span class="">{{ department.name }}</span>
-                    <strong>({{ department.code }})</strong>
-                </li>
-                {% endfor %}
-            </ul>
+
+        <div class="crm-header px-4 py-3 pt-4 {% if active_project %}mb-3{% else %}no-project{% endif %}">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h3 class="d-flex align-items-center">
+                        <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
+                        </svg>
+                        <span>{{ organization.name }}</span>
+                    </h3>
+                    <ul class="d-flex align-items-center list-unstyled flex-wrap" style="padding-left: 0;">
+                        {% for department in org_departments %}
+                        <li class="me-2 crm-region-tag">
+                            <span class="">{{ department.name }}</span>
+                            <strong>({{ department.code }})</strong>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <div class="btn-group btn-group-sm">
+                        <a href="{% url 'crm-organization-update' organization.pk %}" class="btn btn-outline-secondary" aria-current="page">Gérer l'organisation</a>
+                    </div>
+                </div>
             </div>
+        </div>
+
             {% if unread_notifications %}
             <div class="px-4 py-4 bg-light">
                 <h4>
@@ -81,5 +88,5 @@
             {% include 'crm/timeline.html' %}
         </div>
     </div>
-</div> 
+</div>
 {% endblock %}

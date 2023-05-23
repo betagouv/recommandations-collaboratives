@@ -156,6 +156,7 @@ def test_crm_organization_merge_processing(request, client):
     orgs = []
     for d in departments:
         o = baker.make(addressbook_models.Organization)
+        o.sites.add(site)
         o.departments.add(d)
         orgs.append(o)
 
@@ -177,7 +178,7 @@ def test_crm_organization_merge_processing(request, client):
     org = orgs[0]
     assert org.name == data["name"]
     org_dpts = (d.code for d in org.departments.all())
-    assert set(org_dpts) == set(d.id for d in departments)
+    assert set(org_dpts) == set(d.code for d in departments)
 
 
 # eof
