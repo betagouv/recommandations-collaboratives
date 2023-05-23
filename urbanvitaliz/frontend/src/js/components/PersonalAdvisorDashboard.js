@@ -185,11 +185,6 @@ function PersonalAdvisorDashboard() {
             return this.displayedData = this.filterProjectsByDepartments(this.searchProjects(this.search)).sort(this.currentSort);
         },
         handleTerritoryFilter(selectedDepartment) {
-
-            if (this.territorySelectAll) {
-                this.territorySelectAll = false
-            }
-
             this.departments = this.departments.map(department => {
                 if (department.code === selectedDepartment.code) {
                     department.active = !department.active
@@ -197,6 +192,8 @@ function PersonalAdvisorDashboard() {
 
                 return department
             })
+
+            this.territorySelectAll = this.departments.filter(department => department.active).length === this.departments.length
 
             return this.displayedData = this.filterProjectsByDepartments(this.searchProjects(this.search)).sort(this.currentSort);
         },

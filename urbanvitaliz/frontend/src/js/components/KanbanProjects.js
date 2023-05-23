@@ -141,7 +141,7 @@ function boardProjectsApp() {
             this.regions = this.regions.map(
                 region => ({
                     ...region,
-                    active:this.territorySelectAll,
+                    active: this.territorySelectAll,
                     departments: region.departments.map(
                         department => ({ ...department, active: this.territorySelectAll })
                     )
@@ -149,27 +149,20 @@ function boardProjectsApp() {
             )
         },
         handleRegionFilter(selectedRegion) {
-            if (this.territorySelectAll) {
-                this.territorySelectAll = false
-            }
-
             this.regions = this.regions.map(
                 region => {
                     if (region.code === selectedRegion.code) {
                         region.active = !region.active
-                        region.departments = region.departments.map(department => ({...department, active:region.active}))
+                        region.departments = region.departments.map(department => ({ ...department, active: region.active }))
                     }
 
                     return region
                 }
             )
+
+            this.territorySelectAll = this.regions.filter(region => region.active).length === this.regions.length
         },
         handleDepartmentFilter(selectedDepartment) {
-
-            if (this.territorySelectAll) {
-                this.territorySelectAll = false
-            }
-
             this.regions = this.regions.map(
                 region => ({
                     ...region,
@@ -185,6 +178,8 @@ function boardProjectsApp() {
                     active: region.departments.length === region.departments.filter(department => department.active).length
                 })
             )
+
+            this.territorySelectAll = this.regions.filter(region => region.active).length === this.regions.length
         },
         filterProjectsByDepartments(project) {
             return this.regions.find(
