@@ -40,6 +40,11 @@ export function userProjectStatusUrl() {
     return `/api/userprojectstatus/`
 }
 
+// Organization
+export function searchOrganizationsUrl(search) {
+    return `/api/organizations/?search=${search}`
+}
+
 // Tasks : 
 export function taskUrl(projectId, taskId) {
     return `/api/projects/${projectId}/tasks/${taskId}/`

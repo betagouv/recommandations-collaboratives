@@ -8,9 +8,22 @@
     color: #0063CB;
     text-decoration: none;
 
-    transition: background 0.25s ease;
+    transition: all 0.25s ease;
     background: transparent;
     cursor: pointer !important;
+}
+
+.button.blue:active {
+    background-color: #e2effc;
+}
+
+.button.blue:target {
+    background-color: #e2effc;
+}
+
+.button.blue:focus {
+    background-color: #e2effc;
+    box-shadow: 0 0 1px 4px #e0ecf9;
 }
 
 .button.active {
