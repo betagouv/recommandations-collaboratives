@@ -3,6 +3,7 @@
 {% load humanize %}
 {% load static %}
 {% load django_vite %}
+{% load projects_extra %}
 
 {% load sass_tags %}
 
@@ -23,11 +24,13 @@
 
 {% block content %}
 
+{% is_staff_for_current_site request.user as is_staff %}
+
 <div class="col-11 py-5 mx-auto">
     <div class="row" style="font-family: 'Marianne', arial, sans-serif;">
         {% block banner %}{% endblock %}
         {% include 'projects/project/header.html' %}
-        {% if project.status == "DRAFT" %}
+        {% if project.status == "DRAFT" and not is_staff %}
             {% include 'projects/project/fragments/pending_confirmation_banner.html' %}
         {% endif %}
         {% block project_detail %}{% endblock %}
