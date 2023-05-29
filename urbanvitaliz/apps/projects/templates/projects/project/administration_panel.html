@@ -260,7 +260,7 @@
                         </svg>
                     </div>
                 {% else %}
-                    <p class="text-info-custom mb-4 mt-1">Invitations conseiller·e·s</p>
+                    <p class="text-info-custom mb-4 mt-1">Invitations en attente de conseiller·e·s</p>
                     <ul class="list-group">
                         {% for invite in pending_invites %}
                             {% if invite.role == "SWITCHTENDER" %}
@@ -312,7 +312,7 @@
                         </svg>
                     </div>
                 {% else %}
-                    <p class="text-info-custom mb-4 mt-1">Invitations participant·e·s</p>
+                    <p class="text-info-custom mb-4 mt-1">Invitations en attente de membres collectivité</p>
                     <ul class="list-group">
                         {% for invite in pending_invites %}
                             {% if invite.role == "COLLABORATOR" %}
