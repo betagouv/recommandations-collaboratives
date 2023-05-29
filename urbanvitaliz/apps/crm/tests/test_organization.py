@@ -187,6 +187,30 @@ def test_crm_organisation_details_accessible_w_perm(request, client):
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
+def test_crm_organisation_details_accessible_w_multiple_users(request, client):
+    """Introduced following bug in production when multiple profile on organization"""
+    site = get_current_site(request)
+    o = baker.make(addressbook_models.Organization, sites=[site])
+
+    profile = baker.make(auth_models.User).profile
+    profile.organization = o
+    profile.sites.add(site)
+    profile.save()
+
+    profile = baker.make(auth_models.User).profile
+    profile.organization = o
+    profile.sites.add(site)
+    profile.save()
+
+    url = reverse("crm-organization-details", args=[o.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
 ########################################################################
 # merge organizations
 ########################################################################
