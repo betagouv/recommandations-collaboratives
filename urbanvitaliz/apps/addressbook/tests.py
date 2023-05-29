@@ -61,14 +61,6 @@ def test_organization_list_not_available_for_non_staff(client):
 
 
 @pytest.mark.django_db
-def test_organization_list_available_for_switchtender(client):
-    url = reverse("addressbook-organization-list")
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
 def test_create_existing_organization_and_redirect(request, client):
     current_site = get_current_site(request)
 
@@ -304,6 +296,29 @@ def test_contact_update_and_redirect(request, client):
         "addressbook-organization-details", args=[contact.organization_id]
     )
     assertRedirects(response, new_url)
+
+
+########################################################################
+# REST API: projects
+########################################################################
+@pytest.mark.django_db
+def test_anonymous_can_use_organization_api(client):
+    url = reverse("organizations-list")
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_anonymous_can_search_organization_api(client, request):
+    current_site = get_current_site(request)
+
+    baker.make(models.Organization, name="acme corporation", sites=[current_site])
+
+    url = reverse("organizations-list")
+    response = client.get(url, {"search": "acm corparotion"}, format="json")
+
+    assert response.status_code == 200
+    assert len(response.data) > 0
 
 
 # eof
