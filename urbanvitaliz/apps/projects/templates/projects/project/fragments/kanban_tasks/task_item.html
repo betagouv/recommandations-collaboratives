@@ -51,7 +51,7 @@
 								</template>
 							</div>
 							{% if is_switchtender %}
-								<template x-if="t.status < 3">
+								<template x-if="t.status < 3 && t.public">
 									<div class="me-2 text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta" style="background-color: rgba(0, 0, 0, 0.05); border-radius: 5px; cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="toArchiveTooltip()" @click="openFeedbackModal(t)">
 										<svg class="aling-middle bi" width="25px" height="25px" fill="green">
 											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check" />
