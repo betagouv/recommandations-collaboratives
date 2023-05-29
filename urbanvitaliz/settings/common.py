@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.humanize",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     "django.contrib.sites",
     "multisite",
     "django.contrib.admin",
@@ -138,7 +139,7 @@ WSGI_APPLICATION = "urbanvitaliz.wsgi.application"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
