@@ -7,13 +7,16 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
 <div class="user-card position-relative d-flex my-1 flex-column justify-content-between align-items-start">
-    <div class="w-100 d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center flex-wrap">
-            <span class="me-2 d-flex align-items-center font-very-small">
-                <img class="rounded-circle me-2" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
+            <span class="me-1 d-flex align-items-center font-very-small">
+                <img class="rounded-circle me-1" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
                 <strong class="text-nowrap text-capitalize">
                     {% if user.get_full_name %}
                         {{ user.get_full_name }}
+                    {% elif project and project.first_name and project.last_name %}
+                        {{ project.first_name }}
+                        {{ project.last_name }}
                     {% else %}
                         {{user.email}}
                     {% endif %}
@@ -21,7 +24,7 @@
             </span>
             <span class="text-grey-dark fw-light font-italic font-very-small">{{user.profile.organization.name}}</span>
         </div>
-        {% if 'use_crm' in user_site_perms %}
+        {% if 'use_crm' in user_site_perms and user_activity %}
             <a class="small" href="{% url 'crm-user-details' user.pk %}">
                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
@@ -29,38 +32,39 @@
             </a>
         {% endif %}
     </div>
-    <div class="user-card-popup flex-column">
-        <div class="user-role position-absolute">
-            <span class="py-1 px-2 fw-bold text-uppercase tiny bg-green-dark text-white"
-                style="border-radius: 2px;">Conseiller</span>
-        </div>
-        <div class="d-flex align-items-center flex-wrap">
-            <span class="me-2 d-flex align-items-center font-very-small">
-                <img class="rounded-circle me-2" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
-                <strong class="text-nowrap text-capitalize">
-                    {% if user.get_full_name %}
-                        {{ user.get_full_name }}
-                    {% else %}
-                        {{user.email}}
-                    {% endif %}
-                </strong>
-            </span>
-            <span class="text-grey-dark fw-light font-italic font-very-small">{{user.profile.organization.name}}</span>
-        </div>
-        <span class="d-flex align-items-center text-blue font-very-small mt-1">
-            <svg class="bi align-middle me-2" width="18" height="18" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
-            </svg>
-                <a class="text-decoration-none text-blue" href="mailto:{{ user.email }}">{{ user.email }}</a>
-        </span>
-        {% if user.profile.phone_no %}
+    {% if user_hover %}
+        <div class="user-card-popup flex-column">
+            <div class="user-role position-absolute">
+                <span class="py-1 px-2 fw-bold text-uppercase tiny bg-green-dark text-white"
+                    style="border-radius: 2px;">Conseiller</span>
+            </div>
+            <div class="d-flex align-items-center flex-wrap">
+                <span class="me-2 d-flex align-items-center font-very-small">
+                    <img class="rounded-circle me-2" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
+                    <strong class="text-nowrap text-capitalize">
+                        {% if user.get_full_name %}
+                            {{ user.get_full_name }}
+                        {% else %}
+                            {{user.email}}
+                        {% endif %}
+                    </strong>
+                </span>
+                <span class="text-grey-dark fw-light font-italic font-very-small">{{user.profile.organization.name}}</span>
+            </div>
             <span class="d-flex align-items-center text-blue font-very-small mt-1">
-                <svg class="bi align-middle me-2" width="15" height="15" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
+                <svg class="bi align-middle me-2" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
                 </svg>
-                <a class="text-decoration-none text-blue" href="tel:{{ project.owner.profile.phone_no }}">{{ user.profile.phone_no }}</a>
+                    <a class="text-decoration-none text-blue" href="mailto:{{ user.email }}">{{ user.email }}</a>
             </span>
-        {% endif %}
-    </div>
-    
+            {% if user.profile.phone_no %}
+                <span class="d-flex align-items-center text-blue font-very-small mt-1">
+                    <svg class="bi align-middle me-2" width="15" height="15" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
+                    </svg>
+                    <a class="text-decoration-none text-blue" href="tel:{{ project.owner.profile.phone_no }}">{{ user.profile.phone_no }}</a>
+                </span>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
