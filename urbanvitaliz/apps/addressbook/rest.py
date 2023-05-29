@@ -49,7 +49,6 @@ class TrigramSimilaritySearchFilter(SearchFilter):
         for search_field in search_fields:
             conditions[f"{search_field}__trigram_similar"] = search_terms
 
-        print(conditions)
         queryset = queryset.filter(**conditions)
 
         return queryset
