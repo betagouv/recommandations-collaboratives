@@ -1,0 +1,15 @@
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/organizationSearch.js' %}
+{% endblock %}
+
+<div x-data='OrganizationSearch("{{value}}")'>
+        <label class="text-info-custom text-grey-dark" for="id_for_label">{{ label }}</label>
+        <input x-on:input.change.debounce="handleOrganizationChange" x-model="organization" type="text" class="py-4 placeholder-grey form-control {% if errors %} is-invalid {% endif %} {% if disabled %} input-disabled {% endif %}"
+            id="{{ id_for_label }}" name="{{ name }}" placeholder="{{label}}"
+            value="organization" {% if not disabled %} required {% endif %} />
+        {% for error in errors %}
+            <div class="text-danger text-end">{{ error }}</div>
+        {% endfor %}
+</div>
