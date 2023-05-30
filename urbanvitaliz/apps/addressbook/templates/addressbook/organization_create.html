@@ -32,8 +32,19 @@
 
     <form class="form" id="form-organization-create" method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Créer" class="btn btn-primary">
+        <div class="d-flex flex-column align-items-start">
+            <div class="w-100 d-flex flex-column">
+                <p>
+                {% include "tools/organization_search.html" with name=form.name.name label=form.name.label value=form.name.value id_for_label=form.name.id_for_label placeholder="Nom" errors=form.name.errors small_padding=True %}
+                </p>
+            </div>
+            <div class="w-100 d-flex flex-column select-custom mt-2">
+                {{form.departments.errors}}
+                {% include 'tools/searchable_list.html' with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département"%}
+            </div>
+        </div>
+        
+        <input type="submit" value="Créer" class="button filled">
     </form>
 
 </div>

@@ -42,7 +42,8 @@ module.exports = {
                 documents: resolve('./src/js/apps/documents.js'),
                 searchableList: resolve('./src/js/apps/searchableList.js'),
                 consent: resolve('./src/js/apps/consent.js'),
-                tagCloud: resolve('./src/js/apps/tagCloud.js')
+                tagCloud: resolve('./src/js/apps/tagCloud.js'),
+                organizationSearch: resolve('./src/js/apps/organizationSearch.js')
             },
             output: {
                 chunkFileNames: undefined,

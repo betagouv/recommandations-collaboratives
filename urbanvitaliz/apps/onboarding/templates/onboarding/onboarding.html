@@ -136,21 +136,12 @@
                 </div>
             </div>
 
-            <div class="">
-                <label class="text-info-custom text-grey-dark" for="{{ form.org_name.id_for_label }}">{{ form.org_name.label }}</label>
-                {% if user.is_authenticated and user.profile.organization.name %}
-                    <input type="text" class="py-4 placeholder-grey form-control input-disabled"
-                    id="{{ form.org_name.id_for_label }}" name="{{ form.org_name.name }}" placeholder="Mon organisation"
-                    value="{{ user.profile.organization.name }}">
-                {% else %}
-                    <input type="text" class="py-4 placeholder-grey form-control {% if form.org_name.errors %}is-invalid{% endif %}"
-                    id="{{ form.org_name.id_for_label }}" name="{{ form.org_name.name }}" placeholder="Mon organisation"
-                    value="{{ form.org_name.value|default:'' }}" required>
-                {% endif %}
-                {% for error in form.org_name.errors %}
-                <div class="text-danger text-end">{{ error }}</div>
-                {% endfor %}
-            </div>
+            {% if user.is_authenticated and user.profile.organization.name %}
+                {% include "tools/organization_search.html" with name=form.org_name.name label=form.org_name.label value=user.profile.organization.name id_for_label=form.org_name.id_for_label placeholder="Mon organisation" disabled=True errors=form.org_name.errors %}
+            {% else %} 
+                {% include "tools/organization_search.html" with name=form.org_name.name label=form.org_name.label value=form.org_name.value id_for_label=form.org_name.id_for_label placeholder="Mon organisation" errors=form.org_name.errors %}
+            {% endif %}
+            
         </div>
 
 

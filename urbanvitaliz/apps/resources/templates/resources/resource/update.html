@@ -79,18 +79,19 @@
                     {{form.category}}
                 </p>
     
+                <hr/>
                 <div class="d-flex">
-                    <div class="w-50 d-flex flex-column select-custom">
+                    <div class="w-50 d-flex flex-column select-custom border-end pe-4 py-4">
                         {{form.departments.errors}}
                         {% include 'tools/searchable_list.html' with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département"%}
                     </div>
     
-                    <div class="w-50 ms-2 d-flex flex-column select-custom">
+                    <div class="w-50 ms-2 d-flex flex-column select-custom ms-2 ms-4 py-4">
                         {{form.contacts.errors}}
                         {% include 'tools/searchable_list.html' with list=form.contacts label=form.contacts.label search_list_id=form.contacts.id_for_label search_options="['name']" item_label="contact" %}
                     </div>
                 </div>
-    
+                <hr/>
                 <div class="d-flex">
                     {% include 'tools/editor.html' with input_name=form.content.name input_value=form.content.value|default:'' input_required=True escapejs=True%}
                 </div>

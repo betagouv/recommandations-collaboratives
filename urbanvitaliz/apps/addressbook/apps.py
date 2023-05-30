@@ -9,5 +9,5 @@ class AddressbookConfig(AppConfig):
     def ready(self):
         watson.register(
             self.get_model("Organization"),
-            fields=("name",),
+            fields=("name", "departments__name", "departments__code"),
         )

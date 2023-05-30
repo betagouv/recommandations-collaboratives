@@ -23,6 +23,17 @@ def active_project_processor(request):
         "active_project": active_project,
     }
 
+    if request.user.is_authenticated:
+        # Retrieve notification count
+        project_ct = ContentType.objects.get_for_model(projects_models.Project)
+        unread_notifications_for_projects = request.user.notifications.unread().filter(
+            target_content_type=project_ct.pk,
+        )
+
+        context.update(
+            {"unread_notifications_count": unread_notifications_for_projects.count()}
+        )
+
     if active_project:
         try:
             site_config = get_site_config_or_503(request.site)
@@ -33,7 +44,6 @@ def active_project_processor(request):
             session = None
 
         # Retrieve notification count
-        project_ct = ContentType.objects.get_for_model(projects_models.Project)
         project_notifications = request.user.notifications.filter(
             target_content_type=project_ct.pk,
             target_object_id=active_project.pk,
@@ -89,9 +99,9 @@ def active_project_processor(request):
                 ),
                 "active_project_survey_session": session,
                 "active_project_action_notifications_count": action_notifications_count,
-                "active_project_conversation_notifications_count": conversation_notifications_count,
-                "active_project_document_notifications_count": document_notifications_count,
-                "active_project_private_conversation_notifications_count": private_conversation_notifications_count,
+                "active_project_conversation_notifications_count": conversation_notifications_count,  # noqa
+                "active_project_document_notifications_count": document_notifications_count,  # noqa
+                "active_project_private_conversation_notifications_count": private_conversation_notifications_count,  # noqa
             }
         )
 

@@ -83,7 +83,7 @@ function PersonalAdvisorDashboard() {
 
             //If we can't find an active department in state 
             // then uncheck select all departments in filter
-            if (this.departments.findIndex(department => department.active) === -1 ) {
+            if (this.departments.findIndex(department => department.active) === -1) {
                 this.territorySelectAll = false
             }
 
@@ -168,7 +168,10 @@ function PersonalAdvisorDashboard() {
 
                 const foundDepartment = departments.find(department => department.code === item.project?.commune?.department?.code)
 
-                if (foundDepartment) return foundDepartment.nbProjects++;
+                if (foundDepartment) {
+                    foundDepartment.nbProjects++
+                    return foundDepartment
+                };
 
                 const deparmentItem = { ...item.project?.commune?.department, active: true, nbProjects: 1 }
 
@@ -258,8 +261,8 @@ function PersonalAdvisorDashboard() {
                     sortCriterion = this.sortProjectRecentActivities
                     break;
                 case "role":
-                        sortCriterion = this.sortProjectRole
-                        break;
+                    sortCriterion = this.sortProjectRole
+                    break;
                 default:
                     sortCriterion = this.sortProjectDate
                     break;
@@ -317,7 +320,7 @@ function PersonalAdvisorDashboard() {
                 } else return 0
             }
         },
-        sortProjectRole(a,b) {
+        sortProjectRole(a, b) {
 
             if (a.project.is_switchtender && !a.project.is_observer) {
                 return -1
