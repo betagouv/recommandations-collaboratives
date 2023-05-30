@@ -1,7 +1,7 @@
 import Alpine from 'alpinejs'
 import { generateUUID } from '../utils/uuid'
 
-import api from '../utils/api'
+import api, {regionsUrl} from '../utils/api'
 
 Alpine.data("KanbanProjects", boardProjectsApp)
 
@@ -13,6 +13,8 @@ function boardProjectsApp() {
         },
         selectedDepartment: null,
         departments: [],
+        regions: [],
+        territorySelectAll: true,
         boards: [
             { code: 'TO_PROCESS', title: 'À traiter', color_class: 'border-secondary' },
             { code: 'READY', title: 'En attente', color_class: 'border-info' },
@@ -20,12 +22,16 @@ function boardProjectsApp() {
             { code: "DONE", title: "Traité", color_class: 'border-success' },
             { code: "STUCK", title: "Conseil interrompu", color_class: 'border-dark' },
         ],
-        async getData() {
+        async getData(postProcess = true) {
             const json = await api.get('/api/projects/');
 
             const data = json.data.map(d => Object.assign(d, {
                 uuid: generateUUID()
             }));
+
+            if (postProcess) {
+                await this.postProcessData(data);
+            }
 
             this.data = data
         },
@@ -40,7 +46,7 @@ function boardProjectsApp() {
 
             await api.patch(`/api/projects/${data.id}/`, { status: status })
 
-            await this.getData();
+            await this.getData(false);
         },
         findByUuid(uuid) {
             return this.data.find(d => d.uuid === uuid);
@@ -49,7 +55,7 @@ function boardProjectsApp() {
             return this.data.find(d => d.id === id);
         },
         get view() {
-            return this.data.filter(this.filterFn.bind(this)).sort(this.sortFn.bind(this));
+            return this.data.filter(this.filterProjectsByDepartments.bind(this)).sort(this.sortFn.bind(this));
         },
         column(status) {
             if (status instanceof Array) {
@@ -85,24 +91,103 @@ function boardProjectsApp() {
             event.preventDefault();
             event.dataTransfer.dropEffect = "move";
         },
-        postProcessData(data) {
-            const departments = [];
-            data.forEach(d => {
-                if (d.commune != null) {
-                    const dept = {
-                        code: d.commune.department.code,
-                        name: d.commune.department.name,
-                    };
-                    const index = departments.findIndex(obj => obj.code == dept.code);
-                    if (index === -1) {
-                        departments.push(dept);
-                    }
-                }
-            });
-            departments.sort((a, b) => a.name.localeCompare(b.name));
-            this.departments = departments;
+        async postProcessData(data) {
+            const departments = this.extractAndCreateAdvisorDepartments(data)
+            const regionsData = await api.get(regionsUrl());
+            this.constructRegionsFilter(departments, regionsData.data)
         },
+        extractAndCreateAdvisorDepartments(projects) {
+            const departments = []
 
+            projects.forEach(project => {
+
+                const foundDepartment = departments.find(department => department.code === project?.commune?.department?.code)
+
+                if (foundDepartment) {
+                    return foundDepartment.nbProjects++;
+                }
+
+                const deparmentItem = { ...project?.commune?.department, active: true, nbProjects: 1 }
+
+                departments.push(deparmentItem)
+            })
+
+            return this.departments = departments.sort((a, b) => a.name.localeCompare(b.name));
+        },
+        constructRegionsFilter(departments, regions) {
+            const currentRegions = []
+
+            regions.forEach(region => {
+                //Iterate through regions.departments and look for advisors departments
+                const foundDepartments = departments.filter(
+                    department => region.departments.find(
+                        regionDepartment => regionDepartment.code === department.code))
+
+                if (foundDepartments.length > 0) {
+                    const currentRegion = {
+                        code: region.code,
+                        departments: foundDepartments,
+                        name: region.name,
+                        active: true
+                    }
+
+                    return currentRegions.push(currentRegion)
+                }
+            })
+
+            return this.regions = currentRegions
+        },
+        handleTerritorySelectAll() {
+            this.territorySelectAll = !this.territorySelectAll
+
+            this.regions = this.regions.map(
+                region => ({
+                    ...region,
+                    active: this.territorySelectAll,
+                    departments: region.departments.map(
+                        department => ({ ...department, active: this.territorySelectAll })
+                    )
+                })
+            )
+        },
+        handleRegionFilter(selectedRegion) {
+            this.regions = this.regions.map(
+                region => {
+                    if (region.code === selectedRegion.code) {
+                        region.active = !region.active
+                        region.departments = region.departments.map(department => ({ ...department, active: region.active }))
+                    }
+
+                    return region
+                }
+            )
+
+            this.territorySelectAll = this.regions.filter(region => region.active).length === this.regions.length
+        },
+        handleDepartmentFilter(selectedDepartment) {
+            this.regions = this.regions.map(
+                region => ({
+                    ...region,
+                    departments: region.departments.map(
+                        department => {
+                            if (department.code === selectedDepartment.code) {
+                                department.active = !department.active
+                            }
+
+                            return department
+                        }
+                    ),
+                    active: region.departments.length === region.departments.filter(department => department.active).length
+                })
+            )
+
+            this.territorySelectAll = this.regions.filter(region => region.active).length === this.regions.length
+        },
+        filterProjectsByDepartments(project) {
+            return this.regions.find(
+                region => region.departments.find(
+                    department => department.code === project.commune.department.code)?.active)
+        },
         sortFn(a, b) {
             if (b.notifications.count - a.notifications.count)
                 return b.notifications.count - a.notifications.count;

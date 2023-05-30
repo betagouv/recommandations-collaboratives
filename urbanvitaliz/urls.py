@@ -24,6 +24,7 @@ from urbanvitaliz.apps.invites.urls import urlpatterns as invites_urls
 from urbanvitaliz.apps.onboarding.urls import urlpatterns as onboarding_urls
 from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
 from urbanvitaliz.apps.projects.views import rest as projects_rest
+from urbanvitaliz.apps.addressbook import rest as addressbook_rest
 from urbanvitaliz.apps.resources import views as resources_views
 from urbanvitaliz.apps.resources.urls import urlpatterns as resources_urls
 from urbanvitaliz.apps.survey.urls import urlpatterns as survey_urls
@@ -62,7 +63,9 @@ router.register(
 )
 router.register(r"regions", geomatics_rest.RegionViewSet, basename="regions")
 router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
-
+router.register(
+    r"organizations", addressbook_rest.OrganizationViewSet, basename="organizations"
+)
 
 urlpatterns = [
     path("api/", include(router.urls)),
@@ -111,5 +114,6 @@ if settings.DEBUG:
 
     urlpatterns += [path(r"__debug__/", include(debug_toolbar.urls))]
 #    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
+
 
 # eof

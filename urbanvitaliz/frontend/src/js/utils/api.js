@@ -31,8 +31,6 @@ instance.interceptors.response.use((response) => {
 
 export default instance
 
-
-
 // Projects :
 export function projectsUrl() {
     return `/api/projects/`
@@ -73,6 +71,11 @@ export function followupUrl(projectId, taskId, followupId) {
 
 export function resourcePreviewUrl(resourceId) {
     return `/ressource/${resourceId}/embed`;
+}
+
+// Regions :
+export function regionsUrl() {
+    return `/api/regions/`
 }
 
 
