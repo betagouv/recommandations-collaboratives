@@ -33,7 +33,9 @@ def organization_create(request):
             organization.sites.add(request.site)
             organization.departments.add(*departments)
             organization.save()
-            return redirect(reverse("addressbook-organization-list"))
+            return redirect(
+                reverse("addressbook-organization-details", args=(organization.pk,))
+            )
     else:
         form = OrganizationForm()
     return render(request, "addressbook/organization_create.html", locals())
