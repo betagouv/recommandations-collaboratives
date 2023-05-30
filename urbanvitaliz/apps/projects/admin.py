@@ -11,8 +11,7 @@ created : 2021-05-26 13:55:23 CEST
 from csvexport.actions import csvexport
 from django.contrib import admin
 from django.db.models import Count, F, Q
-from ordered_model.admin import (OrderedInlineModelAdminMixin,
-                                 OrderedTabularInline)
+from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 
 from . import models
 
@@ -125,7 +124,7 @@ class UserProjectStatusAdmin(admin.ModelAdmin):
 
 @admin.register(models.Note)
 class NoteAdmin(admin.ModelAdmin):
-    search_fields = ["content", "tags"]
+    search_fields = ["content", "tags", "project__name"]
     list_filter = ["tags", "created_on"]
     list_display = ["created_on", "project_name", "tags"]
 
