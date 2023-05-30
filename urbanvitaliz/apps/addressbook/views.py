@@ -66,7 +66,9 @@ def organization_list(request):
     """Return the Organization list"""
     has_perm_or_403(request.user, "use_addressbook", request.site)
 
-    organizations = models.Organization.on_site.order_by("name")
+    organizations = models.Organization.on_site.order_by("name").prefetch_related(
+        "departments"
+    )
     return render(request, "addressbook/organization_list.html", locals())
 
 
