@@ -364,7 +364,7 @@ def update_projects_with_their_notifications(site, user, project_statuses):
         #     )
         # )
     )
-    notifications = {n.project_id: n for n in all_unread_notifications}
+    notifications = {n["project_id"]: n for n in all_unread_notifications}
 
     # the empty dict is going to be used read only, so sharing same object
     empty = {
