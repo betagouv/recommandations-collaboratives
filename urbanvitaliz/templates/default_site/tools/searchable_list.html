@@ -4,8 +4,7 @@
     {% vite_asset 'js/apps/searchableList.js' %}
 {% endblock %}
 <div x-data="SearchableList('{{ search_list_id }}', {{ list.field.choices|length }}, {{ search_options }})"
-     id="{{ search_list_id }}"
-     class="p-2 py-4 my-4">
+     id="{{ search_list_id }}">
     <h5 class="mb-0 d-flex align-items-center justify-content-start">
         <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#list" />

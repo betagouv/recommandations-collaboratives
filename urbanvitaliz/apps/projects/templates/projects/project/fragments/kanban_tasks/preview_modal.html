@@ -71,12 +71,12 @@
 											</template>
 											<div class="d-flex justify-content-between" style="font-size: 0.9em;">
 												<div>
-													<img class="rounded-circle d-inline-block" width="20px" height="20px"
-														:src="gravatar_url(currentTask.created_by.email, 25)" data-bs-toggle="tooltip"
+													<img class="rounded-circle d-inline-block" width="18px" height="18px"
+														:src="gravatar_url(currentTask.created_by.email, 18)" data-bs-toggle="tooltip"
 														data-bs-placement="bottom"
 														:title="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
 														style="z-index: 1000;" tabindex="0" />
-													<span class="ms-1 fst-italic"
+													<span class="ms-1 fw-bold"
 														x-text="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
 														style="line-height: 20px"></span>
 													<template x-if="currentTask.created_by.profile.organization">

@@ -48,7 +48,7 @@ def test_create_new_organization_and_redirect(request, client):
     assert organization.name == data["name"]
     assert site in list(organization.sites.all())
 
-    new_url = reverse("addressbook-organization-list")
+    new_url = reverse("addressbook-organization-details", args=(organization.pk,))
     assertRedirects(response, new_url)
 
 
@@ -58,14 +58,6 @@ def test_organization_list_not_available_for_non_staff(client):
     with login(client):
         response = client.get(url)
     assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_organization_list_available_for_switchtender(client):
-    url = reverse("addressbook-organization-list")
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-    assert response.status_code == 200
 
 
 @pytest.mark.django_db
@@ -89,7 +81,7 @@ def test_create_existing_organization_and_redirect(request, client):
     assert updated.name == data["name"]
     assert current_site in list(organization.sites.all())
 
-    new_url = reverse("addressbook-organization-list")
+    new_url = reverse("addressbook-organization-details", args=(organization.pk,))
     assertRedirects(response, new_url)
 
 
@@ -304,6 +296,29 @@ def test_contact_update_and_redirect(request, client):
         "addressbook-organization-details", args=[contact.organization_id]
     )
     assertRedirects(response, new_url)
+
+
+########################################################################
+# REST API: projects
+########################################################################
+@pytest.mark.django_db
+def test_anonymous_can_use_organization_api(client):
+    url = reverse("organizations-list")
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_anonymous_can_search_organization_api(client, request):
+    current_site = get_current_site(request)
+
+    baker.make(models.Organization, name="acme corporation", sites=[current_site])
+
+    url = reverse("organizations-list")
+    response = client.get(url, {"search": "acm corparotion"}, format="json")
+
+    assert response.status_code == 200
+    assert len(response.data) > 0
 
 
 # eof

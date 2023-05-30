@@ -107,18 +107,20 @@
                                     <a class="text-decoration-none hover-underline" :href="makeProjectURL('{% url 'projects-project-detail-conversations' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)" class="text-green fw-medium" x-text="getUnreadPublicMessages(item)"></span></a>
                                 </template>
                             </div>
-                            <div class="d-flex align-items-center tiny responsive-flex-column">
-                                <svg class="align-middle bi me-1"
-                                    width="18px"
-                                    height="16px"
-                                    fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
-                                </svg>
-                                <span class="text-grey-dark me-1" x-text="item.project.private_message_count <= 1 ? `${item.project.private_message_count} message conseillers` : `${item.project.private_message_count} messages conseillers`"></span>
-                                <template x-if="getUnreadPrivateMessages(item) && (item.project.is_observer || item.project.is_switchtender)">
-                                    <a class="text-decoration-none hover-underline" :href="makeProjectURL('{% url 'projects-project-detail-internal-followup' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)" class="text-green fw-medium" x-text="getUnreadPrivateMessages(item)"></span></a>
-                                </template>
-                            </div>
+                            <template x-if="item.project.is_observer || item.project.is_switchtender">
+                                <div class="d-flex align-items-center tiny responsive-flex-column">
+                                    <svg class="align-middle bi me-1"
+                                        width="18px"
+                                        height="16px"
+                                        fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
+                                    </svg>
+                                    <span class="text-grey-dark me-1" x-text="item.project.private_message_count <= 1 ? `${item.project.private_message_count} message conseillers` : `${item.project.private_message_count} messages conseillers`"></span>
+                                    <template x-if="getUnreadPrivateMessages(item) && (item.project.is_observer || item.project.is_switchtender)">
+                                        <a class="text-decoration-none hover-underline" :href="makeProjectURL('{% url 'projects-project-detail-internal-followup' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)" class="text-green fw-medium" x-text="getUnreadPrivateMessages(item)"></span></a>
+                                    </template>
+                                </div>
+                            </template>
                         </div>
                         <div x-data="{ open: false }" x-on:click.outside="open = false" class="btn-group position-relative">
                             <button :class="{'active':open}"  class="button grey small filled border px-2" x-on:click="open = !open" type="button">...</button>

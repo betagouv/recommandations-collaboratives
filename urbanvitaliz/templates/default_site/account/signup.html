@@ -33,7 +33,50 @@
                 S'inscrire en remplissant les champs suivants
             </h4>
             <div class="fr-fieldset__content">
-                {{ form.as_p }}
+                <p>
+                    {{form.first_name.label}}
+                    {{form.first_name.errors}}
+                    {{form.first_name}}
+                </p>
+                <p>
+                    {{form.last_name.label}}
+                    {{form.last_name.errors}}
+                    {{form.last_name}}
+                </p>
+                <p class="">
+                    {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True %}
+                </p>
+                <p>
+                    {{form.organization_position.label}}
+                    {{form.organization_position.errors}}
+                    {{form.organization_position}}
+                </p>
+                <p>
+                    {{form.email.label}}
+                    {{form.email.errors}}
+                    {{form.email}}
+                </p>
+                <p>
+                    {{form.phone_no.label}}
+                    {{form.phone_no.errors}}
+                    {{form.phone_no}}
+                </p>
+                <p>
+                    {{form.password1.label}}
+                    {{form.password1.errors}}
+                    {{form.password1}}
+                </p>
+                <p>
+                    {{form.password2.label}}
+                    {{form.password2.errors}}
+                    {{form.password2}}
+                </p>
+                <p>
+                    {{ form.captcha }}
+                    {% for error in form.captcha.errors %}
+                    <div class="text-danger text-start mb-2">{{ error }}</div>
+                    {% endfor %}
+                </p>
                 <div class="fr-input-group fr-mt-4v">
                     <button class="fr-btn custom-login-button" type="submit">
                         S'inscrire

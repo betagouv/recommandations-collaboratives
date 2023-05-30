@@ -45,21 +45,12 @@
                                     {% endfor %}
                                 {% endif %}
                             {% if note.created_by %}
-                            <div>
-                                <span class="align-items-center link-dark text-decoration-none">
-                                    <img
-                                        src="{% gravatar_url note.created_by.email 16 %}"
-                                        alt="{{ note.created_by.get_full_name }}"
-                                        class="me-1 rounded-circle"
-                                        style="width: 16px; height: 16px;"
-                                    />
-                                </span>
-                                <span class="align-middle small text-dark">
-                                    {{ note.created_by.get_full_name|capfirst|default:note.created_by }}
-                                </span>
+                            <div class="d-flex align-items-center">
+                                {% include 'user/user_card.html' with user=note.created_by %}
+
                                 {% if note.created_by == request.user %}
-                                <span class="align-middle small text-dark">
-                                    - <a href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                                <span class="align-middle small text-dark ms-2">
+                                    - <a class="ms-1 "href="{% url 'projects-update-note' note.pk %}">éditer</a>
                                 </span>
                                 {% endif %}
                             </div>
