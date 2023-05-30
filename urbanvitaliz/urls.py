@@ -49,11 +49,11 @@ router.register(
     basename="project-tasks-notifications",
 )
 
-router.register(
-    r"projects",
-    projects_rest.ProjectViewSet,
-    basename="projects",
-)
+# router.register(
+#     r"projects",
+#     projects_rest.ProjectViewSet,
+#     basename="projects",
+# )
 
 
 router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
@@ -66,6 +66,16 @@ router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
 
 urlpatterns = [
     path("api/", include(router.urls)),
+    path(
+        "api/project/<int:pk>/",
+        projects_rest.ProjectDetail.as_view(),
+        name="projects-detail",
+    ),
+    path(
+        "api/project/",
+        projects_rest.ProjectList.as_view(),
+        name="projects-list",
+    ),
     path(
         "api/userprojectstatus/<int:pk>/",
         projects_rest.UserProjectStatusDetail.as_view(),

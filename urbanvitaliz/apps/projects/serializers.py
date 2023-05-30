@@ -121,6 +121,59 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         }
 
 
+class ProjectForListSerializer(serializers.BaseSerializer):
+    class Meta:
+        model = Project
+        fields = []
+
+    def to_representation(self, data):
+        """Return a representation of data (optimized version)"""
+        # uses our optimized queryset and not project serializer
+        commune = data.commune
+        commune_data = (
+            {
+                "name": commune.name,
+                "insee": commune.insee,
+                "postal": commune.postal,
+                "department": {
+                    "code": commune.department.code,
+                    "name": commune.department.name,
+                },
+                "latitude": commune.latitude,
+                "longitude": commune.longitude,
+            }
+            if commune
+            else None
+        )
+        return {
+            "id": data.id,
+            "name": data.name,
+            "org_name": data.org_name,
+            "status": data.status,
+            "created_on": data.created_on,
+            "updated_on": data.updated_on,
+            "switchtenders": [
+                {
+                    "first_name": s.first_name,
+                    "last_name": s.last_name,
+                    "username": s.username,
+                    "profile": {
+                        "organization": {
+                            "name": s.profile.organization.name
+                            if s.profile.organization
+                            else "",
+                        }
+                    },
+                }
+                for s in data.switchtenders.all()
+            ],
+            "is_switchtender": False,
+            "is_observer": False,
+            "commune": commune_data,
+            "notifications": data.notifications,
+        }
+
+
 class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = TaskFollowup

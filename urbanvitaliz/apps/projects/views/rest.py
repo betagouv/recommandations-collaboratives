@@ -24,6 +24,7 @@ from urbanvitaliz.utils import get_group_for_site
 from .. import models, signals
 from ..serializers import (
     ProjectSerializer,
+    ProjectForListSerializer,
     TaskFollowupSerializer,
     TaskNotificationSerializer,
     TaskSerializer,
@@ -36,20 +37,99 @@ from ..serializers import (
 ########################################################################
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows projects to be viewed or edited.
-    """
+class ProjectDetail(APIView):
+    """Retrieve a project"""
 
-    def get_queryset(self):
-        # TODO tune query set to prevent loads of requests on subqueries
-        return self.queryset.for_user(self.request.user).order_by(
-            "-created_on", "-updated_on"
-        )
-
-    queryset = models.Project.on_site
-    serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self, pk):
+        try:
+            return models.Project.on_site.get(pk=pk)
+        except models.Project.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        ups = self.get_object(pk)
+        context = {"request": request}
+        serializer = ProjectSerializer(ups, context=context)
+        return Response(serializer.data)
+
+
+class ProjectList(APIView):
+    """List all user project status"""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, format=None):
+        projects = fetch_the_site_projects(request.site, request.user)
+        context = {"request": request}
+
+        serializer = ProjectForListSerializer(projects, context=context, many=True)
+        return Response(serializer.data)
+
+
+def fetch_the_site_projects(site, user):
+    """Returns the complete project list of site for advisor user
+
+    Here we face a n+1 fetching problem that happens at multiple levels
+    implying an explosition of requests
+    The intent is to fetch each kind of objects in on request and then to
+    reattach the information to the appropriate object.
+    """
+    projects = (
+        models.Project.on_site.for_user(user)
+        .order_by("-created_on", "-updated_on")
+        .prefetch_related("commune__department")
+    )
+
+    # asscoiated related notification to their projects
+    update_projects_with_their_notifications(site, projects)
+
+    return projects
+
+
+def update_projects_with_their_notifications(site, projects):
+    """Fetch all the related notifications and associate them w/ their projects"""
+
+    project_ct = ContentType.objects.get_for_model(models.Project)
+
+    advisor_group = get_group_for_site("advisor", site)
+    advisors = [
+        int(advisor) for advisor in advisor_group.user_set.values_list("id", flat=True)
+    ]
+
+    collaborator_activity = (
+        notifications_models.Notification.on_site.filter(
+            target_content_type=project_ct.pk
+        )
+        .unread()
+        .order_by("target_object_id")
+        .exclude(actor_object_id__in=advisors)
+        .values(project_id=F("target_object_id"))
+        .annotate(activity=Count("id"))
+    )
+    collaborators = {n["project_id"]: n["activity"] for n in collaborator_activity}
+
+    # for each project associate the corresponding notifications
+    for p in projects:
+        active = collaborators.get(str(p.id), False)
+        p.notifications = {"has_collaborator_activity": active}
+
+
+# class ProjectViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint that allows projects to be viewed or edited.
+#     """
+#
+#     def get_queryset(self):
+#         # TODO tune query set to prevent loads of requests on subqueries
+#         return self.queryset.for_user(self.request.user).order_by(
+#             "-created_on", "-updated_on"
+#         )
+#
+#     queryset = models.Project.on_site
+#     serializer_class = ProjectSerializer
+#     permission_classes = [permissions.IsAuthenticated]
 
 
 class TaskFollowupViewSet(viewsets.ModelViewSet):
@@ -287,7 +367,7 @@ def fetch_the_site_project_statuses_for_user(site, user):
     update_user_project_status_with_their_project(site, project_statuses)
 
     # asscoiated related notification to their projects
-    update_projects_with_their_notifications(site, user, project_statuses)
+    update_project_statuses_with_their_notifications(site, user, project_statuses)
 
     return project_statuses
 
@@ -324,11 +404,11 @@ def update_user_project_status_with_their_project(site, project_statuses):
         ps.project = projects[ps.project_id]
 
 
-def update_projects_with_their_notifications(site, user, project_statuses):
+def update_project_statuses_with_their_notifications(site, user, project_statuses):
     """Fetch all the related notifications and associate them w/ their projects"""
 
     # projects of interest
-    projects = [s.project_id for s in project_statuses]
+    project_ids = [s.project_id for s in project_statuses]
 
     notifications = notifications_models.Notification.on_site.filter(recipient=user)
 
@@ -341,7 +421,7 @@ def update_projects_with_their_notifications(site, user, project_statuses):
 
     unread_notifications = (
         notifications.filter(
-            target_content_type=project_ct.pk, target_object_id__in=projects
+            target_content_type=project_ct.pk, target_object_id__in=project_ids
         )
         .unread()
         .order_by("target_object_id")
