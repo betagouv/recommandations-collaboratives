@@ -297,7 +297,11 @@ def create_missing_user_project_statuses(site, user, project_statuses):
 
     # get projects with no user project status
     ids = list(project_statuses.values_list("project__id", flat=True))
-    projects = models.Project.on_site.for_user(user).exclude(id__in=ids)
+    projects = (
+        models.Project.on_site.for_user(user)
+        .exclude(id__in=ids)
+        .prefetch_related("commune__department")
+    )
 
     # create the missing ones
     new_statuses = [
@@ -368,12 +372,12 @@ def update_projects_with_their_notifications(site, user, project_statuses):
 
     # the empty dict is going to be used read only, so sharing same object
     empty = {
-         "count": 0,
-         "has_collaborator_activity": 0,
-         "unread_public_messages": 0,
-         "unread_private_messages": 0,
-         "new_recommendations": 0,
-     }
+        "count": 0,
+        "has_collaborator_activity": 0,
+        "unread_public_messages": 0,
+        "unread_private_messages": 0,
+        "new_recommendations": 0,
+    }
 
     # for each project associate the corresponding notifications
     for ps in project_statuses:
