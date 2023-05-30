@@ -169,8 +169,6 @@ class ProjectForListSerializer(serializers.BaseSerializer):
                 }
                 for s in data.switchtenders.all()
             ],
-            "is_switchtender": False,
-            "is_observer": False,
             "commune": commune_data,
             "notifications": data.notifications,
         }
@@ -352,8 +350,8 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
                     }
                     for s in data.project.switchtenders.all()
                 ],
-                "is_switchtender": False,
-                "is_observer": False,
+                "is_switchtender": data.is_switchtender,
+                "is_observer": data.is_observer,
                 "commune": commune_data,
                 "notifications": data.project.notifications,
                 "recommendation_count": data.project.recommendation_count,

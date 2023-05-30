@@ -398,7 +398,7 @@ def fetch_the_site_project_statuses_for_user(site, user):
     project_statuses = list(project_statuses.prefetch_related("user__profile"))
 
     # associate related project information with each user project status
-    update_user_project_status_with_their_project(site, project_statuses)
+    update_user_project_status_with_their_project(site, user, project_statuses)
 
     # asscoiated related notification to their projects
     update_project_statuses_with_their_notifications(site, user, project_statuses)
@@ -421,16 +421,26 @@ def create_missing_user_project_statuses(site, user, project_statuses):
     models.UserProjectStatus.objects.bulk_create(new_statuses)
 
 
-def update_user_project_status_with_their_project(site, project_statuses):
+def update_user_project_status_with_their_project(site, user, project_statuses):
     """Fetch all related projects and associate them with their project status"""
 
     # fetch all requested projects and their annotations in a single query
     ids = [ps.project_id for ps in project_statuses]
     projects = {p.id: p for p in fetch_site_projects_with_ids(site, ids)}
 
-    # update project statuses with the right project
+    # fetch all related site project switchtender to annotate furthemore the project
+    switchtendering = {
+        ps["project_id"]: ps["is_observer"]
+        for ps in models.ProjectSwitchtender.objects.filter(
+            site=site, switchtender=user, project_id__in=ids
+        ).values("project_id", "is_observer")
+    }
+
+    # update project statuses with the right project and switchtendering statuses
     for ps in project_statuses:
         ps.project = projects[ps.project_id]
+        ps.is_switchtender = ps.project_id in switchtendering
+        ps.is_observer = switchtendering.get(str(ps.project_id), False)
 
 
 def update_project_statuses_with_their_notifications(site, user, project_statuses):
@@ -496,12 +506,6 @@ def update_project_statuses_with_their_notifications(site, user, project_statuse
         ps.project.notifications = notifications.get(str(ps.project_id), empty)
         active = collaborators.get(str(ps.project_id), False)
         ps.project.notifications["has_collaborator_activity"] = active
-
-        # also annotate status of user bad number of requests
-        ps.project.is_switchtender = user in ps.project.switchtenders.all()
-        ps.project.is_observer = user.id in ps.project.switchtenders_on_site.filter(
-            is_observer=True
-        ).values_list("switchtender__id", flat=True)
 
 
 #     return {

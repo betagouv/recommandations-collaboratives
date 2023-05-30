@@ -110,6 +110,8 @@ def test_user_project_status_contains_only_my_projects(request):
         name="Mon project",
     )
     mine = baker.make(models.UserProjectStatus, user=user, site=site, project=project)
+
+    baker.make(models.ProjectSwitchtender, site=site, switchtender=user, project=project)
     # a public note with notification
     pub_note = baker.make(models.Note, public=True, project=mine.project)
     verb = "a envoyé un message"
