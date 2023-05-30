@@ -98,22 +98,54 @@ def update_projects_with_their_notifications(site, projects):
         int(advisor) for advisor in advisor_group.user_set.values_list("id", flat=True)
     ]
 
-    collaborator_activity = (
+    unread_notifications = (
         notifications_models.Notification.on_site.filter(
             target_content_type=project_ct.pk
         )
         .unread()
         .order_by("target_object_id")
-        .exclude(actor_object_id__in=advisors)
+    )
+
+    # fetch the related notifications
+    all_unread_notifications = (
+        unread_notifications.values(project_id=F("target_object_id"))
+        .annotate(count=Count("id"))
+        .annotate(
+            unread_public_messages=Count("id", filter=Q(verb="a envoyé un message"))
+        )
+        .annotate(
+            unread_private_messages=Count(
+                "id", filter=Q(verb="a envoyé un message dans l'espace conseillers")
+            )
+        )
+        .annotate(
+            new_recommendations=Count("id", filter=Q(verb="a recommandé l'action"))
+        )
+    )
+    notifications = {n["project_id"]: n for n in all_unread_notifications}
+
+    # Specific request for collaborator activity as it relies on exclusion
+    collaborator_activity = (
+        unread_notifications.exclude(actor_object_id__in=advisors)
         .values(project_id=F("target_object_id"))
         .annotate(activity=Count("id"))
     )
     collaborators = {n["project_id"]: n["activity"] for n in collaborator_activity}
 
+    # the empty dict is going to be used read only, so sharing same object
+    empty = {
+        "count": 0,
+        "has_collaborator_activity": 0,
+        "unread_public_messages": 0,
+        "unread_private_messages": 0,
+        "new_recommendations": 0,
+    }
+
     # for each project associate the corresponding notifications
     for p in projects:
+        p.notifications = notifications.get(str(p.id), empty)
         active = collaborators.get(str(p.id), False)
-        p.notifications = {"has_collaborator_activity": active}
+        p.notifications["has_collaborator_activity"] = active
 
 
 # class ProjectViewSet(viewsets.ModelViewSet):

@@ -157,6 +157,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
                     "first_name": s.first_name,
                     "last_name": s.last_name,
                     "username": s.username,
+                    "email": s.username,
                     "profile": {
                         "organization": {
                             "name": s.profile.organization.name

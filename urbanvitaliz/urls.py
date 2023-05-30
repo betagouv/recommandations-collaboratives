@@ -75,7 +75,7 @@ urlpatterns = [
         name="projects-detail",
     ),
     path(
-        "api/project/",
+        "api/projects/",
         projects_rest.ProjectList.as_view(),
         name="projects-list",
     ),
