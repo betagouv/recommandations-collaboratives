@@ -497,6 +497,12 @@ def update_project_statuses_with_their_notifications(site, user, project_statuse
         active = collaborators.get(str(ps.project_id), False)
         ps.project.notifications["has_collaborator_activity"] = active
 
+        # also annotate status of user bad number of requests
+        ps.project.is_switchtender = user in ps.project.switchtenders.all()
+        ps.project.is_observer = user.id in ps.project.switchtenders_on_site.filter(
+            is_observer=True
+        ).values_list("switchtender__id", flat=True)
+
 
 #     return {
 #         "count": unread_notifications.count(),

@@ -55,6 +55,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     is_switchtender = serializers.SerializerMethodField()
 
     def get_is_switchtender(self, obj):
+        # FIXME check that we should reduce switchteders to current site
         request = self.context.get("request")
         return request.user in obj.switchtenders.all()
 
