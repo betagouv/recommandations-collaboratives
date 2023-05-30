@@ -39,3 +39,7 @@
 .tiny{
     font-size: 12px;
 }
+
+.font-italic {
+    font-style: italic;
+}
