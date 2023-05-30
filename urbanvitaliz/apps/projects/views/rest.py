@@ -300,6 +300,7 @@ def create_missing_user_project_statuses(site, user, project_statuses):
     projects = (
         models.Project.on_site.for_user(user)
         .exclude(id__in=ids)
+        .prefetch_related("commune")
         .prefetch_related("commune__department")
     )
 
