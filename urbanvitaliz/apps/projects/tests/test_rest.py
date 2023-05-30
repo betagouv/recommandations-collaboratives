@@ -26,6 +26,10 @@ from .. import models, utils
 ########################################################################
 # REST API: projects
 ########################################################################
+
+# FIXME pourquoi est ce que ces tests n'utilisent pas le APIClient ?
+
+
 @pytest.mark.django_db
 def test_anonymous_cannot_use_project_api(client):
     url = reverse("projects-list")
@@ -111,7 +115,9 @@ def test_user_project_status_contains_only_my_projects(request):
     )
     mine = baker.make(models.UserProjectStatus, user=user, site=site, project=project)
 
-    baker.make(models.ProjectSwitchtender, site=site, switchtender=user, project=project)
+    baker.make(
+        models.ProjectSwitchtender, site=site, switchtender=user, project=project
+    )
     # a public note with notification
     pub_note = baker.make(models.Note, public=True, project=mine.project)
     verb = "a envoyé un message"
@@ -151,6 +157,28 @@ def test_user_project_status_contains_only_my_projects(request):
     first = response.data[0]
     assert first["id"] == mine.id
     assert first["project"]["id"] == mine.project.id
+
+    # user project status fields
+    assert set(first.keys()) == set(["id", "project", "status"])
+
+    # project fields: not ideal
+    expected = [
+        "commune",
+        "created_on",
+        "id",
+        "is_observer",
+        "is_switchtender",
+        "name",
+        "notifications",
+        "org_name",
+        "private_message_count",
+        "public_message_count",
+        "recommendation_count",
+        "status",
+        "switchtenders",
+        "updated_on",
+    ]
+    assert set(first["project"].keys()) == set(expected)
 
 
 @pytest.mark.django_db
