@@ -8,14 +8,18 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 from copy import copy
-from django.http import Http404
-from django.db.models import Count, Q
+
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count, F, Q
+from django.http import Http404
+from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from urbanvitaliz.utils import get_group_for_site
 
 from .. import models, signals
 from ..serializers import (
@@ -23,10 +27,9 @@ from ..serializers import (
     TaskFollowupSerializer,
     TaskNotificationSerializer,
     TaskSerializer,
-    UserProjectStatusSerializer,
     UserProjectStatusForListSerializer,
+    UserProjectStatusSerializer,
 )
-
 
 ########################################################################
 # REST API
@@ -255,28 +258,58 @@ class UserProjectStatusList(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, format=None):
-        ups = fetch_the_site_ups_for_user(request.site, request.user)
+        ups = fetch_the_site_project_statuses_for_user(request.site, request.user)
         context = {"request": request}
 
         serializer = UserProjectStatusForListSerializer(ups, context=context, many=True)
         return Response(serializer.data)
 
 
-def fetch_the_site_ups_for_user(site, user):
-    """Returns the complete ups tree with children"""
+def fetch_the_site_project_statuses_for_user(site, user):
+    """Returns the complete user project status list for user on site
+
+    Here we face a n+1 fetching problem that happens at multiple levels
+    implying an explosition of requests (order of 400+ request for 30+ projects)
+    The intent is to fetch each kind of objecst in on request and then to
+    reattache the information to the appropriate object.
+    """
     project_statuses = models.UserProjectStatus.objects.filter(
         user=user, project__deleted=None
     )
 
-    # get projects with missing user project status
+    # create missing user project status
+    create_missing_user_project_statuses(site, user, project_statuses)
+
+    # fetch all projects statuses for user
+    project_statuses = list(project_statuses.prefetch_related("user__profile"))
+
+    # associate related project information with each user project status
+    update_user_project_status_with_their_project(site, project_statuses)
+
+    # asscoiated related notification to their projects
+    update_projects_with_their_notifications(site, user, project_statuses)
+
+    return project_statuses
+
+
+def create_missing_user_project_statuses(site, user, project_statuses):
+    """Create user projects statuses for given projects"""
+
+    # get projects with no user project status
     ids = list(project_statuses.values_list("project__id", flat=True))
     projects = models.Project.on_site.for_user(user).exclude(id__in=ids)
 
-    # create missing user project status
-    create_missing_ups(user, site, projects)
+    # create the missing ones
+    new_statuses = [
+        models.UserProjectStatus(user=user, site=site, project=p, status="NEW")
+        for p in projects
+    ]
+    models.UserProjectStatus.objects.bulk_create(new_statuses)
 
-    # fetch all projects statuses
-    project_statuses = list(project_statuses.prefetch_related("user__profile"))
+
+def update_user_project_status_with_their_project(site, project_statuses):
+    """Fetch all related projects and associate them with their project status"""
+
     # fetch all requested projects and their annotations in a single query
     ids = [ps.project_id for ps in project_statuses]
     projects = {p.id: p for p in fetch_site_projects_with_ids(site, ids)}
@@ -285,16 +318,77 @@ def fetch_the_site_ups_for_user(site, user):
     for ps in project_statuses:
         ps.project = projects[ps.project_id]
 
-    return project_statuses
 
+def update_projects_with_their_notifications(site, user, project_statuses):
+    """Fetch all the related notifications and associate them w/ their projects"""
 
-def create_missing_ups(user, site, projects):
-    """Create user projects statuses for given projects"""
-    new_statuses = [
-        models.UserProjectStatus(user=user, site=site, project=p, status="NEW")
-        for p in projects
+    # projects of interest
+    projects = [s.project_id for s in project_statuses]
+
+    notifications = notifications_models.Notification.on_site.filter(recipient=user)
+
+    project_ct = ContentType.objects.get_for_model(models.Project)
+
+    advisor_group = get_group_for_site("advisor", site)
+    advisors = [
+        int(advisor) for advisor in advisor_group.user_set.values_list("id", flat=True)
     ]
-    models.UserProjectStatus.objects.bulk_create(new_statuses)
+
+    unread_notifications = (
+        notifications.filter(
+            target_content_type=project_ct.pk, target_object_id__in=projects
+        )
+        .unread()
+        .order_by("target_object_id")
+    )
+
+    # fetch the related notifications
+    all_unread_notifications = (
+        unread_notifications.values(project_id=F("target_object_id"))
+        .annotate(count=Count("id"))
+        .annotate(
+            unread_public_messages=Count("id", filter=Q(verb="a envoyé un message"))
+        )
+        .annotate(
+            unread_private_messages=Count(
+                "id", filter=Q(verb="a envoyé un message dans l'espace conseillers")
+            )
+        )
+        .annotate(
+            new_recommendations=Count("id", filter=Q(verb="a recommandé l'action"))
+        )
+        # FIXME currently the generated where clause is empty and fails
+        # .annotate(
+        #     has_collaborator_activity=Count(
+        #         "id", filter=~Q(actor_object_id__in=advisors)
+        #     )
+        # )
+    )
+    notifications = {n.project_id: n for n in all_unread_notifications}
+
+    # the empty dict is going to be used read only, so sharing same object
+    empty = {
+         "count": 0,
+         "has_collaborator_activity": 0,
+         "unread_public_messages": 0,
+         "unread_private_messages": 0,
+         "new_recommendations": 0,
+     }
+
+    # for each project associate the corresponding notifications
+    for ps in project_statuses:
+        ps.project.notifications = notifications.get(ps.project_id, empty)
+
+
+#     return {
+#         "count": unread_notifications.count(),
+#         "has_collaborator_activity": unread_notifications.exclude(
+#             actor_object_id__in=advisors
+#         ).exists(),
+#         "unread_public_messages": unread_public_messages.count(),
+#         "unread_private_messages": unread_private_messages.count(),
+#         "new_recommendations": new_recommendations.count(),
+#     }
 
 
 def fetch_site_projects_with_ids(site, ids):

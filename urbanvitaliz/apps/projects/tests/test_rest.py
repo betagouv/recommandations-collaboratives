@@ -14,11 +14,12 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
+from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertNotContains
 from rest_framework.test import APIClient
 from urbanvitaliz.utils import login
 
-from .. import models, utils
+from .. import models, utils, signals
 
 
 ########################################################################
@@ -136,7 +137,40 @@ def test_user_project_status_contains_only_my_projects_for_site(request):
 def test_access_my_user_project_status(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    mine = baker.make(models.UserProjectStatus, user=user, site=site)
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        commune__name="Ma Comune",
+        commune__department__name="Mon Departement",
+        name="Mon project",
+    )
+    mine = baker.make(models.UserProjectStatus, user=user, site=site, project=project)
+    # a public note with notification
+    pub_note = baker.make(models.Note, public=True, project=mine.project)
+    verb = "a envoyé un message"
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb=verb,
+        action_object=pub_note,
+        target=project,
+        private=True,  # XXX why is private true?
+    )
+
+    # a private note with notification
+    priv_note = baker.make(models.Note, public=False, project=mine.project)
+    verb = "a envoyé un message dans l'espace conseillers"
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb=verb,
+        action_object=priv_note,
+        target=project,
+        private=True,
+    )
+
+    # cont.
     client = APIClient()
     client.force_authenticate(user=user)
     url = reverse("userprojectstatus-detail", args=[mine.id])
