@@ -81,7 +81,7 @@ def fetch_the_site_projects(site, user):
         .order_by("-created_on", "-updated_on")
         .prefetch_related("commune")
         .prefetch_related("commune__department")
-        .prefetch_related("switchtender__profile__organization")
+        .prefetch_related("switchtenders__profile__organization")
     )
 
     # asscoiated related notification to their projects
