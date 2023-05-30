@@ -362,14 +362,16 @@ def update_projects_with_their_notifications(site, user, project_statuses):
         .annotate(
             new_recommendations=Count("id", filter=Q(verb="a recommandé l'action"))
         )
-        # FIXME currently the generated where clause is empty and fails
-        # .annotate(
-        #     has_collaborator_activity=Count(
-        #         "id", filter=~Q(actor_object_id__in=advisors)
-        #     )
-        # )
     )
     notifications = {n["project_id"]: n for n in all_unread_notifications}
+
+    # Specific request for collaborator activity as it relies on exclusion
+    collaborator_activity = (
+        unread_notifications.exclude(actor_object_id__in=advisors)
+        .values(project_id=F("target_object_id"))
+        .annotate(activity=Count("id"))
+    )
+    collaborators = {n["project_id"]: n["activity"] for n in collaborator_activity}
 
     # the empty dict is going to be used read only, so sharing same object
     empty = {
@@ -382,7 +384,9 @@ def update_projects_with_their_notifications(site, user, project_statuses):
 
     # for each project associate the corresponding notifications
     for ps in project_statuses:
-        ps.project.notifications = notifications.get(ps.project_id, empty)
+        ps.project.notifications = notifications.get(str(ps.project_id), empty)
+        active = collaborators.get(str(ps.project_id), False)
+        ps.project.notifications["has_collaborator_activity"] = active
 
 
 #     return {

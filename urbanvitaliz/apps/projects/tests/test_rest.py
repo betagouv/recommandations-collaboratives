@@ -17,9 +17,10 @@ from model_bakery import baker
 from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertNotContains
 from rest_framework.test import APIClient
-from urbanvitaliz.utils import login
 
-from .. import models, utils, signals
+from urbanvitaliz.utils import get_group_for_site, login
+
+from .. import models, utils
 
 
 ########################################################################
@@ -99,44 +100,7 @@ def test_project_status_needs_authentication():
 def test_user_project_status_contains_only_my_projects(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    mine = baker.make(models.UserProjectStatus, user=user, site=site)
-    other = baker.make(models.UserProjectStatus, site=site)  # noqa
-    client = APIClient()
-    client.force_authenticate(user=user)
-    url = reverse("userprojectstatus-list")
-    response = client.get(url)
-    assert response.status_code == 200
-    assert len(response.data) == 1
-
-    with open("/tmp/out.json", "w") as f:
-        f.write(str(response.data))
-
-    first = response.data[0]
-    assert first["id"] == mine.id
-    assert first["project"]["id"] == mine.project.id
-
-
-@pytest.mark.django_db
-def test_user_project_status_contains_only_my_projects_for_site(request):
-    user = baker.make(auth_models.User)
-    site = get_current_site(request)
-    local = baker.make(models.UserProjectStatus, user=user, site=site)
-    other = baker.make(models.UserProjectStatus, user=user)  # noqa
-    client = APIClient()
-    client.force_authenticate(user=user)
-    url = reverse("userprojectstatus-list")
-    response = client.get(url)
-    assert response.status_code == 200
-    assert len(response.data) == 1
-    first = response.data[0]
-    assert first["id"] == local.id
-    assert first["project"]["id"] == local.project.id
-
-
-@pytest.mark.django_db
-def test_access_my_user_project_status(request):
-    user = baker.make(auth_models.User)
-    site = get_current_site(request)
+    # my project and details
     project = baker.make(
         models.Project,
         sites=[site],
@@ -170,7 +134,45 @@ def test_access_my_user_project_status(request):
         private=True,
     )
 
-    # cont.
+    # another one not for me
+    other = baker.make(models.UserProjectStatus, site=site)  # noqa
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("userprojectstatus-list")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    first = response.data[0]
+    assert first["id"] == mine.id
+    assert first["project"]["id"] == mine.project.id
+
+
+@pytest.mark.django_db
+def test_user_project_status_contains_only_my_projects_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    local = baker.make(models.UserProjectStatus, user=user, site=site)
+    other = baker.make(models.UserProjectStatus, user=user)  # noqa
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("userprojectstatus-list")
+    response = client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    first = response.data[0]
+    assert first["id"] == local.id
+    assert first["project"]["id"] == local.project.id
+
+
+@pytest.mark.django_db
+def test_access_my_user_project_status(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    mine = baker.make(models.UserProjectStatus, user=user, site=site)
     client = APIClient()
     client.force_authenticate(user=user)
     url = reverse("userprojectstatus-detail", args=[mine.id])
@@ -335,7 +337,7 @@ def test_user_cannot_see_project_tasks_when_not_in_relation(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     project = baker.make(models.Project, sites=[site])
-    tasks = baker.make(models.Task, project=project, site=site, public=True)
+    baker.make(models.Task, project=project, site=site, public=True)
 
     client = APIClient()
     client.force_authenticate(user=user)
