@@ -48,7 +48,7 @@ def test_create_new_organization_and_redirect(request, client):
     assert organization.name == data["name"]
     assert site in list(organization.sites.all())
 
-    new_url = reverse("addressbook-organization-list")
+    new_url = reverse("addressbook-organization-details", args=(organization.pk,))
     assertRedirects(response, new_url)
 
 
@@ -81,7 +81,7 @@ def test_create_existing_organization_and_redirect(request, client):
     assert updated.name == data["name"]
     assert current_site in list(organization.sites.all())
 
-    new_url = reverse("addressbook-organization-list")
+    new_url = reverse("addressbook-organization-details", args=(organization.pk,))
     assertRedirects(response, new_url)
 
 
