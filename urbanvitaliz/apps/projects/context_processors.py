@@ -23,15 +23,16 @@ def active_project_processor(request):
         "active_project": active_project,
     }
 
-    # Retrieve notification count
-    project_ct = ContentType.objects.get_for_model(projects_models.Project)
-    unread_notifications_for_projects = request.user.notifications.unread().filter(
-        target_content_type=project_ct.pk,
-    )
+    if request.user.is_authenticated:
+        # Retrieve notification count
+        project_ct = ContentType.objects.get_for_model(projects_models.Project)
+        unread_notifications_for_projects = request.user.notifications.unread().filter(
+            target_content_type=project_ct.pk,
+        )
 
-    context.update(
-        {"unread_notifications_count": unread_notifications_for_projects.count()}
-    )
+        context.update(
+            {"unread_notifications_count": unread_notifications_for_projects.count()}
+        )
 
     if active_project:
         try:
