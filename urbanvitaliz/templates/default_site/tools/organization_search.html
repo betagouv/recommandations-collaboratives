@@ -25,7 +25,7 @@
             <div class="d-flex align-items-center flex-wrap mt-2 mb-2">
                 <span class="d-block text-blue text-info-custom text-grey-dark font-small fw-normal">Suggestions de noms d'organisation :</span>
                 <template x-for="result in results">
-                    <div class="d-flex align-item-center flex-wrap mx-1">
+                    <div class="d-flex align-item-center flex-wrap mx-1 mt-1">
                         <button @click.prevent="handleResultClick(result.name)" class="button secondary blue small" x-text="result.name"></button>
                     </div>
                 </template>
