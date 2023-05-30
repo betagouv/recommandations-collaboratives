@@ -106,8 +106,12 @@
                     <div class="btn-group">
                         <a href="{% url 'projects-project-list' %}"
                         class="nav-link link-dark {% if url_name == 'projects-project-list' %}active{% endif %}">
+                            {% if unread_notifications_count %}
+                            <span class="has-notification">&nbsp;</span>
+                            {% endif %}
                             <span class="ms-1 align-middle">Tableau de bord</span>
                         </a>
+
                         <button x-on:click="open = !open"
                             type="button"
                             class="border-0 btn py-0 px-1">
@@ -201,4 +205,3 @@
     {% endif %}
 </ul>
 {% endwith %}
-
