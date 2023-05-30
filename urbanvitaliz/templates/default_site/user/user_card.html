@@ -7,7 +7,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
 <div class="user-card position-relative d-flex my-1 flex-column justify-content-between align-items-start">
-    <div class="d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center justify-content-between {% if user_activity %} w-100 {% endif %}">
         <div class="d-flex align-items-center flex-wrap">
             <span class="me-1 d-flex align-items-center font-very-small">
                 <img class="rounded-circle me-1" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
@@ -22,7 +22,7 @@
                     {% endif %}
                 </strong>
             </span>
-            <span class="text-grey-dark fw-light font-italic font-very-small">{{user.profile.organization.name}}</span>
+            <span class="text-dark fw-normal font-italic font-very-small">{{user.profile.organization.name}}</span>
         </div>
         {% if 'use_crm' in user_site_perms and user_activity %}
             <a class="small" href="{% url 'crm-user-details' user.pk %}">
