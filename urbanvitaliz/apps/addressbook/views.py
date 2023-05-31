@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from urbanvitaliz.utils import has_perm_or_403
 
+
 from . import models
 
 ########################################################################################
@@ -32,7 +33,9 @@ def organization_create(request):
             organization.sites.add(request.site)
             organization.departments.add(*departments)
             organization.save()
-            return redirect(reverse("addressbook-organization-list"))
+            return redirect(
+                reverse("addressbook-organization-details", args=(organization.pk,))
+            )
     else:
         form = OrganizationForm()
     return render(request, "addressbook/organization_create.html", locals())
@@ -63,7 +66,9 @@ def organization_list(request):
     """Return the Organization list"""
     has_perm_or_403(request.user, "use_addressbook", request.site)
 
-    organizations = models.Organization.on_site.order_by("name")
+    organizations = models.Organization.on_site.order_by("name").prefetch_related(
+        "departments"
+    )
     return render(request, "addressbook/organization_list.html", locals())
 
 

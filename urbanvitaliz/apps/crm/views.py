@@ -120,14 +120,20 @@ def crm_search(request):
 ########################################################################
 
 
+def get_queryset_for_site_organizations(site):
+    """Return queryset of organizations from addressbook site or w/ user on site"""
+    return Organization.objects.filter(
+        Q(sites=site) | Q(registered_profiles__sites=site)
+    ).distinct()
+
+
 @login_required
 def organization_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     # organization from addressbook current site or w/ user on site
-    qs = Organization.objects.filter(
-        Q(sites=request.site) | Q(registered_profiles__sites=request.site)
-    )
+    qs = get_queryset_for_site_organizations(request.site)
+
     organizations = filters.OrganizationFilter(
         request.GET,
         queryset=qs.order_by("name"),
@@ -143,10 +149,7 @@ def organization_list(request):
 def organization_update(request, organization_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # organization from addressbook current site or w/ user on site
-    qs = Organization.objects.filter(
-        Q(sites=request.site) | Q(registered_profiles__sites=request.site)
-    )
+    qs = get_queryset_for_site_organizations(request.site)
     organization = get_object_or_404(qs, pk=organization_id)
 
     if request.method == "POST":
@@ -167,10 +170,7 @@ def organization_update(request, organization_id=None):
 def organization_merge(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # organization from addressbook current site or w/ user on site
-    qs = Organization.objects.filter(
-        Q(sites=request.site) | Q(registered_profiles__sites=request.site)
-    )
+    qs = get_queryset_for_site_organizations(request.site)
 
     if request.method == "POST":
         name = request.POST.get("name")
@@ -241,12 +241,8 @@ def merge_organizations_with_name(orgs, name):
 def organization_details(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # organization from addressbook current site or w/ user on site
-    query = Q(sites=request.site) | Q(registered_profiles__sites=request.site)
-
-    organization = get_object_or_404(
-        Organization.objects.filter(query), pk=organization_id
-    )
+    qs = get_queryset_for_site_organizations(request.site)
+    organization = get_object_or_404(qs, pk=organization_id)
 
     participants = User.objects.filter(
         profile__in=organization.registered_profiles.all()
@@ -692,7 +688,8 @@ def create_note_for_project(request, project_id):
 def create_note_for_organization(request, organization_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization.on_site, pk=organization_id)
+    qs = get_queryset_for_site_organizations(request.site)
+    organization = get_object_or_404(qs, pk=organization_id)
 
     _, response = handle_create_note_for_object(
         request,
@@ -760,7 +757,9 @@ def update_note_for_project(request, project_id, note_id):
 def update_note_for_organization(request, organization_id, note_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    organization = get_object_or_404(Organization.on_site, pk=organization_id)
+    qs = get_queryset_for_site_organizations(request.site)
+    organization = get_object_or_404(qs, pk=organization_id)
+
     organization_ct = ContentType.objects.get_for_model(organization)
     note = get_object_or_404(
         models.Note.on_site,
