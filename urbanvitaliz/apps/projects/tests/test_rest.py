@@ -98,12 +98,12 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         private=True,  # only appear on crm stream
     )
 
-    # a private note with notification
+    # a private note with notification for someone else
     priv_note = baker.make(models.Note, public=False, project=project)
     verb = "a envoyé un message dans l'espace conseillers"
     notify.send(
         sender=user,
-        recipient=user,
+        recipient=baker.make(auth_models.User),
         verb=verb,
         action_object=priv_note,
         target=project,
@@ -151,10 +151,10 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     assert data["is_switchtender"] == True
     assert data["is_observer"] == False
     assert data["notifications"] == {
-        "count": 2,
+        "count": 1,
         "has_collaborator_activity": True,
         "new_recommendations": 0,
-        "unread_private_messages": 1,
+        "unread_private_messages": 0,
         "unread_public_messages": 1,
         "project_id": str(project.id),
     }
@@ -191,7 +191,7 @@ def test_user_project_status_contains_only_my_projects(request):
     baker.make(
         models.ProjectSwitchtender, site=site, switchtender=user, project=project
     )
-    # a public note with notification
+    # a public note with notification for myself
     pub_note = baker.make(models.Note, public=True, project=mine.project)
     verb = "a envoyé un message"
     notify.send(
@@ -203,12 +203,12 @@ def test_user_project_status_contains_only_my_projects(request):
         private=True,  # only appear on crm stream
     )
 
-    # a private note with notification
+    # a private note with notification for someone else
     priv_note = baker.make(models.Note, public=False, project=mine.project)
     verb = "a envoyé un message dans l'espace conseillers"
     notify.send(
         sender=user,
-        recipient=user,
+        recipient=baker.make(auth_models.User),  # for someone else
         verb=verb,
         action_object=priv_note,
         target=project,
@@ -259,10 +259,10 @@ def test_user_project_status_contains_only_my_projects(request):
     assert first["project"]["is_switchtender"] == True
     assert first["project"]["is_observer"] == False
     assert first["project"]["notifications"] == {
-        "count": 2,
+        "count": 1,
         "has_collaborator_activity": True,
         "new_recommendations": 0,
-        "unread_private_messages": 1,
+        "unread_private_messages": 0,
         "unread_public_messages": 1,
         "project_id": str(project.id),
     }

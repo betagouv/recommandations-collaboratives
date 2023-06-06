@@ -99,13 +99,13 @@ def fetch_the_site_projects(site, user):
         p.is_switchtender = p.id in switchtendering
         p.is_observer = switchtendering.get(p.id, False)
 
-    # asscoiated related notification to their projects
-    update_projects_with_their_notifications(site, projects)
+    # associate related notification to their projects
+    update_projects_with_their_notifications(site, user, projects)
 
     return projects
 
 
-def update_projects_with_their_notifications(site, projects):
+def update_projects_with_their_notifications(site, user, projects):
     """Fetch all the related notifications and associate them w/ their projects"""
 
     project_ct = ContentType.objects.get_for_model(models.Project)
@@ -116,9 +116,8 @@ def update_projects_with_their_notifications(site, projects):
     ]
 
     unread_notifications = (
-        notifications_models.Notification.on_site.filter(
-            target_content_type=project_ct.pk
-        )
+        notifications_models.Notification.on_site.filter(recipient=user)
+        .filter(target_content_type=project_ct.pk)
         .unread()
         .order_by("target_object_id")
     )
