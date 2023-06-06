@@ -140,6 +140,8 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "created_on": data.created_on,
             "updated_on": data.updated_on,
             "switchtenders": format_switchtenders(data),
+            "is_switchtender": data.is_switchtender,
+            "is_observer": data.is_observer,
             "commune": commune_data,
             "notifications": data.notifications,
         }

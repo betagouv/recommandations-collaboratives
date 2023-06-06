@@ -436,11 +436,13 @@ def update_user_project_status_with_their_project(site, user, project_statuses):
         ).values("project_id", "is_observer")
     }
 
+    print(switchtendering)
+
     # update project statuses with the right project and switchtendering statuses
     for ps in project_statuses:
         ps.project = projects[ps.project_id]
-        ps.is_switchtender = str(ps.project_id) in switchtendering
-        ps.is_observer = switchtendering.get(str(ps.project_id), False)
+        ps.is_switchtender = ps.project_id in switchtendering
+        ps.is_observer = switchtendering.get(ps.project_id, False)
 
 
 def update_project_statuses_with_their_notifications(site, user, project_statuses):

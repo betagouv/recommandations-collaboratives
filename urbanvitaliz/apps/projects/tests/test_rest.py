@@ -100,14 +100,29 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     url = reverse("projects-list")
     response = client.get(url)
 
-    # with login(client, groups=["example_com_advisor"]) as user:
-    #     user.profile.departments.add(project.commune.department)
-    #     response = client.get(url)
-
     assert response.status_code == 200
     assert len(response.data) == 1
 
     data = response.data[0]
+
+    # project fields: not ideal
+    expected = [
+        "commune",
+        "created_on",
+        "id",
+        "is_observer",
+        "is_switchtender",
+        "name",
+        "notifications",
+        "org_name",
+        "private_message_count",
+        "public_message_count",
+        "recommendation_count",
+        "status",
+        "switchtenders",
+        "updated_on",
+    ]
+    assert set(data.keys()) == set(expected)
 
     assert data["name"] == project.name
 
@@ -208,6 +223,8 @@ def test_user_project_status_contains_only_my_projects(request):
         "updated_on",
     ]
     assert set(first["project"].keys()) == set(expected)
+    assert first["project"]["is_switchtender"] == True
+    assert first["project"]["is_observer"] == False
 
 
 @pytest.mark.django_db
