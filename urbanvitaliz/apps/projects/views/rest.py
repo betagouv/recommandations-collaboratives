@@ -73,7 +73,7 @@ def fetch_the_site_projects(site, user):
 
     Here we face a n+1 fetching problem that happens at multiple levels
     implying an explosition of requests
-    The intent is to fetch each kind of objects in on request and then to
+    The intent is to fetch each kind of objects in one request and then to
     reattach the information to the appropriate object.
     """
     projects = (
@@ -111,7 +111,7 @@ def update_projects_with_their_notifications(site, projects):
     # fetch the related notifications
     all_unread_notifications = (
         unread_notifications.values(project_id=F("target_object_id"))
-        .annotate(count=Count("id"))
+        .annotate(count=Count("id", distinct=True))
         .annotate(
             unread_public_messages=Count("id", filter=Q(verb="a envoyé un message"))
         )
@@ -130,7 +130,7 @@ def update_projects_with_their_notifications(site, projects):
     collaborator_activity = (
         unread_notifications.exclude(actor_object_id__in=advisors)
         .values(project_id=F("target_object_id"))
-        .annotate(activity=Count("id"))
+        .annotate(activity=Count("id", disctint=True))
     )
     collaborators = {n["project_id"]: n["activity"] for n in collaborator_activity}
 
@@ -439,7 +439,7 @@ def update_user_project_status_with_their_project(site, user, project_statuses):
     # update project statuses with the right project and switchtendering statuses
     for ps in project_statuses:
         ps.project = projects[ps.project_id]
-        ps.is_switchtender = ps.project_id in switchtendering
+        ps.is_switchtender = str(ps.project_id) in switchtendering
         ps.is_observer = switchtendering.get(str(ps.project_id), False)
 
 
@@ -469,7 +469,7 @@ def update_project_statuses_with_their_notifications(site, user, project_statuse
     # fetch the related notifications
     all_unread_notifications = (
         unread_notifications.values(project_id=F("target_object_id"))
-        .annotate(count=Count("id"))
+        .annotate(count=Count("id", distinct=True))
         .annotate(
             unread_public_messages=Count("id", filter=Q(verb="a envoyé un message"))
         )
