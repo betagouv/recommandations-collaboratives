@@ -258,9 +258,9 @@ def project_list_for_advisor(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
-    unread_notifications = notifications_models.Notification.on_site.unread().filter(
-        recipient=request.user, public=True
-    )
+    # unread_notifications = notifications_models.Notification.on_site.unread().filter(
+    #    recipient=request.user, public=True
+    # )
 
     mark_general_notifications_as_seen(request.user)
 
@@ -307,8 +307,13 @@ def project_list_for_staff(request):
             "-created_on"
         )
 
-    unread_notifications = notifications_models.Notification.on_site.unread().filter(
-        recipient=request.user, public=True
+    unread_notifications = (
+        notifications_models.Notification.on_site.unread()
+        .filter(recipient=request.user, public=True)
+        .prefetch_related("actor__profile__organization")
+        .prefetch_related("action_object")
+        .prefetch_related("target")
+        .order_by("-timestamp")[:100]
     )
 
     mark_general_notifications_as_seen(request.user)
@@ -338,8 +343,13 @@ def project_maplist(request):
             .order_by("-created_on")
         )
 
-    unread_notifications = notifications_models.Notification.on_site.unread().filter(
-        recipient=request.user, public=True
+    unread_notifications = (
+        notifications_models.Notification.on_site.unread()
+        .filter(recipient=request.user, public=True)
+        .prefetch_related("actor__profile__organization")
+        .prefetch_related("action_object")
+        .prefetch_related("target")
+        .order_by("-timestamp")[:100]
     )
 
     return render(request, "projects/project/list-map.html", locals())
