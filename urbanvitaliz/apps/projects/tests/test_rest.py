@@ -73,23 +73,43 @@ def test_project_list_includes_project_for_staff(request, client):
 def test_project_list_includes_only_projects_in_switchtender_departments(
     request, client
 ):
+    user = baker.make(auth_models.User, email="me@example.com")
+    site = get_current_site(request)
+    # my project and details
     project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[site],
+        status="READY",
+        commune__name="Ma Comune",
         commune__department__code="01",
+        commune__department__name="Mon Departement",
+        name="Mon project",
     )
     unwanted_project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[site],
+        status="READY",
         commune__department__code="02",
     )
-    url = reverse("projects-list")
-    with login(client, groups=["example_com_advisor"]) as user:
-        user.profile.departments.add(project.commune.department)
-        response = client.get(url)
 
-    assertContains(response, project.name)
-    assertNotContains(response, unwanted_project.name)
+    utils.assign_advisor(user, project, site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+    response = client.get(url)
+
+    # with login(client, groups=["example_com_advisor"]) as user:
+    #     user.profile.departments.add(project.commune.department)
+    #     response = client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    data = response.data[0]
+
+    assert data["name"] == project.name
 
 
 ########################################################################
