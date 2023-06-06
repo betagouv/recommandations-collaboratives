@@ -31,7 +31,9 @@ def active_project_processor(request):
         )
 
         context.update(
-            {"unread_notifications_count": unread_notifications_for_projects.count()}
+            {
+                "unread_notifications_count": unread_notifications_for_projects.count(),
+            }
         )
 
     if active_project:

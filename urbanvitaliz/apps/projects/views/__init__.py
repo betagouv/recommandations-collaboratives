@@ -20,6 +20,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
+from django.db.models import Q
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import never_cache
 from notifications import models as notifications_models
@@ -223,6 +224,14 @@ def select_commune(request, project_id=None):
 ########################################################################
 # Switchtender
 ########################################################################
+def mark_general_notifications_as_seen(user):
+    # Mark some notifications as seen
+    project_ct = ContentType.objects.get_for_model(models.Project)
+    notifications = user.notifications.unread().filter(
+        Q(verb="a déposé le projet"),
+        target_content_type=project_ct.pk,
+    )
+    notifications.mark_all_as_read()
 
 
 @login_required
@@ -252,6 +261,8 @@ def project_list_for_advisor(request):
     unread_notifications = notifications_models.Notification.on_site.unread().filter(
         recipient=request.user, public=True
     )
+
+    mark_general_notifications_as_seen(request.user)
 
     project_ct = ContentType.objects.get_for_model(models.Project)
     user_project_pks = list(
@@ -299,6 +310,8 @@ def project_list_for_staff(request):
     unread_notifications = notifications_models.Notification.on_site.unread().filter(
         recipient=request.user, public=True
     )
+
+    mark_general_notifications_as_seen(request.user)
 
     return render(request, "projects/project/list-kanban.html", locals())
 
