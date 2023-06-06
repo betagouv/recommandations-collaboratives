@@ -92,6 +92,11 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     assertNotContains(response, unwanted_project.name)
 
 
+########################################################################
+# user project statuses
+########################################################################
+
+
 @pytest.mark.django_db
 def test_project_status_needs_authentication():
     client = APIClient()
@@ -102,7 +107,7 @@ def test_project_status_needs_authentication():
 
 @pytest.mark.django_db
 def test_user_project_status_contains_only_my_projects(request):
-    user = baker.make(auth_models.User)
+    user = baker.make(auth_models.User, email="me@example.com")
     site = get_current_site(request)
     # my project and details
     project = baker.make(
@@ -157,6 +162,10 @@ def test_user_project_status_contains_only_my_projects(request):
     first = response.data[0]
     assert first["id"] == mine.id
     assert first["project"]["id"] == mine.project.id
+
+    assert len(first["project"]["switchtenders"]) == 1
+    switchtender = first["project"]["switchtenders"][0]
+    assert switchtender["email"] == user.email
 
     # user project status fields
     assert set(first.keys()) == set(["id", "project", "status"])

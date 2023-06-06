@@ -1,15 +1,20 @@
+--
+-- create a database for a django project
 
--- Create the database for your application
+-- Create the database for the application
 CREATE DATABASE urbanvitaliz;
+
 -- Create the dedicated user
 CREATE USER urbanvitaliz WITH PASSWORD 'urbanvitaliz';
+
+-- grant privileges for creating things
 ALTER USER "urbanvitaliz" CREATEDB ;
 GRANT ALL PRIVILEGES ON DATABASE "urbanvitaliz" to "urbanvitaliz";
 
--- Connect to mydb
+-- Connect to the database
 \connect urbanvitaliz;
 
--- Create a new schema with urbanvitaliz as urbanvitaliz
+-- Create a new schema dedicated user as owner
 CREATE SCHEMA urbanvitaliz AUTHORIZATION urbanvitaliz;
 
 -- Set some settings as recommended by the Django documentation

@@ -131,21 +131,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
         """Return a representation of data (optimized version)"""
         # uses our optimized queryset and not project serializer
         commune = data.commune
-        commune_data = (
-            {
-                "name": commune.name,
-                "insee": commune.insee,
-                "postal": commune.postal,
-                "department": {
-                    "code": commune.department.code,
-                    "name": commune.department.name,
-                },
-                "latitude": commune.latitude,
-                "longitude": commune.longitude,
-            }
-            if commune
-            else None
-        )
+        commune_data = format_commune(commune)
         return {
             "id": data.id,
             "name": data.name,
@@ -153,22 +139,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "status": data.status,
             "created_on": data.created_on,
             "updated_on": data.updated_on,
-            "switchtenders": [
-                {
-                    "first_name": s.first_name,
-                    "last_name": s.last_name,
-                    "username": s.username,
-                    "email": s.username,
-                    "profile": {
-                        "organization": {
-                            "name": s.profile.organization.name
-                            if s.profile.organization
-                            else "",
-                        }
-                    },
-                }
-                for s in data.switchtenders.all()
-            ],
+            "switchtenders": format_switchtenders(data),
             "commune": commune_data,
             "notifications": data.notifications,
         }
@@ -309,22 +280,8 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
     def to_representation(self, data):
         """Return a representation of data (optimized version)"""
         # use our optimized queryset and not project serializer
-        commune = data.project.commune
-        commune_data = (
-            {
-                "name": commune.name,
-                "insee": commune.insee,
-                "postal": commune.postal,
-                "department": {
-                    "code": commune.department.code,
-                    "name": commune.department.name,
-                },
-                "latitude": commune.latitude,
-                "longitude": commune.longitude,
-            }
-            if commune
-            else None
-        )
+        commune_data = format_commune(data.project.commune)
+
         return {
             "id": data.id,
             "status": data.status,
@@ -335,21 +292,7 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
                 "status": data.project.status,
                 "created_on": data.project.created_on,
                 "updated_on": data.project.updated_on,
-                "switchtenders": [
-                    {
-                        "first_name": s.first_name,
-                        "last_name": s.last_name,
-                        "username": s.username,
-                        "profile": {
-                            "organization": {
-                                "name": s.profile.organization.name
-                                if s.profile.organization
-                                else "",
-                            }
-                        },
-                    }
-                    for s in data.project.switchtenders.all()
-                ],
+                "switchtenders": format_switchtenders(data.project),
                 "is_switchtender": data.is_switchtender,
                 "is_observer": data.is_observer,
                 "commune": commune_data,
@@ -359,6 +302,41 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
                 "private_message_count": data.project.private_message_count,
             },
         }
+
+
+def format_commune(commune):
+    if not commune:
+        return None
+    return {
+        "name": commune.name,
+        "insee": commune.insee,
+        "postal": commune.postal,
+        "department": {
+            "code": commune.department.code,
+            "name": commune.department.name,
+        },
+        "latitude": commune.latitude,
+        "longitude": commune.longitude,
+    }
+
+
+def format_switchtenders(project):
+    return [
+        {
+            "first_name": s.first_name,
+            "last_name": s.last_name,
+            "username": s.username,
+            "email": s.email,
+            "profile": {
+                "organization": {
+                    "name": s.profile.organization.name
+                    if s.profile.organization
+                    else "",
+                }
+            },
+        }
+        for s in project.switchtenders.all()
+    ]
 
 
 # eof

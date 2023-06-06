@@ -146,7 +146,7 @@ def update_projects_with_their_notifications(site, projects):
     # for each project associate the corresponding notifications
     for p in projects:
         p.notifications = notifications.get(str(p.id), empty)
-        active = collaborators.get(str(p.id), False)
+        active = collaborators.get(str(p.id), 0)
         p.notifications["has_collaborator_activity"] = active
 
 
