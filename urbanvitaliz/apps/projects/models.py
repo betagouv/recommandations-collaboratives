@@ -33,6 +33,7 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
+
 from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor, has_perm
 
 from . import apps
@@ -118,7 +119,7 @@ class ProjectManager(models.Manager):
         """Return only project with commune in department scope (empty=full)"""
         result = queryset.exclude(commune=None)
         if departments:
-            result = result.filter(commune__department__in=departments)
+            result = result.filter(commune__department__code__in=departments)
         return result
 
     def for_user(self, user):
@@ -133,7 +134,7 @@ class ProjectManager(models.Manager):
 
         # Reduce scope of projects for regional actors to their area
         if check_if_advisor(user):
-            actor_departments = user.profile.departments.all()
+            actor_departments = user.profile.departments.values_list("code", flat=True)
             projects = self._filter_by_departments(projects, actor_departments)
 
         # Extend scope of projects to those where you're member or invited advisor

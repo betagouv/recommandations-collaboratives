@@ -14,9 +14,11 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
+from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertNotContains
 from rest_framework.test import APIClient
-from urbanvitaliz.utils import login
+
+from urbanvitaliz.utils import get_group_for_site, login
 
 from .. import models, utils
 
@@ -24,6 +26,10 @@ from .. import models, utils
 ########################################################################
 # REST API: projects
 ########################################################################
+
+# FIXME pourquoi est ce que ces tests n'utilisent pas le APIClient ?
+
+
 @pytest.mark.django_db
 def test_anonymous_cannot_use_project_api(client):
     url = reverse("projects-list")
@@ -67,23 +73,96 @@ def test_project_list_includes_project_for_staff(request, client):
 def test_project_list_includes_only_projects_in_switchtender_departments(
     request, client
 ):
+    user = baker.make(auth_models.User, email="me@example.com")
+    site = get_current_site(request)
+    # my project and details
     project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[site],
+        status="READY",
+        commune__name="Ma Comune",
         commune__department__code="01",
+        commune__department__name="Mon Departement",
+        name="Mon project",
     )
+
+    # a public note with notification
+    pub_note = baker.make(models.Note, public=True, project=project)
+    verb = "a envoyé un message"
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb=verb,
+        action_object=pub_note,
+        target=project,
+        private=True,  # only appear on crm stream
+    )
+
+    # a private note with notification for someone else
+    priv_note = baker.make(models.Note, public=False, project=project)
+    verb = "a envoyé un message dans l'espace conseillers"
+    notify.send(
+        sender=user,
+        recipient=baker.make(auth_models.User),
+        verb=verb,
+        action_object=priv_note,
+        target=project,
+        private=True,  # only appear on crm stream
+    )
+
+
     unwanted_project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[site],
+        status="READY",
         commune__department__code="02",
     )
-    url = reverse("projects-list")
-    with login(client, groups=["example_com_advisor"]) as user:
-        user.profile.departments.add(project.commune.department)
-        response = client.get(url)
 
-    assertContains(response, project.name)
-    assertNotContains(response, unwanted_project.name)
+    utils.assign_advisor(user, project, site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    data = response.data[0]
+
+    # project fields: not ideal
+    expected = [
+        "commune",
+        "created_on",
+        "id",
+        "is_observer",
+        "is_switchtender",
+        "name",
+        "notifications",
+        "org_name",
+        "status",
+        "switchtenders",
+        "updated_on",
+    ]
+    assert set(data.keys()) == set(expected)
+
+    assert data["name"] == project.name
+    assert data["is_switchtender"] == True
+    assert data["is_observer"] == False
+    assert data["notifications"] == {
+        "count": 1,
+        "has_collaborator_activity": True,
+        "new_recommendations": 0,
+        "unread_private_messages": 0,
+        "unread_public_messages": 1,
+        "project_id": str(project.id),
+    }
+
+
+########################################################################
+# user project statuses
+########################################################################
 
 
 @pytest.mark.django_db
@@ -96,19 +175,98 @@ def test_project_status_needs_authentication():
 
 @pytest.mark.django_db
 def test_user_project_status_contains_only_my_projects(request):
-    user = baker.make(auth_models.User)
+    user = baker.make(auth_models.User, email="me@example.com")
     site = get_current_site(request)
-    mine = baker.make(models.UserProjectStatus, user=user, site=site)
+    # my project and details
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        commune__name="Ma Comune",
+        commune__department__name="Mon Departement",
+        name="Mon project",
+    )
+    mine = baker.make(models.UserProjectStatus, user=user, site=site, project=project)
+
+    baker.make(
+        models.ProjectSwitchtender, site=site, switchtender=user, project=project
+    )
+    # a public note with notification for myself
+    pub_note = baker.make(models.Note, public=True, project=mine.project)
+    verb = "a envoyé un message"
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb=verb,
+        action_object=pub_note,
+        target=project,
+        private=True,  # only appear on crm stream
+    )
+
+    # a private note with notification for someone else
+    priv_note = baker.make(models.Note, public=False, project=mine.project)
+    verb = "a envoyé un message dans l'espace conseillers"
+    notify.send(
+        sender=user,
+        recipient=baker.make(auth_models.User),  # for someone else
+        verb=verb,
+        action_object=priv_note,
+        target=project,
+        private=True,  # only appear on crm stream
+    )
+
+    # another one not for me
     other = baker.make(models.UserProjectStatus, site=site)  # noqa
+
     client = APIClient()
     client.force_authenticate(user=user)
+
     url = reverse("userprojectstatus-list")
     response = client.get(url)
+
     assert response.status_code == 200
     assert len(response.data) == 1
+
     first = response.data[0]
     assert first["id"] == mine.id
     assert first["project"]["id"] == mine.project.id
+
+    assert len(first["project"]["switchtenders"]) == 1
+    switchtender = first["project"]["switchtenders"][0]
+    assert switchtender["email"] == user.email
+
+    # user project status fields
+    assert set(first.keys()) == set(["id", "project", "status"])
+
+    # project fields: not ideal
+    expected = [
+        "commune",
+        "created_on",
+        "id",
+        "is_observer",
+        "is_switchtender",
+        "name",
+        "notifications",
+        "org_name",
+        "private_message_count",
+        "public_message_count",
+        "recommendation_count",
+        "status",
+        "switchtenders",
+        "updated_on",
+    ]
+    assert set(first["project"].keys()) == set(expected)
+    assert first["project"]["is_switchtender"] == True
+    assert first["project"]["is_observer"] == False
+    assert first["project"]["notifications"] == {
+        "count": 1,
+        "has_collaborator_activity": True,
+        "new_recommendations": 0,
+        "unread_private_messages": 0,
+        "unread_public_messages": 1,
+        "project_id": str(project.id),
+    }
+
 
 
 @pytest.mark.django_db
@@ -297,7 +455,7 @@ def test_user_cannot_see_project_tasks_when_not_in_relation(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     project = baker.make(models.Project, sites=[site])
-    tasks = baker.make(models.Task, project=project, site=site, public=True)
+    baker.make(models.Task, project=project, site=site, public=True)
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -366,7 +524,7 @@ def test_project_advisor_can_move_project_tasks_for_site(request):
 def test_updating_user_project_is_logged(request):
     user = baker.make(auth_models.User, username="Bob")
     site = get_current_site(request)
-    ups = baker.make(models.UserProjectStatus, user=user, site=site)
+    ups = baker.make(models.UserProjectStatus, user=user, site=site, status="DRAFT")
 
     to_update = {"status": "DONE"}
 
