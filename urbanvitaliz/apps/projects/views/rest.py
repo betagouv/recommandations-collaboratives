@@ -76,13 +76,28 @@ def fetch_the_site_projects(site, user):
     The intent is to fetch each kind of objects in one request and then to
     reattach the information to the appropriate object.
     """
-    projects = (
+    projects = list(
         models.Project.on_site.for_user(user)
         .order_by("-created_on", "-updated_on")
         .prefetch_related("commune")
         .prefetch_related("commune__department")
         .prefetch_related("switchtenders__profile__organization")
     )
+
+    ids = [p.id for p in projects]
+
+    # fetch all related site project switchtender to annotate furthemore the project
+    switchtendering = {
+        ps["project_id"]: ps["is_observer"]
+        for ps in models.ProjectSwitchtender.objects.filter(
+            site=site, switchtender=user, project_id__in=ids
+        ).values("project_id", "is_observer")
+    }
+
+    # update project statuses with the right project and switchtendering statuses
+    for p in projects:
+        p.is_switchtender = p.id in switchtendering
+        p.is_observer = switchtendering.get(p.id, False)
 
     # asscoiated related notification to their projects
     update_projects_with_their_notifications(site, projects)
@@ -435,8 +450,6 @@ def update_user_project_status_with_their_project(site, user, project_statuses):
             site=site, switchtender=user, project_id__in=ids
         ).values("project_id", "is_observer")
     }
-
-    print(switchtendering)
 
     # update project statuses with the right project and switchtendering statuses
     for ps in project_statuses:

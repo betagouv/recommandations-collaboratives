@@ -115,9 +115,6 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         "name",
         "notifications",
         "org_name",
-        "private_message_count",
-        "public_message_count",
-        "recommendation_count",
         "status",
         "switchtenders",
         "updated_on",
@@ -125,6 +122,8 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     assert set(data.keys()) == set(expected)
 
     assert data["name"] == project.name
+    assert data["is_switchtender"] == True
+    assert data["is_observer"] == False
 
 
 ########################################################################
