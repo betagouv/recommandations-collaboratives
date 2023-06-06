@@ -530,18 +530,21 @@ def fetch_site_projects_with_ids(site, ids):
             recommendation_count=Count(
                 "tasks",
                 filter=Q(tasks__public=True, tasks__site=site),
+                distinct=True,
             )
         )
         .annotate(
             public_message_count=Count(
                 "notes",
                 filter=Q(notes__public=True, notes__site=site),
+                distinct=True,
             )
         )
         .annotate(
             private_message_count=Count(
                 "notes",
                 filter=Q(notes__public=False, notes__site=site),
+                distinct=True,
             )
         )
     )
