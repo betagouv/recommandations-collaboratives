@@ -58,11 +58,11 @@ class ProjectDetail(APIView):
         p = self.get_object(pk)
         context = {"request": request, "view": self, "format": format}
         serializer = ProjectSerializer(
-            p, context=context, data=request.data
+            p, context=context, data=request.data, partial=True
         )
         if serializer.is_valid():
-            old = copy(p)
-            new = serializer.save()
+            # old = copy(p)
+            # new = serializer.save()
             # if new:
             #     signals.project_project_updated.send(
             #         sender=self, old_one=old, new_one=new
