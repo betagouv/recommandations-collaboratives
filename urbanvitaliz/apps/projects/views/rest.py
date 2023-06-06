@@ -152,7 +152,7 @@ def update_projects_with_their_notifications(site, projects):
     # the empty dict is going to be used read only, so sharing same object
     empty = {
         "count": 0,
-        "has_collaborator_activity": 0,
+        "has_collaborator_activity": False,
         "unread_public_messages": 0,
         "unread_private_messages": 0,
         "new_recommendations": 0,
@@ -161,7 +161,7 @@ def update_projects_with_their_notifications(site, projects):
     # for each project associate the corresponding notifications
     for p in projects:
         p.notifications = notifications.get(str(p.id), empty)
-        active = collaborators.get(str(p.id), 0)
+        active = bool(collaborators.get(str(p.id)))
         p.notifications["has_collaborator_activity"] = active
 
 
@@ -510,7 +510,7 @@ def update_project_statuses_with_their_notifications(site, user, project_statuse
     # the empty dict is going to be used read only, so sharing same object
     empty = {
         "count": 0,
-        "has_collaborator_activity": 0,
+        "has_collaborator_activity": False,
         "unread_public_messages": 0,
         "unread_private_messages": 0,
         "new_recommendations": 0,
@@ -519,7 +519,7 @@ def update_project_statuses_with_their_notifications(site, user, project_statuse
     # for each project associate the corresponding notifications
     for ps in project_statuses:
         ps.project.notifications = notifications.get(str(ps.project_id), empty)
-        active = collaborators.get(str(ps.project_id), False)
+        active = bool(collaborators.get(str(ps.project_id)))
         ps.project.notifications["has_collaborator_activity"] = active
 
 

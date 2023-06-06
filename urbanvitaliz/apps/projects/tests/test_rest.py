@@ -85,6 +85,32 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         commune__department__name="Mon Departement",
         name="Mon project",
     )
+
+    # a public note with notification
+    pub_note = baker.make(models.Note, public=True, project=project)
+    verb = "a envoyé un message"
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb=verb,
+        action_object=pub_note,
+        target=project,
+        private=True,  # only appear on crm stream
+    )
+
+    # a private note with notification
+    priv_note = baker.make(models.Note, public=False, project=project)
+    verb = "a envoyé un message dans l'espace conseillers"
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb=verb,
+        action_object=priv_note,
+        target=project,
+        private=True,  # only appear on crm stream
+    )
+
+
     unwanted_project = baker.make(
         models.Project,
         sites=[site],
@@ -124,6 +150,14 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     assert data["name"] == project.name
     assert data["is_switchtender"] == True
     assert data["is_observer"] == False
+    assert data["notifications"] == {
+        "count": 2,
+        "has_collaborator_activity": True,
+        "new_recommendations": 0,
+        "unread_private_messages": 1,
+        "unread_public_messages": 1,
+        "project_id": str(project.id),
+    }
 
 
 ########################################################################
@@ -166,7 +200,7 @@ def test_user_project_status_contains_only_my_projects(request):
         verb=verb,
         action_object=pub_note,
         target=project,
-        private=True,  # XXX why is private true?
+        private=True,  # only appear on crm stream
     )
 
     # a private note with notification
@@ -178,7 +212,7 @@ def test_user_project_status_contains_only_my_projects(request):
         verb=verb,
         action_object=priv_note,
         target=project,
-        private=True,
+        private=True,  # only appear on crm stream
     )
 
     # another one not for me
@@ -224,6 +258,15 @@ def test_user_project_status_contains_only_my_projects(request):
     assert set(first["project"].keys()) == set(expected)
     assert first["project"]["is_switchtender"] == True
     assert first["project"]["is_observer"] == False
+    assert first["project"]["notifications"] == {
+        "count": 2,
+        "has_collaborator_activity": True,
+        "new_recommendations": 0,
+        "unread_private_messages": 1,
+        "unread_public_messages": 1,
+        "project_id": str(project.id),
+    }
+
 
 
 @pytest.mark.django_db
