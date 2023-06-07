@@ -55,6 +55,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     is_switchtender = serializers.SerializerMethodField()
 
     def get_is_switchtender(self, obj):
+        # FIXME check that we should reduce switchteders to current site
         request = self.context.get("request")
         return request.user in obj.switchtenders.all()
 
@@ -118,6 +119,31 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "unread_public_messages": unread_public_messages.count(),
             "unread_private_messages": unread_private_messages.count(),
             "new_recommendations": new_recommendations.count(),
+        }
+
+
+class ProjectForListSerializer(serializers.BaseSerializer):
+    class Meta:
+        model = Project
+        fields = []
+
+    def to_representation(self, data):
+        """Return a representation of data (optimized version)"""
+        # uses our optimized queryset and not project serializer
+        commune = data.commune
+        commune_data = format_commune(commune)
+        return {
+            "id": data.id,
+            "name": data.name,
+            "org_name": data.org_name,
+            "status": data.status,
+            "created_on": data.created_on,
+            "updated_on": data.updated_on,
+            "switchtenders": format_switchtenders(data),
+            "is_switchtender": data.is_switchtender,
+            "is_observer": data.is_observer,
+            "commune": commune_data,
+            "notifications": data.notifications,
         }
 
 
@@ -246,6 +272,73 @@ class UserProjectStatusSerializer(serializers.HyperlinkedModelSerializer):
         fields = ["id", "project", "status"]
 
     project = ProjectSerializer(read_only=True)
+
+
+class UserProjectStatusForListSerializer(serializers.BaseSerializer):
+    class Meta:
+        model = UserProjectStatus
+        fields = []
+
+    def to_representation(self, data):
+        """Return a representation of data (optimized version)"""
+        # use our optimized queryset and not project serializer
+        commune_data = format_commune(data.project.commune)
+
+        return {
+            "id": data.id,
+            "status": data.status,
+            "project": {
+                "id": data.project.id,
+                "name": data.project.name,
+                "org_name": data.project.org_name,
+                "status": data.project.status,
+                "created_on": data.project.created_on,
+                "updated_on": data.project.updated_on,
+                "switchtenders": format_switchtenders(data.project),
+                "is_switchtender": data.is_switchtender,
+                "is_observer": data.is_observer,
+                "commune": commune_data,
+                "notifications": data.project.notifications,
+                "recommendation_count": data.project.recommendation_count,
+                "public_message_count": data.project.public_message_count,
+                "private_message_count": data.project.private_message_count,
+            },
+        }
+
+
+def format_commune(commune):
+    if not commune:
+        return None
+    return {
+        "name": commune.name,
+        "insee": commune.insee,
+        "postal": commune.postal,
+        "department": {
+            "code": commune.department.code,
+            "name": commune.department.name,
+        },
+        "latitude": commune.latitude,
+        "longitude": commune.longitude,
+    }
+
+
+def format_switchtenders(project):
+    return [
+        {
+            "first_name": s.first_name,
+            "last_name": s.last_name,
+            "username": s.username,
+            "email": s.email,
+            "profile": {
+                "organization": {
+                    "name": s.profile.organization.name
+                    if s.profile.organization
+                    else "",
+                }
+            },
+        }
+        for s in project.switchtenders.all()
+    ]
 
 
 # eof
