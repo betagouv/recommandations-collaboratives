@@ -70,7 +70,7 @@ router.register(
 urlpatterns = [
     path("api/", include(router.urls)),
     path(
-        "api/project/<int:pk>/",
+        "api/projects/<int:pk>/",
         projects_rest.ProjectDetail.as_view(),
         name="projects-detail",
     ),

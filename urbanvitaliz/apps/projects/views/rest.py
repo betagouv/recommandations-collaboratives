@@ -49,10 +49,26 @@ class ProjectDetail(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        ups = self.get_object(pk)
+        p = self.get_object(pk)
         context = {"request": request}
-        serializer = ProjectSerializer(ups, context=context)
+        serializer = ProjectSerializer(p, context=context)
         return Response(serializer.data)
+
+    def patch(self, request, pk, format=None):
+        p = self.get_object(pk)
+        context = {"request": request, "view": self, "format": format}
+        serializer = ProjectSerializer(
+            p, context=context, data=request.data, partial=True
+        )
+        if serializer.is_valid():
+            # old = copy(p)
+            # new = serializer.save()
+            # if new:
+            #     signals.project_project_updated.send(
+            #         sender=self, old_one=old, new_one=new
+            #     )
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProjectList(APIView):
