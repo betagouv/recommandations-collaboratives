@@ -109,11 +109,11 @@
                 </ul>
             </div>
             <div class="d-block mt-4">
-                <p class="text-info-custom">Équipe de suvi</p>
+                <p class="text-info-custom">Équipe de suvi ????</p>
                 <ul class="d-flex flex-column list-unstyled mb-0">
                     {% for advisor in project.switchtenders_on_site.all %}
                     <li>
-                        {% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}
+                        {% include 'user/user_card.html' with user=advisor.switchtender user_hover=True%}
                     </li>
                     {% endfor %}
                 </ul>

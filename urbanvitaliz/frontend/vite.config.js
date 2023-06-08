@@ -44,6 +44,7 @@ module.exports = {
                 consent: resolve('./src/js/apps/consent.js'),
                 tagCloud: resolve('./src/js/apps/tagCloud.js'),
                 organizationSearch: resolve('./src/js/apps/organizationSearch.js'),
+                user: resolve('./src/js/apps/user.js'),
                 tutorial: resolve('./src/js/apps/tutorial.js'),
             },
             output: {

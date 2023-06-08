@@ -1,13 +1,18 @@
 {% load gravatar %}
 {% load static %}
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/user.js' %}
+{% endblock %}
 
 {% load guardian_tags %}
 
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
-<div class="user-card position-relative d-flex my-1 flex-column justify-content-between align-items-start">
-    <div class="d-flex align-items-center justify-content-between {% if user_activity %} w-100 {% endif %}">
+<div x-data="User()" class="user-card position-relative d-flex my-1 flex-column justify-content-between align-items-start">
+    <div x-ref="user" @click="onUserClick" class="d-flex align-items-center justify-content-between {% if user_activity %} w-100 {% endif %}">
         <div class="d-flex align-items-center flex-wrap">
             <span class="me-1 d-flex align-items-center font-very-small">
                 <img class="rounded-circle me-1" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
@@ -33,7 +38,7 @@
         {% endif %}
     </div>
     {% if user_hover %}
-        <div class="user-card-popup flex-column">
+        <div x-cloak x-ref="userTooltip" id="user-tooltip" @click.outside="onOutsideUserClick" class="user-card-popup flex-column">
             <div class="user-role position-absolute">
                 <span class="py-1 px-2 fw-bold text-uppercase tiny bg-green-dark text-white"
                     style="border-radius: 2px;">Conseiller</span>
