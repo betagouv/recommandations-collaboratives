@@ -21,7 +21,7 @@
     style="font-family: 'Marianne', arial, sans-serif;
            padding: 0">
     {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
-        <li>
+        <li data-intro='Hello step one!'>
             <a class="{% if overview %} active{% endif %}"
                href="{% url 'projects-project-detail-overview' project.pk %}">
                 Présentation

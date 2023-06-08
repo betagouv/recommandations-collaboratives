@@ -8,6 +8,7 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/projectShare.js' %}
+    {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock %}
 {% block banner %}
     {% include 'projects/project/fragments/positioning_banner.html' %}
@@ -18,7 +19,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
     <div x-data="ProjectShare" class="col-12">
-        <div class="row">
+        <div x-data="Tutorial()" class="row">
             {% if not is_switchtender %}
                 {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
                     <div class="col box-heading d-flex justify-content-between mb-4 mt-4">
