@@ -25,6 +25,7 @@ nice:
 
 coverage:
 	pytest --cov
+	coverage html
 
 clean:
 	rm -f tags TAGS

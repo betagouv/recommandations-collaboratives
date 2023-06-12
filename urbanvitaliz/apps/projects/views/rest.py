@@ -180,22 +180,6 @@ def update_projects_with_their_notifications(site, user, projects):
         p.notifications["has_collaborator_activity"] = active
 
 
-# class ProjectViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows projects to be viewed or edited.
-#     """
-#
-#     def get_queryset(self):
-#         # TODO tune query set to prevent loads of requests on subqueries
-#         return self.queryset.for_user(self.request.user).order_by(
-#             "-created_on", "-updated_on"
-#         )
-#
-#     queryset = models.Project.on_site
-#     serializer_class = ProjectSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-
 class TaskFollowupViewSet(viewsets.ModelViewSet):
     """
     API endpoint for TaskFollowups
