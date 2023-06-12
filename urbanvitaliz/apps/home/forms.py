@@ -70,7 +70,7 @@ class UVSignupForm(SignupForm):
     )
 
     phone_no = PhoneNumberField(
-        required=False,
+        required=True,
         label="Numéro de téléphone",
         widget=PhoneNumberInternationalFallbackWidget(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
