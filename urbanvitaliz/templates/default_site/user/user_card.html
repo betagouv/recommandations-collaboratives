@@ -30,9 +30,9 @@
                     {% endif %}
                 </strong>
             </span>
-            {% if user.profile.organization.name %}
+            {% if user.profile.organization.name and user.is_active %}
                 <span class="text-dark fw-normal font-italic font-very-small">{{user.profile.organization.name}}</span>
-            {% elif project_owner and project.org_name %}
+            {% elif project_owner and project.org_name and user.is_active %}
                 <span class="text-dark fw-normal font-italic font-very-small">{{project.org_name}}</span>
             {% endif %}
         </div>
@@ -59,30 +59,39 @@
             <div class="d-flex align-items-center flex-wrap">
                 <span class="me-2 d-flex align-items-center font-very-small">
                     <img class="rounded-circle me-2" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
-                    <strong class="text-nowrap text-capitalize">
+                    <strong class="text-nowrap text-capitalize {% if not user.is_active %}inative-status{% endif %}">
                         {% if user.get_full_name %}
                             {{ user.get_full_name }}
+                        {% elif project and project.first_name and project.last_name %}
+                            {{ project.first_name }}
+                            {{ project.last_name }}
                         {% else %}
                             {{user.email}}
                         {% endif %}
                     </strong>
                 </span>
-                <span class="text-grey-dark fw-light font-italic font-very-small">{{user.profile.organization.name}}</span>
+                {% if user.profile.organization.name and user.is_active %}
+                    <span class="text-dark fw-normal font-italic font-very-small">{{user.profile.organization.name}}</span>
+                {% elif project_owner and project.org_name and user.is_active %}
+                    <span class="text-dark fw-normal font-italic font-very-small">{{project.org_name}}</span>
+                {% endif %}
             </div>
-            <span class="d-flex align-items-center justify-content-between text-blue font-very-small mt-1">
-                <div class="d-flex align-items-center">
-                    <svg class="bi align-middle me-2" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
-                    </svg>
-                    <a class="text-decoration-none text-blue" href="mailto:{{ user.email }}">{{ user.email }}</a>
-                </div>
-                    <button class="ms-4 px-2 py-0 btn small btn-outline-primary" @click="clipboardCopy(`L'email`, '{{user.email}}')">
-                        <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
-                          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard" />
+            {% if user.is_active %}
+                <span class="d-flex align-items-center justify-content-between text-blue font-very-small mt-1">
+                    <div class="d-flex align-items-center">
+                        <svg class="bi align-middle me-2" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
                         </svg>
-                    </button>
-            </span>
-            {% if user.profile.phone_no %}
+                        <a class="text-decoration-none text-blue" href="mailto:{{ user.email }}">{{ user.email }}</a>
+                    </div>
+                        <button class="ms-4 px-2 py-0 btn small btn-outline-primary" @click="clipboardCopy(`L'email`, '{{user.email}}')">
+                            <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard" />
+                            </svg>
+                        </button>
+                </span>
+            {% endif %}
+            {% if user.profile.phone_no and user.is_active %}
                 <span class="d-flex align-items-center justify-content-between text-blue font-very-small mt-1">
                     <div class="d-flex align-items-center">
                         <svg class="bi align-middle me-2" width="15" height="15" fill="currentColor">
@@ -96,6 +105,9 @@
                         </svg>
                     </button>
                 </span>
+            {% endif %}
+            {% if not user.is_active %} 
+                <span style="border-radius: 2px;" class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1">Compte desactivé depuis le </span>
             {% endif %}
         </div>
 </div>
