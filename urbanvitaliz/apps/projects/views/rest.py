@@ -62,7 +62,7 @@ class ProjectDetail(APIView):
         )
         if serializer.is_valid():
             # old = copy(p)
-            # new = serializer.save()
+            serializer.save()
             # if new:
             #     signals.project_project_updated.send(
             #         sender=self, old_one=old, new_one=new
