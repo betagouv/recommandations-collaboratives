@@ -60,6 +60,7 @@
             </a>
         </div>
         {% if contacts.count == 0 %} <div class="mt-4"></div>{% endif %}
+        {% include 'resources/resource/fragments/flag.html' %}
         {% include 'resources/resource/fragments/resource_content.html' with resource=resource %}
         <div id="task-contacts">{% include 'resources/resource/fragments/contact_list.html' %}</div>
     </div>
