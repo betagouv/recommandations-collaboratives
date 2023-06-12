@@ -295,7 +295,7 @@ def test_anonymous_cannot_use_project_patch_api(request, client):
 
 
 @pytest.mark.django_db
-def test_api_patch_updates_project(request, client):
+def test_api_patch_updates_project_status(request, client):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
     project = baker.make(models.Project, sites=[site], status="DRAFT")
@@ -308,7 +308,7 @@ def test_api_patch_updates_project(request, client):
     client.force_authenticate(user)
 
     url = reverse("projects-detail", args=[project.id])
-    response = client.patch(url, json={"status": new_status})
+    response = client.patch(url, data={"status": new_status}, json=True)
 
     assert response.status_code == 200
     assert response.data["status"] == new_status
