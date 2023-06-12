@@ -24,14 +24,14 @@ from .. import models, utils
 
 
 ########################################################################
-# REST API: projects
+# list of projects
 ########################################################################
 
 # FIXME pourquoi est ce que ces tests n'utilisent pas le APIClient ?
 
 
 @pytest.mark.django_db
-def test_anonymous_cannot_use_project_api(client):
+def test_anonymous_cannot_use_project_list_api(client):
     url = reverse("projects-list")
     response = client.get(url)
     assert response.status_code == 403
@@ -110,7 +110,6 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         private=True,  # only appear on crm stream
     )
 
-
     unwanted_project = baker.make(
         models.Project,
         sites=[site],
@@ -158,6 +157,164 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         "unread_public_messages": 1,
         "project_id": str(project.id),
     }
+
+
+########################################################################
+# get project details
+########################################################################
+
+
+@pytest.mark.django_db
+def test_anonymous_cannot_use_project_detail_api(request, client):
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+
+    client = APIClient()
+
+    url = reverse("projects-detail", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_detail_contains_project_info(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+    project = create_project_with_notifications(site, user)
+
+    utils.assign_advisor(user, project, site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-detail", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 200
+
+    data = response.data
+    check_project_content(project, data)
+
+
+def create_project_with_notifications(site, user):
+    """Create a new project with user as advisor and notifications
+
+    To keep in sync with check_project_content
+    """
+    # my project and details
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        commune__name="Ma Comune",
+        commune__department__code="01",
+        commune__department__name="Mon Departement",
+        name="Mon project",
+    )
+
+    # a public note with notification
+    pub_note = baker.make(models.Note, public=True, project=project)
+    verb = "a envoyé un message"
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb=verb,
+        action_object=pub_note,
+        target=project,
+        private=True,  # only appear on crm stream
+    )
+
+    # a private note with notification for someone else
+    priv_note = baker.make(models.Note, public=False, project=project)
+    verb = "a envoyé un message dans l'espace conseillers"
+    notify.send(
+        sender=user,
+        recipient=baker.make(auth_models.User),
+        verb=verb,
+        action_object=priv_note,
+        target=project,
+        private=True,  # only appear on crm stream
+    )
+
+    return project
+
+
+def check_project_content(project, data):
+    """Check project content provided as json
+
+    To keep in sync with create_project_with_notifications
+    """
+    # project fields: not ideal
+    expected = [
+        "commune",
+        "created_on",
+        "id",
+        "is_observer",
+        "is_switchtender",
+        "name",
+        "notifications",
+        "org_name",
+        "status",
+        "switchtenders",
+        "updated_on",
+        "private_message_count",
+        "public_message_count",
+        "recommendation_count",
+    ]
+    assert set(data.keys()) == set(expected)
+
+    assert data["name"] == project.name
+    assert data["is_switchtender"] == True
+    assert data["is_observer"] == False
+    assert data["notifications"] == {
+        "count": 1,
+        "has_collaborator_activity": True,
+        "new_recommendations": 0,
+        "unread_private_messages": 0,
+        "unread_public_messages": 1,
+    }
+
+
+########################################################################
+# patch project details
+########################################################################
+
+
+@pytest.mark.django_db
+def test_anonymous_cannot_use_project_patch_api(request, client):
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site], status="DRAFT")
+
+    client = APIClient()
+
+    url = reverse("projects-detail", args=[project.id])
+    response = client.patch(url, json={"status": "DONE"})
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_api_patch_updates_project(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+    project = baker.make(models.Project, sites=[site], status="DRAFT")
+
+    utils.assign_advisor(user, project, site)
+
+    new_status = "READY"
+
+    client = APIClient()
+    client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project.id])
+    response = client.patch(url, json={"status": new_status})
+
+    assert response.status_code == 200
+    assert response.data["status"] == new_status
+
+    project.refresh_from_db()
+    assert project.status == new_status
 
 
 ########################################################################
@@ -266,7 +423,6 @@ def test_user_project_status_contains_only_my_projects(request):
         "unread_public_messages": 1,
         "project_id": str(project.id),
     }
-
 
 
 @pytest.mark.django_db
@@ -541,5 +697,9 @@ def test_updating_user_project_is_logged(request):
     assert stream.count() == 1
     assert stream[0].verb == "a changé l'état de son suivi"
 
+
+########################################################################
+# Helpers for tests
+########################################################################
 
 # eof
