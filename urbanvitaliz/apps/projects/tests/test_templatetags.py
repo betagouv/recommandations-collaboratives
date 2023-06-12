@@ -45,4 +45,48 @@ def test_is_staff_for_current_site_failure(request):
     assert projects_extra.is_staff_for_current_site(user) is False
 
 
+#
+# advising position
+
+@pytest.mark.django_db
+def test_advising_position_for_user_when_nothing(request):
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    user = baker.make(auth.User)
+    expected = {"is_observer": False, "is_advisor": False}
+    assert projects_extra.get_advising_position(user, project) == expected
+
+
+@pytest.mark.django_db
+def test_advising_position_for_user_when_advisor(request):
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    user = baker.make(auth.User)
+    baker.make(
+        models.ProjectSwitchtender,
+        switchtender=user,
+        project=project,
+        site=site,
+        is_observer=False,
+    )
+    expected = {"is_observer": False, "is_advisor": True}
+    assert projects_extra.get_advising_position(user, project) == expected
+
+
+@pytest.mark.django_db
+def test_advising_position_for_user_when_observer(request):
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    user = baker.make(auth.User)
+    baker.make(
+        models.ProjectSwitchtender,
+        switchtender=user,
+        project=project,
+        site=site,
+        is_observer=True,
+    )
+    expected = {"is_observer": True, "is_advisor": False}
+    assert projects_extra.get_advising_position(user, project) == expected
+
+
 # eof

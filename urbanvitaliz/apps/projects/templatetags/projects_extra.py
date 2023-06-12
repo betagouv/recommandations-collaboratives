@@ -8,10 +8,11 @@ created: 2021-06-29 11:30:42 CEST
 """
 
 from django import template
-
-from .. import models
+from django.contrib.sites.models import Site
 
 from urbanvitaliz import utils as uv_utils
+
+from .. import models
 
 register = template.Library()
 
@@ -30,6 +31,21 @@ def current_project(session):
 def is_staff_for_current_site(user):
     """Return True if the given user is staff for the active site"""
     return uv_utils.is_staff_for_site(user)
+
+
+@register.simple_tag
+def get_advising_position(user, project):
+    """Return position of user for project on current site as dict
+
+    {"is_observer": bool, "is_advisor": bool}
+    """
+    try:
+        ps = models.ProjectSwitchtender.objects.get(switchtender=user, project=project)
+        # obsevrer and advisor and in mutual exclusion
+        return {"is_observer": ps.is_observer, "is_advisor": not ps.is_observer}
+    except models.ProjectSwitchtender.DoesNotExist:
+        return {"is_observer": False, "is_advisor": False}
+
 
 
 # eof
