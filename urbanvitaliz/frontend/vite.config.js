@@ -46,6 +46,7 @@ module.exports = {
                 organizationSearch: resolve('./src/js/apps/organizationSearch.js'),
                 user: resolve('./src/js/apps/user.js'),
                 tutorial: resolve('./src/js/apps/tutorial.js'),
+                contactList: resolve('./src/js/apps/contactList.js'),
             },
             output: {
                 chunkFileNames: undefined,

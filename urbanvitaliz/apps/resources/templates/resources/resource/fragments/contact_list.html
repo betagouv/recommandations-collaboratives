@@ -1,7 +1,12 @@
 {% load static %}
 
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/apps/contactList.js' %}
+{% endblock %}
+
 {% if contacts.count %}
-<div id="contact-list" class="mt-4">
+<div x-data="ContactList" id="contact-list" class="mt-4">
     {% if user.is_anonymous %}
     <div class="flag blue">
         <span class="title text-blue text-uppercase fw-bold mb-2 d-block">Contacts</span>
@@ -15,7 +20,7 @@
     <div class="bg-grey-light py-4 px-3 font-marianne">
         <h6 class="fw-bold text-uppercase d-block mb-3">👩‍💼 Contacts</h6>
         {% for contact in contacts.all %}
-            <div class="bg-white border py-2 px-3 mb-2">
+            <div :class="currentHash === '#contact-{{contact.pk}}' && 'component-focus'" class="border py-2 px-3 mb-2" id="contact-{{contact.pk}}">
                 <div>
                     <span class="text-black fw-medium my-1">
                         {{ contact.full_name }}

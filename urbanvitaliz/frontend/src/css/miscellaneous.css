@@ -48,3 +48,25 @@
 .hover-underline:hover {
     text-decoration: underline !important;
 }
+
+.component-focus{
+    box-shadow: 0 0 1px 4px #cce3fb;
+    animation: component-pulse 1s 3 linear;
+    background-color: #fff;
+}
+
+@keyframes component-pulse {
+    0%{
+        box-shadow: 0 0 1px 4px #cce3fb;
+        background-color: #fff;
+    }
+    50% {
+        box-shadow: 0 0 1px 4px #fff;
+        background-color: #cce3fb;
+
+    }
+    100%{
+        box-shadow: 0 0 1px 4px #cce3fb;
+        background-color: #fff;
+    }
+}
