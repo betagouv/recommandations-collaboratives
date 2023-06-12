@@ -65,17 +65,7 @@
       </div>
     </div>
     <div class="ps-4 ms-4 d-flex align-items-center">
-      <span class="tiny"><strong>
-        {% if document.uploaded_by.get_full_name %}
-          {{ document.uploaded_by.get_full_name }}
-        {% else %}
-          {{ document.uploaded_by.email }}
-        {% endif %}
-      .</strong>
-      {% if document.uploaded_by.profile.organization %}
-        <span class="tiny text-grey-dark">Équipe {{ document.uploaded_by.profile.organization.name }}</strong></span>
-      {% endif %}
-    </span>
+      {% include 'user/user_card.html' with user=document.uploaded_by %}
     <span class="ms-4 tiny d-flex align-items-center">
       <svg class="bi align-baseline me-2" width="12" height="12" fill="#222">
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />

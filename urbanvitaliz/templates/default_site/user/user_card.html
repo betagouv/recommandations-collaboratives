@@ -7,16 +7,19 @@
 {% endblock %}
 
 {% load guardian_tags %}
+{% load projects_extra %}
+
+{% get_advising_position user project as position %}
 
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
 <div x-data="User()" class="user-card position-relative d-flex my-1 flex-column justify-content-between align-items-start">
-    <div x-ref="user" @click="onUserClick" class="position-relative d-flex align-items-center justify-content-between {% if user_activity %} w-100 {% endif %}">
-        <div class="d-flex align-items-center flex-wrap user-info">
+    <div class="position-relative d-flex align-items-center justify-content-between {% if user_activity %} w-100 {% endif %}">
+        <div x-ref="user" @click="onUserClick" class="d-flex align-items-center flex-wrap user-info">
             <span class="me-1 d-flex align-items-center font-very-small">
-                <img class="rounded-circle me-1" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
-                <strong class="text-nowrap text-capitalize">
+                <img class="rounded-circle me-1 {% if not user.is_active%}{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
+                <strong class="text-nowrap text-capitalize {% if not user.is_active%}inative-status{% endif %}">
                     {% if user.get_full_name %}
                         {{ user.get_full_name }}
                     {% elif project and project.first_name and project.last_name %}
@@ -34,18 +37,25 @@
             {% endif %}
         </div>
         {% if 'use_crm' in user_site_perms and user_activity %}
-            <a class="small" href="{% url 'crm-user-details' user.pk %}">
+            <a class="small ms-1" href="{% url 'crm-user-details' user.pk %}">
                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
                 </svg>
             </a>
         {% endif %}
     </div>
-        <div x-cloak x-ref="userTooltip" id="user-tooltip" @click.outside="onOutsideUserClick" class="user-card-popup flex-column">
-            <div class="user-role position-absolute">
-                <span class="py-1 px-2 fw-bold text-uppercase tiny bg-green-dark text-white"
-                    style="border-radius: 2px;">Conseiller</span>
-            </div>
+        <div x-cloak x-ref="userTooltip" id="user-tooltip" @click.outside="onOutsideUserClick" class="user-card-popup flex-column {% if position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border {% endif %}">
+            {% if position.is_advisor %}
+                <div class="user-role position-absolute">
+                    <span class="py-1 px-2 fw-bold text-uppercase tiny advisor-background text-white"
+                        style="border-radius: 2px;">Conseiller</span>
+                </div>
+            {% elif position.is_observer %}
+                <div class="user-role position-absolute">
+                    <span class="py-1 px-2 fw-bold text-uppercase tiny observer-background text-white"
+                        style="border-radius: 2px;">Observateur</span>
+                </div>
+            {% endif %}
             <div class="d-flex align-items-center flex-wrap">
                 <span class="me-2 d-flex align-items-center font-very-small">
                     <img class="rounded-circle me-2" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">

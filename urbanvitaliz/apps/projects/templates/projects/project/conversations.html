@@ -98,22 +98,22 @@
                         {% for member in project.members.all %}
                         {% if forloop.counter0 == 0 %}
                             <li>
-                                {% include 'projects/project/fragments/project_owner.html' with project=project %}
+                                {% include 'user/user_card.html' with user=member project_owner=True user_activity=True %}
                             </li>
                             {% else %}
                             <li>
-                                {% include 'projects/project/fragments/user.html' with member=member project=project %}
+                                {% include 'user/user_card.html' with user=member user_activity=True %}
                             </li>
                             {% endif %}
                             {% endfor %}
                 </ul>
             </div>
             <div class="d-block mt-4">
-                <p class="text-info-custom">Équipe de suvi ????</p>
+                <p class="text-info-custom">Équipe de suvi</p>
                 <ul class="d-flex flex-column list-unstyled mb-0">
                     {% for advisor in project.switchtenders_on_site.all %}
                     <li>
-                        {% include 'user/user_card.html' with user=advisor.switchtender user_hover=True%}
+                        {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
                     </li>
                     {% endfor %}
                 </ul>
