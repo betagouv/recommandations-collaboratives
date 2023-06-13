@@ -43,13 +43,13 @@
             </a>
         {% endif %}
     </div>
-        <div x-cloak x-ref="userTooltip" id="user-tooltip" @click.outside="onOutsideUserClick" class="user-card-popup flex-column {% if position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border {% endif %}">
-            {% if position.is_advisor %}
+        <div x-cloak x-ref="userTooltip" id="user-tooltip" @click.outside="onOutsideUserClick" class="user-card-popup flex-column {% if not user.is_active%}{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border {% endif %}">
+            {% if position.is_advisor and user.is_active %}
                 <div class="user-role position-absolute">
                     <span class="py-1 px-2 fw-bold text-uppercase tiny advisor-background text-white"
                         style="border-radius: 2px;">Conseiller</span>
                 </div>
-            {% elif position.is_observer %}
+            {% elif position.is_observer and user.is_active %}
                 <div class="user-role position-absolute">
                     <span class="py-1 px-2 fw-bold text-uppercase tiny observer-background text-white"
                         style="border-radius: 2px;">Observateur</span>
