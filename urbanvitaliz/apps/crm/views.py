@@ -359,6 +359,9 @@ def user_deactivate(request, user_id=None):
     if request.method == "POST":
         crm_user.is_active = False
         crm_user.save()
+        profile = crm_user.profile
+        profile.deleted = timezone.now()
+        profile.save()
         return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm
@@ -376,6 +379,9 @@ def user_reactivate(request, user_id=None):
     if request.method == "POST":
         crm_user.is_active = True
         crm_user.save()
+        profile = crm_user.profile
+        profile.deleted = None
+        profile.save()
         return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm

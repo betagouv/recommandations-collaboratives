@@ -522,17 +522,6 @@ def update_project_statuses_with_their_notifications(site, user, project_statuse
         ps.project.notifications["has_collaborator_activity"] = active
 
 
-#     return {
-#         "count": unread_notifications.count(),
-#         "has_collaborator_activity": unread_notifications.exclude(
-#             actor_object_id__in=advisors
-#         ).exists(),
-#         "unread_public_messages": unread_public_messages.count(),
-#         "unread_private_messages": unread_private_messages.count(),
-#         "new_recommendations": new_recommendations.count(),
-#     }
-
-
 def fetch_site_projects_with_ids(site, ids):
     """Return site projects with given ids including annotations."""
     return (
