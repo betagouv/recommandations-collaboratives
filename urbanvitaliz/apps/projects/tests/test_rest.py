@@ -671,6 +671,9 @@ def test_project_status_patch_updates_object_and_log(request):
 # tasks
 ########################################################################
 
+#
+# list tasks
+
 
 @pytest.mark.django_db
 def test_project_collaborator_can_see_project_tasks_for_site(request):
@@ -768,6 +771,67 @@ def test_user_cannot_see_project_tasks_when_not_in_relation(request):
     assert response.status_code == 403
 
 
+#
+# update tasks
+
+
+@pytest.mark.django_db
+def test_project_collaborator_can_update_project_task_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    task = baker.make(models.Task, project=project, site=site, public=False)
+
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-detail", args=[project.id, task.id])
+    response = client.patch(url, data={"public": True})
+
+    assert response.status_code == 200
+
+    task.refresh_from_db()
+    assert task.public is True
+
+
+#
+# move tasks
+
+
+@pytest.mark.django_db
+def test_non_project_user_cannot_move_project_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, status="READY", sites=[site])
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
+    response = client.post(url, data={"above": tasks[1].id})
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_collaborator_cannot_move_unknown_tasks_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, status="READY", sites=[site])
+    task = baker.make(models.Task, project=project, site=site, public=True)
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-move", args=[project.id, task.id])
+    response = client.post(url, data={"above": 0})
+
+    assert response.status_code == 404
+
+
 @pytest.mark.django_db
 def test_project_collaborator_can_move_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
@@ -800,9 +864,10 @@ def test_project_observer_can_move_project_tasks_for_site(request):
     client = APIClient()
     client.force_authenticate(user=user)
     url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
-    response = client.post(url, data={"above": tasks[1].id})
+    response = client.post(url, data={"below": tasks[1].id})
 
     assert response.status_code == 200
+    assert response.data == {"status": "insert below done"}
 
 
 @pytest.mark.django_db
@@ -997,6 +1062,7 @@ def test_project_task_followup_update_is_processed_for_auth_user(request):
 #
 # fetch notifications
 
+
 @pytest.mark.django_db
 def test_project_task_notifications_list_closed_to_anonymous_user(request):
     site = get_current_site(request)
@@ -1052,6 +1118,7 @@ def test_project_task_notifications_list_returns_notifications_of_advisor(reques
 #
 # mark all notifications as read
 
+
 @pytest.mark.django_db
 def test_project_task_notifications_mark_read_updates_notifications_of_advisor(request):
     user = baker.make(auth_models.User)
@@ -1076,11 +1143,14 @@ def test_project_task_notifications_mark_read_updates_notifications_of_advisor(r
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse("project-tasks-notifications-mark-all-as-read", args=[project.id, task.id])
+    url = reverse(
+        "project-tasks-notifications-mark-all-as-read", args=[project.id, task.id]
+    )
     response = client.post(url)
 
     assert response.status_code == 200
     assert response.data == {}
     assert user.notifications.unread().count() == 0
+
 
 # eof

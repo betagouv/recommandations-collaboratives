@@ -248,6 +248,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         task = self.get_object()
 
         if not self.request.user.has_perm("projects.use_tasks", task.project):
+            # FIXME this line is not covered by a test
             raise PermissionDenied()
 
         above_id = request.POST.get("above", None)
