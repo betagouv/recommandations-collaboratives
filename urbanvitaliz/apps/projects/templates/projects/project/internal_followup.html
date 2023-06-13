@@ -27,7 +27,7 @@
             <svg class="bi align-middle me-4 ms-2" width="25" height="25" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye-fill" />
             </svg>
-            <p class="text-info-custom my-0">Seuls les acteurs conseil positionnés sur ce projet et l’équipe UrbanVitaliz ont accès à cet espace, pas la collectivité.</p>
+            <p class="text-info-custom my-0">Seuls les acteurs positionnés sur ce projet et l’équipe {{request.site.name}} ont accès à cet espace, pas la collectivité.</p>
           </div>
         {% activity_stream "target" project %}
         {% regroup stream by timestamp.date as stream_by_day %}
@@ -59,9 +59,11 @@
 
         <ul class="d-flex flex-column list-unstyled mb-0">
             {% for advisor in project.switchtenders_on_site.all %}
-            <li>
-                {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
-            </li>
+                {% if advisor.switchtender.is_active %}
+                    <li>
+                        {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
+                    </li>
+                {% endif %}
             {% endfor %}
         </ul>
     </div>

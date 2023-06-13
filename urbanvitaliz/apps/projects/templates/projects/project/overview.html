@@ -141,11 +141,11 @@
                         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Membres de la collectivité</h6>
                         <ul class="flex-column list-unstyled mb-0">
                             {% for projectmember in project.projectmember_set.all %}
-                              {% if projectmember.is_owner %}
+                              {% if projectmember.is_owner and projectmember.member.is_active %}
                               <li>
                                 {% include 'user/user_card.html' with user=project.owner project_owner=True user_activity=True %}
                               </li>
-                              {% else %}
+                              {% elif projectmember.member.is_active %}
                               <li>
                                 {% include 'user/user_card.html' with user=projectmember.member user_activity=True %}
                                 </li>
@@ -175,9 +175,11 @@
                         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Équipe de suvi</h6>
                         <ul class="d-flex flex-column list-unstyled mb-0">
                             {% for advisor in project.switchtenders_on_site.all %}
-                                <li>
-                                    {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
-                                </li>
+                                {% if advisor.switchtender.is_active %}
+                                    <li>
+                                        {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
+                                    </li>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                         {% if "invite_advisors" in user_project_perms or is_regional_actor %}
