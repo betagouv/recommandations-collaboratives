@@ -6,7 +6,8 @@ exclude = ".venv,venv,.eggs" # override the default set of excluded paths
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "urbanvitaliz.settings.development"
-addopts = "--cov=urbanvitaliz --cov=test --cov-report=xml --reuse-db --tb=short -p no:warnings -n auto --maxprocesses 4"
+addopts = "--reuse-db --tb=short -p no:warnings -n auto --maxprocesses 4"
+# addopts = "--cov=urbanvitaliz --cov=test --cov-report=xml --reuse-db --tb=short -p no:warnings -n auto --maxprocesses 4"
 testpaths = [
     "urbanvitaliz"
 ]

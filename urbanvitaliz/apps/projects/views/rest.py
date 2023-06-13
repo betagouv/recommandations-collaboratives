@@ -62,7 +62,7 @@ class ProjectDetail(APIView):
         )
         if serializer.is_valid():
             # old = copy(p)
-            # new = serializer.save()
+            serializer.save()
             # if new:
             #     signals.project_project_updated.send(
             #         sender=self, old_one=old, new_one=new
@@ -178,22 +178,6 @@ def update_projects_with_their_notifications(site, user, projects):
         p.notifications = notifications.get(str(p.id), empty)
         active = bool(collaborators.get(str(p.id)))
         p.notifications["has_collaborator_activity"] = active
-
-
-# class ProjectViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows projects to be viewed or edited.
-#     """
-#
-#     def get_queryset(self):
-#         # TODO tune query set to prevent loads of requests on subqueries
-#         return self.queryset.for_user(self.request.user).order_by(
-#             "-created_on", "-updated_on"
-#         )
-#
-#     queryset = models.Project.on_site
-#     serializer_class = ProjectSerializer
-#     permission_classes = [permissions.IsAuthenticated]
 
 
 class TaskFollowupViewSet(viewsets.ModelViewSet):
@@ -536,17 +520,6 @@ def update_project_statuses_with_their_notifications(site, user, project_statuse
         ps.project.notifications = notifications.get(str(ps.project_id), empty)
         active = bool(collaborators.get(str(ps.project_id)))
         ps.project.notifications["has_collaborator_activity"] = active
-
-
-#     return {
-#         "count": unread_notifications.count(),
-#         "has_collaborator_activity": unread_notifications.exclude(
-#             actor_object_id__in=advisors
-#         ).exists(),
-#         "unread_public_messages": unread_public_messages.count(),
-#         "unread_private_messages": unread_private_messages.count(),
-#         "new_recommendations": new_recommendations.count(),
-#     }
 
 
 def fetch_site_projects_with_ids(site, ids):
