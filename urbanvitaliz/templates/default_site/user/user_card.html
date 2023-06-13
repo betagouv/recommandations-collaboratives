@@ -1,4 +1,3 @@
-{% load gravatar %}
 {% load static %}
 {% load django_vite %}
 
@@ -18,7 +17,7 @@
     <div class="position-relative d-flex align-items-center justify-content-between {% if user_activity %} w-100 {% endif %}">
         <div x-ref="user" @click="onUserClick" class="d-flex align-items-center flex-wrap user-info">
             <span class="me-1 d-flex align-items-center font-very-small">
-                <img class="rounded-circle me-1 {% if not user.is_active%}{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
+                <img class="rounded-circle me-1 {% if not user.is_active%}{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}" :src="gravatar_url('{{user.email}}', 18, '{{user.first_name}}' + ' ' + '{{user.last_name}}')" alt="{{action.actor}}">
                 <strong class="text-nowrap text-capitalize {% if not user.is_active%}inative-status{% endif %}">
                     {% if user.get_full_name %}
                         {{ user.get_full_name }}
@@ -58,7 +57,7 @@
             {% endif %}
             <div class="d-flex align-items-center flex-wrap">
                 <span class="me-2 d-flex align-items-center font-very-small">
-                    <img class="rounded-circle me-2" src="{% gravatar_url user.email size=18 %}" alt="{{action.actor}}">
+                    <img class="rounded-circle me-2 {% if not user.is_active%}{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}" :src="gravatar_url('{{user.email}}', 25, '{{user.first_name}}' + ' ' + '{{user.last_name}}')" alt="{{action.actor}}">
                     <strong class="text-nowrap text-capitalize {% if not user.is_active %}inative-status{% endif %}">
                         {% if user.get_full_name %}
                             {{ user.get_full_name }}

@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs'
 import { createPopper } from '@popperjs/core';
 import appStore from '../store/app'
+import { gravatar_url } from '../utils/gravatar';
 
 Alpine.data("User", User)
 
@@ -8,6 +9,7 @@ function User() {
     return {
         popper: null,
         isOpening: false,
+        gravatar_url,
         init() {
             const popper = createPopper(this.$refs.user, this.$refs.userTooltip, {
                 placement: 'top-start',
