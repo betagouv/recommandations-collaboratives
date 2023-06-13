@@ -941,4 +941,51 @@ def test_project_task_followup_create_is_processed_for_auth_user(request):
     assert response.data["comment"] == data["comment"]
 
 
+#
+# - update followup for project
+
+
+@pytest.mark.django_db
+def test_project_task_followup_update_closed_to_anonymous_user(request):
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    task = baker.make(models.Task, project=project, site=site, public=True)
+    followup = baker.make(models.TaskFollowup, task=task)
+
+    client = APIClient()
+    url = reverse("project-tasks-followups-detail", args=[project.id, task.id, followup.id])
+    response = client.post(url, data={}, format="json")
+
+    assert response.status_code == 403
+
+
+# FIXME we should have permission checking on followup creation
+@pytest.mark.django_db
+def test_project_task_followup_update_is_processed_for_auth_user(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    task = baker.make(models.Task, project=project, site=site, public=True)
+    followup = baker.make(models.TaskFollowup, task=task)
+
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    data = {"comment": "an updated comment for followup"}
+    url = reverse("project-tasks-followups-detail", args=[project.id, task.id, followup.id])
+    response = client.patch(url, data=data, format="json")
+
+    assert response.status_code == 200
+
+    # followup updated
+    followup.refresh_from_db()
+    assert followup.status == None  # FIXME should we have a default status ?
+    assert followup.comment == data["comment"]
+
+    # returned value
+    assert response.data["id"] == followup.id
+    assert response.data["comment"] == data["comment"]
+
+
 # eof
