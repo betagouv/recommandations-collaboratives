@@ -107,7 +107,7 @@
                 </span>
             {% endif %}
             {% if not user.is_active %} 
-                <span style="border-radius: 2px;" class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1">Compte desactivé depuis le </span>
+                <span style="border-radius: 2px;" class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap">Compte desactivé depuis le {{user.profile.deleted}}</span>
             {% endif %}
         </div>
 </div>
