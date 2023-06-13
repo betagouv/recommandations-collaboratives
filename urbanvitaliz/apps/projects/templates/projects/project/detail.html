@@ -14,20 +14,20 @@
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
-{% block js %}
-    {% vite_asset 'js/apps/projectDetails.js' %}
-{% endblock %}
-
 {% block title %}
 {{ site.name }} | {{ project.name }}
 {% endblock %}
 
 {% block content %}
 
+{% block js %}
+    {% vite_asset 'js/apps/projectDetails.js' %}
+{% endblock %}
+
 {% is_staff_for_current_site request.user as is_staff %}
 
     <div class="col-11 py-5 mx-auto">
-        <div class="row" style="font-family: 'Marianne', arial, sans-serif;">
+        <div x-data="Tutorial('overview')" class="row" style="font-family: 'Marianne', arial, sans-serif;">
             {% block banner %}{% endblock %}
             {% include 'projects/project/header.html' %}
             {% if project.status == "DRAFT" and request.user in project.members.all %}

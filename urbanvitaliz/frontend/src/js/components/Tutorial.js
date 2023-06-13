@@ -1,15 +1,36 @@
 import Alpine from 'alpinejs'
 import introJs from 'intro.js';
+import tutorials from '../config/tutorials'
 import 'intro.js/introjs.css'
 
+//Custom introjs CSS
+import '../../css/introJs.css'
 
-Alpine.data("Tutorial", Tutorial)
-
-function Tutorial() {
+function Tutorial(tutorial) {
     return {
+        steps: [],
+        hints: [],
+        tour: null,
+        startButton:null,
         init() {
-            console.log('Tutorial component ready : ');
-            introJs().start();
+
+            this.steps = tutorials[tutorial].steps
+
+
+            this.tour = introJs().setOptions({
+                tooltipClass: 'introjs-uv',
+                prevLabel: 'Précédent',
+                nextLabel: 'Suivant',
+                doneLabel: 'C\'est parti !',
+                steps: this.steps,
+            })
         },
+        handleStartTour() {
+            this.startButton = this.$refs.startTourButton
+            this.startButton.style.display = "none"
+            this.tour.start();
+        }
     }
 }
+
+Alpine.data("Tutorial", Tutorial)

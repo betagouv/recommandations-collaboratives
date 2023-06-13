@@ -10,6 +10,7 @@
     {% vite_asset 'js/apps/projectShare.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock %}
+
 {% block banner %}
     {% include 'projects/project/fragments/positioning_banner.html' %}
 {% endblock %}
@@ -19,7 +20,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
     <div x-data="ProjectShare" class="col-12">
-        <div x-data="Tutorial()" class="row">
+        <div class="row">
             {% if not is_switchtender %}
                 {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
                     <div class="col box-heading d-flex justify-content-between mb-4 mt-4">
@@ -141,14 +142,18 @@
                         <ul class="flex-column list-unstyled mb-0">
                             {% for projectmember in project.projectmember_set.all %}
                               {% if projectmember.is_owner %}
-                              <li>{% include 'projects/project/fragments/project_owner.html' with project=project %}</li>
+                              <li>
+                                {% include 'user/user_card.html' with user=project.owner project_owner=True user_activity=True %}
+                              </li>
                               {% else %}
-                              <li>{% include 'projects/project/fragments/user.html' with member=projectmember.member project=project %}</li>
+                              <li>
+                                {% include 'user/user_card.html' with user=projectmember.member user_activity=True %}
+                                </li>
                               {% endif %}
                             {% endfor %}
                         </ul>
                         {% if "invite_collaborators" in user_project_perms %}
-                        <div class="d-block mb-2">
+                        <div class="d-block mb-2 mt-3">
                             <a style="cursor: pointer"
                                @click="openInviteMemberModal"
                                data-toggle="modal"
@@ -170,11 +175,13 @@
                         <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Équipe de suvi</h6>
                         <ul class="d-flex flex-column list-unstyled mb-0">
                             {% for advisor in project.switchtenders_on_site.all %}
-                                <li>{% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}</li>
+                                <li>
+                                    {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
+                                </li>
                             {% endfor %}
                         </ul>
                         {% if "invite_advisors" in user_project_perms or is_regional_actor %}
-                            <div class="d-block mb-2">
+                            <div class="d-block mb-2 mt-3">
                                 <a style="cursor: pointer"
                                    @click="openInviteSwitchtenderModal"
                                    data-toggle="modal"

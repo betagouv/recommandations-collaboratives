@@ -23,6 +23,12 @@
     {% include 'projects/project/navigation.html' with internal_followup=True full_page=True %}
     <div class="row">
     <div class="col-8">
+        <div class="flag orange mb-4 d-flex align-items-center justify-content-start">
+            <svg class="bi align-middle me-4 ms-2" width="25" height="25" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye-fill" />
+            </svg>
+            <p class="text-info-custom my-0">Seuls les acteurs conseil positionnés sur ce projet et l’équipe UrbanVitaliz ont accès à cet espace, pas la collectivité.</p>
+          </div>
         {% activity_stream "target" project %}
         {% regroup stream by timestamp.date as stream_by_day %}
 
