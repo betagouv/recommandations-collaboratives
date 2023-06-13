@@ -6,16 +6,14 @@ import 'intro.js/introjs.css'
 //Custom introjs CSS
 import '../../css/introJs.css'
 
-function Tutorial(tutorial) {
+function Tutorial(tutorial, autoStart=false) {
     return {
         steps: [],
         hints: [],
         tour: null,
         startButton:null,
         init() {
-
             this.steps = tutorials[tutorial].steps
-
 
             this.tour = introJs().setOptions({
                 tooltipClass: 'introjs-uv',
@@ -24,6 +22,10 @@ function Tutorial(tutorial) {
                 doneLabel: 'C\'est parti !',
                 steps: this.steps,
             })
+
+            if (autoStart) {
+                return this.tour.start();
+            }
         },
         handleStartTour() {
             this.startButton = this.$refs.startTourButton
