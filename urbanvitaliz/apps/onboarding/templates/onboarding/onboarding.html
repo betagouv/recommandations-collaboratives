@@ -107,7 +107,7 @@
                             placeholder="nom@organisme.fr" value="{{ form.email.value|default:'' }}" required>
                         {% endif %}
                         <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
-                            <p class="text-info-custom font-small text-grey-dark my-0 ">Votre courriel ne sera jamais partagé en dehors de notre équipe.</p>
+                            <p class="text-info-custom font-small text-grey-dark my-0 ">Votre courriel ne sera jamais partagé en dehors du service.</p>
                         </div>
                         {% for error in form.email.errors %}
                         <div class="text-danger text-end">{{ error }}</div>
@@ -127,7 +127,7 @@
                             value="{{ form.phone.value }}" placeholder="" required>
                         {% endif %}
                         <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
-                            <p class="text-info-custom font-small text-grey-dark my-0 ">Votre numéro ne sera jamais partagé en dehors de notre équipe.</p>
+                            <p class="text-info-custom font-small text-grey-dark my-0 ">Votre numéro ne sera jamais partagé en dehors du service.</p>
                         </div>
                         {% for error in form.phone.errors %}
                         <div class="text-danger text-end">{{ error }}</div>
