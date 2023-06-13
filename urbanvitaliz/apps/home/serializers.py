@@ -34,6 +34,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             "last_name",
             "email",
             "profile",
+            "is_active",
         ]
 
     profile = UserProfileSerializer(read_only=True, many=False)
