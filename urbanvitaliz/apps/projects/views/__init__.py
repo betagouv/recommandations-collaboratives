@@ -229,6 +229,7 @@ def mark_general_notifications_as_seen(user):
     project_ct = ContentType.objects.get_for_model(models.Project)
     notifications = user.notifications.unread().filter(
         Q(verb="a déposé le projet"),
+        Q(verb="a soumis pour modération le projet"),
         target_content_type=project_ct.pk,
     )
     notifications.mark_all_as_read()
