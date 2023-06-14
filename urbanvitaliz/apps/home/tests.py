@@ -83,6 +83,7 @@ def test_create_user_assign_current_site_via_allauth(client, request):
 
     assert len(user.profile.sites.all()) == 1
     assert site in user.profile.sites.all()
+    assert site in user.profile.organization.sites.all()
 
 
 #################################################

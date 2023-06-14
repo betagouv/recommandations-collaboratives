@@ -79,6 +79,7 @@ def onboarding(request):
                     name=org_name
                 )
                 profile.organization = profile.organization or org
+                org.sites.add(request.site)
 
             profile.phone_no = profile.phone_no or form.cleaned_data.get("phone")
             profile.save()
@@ -109,7 +110,10 @@ def onboarding(request):
             # Create initial note
             projects.Note(
                 project=project,
-                content=f"# Demande initiale\n\n{project.description}\n\n{ markdown_content }",
+                content=(
+                    f"# Demande initiale\n\n{project.description}\n\n"
+                    f"{ markdown_content }"
+                ),
                 public=True,
                 site=request.site,
             ).save()

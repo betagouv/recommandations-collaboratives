@@ -1,7 +1,11 @@
 import os
 
-from allauth.account.forms import (LoginForm, ResetPasswordForm,
-                                   ResetPasswordKeyForm, SignupForm)
+from allauth.account.forms import (
+    LoginForm,
+    ResetPasswordForm,
+    ResetPasswordKeyForm,
+    SignupForm,
+)
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
@@ -90,6 +94,8 @@ class UVSignupForm(SignupForm):
         organization, _ = addressbook_models.Organization.objects.get_or_create(
             name__iexact=org_name, defaults={"name": org_name}
         )
+        organization.sites.add(request.site)
+
         user.profile.organization = organization
         user.profile.organization_position = data["organization_position"]
         user.profile.phone_no = data.get("phone_no", None)
