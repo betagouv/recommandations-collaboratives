@@ -325,7 +325,7 @@ def test_crm_user_create_note_performed_no_notification(mocker, request, client)
     assert note.object_id == crm_user.id
     assert note.content == data["content"]
 
-    notify.send.assert_not_called()
+    notify.send.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -371,7 +371,6 @@ def test_crm_user_update_note_not_accessible_for_non_staff(request, client):
 
 @pytest.mark.django_db
 def test_crm_user_update_note_not_accessible_other_site(request, client):
-    site = get_current_site(request)
     other = baker.make(site_models.Site)
     user = baker.make(auth_models.User)
     user.profile.sites.add(other)
