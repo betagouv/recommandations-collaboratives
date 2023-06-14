@@ -152,3 +152,12 @@ class Note(models.Model):
     def content_rendered(self):
         """Return content as markdown"""
         return markdownify(self.content)
+
+    def __str__(self):
+        if self.title:
+            return self.title
+
+        if self.content:
+            return f"{self.content[:10]}..."
+
+        return "Note sans nom"

@@ -99,10 +99,13 @@ def mark_notifications_as_seen(user, project):
         | Q(verb="a mis à jour le questionnaire")
         | Q(verb="a ajouté un document")
         | Q(verb="a envoyé un message")
+        | Q(verb="a commenté l'action")
+        | Q(verb="a créé une note de suivi")
         | Q(verb="a rejoint l'équipe sur le projet")  # XXX For compatibility
         | Q(verb="a rejoint l'équipe projet"),
-        target_content_type=project_ct.pk,
+        target_content_type_id=project_ct.pk,
         target_object_id=project.pk,
+        public=True,
     )
     notifications.mark_all_as_read()
 
