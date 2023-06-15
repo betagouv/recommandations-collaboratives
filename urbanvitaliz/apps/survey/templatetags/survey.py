@@ -20,6 +20,9 @@ def lookup_choices_from_answer(answer):
     if type(answer.values) is not list:
         answer.values = [answer.values]
 
+    # FIXME add a test and then a single request for all choices like
+    # Choice.objects.filter(question=answer.question, value__in=answer.values)
+    # could it be computed on the view instead of the tag itself ?
     for value in answer.values:
         try:
             choices.append(Choice.objects.get(value=value, question=answer.question))

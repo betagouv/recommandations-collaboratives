@@ -60,7 +60,17 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
             Q(target_content_type=ctype)
             | Q(action_object_content_type=ctype)
             | Q(actor_content_type=ctype)
-        ).prefetch_related("actor", "action_object", "target")
+        ).prefetch_related("actor", "action_object", "target")[:100]
+
+        context["crm_notif_stream"] = (
+            self.request.user.notifications.filter(public=False)
+            .filter(Q(verb="a créé une note de CRM"))
+            .prefetch_related("actor", "action_object", "target")
+        )
+
+        # Consume notifications
+        if not self.request.user.is_hijacked:
+            context["crm_notif_stream"].mark_all_as_read()
 
         return context
 
@@ -641,11 +651,11 @@ def handle_create_note_for_object(
             note.site = request.site
             note.save()
             form.save_m2m()
-            return True, redirect(reverse(return_view_name, args=(the_object.pk,)))
+            return note, redirect(reverse(return_view_name, args=(the_object.pk,)))
     else:
         form = forms.CRMNoteForm()
 
-    return False, render(request, "crm/note_create.html", locals())
+    return None, render(request, "crm/note_create.html", locals())
 
 
 @login_required
@@ -656,22 +666,23 @@ def create_note_for_user(request, user_id):
     if request.site not in user.profile.sites.all():
         raise Http404()
 
-    created, response = handle_create_note_for_object(
+    note, response = handle_create_note_for_object(
         request, user, "crm-user-details", "crm-user-note-update"
     )
 
-    if created and user.profile and user.profile.organization:
+    if note and user.profile:
         crm_users = get_users_with_perms(
             request.site, only_with_perms_in=["use_crm"]
         ).exclude(pk=request.user.pk)
+
         notify.send(
             sender=request.user,
             recipient=crm_users,
             verb="a créé une note de CRM",
-            action_object=user,
-            target=user.profile.organization,
+            action_object=note,
+            target=user,
             public=False,
-            crm=True,
+            # crm=True, # Deactivated since JSON is not enabled, useless
         )
 
     return response

@@ -17,6 +17,7 @@ from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertNotContains
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login, has_perm
+from urbanvitaliz.apps.addressbook import models as addressbook_models
 
 from . import api, models
 
@@ -511,6 +512,60 @@ def test_anonymous_accepts_invite_as_collaborator(
     assert user.profile.organization_position == data["position"]
     assert current_site in user.profile.sites.all()
     assert has_perm(user, "view_project", invite.project)
+
+
+@pytest.mark.django_db
+def test_accepting_invitation_assigns_organization_to_current_site(request, client):
+    current_site = get_current_site(request)
+    invite = Recipe(
+        models.Invite,
+        role="COLLABORATOR",
+        site=current_site,
+        email="a@new.one",
+    ).make()
+
+    data = {
+        "first_name": "First",
+        "last_name": "Last",
+        "organization": "New Organization",
+        "position": "Doing Stuff",
+    }
+
+    url = reverse("invites-invite-accept", args=[invite.pk])
+    response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    orga = addressbook_models.Organization.on_site.first()
+    assert orga.name == data["organization"]
+
+
+@pytest.mark.django_db
+def test_accepting_invitation_updates_organization_with_current_site(request, client):
+    current_site = get_current_site(request)
+    invite = Recipe(
+        models.Invite,
+        role="COLLABORATOR",
+        site=current_site,
+        email="a@new.one",
+    ).make()
+
+    data = {
+        "first_name": "First",
+        "last_name": "Last",
+        "organization": "New Organization",
+        "position": "Doing Stuff",
+    }
+
+    orga = baker.make(addressbook_models.Organization, name=data["organization"])
+
+    url = reverse("invites-invite-accept", args=[invite.pk])
+    response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    orga.refresh_from_db()
+    assert current_site in orga.sites.all()
 
 
 # eof

@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.apps.addressbook import models as addressbook_models
-from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects import signals as projects_signals
 from urbanvitaliz.apps.projects.utils import assign_collaborator, assign_advisor
 
@@ -53,6 +52,8 @@ def invite_accept(request, invite_id):
                 organization, _ = addressbook_models.Organization.objects.get_or_create(
                     name=form.cleaned_data.get("organization")
                 )
+
+                organization.sites.add(request.site)
 
                 user.profile.organization = organization
                 user.profile.organization_position = form.cleaned_data.get("position")

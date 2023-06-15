@@ -248,6 +248,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         task = self.get_object()
 
         if not self.request.user.has_perm("projects.use_tasks", task.project):
+            # FIXME this line is not covered by a test
             raise PermissionDenied()
 
         above_id = request.POST.get("above", None)
@@ -319,6 +320,7 @@ class TaskNotificationViewSet(
 
         followup_ids = list(task.followups.all().values_list("id", flat=True))
 
+        # FIXME cannot find who create notifications on followups
         followup_actions = notifications.filter(
             action_object_content_type=followup_ct.pk,
             action_object_object_id__in=followup_ids,

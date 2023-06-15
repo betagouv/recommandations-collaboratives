@@ -118,23 +118,33 @@ def test_organization_list_available_for_switchtender(client):
 
 
 @pytest.mark.django_db
-def test_organization_list_contains_only_site_organizations(request, client):
-    current_site = get_current_site(request)
-    site_organization = baker.make(models.Organization, sites=[current_site])
-    site = baker.make(sites_models.Site)
-    other_organization = baker.make(models.Organization, sites=[site])
-    space_organization = baker.make(models.Organization)
+def test_organization_list_only_contains_site_org_w_contacts(request, client):
+    site = get_current_site(request)
+    other = baker.make(sites_models.Site)
+
+    on_site_no_contacts = Recipe(
+        models.Organization, name="no_contacts", sites=[site]
+    ).make()
+    other_site = Recipe(models.Organization, name="other_site", sites=[other]).make()
+    no_site = Recipe(models.Organization, name="no_site", sites=[]).make()
+
+    on_site_w_contacts = Recipe(
+        models.Organization, name="on_site_w_contacts", sites=[site]
+    ).make()
+    baker.make(models.Contact, organization=on_site_w_contacts, site=site)
 
     url = reverse("addressbook-organization-list")
-    with settings.SITE_ID.override(current_site.pk):
+
+    with settings.SITE_ID.override(site.pk):
         with login(client, groups=["example_com_staff"]):
             response = client.get(url)
 
     assert response.status_code == 200
 
-    assertContains(response, site_organization.name)
-    assertNotContains(response, other_organization.name)
-    assertNotContains(response, space_organization.name)
+    assertContains(response, on_site_w_contacts.name)
+    assertNotContains(response, on_site_no_contacts.name)
+    assertNotContains(response, other_site.name)
+    assertNotContains(response, no_site.name)
 
 
 #
