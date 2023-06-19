@@ -14,7 +14,7 @@
               <input id="invite-email" type="email" name="email" required class="form-control invite-switchtender-modal-email" placeholder="camille@region-hdf.fr"/>
           </div>
 
-          <input type="hidden" name="{{ invite_form.role.html_name }}" id="role-switchtender" value="SWITCHTENDER">
+          <input type="hidden" name="{{ invite_form.role.html_name }}" id="role-switchtender" value="OBSERVER">
 
           {% if source %}
               <input type="hidden" name="source" id="source" value="{{source}}">
