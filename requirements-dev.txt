@@ -6,6 +6,8 @@ django_coverage_plugin
 fabric
 ipython
 model_bakery
+pylint
+pylint-django
 pytest
 pytest-cov
 pytest-coverage

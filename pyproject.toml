@@ -12,3 +12,24 @@ testpaths = [
     "urbanvitaliz"
 ]
 python_files = "tests.py test_*.py *_test.py *_tests.py"
+
+[tool.pylint.main]
+jobs = 2
+load-plugins = "pylint_django"
+ignore = ["settings","static","templates",".venv","tests", "migrations"]
+disable = [
+        "missing-function-docstring",
+        "missing-class-docstring",
+        "missing-module-docstring",
+        "use-list-literal",
+        "use-dict-literal",
+        "duplicate-code",
+        "possibly-unused-variable",  # django views w/ locals()
+        "consider-using-f-string",
+        "fixme",
+]
+
+[tool.pylint.design]
+min-public-methods = 1
+
+

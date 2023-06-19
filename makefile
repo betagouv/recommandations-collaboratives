@@ -6,6 +6,7 @@
 # created: 2021-06-22 11:49:13 CEST
 #
 
+SETTINGS=urbanvitaliz.settings.development
 
 all:
 	echo "what do you want?"
@@ -22,6 +23,9 @@ nice:
 	isort urbanvitaliz
 	black urbanvitaliz
 	flake8 urbanvitaliz
+
+lint:
+	pylint --django-settings-module=$(SETTINGS) urbanvitaliz
 
 coverage:
 	pytest --cov
