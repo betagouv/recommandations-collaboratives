@@ -289,6 +289,7 @@ def resource_update(request, resource_id=None):
             resource = form.save(commit=False)
             resource.updated_on = timezone.now()
             resource.save()
+            form.save_m2m()
             return redirect(next_url)
     else:
         form = EditResourceForm(instance=resource)
