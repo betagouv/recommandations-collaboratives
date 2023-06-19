@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load static %}
+{% load guardian_tags %}
 
 {% block js %}
 <script type="text/javascript">
@@ -12,6 +13,9 @@
 {% endblock %}
 
 {% block content %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 
 <div class="col-11 py-5 mx-auto">
 
@@ -60,19 +64,19 @@
 
 	      </form>
 
-        {% if user.is_staff %}
-        <hr/>
-        <div class="d-flex justify-content-end">
-            <form id="form-projects-delete-note" method="POST" action="{% url 'projects-delete-note' note.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">
-                    <svg class="bi " width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash"/>
-                    </svg>
-			              Supprimer
-		            </button>
-            </form>
-        </div>
+        {% if note.public and 'use_public_notes' in user_project_perms or not note.public and 'use_private_notes' %}
+            <hr/>
+            <div class="d-flex justify-content-end">
+                <form id="form-projects-delete-note" method="POST" action="{% url 'projects-delete-note' note.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <svg class="bi " width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash"/>
+                        </svg>
+                            Supprimer
+                        </button>
+                </form>
+            </div>
         {% endif %}
 
         {{ form.media }}
