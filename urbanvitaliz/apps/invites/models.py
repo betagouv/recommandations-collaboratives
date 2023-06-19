@@ -23,6 +23,7 @@ class Invite(models.Model):
     INVITE_ROLES = (
         ("COLLABORATOR", "Participant·e"),
         ("SWITCHTENDER", "Conseiller·e"),
+        ("OBSERVER", "Observateur·trice"),
     )
 
     objects = InviteManager()
