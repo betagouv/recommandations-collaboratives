@@ -1,6 +1,6 @@
 {% load static %}
 
-<template x-cloak x-if="!hasAlreadyStartedTheChallenge">
+<template x-cloak x-if="!hasAlreadyStartedTheChallenge && showTuto">
     <div x-ref="startTourButton" @click="handleStartTour()"
         class="hint-button align-items-center position-absolute t-0 l-0 p-2 appear-in-with-delay">
         <span x-text="startButtonDescription"></span>

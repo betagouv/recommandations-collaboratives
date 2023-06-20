@@ -16,20 +16,20 @@ function Tutorial(challengeCode, autoStart = false) {
         startButton: null,
         startButtonDescription: "",
         challengeCode: null,
+        showTuto:true,
         async init() {
             this.challengeCode = challengeCode
-
-            //Check if the user has already started the Challenge
-
-            const challenge = await this.getChallenge(this.challengeCode)
-
-            if (challenge && challenge.started_on) {
-                return this.hasAlreadyStartedTheChallenge = true
-            }
 
             const ChallengeDefinition = await this.getChallengeDefinition(challengeCode)
 
             if (!ChallengeDefinition) {
+                return this.showTuto = false
+            }
+
+            //Check if the user has already started the Challenge
+            const challenge = await this.getChallenge(this.challengeCode)
+
+            if (challenge && challenge.started_on) {
                 return this.hasAlreadyStartedTheChallenge = true
             }
 
