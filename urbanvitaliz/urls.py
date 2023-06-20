@@ -61,7 +61,9 @@ router.register(
     r"organizations", addressbook_rest.OrganizationViewSet, basename="organizations"
 )
 router.register(
-    r"challenges", training_rest.ChallengeDefinitionViewSet, basename="challenges"
+    r"challenges/definitions",
+    training_rest.ChallengeDefinitionViewSet,
+    basename="challenge-definitions",
 )
 
 urlpatterns = [
