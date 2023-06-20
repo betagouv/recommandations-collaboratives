@@ -44,12 +44,12 @@
         {% endif %}
     </div>
         <div x-cloak x-ref="userTooltip" id="user-tooltip" @click.outside="onOutsideUserClick" class="user-card-popup flex-column {% if not user.is_active%}{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border {% endif %}">
-            {% if position.is_advisor and user.is_active %}
+            {% if user.is_active and position.is_advisor  %}
                 <div class="user-role position-absolute">
                     <span class="py-1 px-2 fw-bold text-uppercase tiny advisor-background text-white"
                         style="border-radius: 2px;">Conseiller</span>
                 </div>
-            {% elif position.is_observer and user.is_active %}
+            {% elif user.is_active and position.is_observer %}
                 <div class="user-role position-absolute">
                     <span class="py-1 px-2 fw-bold text-uppercase tiny observer-background text-white"
                         style="border-radius: 2px;">Observateur</span>
@@ -69,9 +69,9 @@
                         {% endif %}
                     </strong>
                 </span>
-                {% if user.profile.organization.name and user.is_active %}
+                {% if user.is_active and user.profile.organization.name %}
                     <span class="text-dark fw-normal font-italic font-very-small">{{user.profile.organization.name}}</span>
-                {% elif project_owner and project.org_name and user.is_active %}
+                {% elif user.is_active and project_owner and project.org_name  %}
                     <span class="text-dark fw-normal font-italic font-very-small">{{project.org_name}}</span>
                 {% endif %}
             </div>
@@ -90,7 +90,7 @@
                         </button>
                 </span>
             {% endif %}
-            {% if user.profile.phone_no and user.is_active and not position.is_observer %}
+            {% if user.is_active and user.profile.phone_no and not position.is_observer %}
                 <span class="d-flex align-items-center justify-content-between text-blue font-very-small mt-1">
                     <div class="d-flex align-items-center">
                         <svg class="bi align-middle me-2" width="15" height="15" fill="currentColor">
