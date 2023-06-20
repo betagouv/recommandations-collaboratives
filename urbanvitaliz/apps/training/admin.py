@@ -10,7 +10,7 @@ class ChallengeDefinitionAdmin(admin.ModelAdmin):
 
 @admin.register(models.Challenge)
 class ChallengeAdmin(admin.ModelAdmin):
-    list_display = ["codename", "user", "acquired"]
+    list_display = ["codename", "user", "acquired_on"]
 
     def codename(self, obj):
         return obj.challenge_definition.code

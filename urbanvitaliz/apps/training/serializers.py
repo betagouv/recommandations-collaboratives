@@ -16,14 +16,11 @@ class ChallengeDefinitionSerializer(serializers.ModelSerializer):
 
 
 class ChallengeSerializer(serializers.ModelSerializer):
-    definition = ChallengeDefinitionSerializer(
-        source="challenge_definition", read_only=True, many=False
-    )
+    challenge_definition = ChallengeDefinitionSerializer(read_only=True, many=False)
 
     class Meta:
         model = Challenge
         fields = [
-            "definition",
-            "acquired",
+            "challenge_definition",
             "acquired_on",
         ]

@@ -51,14 +51,12 @@ router.register(
     basename="project-tasks-notifications",
 )
 
-
 router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
 router.register(
     r"departments", geomatics_rest.DepartmentViewSet, basename="departments"
 )
 router.register(r"regions", geomatics_rest.RegionViewSet, basename="regions")
 router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
-router.register(r"challenges", training_rest.ChallengeViewSet, basename="challenges")
 router.register(
     r"organizations", addressbook_rest.OrganizationViewSet, basename="organizations"
 )
@@ -84,6 +82,11 @@ urlpatterns = [
         "api/userprojectstatus/",
         projects_rest.UserProjectStatusList.as_view(),
         name="userprojectstatus-list",
+    ),
+    path(
+        "api/challenges/<str:slug>/",
+        training_rest.ChallengeView.as_view(),
+        name="challenges-challenge",
     ),
     path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
