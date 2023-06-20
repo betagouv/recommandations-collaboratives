@@ -9,7 +9,7 @@
 {% endblock %}
 {% block project_detail %}
     {% challenge_for request.user "project-knowledge-reader" as challenge %}
-    {% if challenge and not challenge.acquired %}
+    {% if challenge and not challenge.acquired_on %}
         {% challenge_acquire challenge %}
     {% endif %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}

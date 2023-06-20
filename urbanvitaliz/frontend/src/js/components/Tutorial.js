@@ -2,52 +2,93 @@ import Alpine from 'alpinejs'
 import introJs from 'intro.js';
 import tutorials from '../config/tutorials'
 import 'intro.js/introjs.css'
-import api, { challengeDefinitionUrl } from '../utils/api'
+import api, { challengeUrl, challengeDefinitionUrl } from '../utils/api'
 
 //Custom introjs CSS
 import '../../css/introJs.css'
 
-function Tutorial(user, challengeCode, autoStart = false) {
+function Tutorial(challengeCode, autoStart = false) {
     return {
         steps: [],
         hints: [],
         tour: null,
+        hasAlreadyStartedTheChallenge:false,
         startButton: null,
         startButtonDescription: "",
-        init() {
+        challengeCode:null,
+        async init() {
+            this.challengeCode = challengeCode
 
-            console.log('current user : ', user)
-            const challenge = this.getChallengeDefinition(challengeCode)
+            //Check if the user has already started the Challenge
 
-            // console.log('challenge : ', challenge);
-            // this.steps = tutorials[challenge.code].steps
-            // this.startButtonDescription = challenge.description
+            const challenge = await this.getChallenge(this.challengeCode)
 
-            // this.tour = introJs().setOptions({
-            //     tooltipClass: 'introjs-uv',
-            //     prevLabel: 'Précédent',
-            //     nextLabel: 'Suivant',
-            //     doneLabel: 'C\'est parti !',
-            //     steps: this.steps,
-            // })
+            if (challenge && challenge.started_on) {
+                return this.hasAlreadyStartedTheChallenge = true
+            }
 
-            // if (autoStart) {
-            //     return this.tour.start();
-            // }
+            const ChallengeDefinition = await this.getChallengeDefinition(challengeCode)
+
+            this.steps = tutorials[ChallengeDefinition.code].steps
+            this.startButtonDescription = ChallengeDefinition.description
+
+            this.tour = introJs().setOptions({
+                tooltipClass: 'introjs-uv',
+                prevLabel: 'Précédent',
+                nextLabel: 'Suivant',
+                doneLabel: 'C\'est parti !',
+                steps: this.steps,
+            })
+
+            this.tour.oncomplete( async () => {
+                this.acquireChallenge(this.challengeCode)
+            })
+
+            if (autoStart) {
+                return this.tour.start();
+            }
         },
         async getChallengeDefinition(code) {
             try {
                 const json = await api.get(challengeDefinitionUrl(code))
                 return json.data
             }
-            catch(err) {
+            catch (err) {
                 console.error(err);
             }
         },
-        handleStartTour() {
+        async getChallenge(code) {
+            try {
+                const json = await api.get(challengeUrl(code))
+                return json.data
+            }
+            catch (err) {
+                console.error(err);
+            }
+        },
+        async startChallenge(code) {
+            try {
+                const json = await api.patch(challengeUrl(code),{started_on:true})
+                return json.data
+            }
+            catch (err) {
+                console.error(err);
+            }
+        },
+        async acquireChallenge(code) {
+            try {
+                const json = await api.patch(challengeUrl(code),{acquired_on:true})
+                return json.data
+            }
+            catch (err) {
+                console.error(err);
+            }
+        },
+        async handleStartTour() {
             this.startButton = this.$refs.startTourButton
             this.startButton.style.display = "none"
             this.tour.start();
+            await this.startChallenge(this.challengeCode)
         }
     }
 }

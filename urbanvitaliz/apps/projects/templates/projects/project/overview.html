@@ -3,10 +3,16 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load training %}
+
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/projectDetails.js' %}
+    {% vite_asset 'js/apps/projectShare.js' %}
+    {% vite_asset 'js/apps/tutorial.js' %}
+{% endblock %}
 
 {% block title %}{{ block.super }} > Connaissance{% endblock %}
-{% load django_vite %}
 
 {% block banner %}
     {% include 'projects/project/fragments/positioning_banner.html' %}
@@ -17,6 +23,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
     <div x-data="ProjectShare" class="col-12">
+        <div x-data="Tutorial('project-advisor-overview')">
             <div class="row">
                 {% if not is_switchtender %}
                     {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
@@ -203,4 +210,5 @@
         {% include "projects/project/fragments/share/invite_member.html" %}
         {% include "projects/project/fragments/share/invite_switchtender.html" %}
         </div>
+    </div>
 {% endblock %}

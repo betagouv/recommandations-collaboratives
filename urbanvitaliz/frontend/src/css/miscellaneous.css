@@ -1,3 +1,6 @@
+/* AlpineJS */
+[x-cloak] { display: none !important; }
+
 .onboarding-response-form label {
     font-family: 'Marianne';
     font-style: normal;
@@ -70,3 +73,21 @@
         background-color: #fff;
     }
 }
+
+.appear-in-with-delay {
+    opacity: 0;
+    transform: translate3d(-5px,0,0);
+    animation: appear-in 0.5s forwards ease 0.5s;
+}
+
+@keyframes appear-in {
+    from{
+        opacity: 0;
+        transform: translate3d(-5px,0,0);
+    }
+    to{
+        opacity: 1;
+        transform: translate3d(0,0,0);
+    }
+}
+

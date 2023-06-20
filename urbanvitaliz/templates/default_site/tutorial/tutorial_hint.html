@@ -1,0 +1,11 @@
+{% load static %}
+
+<template x-cloak x-if="!hasAlreadyStartedTheChallenge">
+    <div x-ref="startTourButton" @click="handleStartTour()"
+        class="hint-button align-items-center position-absolute t-0 l-0 p-2 appear-in-with-delay">
+        <span x-text="startButtonDescription"></span>
+        <svg class="ms-1 bi align-middle" width="25" height="25" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
+        </svg>
+    </div>
+</template>

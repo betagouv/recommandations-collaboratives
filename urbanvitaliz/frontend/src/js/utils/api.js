@@ -84,10 +84,14 @@ export function regionsUrl() {
 }
 
 // Challenges
-export function challengeDefinitionUrl(code) {
-    return `/api/challenges/${code}`
+export function challengeUrl(code) {
+    return `/api/challenges/${code}/`
 }
 
+// Challenges
+export function challengeDefinitionUrl(code) {
+    return `/api/challenges/definitions/${code}`
+}
 
 // Non API routes
 // TODO : Make them into proper endpoints
