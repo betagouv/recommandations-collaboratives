@@ -29,9 +29,9 @@
                     {% endif %}
                 </strong>
             </span>
-            {% if user.profile.organization.name and user.is_active %}
+            {% if user.is_active and user.profile.organization.name %}
                 <span class="text-dark fw-normal font-italic font-very-small">{{user.profile.organization.name}}</span>
-            {% elif project_owner and project.org_name and user.is_active %}
+            {% elif user.is_active and project_owner and project.org_name  %}
                 <span class="text-dark fw-normal font-italic font-very-small">{{project.org_name}}</span>
             {% endif %}
         </div>
