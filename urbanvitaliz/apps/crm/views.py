@@ -55,7 +55,6 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         context["project_model"] = Project
         context["user_model"] = User
 
-        # FIXME no filter on site?
         ctype = ContentType.objects.get_for_model(Project)
         context["projects_stream"] = (
             Action.objects.filter(site=self.request.site)
