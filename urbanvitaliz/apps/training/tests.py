@@ -20,7 +20,7 @@ def test_get_challenge_with_existing_definition(request):
     challenge = get_challenge_for(user, "nice-code")
     assert challenge is not None
     assert Challenge.objects.count() == 1
-    assert challenge.acquired is False
+    assert challenge.acquired_on is None
 
 
 @pytest.mark.django_db
@@ -31,4 +31,4 @@ def test_get_challenge_multiple_times(request):
     challenge = get_challenge_for(user, "nice-code")
     assert challenge is not None
     assert Challenge.objects.count() == 1
-    assert challenge.acquired is False
+    assert challenge.acquired_on is None

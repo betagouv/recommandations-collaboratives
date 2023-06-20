@@ -12,7 +12,6 @@ Inspired by django-gamification (https://github.com/mattjegan/django-gamificatio
 
 from django.contrib.auth import models as auth_models
 from django.db import models
-from django.utils import timezone
 
 
 class ChallengeDefinition(models.Model):
@@ -32,22 +31,16 @@ class AcquiredChallengesManager(models.Manager):
     """ """
 
     def get_queryset(self):
-        return super().get_queryset().filter(acquired=True)
+        return super().get_queryset().exclude(acquired=None)
 
 
 class Challenge(models.Model):
     challenge_definition = models.ForeignKey(
         ChallengeDefinition, on_delete=models.CASCADE
     )
-    acquired = models.BooleanField(default=False)
     acquired_on = models.DateTimeField(
-        default=timezone.now, verbose_name="Date d'acquisition"
+        verbose_name="Date d'acquisition", default=None, null=True
     )
-
-    def acquire(self):
-        self.acquired = True
-        self.acquired_on = timezone.now()
-        self.save()
 
     user = models.ForeignKey(
         auth_models.User, on_delete=models.CASCADE, related_name="training_challenges"
@@ -55,3 +48,6 @@ class Challenge(models.Model):
 
     objects = models.Manager()
     acquired_objects = AcquiredChallengesManager()
+
+    class Meta:
+        unique_together = (("challenge_definition", "user"),)
