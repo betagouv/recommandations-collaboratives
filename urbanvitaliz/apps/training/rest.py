@@ -67,7 +67,10 @@ class ChallengeView(generics.RetrieveUpdateAPIView):
             models.Challenge, user=request.user, challenge_definition=definition
         )
 
-        challenge.acquired_on = timezone.now()
+        if "started_on" in request.data:
+            challenge.started_on = timezone.now()
+        if "acquired_on" in request.data:
+            challenge.acquired_on = timezone.now()
         challenge.save()
 
         data = ChallengeSerializer(challenge).data

@@ -23,4 +23,5 @@ class ChallengeSerializer(serializers.ModelSerializer):
         fields = [
             "challenge_definition",
             "acquired_on",
+            "started_on",
         ]
