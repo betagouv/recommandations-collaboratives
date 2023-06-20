@@ -60,6 +60,9 @@ router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
 router.register(
     r"organizations", addressbook_rest.OrganizationViewSet, basename="organizations"
 )
+router.register(
+    r"challenges", training_rest.ChallengeDefinitionViewSet, basename="challenges"
+)
 
 urlpatterns = [
     path("api/", include(router.urls)),
