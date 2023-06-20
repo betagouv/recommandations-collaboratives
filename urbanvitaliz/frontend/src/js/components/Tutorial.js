@@ -2,29 +2,46 @@ import Alpine from 'alpinejs'
 import introJs from 'intro.js';
 import tutorials from '../config/tutorials'
 import 'intro.js/introjs.css'
+import api, { challengeDefinitionUrl } from '../utils/api'
 
 //Custom introjs CSS
 import '../../css/introJs.css'
 
-function Tutorial(tutorial, autoStart=false) {
+function Tutorial(user, challengeCode, autoStart = false) {
     return {
         steps: [],
         hints: [],
         tour: null,
-        startButton:null,
+        startButton: null,
+        startButtonDescription: "",
         init() {
-            this.steps = tutorials[tutorial].steps
 
-            this.tour = introJs().setOptions({
-                tooltipClass: 'introjs-uv',
-                prevLabel: 'Précédent',
-                nextLabel: 'Suivant',
-                doneLabel: 'C\'est parti !',
-                steps: this.steps,
-            })
+            console.log('current user : ', user)
+            const challenge = this.getChallengeDefinition(challengeCode)
 
-            if (autoStart) {
-                return this.tour.start();
+            // console.log('challenge : ', challenge);
+            // this.steps = tutorials[challenge.code].steps
+            // this.startButtonDescription = challenge.description
+
+            // this.tour = introJs().setOptions({
+            //     tooltipClass: 'introjs-uv',
+            //     prevLabel: 'Précédent',
+            //     nextLabel: 'Suivant',
+            //     doneLabel: 'C\'est parti !',
+            //     steps: this.steps,
+            // })
+
+            // if (autoStart) {
+            //     return this.tour.start();
+            // }
+        },
+        async getChallengeDefinition(code) {
+            try {
+                const json = await api.get(challengeDefinitionUrl(code))
+                return json.data
+            }
+            catch(err) {
+                console.error(err);
             }
         },
         handleStartTour() {

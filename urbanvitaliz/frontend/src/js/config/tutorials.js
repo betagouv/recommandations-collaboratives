@@ -26,7 +26,7 @@ export default {
             }
         ]
     },
-    overview: {
+    'project-advisor-overview': {
         tooltipClass: 'introjs-uv',
         prevLabel: 'Précédent',
         nextLabel: 'Suivant',

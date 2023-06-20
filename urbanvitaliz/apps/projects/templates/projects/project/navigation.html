@@ -15,15 +15,16 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% is_staff_for_current_site request.user as is_staff %}
+{% get_advising_position user project as position %}
 
 
 <ul class="project-navigation d-flex align-items-center"
     style="font-family: 'Marianne', arial, sans-serif;
            padding: 0">
     <div class="position-relative d-flex align-items-center" id="overview-step-1">
-        {% if overview %}
+        {% if position.advisor or position.observer or is_regional_actor %}
             <div x-ref="startTourButton" @click="handleStartTour()" class="hint-button align-items-center position-absolute t-0 l-0 p-2">
-                <span>Découvrez cet espace en 5 clics</span>
+                <span x-text="startButtonDescription"></span>
                 <svg class="ms-1 bi align-middle" width="25" height="25" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
                 </svg>

@@ -22,12 +22,14 @@
 
 {% block js %}
     {% vite_asset 'js/apps/projectDetails.js' %}
+    {% vite_asset 'js/apps/projectShare.js' %}
+    {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock %}
 
 {% is_staff_for_current_site request.user as is_staff %}
 
     <div class="col-11 py-5 mx-auto">
-        <div x-data="Tutorial('overview')" class="row" style="font-family: 'Marianne', arial, sans-serif;">
+        <div x-data="Tutorial({{request.user.pk}}, 'project-advisor-overview')" class="row" style="font-family: 'Marianne', arial, sans-serif;">
             {% block banner %}{% endblock %}
             {% include 'projects/project/header.html' %}
             {% if project.status == "DRAFT" and request.user in project.members.all %}
