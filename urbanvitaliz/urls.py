@@ -25,6 +25,7 @@ from urbanvitaliz.apps.onboarding.urls import urlpatterns as onboarding_urls
 from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
 from urbanvitaliz.apps.projects.views import rest as projects_rest
 from urbanvitaliz.apps.addressbook import rest as addressbook_rest
+from urbanvitaliz.apps.training import rest as training_rest
 from urbanvitaliz.apps.resources import views as resources_views
 from urbanvitaliz.apps.resources.urls import urlpatterns as resources_urls
 from urbanvitaliz.apps.survey.urls import urlpatterns as survey_urls
@@ -50,7 +51,6 @@ router.register(
     basename="project-tasks-notifications",
 )
 
-
 router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
 router.register(
     r"departments", geomatics_rest.DepartmentViewSet, basename="departments"
@@ -59,6 +59,11 @@ router.register(r"regions", geomatics_rest.RegionViewSet, basename="regions")
 router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
 router.register(
     r"organizations", addressbook_rest.OrganizationViewSet, basename="organizations"
+)
+router.register(
+    r"challenges/definitions",
+    training_rest.ChallengeDefinitionViewSet,
+    basename="challenge-definitions",
 )
 
 urlpatterns = [
@@ -82,6 +87,11 @@ urlpatterns = [
         "api/userprojectstatus/",
         projects_rest.UserProjectStatusList.as_view(),
         name="userprojectstatus-list",
+    ),
+    path(
+        "api/challenges/<str:slug>/",
+        training_rest.ChallengeView.as_view(),
+        name="challenges-challenge",
     ),
     path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),

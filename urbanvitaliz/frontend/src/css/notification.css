@@ -12,6 +12,7 @@
 
     z-index: 9999;
     border-radius: 6px;
+    border: solid 1px #222;
 }
 
 .has-notification {

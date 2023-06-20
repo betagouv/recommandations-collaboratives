@@ -298,7 +298,7 @@ def test_user_cannot_access_member_invitation_for_someone_else(
 
 
 @pytest.mark.django_db
-def test_logged_in_user_accepts_invite_switchtender_with_matching_existing_account(
+def test_logged_in_user_accepts_invite_advisor_with_matching_existing_account(
     request,
     client,
 ):
@@ -320,7 +320,38 @@ def test_logged_in_user_accepts_invite_switchtender_with_matching_existing_accou
     assert invite.accepted_on is not None
     assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
-    assert user == invite.project.switchtenders_on_site.first().switchtender
+    switchtending = invite.project.switchtenders_on_site.first()
+    assert user == switchtending.switchtender
+    assert switchtending.is_observer is False
+    assert has_perm(user, "view_project", invite.project)
+
+
+@pytest.mark.django_db
+def test_logged_in_user_accepts_invite_observer_with_matching_existing_account(
+    request,
+    client,
+):
+    current_site = get_current_site(request)
+    with login(client, email="invited@here.tld") as user:
+        invite = Recipe(
+            models.Invite,
+            site=current_site,
+            role="OBSERVER",
+            email=user.email,
+            project__name="project",
+            project__location="here",
+        ).make()
+        url = reverse("invites-invite-accept", args=[invite.pk])
+        response = client.post(url)
+
+    assert response.status_code == 302
+    invite = models.Invite.on_site.get(pk=invite.pk)
+    assert invite.accepted_on is not None
+    assert current_site in user.profile.sites.all()
+    assert user not in invite.project.members.all()
+    switchtending = invite.project.switchtenders_on_site.first()
+    assert user == switchtending.switchtender
+    assert switchtending.is_observer is True
     assert has_perm(user, "view_project", invite.project)
 
 

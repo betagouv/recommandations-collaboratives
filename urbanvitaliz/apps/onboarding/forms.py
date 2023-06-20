@@ -38,7 +38,7 @@ class OnboardingResponseForm(forms.ModelForm):
     first_name = forms.CharField(label="Prénom du contact", initial="", required=True)
     last_name = forms.CharField(label="Nom du contact", initial="", required=True)
     phone = forms.CharField(
-        max_length=16, label="Téléphone", initial="", required=False
+        max_length=16, label="Téléphone", initial="", required=True
     )
     email = forms.CharField(label="Courriel", required=True)
 

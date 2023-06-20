@@ -472,8 +472,9 @@ def notify_note_created(sender, note, project, user, **kwargs):
 @receiver(note_created)
 def note_created_challenged(sender, note, project, user, **kwargs):
     challenge = training_utils.get_challenge_for(user, "project-conversation-writer")
-    if challenge and not challenge.acquired:
-        challenge.acquire()
+    if challenge and not challenge.acquired_on:
+        challenge.acquired_on = timezone.now()
+        challenge.save()
 
 
 ################################################################

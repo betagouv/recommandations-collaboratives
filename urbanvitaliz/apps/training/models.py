@@ -10,12 +10,20 @@ Inspired by django-gamification (https://github.com/mattjegan/django-gamificatio
 """
 
 
+from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.auth import models as auth_models
+from django.contrib.sites import models as site_models
 from django.db import models
-from django.utils import timezone
+
+
+class ChallengeDefinitionOnSiteManager(CurrentSiteManager):
+    pass
 
 
 class ChallengeDefinition(models.Model):
+    objects = ChallengeDefinitionOnSiteManager()
+
+    site = models.ForeignKey(site_models.Site, on_delete=models.CASCADE)
     code = models.SlugField(max_length=128, unique=True)
     name = models.CharField(max_length=128)
     description = models.TextField(null=True, blank=True)
@@ -32,22 +40,19 @@ class AcquiredChallengesManager(models.Manager):
     """ """
 
     def get_queryset(self):
-        return super().get_queryset().filter(acquired=True)
+        return super().get_queryset().exclude(acquired=None)
 
 
 class Challenge(models.Model):
     challenge_definition = models.ForeignKey(
         ChallengeDefinition, on_delete=models.CASCADE
     )
-    acquired = models.BooleanField(default=False)
-    acquired_on = models.DateTimeField(
-        default=timezone.now, verbose_name="Date d'acquisition"
+    started_on = models.DateTimeField(
+        verbose_name="Date de démarrage", default=None, null=True
     )
-
-    def acquire(self):
-        self.acquired = True
-        self.acquired_on = timezone.now()
-        self.save()
+    acquired_on = models.DateTimeField(
+        verbose_name="Date d'acquisition", default=None, null=True
+    )
 
     user = models.ForeignKey(
         auth_models.User, on_delete=models.CASCADE, related_name="training_challenges"
@@ -55,3 +60,6 @@ class Challenge(models.Model):
 
     objects = models.Manager()
     acquired_objects = AcquiredChallengesManager()
+
+    class Meta:
+        unique_together = (("challenge_definition", "user"),)

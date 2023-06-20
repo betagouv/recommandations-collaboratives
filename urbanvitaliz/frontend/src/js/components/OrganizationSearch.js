@@ -6,7 +6,6 @@ function OrganizationSearch(currentOrganization) {
         organization: '',
         results: [],
         init() {
-            console.log('OrganizationSearch ready', currentOrganization)
             this.organization = currentOrganization
         },
         async handleOrganizationChange(e) {

@@ -1,3 +1,6 @@
+/* AlpineJS */
+[x-cloak] { display: none !important; }
+
 .onboarding-response-form label {
     font-family: 'Marianne';
     font-style: normal;
@@ -48,3 +51,43 @@
 .hover-underline:hover {
     text-decoration: underline !important;
 }
+
+.component-focus{
+    box-shadow: 0 0 1px 4px #cce3fb;
+    animation: component-pulse 1s 3 linear;
+    background-color: #fff;
+}
+
+@keyframes component-pulse {
+    0%{
+        box-shadow: 0 0 1px 4px #cce3fb;
+        background-color: #fff;
+    }
+    50% {
+        box-shadow: 0 0 1px 4px #fff;
+        background-color: #cce3fb;
+
+    }
+    100%{
+        box-shadow: 0 0 1px 4px #cce3fb;
+        background-color: #fff;
+    }
+}
+
+.appear-in-with-delay {
+    opacity: 0;
+    transform: translate3d(-5px,0,0);
+    animation: appear-in 0.5s forwards ease 0.5s;
+}
+
+@keyframes appear-in {
+    from{
+        opacity: 0;
+        transform: translate3d(-5px,0,0);
+    }
+    to{
+        opacity: 1;
+        transform: translate3d(0,0,0);
+    }
+}
+

@@ -79,7 +79,7 @@
 									<img class="rounded-circle d-inline-block" width="20px" height="20px"
 									:src="gravatar_url(t.created_by.email, 25)" data-bs-toggle="tooltip" data-bs-placement="bottom"
 										:title="`${t.created_by.first_name} ${t.created_by.last_name}`" style="z-index: 1000;" tabindex="0" />
-									<span class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
+									<span :class="!t.created_by.is_active && 'inative-status'" class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
 									style="line-height: 20px"></span>
 									<template x-if="t.created_by.profile.organization">
 										<span x-text="t.created_by.profile.organization.name" class="fst-italic text-muted"></span>

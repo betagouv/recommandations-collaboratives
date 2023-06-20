@@ -6,7 +6,11 @@ from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import signals as projects_signals
-from urbanvitaliz.apps.projects.utils import assign_collaborator, assign_advisor
+from urbanvitaliz.apps.projects.utils import (
+    assign_collaborator,
+    assign_advisor,
+    assign_observer,
+)
 
 from . import forms, models
 
@@ -72,6 +76,11 @@ def invite_accept(request, invite_id):
             if invite.role == "SWITCHTENDER":
                 if assign_advisor(user, project, current_site):
                     projects_signals.project_switchtender_joined.send(
+                        sender=request.user, project=project
+                    )
+            elif invite.role == "OBSERVER":
+                if assign_observer(user, project, current_site):
+                    projects_signals.project_observer_joined.send(
                         sender=request.user, project=project
                     )
             else:
