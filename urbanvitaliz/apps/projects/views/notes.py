@@ -147,7 +147,10 @@ def delete_note(request, note_id=None):
     """Delete existing note for a project"""
     note = get_object_or_404(models.Note, pk=note_id, site=request.site)
 
-    has_perm_or_403(request.user, "projects.use_private_notes", note.project)
+    if note.public and note.created_by == request.user:
+        has_perm_or_403(request.user, "projects.use_public_notes", note.project)
+    else:
+        has_perm_or_403(request.user, "projects.use_private_notes", note.project)
 
     if request.method == "POST":
         note.updated_on = timezone.now()
