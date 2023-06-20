@@ -23,14 +23,18 @@ function Tutorial(challengeCode, autoStart = false) {
             const ChallengeDefinition = await this.getChallengeDefinition(challengeCode)
 
             if (!ChallengeDefinition) {
-                return this.showTuto = false
+                this.showTuto = false
+
+                return
             }
 
             //Check if the user has already started the Challenge
             const challenge = await this.getChallenge(this.challengeCode)
 
             if (challenge && challenge.started_on) {
-                return this.hasAlreadyStartedTheChallenge = true
+                this.hasAlreadyStartedTheChallenge = true
+
+                return
             }
 
             this.steps = tutorials[ChallengeDefinition.code].steps
