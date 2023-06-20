@@ -7,11 +7,10 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
-from django.utils import timezone
-from rest_framework import generics
-from rest_framework import status
-from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
 
 from . import models
 from .serializers import ChallengeSerializer
@@ -27,6 +26,7 @@ class ChallengeView(generics.RetrieveUpdateAPIView):
 
     http_method_names = ["patch", "get"]
     serializer_class = ChallengeSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
         slug = kwargs.get("slug")
