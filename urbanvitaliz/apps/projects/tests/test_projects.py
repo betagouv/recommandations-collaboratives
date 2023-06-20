@@ -211,6 +211,7 @@ def test_created_prefilled_project_stores_initial_info(request, client):
         "postal_code": "59800",
         "location": "some place",
         "first_name": "john",
+        "phone": "0610101010",
         "last_name": "doe",
         "org_name": "MyOrg",
         "response_0": "blah",
