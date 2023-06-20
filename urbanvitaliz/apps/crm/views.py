@@ -55,12 +55,18 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         context["project_model"] = Project
         context["user_model"] = User
 
+        # FIXME no filter on site?
         ctype = ContentType.objects.get_for_model(Project)
-        context["projects_stream"] = Action.objects.filter(
-            Q(target_content_type=ctype)
-            | Q(action_object_content_type=ctype)
-            | Q(actor_content_type=ctype)
-        ).prefetch_related("actor", "action_object", "target")[:100]
+        context["projects_stream"] = (
+            Action.objects.filter(site=self.request.site)
+            .filter(
+                Q(target_content_type=ctype)
+                | Q(action_object_content_type=ctype)
+                | Q(actor_content_type=ctype)
+            )
+            .order_by("-timestamp")
+            .prefetch_related("actor", "action_object", "target")[:100]
+        )
 
         context["crm_notif_stream"] = (
             self.request.user.notifications.filter(public=False)
@@ -270,10 +276,13 @@ def organization_details(request, organization_id):
 
     user_ct = ContentType.objects.get_for_model(User)
 
-    actions = Action.objects.filter(
-        site=request.site,
-        actor_content_type=user_ct,
-        actor_object_id__in=participant_ids,
+    actions = (
+        Action.objects.filter(site=request.site)
+        .filter(
+            actor_content_type=user_ct,
+            actor_object_id__in=participant_ids,
+        )
+        .order_by("-timestamp")
     )
 
     organization_ct = ContentType.objects.get_for_model(Organization)
