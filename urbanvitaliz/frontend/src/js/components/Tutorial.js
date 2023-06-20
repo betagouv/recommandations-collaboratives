@@ -12,10 +12,10 @@ function Tutorial(challengeCode, autoStart = false) {
         steps: [],
         hints: [],
         tour: null,
-        hasAlreadyStartedTheChallenge:false,
+        hasAlreadyStartedTheChallenge: false,
         startButton: null,
         startButtonDescription: "",
-        challengeCode:null,
+        challengeCode: null,
         async init() {
             this.challengeCode = challengeCode
 
@@ -29,6 +29,10 @@ function Tutorial(challengeCode, autoStart = false) {
 
             const ChallengeDefinition = await this.getChallengeDefinition(challengeCode)
 
+            if (!ChallengeDefinition) {
+                return this.hasAlreadyStartedTheChallenge = true
+            }
+
             this.steps = tutorials[ChallengeDefinition.code].steps
             this.startButtonDescription = ChallengeDefinition.description
 
@@ -40,7 +44,7 @@ function Tutorial(challengeCode, autoStart = false) {
                 steps: this.steps,
             })
 
-            this.tour.oncomplete( async () => {
+            this.tour.oncomplete(async () => {
                 this.acquireChallenge(this.challengeCode)
             })
 
@@ -55,7 +59,7 @@ function Tutorial(challengeCode, autoStart = false) {
                 return json.data
             }
             catch (err) {
-                console.warning(err);
+                console.warn(err);
             }
         },
         async getChallenge(code) {
@@ -64,25 +68,25 @@ function Tutorial(challengeCode, autoStart = false) {
                 return json.data
             }
             catch (err) {
-                console.warning(err);
+                console.warn(err);
             }
         },
         async startChallenge(code) {
             try {
-                const json = await api.patch(challengeUrl(code),{started_on:true})
+                const json = await api.patch(challengeUrl(code), { started_on: true })
                 return json.data
             }
             catch (err) {
-                console.warning(err);
+                console.warn(err);
             }
         },
         async acquireChallenge(code) {
             try {
-                const json = await api.patch(challengeUrl(code),{acquired_on:true})
+                const json = await api.patch(challengeUrl(code), { acquired_on: true })
                 return json.data
             }
             catch (err) {
-                console.warning(err);
+                console.warn(err);
             }
         },
         async handleStartTour() {
