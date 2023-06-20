@@ -22,6 +22,6 @@ def challenge_acquire(challenge):
 def get_challenges_for(user, acquired=True):
     challenges = Challenge.objects.order_by("-acquired_on").filter(user=user)
     if acquired is not None:
-        challenges = challenges.exlcude(acquired=None)
+        challenges = challenges.exclude(acquired=None)
 
     return challenges
