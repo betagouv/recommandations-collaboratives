@@ -347,11 +347,14 @@ def test_collaborator_cant_update_private_note(request, client):
     assert response.status_code == 403
 
 
+########################
+# DELETION
+########################
 @pytest.mark.django_db
-def test_delete_note_for_project_and_redirect(request, client):
+def test_advisor_can_delete_private_note_and_redirect(request, client):
     current_site = get_current_site(request)
     project = Recipe(models.Project, sites=[current_site]).make()
-    note = Recipe(models.Note, project=project, site=current_site).make()
+    note = Recipe(models.Note, project=project, site=current_site, public=False).make()
     url = reverse("projects-delete-note", args=[note.id])
 
     with login(client) as user:
@@ -361,6 +364,53 @@ def test_delete_note_for_project_and_redirect(request, client):
     assert models.Note.on_site.count() == 0
 
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_delete_my_public_note_for_collaborator_and_redirect(request, client):
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
+
+    with login(client) as user:
+        note = Recipe(
+            models.Note,
+            project=project,
+            site=current_site,
+            public=True,
+            created_by=user,
+        ).make()
+
+        url = reverse("projects-delete-note", args=[note.id])
+
+        assign_collaborator(user, project)
+        response = client.post(url)
+
+    assert models.Note.on_site.count() == 0
+
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_collaborator_cant_delete_other_people_public_note(request, client):
+    current_site = get_current_site(request)
+    project = Recipe(models.Project, sites=[current_site]).make()
+
+    with login(client) as user:
+        note = Recipe(
+            models.Note,
+            project=project,
+            site=current_site,
+            public=True,
+        ).make()
+
+        url = reverse("projects-delete-note", args=[note.id])
+
+        assign_collaborator(user, project)
+        response = client.post(url)
+
+    assert models.Note.on_site.count() == 1
+
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
