@@ -16,6 +16,7 @@ python_files = "tests.py test_*.py *_test.py *_tests.py"
 [tool.pylint.main]
 jobs = 2
 load-plugins = "pylint_django"
+good-names-rgxs = "^[_a-z][_a-z0-9]?$"
 ignore = ["settings","static","templates",".venv","tests", "migrations"]
 disable = [
         "missing-function-docstring",
