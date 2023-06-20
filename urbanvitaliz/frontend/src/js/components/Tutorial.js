@@ -45,7 +45,8 @@ function Tutorial(challengeCode, autoStart = false) {
             })
 
             if (autoStart) {
-                return this.tour.start();
+                this.tour.start();
+                await this.startChallenge(this.challengeCode)
             }
         },
         async getChallengeDefinition(code) {
@@ -54,7 +55,7 @@ function Tutorial(challengeCode, autoStart = false) {
                 return json.data
             }
             catch (err) {
-                console.error(err);
+                console.warning(err);
             }
         },
         async getChallenge(code) {
@@ -63,7 +64,7 @@ function Tutorial(challengeCode, autoStart = false) {
                 return json.data
             }
             catch (err) {
-                console.error(err);
+                console.warning(err);
             }
         },
         async startChallenge(code) {
@@ -72,7 +73,7 @@ function Tutorial(challengeCode, autoStart = false) {
                 return json.data
             }
             catch (err) {
-                console.error(err);
+                console.warning(err);
             }
         },
         async acquireChallenge(code) {
@@ -81,7 +82,7 @@ function Tutorial(challengeCode, autoStart = false) {
                 return json.data
             }
             catch (err) {
-                console.error(err);
+                console.warning(err);
             }
         },
         async handleStartTour() {
