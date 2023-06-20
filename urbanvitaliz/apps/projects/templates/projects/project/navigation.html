@@ -22,13 +22,8 @@
     style="font-family: 'Marianne', arial, sans-serif;
            padding: 0">
     <div class="position-relative d-flex align-items-center" id="overview-step-1">
-        {% if position.advisor or position.observer or is_regional_actor %}
-            <div x-ref="startTourButton" @click="handleStartTour()" class="hint-button align-items-center position-absolute t-0 l-0 p-2">
-                <span x-text="startButtonDescription"></span>
-                <svg class="ms-1 bi align-middle" width="25" height="25" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
-                </svg>
-            </div>
+        {% if position.advisor or position.observer or is_regional_actor and overview %}
+            {% include 'tutorial/tutorial_hint.html' %}
         {% endif %}
         {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
             <li id="overview-hint-1">
