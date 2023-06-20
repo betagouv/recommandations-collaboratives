@@ -47,6 +47,9 @@ class Challenge(models.Model):
     challenge_definition = models.ForeignKey(
         ChallengeDefinition, on_delete=models.CASCADE
     )
+    started_on = models.DateTimeField(
+        verbose_name="Date de démarrage", default=None, null=True
+    )
     acquired_on = models.DateTimeField(
         verbose_name="Date d'acquisition", default=None, null=True
     )
