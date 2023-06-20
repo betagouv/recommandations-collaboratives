@@ -10,12 +10,19 @@ Inspired by django-gamification (https://github.com/mattjegan/django-gamificatio
 """
 
 
+from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.db import models
 
 
+class ChallengeDefinitionOnSiteManager(CurrentSiteManager):
+    pass
+
+
 class ChallengeDefinition(models.Model):
+    objects = ChallengeDefinitionOnSiteManager()
+
     site = models.ForeignKey(site_models.Site, on_delete=models.CASCADE)
     code = models.SlugField(max_length=128, unique=True)
     name = models.CharField(max_length=128)
