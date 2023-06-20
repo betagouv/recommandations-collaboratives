@@ -122,7 +122,7 @@
         <li id="overview-step-4">
             {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
                 {% with "Espace conseillers" as label %}
-                    {% if 'view_private_notes' in user_project_perms or 'use_private_notes' in user_project_perms %}
+                    {% if 'use_private_notes' in user_project_perms %}
                         <a class="{% if internal_followup %}active{% endif %} align-items-center"
                         href="{% url 'projects-project-detail-internal-followup' project.pk %}">
                             {% if active_project_private_conversation_notifications_count %}
