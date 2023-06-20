@@ -24,13 +24,16 @@ class ChallengeDefinition(models.Model):
     objects = ChallengeDefinitionOnSiteManager()
 
     site = models.ForeignKey(site_models.Site, on_delete=models.CASCADE)
-    code = models.SlugField(max_length=128, unique=True)
+    code = models.SlugField(max_length=128)
     name = models.CharField(max_length=128)
     description = models.TextField(null=True, blank=True)
     icon_name = models.CharField(null=True, blank=True, max_length=25)
     next_challenge = models.ForeignKey(
         "self", blank=True, null=True, on_delete=models.CASCADE
     )
+
+    class Meta:
+        unique_together = (("site", "code"),)
 
     def __str__(self):
         return self.name
