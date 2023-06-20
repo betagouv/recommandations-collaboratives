@@ -9,6 +9,7 @@ created: 2023-06-20 14:10:36 CEST
 
 import pytest
 from django.contrib.auth import models as auth_models
+from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
@@ -16,6 +17,62 @@ from rest_framework.test import APIClient
 
 
 from .. import models
+
+########################################################################
+# get challenge definition
+########################################################################
+
+
+@pytest.mark.django_db
+def test_anonymous_cannot_use_challenge_defintion_get_api(request, client):
+    site = get_current_site(request)
+    definition = baker.make(models.ChallengeDefinition, site=site)
+
+    client = APIClient()
+
+    url = reverse("challenge-definitions-detail", args=[definition.code])
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_challenge_get_api_fails_if_other_site(request, client):
+    site = baker.make(site_models.Site)
+    user = baker.make(auth_models.User, email="me@example.com")
+    definition = baker.make(models.ChallengeDefinition, site=site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("challenge-definitions-detail", args=[definition.code])
+    response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_challenge_get_api_returns__challenge_definition_info(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    definition = baker.make(models.ChallengeDefinition, site=site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("challenge-definitions-detail", args=[definition.code])
+    response = client.get(url)
+
+    assert response.status_code == 200
+
+    assert dict(response.data) == {
+        "name": definition.name,
+        "code": definition.code,
+        "description": definition.description,
+        "icon_name": None,
+        "next_challenge": None,
+    }
+
 
 ########################################################################
 # get challenge
@@ -33,6 +90,21 @@ def test_anonymous_cannot_use_challenge_get_api(request, client):
     response = client.get(url)
 
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_challenge_get_api_fails_if_other_site(request, client):
+    site = baker.make(site_models.Site)
+    user = baker.make(auth_models.User, email="me@example.com")
+    definition = baker.make(models.ChallengeDefinition, site=site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("challenges-challenge", args=[definition.code])
+    response = client.get(url)
+
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db

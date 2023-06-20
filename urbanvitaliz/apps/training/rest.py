@@ -19,9 +19,17 @@ from .serializers import ChallengeSerializer, ChallengeDefinitionSerializer
 ########################################################################
 # REST API
 ########################################################################
+
+
 class ChallengeDefinitionViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows challenge defintions to be viewed.
+    """
+
+    http_method_names = ["get"]
     serializer_class = ChallengeDefinitionSerializer
     permission_classes = [permissions.IsAuthenticated]
+
     lookup_url_kwarg = "slug"
     lookup_field = "code"
 
