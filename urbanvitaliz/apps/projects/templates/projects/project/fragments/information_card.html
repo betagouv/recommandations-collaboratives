@@ -40,7 +40,7 @@
         <article class="overflow-hidden">
             {% include 'projects/project/fragments/information_card_description.html' %}
         </article>
-        <footer class="d-flex mt-4 justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %} overflow-hidden">
+        <footer class="d-flex mt-4 justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %}">
             {% include 'user/user_card.html' with user=card_user %}
             <div class=" {% if is_editable %}mt-0{% else %}mt-2{% endif %}">
                 <span style="color:#929292;

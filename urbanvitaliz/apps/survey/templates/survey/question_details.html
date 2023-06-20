@@ -4,61 +4,16 @@
 {% load sass_tags %}
 {% load humanize %}
 
+{% load django_vite %}
 {% block js %}
-<script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
-
-<script type="text/javascript">
- var tour = introJs().setOptions({
-     tooltipClass: 'introjs-uv',
-     prevLabel: 'Précédent',
-     nextLabel: 'Suivant',
-     doneLabel: 'C\'est parti !',
-     steps: [
-         {
-             intro: "<strong>Obtenez des recommandations plus efficaces</strong> en répondant à quelques questions ! <br/>Ce parcours vous guide pour structurer votre <strong>connaissance sur le projet</strong>.<br/>Vous pouvez quitter et reprendre le questionnaire à tout moment, et inviter des participants pour le remplir."
-         },
-         {
-             element: document.querySelector('#qs-heading'),
-             intro: "Le parcours est divisé en sections thématiques. Vous pouvez les enchaîner, ou y revenir plus tard : pas de pression 😉"
-         },
-         {
-             element: document.querySelector('#section-why'),
-             intro: "🌱 Certaines informations sont plus importantes qu’elles n’en ont l’air. Découvrez ici pourquoi."
-         },
-         {
-             element: document.querySelector('#section-how'),
-             intro: "🔍 Vous ne savez pas répondre à la question ? Cet encart vous indiquer où trouver l’information manquante."
-         },
-         /*
-            Ici, vous retrouverez le récapitulatif de vos réponses, et les questions que vous avez passées : vous pouvez y revenir une fois l’information trouvée.*/
-
-         {
-             element: document.querySelector('#button-skip'),
-             intro: "✨ Vous pouvez aussi enchaîner les questions, et laisser de côté celles où vous ne savez pas répondre.",
-         },
-         {
-             element: document.querySelector('#project-link'),
-             intro: "Ici, vous retrouverez le récapitulatif de vos réponses, et les questions que vous avez laissées vides : vous pouvez y revenir une fois l’information trouvée. <br/>Bonne exploration de votre site 👋"
-         }
-     ]
- });
-
- {% if session.answers.count == 0 %}
- tour.start()
- {% endif %}
+    {% vite_asset 'js/apps/tutorial.js' %}
+{% endblock %}
 
 </script>
 
-{% endblock %}
-
-{% block css %}
-<link href="https://unpkg.com/intro.js/minified/introjs.min.css" rel="stylesheet" type="text/css">
-<link href="{% sass_src 'survey/css/introjs-uv.scss' %}" rel="stylesheet" type="text/css">
-{% endblock %}
-
 {% block content %}
 
-<div class="col-11 py-5 mx-auto">
+<div x-data="Tutorial('survey', true)" class="col-11 py-5 mx-auto">
 
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">

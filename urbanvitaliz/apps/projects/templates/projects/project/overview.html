@@ -4,11 +4,16 @@
 {% load gravatar %}
 {% load guardian_tags %}
 
-{% block title %}{{ block.super }} > Connaissance{% endblock %}
 {% load django_vite %}
+
 {% block js %}
+    {% vite_asset 'js/apps/projectDetails.js' %}
     {% vite_asset 'js/apps/projectShare.js' %}
+    {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock %}
+
+{% block title %}{{ block.super }} > Connaissance{% endblock %}
+
 {% block banner %}
     {% include 'projects/project/fragments/positioning_banner.html' %}
 {% endblock %}
@@ -18,182 +23,192 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
     <div x-data="ProjectShare" class="col-12">
-        <div class="row">
-            {% if not is_switchtender %}
-                {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
-                    <div class="col box-heading d-flex justify-content-between mb-4 mt-4">
-                        <div class="flex-grow-1">
-                            <h3>Complétez l'exploration du site !</h3>
-                            {% if session.completion > 0 %}
-                                🔎 Zoomer sur les bonnes questions à se poser pour démarrer
-                                <br />
-                                🚀 Obtenir des recommandations plus efficaces !
-                            {% else %}
-                                🔎 Laissez-vous guider vers <strong>les bonnes questions à se poser pour démarrer</strong> un projet de
-                                revitalisation.
-                                <br />
-                                🚀 En prime, <strong>{{ request.site.name }} sera plus efficace</strong> pour vous conseiller !
-                            {% endif %}
+        <div x-data="Tutorial('project-advisor-overview')">
+            <div class="row">
+                {% if not is_switchtender %}
+                    {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
+                        <div class="col box-heading d-flex justify-content-between mb-4 mt-4">
+                            <div class="flex-grow-1">
+                                <h3>Complétez l'exploration du site !</h3>
+                                {% if session.completion > 0 %}
+                                    🔎 Zoomer sur les bonnes questions à se poser pour démarrer
+                                    <br />
+                                    🚀 Obtenir des recommandations plus efficaces !
+                                {% else %}
+                                    🔎 Laissez-vous guider vers <strong>les bonnes questions à se poser pour démarrer</strong> un projet de
+                                    revitalisation.
+                                    <br />
+                                    🚀 En prime, <strong>{{ request.site.name }} sera plus efficace</strong> pour vous conseiller !
+                                {% endif %}
+                            </div>
+                            <div class="flex-shrink-1">
+                                {% if session.completion > 0 %}
+                                    <a href="{% url 'survey-session-start' session.id %}"
+                                    class="btn btn-primary fw-bold p-2 m-4">
+                                        <span class="align-middle">Continuer le parcours</span><span class="align-middle">&#8594;</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'survey-project-session' project.id %}"
+                                    class="btn btn-primary fw-bold p-2 m-4">
+                                        <span class="align-middle">Démarrer le parcours</span><span class="align-middle">&#8594;</span>
+                                    </a>
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="flex-shrink-1">
-                            {% if session.completion > 0 %}
-                                <a href="{% url 'survey-session-start' session.id %}"
-                                   class="btn btn-primary fw-bold p-2 m-4">
-                                    <span class="align-middle">Continuer le parcours</span><span class="align-middle">&#8594;</span>
-                                </a>
-                            {% else %}
-                                <a href="{% url 'survey-project-session' project.id %}"
-                                   class="btn btn-primary fw-bold p-2 m-4">
-                                    <span class="align-middle">Démarrer le parcours</span><span class="align-middle">&#8594;</span>
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
+                    {% else %}
+                        <div class="col"></div>
+                    {% endif %}
                 {% else %}
                     <div class="col"></div>
                 {% endif %}
-            {% else %}
-                <div class="col"></div>
-            {% endif %}
-        </div>
-        {% include 'projects/project/navigation.html' with overview=True %}
-        <div class="row">
-            <div class="col-8">
-                <div class="d-flex">
-                    {% if "use_advisor_note" in user_project_perms %}
-                    <div class="row w-100">
-                        <div class="col-12 col-lg-6 h-100 responsive-wrapper">
-                            <div class="h-100">
-                                {% include 'projects/project/fragments/topics/topic_list.html' %}
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6 h-100 responsive-wrapper">{% include 'projects/project/fragments/advisor_note.html' %}</div>
-                    </div>
-                    {% else %}
-                        <div class="pe-4 w-100">
-                        {% include 'projects/project/fragments/topics/topic_list.html' %}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="mt-4">
-                    <div class="d-flex w-full flex-wrap">
-                        {% include 'projects/project/fragments/information_card.html' with full_width=True project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
-                        {% if onboarding_response %}
-                            {% include 'projects/project/fragments/information_card.html' with full_width=True project=project onboarding_information=True updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
-                        {% elif project.impediments %}
-                            {% include 'projects/project/fragments/information_card.html' with full_width=True project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
-                        {% endif %}
-                    </div>
-                    {% if 'use_private_notes' in user_project_perms %}
-                        <div>
-                            {% include 'projects/project/fragments/timeline/project_timeline.html' %}
-                        </div>
-                    {% endif %}
-                </div>
             </div>
-            <div class="col-4 bg-grey-light p-4">
-                <div class="mb-4">
-                    <div class="d-flex flex-column">
-                        <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Référent collectivité</h6>
-                        {% include 'projects/project/fragments/project_owner.html' with project=project %}
-                        {% if project.owner %}
-                        <a class="d-flex align-items-center mb-1"
-                           style="font-size: 14px;
-                                  color: #0063CB;
-                                  text-decoration: none"
-                           href="mailto:{{ project.owner.email }}">
-                            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
-                            </svg>
-                            &nbsp;
-                            {{ project.owner.email }}
-                        </a>
-                        {% endif %}
-                        {% if project.owner.profile.phone_no or project.phone %}
-                            <span style="font-size: 14px;
-                                         color: #0063CB"
-                                  class="d-flex align-items-center">
-                                <svg class="bi align-middle me-2" width="15" height="15" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
-                                </svg>
-                                {% if project.owner.profile.phone_no %}
-                                    <a style="font-size: 14px;
-                                              color: #0063CB;
-                                              text-decoration: none"
-                                       href="tel:{{ project.owner.profile.phone_no }}">{{ project.owner.profile.phone_no }}</a>
-                                {% else %}
-                                    <a style="font-size: 14px;
-                                              color: #0063CB;
-                                              text-decoration: none"
-                                       href="tel:{{ project.phone }}">{{ project.phone }}</a>
-                                {% endif %}
-                            </span>
-                        {% endif %}
-                    </div>
-                    {% include 'projects/project/fragments/positioning.html' %}
-                </div>
-                <!-- User lists -->
-                <div class="d-flex flex-column my-4">
-                    <!-- Collectivity -->
-                    <div>
-                        <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Membres de la collectivité</h6>
-                        <ul class="flex-column list-unstyled mb-0">
-                            {% for projectmember in project.projectmember_set.all %}
-                              {% if projectmember.is_owner %}
-                              <li>{% include 'projects/project/fragments/project_owner.html' with project=project %}</li>
-                              {% else %}
-                              <li>{% include 'projects/project/fragments/user.html' with member=projectmember.member project=project %}</li>
-                              {% endif %}
-                            {% endfor %}
-                        </ul>
-                        {% if "invite_collaborators" in user_project_perms %}
-                        <div class="d-block mb-2">
-                            <a style="cursor: pointer"
-                               @click="openInviteMemberModal"
-                               data-toggle="modal"
-                               data-target="#InviteMemberModal"
-                               class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100">
-                                {% if project.status == 'DRAFT' %}
-                                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                                    </svg>
-                                    &nbsp;
-                                {% endif %}
-                                <span>Inviter un membre de la collectivité</span>
-                            </a>
+            {% include 'projects/project/navigation.html' with overview=True %}
+            <div class="row">
+                <div class="col-8">
+                    <div class="d-flex">
+                        {% if "use_advisor_note" in user_project_perms %}
+                        <div class="row w-100">
+                            <div class="col-12 col-lg-6 h-100 responsive-wrapper">
+                                <div class="h-100">
+                                    {% include 'projects/project/fragments/topics/topic_list.html' %}
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-6 h-100 responsive-wrapper">{% include 'projects/project/fragments/advisor_note.html' %}</div>
                         </div>
+                        {% else %}
+                            <div class="pe-4 w-100">
+                            {% include 'projects/project/fragments/topics/topic_list.html' %}
+                            </div>
                         {% endif %}
                     </div>
-                    <!-- Advisors -->
                     <div class="mt-4">
-                        <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Équipe de suvi</h6>
-                        <ul class="d-flex flex-column list-unstyled mb-0">
-                            {% for advisor in project.switchtenders_on_site.all %}
-                                <li>{% include 'projects/project/fragments/advisor_item.html' with advisor=advisor %}</li>
-                            {% endfor %}
-                        </ul>
-                        {% if "invite_advisors" in user_project_perms or is_regional_actor %}
-                            <div class="d-block mb-2">
+                        <div class="d-flex w-full flex-wrap">
+                            {% include 'projects/project/fragments/information_card.html' with full_width=True project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
+                            {% if onboarding_response %}
+                                {% include 'projects/project/fragments/information_card.html' with full_width=True project=project onboarding_information=True updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
+                            {% elif project.impediments %}
+                                {% include 'projects/project/fragments/information_card.html' with full_width=True project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.owner org_name=project.owner.profile.organization.name %}
+                            {% endif %}
+                        </div>
+                        {% if 'use_private_notes' in user_project_perms %}
+                            <div>
+                                {% include 'projects/project/fragments/timeline/project_timeline.html' %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-4 bg-grey-light p-4">
+                    <div class="mb-4">
+                        <div class="d-flex flex-column">
+                            <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Référent collectivité</h6>
+                            {% include 'projects/project/fragments/project_owner.html' with project=project %}
+                            {% if project.owner %}
+                            <a class="d-flex align-items-center mb-1"
+                            style="font-size: 14px;
+                                    color: #0063CB;
+                                    text-decoration: none"
+                            href="mailto:{{ project.owner.email }}">
+                                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
+                                </svg>
+                                &nbsp;
+                                {{ project.owner.email }}
+                            </a>
+                            {% endif %}
+                            {% if project.owner.profile.phone_no or project.phone %}
+                                <span style="font-size: 14px;
+                                            color: #0063CB"
+                                    class="d-flex align-items-center">
+                                    <svg class="bi align-middle me-2" width="15" height="15" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
+                                    </svg>
+                                    {% if project.owner.profile.phone_no %}
+                                        <a style="font-size: 14px;
+                                                color: #0063CB;
+                                                text-decoration: none"
+                                        href="tel:{{ project.owner.profile.phone_no }}">{{ project.owner.profile.phone_no }}</a>
+                                    {% else %}
+                                        <a style="font-size: 14px;
+                                                color: #0063CB;
+                                                text-decoration: none"
+                                        href="tel:{{ project.phone }}">{{ project.phone }}</a>
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% include 'projects/project/fragments/positioning.html' %}
+                    </div>
+                    <!-- User lists -->
+                    <div class="d-flex flex-column my-4">
+                        <!-- Collectivity -->
+                        <div>
+                            <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Membres de la collectivité</h6>
+                            <ul class="flex-column list-unstyled mb-0">
+                                {% for projectmember in project.projectmember_set.all %}
+                                {% if projectmember.is_owner and projectmember.member.is_active %}
+                                <li>
+                                    {% include 'user/user_card.html' with user=project.owner project_owner=True user_activity=True %}
+                                </li>
+                                {% elif projectmember.member.is_active %}
+                                <li>
+                                    {% include 'user/user_card.html' with user=projectmember.member user_activity=True %}
+                                    </li>
+                                {% endif %}
+                                {% endfor %}
+                            </ul>
+                            {% if "invite_collaborators" in user_project_perms %}
+                            <div class="d-block mb-2 mt-3">
                                 <a style="cursor: pointer"
-                                   @click="openInviteSwitchtenderModal"
-                                   data-toggle="modal"
-                                   data-target="#InviteSwitchtenderModal"
-                                   class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100">
+                                @click="openInviteMemberModal"
+                                data-toggle="modal"
+                                data-target="#InviteMemberModal"
+                                class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100">
                                     {% if project.status == 'DRAFT' %}
                                         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
                                         </svg>
                                         &nbsp;
                                     {% endif %}
-                                    <span>Inviter un conseiller</span>
+                                    <span>Inviter un membre de la collectivité</span>
                                 </a>
                             </div>
-                        {% endif %}
+                            {% endif %}
+                        </div>
+                        <!-- Advisors -->
+                        <div class="mt-4">
+                            <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Équipe de suvi</h6>
+                            <ul class="d-flex flex-column list-unstyled mb-0">
+                                {% for advisor in project.switchtenders_on_site.all %}
+                                    {% if advisor.switchtender.is_active %}
+                                        <li>
+                                            {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                            {% if "invite_advisors" in user_project_perms or is_regional_actor %}
+                                <div class="d-block mb-2 mt-3">
+                                    <a style="cursor: pointer"
+                                    @click="openInviteSwitchtenderModal"
+                                    data-toggle="modal"
+                                    data-target="#InviteSwitchtenderModal"
+                                    class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100">
+                                        {% if project.status == 'DRAFT' %}
+                                            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                                            </svg>
+                                            &nbsp;
+                                        {% endif %}
+                                        <span>Inviter un conseiller</span>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         {% include "projects/project/fragments/share/invite_member.html" %}
         {% include "projects/project/fragments/share/invite_switchtender.html" %}
+        </div>
     </div>
 {% endblock %}

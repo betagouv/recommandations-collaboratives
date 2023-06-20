@@ -15,106 +15,52 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% is_staff_for_current_site request.user as is_staff %}
+{% get_advising_position user project as position %}
 
 
 <ul class="project-navigation d-flex align-items-center"
     style="font-family: 'Marianne', arial, sans-serif;
            padding: 0">
-    {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
-        <li>
-            <a class="{% if overview %} active{% endif %}"
-               href="{% url 'projects-project-detail-overview' project.pk %}">
-                Présentation
-            </a>
-        </li>
-    {% endif %}
-    {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
-        <li class="position-relative survey">
-            <a class="text-nowrap {% if state_of_play %} active{% endif %}"
-               href="{% url 'projects-project-detail-knowledge' project.pk %}">
-                <p>État des lieux</p>
-                <div class="survey-completion">
-                    <div class="survey-completion-progress-bar-container">
-                        <i class="survey-completion-progress-bar"
-                           style="width: {{ active_project_survey_session.completion }}%;
-                                  {% if active_project_survey_session.completion >= 90 %}background-color:#5ec495{% else %}background-color:#f58188{% endif %}"></i>
+    <div class="position-relative d-flex align-items-center" id="overview-step-1">
+        {% if position.advisor or position.observer or is_regional_actor %}
+            <div x-ref="startTourButton" @click="handleStartTour()" class="hint-button align-items-center position-absolute t-0 l-0 p-2">
+                <span x-text="startButtonDescription"></span>
+                <svg class="ms-1 bi align-middle" width="25" height="25" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
+                </svg>
+            </div>
+        {% endif %}
+        {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
+            <li id="overview-hint-1">
+                <a class="{% if overview %} active{% endif %}"
+                href="{% url 'projects-project-detail-overview' project.pk %}">
+                    Présentation
+                </a>
+            </li>
+        {% endif %}
+        {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
+            <li class="position-relative survey" id="overview-hint-2">
+                <a class="text-nowrap {% if state_of_play %} active{% endif %}"
+                href="{% url 'projects-project-detail-knowledge' project.pk %}">
+                    <p>État des lieux</p>
+                    <div class="survey-completion">
+                        <div class="survey-completion-progress-bar-container">
+                            <i class="survey-completion-progress-bar"
+                            style="width: {{ active_project_survey_session.completion }}%;
+                                    {% if active_project_survey_session.completion >= 90 %}background-color:#5ec495{% else %}background-color:#f58188{% endif %}"></i>
+                        </div>
+                        <span class="survey-completion-number">{{ active_project_survey_session.completion }}%</span>
                     </div>
-                    <span class="survey-completion-number">{{ active_project_survey_session.completion }}%</span>
-                </div>
-            </a>
-        </li>
-    {% endif %}
-    <li>
-        {% with "Recommandations" as label %}
-            {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %}
-                <a class="{% if recommandations %} active{% endif %} align-items-center"
-                   href="{% url 'projects-project-detail-actions' project.pk %}">
-                    {% if active_project_action_notifications_count %}
-                        <span class="has-notification">{{ active_project_action_notifications_count }}</span>
-                    {% endif %}
-                    <span>{{ label }}</span>
                 </a>
-            {% else %}
-                <a class="disabled align-items-center" href="#">
-                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                    </svg>
-                    &nbsp;
-                    <span>{{ label }}</span>
-                </a>
-            {% endif %}
-        {% endwith %}
-    </li>
-    <li>
-        {% with "Conversation" as label %}
-            {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
-                <a class="{% if conversation %} active{% endif %} align-items-center"
-                   href="{% url 'projects-project-detail-conversations' project.pk %}">
-                    {% if active_project_conversation_notifications_count %}
-                        <span class="has-notification">{{ active_project_conversation_notifications_count }}</span>
-                    {% endif %}
-                    <span>{{ label }}</span>
-                </a>
-            {% else %}
-                <a class="disabled align-items-center" href="#">
-                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                    </svg>
-                    &nbsp;
-                    <span>{{ label }}</span>
-                </a>
-            {% endif %}
-        {% endwith %}
-    </li>
-    <li>
-        {% with "Fichiers et liens" as label %}
-            {% if 'manage_documents' in user_project_perms %}
-                <a class="{% if files_links %}active{% endif %} align-items-center"
-                   href="{% url 'projects-project-detail-documents' project.pk %}">
-                    {% if active_project_document_notifications_count %}
-                        <span class="has-notification">{{ active_project_document_notifications_count }}</span>
-                    {% endif %}
-                    <span>{{ label }}</span>
-                </a>
-            {% else %}
-                <a class="disabled align-items-center" href="#">
-                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                    </svg>
-                    &nbsp;
-                    <span>{{ label }}</span>
-                </a>
-            {% endif %}
-        {% endwith %}
-    </li>
-    <li>
-        {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
-            {% with "Espace conseillers" as label %}
-                {% if 'view_private_notes' in user_project_perms or 'use_private_notes' in user_project_perms %}
-                    <a class="{% if internal_followup %}active{% endif %} align-items-center"
-                       href="{% url 'projects-project-detail-internal-followup' project.pk %}">
-                        {% if active_project_private_conversation_notifications_count %}
-                            <span class="has-notification">{{ active_project_private_conversation_notifications_count }}</span>
+            </li>
+        {% endif %}
+        <li id="overview-step-2">
+            {% with "Recommandations" as label %}
+                {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %}
+                    <a class="{% if recommandations %} active{% endif %} align-items-center"
+                    href="{% url 'projects-project-detail-actions' project.pk %}">
+                        {% if active_project_action_notifications_count %}
+                            <span class="has-notification">{{ active_project_action_notifications_count }}</span>
                         {% endif %}
                         <span>{{ label }}</span>
                     </a>
@@ -128,8 +74,75 @@
                     </a>
                 {% endif %}
             {% endwith %}
-        {% endif %}
-    </li>
+        </li>
+    </div>
+    <div class="position-relative d-flex align-items-center" id="overview-step-3">
+        <li>
+            {% with "Conversation" as label %}
+                {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
+                    <a class="{% if conversation %} active{% endif %} align-items-center"
+                    href="{% url 'projects-project-detail-conversations' project.pk %}">
+                        {% if active_project_conversation_notifications_count %}
+                            <span class="has-notification">{{ active_project_conversation_notifications_count }}</span>
+                        {% endif %}
+                        <span>{{ label }}</span>
+                    </a>
+                {% else %}
+                    <a class="disabled align-items-center" href="#">
+                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                        </svg>
+                        &nbsp;
+                        <span>{{ label }}</span>
+                    </a>
+                {% endif %}
+            {% endwith %}
+        </li>
+        <li>
+            {% with "Fichiers et liens" as label %}
+                {% if 'manage_documents' in user_project_perms %}
+                    <a class="{% if files_links %}active{% endif %} align-items-center"
+                    href="{% url 'projects-project-detail-documents' project.pk %}">
+                        {% if active_project_document_notifications_count %}
+                            <span class="has-notification">{{ active_project_document_notifications_count }}</span>
+                        {% endif %}
+                        <span>{{ label }}</span>
+                    </a>
+                {% else %}
+                    <a class="disabled align-items-center" href="#">
+                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                        </svg>
+                        &nbsp;
+                        <span>{{ label }}</span>
+                    </a>
+                {% endif %}
+            {% endwith %}
+        </li>
+        <li id="overview-step-4">
+            {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
+                {% with "Espace conseillers" as label %}
+                    {% if 'use_private_notes' in user_project_perms %}
+                        <a class="{% if internal_followup %}active{% endif %} align-items-center"
+                        href="{% url 'projects-project-detail-internal-followup' project.pk %}">
+                            {% if active_project_private_conversation_notifications_count %}
+                                <span class="has-notification">{{ active_project_private_conversation_notifications_count }}</span>
+                            {% endif %}
+                            <span>{{ label }}</span>
+                        </a>
+                    {% else %}
+                        <a class="disabled align-items-center" href="#">
+                            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                            </svg>
+                            &nbsp;
+                            <span>{{ label }}</span>
+                        </a>
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+        </li>
+    </div>
     {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %}
         <li>
             <a class="{% if administration_panel %} active{% endif %} align-items-center"

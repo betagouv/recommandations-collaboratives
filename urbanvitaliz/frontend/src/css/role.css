@@ -1,0 +1,38 @@
+.advisor-border {
+    border: solid 1px #0063CB;
+}
+
+.advisor-background {
+    background-color: #0063CB;
+}
+
+.observer-border {
+    border: solid 1px #27A658;
+}
+
+.observer-background {
+    background-color: #27A658;
+}
+
+.inative-status-border {
+    border: solid 1px #929292;
+}
+
+.inative-status {
+    position: relative;
+    color: #929292;
+}
+
+.inative-status::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1.5px;
+    top: calc(50% - 0.5px);
+    left: 0;
+    background-color: #929292;
+}
+
+.border-2 {
+    border-width: 2px;
+}

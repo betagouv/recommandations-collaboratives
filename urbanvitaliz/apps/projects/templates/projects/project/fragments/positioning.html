@@ -44,28 +44,4 @@
             </button>
         </form>
     </div>
-{% elif is_regional_actor %}
-    <div class="mt-3 pt-3 p-3 border" style="background-color: #f6f6f6">
-        <h6 style="font-size: 14px;" class="text-uppercase fw-bold">Etes-vous disponible pour ce projet ?</h6>
-        <form method="POST"
-              action="{% url 'projects-project-switchtender-join' project.id %}">
-            {% csrf_token %}
-            <button class="button green d-flex justify-content-center align-items-center my-2 w-100">
-                <span>Devenir conseiller</span>
-            </button>
-        </form>
-        <p class="mb-0" style="font-size: 14px; color:#666666;font-weight: 400;">
-            En vous déclarant conseiller, vous indiquez aux autres participants du projet que vous êtes un interlocuteur disponible. Vous pouvez émettre des recommandations directement sur {{request.site.name}}.
-        </p>
-        <form method="POST"
-              action="{% url 'projects-project-observer-join' project.id %}">
-            {% csrf_token %}
-            <button class="button d-flex justify-content-center align-items-center my-2 w-100">
-                <span>Devenir observateur</span>
-            </button>
-        </form>
-        <p class="mb-0" style="font-size: 14px; color:#666666;font-weight: 400;">
-            En tant qu’observateur, vous recevez des notifications email quand le projet évolue. Vous pouvez le consulter en intégralité et participer aux échanges
-        </p>
-    </div>
 {% endif %}
