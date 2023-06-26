@@ -71,6 +71,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
             self.request.user.notifications.filter(public=False)
             .filter(site=self.request.site)
             .filter(Q(verb="a créé une note de CRM"))
+            .order_by("-timestamp")
             .prefetch_related("actor", "action_object", "target")
         )
 
