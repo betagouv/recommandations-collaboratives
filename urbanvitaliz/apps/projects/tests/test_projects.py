@@ -180,9 +180,12 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
-    assert data["email"].lower() == project.owner.email
-    assert data["first_name"] == project.owner.first_name
-    assert data["last_name"] == project.owner.last_name
+    owner = project.owner
+
+    assert data["email"].lower() == owner.email
+    assert data["first_name"] == owner.first_name
+    assert data["last_name"] == owner.last_name
+    assert site in owner.profile.sites.all()
 
     assert user in project.switchtenders.all()
 

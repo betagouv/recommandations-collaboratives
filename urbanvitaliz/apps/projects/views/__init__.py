@@ -119,6 +119,8 @@ def create_project_prefilled(request):
                 },
             )
 
+            user.profile.sites.add(request.site)
+
             assign_collaborator(user, project, is_owner=True)
 
             # Add the current user as an advisor

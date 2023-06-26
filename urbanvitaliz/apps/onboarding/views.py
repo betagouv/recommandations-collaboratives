@@ -73,6 +73,7 @@ def onboarding(request):
             user.last_name = user.last_name or form.cleaned_data.get("last_name")
             user.save()
             profile = user.profile
+            profile.sites.add(request.site)
             org_name = form.cleaned_data.get("org_name")
             if org_name:
                 org, _ = addressbook_models.Organization.objects.get_or_create(

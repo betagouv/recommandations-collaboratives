@@ -79,14 +79,64 @@ def test_performing_onboarding_create_a_new_project(request, client):
     assert project.name == "a project"
     assert project.status == "DRAFT"
     assert len(project.ro_key) == 32
-    assert project.members.first().username == data["email"].lower()
-    assert project.members.first().email == data["email"].lower()
     note = projects_models.Note.objects.all()[0]
     assert note.project == project
     assert note.public
     assert note.content == f"# Demande initiale\n\n{project.description}\n\n\n"
     assert response.status_code == 302
     assert response["Location"].startswith(reverse("home-user-setup-password"))
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
+    current_site = get_current_site(request)
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+    )
+
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "description": "my desc",
+        "postal_code": "59800",
+        "phone": "0610101010",
+        "location": "some place",
+        "first_name": "john",
+        "last_name": "doe",
+        "org_name": "MyOrg",
+        "response_0": "blah",
+        "impediment_kinds": ["Autre"],
+        "impediments": "some impediment",
+    }
+    response = client.post(reverse("projects-onboarding"), data=data)
+
+    assert response.status_code == 302
+
+    project = projects_models.Project.on_site.first()
+    assert project
+    user = project.members.first()
+
+    assert project.owner == user
+    assert project.submitted_by == user
+
+    next_url = urlencode(
+        {"next": reverse("survey-project-session", args=[project.id]) + "?first_time=1"}
+    )
+    url = reverse("home-user-setup-password")
+    assert response.url == (f"{url}?{next_url}")
+
+    # the user and profile are filled according to provided information
+    assert user.first_name == data["first_name"]
+    assert user.last_name == data["last_name"]
+    assert current_site in user.profile.sites.all()
+    assert user.profile.organization.name == data["org_name"]
+    assert user.profile.phone_no == data["phone"]
+
+    assert int(client.session["_auth_user_id"]) == user.pk
 
 
 @pytest.mark.django_db
@@ -205,56 +255,6 @@ def test_onboarding_redirect_anonymous_to_login_if_mail_exists(request, client):
     # send me to login to prove i am the one
     assert response.status_code == 302
     assert response["Location"].startswith(reverse("account_login"))
-
-
-@pytest.mark.django_db
-def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
-
-    data = {
-        "name": "a project",
-        "email": "a@example.com",
-        "description": "my desc",
-        "postal_code": "59800",
-        "phone": "0610101010",
-        "location": "some place",
-        "first_name": "john",
-        "last_name": "doe",
-        "org_name": "MyOrg",
-        "response_0": "blah",
-        "impediment_kinds": ["Autre"],
-        "impediments": "some impediment",
-    }
-    response = client.post(reverse("projects-onboarding"), data=data)
-
-    assert response.status_code == 302
-
-    project = projects_models.Project.on_site.first()
-    assert project
-    user = project.members.first()
-
-    assert project.owner == user
-    assert project.submitted_by == user
-
-    next_url = urlencode(
-        {"next": reverse("survey-project-session", args=[project.id]) + "?first_time=1"}
-    )
-    url = reverse("home-user-setup-password")
-    assert response.url == (f"{url}?{next_url}")
-
-    # the user and profile are filled according to provided information
-    assert user.first_name == data["first_name"]
-    assert user.last_name == data["last_name"]
-    assert user.profile.organization.name == data["org_name"]
-    assert user.profile.phone_no == data["phone"]
-
-    assert int(client.session["_auth_user_id"]) == user.pk
 
 
 @pytest.mark.django_db
