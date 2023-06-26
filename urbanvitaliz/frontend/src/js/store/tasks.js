@@ -3,7 +3,14 @@ import api, { tasksUrl } from '../utils/api'
 import { generateUUID } from '../utils/uuid'
 
 Alpine.store('tasks', {
+    init() {
+        console.log('tasks store init ', this.currentView);
+    },
+    currentView: 'inline',
     tasks: [],
+    switchView() {
+        this.currentView === 'inline' ? this.currentView = 'kanban' : this.currentView = 'inline'
+    },
     async getTasks(projectId) {
         const json = await api.get(tasksUrl(projectId))
 

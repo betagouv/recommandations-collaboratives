@@ -1,0 +1,18 @@
+{% load django_vite %}
+
+{% block project_js %}
+    {% vite_asset 'js/apps/tasks.js' %}
+{% endblock %}
+
+<div x-data>
+    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html' %}
+    <span x-text="$store.tasks.currentView"></span>
+    <span x-text="$store.app.isLoading"></span>
+
+    <template x-if="$store.tasks.currentView === 'inline'">
+        {% include 'projects/project/fragments/tasks_inline/tasks_inline.html' %}
+    </template>
+    <template x-if="$store.tasks.currentView === 'kanban'">
+        {% include 'projects/project/fragments/tasks_kanban/tasks_kanban.html' %}
+    </template>
+</div>

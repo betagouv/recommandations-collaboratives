@@ -1,0 +1,8 @@
+<div class="tasks-view-switcher">
+    <button @click="$store.tasks.switchView()" :class="{ 'active' : $store.tasks.currentView === 'inline' }" class="button">
+        <span>Thématique</span>
+    </button>
+    <button @click="$store.tasks.switchView()" :class="{ 'active' : $store.tasks.currentView === 'kanban' }" class="button">
+        <span>Statut d’avancement</span>
+    </button>
+</div>
