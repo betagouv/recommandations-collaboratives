@@ -69,6 +69,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
 
         context["crm_notif_stream"] = (
             self.request.user.notifications.filter(public=False)
+            .filter(site=self.request.site)
             .filter(Q(verb="a créé une note de CRM"))
             .prefetch_related("actor", "action_object", "target")
         )
