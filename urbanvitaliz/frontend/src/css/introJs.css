@@ -1,3 +1,17 @@
+.introjs-tooltip * {
+    font-family: 'Marianne', arial, sans-serif;
+}
+
+.introjs-tooltip {
+    min-width: 300px;
+}
+
+.introjs-tooltip .tutorial-first-step h3{
+    border-bottom:#0063CB solid 1px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    display: block;
+}
 
 .introjs-helperLayer {
     box-shadow: rgb(1 99 203) 0px 0px 1px 2px, rgba(33, 33, 33, 0.5) 0px 0px 0px 5000px !important;

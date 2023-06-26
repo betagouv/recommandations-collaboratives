@@ -17,12 +17,11 @@
 {% is_staff_for_current_site request.user as is_staff %}
 {% get_advising_position user project as position %}
 
-
 <ul class="project-navigation d-flex align-items-center"
     style="font-family: 'Marianne', arial, sans-serif;
            padding: 0">
     <div class="position-relative d-flex align-items-center" id="overview-step-1">
-        {% if position.advisor or position.observer or is_regional_actor and overview %}
+        {% if not position.is_advisor and not position.is_observer and is_regional_actor and overview %}
             {% include 'tutorial/tutorial_hint.html' %}
         {% endif %}
         {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}

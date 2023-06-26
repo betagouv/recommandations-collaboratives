@@ -2,7 +2,7 @@
     "survey": {
         "steps": [
             {
-                "intro": "<strong>Obtenez des recommandations plus efficaces</strong> en répondant à quelques questions ! <br/>Ce parcours vous guide pour structurer votre <strong>connaissance sur le projet</strong>.<br/>Vous pouvez quitter et reprendre le questionnaire à tout moment, et inviter des participants pour le remplir."
+                "intro": "<div class='tutorial-first-step'><h3>Bienvenue sur l'état des lieux</h3><strong>Obtenez des recommandations plus efficaces</strong> en répondant à quelques questions ! <br/>Ce parcours vous guide pour structurer votre <strong>connaissance sur le projet</strong>.<br/>Vous pouvez quitter et reprendre le questionnaire à tout moment, et inviter des participants pour le remplir.</div>"
             },
             {
                 "element": "#qs-heading",
@@ -22,7 +22,7 @@
             },
             {
                 "element": "#project-link",
-                "intro": "Ici, vous retrouverez le récapitulatif de vos réponses, et les questions que vous avez laissées vides : vous pouvez y revenir une fois l’information trouvée. <br/>Bonne exploration de votre site 👋"
+                "intro": "Ici, vous retrouverez le récapitulatif de vos réponses, et les questions que vous avez laissées vides : vous pouvez y revenir une fois l’information trouvée. <br/>Bonne exploration de votre projet 👋"
             }
         ]
     },
