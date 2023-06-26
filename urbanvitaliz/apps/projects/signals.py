@@ -60,7 +60,6 @@ def notify_moderators_project_submitted(sender, site, submitter, project, **kwar
         verb="a soumis pour modération le projet",
         action_object=project,
         target=project,
-        private=True,
     )
 
 
@@ -71,17 +70,17 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    # Notify regional actors of a new project
+    # prevent crashing on misconfigured object
     if not project.owner:
         return
 
+    # Notify regional actors of a new project
     notify.send(
         sender=project.owner,
         recipient=get_regional_actors_for_project(site, project),
         verb="a déposé le projet",
         action_object=project,
         target=project,
-        private=True,
     )
 
 
@@ -102,14 +101,12 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
 
     recipients = get_notification_recipients_for_project(project).exclude(id=sender.id)
 
-    # Notify all actors of project
     notify.send(
         sender=sender,
         recipient=recipients,
         verb="est devenu·e conseiller·e sur le projet",
         action_object=project,
         target=project,
-        private=True,
     )
 
 
@@ -130,14 +127,12 @@ def notify_project_observer_joined(sender, project, **kwargs):
 
     recipients = get_collaborators_for_project(project).exclude(id=sender.id)
 
-    # Notify regional actors
     notify.send(
         sender=sender,
         recipient=recipients,
         verb="est devenu·e observateur·rice sur le projet",
         action_object=project,
         target=project,
-        private=True,
     )
 
 
@@ -184,14 +179,12 @@ def notify_project_member_joined(sender, project, **kwargs):
 
     recipients = get_collaborators_for_project(project).exclude(id=sender.id)
 
-    # Notify regional actors
     notify.send(
         sender=sender,
         recipient=recipients,
         verb="a rejoint l'équipe projet",
         action_object=project,
         target=project,
-        private=True,
     )
 
 
@@ -258,7 +251,6 @@ def notify_action_created(sender, task, project, user, **kwargs):
         verb="a recommandé l'action",
         action_object=task,
         target=project,
-        private=True,
     )
 
     # assign reminder in six weeks
@@ -340,13 +332,13 @@ def notify_action_commented(sender, task, project, user, **kwargs):
         return
 
     recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
+
     notify.send(
         sender=user,
         recipient=recipients,
         verb="a commenté l'action",
         action_object=sender,
         target=project,
-        private=True,
     )
 
 
@@ -454,7 +446,12 @@ def notify_note_created(sender, note, project, user, **kwargs):
         )
 
         verb = "a envoyé un message"
-        action.send(user, verb=verb, action_object=note, target=project)
+        action.send(
+            user,
+            verb=verb,
+            action_object=note,
+            target=project,
+        )
 
     if project.status == "DRAFT" or project.muted:
         return
@@ -465,7 +462,6 @@ def notify_note_created(sender, note, project, user, **kwargs):
         verb=verb,
         action_object=note,
         target=project,
-        private=True,
     )
 
 
@@ -555,7 +551,6 @@ def log_survey_session_updated(sender, session, request, **kwargs):
         verb="a mis à jour le questionnaire",
         action_object=session,
         target=project,
-        private=True,
     )
 
 

@@ -95,7 +95,7 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         verb=verb,
         action_object=pub_note,
         target=project,
-        private=True,  # only appear on crm stream
+        public=False,  # only appear on crm stream
     )
 
     # a private note with notification for someone else
@@ -107,7 +107,7 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         verb=verb,
         action_object=priv_note,
         target=project,
-        private=True,  # only appear on crm stream
+        public=False,  # only appear on crm stream
     )
 
     unwanted_project = baker.make(
@@ -222,7 +222,7 @@ def create_project_with_notifications(site, user):
         verb=verb,
         action_object=pub_note,
         target=project,
-        private=True,  # only appear on crm stream
+        public=False,  # only appear on crm stream
     )
 
     # a private note with notification for someone else
@@ -234,7 +234,7 @@ def create_project_with_notifications(site, user):
         verb=verb,
         action_object=priv_note,
         target=project,
-        private=True,  # only appear on crm stream
+        public=False,  # only appear on crm stream
     )
 
     return project
@@ -397,7 +397,7 @@ def test_user_project_status_contains_only_my_projects(request):
         verb=verb,
         action_object=pub_note,
         target=project,
-        private=True,  # only appear on crm stream
+        public=False,  # only appear on crm stream
     )
 
     # a private note with notification for someone else
@@ -409,7 +409,7 @@ def test_user_project_status_contains_only_my_projects(request):
         verb=verb,
         action_object=priv_note,
         target=project,
-        private=True,  # only appear on crm stream
+        public=False,  # only appear on crm stream
     )
 
     # another one not for me
