@@ -13,12 +13,18 @@ Alpine.store('tasksView', {
 })
 
 Alpine.store('tasksData', {
+    projectId: null,
     tasks: [],
     init() {
         console.log('tasks data store init ');
     },
     async getTasks(projectId) {
-        const json = await api.get(tasksUrl(projectId))
+
+        if (!this.projectId) {
+            this.projectId = projectId
+        }
+        
+        const json = await api.get(tasksUrl(this.projectId))
 
         const data = json.data.map(d => Object.assign(d, {
             uuid: generateUUID()
@@ -28,18 +34,18 @@ Alpine.store('tasksData', {
     },
     async moveTask(taskId, otherTaskId, below) {
         const params = new URLSearchParams(`${below ? 'below' : 'above'}=${otherTaskId}`);
-        await api.post(moveTaskUrl(projectId, taskId), params, {
+        await api.post(moveTaskUrl(this.projectId, taskId), params, {
             headers: { 'content-type': 'application/x-www-form-urlencoded' },
         })
     },
     // Movement Buttons
     async moveAbove(task, otherTask) {
-        await moveTask(task.id, otherTask.id);
-        await this.getData();
+        await this.moveTask(task.id, otherTask.id);
+        await this.getTasks();
     },
     async moveBelow(task, otherTask) {
-        await moveTask(task.id, otherTask.id, true);
-        await this.getData();
+        await this.moveTask(task.id, otherTask.id, true);
+        await this.getTasks();
     },
     async patchTask(taskId, patch) {
         await api.patch(taskUrl(projectId, taskId), patch)
@@ -64,18 +70,6 @@ Alpine.store('tasksData', {
     async loadNotifications(taskId) {
         const { data } = await api.get(taskNotificationsUrl(projectId, taskId));
         this.currentTaskNotifications = data;
-    },
-})
-
-Alpine.store('tasksUi', {
-    init() {
-        console.log('tasksUi store init ');
-    },
-    findByUuid(uuid) {
-        return this.tasks.find(d => d.uuid === uuid);
-    },
-    findById(id) {
-        return this.tasks.find(d => d.id === id);
     },
 })
 

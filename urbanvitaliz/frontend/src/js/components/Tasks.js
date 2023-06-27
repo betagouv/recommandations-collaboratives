@@ -8,15 +8,6 @@ import { renderMarkdown } from '../utils/markdown'
 import { gravatar_url } from '../utils/gravatar'
 
 export default function TasksApp(app, projectId) {
-
-    //done
-    const moveTask = async (taskId, otherTaskId, below) => {
-        const params = new URLSearchParams(`${below ? 'below' : 'above'}=${otherTaskId}`);
-        await api.post(moveTaskUrl(projectId, taskId), params, {
-            headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        })
-    }
-
     //done
     const issueFollowup = async (task, status, comment = "") => {
         const body = { comment, status }
@@ -55,7 +46,6 @@ export default function TasksApp(app, projectId) {
         issueFollowup,
         isArchivedStatus,
         resourcePreviewUrl,
-        moveTask,
         editComment,
         patchTask,
         markAllAsRead,
@@ -307,18 +297,6 @@ export default function TasksApp(app, projectId) {
             this.feedbackModal.hide();
         },
 
-        // Movement Buttons
-        //done
-        async moveAbove(task, otherTask) {
-            await moveTask(task.id, otherTask.id);
-            await this.getData();
-        },
-
-        //done
-        async moveBelow(task, otherTask) {
-            await moveTask(task.id, otherTask.id, true);
-            await this.getData();
-        },
         truncate(input, size = 30) {
             return input.length > size ? `${input.substring(0, size)}...` : input;
         },
