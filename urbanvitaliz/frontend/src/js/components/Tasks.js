@@ -9,6 +9,7 @@ import { gravatar_url } from '../utils/gravatar'
 
 export default function TasksApp(app, projectId) {
 
+    //done
     const moveTask = async (taskId, otherTaskId, below) => {
         const params = new URLSearchParams(`${below ? 'below' : 'above'}=${otherTaskId}`);
         await api.post(moveTaskUrl(projectId, taskId), params, {
@@ -16,6 +17,7 @@ export default function TasksApp(app, projectId) {
         })
     }
 
+    //done
     const issueFollowup = async (task, status, comment = "") => {
         const body = { comment, status }
 
@@ -24,14 +26,17 @@ export default function TasksApp(app, projectId) {
         await api.post(followupsUrl(projectId, task.id), body)
     }
 
+    //done
     const editComment = async (taskId, followupId, comment) => {
         await api.patch(followupUrl(projectId, taskId, followupId), { comment })
     }
 
+    //done
     const patchTask = async (taskId, patch) => {
         await api.patch(taskUrl(projectId, taskId), patch)
     }
 
+    //done
     const markAllAsRead = async (taskId) => {
         await api.post(markTaskNotificationsAsReadUrl(projectId, taskId), {})
     }
@@ -84,7 +89,7 @@ export default function TasksApp(app, projectId) {
             return this.$store.app.isLoading
         },
         async getData() {
-            return this.data = await this.$store.tasks.getTasks(projectId)
+            return this.$store.tasksData.tasks = await this.$store.tasksData.getTasks(projectId)
         },
         sortFn(a, b) {
             return a.order - b.order;
@@ -93,13 +98,13 @@ export default function TasksApp(app, projectId) {
             return this.isSwitchtender ? true : (this.canAdministrate || d.public);
         },
         findByUuid(uuid) {
-            return this.data.find(d => d.uuid === uuid);
+            return this.$store.tasksData.tasks.find(d => d.uuid === uuid);
         },
         findById(id) {
-            return this.data.find(d => d.id === id);
+            return this.$store.tasksData.tasks.find(d => d.id === id);
         },
         get view() {
-            const result = this.data.filter((d) => this.filterFn(d)).sort((a, b) => this.sortFn(a, b));
+            const result = this.$store.tasksData.tasks.filter((d) => this.filterFn(d)).sort((a, b) => this.sortFn(a, b));
             return result;
         },
         column(status) {
@@ -146,10 +151,12 @@ export default function TasksApp(app, projectId) {
         },
 
         // Previews
+        //done
         async loadFollowups(taskId) {
             const { data } = await api.get(followupsUrl(projectId, taskId));
             this.currentTaskFollowups = data
         },
+        //done
         async loadNotifications(taskId) {
             const { data } = await api.get(taskNotificationsUrl(projectId, taskId));
             this.currentTaskNotifications = data;
@@ -301,11 +308,13 @@ export default function TasksApp(app, projectId) {
         },
 
         // Movement Buttons
+        //done
         async moveAbove(task, otherTask) {
             await moveTask(task.id, otherTask.id);
             await this.getData();
         },
 
+        //done
         async moveBelow(task, otherTask) {
             await moveTask(task.id, otherTask.id, true);
             await this.getData();
