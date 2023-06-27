@@ -1,0 +1,195 @@
+{% load static %}
+{% load guardian_tags %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
+
+<script>
+
+	var isHijacked = {{request.user.is_hijacked|lower}};
+	var isMember=
+
+	{% if request.user in project.members.all %}
+		true;
+	{% else %}
+		false;
+	{% endif %}
+
+</script>
+
+<div x-data="TaskModal()" class="modal fade" id="task-preview" tabindex="-1" aria-hidden="true">
+	<div @open-preview-modal.window="openPreviewModal($event)" class="modal-dialog modal-xl">
+		<template x-if="$store.taskModal.currentTask">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 :text="$store.taskModal.currentTask.intent"></h3>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body p-0">
+					<div class="d-flex align-items-stretch h-100">
+						<template x-if="$store.taskModal.currentTask.resource_id">
+							<iframe class="w-100" :src="resourcePreviewUrl($store.taskModal.currentTask.resource_id)"></iframe>
+						</template>
+						<template x-if="!$store.taskModal.currentTask.resource_id">
+							<div class="flex-fill p-3 overflow-auto">
+								<div class="col-10 px-5 mx-auto">
+									<div class="resource-details pb-3">
+										<h1 x-text="$store.taskModal.currentTask.intent" class="mb-3"></h1>
+									</div>
+									<p class="text-justified" x-html="renderMarkdown($store.taskModal.currentTask.content)"></p>
+								</div>
+							</div>
+						</template>
+						<div
+							class="border border-top-0 border-bottom-0 border-right-0 flex-shrink-0 d-flex flex-column justify-content-between"
+							style="width: 33%;">
+							<div class="d-flex flex-column flex-fill overflow-hidden">
+								{% include 'projects/project/fragments/status_switcher.html' %}
+								<div x-show="$store.taskModal.currentTask.document && $store.taskModal.currentTask.document.length > 0">
+									<h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
+										Fichier(s) partagé(s)
+									</h2>
+									<template x-for="document in $store.taskModal.currentTask.document" x-key="document.id">
+										<div class="px-3">
+											{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}
+										</div>
+									</template>
+								</div>
+								<h2 class="text-secondary text-uppercase fw-bolder m-3" style="font-size: 12px;">
+									Conversation
+								</h2>
+								<div id="followups-scroll-container" class="flex-fill overflow-auto h-100">
+									<template x-if="$store.taskModal.currentTask.resource_id">
+										<div class="rounded bg-light p-2 m-3 message"
+											:class="canAdministrate && $store.taskModal.currentTask.content === '' && 'border border-warning'">
+											<template x-if="$store.taskModal.currentTask.content !== ''">
+												<p x-html="renderMarkdown($store.taskModal.currentTask.content)" class="mb-2"></p>
+											</template>
+											<template x-if="$store.taskModal.currentTask.content === ''">
+												<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
+											</template>
+											<div class="d-flex justify-content-between" style="font-size: 0.9em;">
+												<div>
+													<img class="rounded-circle d-inline-block" width="18px" height="18px"
+														:src="gravatar_url($store.taskModal.currentTask.created_by.email, 18)" data-bs-toggle="tooltip"
+														data-bs-placement="bottom"
+														:title="`${$store.taskModal.currentTask.created_by.first_name} ${$store.taskModal.currentTask.created_by.last_name}`"
+														style="z-index: 1000;" tabindex="0" />
+													<span class="ms-1 fw-bold"
+														x-text="`${$store.taskModal.currentTask.created_by.first_name} ${$store.taskModal.currentTask.created_by.last_name}`"
+														style="line-height: 20px"></span>
+													<template x-if="$store.taskModal.currentTask.created_by.profile.organization">
+														<span x-text="$store.taskModal.currentTask.created_by.profile.organization.name"
+															class="fst-italic text-muted"></span>
+													</template>
+													<span class="ms-2 text-muted" x-text="`le ${formatDate($store.taskModal.currentTask.created_on)}`"
+														style="line-height: 20px"></span>
+												</div>
+												<template x-if="canAdministrate">
+													<a class="text-muted" style="cursor: pointer;" @click="onEditContent()">Editer</a>
+												</template>
+											</div>
+										</div>
+									</template>
+									<template x-if="!$store.taskModal.currentTask.resource_id">
+										<div class="my-3">
+											<div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
+												<span class="ms-1 fst-italic" x-text="`${$store.taskModal.currentTask.created_by.first_name} ${$store.taskModal.currentTask.created_by.last_name}`"
+													style="line-height: 20px"></span> a créé cette recommandation sans ressource
+													<span class="ms-1 text-muted" x-text="`le ${formatDate($store.taskModal.currentTask.created_on)}`"
+																style="line-height: 20px"></span>
+											</div>
+										</div>
+									</template>
+									<template x-if="currentTaskFollowups">
+										<template x-for="f in currentTaskFollowups" x-key="f.timestamp"
+											x-effect="currentTaskFollowups" id="followups-container">
+											<div>
+												<template x-if="!isStatusUpdate(f)">
+													<div class="rounded bg-light p-2 m-3 message"
+														:class="hasNotification(f.id) && 'border border-warning'">
+														<p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
+														<div class="d-flex justify-content-between" style="font-size: 0.9em;">
+															<div>
+																<img class="rounded-circle d-inline-block" width="20px" height="20px"
+																	:src="gravatar_url(f.who.email, 25)" data-bs-toggle="tooltip" data-bs-placement="bottom"
+																	:title="`${f.who.first_name} ${f.who.last_name}`" style="z-index: 1000;"
+																	tabindex="0" />
+																<span class="ms-1 fst-italic" x-text="`${f.who.first_name} ${f.who.last_name}`"
+																	style="line-height: 20px">
+																</span>
+																<template x-if="f.who.profile.organization">
+																	<span x-text="f.who.profile.organization.name" class="fst-italic text-muted"></span>
+																</template>
+																<span class="ms-2 text-muted" x-text="`le ${formatDate(f.timestamp)}`"
+																	style="line-height: 20px"></span>
+															</div>
+															<template x-if="$store.tasksData.canUseTasks && f.who.email === userEmail">
+																<a class="text-muted" @click="onEditComment(f)">Editer</a>
+															</template>
+														</div>
+													</div>
+												</template>
+												<template x-if="isStatusUpdate(f) && f.status || isStatusUpdate(f) && f.status == 0">
+													<div class="my-3" :class="hasNotification(f.id) && 'text-warning'">
+														<div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
+															<span class="ms-1 fst-italic" x-text="`${f.who.first_name} ${f.who.last_name}`"
+																style="line-height: 20px"></span> a changé le statut de la recommandation en <span
+																class="fw-bold" x-text="statusText(f.status)"></span>
+																<span class="text-muted" x-text="`le ${formatDate(f.timestamp)}`"
+																style="line-height: 20px"></span>
+														</div>
+														<template x-if="f.comment !== ''">
+															<div class="rounded bg-light p-2 m-3 message">
+																<p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
+																<div class="d-flex justify-content-between" style="font-size: 0.9em;">
+																	<div>
+																		<img class="rounded-circle d-inline-block" width="20px" height="20px"
+																			:src="gravatar_url(f.who.email, 25)" data-bs-toggle="tooltip"
+																			data-bs-placement="bottom" :title="`${f.who.first_name} ${f.who.last_name}`"
+																			style="z-index: 1000;" tabindex="0" />
+																		<span class="ms-1 fst-italic" x-text="`${f.who.first_name} ${f.who.last_name}`"
+																			style="line-height: 20px"></span>
+																		<template x-if="f.who.profile.organization">
+																			<span x-text="f.who.profile.organization.name"
+																				class="fst-italic text-muted"></span>
+																		</template>
+																		<span class="ms-2 text-muted" x-text="`le ${formatDate(f.timestamp)}`"
+																			style="line-height: 20px"></span>
+																	</div>
+																	<template x-if="$store.tasksData.canUseTasks && f.who.email === userEmail">
+																		<a class="text-muted" style="cursor: pointer;" @click="onEditComment(f)">Editer</a>
+																	</template>
+																</div>
+															</div>
+														</template>
+													</div>
+												</template>
+											</div>
+										</template>
+									</template>
+								</div>
+							</div>
+							{% if "use_tasks" in user_project_perms and not disable_edit %}
+							<div class="p-3 border-top">
+								<template x-if="currentlyEditing">
+									<span>Editer un commentaire</span>
+								</template>
+								<template x-if="!currentlyEditing">
+									<span>Répondre</span>
+								</template>
+								<form x-ref="commentTextFormRef" class="position-relative mt-2 form d-flex flex-column align-items-end" @submit.prevent="onSubmitComment">
+									<textarea id="modal-textarea" x-ref="commentTextRef" name="comment" style="min-height: 100px; border-color: #ccc;"
+										class="w-100 p-2 rounded rounded-4 my-2 mb-3 border" placeholder="Votre message..."
+										x-model="pendingComment"></textarea>
+									<button x-bind:disabled="pendingComment.length == 0" type="submit" class="btn btn-primary">Envoyer</button>
+								</form>
+							</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</template>
+	</div>
+</div>

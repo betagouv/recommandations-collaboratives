@@ -68,8 +68,8 @@ export default function TasksApp(app, projectId) {
         },
         loadUserProjectPerms() {
             const userProjectPerms = document.getElementById("userProjectPerms").textContent;
-            this.canUseTasks = (userProjectPerms.indexOf("use_tasks") > -1);
-            this.canManageTasks = (userProjectPerms.indexOf("manage_tasks") > -1);
+            this.$store.tasksData.canUseTasks = (userProjectPerms.indexOf("use_tasks") > -1);
+            this.$store.tasksData.canManageTasks = (userProjectPerms.indexOf("manage_tasks") > -1);
         },
         loadIsSwitchtender() {
             const isSwitchtender = document.getElementById("isSwitchtender").textContent;

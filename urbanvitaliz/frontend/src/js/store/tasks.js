@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs'
-import api, { tasksUrl,taskUrl, moveTaskUrl } from '../utils/api'
+import api, { tasksUrl,taskUrl, moveTaskUrl, followupsUrl, taskNotificationsUrl, markTaskNotificationsAsReadUrl } from '../utils/api'
 import { generateUUID } from '../utils/uuid'
 
 Alpine.store('tasksView', {
@@ -15,6 +15,8 @@ Alpine.store('tasksView', {
 Alpine.store('tasksData', {
     projectId: null,
     tasks: [],
+    canUseTasks:false,
+    canManageTasks:false,
     init() {
         console.log('tasks data store init ');
     },
@@ -57,12 +59,17 @@ Alpine.store('task', {
     init() {
         console.log('current task store init ');
     },
+    initProject(projectId) {
+        this.projectId = projectId
+        console.log('project task sotre ? ', this.projectId)
+    },
     async loadFollowups(taskId) {
-        const { data } = await api.get(followupsUrl(projectId, taskId));
+        const { data } = await api.get(followupsUrl(this.projectId, taskId));
+        console.log('data qsdjklqsdjkljklqsdljk ', data);
         return data
     },
     async loadNotifications(taskId) {
-        const { data } = await api.get(taskNotificationsUrl(projectId, taskId));
+        const { data } = await api.get(taskNotificationsUrl(this.projectId, taskId));
         return data;
     },
     async issueFollowup(task, status, comment = "") {
@@ -70,14 +77,24 @@ Alpine.store('task', {
 
         if (body.status === task.status && body.comment === "") return;
 
-        await api.post(followupsUrl(projectId, task.id), body)
+        await api.post(followupsUrl(this.projectId, task.id), body)
     },
     async editComment(taskId, followupId, comment) {
-        await api.patch(followupUrl(projectId, taskId, followupId), { comment })
+        await api.patch(followupUrl(this.projectId, taskId, followupId), { comment })
     },
     async markAllAsRead(taskId) {
-        await api.post(markTaskNotificationsAsReadUrl(projectId, taskId), {})
+        await api.post(markTaskNotificationsAsReadUrl(this.projectId, taskId), {})
     },
+})
+
+Alpine.store('taskModal', {
+    currentTask:null,
+    previewModalHandle:null,
+    onPreviewClick(task) {
+        this.currentTask = task
+        console.log(this.currentTask);
+        this.previewModalHandle.show();
+    }
 })
 
 
