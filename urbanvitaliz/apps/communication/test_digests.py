@@ -22,6 +22,7 @@ from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects import signals as projects_signals
 from urbanvitaliz.apps.resources import models as resources_models
+from urbanvitaliz import verbs
 
 from . import digests
 from .digests import NotificationFormatter

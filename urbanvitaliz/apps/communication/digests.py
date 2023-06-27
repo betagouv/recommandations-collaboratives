@@ -571,6 +571,8 @@ class NotificationFormatter:
             {
                 "a rédigé un message": self.format_public_note_created,
                 "a rédigé un message dans l'espace conseillers": self.format_private_note_created,
+                verbs.Conversation.PUBLIC_MESSAGE: self.format_public_note_created,
+                verbs.Conversation.PRIVATE_MESSAGE: self.format_private_note_created,
                 verbs.Project.BECAME_SWITCHTENDER: self.format_action_became_switchtender,
                 # added for transition from switchtender (aiguilleur) to advisor (conseiller)
                 verbs.Project.BECAME_ADVISOR: self.format_action_became_switchtender,
