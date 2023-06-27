@@ -11,16 +11,14 @@ from dataclasses import asdict, dataclass
 from datetime import timedelta
 from itertools import groupby
 
-from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils import timezone
-from urbanvitaliz import utils
+
+from urbanvitaliz import utils, verbs
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.reminders import models as reminders_models
-
-from urbanvitaliz import verbs
 
 from .api import send_email
 
@@ -507,12 +505,13 @@ class NotificationFormatter:
         Try formatting the notification by the dispatch table or
         use the default reprensentation
         """
-        try:
-            return dispatch_table[notification.verb](notification)
-        except KeyError:
-            return FormattedNotification(
-                summary=f"{notification.actor} {notification.verb} {notification.action_object}"
-            )
+
+        def _default(notification):
+            summary = "{n.actor} {n.verb} {n.action_object}".format(n=notification)
+            return FormattedNotification(summary)
+
+        fmt = dispatch_table.get(notification.verb, _default)
+        return fmt(notification)
 
     # ------ Formatter Utils -----#
     def _represent_user(self, user):
@@ -567,14 +566,13 @@ class NotificationFormatter:
         #         username="-- compte supprimé --", first_name="-- compte supprimé --"
         #     )
 
+        # verbs.Project.BECAME_SWITCHTENDER: self.format_action_became_switchtender,
+        # added for transition from switchtender (aiguilleur) to advisor (conseiller)
+
         return self._format_or_default(
             {
-                "a rédigé un message": self.format_public_note_created,
-                "a rédigé un message dans l'espace conseillers": self.format_private_note_created,
                 verbs.Conversation.PUBLIC_MESSAGE: self.format_public_note_created,
                 verbs.Conversation.PRIVATE_MESSAGE: self.format_private_note_created,
-                verbs.Project.BECAME_SWITCHTENDER: self.format_action_became_switchtender,
-                # added for transition from switchtender (aiguilleur) to advisor (conseiller)
                 verbs.Project.BECAME_ADVISOR: self.format_action_became_advisor,
                 verbs.Project.BECAME_OBSERVER: self.format_action_became_observer,
                 verbs.Project.AVAILABLE: self.format_new_project_available,

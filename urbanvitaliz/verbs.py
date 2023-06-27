@@ -10,21 +10,21 @@ created: 2023-06-26 14:37:45 CEST
 import enum
 
 
-class User(enum.StrEnum):
+class User:
     LOGIN = "s'est connecté"
 
 
-class Document(enum.StrEnum):
+class Document:
     ADDED = "a ajouté un lien ou un document"
     ADDED_FILE = "a ajouté un document"
     ADDED_LINK = "a ajouté un lien"
 
 
-class CRM(enum.StrEnum):
+class CRM:
     NOTE_CREATED = "a créé une note de CRM"
 
 
-class Recommendation(enum.StrEnum):
+class Recommendation:
     DRAFTED = "a créé un brouillon de recommandation"
     CREATED = "a recommandé l'action"
     REMINDER_ADDED = "a créé un rappel sur la recommandation"
@@ -42,7 +42,7 @@ class Recommendation(enum.StrEnum):
     DONE = "a classé la recommandation comme «terminée»"
 
 
-class Project(enum.StrEnum):
+class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le projet"
     JOINED = "a rejoint le projet"
     JOINED_OLD = "a rejoint l'équipe sur le projet"
@@ -67,7 +67,7 @@ class Project(enum.StrEnum):
     USER_STATUS_UPDATED = "a changé l'état de son suivi projet"
 
 
-class Survey(enum.StrEnum):
+class Survey:
     STARTED = "a démarré l'état des lieux"
     UPDATED = "a mis à jour l'état des lieux"
 
@@ -77,7 +77,7 @@ class Survey(enum.StrEnum):
     # le questionnaire -> l'état des lieux
 
 
-class Conversation(enum.StrEnum):
+class Conversation:
     PUBLIC_MESSAGE = "a envoyé un message dans l'espace conversation"
     PRIVATE_MESSAGE = "a envoyé un message dans l'espace conseillers"
 
