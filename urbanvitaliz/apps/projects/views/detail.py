@@ -94,8 +94,9 @@ def mark_notifications_as_seen(user, project):
     notif_verbs = [
         verbs.Conversation.PUBLIC_MESSAGE,
         verbs.Conversation.PRIVATE_MESSAGE_OLD,  # FIXME and new ones ?
-        verbs.Document.ADDED,
-        verbs.Document.ADDED_OLD,
+        verbs.Document.ADDED,  # FIXME to remove
+        verbs.Document.ADDED_FILE,
+        verbs.Document.ADDED_LINK,
         verbs.Project.BECAME_SWITCHTENDER,
         verbs.Project.BECAME_ADVISOR,
         verbs.Project.BECAME_OBSERVER,

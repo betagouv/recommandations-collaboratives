@@ -177,10 +177,11 @@ class Project(models.Model):
     PROJECT_STATES = (
         ("DRAFT", "Brouillon"),
         ("TO_PROCESS", "A traiter"),
-        ("READY", "En attente"),
+        ("READY", "En attente"),  # FIXME A renommer en validé ?
         ("IN_PROGRESS", "En cours"),
         ("DONE", "Traité"),
         ("STUCK", "Conseil Interrompu"),
+        # ^ replace by:("STANDBY", "En attente"), FIXME
         ("REJECTED", "Rejeté"),
     )
 

@@ -49,6 +49,7 @@ document_uploaded = django.dispatch.Signal()
 
 @receiver(project_submitted)
 def log_project_submitted(sender, site, submitter, project, **kwargs):
+    # FIXME log user submitted_by project
     action.send(project, verb=verbs.Project.SUBMITTED)
 
 
@@ -276,6 +277,7 @@ def log_action_visited(sender, task, project, user, **kwargs):
 
 @receiver(action_not_interested)
 def log_action_not_interested(sender, task, project, user, **kwargs):
+    # FIXME to be moved to not applicable
     if not is_staff_for_site(user):
         action.send(
             user,
@@ -290,7 +292,7 @@ def log_action_blocked(sender, task, project, user, **kwargs):
     if not is_staff_for_site(user):
         action.send(
             user,
-            verb=verbs.Recommendation.STUCK,
+            verb=verbs.Recommendation.STANDBY,
             action_object=task,
             target=project,
         )

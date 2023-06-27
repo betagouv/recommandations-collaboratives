@@ -89,7 +89,7 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
 
     # a public note with notification
     pub_note = baker.make(models.Note, public=True, project=project)
-    verb = "a envoyé un message"
+    verb = verbs.Conversation.PUBLIC_MESSAGE
     notify.send(
         sender=user,
         recipient=user,
@@ -101,7 +101,7 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
 
     # a private note with notification for someone else
     priv_note = baker.make(models.Note, public=False, project=project)
-    verb = "a envoyé un message dans l'espace conseillers"
+    verb = verbs.Conversation.PRIVATE_MESSAGE
     notify.send(
         sender=user,
         recipient=baker.make(auth_models.User),
@@ -216,7 +216,7 @@ def create_project_with_notifications(site, user):
 
     # a public note with notification
     pub_note = baker.make(models.Note, public=True, project=project)
-    verb = "a envoyé un message"
+    verb = verbs.Conversation.PUBLIC_MESSAGE
     notify.send(
         sender=user,
         recipient=user,
@@ -228,7 +228,7 @@ def create_project_with_notifications(site, user):
 
     # a private note with notification for someone else
     priv_note = baker.make(models.Note, public=False, project=project)
-    verb = "a envoyé un message dans l'espace conseillers"
+    verb = verbs.Conversation.PRIVATE_MESSAGE
     notify.send(
         sender=user,
         recipient=baker.make(auth_models.User),
@@ -391,7 +391,7 @@ def test_user_project_status_contains_only_my_projects(request):
     )
     # a public note with notification for myself
     pub_note = baker.make(models.Note, public=True, project=mine.project)
-    verb = "a envoyé un message"
+    verb = verbs.Conversation.PUBLIC_MESSAGE
     notify.send(
         sender=user,
         recipient=user,
@@ -403,7 +403,7 @@ def test_user_project_status_contains_only_my_projects(request):
 
     # a private note with notification for someone else
     priv_note = baker.make(models.Note, public=False, project=mine.project)
-    verb = "a envoyé un message dans l'espace conseillers"
+    verb = verbs.Conversation.PRIVATE_MESSAGE
     notify.send(
         sender=user,
         recipient=baker.make(auth_models.User),  # for someone else
@@ -664,7 +664,7 @@ def test_project_status_patch_updates_object_and_log(request):
     # update is logged
     stream = user_stream(user, with_user_activity=True)
     assert stream.count() == 1
-    assert stream[0].verb == "a changé l'état de son suivi"
+    assert stream[0].verb == verbs.Project.USER_STATUS_UPDATED
 
 
 ########################################################################

@@ -553,7 +553,7 @@ class NotificationFormatter:
         return None
 
     def _represent_note_excerpt(self, note):
-        return note.content[:50] or None
+        return note.content[:200] or None
 
     def _represent_followup(self, followup):
         return followup.comment[:50]
@@ -575,8 +575,8 @@ class NotificationFormatter:
                 verbs.Conversation.PRIVATE_MESSAGE: self.format_private_note_created,
                 verbs.Project.BECAME_SWITCHTENDER: self.format_action_became_switchtender,
                 # added for transition from switchtender (aiguilleur) to advisor (conseiller)
-                verbs.Project.BECAME_ADVISOR: self.format_action_became_switchtender,
-                verbs.Project.BECAME_OBSERVER: self.format_action_became_switchtender,
+                verbs.Project.BECAME_ADVISOR: self.format_action_became_advisor,
+                verbs.Project.BECAME_OBSERVER: self.format_action_became_observer,
                 verbs.Project.AVAILABLE: self.format_new_project_available,
                 verbs.Project.SUBMITTED_BY: self.format_project_submitted,
                 verbs.Recommendation.COMMENTED: self.format_action_commented,
@@ -640,11 +640,26 @@ class NotificationFormatter:
 
         return FormattedNotification(summary=summary, excerpt=None)
 
+    def format_action_became_advisor(self, notification):
+        """Someone joined a project as advisor"""
+        subject = self._represent_user(notification.actor)
+        summary = f"{subject} a rejoint le projet en tant que conseiller·e."
+
+        return FormattedNotification(summary=summary, excerpt=None)
+
+    def format_action_became_observer(self, notification):
+        """Someone joined a project as observer"""
+        subject = self._represent_user(notification.actor)
+        summary = f"{subject} a rejoint le projet en tant qu'observateurice."
+
+        return FormattedNotification(summary=summary, excerpt=None)
+
     def format_project_submitted(self, notification):
         """A project was submitted for moderation"""
         subject = self._represent_user(notification.actor)
         complement = self._represent_project(notification.action_object)
-        summary = f"{subject} {verbs.Project.SUBMITTED_BY} '{complement}'"
+        msg = "a déposé un nouveau projet, qui est en attente de validation:"
+        summary = f"{subject} {msg} '{complement}'"
 
         excerpt = self._represent_project_excerpt(notification.action_object)
 

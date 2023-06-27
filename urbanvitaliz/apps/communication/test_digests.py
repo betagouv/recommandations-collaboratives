@@ -233,15 +233,15 @@ def test_notification_formatter():
 
     tests = [
         (
-            "a envoyé un message",
+            verbs.Conversation.PUBLIC_MESSAGE,
             public_note,
             (
-                "Bobi Joe (DuckCorp) a envoyé un message",
+                "Bobi Joe (DuckCorp) a envoyé un message dans l'espace conversation",
                 "my content",
             ),
         ),
         (
-            "a envoyé un message dans l'espace conseillers",
+            verbs.Conversation.PRIVATE_MESSAGE,
             private_note,
             (
                 "Bobi Joe (DuckCorp) a envoyé un message dans l'espace conseillers",
@@ -249,7 +249,7 @@ def test_notification_formatter():
             ),
         ),
         (
-            "a commenté l'action",
+            verbs.Recommendation.COMMENTED,
             followup,
             (
                 "Bobi Joe (DuckCorp) a commenté la recommandation 'Belle Ressource'",
@@ -257,25 +257,33 @@ def test_notification_formatter():
             ),
         ),
         (
-            "a recommandé l'action",
+            verbs.Recommendation.CREATED,
             task,
             ("Bobi Joe (DuckCorp) a recommandé 'Belle Ressource'", task.content),
         ),
         (
-            "est devenu·e conseiller·e sur le projet",
+            verbs.Project.BECAME_ADVISOR,
             project,
-            ("Bobi Joe (DuckCorp) s'est joint·e à l'équipe de conseil.", None),
+            ("Bobi Joe (DuckCorp) a rejoint le projet en tant que conseiller·e.", None),
         ),
         (
-            "a soumis pour modération le projet",
+            verbs.Project.BECAME_OBSERVER,
             project,
             (
-                "Bobi Joe (DuckCorp) a soumis pour modération le projet 'Nice Project'",
+                "Bobi Joe (DuckCorp) a rejoint le projet en tant qu'observateurice.",
+                None,
+            ),
+        ),
+        (
+            verbs.Project.SUBMITTED_BY,
+            project,
+            (
+                "Bobi Joe (DuckCorp) a déposé un nouveau projet, qui est en attente de validation: 'Nice Project'",
                 "Super description",
             ),
         ),
         (
-            "a déposé le projet",
+            verbs.Project.AVAILABLE,  # FIXME redondant avec VALIDATED
             project,
             (
                 "Bobi Joe (DuckCorp) a déposé le projet 'Nice Project'",
@@ -283,7 +291,7 @@ def test_notification_formatter():
             ),
         ),
         (
-            "a ajouté un lien ou un document",
+            verbs.Document.ADDED,  # FIXME replace w/ ADDED_FILE ADDED_LINK
             project,
             ("Bobi Joe (DuckCorp) a ajouté un lien ou un document", None),
         ),
