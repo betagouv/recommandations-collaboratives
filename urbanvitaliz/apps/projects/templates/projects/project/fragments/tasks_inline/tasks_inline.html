@@ -1,7 +1,6 @@
 {% load django_vite %}
 
 <!-- Index of tasks inline app -->
-<div x-data="TasksInline({{ project.pk }})" x-init="getData(); processUrl();">
+<div x-data="TasksInline({{ project.pk }})" x-init="processUrl();">
     {% include 'projects/project/fragments/tasks_inline/status_list.html' %}
-    {% include 'projects/project/fragments/kanban_tasks/preview_modal.html' %}
 </div>

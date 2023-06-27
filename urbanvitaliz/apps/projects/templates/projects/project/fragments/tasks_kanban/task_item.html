@@ -35,7 +35,6 @@
 					<div class="mt-1 d-flex flex-column justify-content-between">
 						{% if "use_tasks" in user_project_perms and not disable_edit %}
 							<div>
-								<span x-text="i"></span>
 								<template x-if="i > 0">
 									<a class="d-block p-1" @click="$store.tasksData.moveAbove(t, column(board.status)[i - 1])" style="cursor: pointer;">
 										<svg class="aling-middle bi ms-1" width="12px" height="12px" fill="currentColor">

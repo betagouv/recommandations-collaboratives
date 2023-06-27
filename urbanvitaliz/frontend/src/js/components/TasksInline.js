@@ -2,7 +2,7 @@ import Alpine from 'alpinejs'
 import TaskApp from './Tasks'
 import { TASK_STATUSES } from '../config/statuses';
 
-function TasksInline(projectId) {
+export default function TasksInline(projectId) {
 
     const app = {
         filterIsDraft: false,
@@ -25,16 +25,16 @@ function TasksInline(projectId) {
             this.updateView()
         },
         async publishTask(taskId) {
-            await this.patchTask(taskId, { public: true });
-            await this.getData();
-            this.updateView()
+            await this.$store.tasksData.patchTask(taskId, { public: true });
+            await this.$store.tasksData.getTasks();
+            // this.updateView()
         },
         //Custom behaviour
-        onPreviewClick(id) {
-            this.currentTaskId = id;
-            this.openPreviewModal();
-            this.filterIsDraft = false
-        },
+        // onPreviewClick(id) {
+        //     this.currentTaskId = id;
+        //     this.openPreviewModal();
+        //     this.filterIsDraft = false
+        // },
         updateView() {
             if (!this.filterIsDraft) return
             

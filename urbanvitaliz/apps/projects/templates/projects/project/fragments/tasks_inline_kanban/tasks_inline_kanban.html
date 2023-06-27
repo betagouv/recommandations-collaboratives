@@ -4,15 +4,21 @@
     {% vite_asset 'js/apps/tasks.js' %}
 {% endblock %}
 
-<div x-data>
+<div x-data x-init="$store.tasksData.getTasks({{ project.pk }}); $store.task.initProject({{project.pk}})">
     {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html' %}
-    <span x-text="$store.tasks.currentView"></span>
+    <span x-text="$store.tasksView.currentView"></span>
     <span x-text="$store.app.isLoading"></span>
 
-    <template x-if="$store.tasks.currentView === 'inline'">
+    <template x-if="$store.tasksView.currentView === 'inline'">
         {% include 'projects/project/fragments/tasks_inline/tasks_inline.html' %}
     </template>
-    <template x-if="$store.tasks.currentView === 'kanban'">
+    <template x-if="$store.tasksView.currentView === 'kanban'">
         {% include 'projects/project/fragments/tasks_kanban/tasks_kanban.html' %}
     </template>
+
+    {% include 'projects/project/fragments/tasks_kanban/preview_modal.html' %}
+    <!-- {% include 'projects/project/fragments/tasks_kanban/reminder_modal.html' %}
+    {% include 'projects/project/fragments/tasks_kanban/feedback_modal.html' %}
+    {% include 'projects/project/fragments/tasks_kanban/delete_task_confirmation_modal.html' %}  -->
+   
 </div>

@@ -14,8 +14,8 @@ export default function TaskModal() {
         formatDate,
         resourcePreviewUrl,
         gravatar_url,
-        currentTaskFollowups:[],
-        currentTaskNotifications:[],
+        currentTaskFollowups: [],
+        currentTaskNotifications: [],
         isStatusUpdate,
         statusText,
         init() {
@@ -79,7 +79,7 @@ export default function TaskModal() {
             if (!this.currentlyEditing) {
                 await this.$store.task.issueFollowup(this.$store.taskModal.currentTask, undefined, this.pendingComment);
                 // await this.getData()
-                await this.$store.task.loadFollowups(this.$store.taskModal.currentTask.id);
+                this.currentTaskFollowups = await this.$store.task.loadFollowups(this.$store.taskModal.currentTask.id);
             } else {
                 const [type, id] = this.currentlyEditing;
                 if (type === "followup") {
@@ -98,9 +98,19 @@ export default function TaskModal() {
         hasNotification(followupId) {
             return this.currentTaskNotifications.filter(n => n.action_object.who && n.action_object.id === followupId).length > 0;
         },
+        //Event listener dispatched by another component
+        async handleIssueFollowup(e) {
+            await this.$store.task.issueFollowup(e.detail.task, e.detail.status)
+            // await this.getData()
+        },
         followupScrollToLastMessage() {
             const scrollContainer = document.getElementById("followups-scroll-container");
-            if (scrollContainer) scrollContainer.scrollTop = scrollContainer.scrollHeight;
+            if (scrollContainer) {
+                setTimeout(() => {
+                    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+                }, 1)
+            }
+
         }
     }
 }
