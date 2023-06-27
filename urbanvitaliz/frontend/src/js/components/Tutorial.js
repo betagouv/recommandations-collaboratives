@@ -16,15 +16,15 @@ function Tutorial(challengeCode, autoStart = false) {
         startButton: null,
         startButtonDescription: "",
         challengeCode: null,
-        showTuto:true,
+        showTuto: false,
         async init() {
             this.challengeCode = challengeCode
 
-            const ChallengeDefinition = await this.getChallengeDefinition(challengeCode)
+            const challengeDefinition = await this.getChallengeDefinition(challengeCode)
 
-            if (!ChallengeDefinition) {
-                this.showTuto = false
-
+            if (challengeDefinition) {
+                this.showTuto = true
+            } else {
                 return
             }
 
@@ -37,8 +37,8 @@ function Tutorial(challengeCode, autoStart = false) {
                 return
             }
 
-            this.steps = tutorials[ChallengeDefinition.code].steps
-            this.startButtonDescription = ChallengeDefinition.description
+            this.steps = tutorials[challengeDefinition.code].steps
+            this.startButtonDescription = challengeDefinition.description
 
             this.tour = introJs().setOptions({
                 tooltipClass: 'introjs-uv',
