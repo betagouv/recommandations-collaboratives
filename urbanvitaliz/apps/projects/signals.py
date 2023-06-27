@@ -60,7 +60,7 @@ def notify_moderators_project_submitted(sender, site, submitter, project, **kwar
     notify.send(
         sender=submitter,
         recipient=recipients,
-        verb=verbs.Project.SUBMITTED_OLD,
+        verb=verbs.Project.SUBMITTED_BY,
         action_object=project,
         target=project,
     )

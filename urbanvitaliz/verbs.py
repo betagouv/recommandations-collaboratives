@@ -28,12 +28,14 @@ class Recommendation(enum.StrEnum):
     CREATED = "a recommandé l'action"
     REMINDER_ADDED = "a créé un rappel sur l'action"
     COMMENTED = "a commenté l'action"
+    COMMENTED_NEW = "a commenté la recommandation"
 
     SEEN = "a visité l'action"
     NOT_INTERESTED = "n'est pas intéressé·e l'action"
     ALREADY_DONE = "a déjà fait l'action"
     IN_PROGRESS = "travaille sur l'action"
-    STUCK = "est bloqué sur l'action"
+    STUCK = "est en attente sur la recommandation"
+    STUCK_OLD = "est bloqué sur l'action"
     RESUMED = "a redémarré l'action"
     DONE = "a terminé l'action"
 
@@ -47,8 +49,8 @@ class Project(enum.StrEnum):
     VALIDATED = "a été validé"
     AVAILABLE = "a déposé le projet"
 
-    SUBMITTED_OLD = "a soumis pour modération le projet"
-    VALIDATED_OLD = "a validé le projet"
+    SUBMITTED_BY = "a soumis pour modération le projet"
+    VALIDATED_BY = "a validé le projet"
 
     BECAME_SWITCHTENDER = "est devenu·e aiguilleur·se sur le projet"
     BECAME_ADVISOR = "est devenu·e conseiller·e sur le projet"
@@ -59,8 +61,10 @@ class Project(enum.StrEnum):
 
 
 class Survey(enum.StrEnum):
-    STARTED = "a démarré le questionnaire"
-    UPDATED = "a mis à jour le questionnaire"
+    STARTED = "a démarré l'état des lieux"
+    STARTED_OLD = "a démarré le questionnaire"
+    UPDATED = "a mis à jour l'état des lieux"
+    UPDATED_OLD = "a mis à jour le questionnaire"
 
 
 class Conversation(enum.StrEnum):

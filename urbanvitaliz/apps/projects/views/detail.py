@@ -101,9 +101,9 @@ def mark_notifications_as_seen(user, project):
         verbs.Project.BECAME_OBSERVER,
         verbs.Project.JOINED,
         verbs.Project.JOINED_OLD,
-        verbs.Project.SUBMITTED_OLD,
+        verbs.Project.SUBMITTED_BY,
         verbs.Project.VALIDATED,
-        verbs.Project.VALIDATED_OLD,
+        verbs.Project.VALIDATED_BY,
         verbs.Recommendation.COMMENTED,
         verbs.Survey.UPDATED,
     ]

@@ -232,7 +232,7 @@ def mark_general_notifications_as_seen(user):
     # Mark some notifications as seen
     project_ct = ContentType.objects.get_for_model(models.Project)
     # FIXME update filter to current verbs
-    notif_verbs = [verbs.Project.AVAILABLE, verbs.Project.SUBMITTED_OLD]
+    notif_verbs = [verbs.Project.AVAILABLE, verbs.Project.SUBMITTED_BY]
     notifications = user.notifications.unread().filter(
         verb__in=notif_verbs,
         target_content_type=project_ct.pk,

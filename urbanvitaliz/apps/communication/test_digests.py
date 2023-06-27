@@ -233,18 +233,18 @@ def test_notification_formatter():
 
     tests = [
         (
-            "a rédigé un message",
+            "a envoyé un message",
             public_note,
             (
-                "Bobi Joe (DuckCorp) a rédigé un message",
+                "Bobi Joe (DuckCorp) a envoyé un message",
                 "my content",
             ),
         ),
         (
-            "a rédigé un message dans l'espace conseillers",
+            "a envoyé un message dans l'espace conseillers",
             private_note,
             (
-                "Bobi Joe (DuckCorp) a rédigé un message dans l'espace conseillers",
+                "Bobi Joe (DuckCorp) a envoyé un message dans l'espace conseillers",
                 "my content",
             ),
         ),
@@ -264,7 +264,7 @@ def test_notification_formatter():
         (
             "est devenu·e conseiller·e sur le projet",
             project,
-            ("Bobi Joe (DuckCorp) s'est joint·e à l'équipe d'aiguillage.", None),
+            ("Bobi Joe (DuckCorp) s'est joint·e à l'équipe de conseil.", None),
         ),
         (
             "a soumis pour modération le projet",
