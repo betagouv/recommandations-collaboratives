@@ -14,6 +14,7 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.survey import signals as survey_signals
 from urbanvitaliz.apps.training import utils as training_utils
 from urbanvitaliz.utils import is_staff_for_site
+from urbanvitaliz import verbs
 
 from . import models
 from .utils import (
@@ -26,9 +27,11 @@ from .utils import (
     remove_reminder,
 )
 
-#####
+########################################################################
 # Projects
-#####
+########################################################################
+
+
 project_submitted = django.dispatch.Signal()
 project_validated = django.dispatch.Signal()
 
@@ -46,7 +49,7 @@ document_uploaded = django.dispatch.Signal()
 
 @receiver(project_submitted)
 def log_project_submitted(sender, site, submitter, project, **kwargs):
-    action.send(project, verb="a été déposé")
+    action.send(project, verb=verbs.Project.SUBMITTED)
 
 
 @receiver(project_submitted)
@@ -57,7 +60,7 @@ def notify_moderators_project_submitted(sender, site, submitter, project, **kwar
     notify.send(
         sender=submitter,
         recipient=recipients,
-        verb="a soumis pour modération le projet",
+        verb=verbs.Project.SUBMITTED_OLD,
         action_object=project,
         target=project,
     )
@@ -65,7 +68,7 @@ def notify_moderators_project_submitted(sender, site, submitter, project, **kwar
 
 @receiver(project_validated)
 def log_project_validated(sender, site, moderator, project, **kwargs):
-    action.send(project, verb="a été validé")
+    action.send(project, verb=verbs.Project.VALIDATED)
 
     if project.status == "DRAFT" or project.muted:
         return
@@ -78,7 +81,7 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
     notify.send(
         sender=project.owner,
         recipient=get_regional_actors_for_project(site, project),
-        verb="a déposé le projet",
+        verb=verbs.Project.AVAILABLE,
         action_object=project,
         target=project,
     )
@@ -88,7 +91,7 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
 def log_project_switchtender_joined(sender, project, **kwargs):
     action.send(
         sender,
-        verb="est devenu·e conseiller·e sur le projet",
+        verb=verbs.Project.BECAME_ADVISOR,
         action_object=project,
         target=project,
     )
@@ -104,7 +107,7 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     notify.send(
         sender=sender,
         recipient=recipients,
-        verb="est devenu·e conseiller·e sur le projet",
+        verb=verbs.Project.BECAME_ADVISOR,
         action_object=project,
         target=project,
     )
@@ -114,7 +117,7 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
 def log_project_observer_joined(sender, project, **kwargs):
     action.send(
         sender,
-        verb="est devenu·e observateur·rice sur le projet",
+        verb=verbs.Project.BECAME_OBSERVER,
         action_object=project,
         target=project,
     )
@@ -130,7 +133,7 @@ def notify_project_observer_joined(sender, project, **kwargs):
     notify.send(
         sender=sender,
         recipient=recipients,
-        verb="est devenu·e observateur·rice sur le projet",
+        verb=verbs.Project.BECAME_OBSERVER,
         action_object=project,
         target=project,
     )
@@ -140,7 +143,7 @@ def notify_project_observer_joined(sender, project, **kwargs):
 def log_project_switchtender_leaved(sender, project, **kwargs):
     action.send(
         sender,
-        verb="ne conseille plus le projet",
+        verb=verbs.Project.LEFT_ADVISING,
         action_object=project,
         target=project,
     )
@@ -152,21 +155,21 @@ def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
     notifications_models.Notification.on_site.filter(
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
-        verb="est devenu·e conseiller·e sur le projet",
+        verb=verbs.Project.BECAME_ADVISOR,
         timestamp__gte=timezone.now() - datetime.timedelta(hours=12),
     ).delete()
 
 
-#####
+########################################################################
 # Project Members
-#####
+########################################################################
 
 
 @receiver(project_member_joined)
 def log_project_member_joined(sender, project, **kwargs):
     action.send(
         sender,
-        verb="a rejoint l'équipe projet",
+        verb=verbs.Project.JOINED,
         action_object=project,
         target=project,
     )
@@ -182,15 +185,16 @@ def notify_project_member_joined(sender, project, **kwargs):
     notify.send(
         sender=sender,
         recipient=recipients,
-        verb="a rejoint l'équipe projet",
+        verb=verbs.Project.JOINED,
         action_object=project,
         target=project,
     )
 
 
-#####
+########################################################################
 # Reminders
-#####
+########################################################################
+
 reminder_created = django.dispatch.Signal()
 
 
@@ -199,15 +203,17 @@ def log_reminder_created(sender, task, project, user, **kwargs):
     if not is_staff_for_site(user):
         action.send(
             user,
-            verb="a créé un rappel sur l'action",
+            verb=verbs.Recommendation.REMINDER_ADDED,
             action_object=task,
             target=project,
         )
 
 
-######
+########################################################################
 # Actions
-#####
+########################################################################
+
+
 action_created = django.dispatch.Signal()
 action_visited = django.dispatch.Signal()
 action_not_interested = django.dispatch.Signal()
@@ -224,14 +230,14 @@ def log_action_created(sender, task, project, user, **kwargs):
     if task.public is False:
         action.send(
             user,
-            verb="a créé un brouillon de recommandation",
+            verb=verbs.Recommendation.DRAFTED,
             action_object=task,
             target=project,
             public=False,
         )
     else:
         action.send(
-            user, verb="a recommandé l'action", action_object=task, target=project
+            user, verb=verbs.Recommendation.CREATED, action_object=task, target=project
         )
 
 
@@ -248,7 +254,7 @@ def notify_action_created(sender, task, project, user, **kwargs):
     notify.send(
         sender=user,
         recipient=recipients,
-        verb="a recommandé l'action",
+        verb=verbs.Recommendation.CREATED,
         action_object=task,
         target=project,
     )
@@ -260,7 +266,12 @@ def notify_action_created(sender, task, project, user, **kwargs):
 @receiver(action_visited)
 def log_action_visited(sender, task, project, user, **kwargs):
     if not is_staff_for_site(user):
-        action.send(user, verb="a visité l'action", action_object=task, target=project)
+        action.send(
+            user,
+            verb=verbs.Recommendation.SEEN,
+            action_object=task,
+            target=project,
+        )
 
 
 @receiver(action_not_interested)
@@ -268,7 +279,7 @@ def log_action_not_interested(sender, task, project, user, **kwargs):
     if not is_staff_for_site(user):
         action.send(
             user,
-            verb="n'est pas intéressé·e l'action",
+            verb=verbs.Recommendation.NOT_INTERESTED,
             action_object=task,
             target=project,
         )
@@ -279,7 +290,7 @@ def log_action_blocked(sender, task, project, user, **kwargs):
     if not is_staff_for_site(user):
         action.send(
             user,
-            verb="est bloqué sur l'action",
+            verb=verbs.Recommendation.STUCK,
             action_object=task,
             target=project,
         )
@@ -289,14 +300,22 @@ def log_action_blocked(sender, task, project, user, **kwargs):
 def log_action_already_done(sender, task, project, user, **kwargs):
     if not is_staff_for_site(user):
         action.send(
-            user, verb="a déjà fait l'action", action_object=task, target=project
+            user,
+            verb=verbs.Recommendation.ALREADY_DONE,
+            action_object=task,
+            target=project,
         )
 
 
 @receiver(action_done)
 def log_action_done(sender, task, project, user, **kwargs):
     if not is_staff_for_site(user):
-        action.send(user, verb="a terminé l'action", action_object=task, target=project)
+        action.send(
+            user,
+            verb=verbs.Recommendation.DONE,
+            action_object=task,
+            target=project,
+        )
 
 
 @receiver(action_inprogress)
@@ -304,17 +323,18 @@ def log_action_inprogress(sender, task, project, user, **kwargs):
     if not is_staff_for_site(user):
         action.send(
             user,
-            verb="travaille sur l'action",
+            verb=verbs.Recommendation.IN_PROGRESS,
             action_object=task,
             target=project,
         )
 
 
+# FIXME to convert to action_resume ?
 @receiver(action_undone)
 def log_action_undone(sender, task, project, user, **kwargs):
     if not is_staff_for_site(user):
         action.send(
-            user, verb="a redémarré l'action", action_object=task, target=project
+            user, verb=verbs.Recommendation.RESUMED, action_object=task, target=project
         )
 
 
@@ -323,7 +343,12 @@ def log_action_commented(sender, task, project, user, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    action.send(user, verb="a commenté l'action", action_object=task, target=project)
+    action.send(
+        user,
+        verb=verbs.Recommendation.COMMENTED,
+        action_object=task,
+        target=project,
+    )
 
 
 @receiver(action_commented)
@@ -336,7 +361,7 @@ def notify_action_commented(sender, task, project, user, **kwargs):
     notify.send(
         sender=user,
         recipient=recipients,
-        verb="a commenté l'action",
+        verb=verbs.Recommendation.COMMENTED,
         action_object=sender,
         target=project,
     )
@@ -476,13 +501,14 @@ def note_created_challenged(sender, note, project, user, **kwargs):
 ################################################################
 # UserProjectStatus
 ################################################################
+
 @receiver(project_userprojectstatus_updated)
 def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs):
     if old_one and new_one:
         if old_one.status != new_one.status:
             action.send(
                 new_one.user,
-                verb="a changé l'état de son suivi",
+                verb=verbs.Project.USER_STATUS_UPDATED,
                 action_object=new_one,
                 target=new_one.project,
             )
@@ -491,6 +517,7 @@ def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs)
 ################################################################
 # File Upload
 ################################################################
+
 @receiver(document_uploaded)
 def project_document_uploaded(sender, instance, **kwargs):
     project = instance.project
@@ -500,7 +527,7 @@ def project_document_uploaded(sender, instance, **kwargs):
     # Add a trace
     action.send(
         instance.uploaded_by,
-        verb="a ajouté un lien ou un document",
+        verb=verbs.Document.ADDED,
         action_object=instance,
         target=project,
     )
@@ -513,7 +540,7 @@ def project_document_uploaded(sender, instance, **kwargs):
     notify.send(
         sender=instance.uploaded_by,
         recipient=recipients,
-        verb="a ajouté un lien ou un document",
+        verb=verbs.Document.ADDED,
         action_object=instance,
         target=instance.project,
     )
@@ -522,6 +549,7 @@ def project_document_uploaded(sender, instance, **kwargs):
 ################################################################
 # Project Survey events
 ################################################################
+
 @receiver(
     survey_signals.survey_session_updated,
     dispatch_uid="survey_answer_created_or_updated",
@@ -533,13 +561,13 @@ def log_survey_session_updated(sender, session, request, **kwargs):
     # If we already sent this notification less a day ago, skip it
     one_day_ago = timezone.now() - datetime.timedelta(days=1)
     if session.action_object_actions.filter(
-        verb="a mis à jour le questionnaire", timestamp__gte=one_day_ago
+        verb=verbs.Survey.UPDATED, timestamp__gte=one_day_ago
     ).count():
         return
 
     action.send(
         user,
-        verb="a mis à jour le questionnaire",
+        verb=verbs.Survey.UPDATED,
         action_object=session,
         target=session.project,
     )
@@ -548,7 +576,7 @@ def log_survey_session_updated(sender, session, request, **kwargs):
     notify.send(
         sender=user,
         recipient=recipients,
-        verb="a mis à jour le questionnaire",
+        verb=verbs.Survey.UPDATED,
         action_object=session,
         target=project,
     )

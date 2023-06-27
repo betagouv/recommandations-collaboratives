@@ -42,7 +42,7 @@ def test_active_project_processor(request, client):
             notify.send(
                 sender=user,
                 recipient=user,
-                verb="verb",
+                verb="a fake verb",
                 action_object=obj,
                 target=project,
             )

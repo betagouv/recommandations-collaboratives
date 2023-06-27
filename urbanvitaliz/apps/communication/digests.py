@@ -20,6 +20,8 @@ from urbanvitaliz import utils
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 
+from urbanvitaliz import verbs
+
 from .api import send_email
 
 ########################################################################
@@ -136,7 +138,7 @@ def send_digests_for_new_recommendations_by_user(user, dry_run):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
-        .filter(target_content_type=project_ct, verb="a recommandé l'action")
+        .filter(target_content_type=project_ct, verb=verbs.Recommendation.CREATED)
         .order_by("target_object_id")
     )
 
@@ -265,7 +267,7 @@ def send_digests_for_new_sites_by_user(user, dry_run=False):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
-        .filter(target_content_type=project_ct, verb="a déposé le projet")
+        .filter(target_content_type=project_ct, verb=verbs.Project.AVAILABLE)
         .order_by("target_object_id")
     )
 
@@ -343,7 +345,7 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
     queryset = (
         user.notifications(manager="on_site")
         .filter(target_content_type=project_ct)
-        .exclude(target_content_type=project_ct, verb="a recommandé l'action")
+        .exclude(target_content_type=project_ct, verb=verbs.Recommendation.CREATED)
         .unsent()
     )
 
@@ -361,7 +363,7 @@ def send_digest_for_switchtender_by_user(user, dry_run=False):
     queryset = (
         user.notifications(manager="on_site")
         .filter(target_content_type=project_ct)
-        .exclude(verb="a recommandé l'action")
+        .exclude(verb=verbs.Recommendation.CREATED)
         .unsent()
     )
 
@@ -569,14 +571,15 @@ class NotificationFormatter:
             {
                 "a rédigé un message": self.format_public_note_created,
                 "a rédigé un message dans l'espace conseillers": self.format_private_note_created,
-                "est devenu·e aiguilleur·se sur le projet": self.format_action_became_switchtender,
+                verbs.Project.BECAME_SWITCHTENDER: self.format_action_became_switchtender,
                 # added for transition from switchtender (aiguilleur) to advisor (conseiller)
-                "est devenu·e conseiller·e sur le projet": self.format_action_became_switchtender,
-                "a déposé le projet": self.format_new_project_available,
-                "a soumis pour modération le projet": self.format_project_submitted,
-                "a commenté l'action": self.format_action_commented,
-                "a recommandé l'action": self.format_action_recommended,
-                "a ajouté un lien ou un document": self.format_document_uploaded,
+                verbs.Project.BECAME_ADVISOR: self.format_action_became_switchtender,
+                verbs.Project.BECAME_OBSERVER: self.format_action_became_switchtender,
+                verbs.Project.AVAILABLE: self.format_new_project_available,
+                verbs.Project.SUBMITTED_OLD: self.format_project_submitted,
+                verbs.Recommendation.COMMENTED: self.format_action_commented,
+                verbs.Recommendation.CREATED: self.format_action_recommended,
+                verbs.Document.ADDED: self.format_document_uploaded,
             },
             notification,
         )

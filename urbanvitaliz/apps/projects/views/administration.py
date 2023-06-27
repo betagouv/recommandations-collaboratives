@@ -28,6 +28,7 @@ from urbanvitaliz.apps.invites.api import (
 )
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.utils import has_perm_or_403, is_staff_for_site_or_403
+from urbanvitaliz import verbs
 
 from .. import forms, models
 from ..utils import (
@@ -128,7 +129,7 @@ def access_invite(request, role, project):
         if invite:
             action.send(
                 invite.inviter,
-                verb="a invité un·e collaborateur·rice à rejoindre le projet",
+                verb=verbs.Project.INVITATION,
                 action_object=invite,
                 target=invite.project,
             )

@@ -6,6 +6,7 @@ tests for digesting emails
 authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2022-02-03 16:14:54 CET
 """
+
 import test  # noqa
 
 import pytest
@@ -316,7 +317,12 @@ def test_notification_formatter_with_bogus_user():
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     note = Recipe(projects_models.Note).make()
 
-    notification = Notification(user, verb="a rédigé un message", action_object=note)
+    notification = Notification(
+        user, verb=verbs.Conversation.PUBLIC_MESSAGE, action_object=note
+    )
 
     fmt_reco = formatter.format(notification)
     assert "compte indisponible" in str(fmt_reco)
+
+
+# eof

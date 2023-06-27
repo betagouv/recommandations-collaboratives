@@ -15,10 +15,11 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from notifications.signals import notify
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains
 from rest_framework.test import APIClient
 
-from urbanvitaliz.utils import get_group_for_site, login
+from urbanvitaliz.utils import login
+from urbanvitaliz import verbs
 
 from .. import models, utils
 
@@ -110,7 +111,7 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         public=False,  # only appear on crm stream
     )
 
-    unwanted_project = baker.make(
+    baker.make(  # unwanted project
         models.Project,
         sites=[site],
         status="READY",
@@ -147,8 +148,8 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     assert set(data.keys()) == set(expected)
 
     assert data["name"] == project.name
-    assert data["is_switchtender"] == True
-    assert data["is_observer"] == False
+    assert data["is_switchtender"] is True
+    assert data["is_observer"] is False
     assert data["notifications"] == {
         "count": 1,
         "has_collaborator_activity": True,
@@ -265,8 +266,8 @@ def check_project_content(project, data):
     assert set(data.keys()) == set(expected)
 
     assert data["name"] == project.name
-    assert data["is_switchtender"] == True
-    assert data["is_observer"] == False
+    assert data["is_switchtender"] is True
+    assert data["is_observer"] is False
     assert data["notifications"] == {
         "count": 1,
         "has_collaborator_activity": True,
@@ -295,8 +296,7 @@ def test_anonymous_cannot_use_project_patch_api(request, client):
 
 
 @pytest.mark.django_db
-def test_bad_project_is_reported_by_project_patch_api(request, client):
-    site = get_current_site(request)
+def test_bad_project_is_reported_by_project_patch_api(client):
     user = baker.make(auth_models.User, email="me@example.com")
 
     client = APIClient()
@@ -367,7 +367,8 @@ def test_user_cannot_change_some_one_else_project_status(request):
     # project and user statuses
     project = baker.make(models.Project, sites=[site])
     baker.make(models.UserProjectStatus, user=user, site=site, project=project)
-    other = baker.make(models.UserProjectStatus, site=site, project=project)
+    baker.make(models.UserProjectStatus, site=site, project=project)
+    # FIXME il manque un bout ici ?!?
 
 
 @pytest.mark.django_db
@@ -453,8 +454,8 @@ def test_user_project_status_contains_only_my_projects(request):
         "updated_on",
     ]
     assert set(first["project"].keys()) == set(expected)
-    assert first["project"]["is_switchtender"] == True
-    assert first["project"]["is_observer"] == False
+    assert first["project"]["is_switchtender"] is True
+    assert first["project"]["is_observer"] is False
     assert first["project"]["notifications"] == {
         "count": 1,
         "has_collaborator_activity": True,
@@ -557,7 +558,6 @@ def test_project_status_detail_needs_authentication(request):
 @pytest.mark.django_db
 def test_project_status_detail_signals_unknown_object(request):
     user = baker.make(auth_models.User)
-    site = get_current_site(request)
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -996,7 +996,7 @@ def test_project_task_followup_create_is_processed_for_auth_user(request):
     assert followups.count() == 1
 
     followup = followups.first()
-    assert followup.status == None  # FIXME should we have a default status ?
+    assert followup.status is None  # FIXME should we have a default status ?
     assert followup.comment == data["comment"]
 
     # returned value
@@ -1047,7 +1047,7 @@ def test_project_task_followup_update_is_processed_for_auth_user(request):
 
     # followup updated
     followup.refresh_from_db()
-    assert followup.status == None  # FIXME should we have a default status ?
+    assert followup.status is None  # FIXME should we have a default status ?
     assert followup.comment == data["comment"]
 
     # returned value
@@ -1087,7 +1087,7 @@ def test_project_task_notifications_list_returns_notifications_of_advisor(reques
     notify.send(
         sender=baker.make(auth_models.User),
         recipient=user,
-        verb="a recommandé l'action",
+        verb=verbs.Recommendation.CREATED,
         action_object=task,
         target=project,
         private=False,
@@ -1130,7 +1130,7 @@ def test_project_task_notifications_mark_read_updates_notifications_of_advisor(r
     notify.send(
         sender=baker.make(auth_models.User),
         recipient=user,
-        verb="a recommandé l'action",
+        verb=verbs.Recommendation.CREATED,
         action_object=task,
         target=project,
         private=False,

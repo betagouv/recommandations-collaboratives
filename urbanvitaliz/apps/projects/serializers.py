@@ -12,6 +12,7 @@ from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 from .models import Document, Project, Task, TaskFollowup, UserProjectStatus, Note
 from .utils import create_reminder, get_collaborators_for_project
 from urbanvitaliz.utils import get_group_for_site
+from urbanvitaliz import verbs
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
@@ -105,11 +106,15 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             target_content_type=project_ct.pk, target_object_id=obj.pk
         ).unread()
 
-        unread_public_messages = unread_notifications.filter(verb="a envoyé un message")
-        unread_private_messages = unread_notifications.filter(
-            verb="a envoyé un message dans l'espace conseillers"
+        unread_public_messages = unread_notifications.filter(
+            verb=verbs.Conversation.PUBLIC_MESSAGE
         )
-        new_recommendations = unread_notifications.filter(verb="a recommandé l'action")
+        unread_private_messages = unread_notifications.filter(
+            verb=verbs.Conversation.PRIVATE_MESSAGE
+        )
+        new_recommendations = unread_notifications.filter(
+            verb=verbs.Recommendation.CREATED
+        )
 
         return {
             "count": unread_notifications.count(),

@@ -30,6 +30,7 @@ from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import get_group_for_site, login
+from urbanvitaliz import verbs
 
 from .. import models, signals, utils
 
@@ -984,14 +985,14 @@ def test_general_notifications_are_consumed_on_project_overview(request, client)
         notify.send(
             sender=user,
             recipient=user,
-            verb="est devenu·e conseiller·e sur le projet",
+            verb=verbs.Project.BECAME_ADVISOR,
             target=project,
         )
 
         notify.send(
             sender=project,
             recipient=user,
-            verb="a été validé",
+            verb=verbs.Project.VALIDATED,
             target=project,
         )
 
