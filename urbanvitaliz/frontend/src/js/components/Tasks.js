@@ -1,55 +1,13 @@
 import { TASK_STATUSES } from '../config/statuses';
 
-import api, { taskUrl, editTaskUrl, deleteTaskReminderUrl, resourcePreviewUrl, followupUrl, followupsUrl, moveTaskUrl, markTaskNotificationsAsReadUrl, taskNotificationsUrl } from '../utils/api'
 import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
 import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
-import { toArchiveTooltip, reminderTooltip, isOldReminder } from '../utils/tooltip'
-import { renderMarkdown } from '../utils/markdown'
-import { gravatar_url } from '../utils/gravatar'
 
 export default function TasksApp(app, projectId) {
-    //done
-    const issueFollowup = async (task, status, comment = "") => {
-        const body = { comment, status }
-
-        if (body.status === task.status && body.comment === "") return;
-
-        await api.post(followupsUrl(projectId, task.id), body)
-    }
-
-    //done
-    const editComment = async (taskId, followupId, comment) => {
-        await api.patch(followupUrl(projectId, taskId, followupId), { comment })
-    }
-
-    //done
-    const patchTask = async (taskId, patch) => {
-        await api.patch(taskUrl(projectId, taskId), patch)
-    }
-
-    //done
-    const markAllAsRead = async (taskId) => {
-        await api.post(markTaskNotificationsAsReadUrl(projectId, taskId), {})
-    }
-
     const taskApp = {
         //utils function
-        renderMarkdown,
-        formatDate,
         isStatusUpdate,
-        statusText,
-        gravatar_url,
-        toArchiveTooltip,
-        reminderTooltip,
-        editTaskUrl,
-        deleteTaskReminderUrl,
-        issueFollowup,
         isArchivedStatus,
-        resourcePreviewUrl,
-        editComment,
-        patchTask,
-        markAllAsRead,
-        isOldReminder,
         currentlyHoveredElement: null,
         canAdministrate: false,
         canUseTasks: false,
@@ -57,7 +15,6 @@ export default function TasksApp(app, projectId) {
         isSwitchtender: false,
         userEmail: null,
         currentTaskId: null,
-        currentTaskFollowups: null,
         currentTaskNotifications: [],
         pendingComment: "",
         currentlyEditing: null,
@@ -139,174 +96,10 @@ export default function TasksApp(app, projectId) {
                 this.currentTaskId = parseInt(match[1], 10);
             }
         },
-
-        // Previews
-        //done
-        async loadFollowups(taskId) {
-            const { data } = await api.get(followupsUrl(projectId, taskId));
-            this.currentTaskFollowups = data
-        },
-        //done
-        async loadNotifications(taskId) {
-            const { data } = await api.get(taskNotificationsUrl(projectId, taskId));
-            this.currentTaskNotifications = data;
-        },
-        initPreviewModal() {
-
-            const element = document.getElementById("task-preview");
-            this.previewModalHandle = new bootstrap.Modal(element);
-
-            const cleanup = () => {
-                // FIXME : Race condition when bootstrap unloads modal
-                // this.currentTaskId = null;
-                // this.currentTaskFollowups = null;
-                // this.currentTaskNotifications = [];
-
-                //Cleaning status changes behaviour
-                this.$refs.commentTextRef.classList.remove('textarea-highlight');
-                this.$refs.commentTextFormRef.classList.remove('tooltip-highlight');
-                this.$refs.commentTextRef.placeholder = "Votre message";
-
-                this.pendingComment = "";
-                this.currentlyEditing = null;
-                location.hash = '';
-            }
-
-            element.addEventListener("hidePrevented.bs.modal", cleanup);
-            element.addEventListener('hidden.bs.modal', cleanup);
-            if (this.currentTaskId) this.openPreviewModal();
-            window.addEventListener('hashchange', event => {
-                if (location.hash === '') {
-                    this.previewModalHandle.hide();
-                }
-            });
-        },
-        async onPreviewClick(id) {
-            this.currentTaskId = id;
-            this.openPreviewModal();
-        },
-        async openPreviewModal() {
-            location.hash = `#action-${this.currentTaskId}`;
-            this.previewModalHandle.show();
-
-            this.loadFollowups(this.currentTaskId);
-            this.loadNotifications(this.currentTaskId);
-
-            if (isMember && !isHijacked) await patchTask(this.currentTaskId, { visited: true });
-
-            await markAllAsRead(this.currentTaskId);
-
-            this.followupScrollToLastMessage();
-            
-            await this.getData();
-        },
         async onSetTaskPublic(id, value) {
             await patchTask(id, { public: value });
             await this.getData();
         },
-        hasNotification(followupId) {
-            return this.currentTaskNotifications.filter(n => n.action_object.who && n.action_object.id === followupId).length > 0;
-        },
-
-        // Comments
-        onEditComment(followup) {
-            this.pendingComment = followup.comment;
-            this.currentlyEditing = ["followup", followup.id];
-            this.$refs.commentTextRef.focus();
-        },
-        onEditContent() {
-            this.pendingComment = this.currentTask.content;
-            this.currentlyEditing = ["content", this.currentTask.id];
-            this.$refs.commentTextRef.focus();
-        },
-        async onSubmitComment() {
-            if (!this.currentlyEditing) {
-                await issueFollowup(this.currentTask, undefined, this.pendingComment);
-                await this.getData()
-                await this.loadFollowups(this.currentTask.id);
-            } else {
-                const [type, id] = this.currentlyEditing;
-                if (type === "followup") {
-                    await editComment(this.currentTask.id, id, this.pendingComment);
-                    await this.loadFollowups(this.currentTask.id);
-                } else if (type === "content") {
-                    await patchTask(this.currentTask.id, { content: this.pendingComment });
-                    await this.getData();
-                }
-            }
-
-            this.pendingComment = "";
-            this.currentlyEditing = null;
-            this.followupScrollToLastMessage();
-        },
-
-        // Reminiders
-        initReminderModal() {
-            const element = document.getElementById("reminder-modal");
-            this.reminderModalHandle = new bootstrap.Modal(element);
-            const cleanup = () => {
-                this.currentReminderTaskId = null;
-                this.pendingReminderDate = formatReminderDate(daysFromNow(30 * 6));
-            };
-            element.addEventListener("hidePrevented.bs.modal", cleanup);
-            element.addEventListener("hidden.bs.modal", cleanup);
-        },
-        onReminderClick(id) {
-            const task = this.findById(id)
-            if (task.reminders.length > 0)
-                this.pendingReminderDate = task.reminders[0].deadline
-            this.currentReminderTaskId = task.id;
-            this.openReminderModal();
-        },
-        openReminderModal() {
-            this.reminderModalHandle.show();
-        },
-        onSubmitReminder() {
-            const form = this.$refs.reminderForm;
-            const dateInput = form.querySelector('#reminder-date');
-            const daysInput = form.querySelector('#reminder-days');
-            daysInput.value = Math.ceil((new Date(dateInput.value) - new Date()) / 86400000);
-            form.submit();
-        },
-        updatePendingReminderDate(days) {
-            this.pendingReminderDate = formatReminderDate(daysFromNow(days));
-        },
-
-        // Feedback
-        initFeedbackModal() {
-            const element = document.getElementById("feedback-modal");
-            this.feedbackModal = new bootstrap.Modal(element);
-            const cleanup = () => {
-                this.feedbackStatus = 3;
-                this.feedbackComment = '';
-                this.currentFeedbackTask = null;
-            }
-            element.addEventListener("hidePrevented.bs.modal", cleanup);
-            element.addEventListener("hidden.bs.modal", cleanup);
-        },
-        openFeedbackModal(task) {
-            this.currentFeedbackTask = task;
-            this.feedbackModal.show();
-        },
-        async onSubmitFeedback() {
-            await issueFollowup(this.currentFeedbackTask, this.feedbackStatus, this.feedbackComment)
-            await this.getData();
-            this.feedbackStatus = 3;
-            this.feedbackComment = '';
-            this.currentFeedbackTask = null;
-            this.feedbackModal.hide();
-        },
-
-        truncate(input, size = 30) {
-            return input.length > size ? `${input.substring(0, size)}...` : input;
-        },
-        formatDateDisplay(date) {
-            return new Date(date).toLocaleDateString('fr-FR');
-        },
-        followupScrollToLastMessage() {
-            const scrollContainer = document.getElementById("followups-scroll-container");
-            if (scrollContainer) scrollContainer.scrollTop = scrollContainer.scrollHeight;
-        }
     };
 
     return Object.assign(taskApp, app);

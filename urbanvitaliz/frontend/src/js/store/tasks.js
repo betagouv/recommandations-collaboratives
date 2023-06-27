@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs'
-import api, { tasksUrl, moveTaskUrl } from '../utils/api'
+import api, { tasksUrl,taskUrl, moveTaskUrl } from '../utils/api'
 import { generateUUID } from '../utils/uuid'
 
 Alpine.store('tasksView', {
@@ -48,13 +48,22 @@ Alpine.store('tasksData', {
         await this.getTasks();
     },
     async patchTask(taskId, patch) {
-        await api.patch(taskUrl(projectId, taskId), patch)
+        await api.patch(taskUrl(this.projectId, taskId), patch)
     },
-    async editComment(taskId, followupId, comment) {
-        await api.patch(followupUrl(projectId, taskId, followupId), { comment })
+})
+
+Alpine.store('task', {
+    projectId: null,
+    init() {
+        console.log('current task store init ');
     },
-    async markAllAsRead(taskId) {
-        await api.post(markTaskNotificationsAsReadUrl(projectId, taskId), {})
+    async loadFollowups(taskId) {
+        const { data } = await api.get(followupsUrl(projectId, taskId));
+        return data
+    },
+    async loadNotifications(taskId) {
+        const { data } = await api.get(taskNotificationsUrl(projectId, taskId));
+        return data;
     },
     async issueFollowup(task, status, comment = "") {
         const body = { comment, status }
@@ -63,19 +72,11 @@ Alpine.store('tasksData', {
 
         await api.post(followupsUrl(projectId, task.id), body)
     },
-    async loadFollowups(taskId) {
-        const { data } = await api.get(followupsUrl(projectId, taskId));
-        this.currentTaskFollowups = data
+    async editComment(taskId, followupId, comment) {
+        await api.patch(followupUrl(projectId, taskId, followupId), { comment })
     },
-    async loadNotifications(taskId) {
-        const { data } = await api.get(taskNotificationsUrl(projectId, taskId));
-        this.currentTaskNotifications = data;
-    },
-})
-
-Alpine.store('currentTask', {
-    init() {
-        console.log('current task store init ');
+    async markAllAsRead(taskId) {
+        await api.post(markTaskNotificationsAsReadUrl(projectId, taskId), {})
     },
 })
 
