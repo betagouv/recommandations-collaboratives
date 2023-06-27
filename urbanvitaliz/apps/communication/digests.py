@@ -497,10 +497,20 @@ class FormattedNotification:
 
 
 class NotificationFormatter:
-    def format(self, notification):
-        return self._format_for_actor(notification)
+    def __init__(self):
+        self.dispatch_table = {
+            verbs.Conversation.PUBLIC_MESSAGE: self.format_public_note_created,
+            verbs.Conversation.PRIVATE_MESSAGE: self.format_private_note_created,
+            verbs.Project.BECAME_ADVISOR: self.format_action_became_advisor,
+            verbs.Project.BECAME_OBSERVER: self.format_action_became_observer,
+            verbs.Project.AVAILABLE: self.format_new_project_available,
+            verbs.Project.SUBMITTED_BY: self.format_project_submitted,
+            verbs.Recommendation.COMMENTED: self.format_action_commented,
+            verbs.Recommendation.CREATED: self.format_action_recommended,
+            verbs.Document.ADDED: self.format_document_uploaded,
+        }
 
-    def _format_or_default(self, dispatch_table, notification):
+    def format(self, notification):
         """
         Try formatting the notification by the dispatch table or
         use the default reprensentation
@@ -508,10 +518,11 @@ class NotificationFormatter:
 
         def _default(notification):
             summary = "{n.actor} {n.verb} {n.action_object}".format(n=notification)
-            return FormattedNotification(summary)
+            return FormattedNotification(summary=summary)
 
-        fmt = dispatch_table.get(notification.verb, _default)
+        fmt = self.dispatch_table.get(notification.verb, _default)
         return fmt(notification)
+
 
     # ------ Formatter Utils -----#
     def _represent_user(self, user):
@@ -558,32 +569,6 @@ class NotificationFormatter:
         return followup.comment[:50]
 
     # -------- Routers -----------#
-    def _format_for_actor(self, notification):
-        """Format for User"""
-
-        # if not notification.actor:
-        #     notification.actor = auth_models.User(
-        #         username="-- compte supprimé --", first_name="-- compte supprimé --"
-        #     )
-
-        # verbs.Project.BECAME_SWITCHTENDER: self.format_action_became_switchtender,
-        # added for transition from switchtender (aiguilleur) to advisor (conseiller)
-
-        return self._format_or_default(
-            {
-                verbs.Conversation.PUBLIC_MESSAGE: self.format_public_note_created,
-                verbs.Conversation.PRIVATE_MESSAGE: self.format_private_note_created,
-                verbs.Project.BECAME_ADVISOR: self.format_action_became_advisor,
-                verbs.Project.BECAME_OBSERVER: self.format_action_became_observer,
-                verbs.Project.AVAILABLE: self.format_new_project_available,
-                verbs.Project.SUBMITTED_BY: self.format_project_submitted,
-                verbs.Recommendation.COMMENTED: self.format_action_commented,
-                verbs.Recommendation.CREATED: self.format_action_recommended,
-                verbs.Document.ADDED: self.format_document_uploaded,
-            },
-            notification,
-        )
-
     # ------ Real Formatters -----#
     def format_public_note_created(self, notification):
         """A public note was written by a user"""
