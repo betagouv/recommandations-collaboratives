@@ -1,5 +1,5 @@
 {% load i18n %}
- 
+{% load common_extra %}
 
 <div class="d-block font-marianne">
     <div class="d-flex align-items-start mb-2">
@@ -17,13 +17,17 @@
                 <i>{{ action.actor.profile.organization_position|default:'' }}</i>
                 <span class="d-inline-block">
                 <span class="d-inline">
-                    {% if action.verb == "a envoyé un message dans l'espace conseillers" %}
+									{% comment %} FIXME	ne pourrait on pas utiliser un template filter ici ?  {% endcomment %}
+                    {% if action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
                         a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message dans l'espace conseillers</a> sur
-                    {% elif action.verb == "a envoyé un message" %}
-                        a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message dans la conversation</a> sur 
-                    {% elif action.verb == "a recommandé l'action" %}
+                    {% elif action.verb == verbs.Conversation.PUBLIC_MESSAGE %}
+                        a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message dans l'espace conversation</a> sur
+									{% comment %} FIXME	Ajouter les cas manquant du doc google wording {% endcomment %}
+                    {% elif action.verb == verbs.Recommendation.CREATED %}
                         a recommandé l'action <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">"{{ action.action_object.intent }}"</a> sur
-                    {% elif action.verb == "a invité un·e collaborateur·rice à rejoindre le projet" %}
+                    {% elif action.verb == verbs.Survey.UPDATED %}
+                        a mis à jour <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}"> l'état des lieux </a> sur
+                    {% elif action.verb == verbs.Project.INVITAION %}
                         {% if action.action_object.role %}
                             <span>a invité <strong class="d-inline-block fw-bold text-dark">{{action.action_object.email}}</strong> en tant que
                                 <strong class="text-dark">
@@ -41,7 +45,7 @@
                         {% endif %}
                     {% endif %}
                 </span>
-                
+
 
                 {% if action.action_object and action.target and action.action_object != action.target %}
                     {% if action.action_object and action.target %}
