@@ -43,6 +43,7 @@ class Recommendation:
 
 class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le projet"
+
     JOINED = "a rejoint le projet"
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
