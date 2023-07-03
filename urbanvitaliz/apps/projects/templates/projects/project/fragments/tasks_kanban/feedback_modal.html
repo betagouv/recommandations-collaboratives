@@ -1,0 +1,54 @@
+{% load static %}
+
+<div x-data="TaskModal()" class="modal fade" id="feedback-modal" tabindex="-1" aria-labelledby="feedback-modal-label" aria-hidden="true"
+  @open-feedback-modal.window="openFeedbackModal($event)">
+  <div class="modal-dialog">
+    <template x-if="currentFeedbackTask">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reminder-modal-label">
+            <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
+              <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightbulb" />
+            </svg>
+            <span class="align-middle">
+              Archiver une recommandation
+            </span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label fw-bolder" for="invite-role">Raison de l'archivage</label>
+
+            <div class="position-relative bg-white border rounded p-3 mb-2">
+              <input x-model="feedbackStatus" type="radio" id="status-done" value="3" style="transform: scale(1.2);">
+              <label for="status-done" class="position-absolute w-100 h-100 top-0 left-0"><span
+                  class="visually-hidden">C'est fait / Ça a été utile</span></label>
+              <span class="ms-1">C'est fait / Ça a été utile</span>
+            </div>
+
+            <div class="position-relative bg-white border rounded p-3 mb-2">
+              <input x-model="feedbackStatus" type="radio" id="status-non-applicable" value="4"
+                style="transform: scale(1.2);">
+              <label for="status-non-applicable" class="position-absolute w-100 h-100 top-0 left-0"><span
+                  class="visually-hidden">Ça n'était pas applicable</span></label>
+              <span class="ms-1">Ça n'était pas applicable</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bolder" for="invite-message">Précisez pourquoi - pour garder une trace :</label>
+            <textarea x-model="feedbackComment" rows="8"
+              class="form-control {% if form.message.errors %}is-invalid{% endif %}"
+              placeholder="Précisions sur les recommandation faites, les points bloquants, etc."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" type="submit" class="btn btn-primary" @click="onSubmitFeedback">Archiver</button>
+        </div>
+      </div>
+    </template>
+  </div>
+</div>

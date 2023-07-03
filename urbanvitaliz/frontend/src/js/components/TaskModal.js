@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs'
+import { TASK_STATUSES } from '../config/statuses';
 
 import { renderMarkdown } from '../utils/markdown'
 import { formatDate } from '../utils/date'
@@ -20,10 +21,15 @@ export default function TaskModal() {
         statusText,
         deleteTaskUrl,
         currentDeletingTask: {},
+        currentFeedbackTask: {},
+        feedbackComment:'',
+        feedbackStatus: TASK_STATUSES.DONE,
         init() {
             console.log('task modal initialized');
             // console.log('current task clicked :', this.$store.taskModal.currentTask);
             this.initPreviewModal();
+            this.initDeleteTaskConfirmationModal();
+            this.initFeedbackModal();
         },
         initPreviewModal() {
 
@@ -122,12 +128,42 @@ export default function TaskModal() {
             element.addEventListener("hidden.bs.modal", cleanup);
         },
         openDeleteModal(e) {
+            console.log('task open delete event ? :', e)
             console.log('open delete modal')
             const task = e.detail
             this.$store.taskModal.onDeleteClick(task)
             this.currentDeletingTask = task;
             console.log(this.currentDeletingTask);
-        }
+        },
+        //feedback
+        initFeedbackModal() {
+            console.log('init feedback modal ?')
+            const element = document.getElementById("feedback-modal");
+            this.$store.taskModal.feedbackModalHandle = new bootstrap.Modal(element);
+            const cleanup = () => {
+                this.feedbackStatus = 3;
+                this.feedbackComment = '';
+                this.currentFeedbackTask = null;
+            }
+            element.addEventListener("hidePrevented.bs.modal", cleanup);
+            element.addEventListener("hidden.bs.modal", cleanup);
+        },
+        openFeedbackModal(e) {
+            console.log('task open feedback event ? :', e)
+            const task = e.detail
+            console.log('task open feedback modal ? :', task)
+            this.currentFeedbackTask = task;
+            this.$store.taskModal.onFeedbackClick(task)
+        },
+        async onSubmitFeedback() {
+            await this.$store.task.issueFollowup(this.currentFeedbackTask, this.feedbackStatus, this.feedbackComment)
+            // await this.getData();
+            this.feedbackStatus = 3;
+            this.feedbackComment = '';
+            this.currentFeedbackTask = null;
+            this.$store.taskModal.feedbackModalHandle.hide();
+            await this.$store.tasksData.getTasks()
+        },
     }
 }
 

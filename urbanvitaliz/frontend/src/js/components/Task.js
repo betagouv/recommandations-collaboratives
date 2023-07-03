@@ -23,7 +23,6 @@ export default function Task(currentTask) {
         isOldReminder,
         reminderTooltip,
         deleteTaskReminderUrl,
-        isArchivedStatus,
         init() {
             this.currentTask = currentTask
         },
@@ -32,38 +31,9 @@ export default function Task(currentTask) {
             console.log('dispatch somthg', this.currentTask);
             console.log(this.$dispatch('open-preview-modal', this.currentTask))
         },
-
-        handleOpenFeedbackModal() {
-            console.log('dispatch somthg', this.currentTask);
-            console.log(this.$dispatch('open-preview-modal', this.currentTask))
-        },
         handleOpenDeleteModal() {
             console.log('dispatch somthg', this.currentTask);
             console.log(this.$dispatch('open-delete-modal', this.currentTask))
-        },
-        // Feedback
-        initFeedbackModal() {
-            const element = document.getElementById("feedback-modal");
-            this.feedbackModal = new bootstrap.Modal(element);
-            const cleanup = () => {
-                this.feedbackStatus = 3;
-                this.feedbackComment = '';
-                this.currentFeedbackTask = null;
-            }
-            element.addEventListener("hidePrevented.bs.modal", cleanup);
-            element.addEventListener("hidden.bs.modal", cleanup);
-        },
-        openFeedbackModal(task) {
-            this.currentFeedbackTask = task;
-            this.feedbackModal.show();
-        },
-        async onSubmitFeedback() {
-            await issueFollowup(this.currentFeedbackTask, this.feedbackStatus, this.feedbackComment)
-            await this.getData();
-            this.feedbackStatus = 3;
-            this.feedbackComment = '';
-            this.currentFeedbackTask = null;
-            this.feedbackModal.hide();
         },
          // Comments
          onEditComment(followup) {

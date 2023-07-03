@@ -3,27 +3,20 @@ import { TASK_STATUSES } from '../config/statuses';
 import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
 import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
 
+
 export default function TasksApp(app, projectId) {
     const taskApp = {
         //utils function
-        isStatusUpdate,
-        isArchivedStatus,
         currentlyHoveredElement: null,
+
         canAdministrate: false,
         canUseTasks: false,
         canManageTasks: false,
         isSwitchtender: false,
         userEmail: null,
-        currentTaskId: null,
-        currentTaskNotifications: [],
-        pendingComment: "",
-        currentlyEditing: null,
+        isArchivedStatus,
         currentReminderTaskId: null,
         pendingReminderDate: formatReminderDate(daysFromNow(30 * 6)),
-        feedbackStatus: TASK_STATUSES.DONE,
-        feedbackComment: '',
-        feedbackModal: null,
-        currentFeedbackTask: null,
         data: [],
         boards: [],
         STATUSES: TASK_STATUSES,
@@ -34,9 +27,6 @@ export default function TasksApp(app, projectId) {
         },
         get isBusy() {
             return this.$store.app.isLoading
-        },
-        async getData() {
-            return this.$store.tasksData.tasks = await this.$store.tasksData.getTasks(projectId)
         },
         sortFn(a, b) {
             return a.order - b.order;
@@ -99,6 +89,10 @@ export default function TasksApp(app, projectId) {
         async onSetTaskPublic(id, value) {
             await patchTask(id, { public: value });
             await this.getData();
+        },
+        handleOpenFeedbackModal(task) {
+            console.log('dispatch somthg', task);
+            console.log(this.$dispatch('open-feedback-modal', task))
         },
     };
 

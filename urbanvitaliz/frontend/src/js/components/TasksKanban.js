@@ -1,6 +1,5 @@
 import Alpine from "alpinejs"
 import TaskApp from './Tasks'
-import { deleteTaskUrl } from "../utils/api";
 import { TASK_STATUSES } from '../config/statuses';
 
 Alpine.data("KanbanTasks", boardTasksApp)
@@ -44,6 +43,8 @@ export default function boardTasksApp(projectId) {
         async onDrop(event, status, targetUuid) {
             event.preventDefault();
 
+            console.log('board status ? ', status);
+
             this.currentlyHoveredElement.classList.remove('drag-target');
             this.currentlyHoveredElement = null;
 
@@ -56,29 +57,15 @@ export default function boardTasksApp(projectId) {
                 if (this.isArchivedStatus(data.status) && nextData) {
                     await this.$store.tasksData.moveTask(data.id, nextData.id);
                 } else {
-                    this.openFeedbackModal(data);
+                    this.handleOpenFeedbackModal(data);
                 }
             } else {
-                await this.issueFollowup(data, status);
+                await this.$store.task.issueFollowup(data, status);
                 if (nextData) await this.$store.tasksData.moveTask(data.id, nextData.id);
             }
 
-            await this.getData();
-        },
-        deleteTaskUrl,
-        currentDeletingTask: {},
-        initDeleteTaskConfirmationModal() {
-            const element = document.getElementById("delete-task-confirmation-modal");
-            this.deleteTaskConfirmationModal = new bootstrap.Modal(element);
-            const cleanup = () => { };
-            element.addEventListener("hidePrevented.bs.modal", cleanup);
-            element.addEventListener("hidden.bs.modal", cleanup);
-        },
-        openDeleteTaskConfirmationModal(task) {
-            this.deleteTaskConfirmationModal.show();
-            this.currentDeletingTask = task;
-            console.log(this.currentDeletingTask);
-        }
+            await this.$store.tasksData.getTasks()
+        }    
     }
 
     return TaskApp(app, projectId)

@@ -101,6 +101,11 @@ Alpine.store('taskModal', {
         this.currentTask = task
         console.log('delete task ', this.currentTask);
         this.deleteModalHandle.show();
+    },
+    onFeedbackClick(task) {
+        this.currentTask = task
+        console.log('delete task ', this.currentTask);
+        this.feedbackModalHandle.show();
     }
 })
 
