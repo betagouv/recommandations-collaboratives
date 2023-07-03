@@ -357,7 +357,10 @@ class Project(models.Model):
         )
 
     def __str__(self):  # pragma: nocover
+        if not self.commune:
+            return f"{self.name} - {self.location}"
         return f"{self.commune.name} - {self.name}"
+
 
 
 class ProjectMember(models.Model):
