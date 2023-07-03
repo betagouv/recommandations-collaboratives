@@ -1,70 +1,55 @@
 {% load i18n %}
-{% load common_extra %}
-
+{% load static %}
+{% load common_tags %}
 <div class="d-block font-marianne">
-    <div class="d-flex align-items-start mb-2">
-        <img class="align-middle rounded-circle d-inline-block  p-1 {% if not transparent_background %} bg-white {% endif %}"
-             width="35px"
-             :src='gravatar_url("{{action.actor}}", 25, "{{action.actor.first_name}}" + " " + "{{action.actor.last_name}}")'
-             data-bs-toggle="tooltip"
-             data-bs-placement="bottom"
-             style="z-index: 1000"
-             tabindex="0">
-        <div class="mt-1 ms-1 font-very-small">
-            <span class="text-grey-dark fw-light">
-                <strong class="text-dark fw-bold">{{ action.actor.first_name|default:action.actor.email }}
-                {{ action.actor.last_name|default:"" }}</strong>
-                <i>{{ action.actor.profile.organization_position|default:'' }}</i>
-                <span class="d-inline-block">
-                <span class="d-inline">
-									{% comment %} FIXME	ne pourrait on pas utiliser un template filter ici ?  {% endcomment %}
-                    {% if action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
-                        a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message dans l'espace conseillers</a> sur
-                    {% elif action.verb == verbs.Conversation.PUBLIC_MESSAGE %}
-                        a envoyé un nouveau <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">message dans l'espace conversation</a> sur
-									{% comment %} FIXME	Ajouter les cas manquant du doc google wording {% endcomment %}
-                    {% elif action.verb == verbs.Recommendation.CREATED %}
-                        a recommandé l'action <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">"{{ action.action_object.intent }}"</a> sur
-                    {% elif action.verb == verbs.Survey.UPDATED %}
-                        a mis à jour <a class="d-inline text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}"> l'état des lieux </a> sur
-                    {% elif action.verb == verbs.Project.INVITAION %}
-                        {% if action.action_object.role %}
-                            <span>a invité <strong class="d-inline-block fw-bold text-dark">{{action.action_object.email}}</strong> en tant que
-                                <strong class="text-dark">
-                                    {% if action.action_object.role == "SWITCHTENDER" %}conseiller·e{% else %}collectivité{% endif %}</strong>
-                            </span>
-                        {% endif %}
+  <div class="d-flex align-items-start mb-2">
+    <img class="align-middle rounded-circle d-inline-block  p-1 {% if not transparent_background %}bg-white{% endif %}"
+         width="35px"
+         :src='gravatar_url("{{ action.actor }}", 25, "{{ action.actor.first_name }}" + " " + "{{ action.actor.last_name }}")'
+         data-bs-toggle="tooltip"
+         data-bs-placement="bottom"
+         style="z-index: 1000"
+         tabindex="0">
+    <div class="mt-1 ms-1 font-very-small">
+      <span class="text-grey-dark fw-light">
+        <strong class="text-dark fw-bold">{{ action.actor.first_name|default:action.actor.email }}
+        {{ action.actor.last_name|default:"" }}</strong>
+        <span class="text-dark fw-normal font-italic font-very-small">{{ action.actor.profile.organization_position|default:'' }}</span>
+        <span class="d-inline-block">
+          <span class="d-inline">
+            {% if action.verb == verbs.Project.INVITATION %}
+              {% if action.action_object.role %}
+                <span>a invité
+                  <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
+                  <strong class="text-dark">
+                    {% if action.action_object.role == "SWITCHTENDER" %}
+                      conseiller·e
                     {% else %}
-                        {{action.verb}}
-                        {% if action.action_object %}
-                            {% if action.action_object.get_absolute_url %}
-                                <a class="text-decoration-none hover-underline text-dark fw-bold" href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
-                            {% else %}
-                                {{ action.action_object }}
-                            {% endif %}
-                        {% endif %}
+                      collectivité
                     {% endif %}
+                  </strong>
                 </span>
-
-
-                {% if action.action_object and action.target and action.action_object != action.target %}
-                    {% if action.action_object and action.target %}
-                        <span class="d-inline"> le projet</span>
+              {% endif %}
+            {% else %}
+              <a class="d-inline text-decoration-none hover-underline text-dark fw-bold"
+                 href="{{ action.action_object.get_absolute_url }}">{{ action.verb }}</a>
+              {% if action.target %}
+                <div class="d-inline-block">
+                    <svg class="bi me-1 flex-shrink-0" width="14" height="14" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill"/>
+                    </svg>
+                    {% if action.target.get_absolute_url %}
+                        <a class="text-decoration-none hover-underline text-dark"
+                            href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                    {% else %}
+                        {{ action.target }}
                     {% endif %}
-                    {% if action.target %}
-                        {% if action.target.get_absolute_url %}
-                            <a class="text-decoration-none hover-underline text-dark fw-bold"  href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-                        {% else %}
-                            {{ action.target }}
-                        {% endif %}
-                    {% endif %}
-                {% endif %}
-                </span>
-            </span>
-        </div>
+                </div>
+              {% endif %}
+            {% endif %}
+          </span>
+        </span>
+      </span>
     </div>
-
-
-
-
+  </div>
 </div>
