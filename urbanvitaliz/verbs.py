@@ -11,7 +11,7 @@ import enum
 
 
 class User:
-    LOGIN = "s'est connecté"
+    LOGIN = "s'est connecté·e"
 
 
 class Document:
@@ -30,13 +30,12 @@ class Recommendation:
     REMINDER_ADDED = "a créé un rappel sur la recommandation"
     COMMENTED = "a commenté la recommandation"
 
-    # SEEN_OLD = "a visité la recommandation"
     SEEN = "a consulté la recommandation"
     NOT_APPLICABLE = "a classé la recommandation comme «non applicable»"
-    NOT_INTERESTED = "n'est pas intéressé·e par la recommandation" # ^
+    NOT_INTERESTED = "n'est pas intéressé·e par la recommandation"  # ^
     ALREADY_DONE = "a déjà fait l'action recommandée"  # FIXME to keep?
     IN_PROGRESS = "a classé la recommandation comme «en cours»"
-    STANDBY =  "a classé la recommandation comme «en attente»"
+    STANDBY = "a classé la recommandation comme «en attente»"
     # STUCK is replaced by STANDBY
     RESUMED = "a redémarré l'action recommandée"  # FIXME to keep ?
     DONE = "a classé la recommandation comme «terminée»"
@@ -45,7 +44,6 @@ class Recommendation:
 class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le projet"
     JOINED = "a rejoint le projet"
-    JOINED_OLD = "a rejoint l'équipe sur le projet"
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
     SUBMITTED_BY = "a soumis pour modération le projet"
@@ -59,9 +57,10 @@ class Project:
     # FIXME to be removed
     BECAME_SWITCHTENDER = "est devenu·e aiguilleur·se sur le projet"
 
-    BECAME_ADVISOR = "est devenu·e conseiller·e sur le projet"
+    BECAME_ADVISOR = "est devenu·e conseiller·ère sur le projet"
     BECAME_OBSERVER = "est devenu·e observateur·rice sur le projet"
     LEFT_ADVISING = "ne suit plus le projet"
+    LEFT_OBSERVING = "ne suit plus le projet"
 
     # Only related to advisor kanban
     USER_STATUS_UPDATED = "a changé l'état de son suivi projet"
@@ -71,17 +70,10 @@ class Survey:
     STARTED = "a démarré l'état des lieux"
     UPDATED = "a mis à jour l'état des lieux"
 
-    STARTED_OLD = "a démarré le questionnaire"
-    UPDATED_OLD = "a mis à jour le questionnaire"
-
-    # le questionnaire -> l'état des lieux
-
 
 class Conversation:
     PUBLIC_MESSAGE = "a envoyé un message dans l'espace conversation"
     PRIVATE_MESSAGE = "a envoyé un message dans l'espace conseillers"
-
-    PRIVATE_MESSAGE_OLD = "a créé une note de suivi"
 
 
 # eof
