@@ -1,0 +1,14 @@
+[MAIN]
+
+load-plugins=pylint_django
+ignore=settings,static,templates,.venv,tests
+
+
+[DESIGN]
+
+min-public-methods=1
+
+
+[MESSAGES CONTROL]
+
+disable=C0114,C0115,C0116,R1735,R0801,W0641,W0511,C0209

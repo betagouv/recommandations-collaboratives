@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load static %}
 {% load common_tags %}
+{% get_verbs as verbs %}
 <div class="d-block font-marianne">
   <div class="d-flex align-items-start mb-2">
     <img class="align-middle rounded-circle d-inline-block  p-1 {% if not transparent_background %}bg-white{% endif %}"

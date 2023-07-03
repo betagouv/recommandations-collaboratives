@@ -8,6 +8,8 @@
 {% load django_vite %}
 {% load guardian_tags %}
 {% load projects_extra %}
+{% load common_tags %}
+{% get_verbs as verbs %}
 
 {% block js %}
 
@@ -187,7 +189,7 @@
             {% activity_stream "model_actions" user_model %}
             <ul class="list-group">
                 {% for action in stream|slice:":200" %}
-                {% if action.verb == "s'est connecté" %}
+                {% if action.verb == verbs.User.LOGIN %}
                 <li class="list-group-item">
                     {{ action.timestamp|naturalday|capfirst }} - <a href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor|capfirst }}</a> {{ action.verb }}
                 </li>
