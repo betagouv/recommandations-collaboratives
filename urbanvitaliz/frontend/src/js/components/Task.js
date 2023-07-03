@@ -4,6 +4,7 @@ import{ editTaskUrl, deleteTaskReminderUrl} from '../utils/api'
 
 import { TASK_STATUSES } from '../config/statuses';
 import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
+import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
 import { toArchiveTooltip, reminderTooltip, isOldReminder } from '../utils/tooltip'
 import { renderMarkdown } from '../utils/markdown'
 import { gravatar_url } from '../utils/gravatar'
@@ -22,43 +23,23 @@ export default function Task(currentTask) {
         isOldReminder,
         reminderTooltip,
         deleteTaskReminderUrl,
+        isArchivedStatus,
         init() {
             this.currentTask = currentTask
         },
-        initReminderModal() {
-            const element = document.getElementById("reminder-modal");
-            this.reminderModalHandle = new bootstrap.Modal(element);
-            const cleanup = () => {
-                this.currentReminderTaskId = null;
-                this.pendingReminderDate = formatReminderDate(daysFromNow(30 * 6));
-            };
-            element.addEventListener("hidePrevented.bs.modal", cleanup);
-            element.addEventListener("hidden.bs.modal", cleanup);
+
+        handleOpenPreviewModal() {
+            console.log('dispatch somthg', this.currentTask);
+            console.log(this.$dispatch('open-preview-modal', this.currentTask))
         },
-        onReminderClick(id) {
-            const task = this.findById(id)
-            if (task.reminders.length > 0)
-                this.pendingReminderDate = task.reminders[0].deadline
-            this.currentReminderTaskId = task.id;
-            this.openReminderModal();
+
+        handleOpenFeedbackModal() {
+            console.log('dispatch somthg', this.currentTask);
+            console.log(this.$dispatch('open-preview-modal', this.currentTask))
         },
-        openReminderModal() {
-            this.reminderModalHandle.show();
-        },
-        onSubmitReminder() {
-            const form = this.$refs.reminderForm;
-            const dateInput = form.querySelector('#reminder-date');
-            const daysInput = form.querySelector('#reminder-days');
-            daysInput.value = Math.ceil((new Date(dateInput.value) - new Date()) / 86400000);
-            form.submit();
-        },
-        updatePendingReminderDate(days) {
-            this.pendingReminderDate = formatReminderDate(daysFromNow(days));
-        },
-        handleOpenPreviewModal(task) {
-            console.log('dispatch somthg', task);
-            console.log(this.$dispatch('open-preview-modal', task))
-            console.log(this.$dispatch('issue-followup', { task }))
+        handleOpenDeleteModal() {
+            console.log('dispatch somthg', this.currentTask);
+            console.log(this.$dispatch('open-delete-modal', this.currentTask))
         },
         // Feedback
         initFeedbackModal() {

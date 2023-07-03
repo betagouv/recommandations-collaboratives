@@ -2,7 +2,7 @@ import Alpine from 'alpinejs'
 
 import { renderMarkdown } from '../utils/markdown'
 import { formatDate } from '../utils/date'
-import { resourcePreviewUrl } from '../utils/api'
+import { resourcePreviewUrl, deleteTaskUrl } from '../utils/api'
 import { gravatar_url } from '../utils/gravatar'
 import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
 
@@ -18,6 +18,8 @@ export default function TaskModal() {
         currentTaskNotifications: [],
         isStatusUpdate,
         statusText,
+        deleteTaskUrl,
+        currentDeletingTask: {},
         init() {
             console.log('task modal initialized');
             // console.log('current task clicked :', this.$store.taskModal.currentTask);
@@ -111,6 +113,20 @@ export default function TaskModal() {
                 }, 1)
             }
 
+        },
+        initDeleteTaskConfirmationModal() {
+            const element = document.getElementById("delete-task-confirmation-modal");
+            this.$store.taskModal.deleteModalHandle = new bootstrap.Modal(element);
+            const cleanup = () => { };
+            element.addEventListener("hidePrevented.bs.modal", cleanup);
+            element.addEventListener("hidden.bs.modal", cleanup);
+        },
+        openDeleteModal(e) {
+            console.log('open delete modal')
+            const task = e.detail
+            this.$store.taskModal.onDeleteClick(task)
+            this.currentDeletingTask = task;
+            console.log(this.currentDeletingTask);
         }
     }
 }

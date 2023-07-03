@@ -90,13 +90,18 @@ Alpine.store('task', {
 Alpine.store('taskModal', {
     currentTask:null,
     previewModalHandle:null,
+    deleteModalHandle:null,
+    feedbackModalHandle:null,
     onPreviewClick(task) {
         this.currentTask = task
-        console.log(this.currentTask);
+        console.log('preview click ? ', this.currentTask);
         this.previewModalHandle.show();
+    },
+    onDeleteClick(task) {
+        this.currentTask = task
+        console.log('delete task ', this.currentTask);
+        this.deleteModalHandle.show();
     }
 })
-
-
 
 export default Alpine.store('tasks')

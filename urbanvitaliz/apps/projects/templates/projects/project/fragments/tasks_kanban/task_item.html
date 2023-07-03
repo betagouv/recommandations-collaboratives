@@ -50,18 +50,6 @@
 									</a>
 								</template>
 							</div>
-							{% if is_switchtender %}
-								<template x-if="t.status < 3 && t.public">
-									<div class="me-2 text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta" style="background-color: rgba(0, 0, 0, 0.05); border-radius: 5px; cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="toArchiveTooltip()" @click="openFeedbackModal(t)">
-										<svg class="aling-middle bi" width="25px" height="25px" fill="green">
-											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check" />
-										</svg>
-										<svg class="aling-middle bi" style="margin: 3px 0;" width="16px" height="16px" fill="currentColor">
-											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
-										</svg>
-									</div>
-								</template>
-							{% endif %}
 						{% endif %}
 					</div>
 					<div class="flex-fill mt-1 ms-2" @click="onPreviewClick(t.id)" style="cursor: pointer; font-size: 0.9em;">
@@ -135,7 +123,7 @@
 							</li>
 							
 							<li>
-								<a :id=`task-${t.id}-delete-button` class="dropdown-item text-danger" style="cursor: pointer;" @click="openDeleteTaskConfirmationModal(t)">Supprimer</a>
+								<a :id=`task-${t.id}-delete-button` class="dropdown-item text-danger" style="cursor: pointer;" @click="handleOpenDeleteModal()">Supprimer</a>
 							</li>
 						</ul>
 					</div>
