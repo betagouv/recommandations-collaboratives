@@ -13,7 +13,7 @@ class="row">
                     </div>
                 </div>
 
-                <div style="height: 80vh; overflow-y: auto; position: relative;" class="px-2 py-1 pb-1 overflow-auto">
+                <div style="height: 80vh; overflow-y: auto; position: relative;" class="px-2 pt-2 mt-2 pb-1 overflow-auto">
                     <template x-if="column(board.status).length === 0">
                         <div class="drag-targetable py-3" @dragover="onDragOver(event, null)"
                             @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)"

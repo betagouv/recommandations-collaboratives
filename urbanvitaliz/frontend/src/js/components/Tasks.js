@@ -1,30 +1,21 @@
 import { TASK_STATUSES } from '../config/statuses';
 
-import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
-import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
+import { isArchivedStatus } from "../utils/taskStatus"
 
 
 export default function TasksApp(app, projectId) {
     const taskApp = {
         //utils function
         currentlyHoveredElement: null,
-
         canAdministrate: false,
         canUseTasks: false,
         canManageTasks: false,
         isSwitchtender: false,
         userEmail: null,
         isArchivedStatus,
-        currentReminderTaskId: null,
-        pendingReminderDate: formatReminderDate(daysFromNow(30 * 6)),
         data: [],
         boards: [],
         STATUSES: TASK_STATUSES,
-        //Event listener dispatched by another component
-        async handleIssueFollowup(e) {
-            await issueFollowup(e.detail.task, e.detail.status)
-            await this.getData()
-        },
         get isBusy() {
             return this.$store.app.isLoading
         },

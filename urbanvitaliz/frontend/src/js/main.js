@@ -1,6 +1,8 @@
 import 'vite/modulepreload-polyfill';
 import './utils/globals'
 
+//Global Store
+import './store/djangoData'
 import './store/app'
 
 //Global reused component
@@ -23,7 +25,5 @@ import '../css/user.css'
 import '../css/callout.css'
 import '../css/markdown.css'
 import '../css/miscellaneous.css'
-
-
 
 console.log('js main added');

@@ -4,7 +4,10 @@
     {% vite_asset 'js/apps/tasks.js' %}
 {% endblock %}
 
-<div x-data x-init="$store.tasksData.getTasks({{ project.pk }})">
+<!-- Extraire ces trucs dans son propre template -->
+{{ project.pk|json_script:"djangoProjectId" }}
+
+<div x-data>
     {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_header.html' %}
 
     <template x-if="$store.tasksView.currentView === 'inline'">
@@ -14,8 +17,5 @@
         {% include 'projects/project/fragments/tasks_kanban/tasks_kanban.html' %}
     </template>
 
-    {% include 'projects/project/fragments/tasks_kanban/preview_modal.html' %}
-    {% include 'projects/project/fragments/tasks_kanban/feedback_modal.html' %}
-    {% include 'projects/project/fragments/tasks_kanban/delete_task_confirmation_modal.html' %}
-   
+    {% include 'projects/project/fragments/tasks_kanban/test_modal.html' %}
 </div>
