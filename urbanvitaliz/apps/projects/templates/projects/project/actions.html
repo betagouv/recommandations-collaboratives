@@ -35,7 +35,6 @@
     <div class="row">
         <div class="col">
             {% include 'projects/project/navigation.html' with recommandations=True %}
-            {% include 'projects/project/fragments/kanban_tasks/kanban_header.html' %}
 
             {{ can_administrate|json_script:"canAdministrate" }}
 
