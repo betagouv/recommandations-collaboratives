@@ -4,8 +4,8 @@
     {% vite_asset 'js/apps/tasks.js' %}
 {% endblock %}
 
-<div x-data x-init="$store.tasksData.getTasks({{ project.pk }}); $store.task.initProject({{project.pk}})">
-    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html' %}
+<div x-data x-init="$store.tasksData.getTasks({{ project.pk }})">
+    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_header.html' %}
     <span x-text="$store.tasksView.currentView"></span>
     <span x-text="$store.app.isLoading"></span>
 

@@ -15,6 +15,7 @@ Alpine.store('tasksView', {
 Alpine.store('tasksData', {
     projectId: null,
     tasks: [],
+    newTasks:[],
     canUseTasks:false,
     canManageTasks:false,
     init() {
@@ -31,6 +32,8 @@ Alpine.store('tasksData', {
         const data = json.data.map(d => Object.assign(d, {
             uuid: generateUUID()
         }));
+
+        this.newTasks = data.filter(task => task.status === 0)
 
         return this.tasks = data;
     },
@@ -51,17 +54,6 @@ Alpine.store('tasksData', {
     },
     async patchTask(taskId, patch) {
         await api.patch(taskUrl(this.projectId, taskId), patch)
-    },
-})
-
-Alpine.store('task', {
-    projectId: null,
-    init() {
-        console.log('current task store init ');
-    },
-    initProject(projectId) {
-        this.projectId = projectId
-        console.log('project task sotre ? ', this.projectId)
     },
     async loadFollowups(taskId) {
         const { data } = await api.get(followupsUrl(this.projectId, taskId));
@@ -84,7 +76,7 @@ Alpine.store('task', {
     },
     async markAllAsRead(taskId) {
         await api.post(markTaskNotificationsAsReadUrl(this.projectId, taskId), {})
-    },
+    }
 })
 
 Alpine.store('taskModal', {
