@@ -29,8 +29,9 @@ export default function Task(currentTask) {
 
         handleOpenPreviewModal() {
             console.log('dispatch somthg', this.currentTask);
+            // Old modal
             //console.log(this.$dispatch('open-preview-modal', this.currentTask))
-            this.$store.previewModal.open(this.currentTask)
+            this.$store.previewModal.open(this.currentTask.id)
         },
         handleOpenDeleteModal() {
             console.log('dispatch somthg', this.currentTask);

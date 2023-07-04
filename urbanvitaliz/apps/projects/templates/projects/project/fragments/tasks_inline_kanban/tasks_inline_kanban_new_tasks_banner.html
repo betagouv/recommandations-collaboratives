@@ -11,7 +11,7 @@
         <p class="text-info-custom my-0">
             Consultez les nouvelles recommandations ajoutées par notre équipe conseil pour vous aider dans l’avancement de votre projet
         </p>
-        <button style="color: #0063CB !important;" class="button filled white small inherit mt-3 fw-bold">
+        <button @click="$store.previewModal.openWithPagination()" style="color: #0063CB !important;" class="button filled white small inherit mt-3 fw-bold">
             Consultez les recommandations
         </button>
     </div>

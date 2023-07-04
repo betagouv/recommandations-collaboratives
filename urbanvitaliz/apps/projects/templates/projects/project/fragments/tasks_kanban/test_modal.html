@@ -11,10 +11,18 @@
         <div class="modal-content">
             <template x-if="task">
                 <div>
-                    <pre x-text="JSON.stringify(task)"></pre>
-                    <template x-if="followups">
-                        <pre x-text="JSON.stringify(followups)"></pre>
+                    <template x-if="$store.previewModal.isPaginated">
+                        <div>
+                            <button @click="$store.previewModal.previous()">Previous</button>
+                            <button @click="$store.previewModal.next()">Next</button>
+                        </div>
                     </template>
+                    <pre x-text="JSON.stringify(task)"></pre>
+                    <div x-effect="taskId && $store.previewModal.loadFollowups()">
+                        <template x-if="followups">
+                            <pre x-text="JSON.stringify(followups)"></pre>
+                        </template>
+                    </div>
                 </div>
             </template>
         </div>

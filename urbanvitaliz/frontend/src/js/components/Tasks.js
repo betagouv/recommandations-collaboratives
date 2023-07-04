@@ -70,13 +70,6 @@ export default function TasksApp(app, projectId) {
             })
         },
 
-        // URL Parsing trickery
-        processUrl() {
-            const match = location.hash.match(/^#action-(\d+)/);
-            if (match) {
-                this.currentTaskId = parseInt(match[1], 10);
-            }
-        },
         async onSetTaskPublic(id, value) {
             await patchTask(id, { public: value });
             await this.getData();

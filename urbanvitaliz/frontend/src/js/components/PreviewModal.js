@@ -2,18 +2,20 @@ import Alpine from 'alpinejs'
 
 export default function PreviewModal() {
     return {
+        get taskId() {
+            return this.$store.previewModal.taskId
+        },
         get task() {
-            return this.$store.previewModal.task
+            return this.$store.tasksData.getTaskById(this.taskId)
         },
         get followups() {
             return this.$store.previewModal.followups
         },
 
-        async init() {
-            await this.$store.tasksData.markAllAsRead(task.id);
-
+        async refresh() {
             this.followupScrollToLastMessage();
         },
+        
         //TODO use TaskComment()
     }
 }

@@ -1,7 +1,7 @@
 {% load static %}
 
 <!-- Index of tasks kanban app -->
-<div x-data="KanbanTasks({{ project.id }})" x-init="initTooltips(); loadCanAdministrate(); loadUserProjectPerms(); loadIsSwitchtender(); loadUserId(); processUrl();"
+<div x-data="KanbanTasks({{ project.id }})" x-init="initTooltips(); loadCanAdministrate(); loadUserProjectPerms(); loadIsSwitchtender(); loadUserId();"
 class="row">
     <template x-for="board in boards">
         <div class="col px-2">
