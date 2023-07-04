@@ -4,35 +4,17 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 
-	<div x-data="Task(t)" :id="t.uuid" class="drag-targetable py-3" @dragover="onDragOver(event)"
+	<div x-data="Task(t)" :id="t.uuid" class="drag-targetable py-1" @dragover="onDragOver(event)"
 		@drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
-		<div class="rounded bg-white shadow position-relative" :draggable="true" @dragstart="onDragStart(event, t.uuid)"
+		<div class="medium-border-radius bg-white border-grey position-relative" :draggable="true" @dragstart="onDragStart(event, t.uuid)"
 			@dragend="onDragEnd(event)">
 			<template x-if="currentTask.notifications.count > 0">
 				<span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold"
 					style="font-size: 0.7em;" x-text="currentTask.notifications.count"></span>
 			</template>
-			<div class="position-absolute top-0 left-0 d-flex" style="margin: -10px 0 0 5px;">
-				<template x-if="!currentTask.public && !isArchivedStatus(currentTask.status)">
-					<span class="rounded-pill px-2 bg-warning z-index-dropdown text-uppercase fw-bold text-white"
-						style="font-size: 0.7em;">Brouillon</span>
-				</template>
-				<template x-if="currentTask.public && !currentTask.visited && !isArchivedStatus(currentTask.status)">
-					<span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white"
-						style="font-size: 0.7em;">Nouveauqsdsd</span>
-				</template>
-				<template x-if="currentTask.status === STATUSES.DONE || currentTask.status === STATUSES.ALREADY_DONE">
-					<span class="rounded-pill px-2 bg-success z-index-dropdown text-uppercase fw-bold text-white"
-						style="font-size: 0.7em;">Fait</span>
-				</template>
-				<template x-if="currentTask.status === STATUSES.NOT_INTERESTED">
-					<span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white"
-						style="font-size: 0.7em;">Non applicable</span>
-				</template>
-			</div>
 			<div class="p-2">
 				<div class="d-flex flex-row">
-					<div class="mt-1 d-flex flex-column justify-content-between">
+					<!-- <div class="mt-1 d-flex flex-column justify-content-between">
 						{% if "use_tasks" in user_project_perms and not disable_edit %}
 							<div>
 								<template x-if="i > 0">
@@ -51,28 +33,32 @@
 								</template>
 							</div>
 						{% endif %}
-					</div>
+					</div> -->
 					<div class="flex-fill mt-1 ms-2" @click="handleOpenPreviewModal()" style="cursor: pointer; font-size: 0.9em;">
 						<h6 class="mb-0 fw-bold" x-text="currentTask.intent"></h6>
-
-						<div class="rounded bg-light p-2 my-2" :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
-							<template x-if="canAdministrate && currentTask.content === ''">
-								<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
-							</template>
-							<template x-if="currentTask.content !== ''">
-								<p x-html="truncate(renderMarkdown(currentTask.content), 200)" class="mb-3"></p>
-							</template>
-							<div class="d-flex justify-content-between">
-								<div>
+						
+						<div class="pt-2 my-2" :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
+							<div class="d-flex flex-column">
+								<span class="align-middle text-grey-dark tiny" x-text="`le ${formatDate(currentTask.created_on)}`" style="line-height: 20px"></span>
+								<div class="tiny">
+									<span class="text-grey-dark">par </span>
 									<img class="rounded-circle d-inline-block" width="20px" height="20px"
 									:src="gravatar_url(currentTask.created_by.email, 25)" data-bs-toggle="tooltip" data-bs-placement="bottom"
 										:title="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`" style="z-index: 1000;" tabindex="0" />
 									<span :class="!currentTask.created_by.is_active && 'inative-status'" class="ms-1 fst-italic" x-text="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
 									style="line-height: 20px"></span>
-									<template x-if="currentTask.created_by.profile.organization">
-										<span x-text="currentTask.created_by.profile.organization.name" class="fst-italic text-muted"></span>
+									<template x-if="currentTask.created_by.profile.organization_position">
+										<span x-text="currentTask.created_by.profile.organization_position" class="fst-italic text-muted"></span>
 									</template>
-									<span class="ms-2 text-muted" x-text="`le ${formatDate(currentTask.created_on)}`" style="line-height: 20px"></span>
+								</div>
+								<div class="text-grey-dark d-flex align-items-center tiny me-3 responsive-flex-column mt-1">
+									<svg class="align-middle bi me-1"
+										width="18px"
+										height="15px"
+										fill="currentColor">
+										<use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
+									</svg>
+									<span class="tiny" x-text="currentTask.resource_id ? currentTask.comments_count + 1  + ' messages' : currentTask.comments_count + ' messages'"></span>
 								</div>
 							</div>
 						</div>
@@ -80,7 +66,7 @@
 				</div>
 			</div>
 
-			<div class="border-top p-2 d-flex justify-content-between" style="font-size: 0.8em">
+			<!-- <div class="border-top p-2 d-flex justify-content-between" style="font-size: 0.8em">
 				<div class="d-flex align-items-center">
 					<div class="text-primary position-relative" @click="onPreviewClick(currentTask.id)" style="cursor: pointer;">
 						<svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
@@ -129,6 +115,6 @@
 					</div>
 					{% endif %}
 				</div>
-			</div>
+			</div> -->
 		</div>
 	</div>

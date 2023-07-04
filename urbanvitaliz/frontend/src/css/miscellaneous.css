@@ -80,6 +80,18 @@
     animation: appear-in 0.5s forwards ease 0.5s;
 }
 
+.small-border-radius {
+    border-radius: 2px;
+}
+
+.medium-border-radius {
+    border-radius: 4px;
+}
+
+.border-grey {
+    border: 1px solid #EEE;
+}
+
 @keyframes appear-in {
     from{
         opacity: 0;

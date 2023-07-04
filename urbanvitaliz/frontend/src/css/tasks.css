@@ -5,6 +5,15 @@
     border-radius: 2px;
 }
 
+.status-color-indicator.big {
+    width: 18px;
+    height: 18px;
+}
+
+.status-color-indicator.bg-white {
+    border: solid 1px #CECECE;
+} 
+
 .task-separator {
     width: 32px;
     height: 4px;

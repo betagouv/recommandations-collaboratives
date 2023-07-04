@@ -6,8 +6,6 @@
 
 <div x-data x-init="$store.tasksData.getTasks({{ project.pk }})">
     {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_header.html' %}
-    <span x-text="$store.tasksView.currentView"></span>
-    <span x-text="$store.app.isLoading"></span>
 
     <template x-if="$store.tasksView.currentView === 'inline'">
         {% include 'projects/project/fragments/tasks_inline/tasks_inline.html' %}

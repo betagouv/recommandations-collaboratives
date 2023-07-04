@@ -2,7 +2,7 @@
 <div class="flag dark-blue mb-4 d-flex align-items-center justify-content-start text-white small-border-radius mt-4">
     {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_new_tasks_banner_svg.html' %}
     <div class="ms-4">
-        <h5 class="mb-0">
+        <h5 class="mb-0 fw-bold">
             Vous avez
             <span x-text="`${$store.tasksData.newTasks.length > 0 ? $store.tasksData.newTasks.length + ' nouvelles' : $store.tasksData.newTasks.length + ' nouvelle'}`"></span>
             recommandations

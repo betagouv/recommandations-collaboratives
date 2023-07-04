@@ -1,27 +1,19 @@
 {% load static %}
 
 <!-- Index of tasks kanban app -->
-<div x-data="KanbanTasks({{ project.id }})" x-init="initTooltips(); loadCanAdministrate(); loadUserProjectPerms(); loadIsSwitchtender(); loadUserId(); processUrl();">
+<div x-data="KanbanTasks({{ project.id }})" x-init="initTooltips(); loadCanAdministrate(); loadUserProjectPerms(); loadIsSwitchtender(); loadUserId(); processUrl();"
+class="row">
     <template x-for="board in boards">
         <div class="col px-2">
-            <div class="rounded border-top border-2 drop-column" :class="board.color_class">
-                <div class="d-flex align-items-center justify-content-between px-3 py-2 bg-light">
-                    <div class="d-flex align-items-start">
-                        <span x-show="column(board.status).length > 0" class="me-2 badge rounded-pill text-bg-secondary" x-text="column(board.status).length">Primary</span>
-                        <h5 x-text="board.title" class="fs-6 font-medium text-gray-800"></h5>
+            <div class="medium-border-radius drop-column bg-grey-light">
+                <div class="d-flex align-items-center justify-content-between px-2 pt-2 pb-0">
+                    <div class="d-flex align-items-center">
+                        <span :class="board.color_class" class="status-color-indicator me-2"></span>
+                        <h5 x-text="board.title" class="fs-6 fw-normal text-gray-800 mb-0"></h5>
                     </div>
-                    {% if user.is_staff or active_project_can_administrate %}
-                    <template x-if="board.status == 0">
-                        <a id="tasks-inline-button" href="{% url 'projects-project-detail-actions-inline' project.pk %}" class="btn btn-outline-primary btn-sm">
-                            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#search" />
-                            </svg>
-                        </a>
-                    </template>
-                    {% endif %}
                 </div>
 
-                <div class="px-3 py-1 pb-1 bg-light shadow-sm overflow-auto" style="max-height: 70vh;">
+                <div style="height: 80vh; overflow-y: auto; position: relative;" class="px-2 py-1 pb-1 overflow-auto">
                     <template x-if="column(board.status).length === 0">
                         <div class="drag-targetable py-3" @dragover="onDragOver(event, null)"
                             @drop="onDrop(event, board.status, null)" @dragenter="onDragEnter(event)"
