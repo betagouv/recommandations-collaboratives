@@ -47,7 +47,7 @@ class Project:
     JOINED = "a rejoint le projet"
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
-    SUBMITTED_BY = "a soumis pour modération le projet"
+    SUBMITTED_BY = "a déposé un nouveau projet, qui est en attente de validation"
 
     VALIDATED = "a été validé"
     VALIDATED_BY = "a validé le projet"

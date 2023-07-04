@@ -236,7 +236,7 @@ def test_notification_formatter():
             verbs.Conversation.PUBLIC_MESSAGE,
             public_note,
             (
-                "Bobi Joe (DuckCorp) a envoyé un message dans l'espace conversation",
+                f"Bobi Joe (DuckCorp) {verbs.Conversation.PUBLIC_MESSAGE}",
                 "my content",
             ),
         ),
@@ -244,7 +244,7 @@ def test_notification_formatter():
             verbs.Conversation.PRIVATE_MESSAGE,
             private_note,
             (
-                "Bobi Joe (DuckCorp) a envoyé un message dans l'espace conseillers",
+                f"Bobi Joe (DuckCorp) {verbs.Conversation.PRIVATE_MESSAGE}",
                 "my content",
             ),
         ),
@@ -252,25 +252,31 @@ def test_notification_formatter():
             verbs.Recommendation.COMMENTED,
             followup,
             (
-                "Bobi Joe (DuckCorp) a commenté la recommandation 'Belle Ressource'",
+                f"Bobi Joe (DuckCorp) {verbs.Recommendation.COMMENTED} 'Belle Ressource'",
                 followup.comment,
             ),
         ),
         (
             verbs.Recommendation.CREATED,
             task,
-            ("Bobi Joe (DuckCorp) a recommandé 'Belle Ressource'", task.content),
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Recommendation.CREATED} 'Belle Ressource'",
+                task.content,
+            ),
         ),
         (
             verbs.Project.BECAME_ADVISOR,
             project,
-            ("Bobi Joe (DuckCorp) a rejoint le projet en tant que conseiller·e.", None),
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Project.BECAME_ADVISOR}.",
+                None,
+            ),
         ),
         (
             verbs.Project.BECAME_OBSERVER,
             project,
             (
-                "Bobi Joe (DuckCorp) a rejoint le projet en tant qu'observateurice.",
+                f"Bobi Joe (DuckCorp) {verbs.Project.BECAME_OBSERVER}.",
                 None,
             ),
         ),
@@ -278,7 +284,7 @@ def test_notification_formatter():
             verbs.Project.SUBMITTED_BY,
             project,
             (
-                "Bobi Joe (DuckCorp) a déposé un nouveau projet, qui est en attente de validation: 'Nice Project'",
+                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY}: 'Nice Project'",
                 "Super description",
             ),
         ),
@@ -286,19 +292,25 @@ def test_notification_formatter():
             verbs.Project.AVAILABLE,  # FIXME redondant avec VALIDATED
             project,
             (
-                "Bobi Joe (DuckCorp) a déposé le projet 'Nice Project'",
+                f"Bobi Joe (DuckCorp) {verbs.Project.AVAILABLE} 'Nice Project'",
                 "Super description",
             ),
         ),
         (
             verbs.Document.ADDED,  # FIXME replace w/ ADDED_FILE ADDED_LINK
             project,
-            ("Bobi Joe (DuckCorp) a ajouté un lien ou un document", None),
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED}",
+                None,
+            ),
         ),
         (
             "action inconnue",
             project,
-            ("Bob action inconnue Nice Project - SomeWhere", None),
+            (
+                f"Bob action inconnue Nice Project - SomeWhere",
+                None,
+            ),
         ),
     ]
 

@@ -597,7 +597,7 @@ class NotificationFormatter:
         """An action was recommended by a switchtender"""
         subject = self._represent_user(notification.actor)
         complement = self._represent_recommendation(notification.action_object)
-        summary = f"{subject} a recommandé '{complement}'"
+        summary = f"{subject} {verbs.Recommendation.CREATED} '{complement}'"
         excerpt = self._represent_recommendation_excerpt(notification.action_object)
 
         return FormattedNotification(summary=summary, excerpt=excerpt)
@@ -626,14 +626,14 @@ class NotificationFormatter:
     def format_action_became_advisor(self, notification):
         """Someone joined a project as advisor"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} a rejoint le projet en tant que conseiller·e."
+        summary = f"{subject} {verbs.Project.BECAME_ADVISOR}."
 
         return FormattedNotification(summary=summary, excerpt=None)
 
     def format_action_became_observer(self, notification):
         """Someone joined a project as observer"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} a rejoint le projet en tant qu'observateurice."
+        summary = f"{subject} {verbs.Project.BECAME_OBSERVER}."
 
         return FormattedNotification(summary=summary, excerpt=None)
 
@@ -641,8 +641,7 @@ class NotificationFormatter:
         """A project was submitted for moderation"""
         subject = self._represent_user(notification.actor)
         complement = self._represent_project(notification.action_object)
-        msg = "a déposé un nouveau projet, qui est en attente de validation:"
-        summary = f"{subject} {msg} '{complement}'"
+        summary = f"{subject} {verbs.Project.SUBMITTED_BY}: '{complement}'"
 
         excerpt = self._represent_project_excerpt(notification.action_object)
 
