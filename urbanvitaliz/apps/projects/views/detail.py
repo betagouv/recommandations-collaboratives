@@ -93,7 +93,6 @@ def mark_notifications_as_seen(user, project):
     project_ct = ContentType.objects.get_for_model(project)
     notif_verbs = [
         verbs.Conversation.PUBLIC_MESSAGE,
-        verbs.Conversation.PRIVATE_MESSAGE_OLD,  # FIXME and new ones ?
         verbs.Document.ADDED,  # FIXME to remove
         verbs.Document.ADDED_FILE,
         verbs.Document.ADDED_LINK,
@@ -101,7 +100,6 @@ def mark_notifications_as_seen(user, project):
         verbs.Project.BECAME_ADVISOR,
         verbs.Project.BECAME_OBSERVER,
         verbs.Project.JOINED,
-        verbs.Project.JOINED_OLD,
         verbs.Project.SUBMITTED_BY,
         verbs.Project.VALIDATED,
         verbs.Project.VALIDATED_BY,

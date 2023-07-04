@@ -1,8 +1,10 @@
 {% load gravatar %}
+{% load common_tags %}
+{% get_verbs as verbs %}
 
 <ul class="list-group">
     {% for action in actions %}
-        {% if action.verb == "a invité un·e collaborateur·rice à rejoindre le projet" %}
+        {% if action.verb == verbs.Project.INVITATION %}
             {% include 'crm/fragments/action_invite.html' %}
         {% else %}
             <li class="d-flex flex-columns list-group-item">
@@ -35,13 +37,13 @@
                         {% endif %}
                         <span class="ms-1 small text-secondary">il y a {{ action.timestamp|timesince }}</span>
                     </div>
-        
+
                     {% if action.action_object.resource %}
                     <div class="border p-2 rounded bg-white w-100">
                         {{ action.action_object.resource.title }}
                     </div>
                     {% endif %}
-        
+
                     {% if action.action_object.comment %}
                     <div class="border p-2 rounded bg-white w-100">
                         "{{ action.action_object.comment }}" à propos de <a

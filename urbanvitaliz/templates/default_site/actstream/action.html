@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load static %}
 {% load common_tags %}
+{% get_verbs as verbs %}
 <div class="d-block font-marianne">
   <div class="d-flex align-items-start mb-2">
     <img class="align-middle rounded-circle d-inline-block  p-1 {% if not transparent_background %}bg-white{% endif %}"
@@ -35,15 +36,18 @@
                  href="{{ action.action_object.get_absolute_url }}">{{ action.verb }}</a>
               {% if action.target %}
                 <div class="d-inline-block">
-                    <svg class="bi me-1 flex-shrink-0" width="14" height="14" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill"/>
-                    </svg>
-                    {% if action.target.get_absolute_url %}
-                        <a class="text-decoration-none hover-underline text-dark"
-                            href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-                    {% else %}
-                        {{ action.target }}
-                    {% endif %}
+                  <svg class="bi me-1 flex-shrink-0"
+                       width="14"
+                       height="14"
+                       fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
+                  </svg>
+                  {% if action.target.get_absolute_url %}
+                    <a class="text-decoration-none hover-underline text-dark"
+                       href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                  {% else %}
+                    {{ action.target }}
+                  {% endif %}
                 </div>
               {% endif %}
             {% endif %}
