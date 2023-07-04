@@ -91,9 +91,7 @@ class UVSignupForm(SignupForm):
         data = self.cleaned_data
 
         org_name = data.get("organization")
-        organization, _ = addressbook_models.Organization.objects.get_or_create(
-            name__iexact=org_name, defaults={"name": org_name}
-        )
+        organization = addressbook_models.Organization.get_or_create(org_name)
         organization.sites.add(request.site)
 
         user.profile.organization = organization
