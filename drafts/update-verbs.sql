@@ -33,10 +33,10 @@ VALUES
   ('a créé une note de CRM', 'a créé une note de CRM'),
   ('a créé un brouillon de recommandation', 'a créé un brouillon de recommandation'),
   ('a recommandé l''action', 'a recommandé l''action'),
-  ('a créé un rappel sur l''action', 'a créer un rappel sur la recommandation'),
+  ('a créé un rappel sur l''action', 'a créé un rappel sur la recommandation'),
   ('a commenté l''action', 'a commenté la recommandation'),
   ('a accepté l''action', 'a accepté l''action'),
-  ('n''est pas intéressé·e l''action', 'n''est pas intéressé·e la recommandation'),
+  ('n''est pas intéressé·e l''action', 'n''est pas intéressé·e par la recommandation'),
   ('a refusé l''action', 'a classé la recommandation comme «non applicable»'),
   ('a déjà fait l''action', 'a déjà fait l''action recommandée'),
   ('a redémarré l''action', 'a redémarré l''action recommandée'),
@@ -57,17 +57,14 @@ VALUES
   ('est devenu·e observateur·rice sur le projet', 'est devenu·e observateur·ice sur le projet'),
   ('n''aiguille plus le projet', 'ne suit plus le projet'),
   ('ne conseille plus le projet', 'ne suit plus le projet'),
-  ('n''aiguille plus le projet', 'n''est plus conseiller·ère sur le projet'),
-  ('ne conseille plus le projet', 'n''est plus conseiller·ère sur le projet'),
-  ('', 'n''est plus observateur·ice sur le projet'),
   ('a changé l''état de son suivi','a changé l''état de son suivi'),
-  ('a démarré le questionnaire', 'a démarré l''état des lieux'),
-  ('a mis à jour le questionnaire', 'a mise à jour l''état des lieux'),
+  ('a démarré le questionnaire', 'a commencé à remplir l''état des lieux'),
+  ('a mis à jour le questionnaire', 'a mis à jour l''état des lieux'),
   ('a rédigé un message', 'a envoyé un message dans l''espace conversation'),
   ('a envoyé un message', 'a envoyé un message dans l''espace conversation'),
   ('a envoyé un message dans l''espace conseillers', 'a envoyé un message dans l''espace conseillers'),
   ('a créé une note de suivi', 'a envoyé un message dans l''espace conseillers'),
-  ('a rédigé une note interne', 'a rédigé une note interne');
+  ('a rédigé une note interne', 'a envoyé un message dans l''espace conseillers');
 
 
 --

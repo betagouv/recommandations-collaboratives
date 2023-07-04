@@ -60,6 +60,14 @@ class Organization(models.Model):
     def __str__(self):  # pragma: nocover
         return "{0}".format(self.name)
 
+    @classmethod
+    def get_or_create(cls, name):
+        """Return existing organization with casefree name or new one"""
+        organization, _ = cls.objects.get_or_create(
+            name__iexact=name, defaults={"name": name}
+        )
+        return organization
+
 
 class ContactManager(models.Manager):
     def get_queryset(self):

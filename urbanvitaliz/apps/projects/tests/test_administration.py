@@ -167,7 +167,6 @@ def test_accepted_project_update_accessible_for_collaborator(request, client):
 
 @pytest.mark.django_db
 def test_promote_referent_not_available_is_post_only(request, client):
-
     url = reverse("projects-project-promote-referent", args=[0, 0])
     with login(client):
         response = client.get(url)
@@ -220,11 +219,17 @@ def test_promote_referent_available_for_advisor(request, client):
     project = Recipe(models.Project, sites=[site]).make()
 
     crm_user = baker.make(auth_models.User)
-    crm_user.profile.sites.add(site)
+    profile = crm_user.profile
+    profile.sites.add(site)
+    profile.phone_no = "555-1234"
+    profile.save()
 
-    owner = baker.make(projects_models.ProjectMember, project=project, is_owner=False)
-    member = baker.make(
-        projects_models.ProjectMember, project=project, member=crm_user, is_owner=False
+    powner = baker.make(projects_models.ProjectMember, project=project, is_owner=False)
+    pmember = baker.make(
+        projects_models.ProjectMember,
+        project=project,
+        member=crm_user,
+        is_owner=False
     )
 
     url = reverse("projects-project-promote-referent", args=[project.id, crm_user.id])
@@ -233,10 +238,14 @@ def test_promote_referent_available_for_advisor(request, client):
 
     assert response.status_code == 302
 
-    owner.refresh_from_db()
-    assert owner.is_owner is False
-    member.refresh_from_db()
-    assert member.is_owner is True
+    powner.refresh_from_db()
+    assert powner.is_owner is False
+    pmember.refresh_from_db()
+    assert pmember.is_owner is True
+
+    # project phone number is updated to current owner one's
+    project.refresh_from_db()
+    assert project.phone == pmember.member.profile.phone_no
 
 
 #####################################################################

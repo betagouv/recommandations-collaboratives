@@ -211,6 +211,8 @@ def promote_collaborator_as_referent(request, project_id, user_id=None):
     with transaction.atomic():
         members.update(is_owner=False)
         members.filter(member=user).update(is_owner=True)
+        project.phone = user.profile.phone_no
+        project.save()
 
     return redirect(reverse("projects-project-administration", args=[project_id]))
 

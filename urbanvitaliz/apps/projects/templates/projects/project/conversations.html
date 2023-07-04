@@ -1,126 +1,109 @@
 {% extends "projects/project/detail.html" %}
-
 {% load static %}
 {% load humanize %}
 {% load gravatar %}
 {% load training %}
 {% load guardian_tags %}
-
-{% block title %}
-{{ block.super }} > Conversations
-{% endblock %}
-
+{% block title %}{{ block.super }} > Conversations{% endblock %}
 {% block project_detail %}
-
-{% challenge_for request.user "project-conversation-reader" as challenge %}
-
-{% if challenge and not challenge.acquired %}
-{% challenge_acquire challenge %}
-{% endif %}
-
-{% challenge_for request.user "project-conversation-writer" as challenge %}
-{% get_obj_perms request.user for request.site as "user_site_perms" %}
-{% get_obj_perms request.user for project as "user_project_perms" %}
-
-<div class="col-12 mx-auto">
+  {% challenge_for request.user "project-conversation-reader" as challenge %}
+  {% if challenge and not challenge.acquired %}
+    {% challenge_acquire challenge %}
+  {% endif %}
+  {% challenge_for request.user "project-conversation-writer" as challenge %}
+  {% get_obj_perms request.user for request.site as "user_site_perms" %}
+  {% get_obj_perms request.user for project as "user_project_perms" %}
+  <div class="col-12 mx-auto">
     {% include 'projects/project/navigation.html' with conversation=True %}
     <div class="row">
-        <div class="col-12 col-lg-8">
-            {% regroup project.notes.public by created_on.date as notes_by_day %}
-            <div class="message-window flex-grow-1" style="overflow-y: auto; overflow-x: hidden; max-height: 40vh; display:flex; flex-direction:column-reverse;">
-                <ul class="list-group">
-                    {% for date, notes in notes_by_day|slice:":20" reversed %}
-                    <li class="list-group-item border-0 m-0 p-0">
-                        <div class="small my-2 text-center w-100">{{ date|naturalday|capfirst }}</div>
-                        {% for note in notes reversed  %}
-                            {% if request.user == note.created_by %}
-                                <div class="rounded-3 p-3 bg-blue-light my-2" style="margin-left: 2vw;">
-                            {% else %}
-                                <div class="bg-grey-light rounded-3 p-3 my-2" style="margin-right: 2vw;">
-                            {% endif %}
-                                {{ note.content_rendered|safe }}
-                                {% if note.document.count %}
-                                    {% for document in note.document.all %}
-                                            {% include 'projects/project/fragments/files_links/file_list_item_embedded.html' with document=document %}
-                                    {% endfor %}
-                                {% endif %}
-                            {% if note.created_by %}
-                            <div class="d-flex align-items-center">
-                                {% include 'user/user_card.html' with user=note.created_by %}
-
-                                {% if note.created_by == request.user %}
-                                <span class="align-middle small text-dark ms-2">
-                                    - <a class="ms-1 "href="{% url 'projects-update-note' note.pk %}">éditer</a>
-                                </span>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-                        </div>
+      <div class="col-12 col-lg-8">
+        {% regroup project.notes.public by created_on.date as notes_by_day %}
+        <div class="message-window flex-grow-1"
+             style="overflow-y: auto;
+                    overflow-x: hidden;
+                    max-height: 40vh;
+                    display:flex;
+                    flex-direction:column-reverse">
+          <ul class="list-group">
+            {% for date, notes in notes_by_day|slice:":20" reversed %}
+              <li class="list-group-item border-0 m-0 p-0">
+                <div class="small my-2 text-center w-100">{{ date|naturalday|capfirst }}</div>
+                {% for note in notes reversed %}
+                  {% if request.user == note.created_by %}
+                    <div class="rounded-3 p-3 bg-blue-light my-2" style="margin-left: 2vw;">
+                    {% else %}
+                      <div class="bg-grey-light rounded-3 p-3 my-2" style="margin-right: 2vw;">
+                      {% endif %}
+                      {{ note.content_rendered|safe }}
+                      {% if note.document.count %}
+                        {% for document in note.document.all %}
+                          {% include 'projects/project/fragments/files_links/file_list_item_embedded.html' with document=document %}
                         {% endfor %}
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            {% if "use_public_notes" in user_project_perms %}
-            <hr/>
-
+                      {% endif %}
+                      {% if note.created_by %}
+                        <div class="d-flex align-items-center">
+                          {% include 'user/user_card.html' with user=note.created_by %}
+                          {% if note.created_by == request.user %}
+                            <span class="align-middle small text-dark ms-2">
+                              - <a class="ms-1 "href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                            </span>
+                          {% endif %}
+                        </div>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% if "use_public_notes" in user_project_perms %}
+            <hr />
             <!-- Post message -->
             <div class="message-form mt-4 p-3 bg-light border-form">
-                <form class="form"
-                      method="POST"
-                      action="{% url 'projects-conversation-create-message' project.pk %}"
-                      enctype="multipart/form-data"
-                      id="conversation-form">
-                    {% csrf_token %}
-                    
-                    {% include 'tools/editor.html' with input_name=public_note_form.content.name input_value=public_note_form.content.value|default:'' input_required=True %}
-                    <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
-
-                    {% for error in public_note_form.content.errors %}
-                    <div class="text-danger text-end">{{ error }}</div>
-                    {% endfor %}
-
-                    {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
-
-                    <div class="d-flex justify-content-end mt-4">
-                        <button form="conversation-form" class="button filled" type="submit">Envoyer</button>
-                    </div>
-                </form>
+              <form class="form"
+                    method="POST"
+                    action="{% url 'projects-conversation-create-message' project.pk %}"
+                    enctype="multipart/form-data"
+                    id="conversation-form">
+                {% csrf_token %}
+                {% include 'tools/editor.html' with input_name=public_note_form.content.name input_value=public_note_form.content.value|default:'' input_required=True %}
+                <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
+                {% for error in public_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
+                <div class="d-flex justify-content-end mt-4">
+                  <button form="conversation-form" class="button filled" type="submit">Envoyer</button>
+                </div>
+              </form>
             </div>
-            {% endif %}
+          {% endif %}
         </div>
         <div class="col mx-auto col-lg-4 col-md-12">
-            <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Participants</h6>
-            <div>
-                <p class="text-info-custom">Membres de la collectivité</p>
-                <ul class="flex-column list-unstyled mb-0">
-                        {% for member in project.members.all %}
-                            {% if forloop.counter0 == 0 and member.is_active %}
-                                <li>
-                                    {% include 'user/user_card.html' with user=member project_owner=True user_activity=True %}
-                                </li>
-                            {% elif member.is_active %}
-                                <li>
-                                    {% include 'user/user_card.html' with user=member user_activity=True %}
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                </ul>
-            </div>
-            <div class="d-block mt-4">
-                <p class="text-info-custom">Équipe de suvi</p>
-                <ul class="d-flex flex-column list-unstyled mb-0">
-                    {% for advisor in project.switchtenders_on_site.all %}
-                    {% if advisor.switchtender.is_active %}
-                        <li>
-                            {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
-                        </li>
-                    {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
+          <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Participants</h6>
+          <div>
+            <p class="text-info-custom">Membres de la collectivité</p>
+            <ul class="flex-column list-unstyled mb-0">
+              {% for pm in project.projectmember_set.all %}
+                {% if pm.member.is_active %}
+                  {% if pm.is_owner %}
+                    <li>{% include 'user/user_card.html' with user=pm.member project_owner=True user_activity=True %}</li>
+                  {% else %}
+                    <li>{% include 'user/user_card.html' with user=pm.member user_activity=True %}</li>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="d-block mt-4">
+            <p class="text-info-custom">Équipe de suvi</p>
+            <ul class="d-flex flex-column list-unstyled mb-0">
+              {% for advisor in project.switchtenders_on_site.all %}
+                {% if advisor.switchtender.is_active %}
+                  <li>{% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}</li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-{% endblock %}
+  {% endblock %}
