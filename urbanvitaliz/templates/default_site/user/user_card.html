@@ -106,7 +106,7 @@
                         <svg class="bi align-middle me-2" width="15" height="15" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
                         </svg>
-                        <a class="text-decoration-none text-blue" href="tel:{{ project.owner.profile.phone_no }}">{{ user.profile.phone_no }}</a>
+                        <a class="text-decoration-none text-blue" href="tel:{{ user.profile.phone_no }}">{{ user.profile.phone_no }}</a>
                     </div>
                     <button class="ms-4 px-2 py-0 btn small btn-outline-primary" @click="clipboardCopy('Le numéro de téléphone', '{{user.profile.phone_no}}')">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
@@ -115,7 +115,7 @@
                     </button>
                 </span>
             {% endif %}
-            {% if not user.is_active %} 
+            {% if not user.is_active %}
                 <span style="border-radius: 2px;" class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap">Compte desactivé depuis le {{user.profile.deleted}}</span>
             {% endif %}
         </div>
