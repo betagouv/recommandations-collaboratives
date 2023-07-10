@@ -26,6 +26,9 @@ export default function Task(currentTask) {
         handleOpenDeleteModal() {
             this.$dispatch('open-delete-modal', this.currentTask)
         },
+        handleOpenPreviewModal() {	
+            this.$store.previewModal.open(this.currentTask.id)	
+        },
         async onSetTaskPublic(task, value) {
             task.isLoading = true
             await this.$store.tasksData.patchTask(task.id, { public: value });
