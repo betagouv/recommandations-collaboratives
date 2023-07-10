@@ -26,15 +26,9 @@ export default function TasksInline(projectId) {
         },
         async publishTask(taskId) {
             await this.$store.tasksData.patchTask(taskId, { public: true });
-            await this.$store.tasksData.getTasks();
+            await this.$store.tasksData.loadTasks();
             // this.updateView()
         },
-        //Custom behaviour
-        // onPreviewClick(id) {
-        //     this.currentTaskId = id;
-        //     this.openPreviewModal();
-        //     this.filterIsDraft = false
-        // },
         updateView() {
             if (!this.filterIsDraft) return
             

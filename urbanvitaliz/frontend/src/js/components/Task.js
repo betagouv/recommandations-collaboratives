@@ -1,10 +1,7 @@
 import Alpine from 'alpinejs'
 
 import{ editTaskUrl, deleteTaskReminderUrl} from '../utils/api'
-
-import { TASK_STATUSES } from '../config/statuses';
-import { formatReminderDate, daysFromNow, formatDate } from '../utils/date'
-import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
+import { formatDate } from '../utils/date'
 import { toArchiveTooltip, reminderTooltip, isOldReminder } from '../utils/tooltip'
 import { renderMarkdown } from '../utils/markdown'
 import { gravatar_url } from '../utils/gravatar'
@@ -26,10 +23,8 @@ export default function Task(currentTask) {
         init() {
             this.currentTask = currentTask
         },
-
         handleOpenPreviewModal() {
             console.log('dispatch somthg', this.currentTask);
-            // Old modal
             //console.log(this.$dispatch('open-preview-modal', this.currentTask))
             this.$store.previewModal.open(this.currentTask.id)
         },

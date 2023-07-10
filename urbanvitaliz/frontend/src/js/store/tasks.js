@@ -5,9 +5,15 @@ import { generateUUID } from '../utils/uuid'
 document.addEventListener('alpine:init', () => {
 
     Alpine.store('tasksView', {
-        currentView: 'kanban',
+        displayedTasks: [],
+        currentView: 'inline',
         init() {
             console.log('tasks view store init ');
+        },
+        async updateViewWithTask(taskId) {
+            const updatedTasks = await Alpine.store('tasksData').loadTasks();
+            const updatedTask = updatedTasks.find(task => task.id === taskId)
+            this.displayedTasks = this.displayedTasks.map(task => task.id === taskId ? updatedTask : task)
         },
         switchView() {
             this.currentView === 'inline' ? this.currentView = 'kanban' : this.currentView = 'inline'

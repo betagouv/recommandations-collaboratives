@@ -16,12 +16,11 @@ document.addEventListener('alpine:init', () => {
 
         async init() {
             await this.loadTasks()
+            Alpine.store('tasksView').displayedTasks = this.tasks
         },
-
         get newTasks() {
             return this.tasks.filter(task => task.status === 0)
         },
-
         async loadTasks() {
             const json = await api.get(tasksUrl(this.projectId))
 
@@ -30,9 +29,10 @@ document.addEventListener('alpine:init', () => {
                 uuid: generateUUID()
             }));
 
-            this.tasks = data;
-        },
+            this.tasks = data.map(task => ({ ...task, isLoading: false }))
 
+            return this.tasks;
+        },
         getTaskById(id) {
             return this.tasks.find(task => task.id == id)
         },
@@ -58,7 +58,6 @@ document.addEventListener('alpine:init', () => {
         // TODO : Plus tard
         async loadFollowups(taskId) {
             const { data } = await api.get(followupsUrl(this.projectId, taskId));
-            console.log('data qsdjklqsdjkljklqsdljk ', data);
             return data
         },
         async loadNotifications(taskId) {
@@ -69,7 +68,7 @@ document.addEventListener('alpine:init', () => {
             const body = { comment, status }
 
             if (body.status === task.status && body.comment === "") return;
-
+            
             await api.post(followupsUrl(this.projectId, task.id), body)
         },
         async editComment(taskId, followupId, comment) {

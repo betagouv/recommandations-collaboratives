@@ -25,54 +25,8 @@ export default function TaskModal() {
         feedbackComment:'',
         feedbackStatus: TASK_STATUSES.DONE,
         init() {
-            this.initPreviewModal();
             this.initDeleteTaskConfirmationModal();
             this.initFeedbackModal();
-        },
-        initPreviewModal() {
-            const element = document.getElementById("task-preview");
-            this.$store.taskModal.previewModalHandle = new bootstrap.Modal(element);
-
-            const cleanup = () => {
-                //Cleaning status changes behaviour
-                // this.$refs.commentTextRef.classList.remove('textarea-highlight');
-                // this.$refs.commentTextFormRef.classList.remove('tooltip-highlight');
-                // this.$refs.commentTextRef.placeholder = "Votre message";
-
-                // this.pendingComment = "";
-                // this.currentlyEditing = null;
-                // location.hash = '';
-                this.$store.taskModal.previewModalHandle.hide();
-            }
-
-            element.addEventListener("hidePrevented.bs.modal", cleanup);
-            element.addEventListener('hidden.bs.modal', cleanup);
-            if (this.$store.taskModal.currentTaskId) this.openPreviewModal();
-
-            window.addEventListener('hashchange', event => {
-                if (location.hash === '') {
-                    this.$store.taskModal.previewModalHandle.hide();
-                }
-            });
-        },
-        async openPreviewModal(e) {
-
-            const task = e.detail
-            console.log('dispatched open preview task : ', task);
-            console.log('modal com : open preview modal')
-            this.$store.taskModal.onPreviewClick(task)
-            location.hash = `#action-${task.id}`;
-
-            this.currentTaskFollowups = await this.$store.tasksData.loadFollowups(task.id);
-            this.currentTaskNotifications = await this.$store.tasksData.loadNotifications(task.id);
-
-            if (isMember && !isHijacked) await this.$store.tasksData.patchTask(task.id, { visited: true });
-
-            await this.$store.tasksData.markAllAsRead(task.id);
-
-            this.followupScrollToLastMessage();
-
-            // await this.getData();
         },
         async onSubmitComment() {
             if (!this.currentlyEditing) {
@@ -153,7 +107,7 @@ export default function TaskModal() {
             this.feedbackComment = '';
             this.currentFeedbackTask = null;
             this.$store.taskModal.feedbackModalHandle.hide();
-            await this.$store.tasksData.getTasks()
+            await this.$store.tasksData.loadTasks()
         },
     }
 }

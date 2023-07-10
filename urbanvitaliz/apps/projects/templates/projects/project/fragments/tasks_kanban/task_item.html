@@ -40,17 +40,7 @@
 						<div class="pt-2 my-2" :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
 							<div class="d-flex flex-column">
 								<span class="align-middle text-grey-dark tiny" x-text="`le ${formatDate(currentTask.created_on)}`" style="line-height: 20px"></span>
-								<div class="tiny">
-									<span class="text-grey-dark">par </span>
-									<img class="rounded-circle d-inline-block" width="20px" height="20px"
-									:src="gravatar_url(currentTask.created_by.email, 25)" data-bs-toggle="tooltip" data-bs-placement="bottom"
-										:title="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`" style="z-index: 1000;" tabindex="0" />
-									<span :class="!currentTask.created_by.is_active && 'inative-status'" class="ms-1 fst-italic" x-text="`${currentTask.created_by.first_name} ${currentTask.created_by.last_name}`"
-									style="line-height: 20px"></span>
-									<template x-if="currentTask.created_by.profile.organization_position">
-										<span x-text="currentTask.created_by.profile.organization_position" class="fst-italic text-muted"></span>
-									</template>
-								</div>
+    							{% include 'projects/project/fragments/task/task_user_card.html' %}
 								<div class="text-grey-dark d-flex align-items-center tiny me-3 responsive-flex-column mt-1">
 									<svg class="align-middle bi me-1"
 										width="18px"

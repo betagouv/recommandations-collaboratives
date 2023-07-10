@@ -1,5 +1,5 @@
 import '../store/tasks'
-import '../components/KanbanTasks'
+// import '../components/TasksKanban'
 import '../components/Spinner'
 import '../components/StatusSwitcher'
 import '../../css/statusSwitcher.css'

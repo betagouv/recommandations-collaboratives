@@ -64,7 +64,7 @@ export default function boardTasksApp(projectId) {
                 if (nextData) await this.$store.tasksData.moveTask(data.id, nextData.id);
             }
 
-            await this.$store.tasksData.getTasks()
+            await this.$store.tasksData.loadTasks()
         }    
     }
 

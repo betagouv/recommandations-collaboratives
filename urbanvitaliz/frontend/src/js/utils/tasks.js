@@ -20,10 +20,10 @@ export function isStatusUpdate(followup) {
 
 const STATUS_TEXT = {
     0: "nouveau",
-    1: "en cours",
+    1: "En cours",
     2: "en attente",
-    3: "faite",
-    4: "non applicable",
+    3: "Fait",
+    4: "Non applicable",
     5: "faite" // ALREADY_DONE: Legacy status, kind of
 }
 

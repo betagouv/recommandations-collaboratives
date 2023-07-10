@@ -5,8 +5,8 @@ import '../../css/tasks.css'
 
 
 //Store
-import '../store/tasks'
 import '../store/tasksData'
+import '../store/tasks'
 import '../store/previewModal'
 
 //Components
@@ -15,4 +15,4 @@ import '../components/TasksKanban'
 import '../components/Task'
 import '../components/PreviewModal'
 import '../components/TaskModal'
-import '../components/StatusSwitcher'
+import '../components/TaskStatusSwitcher'

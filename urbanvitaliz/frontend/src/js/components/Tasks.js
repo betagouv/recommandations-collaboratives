@@ -32,7 +32,7 @@ export default function TasksApp(app, projectId) {
             return this.$store.tasksData.tasks.find(d => d.id === id);
         },
         get view() {
-            const result = this.$store.tasksData.tasks.filter((d) => this.filterFn(d)).sort((a, b) => this.sortFn(a, b));
+            const result = this.$store.tasksView.displayedTasks.filter((d) => this.filterFn(d)).sort((a, b) => this.sortFn(a, b));
             return result;
         },
         column(status) {
@@ -69,7 +69,6 @@ export default function TasksApp(app, projectId) {
                 selector: "[data-bs-toggle='tooltip']"
             })
         },
-
         async onSetTaskPublic(id, value) {
             await patchTask(id, { public: value });
             await this.getData();

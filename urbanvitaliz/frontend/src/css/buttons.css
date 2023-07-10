@@ -34,6 +34,10 @@
     padding: 5px 15px;
 }
 
+.button.tiny {
+    padding: 3px 10px;
+}
+
 .button.filled {
     background-color: #0063CB;
     color: white;
@@ -51,6 +55,11 @@
 .button.white {
     border-color: white;
     color: white;
+}
+
+.button.black {
+    border-color: #222;
+    color: #222;
 }
 
 .button.white.filled {
