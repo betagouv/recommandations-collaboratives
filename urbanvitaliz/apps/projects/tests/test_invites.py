@@ -247,6 +247,8 @@ def test_assigned_advisor_can_invite_advisor_to_project(request, client):
     assert response.status_code == 302
     invite = invites_models.Invite.on_site.first()
     assert invite.email == data["email"]
+    # advisrors are invited as observer by default
+    assert invite.role == "OBSERVER"
 
 
 @pytest.mark.django_db
