@@ -69,10 +69,6 @@ export default function TasksApp(app, projectId) {
                 selector: "[data-bs-toggle='tooltip']"
             })
         },
-        async onSetTaskPublic(id, value) {
-            await patchTask(id, { public: value });
-            await this.getData();
-        },
         handleOpenFeedbackModal(task) {
             console.log('dispatch somthg', task);
             console.log(this.$dispatch('open-feedback-modal', task))

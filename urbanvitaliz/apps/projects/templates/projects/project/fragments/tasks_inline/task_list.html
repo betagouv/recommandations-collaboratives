@@ -1,5 +1,5 @@
 <template x-for="(task, i) in column(board.status)" :key="task.id">
-    <div class="task-animation-appear-in">
+    <div class="task-animation-appear-in position-relative" :style="`z-index:${10000-i}`">
         {% include 'projects/project/fragments/tasks_inline/task_item.html' %}
     </div>
 </template>

@@ -5,7 +5,7 @@ import { renderMarkdown } from '../utils/markdown'
 import { formatDate } from '../utils/date'
 import { resourcePreviewUrl, deleteTaskUrl } from '../utils/api'
 import { gravatar_url } from '../utils/gravatar'
-import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
+import { isStatusUpdate, statusText } from "../utils/taskStatus"
 
 export default function TaskModal() {
     return {
@@ -25,8 +25,7 @@ export default function TaskModal() {
         feedbackComment:'',
         feedbackStatus: TASK_STATUSES.DONE,
         init() {
-            this.initDeleteTaskConfirmationModal();
-            this.initFeedbackModal();
+            // this.initFeedbackModal();
         },
         async onSubmitComment() {
             if (!this.currentlyEditing) {
@@ -73,8 +72,6 @@ export default function TaskModal() {
             element.addEventListener("hidden.bs.modal", cleanup);
         },
         openDeleteModal(e) {
-            console.log('task open delete event ? :', e)
-            console.log('open delete modal')
             const task = e.detail
             this.$store.taskModal.onDeleteClick(task)
             this.currentDeletingTask = task;

@@ -1,0 +1,80 @@
+{% load static %}
+<div class="d-flex align-items-center position-relative">
+    <template x-if="i > 0">
+        <button class="border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1"
+                @click="handleMove('above',task, column(board.status)[i - 1])"
+                style="cursor: pointer">
+            <svg class="bi" width="13px" height="13px" fill="#929292">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
+            </svg>
+        </button>
+    </template>
+    <template x-if="i < column(board.status).length - 1">
+        <button class="border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1"
+                @click="handleMove('below',task, column(board.status)[i + 1])"
+                :class="{'active':open}"
+                style="cursor: pointer">
+            <svg class="bi" width="13px" height="13px" fill="#929292">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
+            </svg>
+        </button>
+    </template>
+    <div x-data="{ open: false }" x-on:click.outside="open = false">
+        <button id="update-task-action-inline"
+                x-on:click="open = !open"
+                :class="{'bg-grey':open}"
+                class="border tiny d-flex align-items-center justify-content-center px-2 py-2">
+            <svg class="bi" width="13" height="13" fill="#929292">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#three-dots" />
+            </svg>
+        </button>
+        <ul x-show="open"
+            :class="{'show':open}"
+            class="common-dropdown list-unstyled flex-column">
+            <li>
+                <a id="update-task-action-inline"
+                   class="appearance-none w-100 py-2 px-2 d-flex justify-content-start align-items-center border-bottom text-decoration-none"
+                   :href="editTaskUrl(task.id, '{{ request.path }}')">
+                    <svg class="bi me-2" width="13" height="13" fill="#666666">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
+                    </svg>
+                    <span class="text-grey-dark text-info-custom tiny">Modifier</span>
+                </a>
+            </li>
+            <template x-if="task.public">
+                <li>
+                    <button id="update-task-action-inline"
+                            @click="onSetTaskPublic(task, false)"
+                            class="bg-white appearance-none w-100 py-2 px-2 d-flex justify-content-start align-items-center border-bottom text-decoration-none">
+                        <svg class="bi me-2" width="13" height="13" fill="#666666">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-square" />
+                        </svg>
+                        <span class="text-grey-dark text-info-custom tiny text-nowrap">Passer en brouillon</span>
+                    </button>
+                </li>
+            </template>
+            <template x-if="!task.public">
+                <li>
+                    <button id="update-task-action-inline"
+                            @click="onSetTaskPublic(task, true)"
+                            class="bg-white appearance-none w-100 py-2 px-2 d-flex justify-content-start align-items-center border-bottom text-decoration-none">
+                        <svg class="bi me-2" width="13" height="13" fill="#666666">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-square" />
+                        </svg>
+                        <span class="text-grey-dark text-info-custom tiny text-nowrap">Publier</span>
+                    </button>
+                </li>
+            </template>
+            <li>
+                <button id="update-task-action-inline cursor-pointer"
+                        @click="handleOpenDeleteModal()"
+                        class="bg-white text-red-light appearance-none w-100 py-2 px-2 d-flex justify-content-start align-items-center border-bottom text-decoration-none">
+                    <svg class="bi text-red-light me-2" width="13" height="13" fill="#E1000F">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
+                    </svg>
+                    <span class="text-red-light text-info-custom tiny text-nowrap">Supprimer</span>
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>

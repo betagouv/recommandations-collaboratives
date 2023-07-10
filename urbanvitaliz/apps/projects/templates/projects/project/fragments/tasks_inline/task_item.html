@@ -5,31 +5,8 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
      :class="!task.public ? 'border-yellow' : 'border'"
-     :style="task.isLoading && 'opacity:0.3'"
+     :style="task.isLoading && 'opacity:0.3';"
      class="rounded mb-3 px-3 d-flex pt-3 pb-3 justify-content-between align-items-start task-item ease-transition">
-    <!-- {% if "use_tasks" in user_project_perms and not disable_edit %}
-        <div class="task-toolbar">
-            <template x-if="i > 0 && !filterIsDraft">
-                <a class="mb-1 bg-white rounded-circle border tiny d-flex align-items-center justify-content-center px-2 py-2" @click="$store.tasksData.moveAbove(task, column(board.status)[i - 1])" style="cursor: pointer">
-                    <svg class="bi" width="13px" height="13px" fill="#c6c6c6">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
-                    </svg>
-                </a>
-            </template>
-            <template x-if="i < column(board.status).length - 1 && !filterIsDraft">
-                <a class="mb-1 bg-white rounded-circle border tiny d-flex align-items-center justify-content-center px-2 py-2" @click="$store.tasksData.moveBelow(task, column(board.status)[i + 1])" style="cursor: pointer">
-                    <svg class="bi" width="13px" height="13px" fill="#c6c6c6">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
-                    </svg>
-                </a>
-            </template>
-            <a id="update-task-action-inline" class="rounded-circle bg-white border tiny d-flex align-items-center justify-content-center px-2 py-2" :href="editTaskUrl(task.id, '{{ request.path }}')">
-                <svg class="bi" width="13" height="13" fill="#CCCCCC">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
-                </svg>
-            </a>
-        </div>
-    {% endif %} -->
     <div x-show="task.isLoading"
          class="ms-2 item-loader"
          style="width: 24px;
@@ -48,20 +25,25 @@
                 <span class="bg-yellow text-dark">Brouillon</span>
             </div>
         </template>
-        {% if "manage_tasks" in user_project_perms and not disable_edit %}
-            <div class="d-flex w-100 justify-content-between align-items-center">
-                <div class="d-flex w-100 align-items-center">
-                    <span class="mt-0 pt-0mb-0 fw-bold title-info text-dark cursor-pointer hover-border-bottom"
-                          @click="handleOpenPreviewModal()"
-                          x-text="task.intent"></span>
-                    <!-- <template x-if="!task.public">
+        <div class="d-flex align-items-center justify-content-between">
+            {% if "manage_tasks" in user_project_perms and not disable_edit %}
+                <div class="d-flex w-100 justify-content-between align-items-center">
+                    <div class="d-flex w-100 align-items-center">
+                        <span class="mt-0 pt-0mb-0 fw-bold title-info text-dark cursor-pointer hover-border-bottom"
+                              @click="handleOpenPreviewModal()"
+                              x-text="task.intent"></span>
+                        <!-- <template x-if="!task.public">
                         <div class="d-flex justify-content-between align-items-center flex-grow-1">
                             <button @click="publishTask(task.id)" class="button small tiny py-0 px-2 me-4">publier</button>
                         </div>
                     </template> -->
+                    </div>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+            {% if "use_tasks" in user_project_perms and not disable_edit %}
+                {% include 'projects/project/fragments/task/task_actions.html' %}
+            {% endif %}
+        </div>
         <article class="mt-1 mb-2">
             <template x-if="task.content !== ''">
                 <div x-html="renderMarkdown(task.content)"

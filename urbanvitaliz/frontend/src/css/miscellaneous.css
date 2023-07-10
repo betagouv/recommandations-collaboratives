@@ -77,6 +77,32 @@
     cursor: pointer;
 }
 
+.common-dropdown {
+    position: absolute;
+    z-index: 100;
+
+    right: 0;
+    top: 112%;
+
+    background-color: white;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.16), 0px 1px 0px -2px rgba(0, 0, 0, 0.16), 0px 1px 4px rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+
+    overflow: hidden;
+}
+
+.common-dropdown.show {
+    display: flex;
+}
+
+.common-dropdown li a:hover, .common-dropdown li button:hover {
+    background-color: #e6e6e6 !important;
+}
+
+.common-dropdown li a:hover span, .common-dropdown li button:hover span {
+    color: #222 !important;
+}
+
 @keyframes component-pulse {
     0% {
         box-shadow: 0 0 1px 4px #cce3fb;

@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs'
 
-import{ editTaskUrl, deleteTaskReminderUrl} from '../utils/api'
+import { editTaskUrl, deleteTaskReminderUrl } from '../utils/api'
 import { formatDate } from '../utils/date'
 import { toArchiveTooltip, reminderTooltip, isOldReminder } from '../utils/tooltip'
 import { renderMarkdown } from '../utils/markdown'
@@ -8,11 +8,11 @@ import { gravatar_url } from '../utils/gravatar'
 
 export default function Task(currentTask) {
     return {
-        currentTask:null,
-        currentTaskId:null,
+        currentTask: null,
+        currentTaskId: null,
         toArchiveTooltip,
-        currentTaskFollowups:null,
-        currentTaskNotifications:null,
+        currentTaskFollowups: null,
+        currentTaskNotifications: null,
         editTaskUrl,
         renderMarkdown,
         formatDate,
@@ -23,17 +23,37 @@ export default function Task(currentTask) {
         init() {
             this.currentTask = currentTask
         },
-        handleOpenPreviewModal() {
-            console.log('dispatch somthg', this.currentTask);
-            //console.log(this.$dispatch('open-preview-modal', this.currentTask))
-            this.$store.previewModal.open(this.currentTask.id)
-        },
         handleOpenDeleteModal() {
-            console.log('dispatch somthg', this.currentTask);
-            console.log(this.$dispatch('open-delete-modal', this.currentTask))
+            this.$dispatch('open-delete-modal', this.currentTask)
         },
-         // Comments
-         onEditComment(followup) {
+        async onSetTaskPublic(task, value) {
+            task.isLoading = true
+            await this.$store.tasksData.patchTask(task.id, { public: value });
+            await this.$store.tasksView.updateViewWithTask(task.id)
+            task.isLoading = false
+        },
+        async handleMove(direction, task, otherTask) {
+
+            const taskToChange = this.$store.tasksView.findById(task.id)
+            const otherTaskToChange = this.$store.tasksView.findById(otherTask.id)
+
+            taskToChange.isLoading = true
+            otherTaskToChange.isLoading = true
+
+            if (direction === 'above') {
+                await this.$store.tasksData.moveAbove(task, otherTask)
+            } else if (direction === 'below') {
+                await this.$store.tasksData.moveBelow(task, otherTask)
+            }
+
+            await this.$store.tasksView.updateViewWithTask(task.id)
+            await this.$store.tasksView.updateViewWithTask(otherTask.id)
+
+            taskToChange.isLoading = true
+            otherTaskToChange.isLoading = true
+        },
+        // Comments
+        onEditComment(followup) {
             this.pendingComment = followup.comment;
             this.currentlyEditing = ["followup", followup.id];
             this.$refs.commentTextRef.focus();

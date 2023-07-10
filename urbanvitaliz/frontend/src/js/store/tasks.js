@@ -1,6 +1,4 @@
 import Alpine from 'alpinejs'
-import api, { tasksUrl, taskUrl, moveTaskUrl, followupsUrl, taskNotificationsUrl, markTaskNotificationsAsReadUrl } from '../utils/api'
-import { generateUUID } from '../utils/uuid'
 
 document.addEventListener('alpine:init', () => {
 
@@ -14,6 +12,9 @@ document.addEventListener('alpine:init', () => {
             const updatedTasks = await Alpine.store('tasksData').loadTasks();
             const updatedTask = updatedTasks.find(task => task.id === taskId)
             this.displayedTasks = this.displayedTasks.map(task => task.id === taskId ? updatedTask : task)
+        },
+        findById(taskId) {
+            return this.displayedTasks.find(task => task.id === taskId)
         },
         switchView() {
             this.currentView === 'inline' ? this.currentView = 'kanban' : this.currentView = 'inline'
@@ -34,12 +35,10 @@ document.addEventListener('alpine:init', () => {
         },
         onDeleteClick(task) {
             this.currentTask = task
-            console.log('delete task ', this.currentTask);
             this.deleteModalHandle.show();
         },
         onFeedbackClick(task) {
             this.currentTask = task
-            console.log('delete task ', this.currentTask);
             this.feedbackModalHandle.show();
         }
     })

@@ -41,7 +41,6 @@ document.addEventListener('alpine:init', () => {
             await api.post(moveTaskUrl(this.projectId, taskId), params, {
                 headers: { 'content-type': 'application/x-www-form-urlencoded' },
             })
-            await this.loadTasks();
         },
         // Movement Buttons
         async moveAbove(task, otherTask) {
