@@ -24,7 +24,7 @@ class="row">
                             </div>
                         </div>
                     </template>
-                    <template x-for="(t, i) in column(board.status)" :key="t.id">
+                    <template x-for="(task, i) in column(board.status)" :key="task.id">
                         {% include 'projects/project/fragments/tasks_kanban/task_item.html' %}
                     </template>
                 </div>

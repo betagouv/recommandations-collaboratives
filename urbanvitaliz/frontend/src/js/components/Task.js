@@ -76,7 +76,7 @@ export default function Task(currentTask) {
             } else if (!task.public) {
                 return '-yellow'
             } else {
-                return ''
+                return '-grey-dark'
             }
         }
     }

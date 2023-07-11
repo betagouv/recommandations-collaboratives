@@ -1,20 +1,34 @@
 {% load static %}
 {% load guardian_tags %}
-
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-
-	<div x-data="Task(t)" :id="t.uuid" class="drag-targetable py-1" @dragover="onDragOver(event)"
-		@drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
-		<div class="medium-border-radius bg-white border-grey position-relative" :draggable="true" @dragstart="onDragStart(event, t.uuid)"
-			@dragend="onDragEnd(event)">
-			<template x-if="currentTask.notifications.count > 0">
-				<span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold"
-					style="font-size: 0.7em;" x-text="currentTask.notifications.count"></span>
-			</template>
-			<div class="p-2">
-				<div class="d-flex flex-row">
-					<!-- <div class="mt-1 d-flex flex-column justify-content-between">
+<div x-data="Task(task)"
+     :id="task.uuid"
+     class="drag-targetable py-1 position-relative"
+     @dragover="onDragOver(event)"
+     @drop="onDrop(event, board.status, task.uuid)"
+     @dragenter="onDragEnter(event)"
+     @dragleave="onDragLeave(event)">
+    <div x-show="task.isLoading"
+         class="ms-2 item-loader z-index-1"
+         style="width: 24px;
+                height: 24px">
+        <div class="spinner-border spinner-border spinner-border-sm text-primary"
+             role="status"></div>
+    </div>
+    <div class="medium-border-radius bg-white border-grey-dark position-relative"
+         :style="task.isLoading && 'opacity:0.3';"
+         :draggable="true"
+         @dragstart="onDragStart(event, task.uuid)"
+         @dragend="onDragEnd(event)">
+        <template x-if="currentTask.notifications.count > 0">
+            <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold"
+                  style="font-size: 0.7em"
+                  x-text="currentTask.notifications.count"></span>
+        </template>
+        <div class="p-2">
+            <div class="d-flex flex-row">
+                <!-- <div class="mt-1 d-flex flex-column justify-content-between">
 						{% if "use_tasks" in user_project_perms and not disable_edit %}
 							<div>
 								<template x-if="i > 0">
@@ -33,30 +47,35 @@
 								</template>
 							</div>
 						{% endif %}
-					</div> -->
-					<div class="flex-fill mt-1 ms-2" @click="handleOpenPreviewModal()" style="cursor: pointer; font-size: 0.9em;">
-						<h6 class="mb-0 fw-bold" x-text="currentTask.intent"></h6>
-						
-						<div class="pt-2 my-2" :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
-							<div class="d-flex flex-column">
-								<span class="align-middle text-grey-dark tiny" x-text="`le ${formatDate(currentTask.created_on)}`" style="line-height: 20px"></span>
-    							{% include 'projects/project/fragments/task/task_user_card.html' %}
-								<div class="text-grey-dark d-flex align-items-center tiny me-3 responsive-flex-column mt-1">
-									<svg class="align-middle bi me-1"
-										width="18px"
-										height="15px"
-										fill="currentColor">
-										<use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
-									</svg>
-									<span class="tiny" x-text="currentTask.resource_id ? currentTask.comments_count + 1  + ' messages' : currentTask.comments_count + ' messages'"></span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- <div class="border-top p-2 d-flex justify-content-between" style="font-size: 0.8em">
+</div> -->
+                <div class="flex-fill mt-1 ms-2"
+                     @click="handleOpenPreviewModal()"
+                     style="cursor: pointer;
+                            font-size: 0.9em">
+                    <h6 class="mb-0 fw-bold" x-text="currentTask.intent"></h6>
+                    <div class="pt-2 my-2"
+                         :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
+                        <div class="d-flex flex-column">
+                            <span class="align-middle text-grey-dark tiny"
+                                  x-text="`le ${formatDate(currentTask.created_on)}`"
+                                  style="line-height: 20px"></span>
+                            {% include 'projects/project/fragments/task/task_user_card.html' %}
+                            <div class="text-grey-dark d-flex align-items-center tiny me-3 responsive-flex-column mt-1">
+                                <svg class="align-middle bi me-1"
+                                     width="18px"
+                                     height="15px"
+                                     fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
+                                </svg>
+                                <span class="tiny"
+                                      x-text="currentTask.resource_id ? currentTask.comments_count + 1  + ' messages' : currentTask.comments_count + ' messages'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="border-top p-2 d-flex justify-content-between" style="font-size: 0.8em">
 				<div class="d-flex align-items-center">
 					<div class="text-primary position-relative" @click="onPreviewClick(currentTask.id)" style="cursor: pointer;">
 						<svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
@@ -66,11 +85,8 @@
 					</div>
 				</div>
 
-				<div class="d-flex align-items-center"
-					x-data="{ hasReminders: currentTask.reminders.length > 0, reminder: currentTask.reminders[0] }">
-					<div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" :style="isOldReminder(currentTask.reminders[0]) ? 'color:#6c757d !important;' : ''" data-bs-toggle="tooltip"
-						data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(currentTask.id)"
-						style="cursor: pointer;">
+				<div class="d-flex align-items-center" x-data="{ hasReminders: currentTask.reminders.length > 0, reminder: currentTask.reminders[0] }">
+					<div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" :style="isOldReminder(currentTask.reminders[0]) ? 'color:#6c757d !important;' : ''" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(currentTask.id)" style="cursor: pointer;">
 						<svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
 							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
 						</svg>
@@ -99,12 +115,12 @@
 							</li>
 							
 							<li>
-								<a :id=`task-${t.id}-delete-button` class="dropdown-item text-danger" style="cursor: pointer;" @click="handleOpenDeleteModal()">Supprimer</a>
+								<a :id=`task-${task.id}-delete-button` class="dropdown-item text-danger" style="cursor: pointer;" @click="handleOpenDeleteModal()">Supprimer</a>
 							</li>
 						</ul>
 					</div>
 					{% endif %}
 				</div>
-			</div> -->
-		</div>
-	</div>
+</div> -->
+    </div>
+</div>

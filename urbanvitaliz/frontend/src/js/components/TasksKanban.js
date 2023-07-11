@@ -43,8 +43,6 @@ export default function boardTasksApp(projectId) {
         async onDrop(event, status, targetUuid) {
             event.preventDefault();
 
-            console.log('board status ? ', status);
-
             this.currentlyHoveredElement.classList.remove('drag-target');
             this.currentlyHoveredElement = null;
 
@@ -52,6 +50,11 @@ export default function boardTasksApp(projectId) {
 
             const data = this.findByUuid(uuid)
             const nextData = this.findByUuid(targetUuid)
+
+            data.isLoading = true
+            if (nextData) {
+                nextData.isLoading = true
+            }
 
             if (status instanceof Array) {
                 if (this.isArchivedStatus(data.status) && nextData) {
@@ -64,8 +67,12 @@ export default function boardTasksApp(projectId) {
                 if (nextData) await this.$store.tasksData.moveTask(data.id, nextData.id);
             }
 
-            await this.$store.tasksData.loadTasks()
-        }    
+            await this.$store.tasksView.updateView()
+            data.isLoading = false
+            if (nextData) {
+                nextData.isLoading = false
+            }
+        }
     }
 
     return TaskApp(app, projectId)
