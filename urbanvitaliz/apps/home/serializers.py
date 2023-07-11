@@ -19,7 +19,7 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserProfile
 
-        fields = ["organization"]
+        fields = ["organization", "organization_position"]
 
     organization = OrganizationSerializer(read_only=True, many=False)
 
