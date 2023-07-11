@@ -7,7 +7,7 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-12-24 12:37:56 CEST
 """
 
-from .sendinblue import SendInBlue
+from ..sendinblue import SendInBlue
 
 
 def test_sib_send_email_to_unique_recipient(mocker, client):
