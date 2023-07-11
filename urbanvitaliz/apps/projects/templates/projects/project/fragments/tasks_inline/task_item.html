@@ -41,13 +41,17 @@
         </div>
         <article class="mt-1 mb-2">
             <template x-if="task.resource_id && task.resource && task.resource.subtitle">
-                <div x-html="renderMarkdown(task.resource.subtitle)"
+                <div x-html="truncate(renderMarkdown(task.resource.subtitle),500)"
                      class="text-info-custom fw-light font-small text-dark m-0 p-0"></div>
             </template>
+            <template x-if="!task.resource_id && task.content">
+                <div x-html="truncate(renderMarkdown(task.content),500)"
+                     class="text-info-custom fw-light font-small text-dark mb-2 p-0"></div>
+            </template>
         </article>
-        <article class="mb-3">
-            {% include 'projects/project/fragments/task/task_comment.html' %}
-        </article>
+        <template x-if="task.resource">
+            <article class="mb-3">{% include 'projects/project/fragments/task/task_comment.html' %}</article>
+        </template>
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 {% include 'projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html' %}
