@@ -13,6 +13,9 @@ document.addEventListener('alpine:init', () => {
             const updatedTask = updatedTasks.find(task => task.id === taskId)
             this.displayedTasks = this.displayedTasks.map(task => task.id === taskId ? updatedTask : task)
         },
+        async updateView() {
+            this.displayedTasks = await Alpine.store('tasksData').loadTasks();
+        },
         findById(taskId) {
             return this.displayedTasks.find(task => task.id === taskId)
         },

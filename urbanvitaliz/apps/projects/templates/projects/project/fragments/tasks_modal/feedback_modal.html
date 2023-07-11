@@ -1,6 +1,6 @@
 {% load static %}
 
-<div x-data="TaskModal()" class="modal fade" id="feedback-modal" tabindex="-1" aria-labelledby="feedback-modal-label" aria-hidden="true"
+<div x-data="TaskModal()" x-init="initFeedbackModal()" class="modal fade" id="feedback-modal" tabindex="-1" aria-labelledby="feedback-modal-label" aria-hidden="true"
   @open-feedback-modal.window="openFeedbackModal($event)">
   <div class="modal-dialog">
     <template x-if="currentFeedbackTask">
@@ -22,7 +22,7 @@
             <label class="form-label fw-bolder" for="invite-role">Raison de l'archivage</label>
 
             <div class="position-relative bg-white border rounded p-3 mb-2">
-              <input x-model="feedbackStatus" type="radio" id="status-done" value="3" style="transform: scale(1.2);">
+              <input x-model="feedbackStatus" type="radio" id="status-done" value="4" style="transform: scale(1.2);">
               <label for="status-done" class="position-absolute w-100 h-100 top-0 left-0"><span
                   class="visually-hidden">C'est fait / Ça a été utile</span></label>
               <span class="ms-1">C'est fait / Ça a été utile</span>

@@ -26,10 +26,10 @@ export default function TasksApp(app, projectId) {
             return this.isSwitchtender ? true : (this.canAdministrate || d.public);
         },
         findByUuid(uuid) {
-            return this.$store.tasksData.tasks.find(d => d.uuid === uuid);
+            return this.$store.tasksView.displayedTasks.find(d => d.uuid === uuid);
         },
         findById(id) {
-            return this.$store.tasksData.tasks.find(d => d.id === id);
+            return this.$store.tasksView.displayedTasks.find(d => d.id === id);
         },
         get view() {
             const result = this.$store.tasksView.displayedTasks.filter((d) => this.filterFn(d)).sort((a, b) => this.sortFn(a, b));

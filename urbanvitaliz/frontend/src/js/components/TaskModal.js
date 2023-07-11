@@ -24,9 +24,6 @@ export default function TaskModal() {
         currentFeedbackTask: {},
         feedbackComment:'',
         feedbackStatus: TASK_STATUSES.DONE,
-        init() {
-            // this.initFeedbackModal();
-        },
         async onSubmitComment() {
             if (!this.currentlyEditing) {
                 await this.$store.tasksData.issueFollowup(this.$store.taskModal.currentTask, undefined, this.pendingComment);
@@ -104,7 +101,7 @@ export default function TaskModal() {
             this.feedbackComment = '';
             this.currentFeedbackTask = null;
             this.$store.taskModal.feedbackModalHandle.hide();
-            await this.$store.tasksData.loadTasks()
+            await this.$store.tasksView.updateView()
         },
     }
 }
