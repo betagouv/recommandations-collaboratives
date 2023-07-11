@@ -16,6 +16,7 @@ def assign_org_sites_from_user_profiles(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
+        ("home", "0001_initial"),
         ("addressbook", "0007_activate_trm"),
     ]
 
