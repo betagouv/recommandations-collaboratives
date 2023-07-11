@@ -1,7 +1,7 @@
 {% load static %}
 <div class="d-flex align-items-center position-relative">
     <template x-if="i > 0">
-        <button class="border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1"
+        <button class="border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey"
                 @click="handleMove('above',task, column(board.status)[i - 1])"
                 style="cursor: pointer">
             <svg class="bi" width="13px" height="13px" fill="#929292">
@@ -10,7 +10,7 @@
         </button>
     </template>
     <template x-if="i < column(board.status).length - 1">
-        <button class="border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1"
+        <button class="border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey"
                 @click="handleMove('below',task, column(board.status)[i + 1])"
                 :class="{'active':open}"
                 style="cursor: pointer">
@@ -23,7 +23,7 @@
         <button id="update-task-action-inline"
                 x-on:click="open = !open"
                 :class="{'bg-grey':open}"
-                class="border tiny d-flex align-items-center justify-content-center px-2 py-2">
+                class="border tiny d-flex align-items-center justify-content-center px-2 py-2 hover-bg-grey">
             <svg class="bi" width="13" height="13" fill="#929292">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#three-dots" />
             </svg>

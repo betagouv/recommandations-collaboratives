@@ -5,16 +5,16 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
      :class="!task.public ? 'border-yellow' : 'border'"
-     :style="task.isLoading && 'opacity:0.3';"
-     class="rounded mb-3 px-3 d-flex pt-3 pb-3 justify-content-between align-items-start task-item ease-transition">
+     class="rounded mb-3 px-3 d-flex pt-3 pb-3 justify-content-between align-items-start task-item">
     <div x-show="task.isLoading"
-         class="ms-2 item-loader"
+         class="ms-2 item-loader z-index-1"
          style="width: 24px;
                 height: 24px">
         <div class="spinner-border spinner-border spinner-border-sm text-primary"
              role="status"></div>
     </div>
-    <div class="d-flex flex-column flex-grow-1">
+    <div class="d-flex flex-column flex-grow-1 ease-transition"
+         :style="task.isLoading && 'opacity:0.3';">
         <template x-if="task.status === 0 && task.public">
             <div class="card-top-information left-0">
                 <span class="bg-blue text-white">Nouveau</span>
@@ -32,11 +32,6 @@
                         <span class="mt-0 pt-0mb-0 fw-bold title-info text-dark cursor-pointer hover-border-bottom"
                               @click="handleOpenPreviewModal()"
                               x-text="task.intent"></span>
-                        <!-- <template x-if="!task.public">
-                        <div class="d-flex justify-content-between align-items-center flex-grow-1">
-                            <button @click="publishTask(task.id)" class="button small tiny py-0 px-2 me-4">publier</button>
-                        </div>
-                    </template> -->
                     </div>
                 </div>
             {% endif %}
@@ -45,10 +40,13 @@
             {% endif %}
         </div>
         <article class="mt-1 mb-2">
-            <template x-if="task.content !== ''">
-                <div x-html="renderMarkdown(task.content)"
+            <template x-if="task.resource_id && task.resource && task.resource.subtitle">
+                <div x-html="renderMarkdown(task.resource.subtitle)"
                      class="text-info-custom fw-light font-small text-dark m-0 p-0"></div>
             </template>
+        </article>
+        <article class="mb-3">
+            {% include 'projects/project/fragments/task/task_comment.html' %}
         </article>
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">

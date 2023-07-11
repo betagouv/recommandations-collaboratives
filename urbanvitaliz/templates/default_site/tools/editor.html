@@ -1,5 +1,5 @@
 {% load static %}
-<div {% if escapejs %} x-data='editor("{{ input_value|escapejs }}")' {% else %} x-data='editor({{ input_value }})'{% endif %}
+<div {% if escapejs %} x-data='editor("{{ input_value|escapejs }}")' {% elif is_task_comment %}x-data='editor(task.content)' {% else %} x-data='editor({{ input_value }})'{% endif %}
      class="w-100">
   <template x-if="isLoaded()">
     <div class="tiptap-menu">
@@ -51,7 +51,7 @@
     {% if is_task_comment %}
       <div class="d-flex justify-content-end">
         <button class="button filled blue small inherit"
-                @click="$store.taskComment.addComment(markdownContent,task)">Enregistrer</button>
+                @click="handleEditComment(markdownContent,task)">Enregistrer</button>
       </div>
     {% endif %}
     {% if errors %}

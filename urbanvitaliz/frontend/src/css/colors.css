@@ -58,3 +58,6 @@
     fill: #929292;
 }
 
+.hover-bg-grey:hover {
+    background-color: #E5E5E5;
+}
