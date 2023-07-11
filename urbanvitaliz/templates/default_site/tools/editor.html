@@ -1,52 +1,67 @@
 {% load static %}
-
-<div {%if escapejs %} x-data='editor("{{input_value|escapejs}}")' {% else %} x-data='editor({{input_value}})'{% endif %} class="w-100">
+<div {% if escapejs %} x-data='editor("{{ input_value|escapejs }}")' {% else %} x-data='editor({{ input_value }})'{% endif %}
+     class="w-100">
   <template x-if="isLoaded()">
     <div class="tiptap-menu">
-      <button @click.prevent @click="toggleHeading({ level: 3 })"
-        :class="{ 'is-active': isActive('heading', { level: 3 }, updatedAt) }">
+      <button @click.prevent
+              @click="toggleHeading({ level: 3 })"
+              :class="{ 'is-active': isActive('heading', { level: 3 }, updatedAt) }">
         <span style="font-weight:500">Titre</span>
       </button>
-      <button @click.prevent @click="toggleBold()" :class="{ 'is-active' : isActive('bold', updatedAt) }">
+      <button @click.prevent
+              @click="toggleBold()"
+              :class="{ 'is-active' : isActive('bold', updatedAt) }">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#type-bold"/>
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#type-bold" />
         </svg>
       </button>
-      <button @click.prevent @click="toggleItalic()" :class="{ 'is-active' : isActive('italic', updatedAt) }">
+      <button @click.prevent
+              @click="toggleItalic()"
+              :class="{ 'is-active' : isActive('italic', updatedAt) }">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#type-italic"/>
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#type-italic" />
         </svg>
       </button>
-      <button @click.prevent @click="toggleBulletList()" :class="{ 'is-active' : isActive('bulletList', updatedAt) }">
+      <button @click.prevent
+              @click="toggleBulletList()"
+              :class="{ 'is-active' : isActive('bulletList', updatedAt) }">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#list-ul"/>
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#list-ul" />
         </svg>
       </button>
-      <button @click.prevent @click="setLink()" :class="{ 'is-active' : isActive('link', updatedAt) }">
+      <button @click.prevent
+              @click="setLink()"
+              :class="{ 'is-active' : isActive('link', updatedAt) }">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#link"/>
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link" />
         </svg>
       </button>
-      <button class="unset-link" @click.prevent @click="unsetLink()" x-bind:disabled="!isActive('link', updatedAt)">
+      <button class="unset-link"
+              @click.prevent
+              @click="unsetLink()"
+              x-bind:disabled="!isActive('link', updatedAt)">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-          <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#link"/>
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link" />
         </svg>
       </button>
     </div>
   </template>
-
   <div class="position-relative">
-      <div class="tiptap-editor {% if wide %} is-wide {% endif %}" x-ref="element"></div>
-
-    {% if errors %}
-      {% for error in errors %}
-        <div class="text-danger text-start mb-2">{{ error }}</div>
-      {% endfor %}
+    <div class="tiptap-editor {% if wide %}is-wide{% endif %}" x-ref="element"></div>
+    {% if is_task_comment %}
+      <div class="d-flex justify-content-end">
+        <button class="button filled blue small inherit"
+                @click="$store.taskComment.addComment(markdownContent,task)">Enregistrer</button>
+      </div>
     {% endif %}
-
-    <textarea style="height: 0;" class="position-absolute top-0 opacity-0" x-model="markdownContent"
-      name="{{input_name}}" {% if input_required %} required {% endif %}></textarea>
-    
+    {% if errors %}
+      {% for error in errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
+    {% endif %}
+    <textarea style="height: 0"
+              class="position-absolute top-0 opacity-0"
+              x-model="markdownContent"
+              name="{{input_name}}"
+              :required="push_type == 'noresource' || (push_type == 'single' && public)"
+              {% if input_required %} required {% endif %}></textarea>
   </div>
-
 </div>

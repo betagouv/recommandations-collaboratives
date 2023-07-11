@@ -683,7 +683,7 @@ class Task(OrderedModel):
     intent = models.CharField(
         max_length=256, blank=True, default="", verbose_name="Intention"
     )
-    content = models.TextField(default="", verbose_name="Contenu")
+    content = models.TextField(default="", verbose_name="Contenu", blank=True)
 
     @property
     def content_rendered(self):
