@@ -57,11 +57,13 @@
     {% if errors %}
       {% for error in errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
     {% endif %}
-    <textarea style="height: 0"
-              class="position-absolute top-0 opacity-0"
-              x-model="markdownContent"
-              name="{{input_name}}"
-              :required="push_type == 'noresource' || (push_type == 'single' && public)"
-              {% if input_required %} required {% endif %}></textarea>
+    {% if input_value %}
+      <textarea style="height: 0"
+                class="position-absolute top-0 opacity-0"
+                x-model="markdownContent"
+                name="{{input_name}}"
+                :required="push_type == 'noresource' || (push_type == 'single' && public)"
+                {% if input_required %} required {% endif %}></textarea>
+    {% endif %}
   </div>
 </div>
