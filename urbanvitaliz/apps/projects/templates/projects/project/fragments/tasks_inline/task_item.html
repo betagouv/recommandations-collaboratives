@@ -4,7 +4,7 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
-     :class="!task.public ? 'border-yellow' : 'border'"
+     :class="`border${getTaskColor(task)}`"
      class="rounded mb-3 px-3 d-flex pt-3 pb-3 justify-content-between align-items-start task-item">
     <div x-show="task.isLoading"
          class="ms-2 item-loader z-index-1"
@@ -22,7 +22,7 @@
         </template>
         <template x-if="!task.public">
             <div class="card-top-information left-0">
-                <span class="bg-yellow text-dark">Brouillon</span>
+                <span :class="`bg${getTaskColor(task)}`" class="text-dark">Brouillon</span>
             </div>
         </template>
         <div class="d-flex align-items-center justify-content-between">
