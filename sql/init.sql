@@ -14,7 +14,10 @@ GRANT ALL PRIVILEGES ON DATABASE "urbanvitaliz" to "urbanvitaliz";
 -- Connect to the database
 \connect urbanvitaliz;
 
--- Create a new schema with dedicated user as owner
+-- even on pg 15 stay on unsafe usage of public schema
+GRANT ALL PRIVILEGES ON SCHEMA public TO urbanvitaliz;
+
+-- Create a new schema with dedicated user as owner for safe usage
 CREATE SCHEMA urbanvitaliz AUTHORIZATION urbanvitaliz;
 
 -- Set some settings as recommended by the Django documentation

@@ -104,6 +104,7 @@ def test_proper_commune_selection_contains_all_possible_commmunes(request, clien
 #################################################################
 # Prefilled projects
 #################################################################
+
 @pytest.mark.django_db
 def test_create_prefilled_project_is_not_reachable_without_login(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()

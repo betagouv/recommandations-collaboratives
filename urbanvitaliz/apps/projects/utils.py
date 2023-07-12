@@ -84,10 +84,10 @@ def assign_advisor(user, project, site=None):
         switchtender=user,
         site=site,
         project=project,
-        defaults={"is_observer": False},
+        defaults={"is_observer": False},  # FIXME is_observer=True requested by default
     )
 
-    if not created:
+    if not created:  # FIXME is_observer=True requested by default
         switchtending.is_observer = False
         switchtending.save()
 

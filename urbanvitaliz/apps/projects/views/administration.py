@@ -316,9 +316,8 @@ def access_advisor_invite(request, project_id):
 
     is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
 
-    return access_invite(
-        request, "SWITCHTENDER", project
-    )  # should we keep switchtender?
+    # by default advisors are created as observer first
+    return access_invite(request, "OBSERVER", project)
 
 
 @login_required

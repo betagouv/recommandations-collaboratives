@@ -71,6 +71,8 @@ def test_create_mail_reminder_replace_existing_ones():
 # Sending reminders
 ########################################################################
 
+# FIXME pourquoi ces tests ne sont pas dans communication avec la commande
+# senddigest ou la commande senddigest dans l'application courante ?
 
 @pytest.mark.django_db
 @override_settings(SENDINBLUE_FORCE_DEBUG=True)

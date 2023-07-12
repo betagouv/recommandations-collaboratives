@@ -24,8 +24,7 @@ from urbanvitaliz.apps.projects import signals as projects_signals
 from urbanvitaliz.apps.resources import models as resources_models
 from urbanvitaliz import verbs
 
-from . import digests
-from .digests import NotificationFormatter
+from .. import digests
 
 ########################################################################
 # new reco digests
@@ -204,7 +203,7 @@ def test_send_digests_for_switchtender_by_user(request, client):
 
 @pytest.mark.django_db
 def test_notification_formatter():
-    formatter = NotificationFormatter()
+    formatter = digests.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     organization = Recipe(addressbook_models.Organization, name="DuckCorp").make()
@@ -333,7 +332,7 @@ def test_notification_formatter():
 
 @pytest.mark.django_db
 def test_notification_formatter_with_bogus_user():
-    formatter = NotificationFormatter()
+    formatter = digests.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     note = Recipe(projects_models.Note).make()
