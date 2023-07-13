@@ -37,6 +37,7 @@ from urbanvitaliz.utils import (
     has_perm_or_403,
     make_group_name_for_site,
 )
+from urbanvitaliz import verbs
 from watson import search as watson
 
 from . import filters, forms, models
@@ -70,7 +71,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         context["crm_notif_stream"] = (
             self.request.user.notifications.filter(public=False)
             .filter(site=self.request.site)
-            .filter(Q(verb="a créé une note de CRM"))
+            .filter(Q(verb=verbs.CRM.NOTE_CREATED))
             .order_by("-timestamp")
             .prefetch_related("actor", "action_object", "target")
         )
@@ -688,7 +689,7 @@ def create_note_for_user(request, user_id):
         notify.send(
             sender=request.user,
             recipient=crm_users,
-            verb="a créé une note de CRM",
+            verb=verbs.CRM.NOTE_CREATED,
             action_object=note,
             target=user,
             public=False,

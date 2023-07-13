@@ -9,10 +9,11 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
+
+from urbanvitaliz import verbs
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import (
@@ -28,9 +29,9 @@ from ..utils import (
     get_advisor_for_project,
     get_notification_recipients_for_project,
     is_advisor_for_project,
+    is_member,
     is_regional_actor_for_project,
     set_active_project_id,
-    is_member,
 )
 
 
@@ -90,19 +91,23 @@ def update_user_project_status(site, user, project):
 def mark_notifications_as_seen(user, project):
     # Mark some notifications as seen (general ones)
     project_ct = ContentType.objects.get_for_model(project)
+    notif_verbs = [
+        verbs.Conversation.PUBLIC_MESSAGE,
+        verbs.Document.ADDED,  # FIXME to remove
+        verbs.Document.ADDED_FILE,
+        verbs.Document.ADDED_LINK,
+        verbs.Project.BECAME_SWITCHTENDER,
+        verbs.Project.BECAME_ADVISOR,
+        verbs.Project.BECAME_OBSERVER,
+        verbs.Project.JOINED,
+        verbs.Project.SUBMITTED_BY,
+        verbs.Project.VALIDATED,
+        verbs.Project.VALIDATED_BY,
+        verbs.Recommendation.COMMENTED,
+        verbs.Survey.UPDATED,
+    ]
     notifications = user.notifications.unread().filter(
-        Q(verb="est devenu·e aiguilleur·se sur le projet")  # XXX For compatibility
-        | Q(verb="est devenu·e conseiller·e sur le projet")
-        | Q(verb="a été validé")
-        | Q(verb="a validé le projet")
-        | Q(verb="a soumis pour modération le projet")
-        | Q(verb="a mis à jour le questionnaire")
-        | Q(verb="a ajouté un document")
-        | Q(verb="a envoyé un message")
-        | Q(verb="a commenté l'action")
-        | Q(verb="a créé une note de suivi")
-        | Q(verb="a rejoint l'équipe sur le projet")  # XXX For compatibility
-        | Q(verb="a rejoint l'équipe projet"),
+        verb__in=notif_verbs,
         target_content_type_id=project_ct.pk,
         target_object_id=project.pk,
         public=True,
@@ -295,7 +300,7 @@ def project_create_or_update_topics(request, project_id=None):
             project.save()
             form.save_m2m()
 
-            ## Topics
+            # Topics
             # save new ones
             for topic in topic_formset.save(commit=False):
                 topic.project = project

@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
@@ -339,7 +340,7 @@ def test_crm_project_undelete(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_search(request, client):
+def test_crm_search_by_project_name_on_current_site(request, client):
     current_site = get_current_site(request)
     second_site = baker.make(site_models.Site)
 
@@ -361,6 +362,29 @@ def test_crm_search(request, client):
     assertContains(response, project_on_site.name)
     assertNotContains(response, project_no_site.name)
     assertNotContains(response, project_another_site.name)
+
+
+@pytest.mark.django_db
+def test_crm_search_by_user_name_on_current_site(request, client):
+    current_site = get_current_site(request)
+    other_site = baker.make(site_models.Site)
+
+    john = baker.make(auth_models.User, first_name="John", last_name="DOE")
+    john.profile.sites.add(current_site)
+
+    jane = baker.make(auth_models.User, first_name="Jane", last_name="DOE")
+    jane.profile.sites.add(other_site)
+
+
+    data = {"query": "doe"}
+
+    url = reverse("crm-search")
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data)
+
+    assert response.status_code == 200
+    assertContains(response, john.first_name)
+    assertNotContains(response, jane.first_name)
 
 
 ########################################################################

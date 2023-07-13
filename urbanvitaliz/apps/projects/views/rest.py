@@ -20,6 +20,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from urbanvitaliz.utils import get_group_for_site
+from urbanvitaliz import verbs
 
 from .. import models, signals
 from ..serializers import (
@@ -143,15 +144,17 @@ def update_projects_with_their_notifications(site, user, projects):
         unread_notifications.values(project_id=F("target_object_id"))
         .annotate(count=Count("id", distinct=True))
         .annotate(
-            unread_public_messages=Count("id", filter=Q(verb="a envoyé un message"))
-        )
-        .annotate(
-            unread_private_messages=Count(
-                "id", filter=Q(verb="a envoyé un message dans l'espace conseillers")
+            unread_public_messages=Count(
+                "id", filter=Q(verb=verbs.Conversation.PUBLIC_MESSAGE)
             )
         )
         .annotate(
-            new_recommendations=Count("id", filter=Q(verb="a recommandé l'action"))
+            unread_private_messages=Count(
+                "id", filter=Q(verb=verbs.Conversation.PRIVATE_MESSAGE)
+            )
+        )
+        .annotate(
+            new_recommendations=Count("id", filter=Q(verb=verbs.Recommendation.CREATED))
         )
     )
     notifications = {n["project_id"]: n for n in all_unread_notifications}
@@ -488,15 +491,17 @@ def update_project_statuses_with_their_notifications(site, user, project_statuse
         unread_notifications.values(project_id=F("target_object_id"))
         .annotate(count=Count("id", distinct=True))
         .annotate(
-            unread_public_messages=Count("id", filter=Q(verb="a envoyé un message"))
-        )
-        .annotate(
-            unread_private_messages=Count(
-                "id", filter=Q(verb="a envoyé un message dans l'espace conseillers")
+            unread_public_messages=Count(
+                "id", filter=Q(verb=verbs.Conversation.PUBLIC_MESSAGE)
             )
         )
         .annotate(
-            new_recommendations=Count("id", filter=Q(verb="a recommandé l'action"))
+            unread_private_messages=Count(
+                "id", filter=Q(verb=verbs.Conversation.PRIVATE_MESSAGE)
+            )
+        )
+        .annotate(
+            new_recommendations=Count("id", filter=Q(verb=verbs.Recommendation.CREATED))
         )
     )
     notifications = {n["project_id"]: n for n in all_unread_notifications}

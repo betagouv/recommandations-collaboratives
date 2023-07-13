@@ -11,12 +11,12 @@ from dataclasses import asdict, dataclass
 from datetime import timedelta
 from itertools import groupby
 
-from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.utils import timezone
-from urbanvitaliz import utils
+
+from urbanvitaliz import utils, verbs
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 
@@ -136,7 +136,7 @@ def send_digests_for_new_recommendations_by_user(user, dry_run):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
-        .filter(target_content_type=project_ct, verb="a recommandé l'action")
+        .filter(target_content_type=project_ct, verb=verbs.Recommendation.CREATED)
         .order_by("target_object_id")
     )
 
@@ -265,7 +265,7 @@ def send_digests_for_new_sites_by_user(user, dry_run=False):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
-        .filter(target_content_type=project_ct, verb="a déposé le projet")
+        .filter(target_content_type=project_ct, verb=verbs.Project.AVAILABLE)
         .order_by("target_object_id")
     )
 
@@ -343,7 +343,7 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
     queryset = (
         user.notifications(manager="on_site")
         .filter(target_content_type=project_ct)
-        .exclude(target_content_type=project_ct, verb="a recommandé l'action")
+        .exclude(target_content_type=project_ct, verb=verbs.Recommendation.CREATED)
         .unsent()
     )
 
@@ -361,7 +361,7 @@ def send_digest_for_switchtender_by_user(user, dry_run=False):
     queryset = (
         user.notifications(manager="on_site")
         .filter(target_content_type=project_ct)
-        .exclude(verb="a recommandé l'action")
+        .exclude(verb=verbs.Recommendation.CREATED)
         .unsent()
     )
 
@@ -497,20 +497,32 @@ class FormattedNotification:
 
 
 class NotificationFormatter:
-    def format(self, notification):
-        return self._format_for_actor(notification)
+    def __init__(self):
+        self.dispatch_table = {
+            verbs.Conversation.PUBLIC_MESSAGE: self.format_public_note_created,
+            verbs.Conversation.PRIVATE_MESSAGE: self.format_private_note_created,
+            verbs.Project.BECAME_ADVISOR: self.format_action_became_advisor,
+            verbs.Project.BECAME_OBSERVER: self.format_action_became_observer,
+            verbs.Project.AVAILABLE: self.format_new_project_available,
+            verbs.Project.SUBMITTED_BY: self.format_project_submitted,
+            verbs.Recommendation.COMMENTED: self.format_action_commented,
+            verbs.Recommendation.CREATED: self.format_action_recommended,
+            verbs.Document.ADDED: self.format_document_uploaded,
+        }
 
-    def _format_or_default(self, dispatch_table, notification):
+    def format(self, notification):
         """
         Try formatting the notification by the dispatch table or
         use the default reprensentation
         """
-        try:
-            return dispatch_table[notification.verb](notification)
-        except KeyError:
-            return FormattedNotification(
-                summary=f"{notification.actor} {notification.verb} {notification.action_object}"
-            )
+
+        def _default(notification):
+            summary = "{n.actor} {n.verb} {n.action_object}".format(n=notification)
+            return FormattedNotification(summary=summary)
+
+        fmt = self.dispatch_table.get(notification.verb, _default)
+        return fmt(notification)
+
 
     # ------ Formatter Utils -----#
     def _represent_user(self, user):
@@ -551,41 +563,17 @@ class NotificationFormatter:
         return None
 
     def _represent_note_excerpt(self, note):
-        return note.content[:50] or None
+        return note.content[:200] or None
 
     def _represent_followup(self, followup):
         return followup.comment[:50]
 
     # -------- Routers -----------#
-    def _format_for_actor(self, notification):
-        """Format for User"""
-
-        # if not notification.actor:
-        #     notification.actor = auth_models.User(
-        #         username="-- compte supprimé --", first_name="-- compte supprimé --"
-        #     )
-
-        return self._format_or_default(
-            {
-                "a rédigé un message": self.format_public_note_created,
-                "a rédigé un message dans l'espace conseillers": self.format_private_note_created,
-                "est devenu·e aiguilleur·se sur le projet": self.format_action_became_switchtender,
-                # added for transition from switchtender (aiguilleur) to advisor (conseiller)
-                "est devenu·e conseiller·e sur le projet": self.format_action_became_switchtender,
-                "a déposé le projet": self.format_new_project_available,
-                "a soumis pour modération le projet": self.format_project_submitted,
-                "a commenté l'action": self.format_action_commented,
-                "a recommandé l'action": self.format_action_recommended,
-                "a ajouté un lien ou un document": self.format_document_uploaded,
-            },
-            notification,
-        )
-
     # ------ Real Formatters -----#
     def format_public_note_created(self, notification):
         """A public note was written by a user"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} a rédigé un message"
+        summary = f"{subject} {verbs.Conversation.PUBLIC_MESSAGE}"
         excerpt = self._represent_note_excerpt(notification.action_object)
 
         return FormattedNotification(summary=summary, excerpt=excerpt)
@@ -593,7 +581,7 @@ class NotificationFormatter:
     def format_private_note_created(self, notification):
         """A note was written by a switchtender"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} a rédigé un message dans l'espace conseillers"
+        summary = f"{subject} {verbs.Conversation.PRIVATE_MESSAGE}"
         excerpt = self._represent_note_excerpt(notification.action_object)
 
         return FormattedNotification(summary=summary, excerpt=excerpt)
@@ -601,7 +589,7 @@ class NotificationFormatter:
     def format_document_uploaded(self, notification):
         """A document was uploaded by a user"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} a ajouté un lien ou un document"
+        summary = f"{subject} {verbs.Document.ADDED}"
 
         return FormattedNotification(summary=summary, excerpt=None)
 
@@ -609,7 +597,7 @@ class NotificationFormatter:
         """An action was recommended by a switchtender"""
         subject = self._represent_user(notification.actor)
         complement = self._represent_recommendation(notification.action_object)
-        summary = f"{subject} a recommandé '{complement}'"
+        summary = f"{subject} {verbs.Recommendation.CREATED} '{complement}'"
         excerpt = self._represent_recommendation_excerpt(notification.action_object)
 
         return FormattedNotification(summary=summary, excerpt=excerpt)
@@ -619,7 +607,7 @@ class NotificationFormatter:
         subject = self._represent_user(notification.actor)
 
         if notification.action_object is None:
-            summary = f"{subject} a commenté une recommandation"
+            summary = f"{subject} {verbs.Recommendation.COMMENTED}"
             excerpt = ""
         else:
             complement = self._represent_recommendation(notification.action_object.task)
@@ -631,7 +619,21 @@ class NotificationFormatter:
     def format_action_became_switchtender(self, notification):
         """Someone joined a project as switchtender"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} s'est joint·e à l'équipe d'aiguillage."
+        summary = f"{subject} s'est joint·e à l'équipe de conseil."
+
+        return FormattedNotification(summary=summary, excerpt=None)
+
+    def format_action_became_advisor(self, notification):
+        """Someone joined a project as advisor"""
+        subject = self._represent_user(notification.actor)
+        summary = f"{subject} {verbs.Project.BECAME_ADVISOR}."
+
+        return FormattedNotification(summary=summary, excerpt=None)
+
+    def format_action_became_observer(self, notification):
+        """Someone joined a project as observer"""
+        subject = self._represent_user(notification.actor)
+        summary = f"{subject} {verbs.Project.BECAME_OBSERVER}."
 
         return FormattedNotification(summary=summary, excerpt=None)
 
@@ -639,7 +641,7 @@ class NotificationFormatter:
         """A project was submitted for moderation"""
         subject = self._represent_user(notification.actor)
         complement = self._represent_project(notification.action_object)
-        summary = f"{subject} a soumis pour modération le projet '{complement}'"
+        summary = f"{subject} {verbs.Project.SUBMITTED_BY}: '{complement}'"
 
         excerpt = self._represent_project_excerpt(notification.action_object)
 
@@ -649,7 +651,7 @@ class NotificationFormatter:
         """A new project is now available"""
         subject = self._represent_user(notification.actor)
         complement = self._represent_project(notification.action_object)
-        summary = f"{subject} a déposé le projet '{complement}'"
+        summary = f"{subject} {verbs.Project.AVAILABLE} '{complement}'"
 
         excerpt = self._represent_project_excerpt(notification.action_object)
 

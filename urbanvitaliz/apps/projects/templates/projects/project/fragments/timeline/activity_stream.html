@@ -2,44 +2,44 @@
 {% load static %}
 {% load gravatar %}
 {% load activity_tags %}
-
-
 {% activity_stream "target" project %}
 {% regroup stream by timestamp.date as stream_by_day %}
-
 <ul class="list-group">
-    {% for date, actions in stream_by_day|slice:limit %}
+  {% for date, actions in stream_by_day|slice:limit %}
     <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0">
-        <span class="small text-secondary">{{ date|naturalday|capfirst }}</span>
-
-        {% for action in actions %}
+      <span class="small text-secondary">{{ date|naturalday|capfirst }}</span>
+      {% for action in actions %}
         <div class="{% if cropped %}my-1 mb-0 {% else %} my-3 mb-4 {% endif %} py-1 border-start border-4 ps-3">
-            {% if action.target %}
+          {% if action.target %}
             <span class="align-items-center link-dark text-decoration-none">
-                <img src="{% gravatar_url action.actor.email 32 %}" alt="{{ action.actor.get_full_name }}"
-                    class="me-1 rounded-circle" style="width: 16px; height: 16px;" />
+              <img src="{% gravatar_url action.actor.email 32 %}"
+                   alt="{{ action.actor.get_full_name }}"
+                   class="me-1 rounded-circle"
+                   style="width: 16px; height: 16px" />
             </span>
             <span class="align-middle small">
-                {{ action.actor.get_full_name|capfirst|default:action.actor }} <strong>{{action.verb}}</strong>
-                {{ action.action_object }}
+              {{ action.actor.get_full_name|capfirst|default:action.actor }}
+              <strong>{{ action.verb }}</strong>
+              {{ action.action_object }}
             </span>
-            {% else %}
+          {% else %}
             {% if action.action_object %}
-            {{ action.actor|capfirst }} <strong>{{ action.verb }}</strong> <a
-                href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
+              {{ action.actor|capfirst }}
+              <strong>{{ action.verb }}</strong>
+              <a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
             {% else %}
-            <a href="{{ action.actor.get_absolute_url }}">{{ action.actor|capfirst }}</a> <strong>{{
-                action.verb }}</strong>
+              <a href="{{ action.actor.get_absolute_url }}">{{ action.actor|capfirst }}</a>
+              <strong>{{ action.verb }}</strong>
             {% endif %}
-            {% endif %}
+          {% endif %}
         </div>
-        {% endfor %}
-
+      {% endfor %}
     </li>
-    {% empty %}
+  {% empty %}
     <div class="mt-4 bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
-        <p class="m-0 text-info-custom text-grey text-center fw-normal">Quelles sont vos actualités sur
-            le dossier ?</p>
+      <p class="m-0 text-info-custom text-grey text-center fw-normal">
+        Quelles sont vos actualités sur le dossier ?
+      </p>
     </div>
-    {% endfor %}
+  {% endfor %}
 </ul>

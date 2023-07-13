@@ -6,6 +6,8 @@
 # created: 2021-06-22 11:49:13 CEST
 #
 
+which=urbanvitliz  # default package for linting
+
 SETTINGS=urbanvitaliz.settings.development
 
 all:
@@ -25,7 +27,7 @@ nice:
 	flake8 urbanvitaliz
 
 lint:
-	pylint --django-settings-module=$(SETTINGS) urbanvitaliz
+	pylint --django-settings-module=$(SETTINGS) $(which)
 
 coverage:
 	pytest --cov

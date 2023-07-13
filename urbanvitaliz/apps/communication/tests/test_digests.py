@@ -6,6 +6,7 @@ tests for digesting emails
 authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2022-02-03 16:14:54 CET
 """
+
 import test  # noqa
 
 import pytest
@@ -21,9 +22,9 @@ from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects import signals as projects_signals
 from urbanvitaliz.apps.resources import models as resources_models
+from urbanvitaliz import verbs
 
-from . import digests
-from .digests import NotificationFormatter
+from .. import digests
 
 ########################################################################
 # new reco digests
@@ -202,7 +203,7 @@ def test_send_digests_for_switchtender_by_user(request, client):
 
 @pytest.mark.django_db
 def test_notification_formatter():
-    formatter = NotificationFormatter()
+    formatter = digests.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     organization = Recipe(addressbook_models.Organization, name="DuckCorp").make()
@@ -231,64 +232,84 @@ def test_notification_formatter():
 
     tests = [
         (
-            "a rédigé un message",
+            verbs.Conversation.PUBLIC_MESSAGE,
             public_note,
             (
-                "Bobi Joe (DuckCorp) a rédigé un message",
+                f"Bobi Joe (DuckCorp) {verbs.Conversation.PUBLIC_MESSAGE}",
                 "my content",
             ),
         ),
         (
-            "a rédigé un message dans l'espace conseillers",
+            verbs.Conversation.PRIVATE_MESSAGE,
             private_note,
             (
-                "Bobi Joe (DuckCorp) a rédigé un message dans l'espace conseillers",
+                f"Bobi Joe (DuckCorp) {verbs.Conversation.PRIVATE_MESSAGE}",
                 "my content",
             ),
         ),
         (
-            "a commenté l'action",
+            verbs.Recommendation.COMMENTED,
             followup,
             (
-                "Bobi Joe (DuckCorp) a commenté la recommandation 'Belle Ressource'",
+                f"Bobi Joe (DuckCorp) {verbs.Recommendation.COMMENTED} 'Belle Ressource'",
                 followup.comment,
             ),
         ),
         (
-            "a recommandé l'action",
+            verbs.Recommendation.CREATED,
             task,
-            ("Bobi Joe (DuckCorp) a recommandé 'Belle Ressource'", task.content),
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Recommendation.CREATED} 'Belle Ressource'",
+                task.content,
+            ),
         ),
         (
-            "est devenu·e conseiller·e sur le projet",
-            project,
-            ("Bobi Joe (DuckCorp) s'est joint·e à l'équipe d'aiguillage.", None),
-        ),
-        (
-            "a soumis pour modération le projet",
+            verbs.Project.BECAME_ADVISOR,
             project,
             (
-                "Bobi Joe (DuckCorp) a soumis pour modération le projet 'Nice Project'",
+                f"Bobi Joe (DuckCorp) {verbs.Project.BECAME_ADVISOR}.",
+                None,
+            ),
+        ),
+        (
+            verbs.Project.BECAME_OBSERVER,
+            project,
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Project.BECAME_OBSERVER}.",
+                None,
+            ),
+        ),
+        (
+            verbs.Project.SUBMITTED_BY,
+            project,
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY}: 'Nice Project'",
                 "Super description",
             ),
         ),
         (
-            "a déposé le projet",
+            verbs.Project.AVAILABLE,  # FIXME redondant avec VALIDATED
             project,
             (
-                "Bobi Joe (DuckCorp) a déposé le projet 'Nice Project'",
+                f"Bobi Joe (DuckCorp) {verbs.Project.AVAILABLE} 'Nice Project'",
                 "Super description",
             ),
         ),
         (
-            "a ajouté un lien ou un document",
+            verbs.Document.ADDED,  # FIXME replace w/ ADDED_FILE ADDED_LINK
             project,
-            ("Bobi Joe (DuckCorp) a ajouté un lien ou un document", None),
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED}",
+                None,
+            ),
         ),
         (
             "action inconnue",
             project,
-            ("Bob action inconnue Nice Project - SomeWhere", None),
+            (
+                f"Bob action inconnue Nice Project - SomeWhere",
+                None,
+            ),
         ),
     ]
 
@@ -311,12 +332,17 @@ def test_notification_formatter():
 
 @pytest.mark.django_db
 def test_notification_formatter_with_bogus_user():
-    formatter = NotificationFormatter()
+    formatter = digests.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     note = Recipe(projects_models.Note).make()
 
-    notification = Notification(user, verb="a rédigé un message", action_object=note)
+    notification = Notification(
+        user, verb=verbs.Conversation.PUBLIC_MESSAGE, action_object=note
+    )
 
     fmt_reco = formatter.format(notification)
     assert "compte indisponible" in str(fmt_reco)
+
+
+# eof

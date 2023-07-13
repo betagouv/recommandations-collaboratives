@@ -30,6 +30,7 @@ from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import get_group_for_site, login
+from urbanvitaliz import verbs
 
 from .. import models, signals, utils
 
@@ -103,6 +104,7 @@ def test_proper_commune_selection_contains_all_possible_commmunes(request, clien
 #################################################################
 # Prefilled projects
 #################################################################
+
 @pytest.mark.django_db
 def test_create_prefilled_project_is_not_reachable_without_login(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
@@ -180,9 +182,12 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
-    assert data["email"].lower() == project.owner.email
-    assert data["first_name"] == project.owner.first_name
-    assert data["last_name"] == project.owner.last_name
+    owner = project.owner
+
+    assert data["email"].lower() == owner.email
+    assert data["first_name"] == owner.first_name
+    assert data["last_name"] == owner.last_name
+    assert site in owner.profile.sites.all()
 
     assert user in project.switchtenders.all()
 
@@ -981,14 +986,14 @@ def test_general_notifications_are_consumed_on_project_overview(request, client)
         notify.send(
             sender=user,
             recipient=user,
-            verb="est devenu·e conseiller·e sur le projet",
+            verb=verbs.Project.BECAME_ADVISOR,
             target=project,
         )
 
         notify.send(
             sender=project,
             recipient=user,
-            verb="a été validé",
+            verb=verbs.Project.VALIDATED,
             target=project,
         )
 

@@ -28,6 +28,7 @@ from urbanvitaliz.apps.invites.api import (
 )
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.utils import has_perm_or_403, is_staff_for_site_or_403
+from urbanvitaliz import verbs
 
 from .. import forms, models
 from ..utils import (
@@ -128,7 +129,7 @@ def access_invite(request, role, project):
         if invite:
             action.send(
                 invite.inviter,
-                verb="a invité un·e collaborateur·rice à rejoindre le projet",
+                verb=verbs.Project.INVITATION,
                 action_object=invite,
                 target=invite.project,
             )
@@ -210,6 +211,8 @@ def promote_collaborator_as_referent(request, project_id, user_id=None):
     with transaction.atomic():
         members.update(is_owner=False)
         members.filter(member=user).update(is_owner=True)
+        project.phone = user.profile.phone_no
+        project.save()
 
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
@@ -313,9 +316,8 @@ def access_advisor_invite(request, project_id):
 
     is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
 
-    return access_invite(
-        request, "SWITCHTENDER", project
-    )  # should we keep switchtender?
+    # by default advisors are created as observer first
+    return access_invite(request, "OBSERVER", project)
 
 
 @login_required

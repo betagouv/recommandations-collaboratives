@@ -73,14 +73,15 @@ def onboarding(request):
             user.last_name = user.last_name or form.cleaned_data.get("last_name")
             user.save()
             profile = user.profile
+            profile.sites.add(request.site)
+
             org_name = form.cleaned_data.get("org_name")
             if org_name:
-                org, _ = addressbook_models.Organization.objects.get_or_create(
-                    name=org_name
-                )
-                profile.organization = profile.organization or org
-                org.sites.add(request.site)
+                organization = addressbook_models.Organization.get_or_create(org_name)
+                profile.organization = profile.organization or organization
+                organization.sites.add(request.site)
 
+            # Why isn't phone_no updated if value present in cleaned_data?
             profile.phone_no = profile.phone_no or form.cleaned_data.get("phone")
             profile.save()
 

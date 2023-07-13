@@ -15,16 +15,17 @@ from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
-from django.db.models import Q
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import ensure_csrf_cookie
 from notifications import models as notifications_models
 
+from urbanvitaliz import verbs
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.communication.digests import normalize_user_name
@@ -118,6 +119,8 @@ def create_project_prefilled(request):
                     "last_name": form.cleaned_data.get("last_name"),
                 },
             )
+
+            user.profile.sites.add(request.site)
 
             assign_collaborator(user, project, is_owner=True)
 
@@ -224,11 +227,14 @@ def select_commune(request, project_id=None):
 ########################################################################
 # Switchtender
 ########################################################################
+
 def mark_general_notifications_as_seen(user):
     # Mark some notifications as seen
     project_ct = ContentType.objects.get_for_model(models.Project)
+    # FIXME update filter to current verbs
+    notif_verbs = [verbs.Project.AVAILABLE, verbs.Project.SUBMITTED_BY]
     notifications = user.notifications.unread().filter(
-        Q(verb="a déposé le projet") | Q(verb="a soumis pour modération le projet"),
+        verb__in=notif_verbs,
         target_content_type=project_ct.pk,
     )
     notifications.mark_all_as_read()

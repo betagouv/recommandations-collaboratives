@@ -33,9 +33,9 @@ class Command(BaseCommand):
     def send_email_digests(self, dry_run):
         for site in Site.objects.all():
             with settings.SITE_ID.override(site.pk):
-                print("\n")
-                print(f"#### Sending digests for site <{site.domain}> ####")
-                print("\n")
+                self.stdout.write("\n")
+                self.stdout.write(f"#### Sending digests for site <{site.domain}> ####\n")
+                self.stdout.write("\n")
                 self.send_email_digests_for_site(site, dry_run)
 
     def send_email_digests_for_site(self, site, dry_run):
@@ -43,33 +43,37 @@ class Command(BaseCommand):
         advisor_group = get_group_for_site("advisor", site)
         # sw_group = auth_models.Group.objects.get(name="switchtender")
 
-        print("** Sending Task Reminders **")
+        # only send emails to active users
+        active_users = auth_models.User.objects.filter(is_active=True)
+
         # Send reminders
-        for user in auth_models.User.objects.filter(is_active=True):
+        self.stdout.write("** Sending Task Reminders **\n")
+        for user in active_users:
             if digests.send_digests_for_task_reminders_by_user(user, dry_run):
-                print(f"Sent reminder digests for {user}")
+                self.stdout.write(f"Sent reminder digest for {user}\n")
 
         # Send project collaborators new recommendations
-        print("** Sending new recommendations digests **")
+        self.stdout.write("** Sending new recommendations digests **\n")
         for project in project_models.Project.on_site.all():
-            for user in project.members.all():
+            for user in project.members.filter(is_active=True):
                 if digests.send_digests_for_new_recommendations_by_user(user, dry_run):
-                    print(f"Sent new reco digests for {user} on {project.name}")
+                    self.stdout.write(f"Sent new reco digest for {user} on {project.name}\n")
 
         # Digests for non switchtenders
-        print("** Sending general digests **")
-        for user in auth_models.User.objects.exclude(groups__in=[advisor_group]):
+        self.stdout.write("** Sending general digests **\n")
+        for user in active_users.exclude(groups__in=[advisor_group]):
             if digests.send_digest_for_non_switchtender_by_user(user, dry_run):
-                print(f"Sent general digest for {user})")
+                self.stdout.write(f"Sent general digest for {user}\n")
 
         # Digests for switchtenders
-        print("** Sending general switchtender digests **")
-        for user in auth_models.User.objects.filter(groups__in=[advisor_group]):
+        self.stdout.write("** Sending general switchtender digests **\n")
+        # XXX pourquoi groups__in=[] et non groups=advisor_group
+        for user in active_users.filter(groups__in=[advisor_group]):
             if digests.send_digests_for_new_sites_by_user(user, dry_run):
-                print(f"* Sent new site digests for {user}")
+                self.stdout.write(f"* Sent new site digest for {user}\n")
 
             if digests.send_digest_for_switchtender_by_user(user, dry_run):
-                print(f"* Sent general digest for switchtender (to {user})")
+                self.stdout.write(f"* Sent general digest for switchtender (to {user})\n")
 
 
 # eof

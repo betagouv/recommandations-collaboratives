@@ -124,6 +124,9 @@ TEMPLATES = [
                 "multisite.template.loaders.filesystem.Loader",
                 "django.template.loaders.app_directories.Loader",
             ],
+            "libraries": {
+                "common_tags": "urbanvitaliz.templatetags.common_extra",
+            },
         },
     },
 ]

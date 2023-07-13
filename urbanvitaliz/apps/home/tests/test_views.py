@@ -26,7 +26,7 @@ from urbanvitaliz.apps.projects.utils import assign_collaborator
 from urbanvitaliz.utils import login
 from magicauth import models as magicauth_models
 
-from . import adapters, utils, models
+from .. import adapters, utils, models
 
 
 ########################################################################
