@@ -54,6 +54,12 @@
                 @click="handleEditComment(markdownContent,task)">Enregistrer</button>
       </div>
     {% endif %}
+    {% if is_task_modal_comment %}
+      <div class="d-flex justify-content-end">
+        <button class="button filled blue small inherit"
+                @click="onSubmitComment(markdownContent)">Enregistrer</button>
+      </div>
+    {% endif %}
     {% if errors %}
       {% for error in errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
     {% endif %}

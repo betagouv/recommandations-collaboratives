@@ -2,7 +2,7 @@ import Alpine from 'alpinejs'
 import { resourcePreviewUrl } from '../utils/api'
 import { renderMarkdown } from '../utils/markdown'
 import { formatDate } from '../utils/date';
-import {gravatar_url} from '../utils/gravatar'
+import { gravatar_url } from '../utils/gravatar'
 import { isStatusUpdate, statusText } from "../utils/taskStatus"
 
 export default function PreviewModal() {
@@ -38,8 +38,35 @@ export default function PreviewModal() {
         hasNotification(followupId) {
             return this.currentTaskNotifications.filter(n => n.action_object.who && n.action_object.id === followupId).length > 0;
         },
-        
-        //TODO use TaskComment()
+        async onSubmitComment(content) {
+            if (!this.currentlyEditing) {
+                await this.$store.tasksData.issueFollowup(this.task, undefined, content);
+                // await this.getData()
+                await this.$store.previewModal.loadFollowups();
+            } else {
+                const [type, id] = this.currentlyEditing;
+                if (type === "followup") {
+                    await editComment(this.task.id, id, content);
+                    await this.loadFollowups(this.task.id);
+                } else if (type === "content") {
+                    await this.$store.tasksData.patchTask(this.task.id, { content: content });
+                    await this.getData();
+                }
+            }
+
+            this.pendingComment = "";
+            this.currentlyEditing = null;
+            this.followupScrollToLastMessage();
+        },
+        followupScrollToLastMessage() {
+            const scrollContainer = document.getElementById("followups-scroll-container");
+            if (scrollContainer) {
+                setTimeout(() => {
+                    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+                }, 1)
+            }
+
+        },
     }
 }
 

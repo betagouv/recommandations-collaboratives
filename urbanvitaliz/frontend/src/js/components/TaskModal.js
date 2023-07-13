@@ -24,42 +24,10 @@ export default function TaskModal() {
         currentFeedbackTask: {},
         feedbackComment:'',
         feedbackStatus: TASK_STATUSES.DONE,
-        async onSubmitComment() {
-            if (!this.currentlyEditing) {
-                await this.$store.tasksData.issueFollowup(this.$store.taskModal.currentTask, undefined, this.pendingComment);
-                // await this.getData()
-                this.currentTaskFollowups = await this.$store.tasksData.loadFollowups(this.$store.taskModal.currentTask.id);
-            } else {
-                const [type, id] = this.currentlyEditing;
-                if (type === "followup") {
-                    await editComment(this.currentTask.id, id, this.pendingComment);
-                    await this.loadFollowups(this.currentTask.id);
-                } else if (type === "content") {
-                    await this.$store.tasksData.patchTask(this.$store.taskModal.currentTask.id, { content: this.pendingComment });
-                    await this.getData();
-                }
-            }
-
-            this.pendingComment = "";
-            this.currentlyEditing = null;
-            this.followupScrollToLastMessage();
-        },
-        hasNotification(followupId) {
-            return this.currentTaskNotifications.filter(n => n.action_object.who && n.action_object.id === followupId).length > 0;
-        },
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await this.$store.tasksData.issueFollowup(e.detail.task, e.detail.status)
             // await this.getData()
-        },
-        followupScrollToLastMessage() {
-            const scrollContainer = document.getElementById("followups-scroll-container");
-            if (scrollContainer) {
-                setTimeout(() => {
-                    scrollContainer.scrollTop = scrollContainer.scrollHeight;
-                }, 1)
-            }
-
         },
         initDeleteTaskConfirmationModal() {
             const element = document.getElementById("delete-task-confirmation-modal");

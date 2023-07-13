@@ -13,7 +13,7 @@
                 <div class="d-flex flex-column">
                     <!-- Pagination -->
                     <template x-if="$store.previewModal.isPaginated">
-                        <div class="bg-blue d-flex align-items-center justify-content-between p-2">
+                        <div class="bg-blue d-flex align-items-center justify-content-between p-2 rounded" style="border-bottom-left-radius: 0 !important;border-bottom-right-radius: 0!important;">
                             <button class="p-1 button filled white small"
                                     @click="$store.previewModal.previous()">
                                 <svg class="bi align-middle" width="25" height="25" fill="#0063CB">
@@ -31,20 +31,18 @@
                     </template>
                     <!-- Modal body -->
                     <div x-effect="taskId && $store.previewModal.loadFollowups()"
-                         class="d-flex w-100 align-items-stretch">
+                         class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
+                        <div class="position-absolute top-0 end-0 p-2">
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
                         <div class="d-flex flex-grow-1 align-items-stretch w-65">
                             <template x-if="task.resource_id">
-                                <iframe class="w-100 d-flex flex-column"
+                                <iframe class="w-100 d-flex flex-column rounded"
                                         :src="resourcePreviewUrl(task.resource_id)"></iframe>
-                                <!-- <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Fermentum posuere urna nec tincidunt praesent semper feugiat. Enim nulla aliquet porttitor lacus luctus. Laoreet sit amet cursus sit amet dictum. Mi bibendum neque egestas congue quisque egestas diam. Euismod nisi porta lorem mollis aliquam ut porttitor leo a. Ornare massa eget egestas purus viverra accumsan in nisl nisi. Mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Nibh tortor id aliquet lectus. Egestas tellus rutrum tellus pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Sed egestas egestas fringilla phasellus faucibus. Nunc sed id semper risus in. At tellus at urna condimentum mattis pellentesque id nibh. Risus feugiat in ante metus dictum at tempor commodo ullamcorper. Ornare aenean euismod elementum nisi. Eu facilisis sed odio morbi quis commodo odio aenean sed. Cras sed felis eget velit aliquet sagittis. Eget mi proin sed libero enim sed.
-                                    Est lorem ipsum dolor sit amet consectetur adipiscing elit pellentesque. Aliquam nulla facilisi cras fermentum odio eu feugiat pretium. Donec ac odio tempor orci dapibus ultrices in iaculis nunc. Lacus sed turpis tincidunt id aliquet risus feugiat in ante. Lacus vel facilisis volutpat est velit. Porta nibh venenatis cras sed felis eget velit. Purus in mollis nunc sed id semper risus in. At urna condimentum mattis pellentesque id nibh tortor id. Aliquam purus sit amet luctus venenatis lectus magna. Metus aliquam eleifend mi in nulla. Sagittis purus sit amet volutpat consequat mauris.
-                                    
-                                    Ut pharetra sit amet aliquam id diam maecenas. Elementum tempus egestas sed sed risus. Quam nulla porttitor massa id neque aliquam vestibulum. Est pellentesque elit ullamcorper dignissim cras. Eget dolor morbi non arcu. Integer malesuada nunc vel risus. Sit amet est placerat in egestas erat. Faucibus turpis in eu mi bibendum neque egestas. Enim facilisis gravida neque convallis a cras semper auctor neque. Nunc sed velit dignissim sodales. Tellus orci ac auctor augue mauris augue.
-                                    
-                                    Egestas congue quisque egestas diam in. Vel orci porta non pulvinar neque laoreet. Sed libero enim sed faucibus turpis in. Sagittis vitae et leo duis ut. Lobortis mattis aliquam faucibus purus in massa. Facilisi etiam dignissim diam quis enim lobortis scelerisque. Interdum posuere lorem ipsum dolor sit. Sed arcu non odio euismod lacinia at quis risus sed. Est pellentesque elit ullamcorper dignissim cras tincidunt lobortis feugiat. Sed id semper risus in hendrerit gravida rutrum quisque non. Iaculis urna id volutpat lacus laoreet. Cras semper auctor neque vitae tempus. Gravida rutrum quisque non tellus orci ac auctor augue mauris.
-                                    
-                                    Nec feugiat in fermentum posuere. Vel orci porta non pulvinar neque laoreet. Vitae et leo duis ut diam quam nulla porttitor. Est velit egestas dui id ornare arcu. Parturient montes nascetur ridiculus mus mauris. Arcu cursus vitae congue mauris rhoncus. Facilisis magna etiam tempor orci eu. Urna duis convallis convallis tellus id interdum velit laoreet. Amet cursus sit amet dictum. Sit amet mattis vulputate enim nulla aliquet porttitor lacus. In mollis nunc sed id semper risus in. Quam adipiscing vitae proin sagittis nisl. Lorem ipsum dolor sit amet consectetur adipiscing. Tortor posuere ac ut consequat. Ut diam quam nulla porttitor massa id neque.</p> -->
                             </template>
                             <template x-if="!task.resource_id">
                                 <div class="w-100 text-break p-3">
@@ -56,7 +54,7 @@
                             </template>
                         </div>
                         <!-- Modal followups -->
-                        <div class="d-flex flex-column justify-content-between w-35 border border-top-0 border-bottom-0 border-right-0">
+                        <div class="d-flex flex-column justify-content-between w-35" style="border-left: 1px solid #EEEEEE;">
                             <div class="w-100">
                                 <div x-show="task.document && task.document.length > 0">
                                     <h2 class="text-secondary text-uppercase fw-bolder m-3"
@@ -66,7 +64,7 @@
                                     </template>
                                 </div>
                             </div>
-                            <div class="task-modal-followups">
+                            <div class="task-modal-followups" id="followups-scroll-container">
                                 <template x-if="task.resource_id">
                                     <div class="rounded bg-light p-2 m-3 message"
                                          :class="canAdministrate && task.content === '' && 'border border-warning'">
@@ -77,27 +75,7 @@
                                             <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
                                         </template>
                                         <div class="d-flex justify-content-between" style="font-size: 0.9em;">
-                                            <div>
-                                                <img class="rounded-circle d-inline-block"
-                                                     width="18px"
-                                                     height="18px"
-                                                     :src="gravatar_url(task.created_by.email, 18)"
-                                                     data-bs-toggle="tooltip"
-                                                     data-bs-placement="bottom"
-                                                     :title="`${task.created_by.first_name} ${task.created_by.last_name}`"
-                                                     style="z-index: 1000"
-                                                     tabindex="0" />
-                                                <span class="ms-1 fw-bold"
-                                                      x-text="`${task.created_by.first_name} ${task.created_by.last_name}`"
-                                                      style="line-height: 20px"></span>
-                                                <template x-if="task.created_by.profile.organization">
-                                                    <span x-text="task.created_by.profile.organization.name"
-                                                          class="fst-italic text-muted"></span>
-                                                </template>
-                                                <span class="ms-2 text-muted"
-                                                      x-text="`le ${formatDate(task.created_on)}`"
-                                                      style="line-height: 20px"></span>
-                                            </div>
+                                            {% include 'projects/project/fragments/task/task_user_card.html' %}
                                             <template x-if="canAdministrate">
                                                 <a class="text-muted" style="cursor: pointer;" @click="onEditContent()">Editer</a>
                                             </template>
@@ -127,27 +105,7 @@
                                                      :class="hasNotification(f.id) && 'border border-warning'">
                                                     <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
                                                     <div class="d-flex justify-content-between" style="font-size: 0.9em;">
-                                                        <div>
-                                                            <img class="rounded-circle d-inline-block"
-                                                                 width="20px"
-                                                                 height="20px"
-                                                                 :src="gravatar_url(f.who.email, 25)"
-                                                                 data-bs-toggle="tooltip"
-                                                                 data-bs-placement="bottom"
-                                                                 :title="`${f.who.first_name} ${f.who.last_name}`"
-                                                                 style="z-index: 1000"
-                                                                 tabindex="0" />
-                                                            <span class="ms-1 fst-italic"
-                                                                  x-text="`${f.who.first_name} ${f.who.last_name}`"
-                                                                  style="line-height: 20px"></span>
-                                                            <template x-if="f.who.profile.organization">
-                                                                <span x-text="f.who.profile.organization.name"
-                                                                      class="fst-italic text-muted"></span>
-                                                            </template>
-                                                            <span class="ms-2 text-muted"
-                                                                  x-text="`le ${formatDate(f.timestamp)}`"
-                                                                  style="line-height: 20px"></span>
-                                                        </div>
+                                                        {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
                                                         <template x-if="$store.tasksData.canUseTasks && f.who.email === userEmail">
                                                             <a class="text-muted" @click="onEditComment(f)">Editer</a>
                                                         </template>
@@ -168,27 +126,7 @@
                                                         <div class="rounded bg-light p-2 m-3 message">
                                                             <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
                                                             <div class="d-flex justify-content-between" style="font-size: 0.9em;">
-                                                                <div>
-                                                                    <img class="rounded-circle d-inline-block"
-                                                                         width="20px"
-                                                                         height="20px"
-                                                                         :src="gravatar_url(f.who.email, 25)"
-                                                                         data-bs-toggle="tooltip"
-                                                                         data-bs-placement="bottom"
-                                                                         :title="`${f.who.first_name} ${f.who.last_name}`"
-                                                                         style="z-index: 1000"
-                                                                         tabindex="0" />
-                                                                    <span class="ms-1 fst-italic"
-                                                                          x-text="`${f.who.first_name} ${f.who.last_name}`"
-                                                                          style="line-height: 20px"></span>
-                                                                    <template x-if="f.who.profile.organization">
-                                                                        <span x-text="f.who.profile.organization.name"
-                                                                              class="fst-italic text-muted"></span>
-                                                                    </template>
-                                                                    <span class="ms-2 text-muted"
-                                                                          x-text="`le ${formatDate(f.timestamp)}`"
-                                                                          style="line-height: 20px"></span>
-                                                                </div>
+                                                                {% include 'projects/project/fragments/task/task_followup_user_card.html'%}
                                                                 <template x-if="$store.tasksData.canUseTasks && f.who.email === userEmail">
                                                                     <a class="text-muted" style="cursor: pointer;" @click="onEditComment(f)">Editer</a>
                                                                 </template>
@@ -201,7 +139,7 @@
                                     </template>
                                 </template>
                             </div>
-                            <div class="w-100">{% include 'tools/editor.html' with is_task_modal_comment=True %}</div>
+                            <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">{% include 'tools/editor.html' with is_task_modal_comment=True %}</div>
                         </div>
                     </div>
                 </div>
