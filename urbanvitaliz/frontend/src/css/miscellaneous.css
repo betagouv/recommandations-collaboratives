@@ -195,6 +195,22 @@
     z-index: 1;
 }
 
+.h-90vh {
+    height: 90vh;
+}
+
+.h-100vh {
+    height: 100vh;
+}
+
+.w-35 {
+    width: 35%;
+}
+
+.w-65 {
+    width: 65%;
+}
+
 @keyframes appear-in {
     from {
         opacity: 0;

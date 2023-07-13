@@ -158,14 +158,14 @@ progress::-moz-progress-bar {
     z-index: 9889089;
 }
 
-.modal-xl {
-    &.modal-dialog {
-        height: 90vh;
-        overflow: hidden;
-        display: flex;
-    }
+// .modal-xl {
+//     &.modal-dialog {
+//         height: 90vh;
+//         overflow: hidden;
+//         display: flex;
+//     }
 
-    .modal-body {
-        overflow: scroll;
-    }
-}
+//     .modal-body {
+//         overflow: scroll;
+//     }
+// }

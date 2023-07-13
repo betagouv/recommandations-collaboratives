@@ -19,7 +19,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         init() {
-            const element = document.getElementById("test-modal");
+            const element = document.getElementById("task-modal");
             this.handle = new bootstrap.Modal(element);
 
             const cleanup = () => {
