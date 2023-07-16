@@ -3,6 +3,12 @@
 {% load static %}
 {% load training %}
 {% load guardian_tags %}
+{% load django_vite %}
+
+{% block css %}
+    {% vite_asset 'css/projectDetails.css' %}
+{% endblock %}
+
 {% block title %}{{ block.super }} > Connaissance{% endblock %}
 {% block banner %}
     {% include 'projects/project/fragments/positioning_banner.html' %}
