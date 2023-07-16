@@ -21,6 +21,11 @@ from django.db import models as db_models
 from django.db.models.functions import Cast
 from django.template import loader
 from sesame.utils import get_query_string
+from pathlib import Path
+from typing import AnyStr
+
+from django.db import migrations
+
 
 from urbanvitaliz.apps.home.models import SiteConfiguration
 
@@ -198,6 +203,37 @@ class CastedGenericRelation(GenericRelation):
         )
         cond.add(lookup, "AND")
         return cond
+
+
+######################################################################
+# Migration helpers
+######################################################################
+
+
+def _read_sql_file(path: Path) -> AnyStr:
+    with open(path, "r") as sql_file:
+        return sql_file.read()
+
+
+class RunSQLFile(migrations.RunSQL):
+    """from https://stackoverflow.com/a/75656369"""
+
+    def __init__(
+        self,
+        sql_file_path: Path,
+        reverse_sql=None,
+        state_operations=None,
+        hints=None,
+        elidable=False,
+    ):
+        sql = _read_sql_file(sql_file_path)
+        super().__init__(
+            sql=sql,
+            reverse_sql=reverse_sql,
+            state_operations=state_operations,
+            hints=hints,
+            elidable=elidable,
+        )
 
 
 # eof

@@ -18,12 +18,12 @@ from django.core.mail import mail_admins
 from django.core.mail import send_mail as django_send_mail
 
 from .models import EmailTemplate
-from .sendinblue import SendInBlue
+from .brevo import Brevo
 
 
-def send_in_blue_email(template_name, recipients, params=None, test=False):
-    """Uses sendinblue service to send an email using the given template and params"""
-    sib = SendInBlue()
+def brevo_email(template_name, recipients, params=None, test=False):
+    """Uses Brevo service to send an email using the given template and params"""
+    brevo = Brevo()
     try:
         template = EmailTemplate.on_site.get(name__iexact=template_name)
     except EmailTemplate.DoesNotExist:
@@ -32,12 +32,14 @@ def send_in_blue_email(template_name, recipients, params=None, test=False):
         )
         return False
 
-    return sib.send_email(template.sib_id, recipients, params, test=test)
+    return brevo.send_email(template.sib_id, recipients, params, test=test)
 
 
 def send_debug_email(template_name, recipients, params=None, test=False):
-    """As an alternative, use the default django send_mail, mostly used for debugging and
-    displaying email on the terminal"""
+    """
+    As an alternative, use the default django send_mail, mostly used for debugging
+    and displaying email on the terminal.
+    """
 
     if type(recipients) is not list:
         recipients = [recipients]
@@ -52,8 +54,9 @@ def send_debug_email(template_name, recipients, params=None, test=False):
     print(f"Sending to {simple_recipients}")
 
     django_send_mail(
-        "SIB Mail",
-        f"Message utilisant le template {template_name} avec les paramètres : {params} (TEST MODE: {test})",
+        "Brevo Mail",
+        f"Message utilisant le template {template_name} avec les"
+        f"paramètres : {params} (TEST MODE: {test})",
         "no-reply@urbanvitaliz.fr",
         simple_recipients,
         fail_silently=False,
@@ -61,9 +64,9 @@ def send_debug_email(template_name, recipients, params=None, test=False):
     return True
 
 
-if settings.DEBUG and getattr(settings, "SENDINBLUE_FORCE_DEBUG", False):
+if settings.DEBUG and getattr(settings, "BREVO_FORCE_DEBUG", False):
     send_email = send_debug_email
 else:
-    send_email = send_in_blue_email
+    send_email = brevo_email
 
 # eof

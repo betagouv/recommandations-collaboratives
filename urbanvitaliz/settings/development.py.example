@@ -45,8 +45,8 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-SENDINBLUE_API_KEY = os.environ.get("SENDINBLUE_API_KEY")
-SENDINBLUE_FORCE_DEBUG = True
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
+BREVO_FORCE_DEBUG = True
 
 # Recaptcha
 RECAPTCHA_REQUIRED_SCORE = 0

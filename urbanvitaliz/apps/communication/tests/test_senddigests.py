@@ -21,11 +21,9 @@ from urbanvitaliz.apps.projects import models as project_models
 from urbanvitaliz.apps.projects.utils import assign_advisor
 from urbanvitaliz.utils import get_group_for_site
 
-from .. import digests
-
 
 @pytest.mark.django_db
-@override_settings(SENDINBLUE_FORCE_DEBUG=True)
+@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_send_digest_to_active_users(request, mocker):
     site = get_current_site(request)
 
@@ -86,7 +84,7 @@ Sent general digest for {user.username}
 
 
 @pytest.mark.django_db
-@override_settings(SENDINBLUE_FORCE_DEBUG=True)
+@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_do_not_send_digest_to_deactivated_users(request, mocker):
     site = get_current_site(request)
 
@@ -134,7 +132,7 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker):
 
     output = out.getvalue()
 
-    expected = f"""
+    expected = """
 #### Sending digests for site <example.com> ####
 
 ** Sending Task Reminders **
