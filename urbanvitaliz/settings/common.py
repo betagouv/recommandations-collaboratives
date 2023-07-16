@@ -254,8 +254,8 @@ COOKIE_CONSENT_HTTPONLY = False
 # emails to use for notifications
 TEAM_EMAILS = ["friches@beta.gouv.fr"]
 
-# SENDINBLUE
-SENDINBLUE_API_KEY = "NO-API-KEY-DEFINED"
+# BREVO
+BREVO_API_KEY = "NO-API-KEY-DEFINED"
 
 
 # IFrames

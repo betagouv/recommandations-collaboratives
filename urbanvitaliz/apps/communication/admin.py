@@ -2,17 +2,17 @@ from django import forms
 from django.contrib import admin
 
 from . import models
-from .sendinblue import SendInBlue
+from .brevo import Brevo
 
 
 class EmailTemplateForm(forms.ModelForm):
-    def fetch_sib_templates():
-        sib = SendInBlue()
+    def fetch_brevo_templates():
+        brevo = Brevo()
 
-        return [(template.id, template.name) for template in sib.get_templates()]
+        return [(template.id, template.name) for template in brevo.get_templates()]
 
     sib_id = forms.ChoiceField(
-        choices=fetch_sib_templates, label="Template SendInBlue", required=True
+        choices=fetch_brevo_templates, label="Template Brevo", required=True
     )
 
     class Meta:
