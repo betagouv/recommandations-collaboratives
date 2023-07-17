@@ -14,7 +14,11 @@ from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
 
-# Baker addons
+########################################################################
+# Baker addons for using dynamic forms in onboarding
+########################################################################
+
+
 def gen_onboarding_func():
     return """[{ "type": "text",
     "required": false,
@@ -243,7 +247,7 @@ def test_onboarding_known_not_logged_user_login_and_preserve_data(request, clien
         "description": "a description of my new project",
         "response_0": "blah",
         "impediment_kinds": ["Autre"],  # FIXME seems unused
-        "impediments": "some impediment", # FIXME seems unused
+        "impediments": "some impediment",  # FIXME seems unused
     }
 
     # someone exists with this email (which is lower case)
@@ -525,43 +529,6 @@ def test_performing_onboarding_discard_unknown_postal_code(request, client):
     assert response.status_code == 302
     project = projects_models.Project.on_site.all()[0]
     assert project.commune is None
-
-
-@pytest.mark.django_db
-def test_performing_onboarding_allow_select_on_multiple_communes(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
-
-    commune = baker.make(geomatics.Commune, postal="12345")
-    baker.make(geomatics.Commune, postal="12345")
-    with login(client):
-        response = client.post(
-            reverse("projects-onboarding"),
-            data={
-                "name": "a project",
-                "email": "a@example.com",
-                "location": "some place",
-                "org_name": "My Org",
-                "description": "my desc",
-                "first_name": "john",
-                "phone": "0610101010",
-                "last_name": "doe",
-                "response_0": "blah",
-                "postcode": commune.postal,
-                "impediment_kinds": ["Autre"],
-                "impediments": "some impediment",
-            },
-        )
-
-    assert response.status_code == 302
-    project = projects_models.Project.on_site.first()
-    url = reverse("projects-onboarding-select-commune", args=[project.id])
-    assert response.url == (url)
 
 
 @pytest.mark.django_db

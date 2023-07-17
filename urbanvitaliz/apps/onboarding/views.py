@@ -1,6 +1,15 @@
+# encoding: utf-8
+
+"""
+views for onboarding new users/projects
+
+authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
+created: 2023-07-17 20:39:35 CEST
+"""
+
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
-from django.db.models import Q
+from django.contrib.sites import models as sites
 from django.shortcuts import redirect, render, reverse
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
@@ -28,8 +37,7 @@ def onboarding(request):
 
     site_config = get_site_config_or_503(request.site)
 
-    # FIXME if user authenticated, prefill user part of form
-    # FIXME if session contains pre-login data fill it back to form
+    # if we're back from login page restore data already entered
     existing_data = request.session.get("onboarding_existing_data")
 
     # Fetch the onboarding form associated with the current site
@@ -43,6 +51,7 @@ def onboarding(request):
     form.fields["response"].add_fields(onboarding_instance.form)
 
     if request.method == "POST" and form.is_valid():
+        # NOTE we may check for known user not logged before valid form
         email = (
             request.user.username
             if request.user.is_authenticated
@@ -54,8 +63,8 @@ def onboarding(request):
         )
 
         if not new_user and not request.user.is_authenticated:
-            # NOTE user exists but is not currently logged in,
-            # NOTE save data, log in, and come back to complete
+            # user exists but is not currently logged in,
+            # save data, log in, and come back to complete
             request.session["onboarding_existing_data"] = form.cleaned_data
             login_url = reverse("account_login")
             next_args = urlencode({"next": reverse("projects-onboarding")})
@@ -76,16 +85,12 @@ def onboarding(request):
 
         notify_and_email_new_project(request.site, project, user)
 
-        # NOTE if commune is not unique ask for precision
-        insee = form.cleaned_data.get("insee", None)
-        if not insee and project.commune:
-            communes = geomatics.Commune.objects.filter(postal=project.commune.postal)
-            if communes.count() > 1:
-                url = reverse("projects-onboarding-select-commune", args=[project.id])
-                return redirect(url)
+        # cleanup now useless onboarding existing data if present
+        if "onboarding_existing_data" in request.session:
+            del request.session["onboarding_existing_data"]
 
-        # NOTE redirect to next step according to situation
         if new_user:
+            # new user first have to setup her password and then complete the survey
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
             next_url = (
                 reverse("survey-project-session", args=(project.id,)) + "?first_time=1"
@@ -131,7 +136,7 @@ def create_project_for_user(
     return project
 
 
-def update_user(site, user, data) -> auth.User:
+def update_user(site: sites.Site, user: auth.User, data: dict) -> auth.User:
     """Update and return given user and its profile w/ data from form"""
 
     # FIXME existing value are kept instead of new ones, why?
@@ -152,7 +157,7 @@ def update_user(site, user, data) -> auth.User:
     return user
 
 
-def get_organization(site, name):
+def get_organization(site: sites.Site, name: str) -> addressbook_models.Organization:
     """Return (new) organization with the given name or None"""
     if not name:
         return None
@@ -161,7 +166,9 @@ def get_organization(site, name):
     return organization
 
 
-def create_initial_note(site, onboarding_response):
+def create_initial_note(
+    site: sites.Site, onboarding_response: models.OnboardingResponse
+) -> None:
     """Create the initial note that describe the project"""
 
     project = onboarding_response.project
@@ -184,7 +191,9 @@ def create_initial_note(site, onboarding_response):
     )
 
 
-def notify_and_email_new_project(site, project, user):
+def notify_and_email_new_project(
+    site: sites.Site, project: projects.Project, user: auth.User
+) -> None:
     """Send notifications and email for new project"""
 
     # notify project submission
@@ -212,3 +221,6 @@ def notify_and_email_new_project(site, project, user):
         params=params,
     )
     # FIXME return send_mail status ?
+
+
+# eof
