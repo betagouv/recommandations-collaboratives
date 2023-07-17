@@ -8,19 +8,14 @@
 {% load guardian_tags %}
 {% load projects_extra %}
 {% load common_tags %}
-
-
 {% block js %}
   {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}
 {% block title %}| Tableau de bord{% endblock %}
 {% block content %}
-
   {% get_obj_perms request.user for request.site as "user_site_perms" %}
   {% is_staff_for_current_site request.user as is_staff %}
-
   {% get_verbs as verbs %}
-
   <div x-data="Crm"
        class="d-flex px-0"
        style="font-family: 'Marianne', arial, sans-serif">
@@ -116,25 +111,9 @@
             </svg>
             <span class="align-middle">Activité du CRM</span>
           </h3>
-          <ul class="list-group">
+          <ul class="bg-white pt-3 px-4 border rounded crm-activity">
             {% for action in crm_notif_stream|slice:":30" %}
-              <li class="list-group-item">
-                <span class="text-secondary">{{ action.timestamp|naturalday|capfirst }}</span> -
-                {% if action.target %}
-                  <a href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor|capfirst }}</a>
-                  <strong>{{ action.verb }}</strong>
-                  <a href="{{ action.action_object.get_absolute_url }}">"{{ action.action_object }}"</a>
-                  à propos de {{ action.target }}
-                {% else %}
-                  {% if action.action_object %}
-                    <a href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor|capfirst }}</a>
-                    <strong>{{ action.verb }}</strong>
-                    <a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
-                  {% else %}
-                    {{ action.actor|capfirst }} <strong>{{ action.verb }}</strong>
-                  {% endif %}
-                {% endif %}
-              </li>
+              {% include "crm/fragments/activity_action.html" %}
             {% empty %}
               -- Pas encore d'activité de la part du staff --
             {% endfor %}
@@ -147,26 +126,11 @@
             </svg>
             <span class="align-middle">Activité de l'ensemble des projets</span>
           </h3>
-          <ul class="list-group">
-            {% for action in projects_stream|slice:":200" %}
-              <li class="list-group-item">
-                <span class="text-secondary">{{ action.timestamp|naturalday|capfirst }}</span> -
-                {% if action.target %}
-                  <a href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor|capfirst }}</a>
-									<strong>{{ action.verb }}</strong>
-									{{ action.action_object }} (sur <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>)
-                {% else %}
-                  {% if action.action_object %}
-                    <a href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor|capfirst }}</a>
-										<strong>{{ action.verb }}</strong>
-										<a href="{{ action.action_object.get_absolute_url }}">{{ action.action_object }}</a>
-                  {% else %}
-                    {{ action.actor|capfirst }} <strong>{{ action.verb }}</strong>
-                  {% endif %}
-                {% endif %}
-              </li>
+          <ul class="bg-white pt-3 px-4 border rounded crm-activity">
+            {% for action in projects_stream|slice:":30" %}
+              {% include "crm/fragments/activity_action.html" %}
             {% empty %}
-              -- Pas encore d'activité, revenez plus tard ! --
+              -- Pas encore d'activité de la part du staff --
             {% endfor %}
           </ul>
           <h3 class="mt-3">
