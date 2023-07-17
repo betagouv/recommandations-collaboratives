@@ -8,14 +8,19 @@
 {% load guardian_tags %}
 {% load projects_extra %}
 {% load common_tags %}
-{% get_verbs as verbs %}
+
+
 {% block js %}
   {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}
 {% block title %}| Tableau de bord{% endblock %}
 {% block content %}
+
   {% get_obj_perms request.user for request.site as "user_site_perms" %}
   {% is_staff_for_current_site request.user as is_staff %}
+
+  {% get_verbs as verbs %}
+
   <div x-data="Crm"
        class="d-flex px-0"
        style="font-family: 'Marianne', arial, sans-serif">
