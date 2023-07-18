@@ -64,7 +64,7 @@
                                     </template>
                                 </div>
                             </div>
-                            <div class="task-modal-followups" id="followups-scroll-container">
+                            <div class="task-modal-followups" :class="$store.previewModal.isPaginated && 'is-paginated'" id="followups-scroll-container">
                                 <template x-if="task.resource_id">
                                     <div class="rounded bg-light p-2 m-3 message"
                                          :class="canAdministrate && task.content === '' && 'border border-warning'">

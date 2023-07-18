@@ -65,9 +65,12 @@ body.modal-open {
 }
 
 .task-modal-followups {
-    min-height: 40vh;
-    max-height: 50vh;
+    height: 60vh;
     overflow-y: auto;
+}
+
+.task-modal-followups.is-paginated {
+    height: 50vh;
 }
 
 @keyframes status-animation-appear {
