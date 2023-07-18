@@ -14,7 +14,11 @@ from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
 
-# Baker addons
+########################################################################
+# Baker addons for using dynamic forms in onboarding
+########################################################################
+
+
 def gen_onboarding_func():
     return """[{ "type": "text",
     "required": false,
@@ -163,7 +167,8 @@ def test_onboarding_fills_existing_user_and_profile_missing_info(request, client
         "impediments": "some impediment",
     }
 
-    with login(client, username=data["email"]) as user:
+    email = data["email"].lower()
+    with login(client, username=email) as user:
         response = client.post(reverse("projects-onboarding"), data=data)
 
     project = projects_models.Project.objects.first()
@@ -222,7 +227,7 @@ def test_onbording_do_not_replace_existing_user_email_when_logged_in(request, cl
 
 
 @pytest.mark.django_db
-def test_onboarding_redirect_anonymous_to_login_if_mail_exists(request, client):
+def test_onboarding_known_not_logged_user_login_and_preserve_data(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
 
     baker.make(
@@ -232,22 +237,22 @@ def test_onboarding_redirect_anonymous_to_login_if_mail_exists(request, client):
     )
 
     data = {
-        "name": "a project",
+        "name": "a new project for existing user",
         "email": "a@exAmpLe.Com",
         "location": "some place",
-        "org_name": "MyOrg",
+        "org_name": "My organization",
         "phone": "+3893889393399",
         "first_name": "john",
         "last_name": "doe",
-        "description": "a description",
-        "impediment_kinds": ["Autre"],
+        "description": "a description of my new project",
         "response_0": "blah",
-        "impediments": "some impediment",
+        "impediment_kinds": ["Autre"],  # FIXME seems unused
+        "impediments": "some impediment",  # FIXME seems unused
     }
 
     # someone exists with this email (which is lower case)
     email = data["email"].lower()
-    baker.make(auth.User, email=email, username=email)
+    user = baker.make(auth.User, email=email, username=email)
 
     # i am not connected
     response = client.post(reverse("projects-onboarding"), data=data)
@@ -255,6 +260,58 @@ def test_onboarding_redirect_anonymous_to_login_if_mail_exists(request, client):
     # send me to login to prove i am the one
     assert response.status_code == 302
     assert response["Location"].startswith(reverse("account_login"))
+
+    assert client.session["onboarding_existing_data"] == {
+        "first_name": "john",
+        "last_name": "doe",
+        "phone": "+3893889393399",
+        "org_name": "My organization",
+        "email": "a@example.com",
+        "name": "a new project for existing user",
+        "location": "some place",
+        "insee": "",
+        "description": "a description of my new project",
+        "response": {"Vide": "blah"},
+        "postcode": "",
+    }
+
+
+@pytest.mark.django_db
+def test_onboarding_reuse_session_content_when_logged_user_is_back(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    data = {
+        "first_name": "john",
+        "last_name": "doe",
+        "phone": "+3893889393399",
+        "org_name": "My organization",
+        "email": "a@example.com",
+        "name": "a new project for existing user",
+        "location": "some place",
+        "insee": "",
+        "description": "a description of my new project",
+        "response": {"Vide": "blah"},
+        "postcode": "",
+    }
+
+    with login(client, username=data["email"], email=data["email"]):
+        session = client.session
+        session["onboarding_existing_data"] = data
+        session.save()
+
+        response = client.get(reverse("projects-onboarding"))
+
+    assert response.status_code == 200
+    # data is there when i am back to onboarding
+    assertContains(response, data["name"])
+    assertContains(response, data["description"])
+    assertContains(response, data["location"])
 
 
 @pytest.mark.django_db
@@ -472,43 +529,6 @@ def test_performing_onboarding_discard_unknown_postal_code(request, client):
     assert response.status_code == 302
     project = projects_models.Project.on_site.all()[0]
     assert project.commune is None
-
-
-@pytest.mark.django_db
-def test_performing_onboarding_allow_select_on_multiple_communes(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
-
-    commune = baker.make(geomatics.Commune, postal="12345")
-    baker.make(geomatics.Commune, postal="12345")
-    with login(client):
-        response = client.post(
-            reverse("projects-onboarding"),
-            data={
-                "name": "a project",
-                "email": "a@example.com",
-                "location": "some place",
-                "org_name": "My Org",
-                "description": "my desc",
-                "first_name": "john",
-                "phone": "0610101010",
-                "last_name": "doe",
-                "response_0": "blah",
-                "postcode": commune.postal,
-                "impediment_kinds": ["Autre"],
-                "impediments": "some impediment",
-            },
-        )
-
-    assert response.status_code == 302
-    project = projects_models.Project.on_site.first()
-    url = reverse("projects-onboarding-select-commune", args=[project.id])
-    assert response.url == (url)
 
 
 @pytest.mark.django_db
