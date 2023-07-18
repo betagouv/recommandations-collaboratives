@@ -7,25 +7,35 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-17 20:39:35 CEST
 """
 
+from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
+from django.contrib.auth.decorators import login_required
 from django.contrib.sites import models as sites
-from django.shortcuts import redirect, render, reverse
+from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
-from urbanvitaliz.apps.addressbook import models as addressbook_models
+
+from urbanvitaliz.apps.addressbook import models as addressbook
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.communication.digests import normalize_user_name
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.invites import models as invites
 from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import signals as projects_signals
-from urbanvitaliz.apps.projects.utils import generate_ro_key, assign_collaborator
-from urbanvitaliz.utils import get_site_config_or_503
-
+from urbanvitaliz.apps.projects.utils import (
+    assign_advisor,
+    assign_collaborator,
+    generate_ro_key,
+)
+from urbanvitaliz.utils import (
+    build_absolute_url,
+    get_site_config_or_503,
+    is_switchtender_or_403,
+)
 
 from . import forms, models
-
 
 ########################################################################
 # User driven onboarding for a new project
@@ -58,11 +68,11 @@ def onboarding(request):
             else form.cleaned_data.get("email").lower()
         )
 
-        user, new_user = auth.User.objects.get_or_create(
+        user, is_new_user = auth.User.objects.get_or_create(
             username=email, defaults={"email": email}
         )
 
-        if not new_user and not request.user.is_authenticated:
+        if not is_new_user and not request.user.is_authenticated:
             # user exists but is not currently logged in,
             # save data, log in, and come back to complete
             request.session["onboarding_existing_data"] = form.cleaned_data
@@ -72,7 +82,9 @@ def onboarding(request):
 
         user = update_user(request.site, user, form.cleaned_data)
 
-        project = create_project_for_user(user, form.cleaned_data, "DRAFT")
+        project = create_project_for_user(
+            user=user, data=form.cleaned_data, status="DRAFT"
+        )
 
         project.sites.add(request.site)
 
@@ -81,15 +93,18 @@ def onboarding(request):
         onboarding_response.project = project
         onboarding_response.save()
 
+        assign_collaborator(user, project, is_owner=True)
+
         create_initial_note(request.site, onboarding_response)
 
-        notify_and_email_new_project(request.site, project, user)
+        notify_new_project(request.site, project, user)
+        email_owner_of_project(request.site, project, user)
 
         # cleanup now useless onboarding existing data if present
         if "onboarding_existing_data" in request.session:
             del request.session["onboarding_existing_data"]
 
-        if new_user:
+        if is_new_user:
             # new user first have to setup her password and then complete the survey
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
             next_url = (
@@ -105,8 +120,80 @@ def onboarding(request):
     return render(request, "onboarding/onboarding.html", locals())
 
 
+########################################################################
+# Advisor onboard someone else
+########################################################################
+
+
+def create_project_prefilled(request):
+    """Create a new project for someone else"""
+    site_config = get_site_config_or_503(request.site)
+
+    is_switchtender_or_403(request.user)
+
+    form = forms.OnboardingResponseForm(request.POST or None)
+    onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
+
+    # Add fields in JSON to dynamic form rendering field.
+    form.fields["response"].add_fields(onboarding_instance.form)
+
+    if request.method == "POST" and form.is_valid():
+        email = form.cleaned_data.get("email").lower()
+
+        user, is_new_user = auth.User.objects.get_or_create(
+            username=email, defaults={"email": email}
+        )
+        user = update_user(request.site, user, form.cleaned_data)
+
+        project = create_project_for_user(
+            user=user,
+            data=form.cleaned_data,
+            status="TO_PROCESS",
+            submitted_by=request.user,
+        )
+
+        project.sites.add(request.site)
+
+        onboarding_response = form.save(commit=False)
+        onboarding_response.onboarding = onboarding_instance
+        onboarding_response.project = project
+        onboarding_response.save()
+
+        assign_collaborator(user, project, is_owner=True)
+        assign_advisor(request.user, project, request.site)
+
+        create_initial_note(request.site, onboarding_response)
+
+        invite_user_to_project(request, user, project, is_new_user)
+        notify_new_project(request.site, project, user)
+
+        return redirect("projects-project-detail-knowledge", project_id=project.id)
+
+    return render(request, "onboarding/prefill.html", locals())
+
+
+@login_required
+def select_commune(request, project_id=None):
+    """Intermediate screen to select proper insee number of commune"""
+    project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
+    response = redirect("survey-project-session", project_id=project.id)
+    response["Location"] += "?first_time=1"
+    if not project.commune:
+        return response
+    communes = geomatics.Commune.objects.filter(postal=project.commune.postal)
+    if request.method == "POST":
+        form = forms.SelectCommuneForm(communes, request.POST)
+        if form.is_valid():
+            project.commune = form.cleaned_data["commune"]
+            project.save()
+            return response
+    else:
+        form = forms.SelectCommuneForm(communes)
+    return render(request, "onboarding/select-commune.html", locals())
+
+
 def create_project_for_user(
-    user: auth.User, data: dict, status: str
+    user: auth.User, data: dict, status: str, submitted_by: auth.User = None
 ) -> projects.Project:
     """Use data from form to create and return a new project for user"""
 
@@ -120,7 +207,7 @@ def create_project_for_user(
     )
 
     project = projects.Project.objects.create(
-        submitted_by=user,
+        submitted_by=submitted_by or user,
         name=data.get("name"),
         phone=data.get("phone"),
         org_name=data.get("org_name"),
@@ -130,8 +217,6 @@ def create_project_for_user(
         status=status,
         ro_key=generate_ro_key(),
     )
-
-    assign_collaborator(user, project, is_owner=True)
 
     return project
 
@@ -157,11 +242,11 @@ def update_user(site: sites.Site, user: auth.User, data: dict) -> auth.User:
     return user
 
 
-def get_organization(site: sites.Site, name: str) -> addressbook_models.Organization:
+def get_organization(site: sites.Site, name: str) -> addressbook.Organization:
     """Return (new) organization with the given name or None"""
     if not name:
         return None
-    organization = addressbook_models.Organization.get_or_create(name)
+    organization = addressbook.Organization.get_or_create(name)
     organization.sites.add(site)
     return organization
 
@@ -184,25 +269,33 @@ def create_initial_note(
     projects.Note.objects.create(
         project=project,
         content=(
-            f"# Demande initiale\n\n{project.description}\n\n{ markdown_content }"
+            f"# Demande initiale\n\n"
+            f"{project.description}\n\n"
+            f"{ markdown_content }"
         ),
         public=True,
         site=site,
     )
 
 
-def notify_and_email_new_project(
-    site: sites.Site, project: projects.Project, user: auth.User
+def notify_new_project(
+    site: sites.Site, project: projects.Project, owner: auth.User
 ) -> None:
-    """Send notifications and email for new project"""
+    """Create notification of new project"""
 
     # notify project submission
     projects_signals.project_submitted.send(
         sender=projects.Project,
         site=site,
-        submitter=user,
+        submitter=owner,
         project=project,
     )
+
+
+def email_owner_of_project(
+    site: sites.Site, project: projects.Project, user: auth.User
+) -> None:
+    """Send email to new project owner"""
 
     # Send an email to the project owner
     params = {
@@ -221,6 +314,46 @@ def notify_and_email_new_project(
         params=params,
     )
     # FIXME return send_mail status ?
+
+
+def invite_user_to_project(
+    request, user: auth.User, project: projects.Project, is_new_user: bool
+):
+    invite, _ = invites.Invite.objects.get_or_create(
+        project=project,
+        inviter=request.user,
+        site=request.site,
+        email=user.email,
+        defaults={
+            "message": (
+                "Je viens de déposer votre projet sur la"
+                "plateforme de manière à faciliter nos échanges."
+            )
+        },
+    )
+
+    send_email(
+        template_name="sharing invitation",
+        recipients=[{"email": user.email}],
+        params={
+            "sender": {"email": request.user.email},
+            "message": invite.message,
+            "invite_url": build_absolute_url(
+                invite.get_absolute_url(),
+                auto_login_user=user if not is_new_user else None,
+            ),
+            "project": digests.make_project_digest(project),
+        },
+    )
+
+    messages.success(
+        request,
+        (
+            "Un courriel d'invitation à rejoindre"
+            f" le projet a été envoyé à {user.email}."
+        ),
+        extra_tags=["email"],
+    )
 
 
 # eof
