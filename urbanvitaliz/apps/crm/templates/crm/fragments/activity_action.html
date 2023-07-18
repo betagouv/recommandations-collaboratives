@@ -35,7 +35,7 @@
                                     {% endif %}
                                 {% else %}
                                     {% if action.action_object.feed_label %}
-                                        <a class="d-inline text-decoration-none hover-underline text-dark"
+                                        <a class="d-inline hover-underline"
                                            href="{{ action.action_object.get_absolute_url }}">
                                             {{ action.verb }}
                                             {{ action.action_object.feed_label }}
@@ -51,7 +51,7 @@
                                         <div class="d-inline-block ms-1">
                                             <span>à propos de</span>
                                             {% if action.target.get_absolute_url %}
-                                                <a class="text-decoration-none hover-underline text-dark"
+                                                <a class="hover-underline"
                                                    href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                                             {% else %}
                                                 <strong class="fw-normal">{{ action.target }}</strong>
