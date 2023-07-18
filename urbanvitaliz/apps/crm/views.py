@@ -681,20 +681,10 @@ def create_note_for_user(request, user_id):
         request, user, "crm-user-details", "crm-user-note-update"
     )
 
+    # FIXME check that user.profile has any meaning or remove
+    # FIXME if user.profile has no meaning move notification into handle
     if note and user.profile:
-        crm_users = get_users_with_perms(
-            request.site, only_with_perms_in=["use_crm"]
-        ).exclude(pk=request.user.pk)
-
-        notify.send(
-            sender=request.user,
-            recipient=crm_users,
-            verb=verbs.CRM.NOTE_CREATED,
-            action_object=note,
-            target=user,
-            public=False,
-            # crm=True, # Deactivated since JSON is not enabled, useless
-        )
+        notify_note_creation(request, note, user)
 
     return response
 
@@ -705,9 +695,12 @@ def create_note_for_project(request, project_id):
 
     project = get_object_or_404(Project.on_site, pk=project_id)
 
-    _, response = handle_create_note_for_object(
+    note, response = handle_create_note_for_object(
         request, project, "crm-project-details", "crm-project-note-update"
     )
+
+    if note:
+        notify_note_creation(request, note, project)
 
     return response
 
@@ -719,14 +712,33 @@ def create_note_for_organization(request, organization_id):
     qs = get_queryset_for_site_organizations(request.site)
     organization = get_object_or_404(qs, pk=organization_id)
 
-    _, response = handle_create_note_for_object(
+    note, response = handle_create_note_for_object(
         request,
         organization,
         "crm-organization-details",
         "crm-organization-note-update",
     )
 
+    if note:
+        notify_note_creation(request, note, organization)
+
     return response
+
+
+def notify_note_creation(request, note, target):
+    """Notify crm users of new note creation"""
+    crm_users = get_users_with_perms(
+        request.site, only_with_perms_in=["use_crm"]
+    ).exclude(pk=request.user.pk)
+
+    notify.send(
+        sender=request.user,
+        recipient=crm_users,
+        verb=verbs.CRM.NOTE_CREATED,
+        action_object=note,
+        target=target,
+        public=False,
+    )
 
 
 def update_note_for_object(request, note, return_view_name):

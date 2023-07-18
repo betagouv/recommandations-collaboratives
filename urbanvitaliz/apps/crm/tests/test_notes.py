@@ -7,6 +7,7 @@ from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from notifications import notify
+
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
@@ -56,9 +57,11 @@ def test_crm_project_create_note_accessible_for_staff(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_project_create_note(request, client):
+def test_crm_project_create_note(mocker, request, client):
     site = get_current_site(request)
     project = baker.make(projects_models.Project, sites=[site])
+
+    mocker.patch("notifications.notify.send")
 
     data = {"tags": ["canard"], "content": "hola"}
 
@@ -70,6 +73,9 @@ def test_crm_project_create_note(request, client):
 
     note = models.Note.objects.first()
     assert list(note.tags.names()) == data["tags"]
+
+    # crm users notification
+    notify.send.assert_called_once()
 
 
 ########################################################################
@@ -177,9 +183,11 @@ def test_crm_organization_create_note_accessible_for_staff(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_organization_create_note(request, client):
+def test_crm_organization_create_note(mocker, request, client):
     site = get_current_site(request)
     organization = baker.make(addressbook_models.Organization, sites=[site])
+
+    mocker.patch("notifications.notify.send")
 
     data = {"content": "hola"}
 
@@ -191,6 +199,9 @@ def test_crm_organization_create_note(request, client):
 
     note = models.Note.objects.first()
     assert note.content == data["content"]
+
+    # crm users notification
+    notify.send.assert_called_once()
 
 
 ########################################################################
@@ -302,6 +313,7 @@ def test_crm_user_create_note_accessible_w_perm(request, client):
     assert response.status_code == 200
 
 
+# FIXME ce test est un non sens -- assert à l'opposé du nom
 @pytest.mark.django_db
 def test_crm_user_create_note_performed_no_notification(mocker, request, client):
     site = get_current_site(request)
@@ -319,23 +331,15 @@ def test_crm_user_create_note_performed_no_notification(mocker, request, client)
 
     assert response.status_code == 302
 
-    note = models.Note.objects.first()
-
-    assert note.site == site
-    assert note.object_id == crm_user.id
-    assert note.content == data["content"]
-
     notify.send.assert_called_once()
 
 
 @pytest.mark.django_db
-def test_crm_user_create_note_notify_if_organization(mocker, request, client):
+def test_crm_user_create_note_notify_crm_users(mocker, request, client):
     site = get_current_site(request)
     crm_user = baker.make(auth_models.User)
-    profile = crm_user.profile
-    profile.sites.add(site)
-    profile.organization = baker.make(addressbook_models.Organization)
-    profile.save()
+    crm_user.profile.sites.add(site)
+    # profile = crm_user.profile
 
     mocker.patch("notifications.notify.send")
 
@@ -345,6 +349,12 @@ def test_crm_user_create_note_notify_if_organization(mocker, request, client):
     with login(client) as user:
         assign_perm("use_crm", user, site)
         response = client.post(url, data=data)
+
+    note = models.Note.objects.first()
+
+    assert note.site == site
+    assert note.object_id == crm_user.id
+    assert note.content == data["content"]
 
     assert response.status_code == 302
 
