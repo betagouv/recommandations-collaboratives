@@ -144,27 +144,31 @@
             {% for action in stream|slice:":200" %}
               {% if action.verb == verbs.User.LOGIN %}
                 <li class="list-group-item">
-                  {{ action.timestamp|naturalday|capfirst }} - <a href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor|capfirst }}</a> {{ action.verb }}
+                  <span class="text-info-custom text-grey-dark me-2 text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
+                  <a class="font-small"
+                     href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor.first_name|default:action.actor.email }}
+                    {{ action.actor.last_name|default:"" }}</a> 
+                    <span class="font-small">{{ action.verb }}</span>
+                  </li>
+                {% endif %}
+              {% empty %}
+                -- Pas encore d'activité, revenez plus tard ! --
+              {% endfor %}
+            </ul>
+            <h3 class="mt-3 d-inline-block">
+              <svg class="bi align-middle" width="24" height="24">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#journal-check" />
+              </svg>
+              <span class="align-middle">Mes dernières actions</span>
+            </h3>
+            <ul class="list-group">
+              {% for task in request.user.tasks_created.all|slice:":200" %}
+                <li class="list-group-item font-small">
+                  <a class="" href="{{ task.get_absolute_url }}">{{ task }}</a> ({{ task.project }})
                 </li>
-              {% endif %}
-            {% empty %}
-              -- Pas encore d'activité, revenez plus tard ! --
-            {% endfor %}
-          </ul>
-          <h3 class="mt-3 d-inline-block">
-            <svg class="bi align-middle" width="24" height="24">
-              <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#journal-check" />
-            </svg>
-            <span class="align-middle">Mes dernières actions</span>
-          </h3>
-          <ul class="list-group">
-            {% for task in request.user.tasks_created.all|slice:":200" %}
-              <li class="list-group-item">
-                <a href="{{ task.get_absolute_url }}">{{ task }}</a> ({{ task.project }})
-              </li>
-            {% endfor %}
-          </ul>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
-  {% endblock %}
+    {% endblock %}
