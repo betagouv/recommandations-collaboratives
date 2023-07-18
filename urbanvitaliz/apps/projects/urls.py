@@ -23,16 +23,6 @@ from .views import (
 )
 
 urlpatterns = [
-    path(
-        r"projects/prefill/",
-        views.create_project_prefilled,
-        name="projects-project-prefill",
-    ),
-    path(
-        r"onboarding/<int:project_id>/commune/",
-        views.select_commune,
-        name="projects-onboarding-select-commune",
-    ),
     path(r"projects/", views.project_list, name="projects-project-list"),
     # projects for switchtenders
     path(

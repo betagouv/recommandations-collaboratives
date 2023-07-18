@@ -226,14 +226,6 @@ class ProjectForm(forms.ModelForm):
         ]
 
 
-class SelectCommuneForm(forms.Form):
-    def __init__(self, communes, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["commune"] = forms.ModelChoiceField(
-            queryset=communes, widget=forms.RadioSelect, label="Votre commune :"
-        )
-
-
 class DocumentUploadForm(forms.ModelForm):
     class Meta:
         model = models.Document

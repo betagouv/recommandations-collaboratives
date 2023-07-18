@@ -8,17 +8,13 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 
-from django.contrib import messages
-from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
 from django.dispatch import receiver
 from django.shortcuts import get_object_or_404, redirect, render
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
@@ -29,27 +25,14 @@ from urbanvitaliz import verbs
 from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.communication.api import send_email
 from urbanvitaliz.apps.communication.digests import normalize_user_name
-from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.invites import models as invites_models
-from urbanvitaliz.apps.onboarding import forms as onboarding_forms
-from urbanvitaliz.apps.onboarding import models as onboarding_models
-from urbanvitaliz.utils import (
-    build_absolute_url,
-    check_if_advisor,
-    get_site_config_or_503,
-    has_perm_or_403,
-    is_staff_for_site,
-    is_switchtender_or_403,
-)
+from urbanvitaliz.utils import check_if_advisor, has_perm_or_403, is_staff_for_site
 
 from .. import models, signals
-from ..forms import SelectCommuneForm
 from ..utils import (
     assign_advisor,
     assign_collaborator,
     assign_observer,
     can_administrate_project,
-    generate_ro_key,
     get_active_project,
     is_advisor_for_project,
     is_project_moderator,
@@ -63,170 +46,9 @@ from ..utils import (
 __all__ = ["rest", "feeds", "notes", "sharing", "tasks", "documents"]
 
 ########################################################################
-# On boarding
-########################################################################
-
-
-def create_project_prefilled(request):
-    """Create a new project for someone else"""
-    site_config = get_site_config_or_503(request.site)
-
-    is_switchtender_or_403(request.user)
-
-    form = onboarding_forms.OnboardingResponseForm(request.POST or None)
-    onboarding_instance = onboarding_models.Onboarding.objects.get(
-        pk=site_config.onboarding.pk
-    )
-
-    # Add fields in JSON to dynamic form rendering field.
-    form.fields["response"].add_fields(onboarding_instance.form)
-
-    if request.method == "POST":
-        if form.is_valid():
-            onboarding_response = form.save(commit=False)
-            onboarding_response.onboarding = onboarding_instance
-
-            project = models.Project()
-
-            project.name = form.cleaned_data.get("name")
-            project.phone = form.cleaned_data.get("phone")
-            project.org_name = form.cleaned_data.get("org_name")
-            project.description = form.cleaned_data.get("description")
-            project.location = form.cleaned_data.get("location")
-            project.postcode = form.cleaned_data.get("postcode")
-            project.ro_key = generate_ro_key()
-            project.status = "TO_PROCESS"
-            project.submitted_by = request.user
-
-            insee = form.cleaned_data.get("insee", None)
-            if insee:
-                project.commune = geomatics.Commune.get_by_insee_code(insee)
-            else:
-                postcode = form.cleaned_data.get("postcode")
-                project.commune = geomatics.Commune.get_by_postal_code(postcode)
-
-            project.save()
-            project.sites.add(request.site)
-
-            onboarding_response.project = project
-            onboarding_response.save()
-
-            user, created = auth.User.objects.get_or_create(
-                username=form.cleaned_data.get("email"),
-                defaults={
-                    "email": form.cleaned_data.get("email"),
-                    "first_name": form.cleaned_data.get("first_name"),
-                    "last_name": form.cleaned_data.get("last_name"),
-                },
-            )
-
-            user.profile.sites.add(request.site)
-
-            assign_collaborator(user, project, is_owner=True)
-
-            # Add the current user as an advisor
-            assign_advisor(request.user, project, request.site)
-
-            markdown_content = render_to_string(
-                "projects/project/onboarding_initial_note.md",
-                {
-                    "onboarding_response": onboarding_response,
-                    "project": project,
-                },
-            )
-
-            models.Note(
-                project=project,
-                content=(
-                    "# Demande initiale\n\n"
-                    f"{project.description}\n\n"
-                    f"{ markdown_content }"
-                ),
-                public=True,
-                site=request.site,
-            ).save()
-
-            invite, _ = invites_models.Invite.objects.get_or_create(
-                project=project,
-                inviter=request.user,
-                site=request.site,
-                email=user.email,
-                defaults={
-                    "message": (
-                        "Je viens de déposer votre projet sur la"
-                        "plateforme de manière à faciliter nos échanges."
-                    )
-                },
-            )
-            send_email(
-                template_name="sharing invitation",
-                recipients=[{"email": user.email}],
-                params={
-                    "sender": {"email": request.user.email},
-                    "message": invite.message,
-                    "invite_url": build_absolute_url(
-                        invite.get_absolute_url(),
-                        auto_login_user=user if not created else None,
-                    ),
-                    "project": digests.make_project_digest(project),
-                },
-            )
-
-            messages.success(
-                request,
-                (
-                    "Un courriel d'invitation à rejoindre"
-                    f" le projet a été envoyé à {user.email}."
-                ),
-                extra_tags=["email"],
-            )
-
-            signals.project_submitted.send(
-                sender=models.Project,
-                site=request.site,
-                submitter=user,
-                project=project,
-            )
-
-            # NOTE check if commune is unique for code postal
-            if project.commune:
-                communes = geomatics.Commune.objects.filter(
-                    postal=project.commune.postal
-                )
-                if communes.count() > 1:
-                    url = reverse(
-                        "projects-onboarding-select-commune", args=[project.id]
-                    )
-                    return redirect(url)
-
-            return redirect("projects-project-detail-knowledge", project_id=project.id)
-
-    return render(request, "projects/project/create_prefilled.html", locals())
-
-
-@login_required
-def select_commune(request, project_id=None):
-    """Intermediate screen to select proper insee number of commune"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-    response = redirect("survey-project-session", project_id=project.id)
-    response["Location"] += "?first_time=1"
-    if not project.commune:
-        return response
-    communes = geomatics.Commune.objects.filter(postal=project.commune.postal)
-    if request.method == "POST":
-        form = SelectCommuneForm(communes, request.POST)
-        if form.is_valid():
-            project.commune = form.cleaned_data["commune"]
-            project.save()
-            return response
-    else:
-        form = SelectCommuneForm(communes)
-    return render(request, "projects/select-commune.html", locals())
-
-
-########################################################################
 # Switchtender
 ########################################################################
+
 
 def mark_general_notifications_as_seen(user):
     # Mark some notifications as seen

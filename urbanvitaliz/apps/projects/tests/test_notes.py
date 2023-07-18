@@ -8,6 +8,7 @@ created: 2021-06-01 10:11:56 CEST
 """
 
 
+import notifications
 import pytest
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
@@ -16,7 +17,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from notifications import notify
 from pytest_django.asserts import assertContains
+
 from urbanvitaliz.utils import login
 
 from .. import models
@@ -144,10 +147,13 @@ def test_switchtender_creates_new_private_note_for_project_and_redirect(
 
 @pytest.mark.django_db
 def test_create_public_note_for_project_collaborator_and_redirect(request, client):
+    membership = baker.make(models.ProjectMember, member__is_staff=False)
+
     project = Recipe(
         models.Project,
         sites=[get_current_site(request)],
         status="READY",
+        projectmember_set=[membership],
     ).make()
 
     with login(client) as user:
@@ -166,6 +172,8 @@ def test_create_public_note_for_project_collaborator_and_redirect(request, clien
     actions = action_object_stream(note)
     assert actions.count() == 1
     assert actions[0].verb == "a envoyé un message"
+
+    assert notifications.models.Notification.objects.count() == 1
 
 
 @pytest.mark.django_db
@@ -347,9 +355,11 @@ def test_collaborator_cant_update_private_note(request, client):
     assert response.status_code == 403
 
 
-########################
+########################################################################
 # DELETION
-########################
+########################################################################
+
+
 @pytest.mark.django_db
 def test_advisor_can_delete_private_note_and_redirect(request, client):
     current_site = get_current_site(request)
@@ -380,12 +390,24 @@ def test_delete_my_public_note_for_collaborator_and_redirect(request, client):
             created_by=user,
         ).make()
 
+        notify.send(
+            sender=user,
+            recipient=user,
+            verb="sent note",
+            action_object=note,
+            target=project,
+        )
+
         url = reverse("projects-delete-note", args=[note.id])
 
         assign_collaborator(user, project)
         response = client.post(url)
 
+    # Note is deleted
     assert models.Note.on_site.count() == 0
+
+    # associated notifications also
+    assert notifications.models.Notification.objects.count() == 0
 
     assert response.status_code == 302
 

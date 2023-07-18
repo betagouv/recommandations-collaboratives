@@ -11,7 +11,7 @@ created: 2022-01-24 22:39:27 CEST
 import json
 
 from django.core.management.base import BaseCommand
-from urbanvitaliz.apps.communication.api import send_in_blue_email
+from urbanvitaliz.apps.communication.api import brevo_email
 from urbanvitaliz.apps.communication.models import EmailTemplate
 
 
@@ -45,7 +45,7 @@ class Command(BaseCommand):
 
         recipients = [{"name": "??", "email": email} for email in options["to"]]
 
-        if send_in_blue_email(template.name, recipients, params=payload):
+        if brevo_email(template.name, recipients, params=payload):
             print("Email sent! :)")
         else:
             print("Something went wrong! :(")

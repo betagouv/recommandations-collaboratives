@@ -74,8 +74,9 @@ def test_create_mail_reminder_replace_existing_ones():
 # FIXME pourquoi ces tests ne sont pas dans communication avec la commande
 # senddigest ou la commande senddigest dans l'application courante ?
 
+
 @pytest.mark.django_db
-@override_settings(SENDINBLUE_FORCE_DEBUG=True)
+@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_send_pending_reminder_with_reached_deadline(request, mocker):
     current_site = get_current_site(request)
     today = datetime.date.today()
@@ -97,7 +98,7 @@ def test_command_send_pending_reminder_with_reached_deadline(request, mocker):
 
 
 @pytest.mark.django_db
-@override_settings(SENDINBLUE_FORCE_DEBUG=True)
+@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_send_pending_task_reminder_with_past_deadline(request, mocker):
     current_site = get_current_site(request)
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
@@ -112,7 +113,7 @@ def test_command_send_pending_task_reminder_with_past_deadline(request, mocker):
 
 
 @pytest.mark.django_db
-@override_settings(SENDINBLUE_FORCE_DEBUG=True)
+@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_do_not_send_pending_reminder_with_future_deadline(mocker):
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     baker.make(

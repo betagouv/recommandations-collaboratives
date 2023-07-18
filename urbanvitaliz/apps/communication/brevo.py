@@ -1,13 +1,13 @@
-import sib_api_v3_sdk
+import sib_api_v3_sdk as brevo_sdk
 from django.conf import settings
 
 
-class SendInBlue:
+class Brevo:
     def __init__(self):
-        self.configuration = sib_api_v3_sdk.Configuration()
-        self.configuration.api_key["api-key"] = settings.SENDINBLUE_API_KEY
-        self.api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
-            sib_api_v3_sdk.ApiClient(self.configuration)
+        self.configuration = brevo_sdk.Configuration()
+        self.configuration.api_key["api-key"] = settings.BREVO_API_KEY
+        self.api_instance = brevo_sdk.TransactionalEmailsApi(
+            brevo_sdk.ApiClient(self.configuration)
         )
 
     def get_templates(self):
@@ -22,22 +22,20 @@ class SendInBlue:
             recipients = [recipients]
 
         if test:
-            send_test_email = sib_api_v3_sdk.SendTestEmail(
-                email_to=[recipients[0]["email"]]
-            )
+            send_test_email = brevo_sdk.SendTestEmail(email_to=[recipients[0]["email"]])
             response = self.api_instance.send_test_template(
                 template_id, send_test_email
             )
         else:
             send_to = [
-                sib_api_v3_sdk.SendSmtpEmailTo(
+                brevo_sdk.SendSmtpEmailTo(
                     name=recipient.get("name", "Utilisateur UrbanVitaliz"),
                     email=recipient["email"],
                 )
                 for recipient in recipients
             ]
 
-            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+            send_smtp_email = brevo_sdk.SendSmtpEmail(
                 template_id=template_id, to=send_to, params=params
             )
             response = self.api_instance.send_transac_email(send_smtp_email)
