@@ -775,6 +775,13 @@ class TaskFollowup(models.Model):
     def __str__(self):  # pragma: nocover
         return f"TaskFollowup{self.id}"
 
+    def get_absolute_url(self):
+        task = self.task
+        return (
+            reverse("projects-project-detail-actions", args=[task.project.id])
+            + f"#action-{task.pk}"
+        )
+
 
 class TaskFollowupRsvp(models.Model):
     """Task followup request sent to project owner."""

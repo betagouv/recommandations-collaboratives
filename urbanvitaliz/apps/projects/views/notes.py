@@ -7,12 +7,15 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+import notifications
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from urbanvitaliz.utils import has_perm_or_403, has_perm
+
+from urbanvitaliz.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm, NoteForm, PublicNoteForm, StaffNoteForm
@@ -159,6 +162,8 @@ def delete_note(request, note_id=None):
         note.project.updated_on = note.updated_on
         note.project.save()
 
+        cleanup_notifications_for_note(note)
+
         if note.public:
             return redirect(
                 reverse("projects-project-detail-conversations", args=[note.project_id])
@@ -167,6 +172,16 @@ def delete_note(request, note_id=None):
     return redirect(
         reverse("projects-project-detail-internal-followup", args=[note.project_id])
     )
+
+
+# This functions could be made more general
+def cleanup_notifications_for_note(note):
+    """Delete all notifications related to this note"""
+    note_ct = ContentType.objects.get_for_model(models.Note)
+    notifications.models.Notification.objects.filter(
+        action_object_content_type=note_ct,
+        action_object_object_id=note.id,
+    ).delete()
 
 
 # eof
