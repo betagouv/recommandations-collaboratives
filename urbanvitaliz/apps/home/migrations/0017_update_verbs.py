@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("home", "0016_remove_unused_groups"),
+        ("notifications", "0001_initial"),
     ]
 
     operations = [
