@@ -11,6 +11,7 @@ from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.utils import login
 
 
@@ -32,7 +33,7 @@ baker.generators.add("dynamic_forms.models.FormField", gen_onboarding_func)
 
 
 ########################################################################
-# Onboarding page
+# Onboarding page for user
 ########################################################################
 
 
@@ -252,7 +253,7 @@ def test_onboarding_known_not_logged_user_login_and_preserve_data(request, clien
 
     # someone exists with this email (which is lower case)
     email = data["email"].lower()
-    user = baker.make(auth.User, email=email, username=email)
+    baker.make(auth.User, email=email, username=email)
 
     # i am not connected
     response = client.post(reverse("projects-onboarding"), data=data)
@@ -531,6 +532,148 @@ def test_performing_onboarding_discard_unknown_postal_code(request, client):
     assert project.commune is None
 
 
+#################################################################
+# onboarding by an advisor for someone else
+#################################################################
+
+
+@pytest.mark.django_db
+def test_create_prefilled_project_is_not_reachable_without_login(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    url = reverse("projects-project-prefill")
+    response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_create_prefilled_project_is_not_reachable_with_simple_login(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    with login(client):
+        response = client.get(reverse("projects-project-prefill"))
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_create_prefilled_project_reachable_by_switchtenders(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+    site = get_current_site(request)
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding=onboarding,
+    )
+
+    with login(client, groups=["example_com_advisor"]):
+        response = client.get(reverse("projects-project-prefill"))
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_create_prefilled_project_creates_a_new_project(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+    site = get_current_site(request)
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding=onboarding,
+    )
+
+    data = {
+        "name": "a project",
+        "email": "a@ExAmple.Com",
+        "location": "some place",
+        "phone": "03939382828",
+        "postcode": "59000",
+        "org_name": "my org",
+        "description": "blah",
+        "first_name": "john",
+        "last_name": "doe",
+        "response_0": "blah",
+    }
+    with login(client, groups=["example_com_advisor"]) as user:
+        response = client.post(reverse("projects-project-prefill"), data=data)
+
+    project = projects_models.Project.on_site.all()[0]
+    assert project.name == data["name"]
+    assert project.status == "TO_PROCESS"
+    assert len(project.ro_key) == 32
+
+    owner = project.owner
+
+    assert data["email"].lower() == owner.email
+    assert data["first_name"] == owner.first_name
+    assert data["last_name"] == owner.last_name
+    assert site in owner.profile.sites.all()
+
+    assert user in project.switchtenders.all()
+
+    assert user == project.submitted_by
+
+    invite = invites_models.Invite.objects.first()
+    assert invite.project == project
+
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_created_prefilled_project_stores_initial_info(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+    site = get_current_site(request)
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding=onboarding,
+    )
+
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "description": "my desc",
+        "postal_code": "59800",
+        "location": "some place",
+        "first_name": "john",
+        "phone": "0610101010",
+        "last_name": "doe",
+        "org_name": "MyOrg",
+        "response_0": "blah",
+        "impediment_kinds": ["Autre"],
+        "impediments": "some impediment",
+    }
+
+    with login(client, groups=["example_com_advisor"]):
+        response = client.post(reverse("projects-project-prefill"), data=data)
+
+    assert response.status_code == 302
+
+    project = projects_models.Project.on_site.first()
+    assert project
+
+    note = projects_models.Note.objects.first()
+    assert data["description"] in note.content
+    assert note.public is True
+
+
+########################################################################
+# Selecting proper commune insee code for multiple commune postal code
+########################################################################
+
+
 @pytest.mark.django_db
 def test_selecting_proper_commune_completes_project_creation(request, client):
     commune = Recipe(geomatics.Commune, postal="12345").make()
@@ -583,3 +726,6 @@ def test_proper_commune_selection_contains_all_possible_commmunes(request, clien
     for commune in expected:
         assert commune.name in page
     assert unexpected.name not in page
+
+
+# eof
