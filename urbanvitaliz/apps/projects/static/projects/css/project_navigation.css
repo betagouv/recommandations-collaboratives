@@ -6,19 +6,23 @@
 
 .project-navigation a .has-notification {
     position: absolute;
+
     top: -2px;
-    right: -1px;
+    left: -1px;
 
-    background-color: #0063cb;
     color: white;
+    font-size: 9px !important;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    border-bottom-right-radius: 5px;
+    background-color: #0063CB;
+    padding: 0 5px !important;
 
-    padding: 0px 5px;
-    border-bottom-left-radius: 5px;
-    font-size: 10px;
+    width: auto !important;
+    height: auto !important;
+
+    border-top-left-radius:0 !important;
+    border-top-right-radius:0 !important;
+    border-bottom-left-radius:0 !important;
 }
 
 .project-navigation a {
