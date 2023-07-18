@@ -3,7 +3,7 @@ import { TASK_STATUSES } from '../config/statuses';
 import { isArchivedStatus } from "../utils/taskStatus"
 
 
-export default function TasksApp(app, projectId) {
+export default function TasksApp(app) {
     const taskApp = {
         //utils function
         currentlyHoveredElement: null,

@@ -8,6 +8,8 @@ import { isStatusUpdate, statusText } from "../utils/taskStatus"
 export default function PreviewModal() {
     return {
         currentTaskNotifications: [],
+        pendingComment:'',
+        currentlyEditing:null,
         get index() {
             return this.$store.previewModal.index
         },
@@ -41,22 +43,34 @@ export default function PreviewModal() {
         async onSubmitComment(content) {
             if (!this.currentlyEditing) {
                 await this.$store.tasksData.issueFollowup(this.task, undefined, content);
-                // await this.getData()
                 await this.$store.previewModal.loadFollowups();
             } else {
                 const [type, id] = this.currentlyEditing;
                 if (type === "followup") {
-                    await editComment(this.task.id, id, content);
-                    await this.loadFollowups(this.task.id);
+                    await this.$store.tasksData.editComment(this.task.id, id, content);
+                    await this.$store.previewModal.loadFollowups();
                 } else if (type === "content") {
                     await this.$store.tasksData.patchTask(this.task.id, { content: content });
-                    await this.getData();
+                    await this.$store.tasksView.updateViewWithTask(this.task.id)
                 }
             }
 
             this.pendingComment = "";
             this.currentlyEditing = null;
+            this.$dispatch('set-comment', this.pendingComment)
             this.followupScrollToLastMessage();
+        },
+        onEditComment(followup) {
+            this.pendingComment = followup.comment;
+            this.currentlyEditing = ["followup", followup.id];
+            document.querySelector('#comment-text-ref .ProseMirror').focus();
+            this.$dispatch('set-comment', followup.comment)
+        },
+        onEditContent() {
+            this.pendingComment = this.task.content;
+            this.currentlyEditing = ["content", this.task.id];
+            document.querySelector('#comment-text-ref .ProseMirror').focus();
+            this.$dispatch('set-comment', this.task.content)
         },
         followupScrollToLastMessage() {
             const scrollContainer = document.getElementById("followups-scroll-container");

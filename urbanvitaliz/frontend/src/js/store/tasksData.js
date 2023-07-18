@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs'
-import api, { tasksUrl, taskUrl, moveTaskUrl, followupsUrl, taskNotificationsUrl, markTaskNotificationsAsReadUrl } from '../utils/api'
+import api, { tasksUrl, taskUrl, moveTaskUrl, followupsUrl, followupUrl, taskNotificationsUrl, markTaskNotificationsAsReadUrl } from '../utils/api'
 import { generateUUID } from '../utils/uuid'
 
 document.addEventListener('alpine:init', () => {
