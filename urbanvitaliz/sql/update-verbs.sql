@@ -108,7 +108,7 @@ DROP TABLE verb_mapping ;
 --
 -- to commit once properly tested
 
-ROLLBACK ;
+COMMIT ;
 
 
 -- eof

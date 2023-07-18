@@ -7,4 +7,5 @@ recursive-include urbanvitaliz/apps/projects/static *.*
 recursive-include urbanvitaliz/apps/resources/static *.*
 recursive-include urbanvitaliz/apps/survey/static *.*
 recursive-include urbanvitaliz/apps/resources *.md
+recursive-include urbanvitaliz/sql/ *.sql
 recursive-include urbanvitaliz *.html
