@@ -1,22 +1,23 @@
 {% load activity_tags %}
 {% load humanize %}
 {% load gravatar %}
-<li class="d-flex mx-0 px-0 d-flex align-items-center">
-    <span class="small text-info-custom text-grey-dark">{{ action.timestamp|naturalday|capfirst }}</span>
+<li class="d-flex mx-0 px-0 d-flex align-items-center py-1">
+    <span class="small text-info-custom text-grey-dark me-2 text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
     <div class="activity-stream-actions-container d-flex flex-column">
         {% load i18n %}
         {% load static %}
         {% load common_tags %}
         {% get_verbs as verbs %}
         <div class="d-block font-marianne">
-            <div class="d-flex align-items-start mb-2">
-                <div class="mt-1 ms-1 font-very-small">
-                    <span class="text-grey-dark fw-light">
-                        <a href="{% url 'crm-user-details' action.actor.pk %}">
-                            <strong class="text-dark fw-bold">{{ action.actor.first_name|default:action.actor.email }}
-                            {{ action.actor.last_name|default:"" }}</strong>
+            <div class="d-flex align-items-start">
+                <div class="font-small">
+                    <span class="fw-normal">
+                        <a class=""
+                           href="{% url 'crm-user-details' action.actor.pk %}">
+                            {{ action.actor.first_name|default:action.actor.email }}
+                            {{ action.actor.last_name|default:"" }}
                         </a>
-                        <span class="text-dark fw-normal font-italic font-very-small">{{ action.actor.profile.organization_position|default:'' }}</span>
+                        <span class="text-dark fw-normal font-italic font-small">{{ action.actor.profile.organization.name|default:'' }}</span>
                         <span class="d-inline-block">
                             <span class="d-inline">
                                 {% if action.verb == verbs.Project.INVITATION %}
@@ -33,21 +34,27 @@
                                         </span>
                                     {% endif %}
                                 {% else %}
-                                    <a class="d-inline text-decoration-none hover-underline text-dark fw-bold"
-                                       href="{{ action.action_object.get_absolute_url }}">{{ action.verb }}</a>
+                                    {% if action.action_object.feed_label %}
+                                        <a class="d-inline text-decoration-none hover-underline text-dark"
+                                           href="{{ action.action_object.get_absolute_url }}">
+                                            {{ action.verb }}
+                                            {{ action.action_object.feed_label }}
+                                        </a>
+                                    {% else %}
+                                        <span>{{ action.verb }}</span>
+                                        <a class="d-inline hover-underline"
+                                           href="{{ action.action_object.get_absolute_url }}">
+                                            "{{ action.action_object }}"
+                                        </a>
+                                    {% endif %}
                                     {% if action.target %}
-                                        <div class="d-inline-block">
-                                            <svg class="bi me-1 flex-shrink-0"
-                                                 width="14"
-                                                 height="14"
-                                                 fill="currentColor">
-                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
-                                            </svg>
+                                        <div class="d-inline-block ms-1">
+                                            <span>à propos de</span>
                                             {% if action.target.get_absolute_url %}
                                                 <a class="text-decoration-none hover-underline text-dark"
                                                    href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                                             {% else %}
-                                                {{ action.target }}
+                                                <strong class="fw-normal">{{ action.target }}</strong>
                                             {% endif %}
                                         </div>
                                     {% endif %}
