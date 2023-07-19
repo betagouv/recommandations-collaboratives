@@ -17,6 +17,8 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains
+
+from urbanvitaliz import verbs
 from urbanvitaliz.utils import login
 
 from .. import models
@@ -139,7 +141,7 @@ def test_switchtender_creates_new_private_note_for_project_and_redirect(
     # stream and notifications
     actions = action_object_stream(note)
     assert actions.count() == 1
-    assert actions[0].verb == "a envoyé un message dans l'espace conseillers"
+    assert actions[0].verb == verbs.Conversation.PRIVATE_MESSAGE
 
 
 @pytest.mark.django_db
@@ -165,7 +167,7 @@ def test_create_public_note_for_project_collaborator_and_redirect(request, clien
     # stream and notifications
     actions = action_object_stream(note)
     assert actions.count() == 1
-    assert actions[0].verb == "a envoyé un message"
+    assert actions[0].verb == verbs.Conversation.PUBLIC_MESSAGE
 
 
 @pytest.mark.django_db
