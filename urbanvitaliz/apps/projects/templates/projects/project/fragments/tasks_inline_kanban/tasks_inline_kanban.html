@@ -1,22 +1,22 @@
 {% load django_vite %}
-
 {% block project_js %}
     {% vite_asset 'js/apps/tasks.js' %}
 {% endblock %}
 
-<!-- Extraire ces trucs dans son propre template -->
 {{ project.pk|json_script:"djangoProjectId" }}
+{{ can_administrate|json_script:"canAdministrate" }}
+{{ user_project_perms|json_script:"userProjectPerms" }}
+{{ is_switchtender|json_script:"isSwitchtender" }}
+{{ user.email|json_script:"userEmail" }}
 
 <div x-data>
     {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_header.html' %}
-
     <template x-if="$store.tasksView.currentView === 'inline'">
         {% include 'projects/project/fragments/tasks_inline/tasks_inline.html' %}
     </template>
     <template x-if="$store.tasksView.currentView === 'kanban'">
         {% include 'projects/project/fragments/tasks_kanban/tasks_kanban.html' %}
     </template>
-
     {% include 'projects/project/fragments/tasks_modal/task_modal.html' %}
     {% include 'projects/project/fragments/tasks_modal/delete_task_confirmation_modal.html' %}
     {% include 'projects/project/fragments/tasks_modal/feedback_modal.html' %}

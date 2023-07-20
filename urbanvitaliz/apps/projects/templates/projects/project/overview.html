@@ -115,24 +115,17 @@
                                 {{ project.owner.email }}
                             </a>
                             {% endif %}
-                            {% if project.owner.profile.phone_no or project.phone %}
+                            {% if project.owner.profile.phone_no %}
                                 <span style="font-size: 14px;
                                             color: #0063CB"
                                     class="d-flex align-items-center">
                                     <svg class="bi align-middle me-2" width="15" height="15" fill="currentColor">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
                                     </svg>
-                                    {% if project.owner.profile.phone_no %}
-                                        <a style="font-size: 14px;
-                                                color: #0063CB;
-                                                text-decoration: none"
-                                        href="tel:{{ project.owner.profile.phone_no }}">{{ project.owner.profile.phone_no }}</a>
-                                    {% else %}
-                                        <a style="font-size: 14px;
-                                                color: #0063CB;
-                                                text-decoration: none"
-                                        href="tel:{{ project.phone }}">{{ project.phone }}</a>
-                                    {% endif %}
+                                    <a style="font-size: 14px; color: #0063CB; text-decoration: none"
+                                       href="tel:{{ project.owner.profile.phone_no }}">
+                                        {{ project.owner.profile.phone_no }}
+                                    </a>
                                 </span>
                             {% endif %}
                         </div>

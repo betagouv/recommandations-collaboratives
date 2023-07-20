@@ -4,11 +4,9 @@
 {% load training %}
 {% load guardian_tags %}
 {% load django_vite %}
-
 {% block css %}
     {% vite_asset 'css/projectDetails.css' %}
 {% endblock %}
-
 {% block title %}{{ block.super }} > Connaissance{% endblock %}
 {% block banner %}
     {% include 'projects/project/fragments/positioning_banner.html' %}
@@ -35,7 +33,12 @@
             margin-top: 0 !important;
         }
         .masonry-wrapper{
-            display: block !important;
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
+            max-width: 100%;
+            flex-wrap: nowrap;
+            height: auto !important;
         }
         .masonry-wrapper .masonry-item{
             display: block !important;
@@ -43,12 +46,18 @@
             top: 0 !important;
             left: 0 !important;
             width: 100% !important;
+            max-width: 100% !important;
             height: auto !important;
         }
+
         .navbar {
             display: none !important;
         }
         footer {
+            display: none !important;
+        }
+        
+        #overview-step-5 {
             display: none !important;
         }
 	}

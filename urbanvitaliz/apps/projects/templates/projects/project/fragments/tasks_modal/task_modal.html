@@ -64,10 +64,10 @@
                                     </template>
                                 </div>
                             </div>
-                            <div class="task-modal-followups" id="followups-scroll-container">
+                            <div class="task-modal-followups" :class="$store.previewModal.isPaginated && 'is-paginated'" id="followups-scroll-container">
                                 <template x-if="task.resource_id">
                                     <div class="rounded bg-light p-2 m-3 message"
-                                         :class="canAdministrate && task.content === '' && 'border border-warning'">
+                                         :class="$store.djangoData.canManageTasks && task.content === '' && 'border border-warning'">
                                         <template x-if="task.content !== ''">
                                             <p x-html="renderMarkdown(task.content)" class="mb-2"></p>
                                         </template>
@@ -76,8 +76,8 @@
                                         </template>
                                         <div class="d-flex justify-content-between" style="font-size: 0.9em;">
                                             {% include 'projects/project/fragments/task/task_user_card.html' %}
-                                            <template x-if="canAdministrate">
-                                                <a class="text-muted" style="cursor: pointer;" @click="onEditContent()">Editer</a>
+                                            <template x-if="$store.djangoData.canManageTasks">
+                                                <a class="text-muted cursor-pointer" @click="onEditContent()">Editer</a>
                                             </template>
                                         </div>
                                     </div>
@@ -106,8 +106,8 @@
                                                     <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
                                                     <div class="d-flex justify-content-between" style="font-size: 0.9em;">
                                                         {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
-                                                        <template x-if="$store.tasksData.canUseTasks && f.who.email === userEmail">
-                                                            <a class="text-muted" @click="onEditComment(f)">Editer</a>
+                                                        <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
+                                                            <a class="text-muted cursor-pointer" @click="onEditComment(f)">Editer</a>
                                                         </template>
                                                     </div>
                                                 </div>
@@ -127,8 +127,8 @@
                                                             <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
                                                             <div class="d-flex justify-content-between" style="font-size: 0.9em;">
                                                                 {% include 'projects/project/fragments/task/task_followup_user_card.html'%}
-                                                                <template x-if="$store.tasksData.canUseTasks && f.who.email === userEmail">
-                                                                    <a class="text-muted" style="cursor: pointer;" @click="onEditComment(f)">Editer</a>
+                                                                <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
+                                                                    <a class="text-muted cursor-pointer" @click="onEditComment(f)">Editer</a>
                                                                 </template>
                                                             </div>
                                                         </div>

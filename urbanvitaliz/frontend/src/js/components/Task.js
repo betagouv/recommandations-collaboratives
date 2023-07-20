@@ -53,17 +53,6 @@ export default function Task(currentTask) {
             taskToChange.isLoading = true
             otherTaskToChange.isLoading = true
         },
-        // Comments
-        // onEditComment(followup) {
-        //     this.pendingComment = followup.comment;
-        //     this.currentlyEditing = ["followup", followup.id];
-        //     this.$refs.commentTextRef.focus();
-        // },
-        // onEditContent() {
-        //     this.pendingComment = this.currentTask.content;
-        //     this.currentlyEditing = ["content", this.currentTask.id];
-        //     this.$refs.commentTextRef.focus();
-        // },
         truncate(input, size = 30) {
             return input.length > size ? `${input.substring(0, size)}...` : input;
         },

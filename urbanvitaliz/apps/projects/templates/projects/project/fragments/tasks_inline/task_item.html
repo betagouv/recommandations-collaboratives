@@ -26,16 +26,14 @@
             </div>
         </template>
         <div class="d-flex align-items-center justify-content-between">
-            {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                <div class="d-flex w-100 justify-content-between align-items-center">
-                    <div class="d-flex w-100 align-items-center">
-                        <span class="mt-0 pt-0mb-0 fw-bold title-info text-dark cursor-pointer hover-border-bottom"
-                              @click="handleOpenPreviewModal()"
-                              x-text="task.intent"></span>
-                    </div>
+            <div class="d-flex w-100 justify-content-between align-items-center">
+                <div class="d-flex w-100 align-items-center">
+                    <span class="mt-0 pt-0mb-0 fw-bold title-info text-dark cursor-pointer hover-border-bottom"
+                          @click="handleOpenPreviewModal()"
+                          x-text="task.intent"></span>
                 </div>
-            {% endif %}
-            {% if "use_tasks" in user_project_perms and not disable_edit %}
+            </div>
+            {% if "manage_tasks" in user_project_perms and not disable_edit %}
                 {% include 'projects/project/fragments/task/task_actions.html' %}
             {% endif %}
         </div>

@@ -1,6 +1,8 @@
 {% load static %}
 <div {% if escapejs %} x-data='editor("{{ input_value|escapejs }}")' {% elif is_task_comment %}x-data='editor(task.content)' {% else %} x-data='editor({{ input_value }})'{% endif %}
-     class="w-100">
+     class="w-100"
+     @set-comment.window="setMarkdownContentFromTaskModal($event)"
+     >
   <template x-if="isLoaded()">
     <div class="tiptap-menu">
       <button @click.prevent
@@ -47,7 +49,11 @@
     </div>
   </template>
   <div class="position-relative">
-    <div class="tiptap-editor {% if wide %}is-wide{% endif %}" x-ref="element"></div>
+
+    <div class="tiptap-editor {% if wide %}is-wide{% endif %}"
+         x-ref="element"
+         id="comment-text-ref"></div>
+         
     {% if is_task_comment %}
       <div class="d-flex justify-content-end">
         <button class="button filled blue small inherit"

@@ -79,6 +79,9 @@ Alpine.data('editor', (content) => {
     unsetLink() {
       editor.chain().focus().unsetLink().run()
     },
+    setMarkdownContentFromTaskModal(event){
+      editor.commands.setContent(event.detail);
+    },
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown()
     }

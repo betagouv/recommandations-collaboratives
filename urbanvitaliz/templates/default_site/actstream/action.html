@@ -33,7 +33,7 @@
               {% endif %}
             {% else %}
               <a class="d-inline text-decoration-none hover-underline text-dark fw-bold"
-                 href="{{ action.action_object.get_absolute_url }}">{{ action.verb }}</a>
+                 href="{{ action.action_object.get_absolute_url }}">{{ action.verb }} {{ action.action_object.feed_label }}</a>
               {% if action.target %}
                 <div class="d-inline-block">
                   <svg class="bi me-1 flex-shrink-0"
