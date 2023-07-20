@@ -11,6 +11,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from urbanvitaliz.apps.projects import models as project_models
 from urbanvitaliz.utils import login
+from urbanvitaliz import verbs
 
 
 @pytest.mark.django_db
@@ -48,7 +49,7 @@ def test_site_dashboard_shows_site_project_notifications(request, client):
     user = baker.make(auth_models.User)
     project = baker.make(project_models.Project, sites=[site])
     # a notification for this project
-    verb = "a créé une note de CRM"
+    verb = verbs.CRM.NOTE_CREATED
     notify.send(
         sender=user,
         recipient=user,
@@ -75,7 +76,7 @@ def test_site_dashboard_hides_other_site_project_notifications(request, client):
     with settings.SITE_ID.override(other_site.pk):
         other_project = baker.make(project_models.Project, sites=[other_site])
         # a notification for this project
-        verb = "a créé une note de CRM"
+        verb = verbs.CRM.NOTE_CREATED
         notify.send(
             sender=user,
             recipient=user,
