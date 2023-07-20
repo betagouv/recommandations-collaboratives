@@ -37,9 +37,7 @@ class OnboardingResponseForm(forms.ModelForm):
 
     first_name = forms.CharField(label="Prénom du contact", initial="", required=True)
     last_name = forms.CharField(label="Nom du contact", initial="", required=True)
-    phone = forms.CharField(
-        max_length=16, label="Téléphone", initial="", required=True
-    )
+    phone = forms.CharField(max_length=16, label="Téléphone", initial="", required=True)
     email = forms.CharField(label="Courriel", required=True)
 
     def clean_email(self):
@@ -84,3 +82,14 @@ class OnboardingResponseWithCaptchaForm(OnboardingResponseForm):
             self.fields.pop("captcha")
 
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
+
+
+class SelectCommuneForm(forms.Form):
+    def __init__(self, communes, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["commune"] = forms.ModelChoiceField(
+            queryset=communes, widget=forms.RadioSelect, label="Votre commune :"
+        )
+
+
+# eof

@@ -4,12 +4,16 @@ from django.db import migrations
 
 from urbanvitaliz.utils import RunSQLFile
 from pathlib import Path
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
         ("home", "0016_remove_unused_groups"),
+        ("notifications", "0001_initial"),
     ]
 
-    operations = [RunSQLFile(sql_file_path=Path("sql/update-verbs.sql"))]
+    operations = [
+        RunSQLFile(sql_file_path=Path(settings.BASE_DIR / "sql/update-verbs.sql"))
+    ]

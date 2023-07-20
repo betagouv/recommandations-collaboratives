@@ -39,6 +39,8 @@ from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor, has_perm
 from . import apps
 from .utils import generate_ro_key
 
+FEED_LABEL_MAX_LENGTH = 50
+
 COLLABORATOR_DRAFT_PERMISSIONS = (
     "projects.view_public_notes",
     "projects.use_public_notes",
@@ -74,6 +76,7 @@ ADVISOR_PERMISSIONS = [
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
+
 
 # We need the permission to be associated to the site and not to the projects
 @receiver(post_migrate)
@@ -360,7 +363,6 @@ class Project(models.Model):
         if not self.commune:
             return f"{self.name} - {self.location}"
         return f"{self.commune.name} - {self.name}"
-
 
 
 class ProjectMember(models.Model):
@@ -729,6 +731,11 @@ class Task(OrderedModel):
     def __str__(self):  # pragma: nocover
         return "Task:{0}".format(self.intent or self.id)
 
+    def feed_label(self, max_length=FEED_LABEL_MAX_LENGTH):
+        """Return a truncated version of intent for feeds"""
+        label = truncate_string(self.intent, max_length)
+        return f"«{label}»"
+
     def get_absolute_url(self):
         return (
             reverse("projects-project-detail-actions", args=[self.project.id])
@@ -774,6 +781,17 @@ class TaskFollowup(models.Model):
 
     def __str__(self):  # pragma: nocover
         return f"TaskFollowup{self.id}"
+
+    def feed_label(self):
+        """Return a truncated version of task intent for feeds"""
+        return self.task.feed_label()
+
+    def get_absolute_url(self):
+        task = self.task
+        return (
+            reverse("projects-project-detail-actions", args=[task.project.id])
+            + f"#action-{task.pk}"
+        )
 
 
 class TaskFollowupRsvp(models.Model):
@@ -920,6 +938,22 @@ class Document(models.Model):
 
     def __str__(self):  # pragma: nocover
         return f"Document {self.id}"
+
+
+########################################################################
+# helpers / utils
+########################################################################
+
+
+def truncate_string(s, max_length):
+    """Truncate given string to max_length"""
+    if len(s) < max_length:
+        return s
+    sub = s[:max_length]
+    if s[max_length] != " ":
+        # we are truncating last word, rewind to its begining
+        sub = sub[:sub.rfind(" ")]
+    return f"{sub}…"
 
 
 # eof
