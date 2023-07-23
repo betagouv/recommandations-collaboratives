@@ -460,7 +460,7 @@ def notify_note_created(sender, note, project, user, **kwargs):
     if note.public is False:
         recipients = get_switchtenders_for_project(project).exclude(id=user.id)
 
-        verb = "a envoyé un message dans l'espace conseillers"
+        verb = verbs.Conversation.PRIVATE_MESSAGE
         action.send(
             user,
             verb=verb,
@@ -472,7 +472,7 @@ def notify_note_created(sender, note, project, user, **kwargs):
             id=user.id
         )
 
-        verb = "a envoyé un message"
+        verb = verbs.Conversation.PUBLIC_MESSAGE
         action.send(
             user,
             verb=verb,
