@@ -146,7 +146,7 @@
                 <li class="list-group-item">
                   <span class="text-info-custom text-grey-dark me-2 text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
                   <a class="font-small"
-                     href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor.first_name|default:action.actor.email }}
+                     href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor.first_name|default:action.actor }}
                     {{ action.actor.last_name|default:"" }}</a> 
                     <span class="font-small">{{ action.verb }}</span>
                   </li>

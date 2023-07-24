@@ -14,7 +14,7 @@
                     <span class="fw-normal">
                         <a class=""
                            href="{% url 'crm-user-details' action.actor.pk %}">
-                            {{ action.actor.first_name|default:action.actor.email }}
+                            {{ action.actor.first_name|default:action.actor }}
                             {{ action.actor.last_name|default:"" }}
                         </a>
                         <span class="text-dark fw-normal font-italic font-small">{{ action.actor.profile.organization.name|default:'' }}</span>
