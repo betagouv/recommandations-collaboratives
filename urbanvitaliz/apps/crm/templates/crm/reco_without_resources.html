@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load django_vite %}
+
+{% load static %}
+{% load humanize %}
+{% load crm_tags %}
+
+{% block js %}
+{% vite_asset 'js/apps/crm.js' %}
+
+
+{% endblock %}
+
+{% block content %}
+
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+        {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
+    <div class="w-75 d-flex flex-column justify-content-start">
+
+        <div class="d-flex justify-content-between align-items-center px-4 pt-4">
+            <h2>Recommandations sans ressource</h2>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Projet</th>
+                    <th>Date</th>
+                    <th>Créé par</th>
+                    <th>Recommandation</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for reco in recommendations %}
+                <tr>
+                    <td>{{ reco.project }}</td>
+                    <td>{{ reco.created_on }}</td>
+                    <td>{{ reco.created_by }}</td>
+                    <td>
+                        <a href="{{ reco.get_absolute_url }}"><strong>{{ reco.intent|default:"Sans nom" }}</strong></a>
+                        <br/>
+                        {{ reco.content }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
