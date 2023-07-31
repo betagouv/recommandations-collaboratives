@@ -13,7 +13,9 @@
                 <div class="d-flex flex-column">
                     <!-- Pagination -->
                     <template x-if="$store.previewModal.isPaginated">
-                        <div class="bg-blue d-flex align-items-center justify-content-between p-2 rounded" style="border-bottom-left-radius: 0 !important;border-bottom-right-radius: 0!important;">
+                        <div class="bg-blue d-flex align-items-center justify-content-between p-2 rounded"
+                             style="border-bottom-left-radius: 0 !important;
+                                    border-bottom-right-radius: 0!important">
                             <button class="p-1 button filled white small"
                                     @click="$store.previewModal.previous()">
                                 <svg class="bi align-middle" width="25" height="25" fill="#0063CB">
@@ -33,12 +35,6 @@
                     <div x-effect="taskId && $store.previewModal.loadFollowups()"
                          class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
-                        <div class="position-absolute top-0 end-0 p-2">
-                            <button type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                        </div>
                         <div class="d-flex flex-grow-1 align-items-stretch w-65">
                             <template x-if="task.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
@@ -54,7 +50,8 @@
                             </template>
                         </div>
                         <!-- Modal followups -->
-                        <div class="d-flex flex-column justify-content-between w-35" style="border-left: 1px solid #EEEEEE;">
+                        <div class="d-flex flex-column justify-content-between w-35"
+                             style="border-left: 1px solid #EEEEEE">
                             <div class="w-100">
                                 <div x-show="task.document && task.document.length > 0">
                                     <h2 class="text-secondary text-uppercase fw-bolder m-3"
@@ -64,7 +61,16 @@
                                     </template>
                                 </div>
                             </div>
-                            <div class="task-modal-followups" :class="getTypeOfModalClass(task.document && task.document.length > 0)" id="followups-scroll-container">
+                            <div class="task-modal-followups"
+                                 :class="getTypeOfModalClass(task.document && task.document.length > 0)"
+                                 id="followups-scroll-container">
+                                <div class="py-2 px-3 position-sticky top-0 d-flex justify-content-between bg-white z-index-100 border-bottom-grey">
+                                    <span class="fw-medium title-info text-dark">Conversation</span>
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
                                 <template x-if="task.resource_id">
                                     <div class="rounded bg-light p-2 m-3 message"
                                          :class="$store.djangoData.canManageTasks && task.content === '' && 'border border-warning'">
@@ -99,13 +105,13 @@
                                               x-key="f.timestamp"
                                               x-effect="followups"
                                               id="followups-container">
-                                        <div>
+                                        <div class="position-relative">
                                             <template x-if="!isStatusUpdate(f)">
                                                 <div class="rounded bg-light p-2 m-3 message"
                                                      :class="hasNotification(f.id) && 'border border-warning'">
                                                     <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
                                                     <div class="d-flex justify-content-between" style="font-size: 0.9em;">
-                                                        {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
+                                                        {% include 'projects/project/fragments/task/task_user_card.html' with followup_user=True %}
                                                         <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
                                                             <a class="text-muted cursor-pointer" @click="onEditComment(f)">Editer</a>
                                                         </template>
@@ -126,7 +132,7 @@
                                                         <div class="rounded bg-light p-2 m-3 message">
                                                             <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
                                                             <div class="d-flex justify-content-between" style="font-size: 0.9em;">
-                                                                {% include 'projects/project/fragments/task/task_followup_user_card.html'%}
+                                                                {% include 'projects/project/fragments/task/task_user_card.html' with followup_user=True %}
                                                                 <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
                                                                     <a class="text-muted cursor-pointer" @click="onEditComment(f)">Editer</a>
                                                                 </template>
@@ -139,7 +145,9 @@
                                     </template>
                                 </template>
                             </div>
-                            <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">{% include 'tools/editor.html' with is_task_modal_comment=True %}</div>
+                            <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">
+                                {% include 'tools/editor.html' with is_task_modal_comment=True %}
+                            </div>
                         </div>
                     </div>
                 </div>
