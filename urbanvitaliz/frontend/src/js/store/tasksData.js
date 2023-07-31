@@ -9,11 +9,6 @@ document.addEventListener('alpine:init', () => {
         },
 
         tasks: [],
-
-        // TODO: Extraits plus tard dans djangoData.user
-        canUseTasks: false,
-        canManageTasks: false,
-
         async init() {
             await this.loadTasks()
             Alpine.store('tasksView').displayedTasks = this.tasks
