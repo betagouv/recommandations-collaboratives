@@ -14,7 +14,7 @@ function TaskStatusSwitcher(commentTextRef, commentTextFormRef) {
         async handleStatusClick(task, status) {
             task.isLoading = true
 
-            if (status === STATUSES.DONE && !this.isArchivedStatus(task.status)) {
+            if (status === STATUSES.DONE) {
                 this.handleOpenFeedbackModal(task, status);
             }
             

@@ -32,9 +32,15 @@
                         </div>
                     </template>
                     <!-- Modal body -->
-                    <div x-effect="taskId && $store.previewModal.loadFollowups() && $store.previewModal.setTaskIsVisited() && followupScrollToLastMessage()"
+                    <div x-effect="taskId && $store.previewModal.loadFollowups() && followupScrollToLastMessage()"
                          class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
+                        <div class="position-absolute top-0 end-0 px-3 py-2">
+                            <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                        </div>
                         <div class="d-flex flex-grow-1 align-items-stretch w-65">
                             <template x-if="task.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
@@ -53,9 +59,8 @@
                         <div class="d-flex flex-column justify-content-between w-35"
                              style="border-left: 1px solid #EEEEEE">
                             <div class="w-100">
-                                <div x-show="task.document && task.document.length > 0">
-                                    <h2 class="text-secondary text-uppercase fw-bolder m-3"
-                                        style="font-size: 12px">Fichier(s) partagé(s)</h2>
+                                <div class="border-bottom-grey" x-show="task.document && task.document.length > 0">
+                                    <span class="py-2 d-block px-3 fw-medium title-info text-dark">Fichier(s) partagé(s)</span>
                                     <template x-for="document in task.document" x-key="document.id">
                                         <div class="px-3">{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}</div>
                                     </template>
@@ -66,10 +71,6 @@
                                  id="followups-scroll-container">
                                 <div class="py-2 px-3 position-sticky top-0 d-flex justify-content-between bg-white z-index-100 border-bottom-grey">
                                     <span class="fw-medium title-info text-dark">Conversation</span>
-                                    <button type="button"
-                                            class="btn-close"
-                                            data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
                                 </div>
                                 <template x-if="task.resource_id">
                                     <div class="rounded bg-light p-2 m-3 message"

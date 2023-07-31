@@ -22,8 +22,9 @@ document.addEventListener('alpine:init', () => {
             const element = document.getElementById("task-modal");
             this.handle = new bootstrap.Modal(element);
 
-            const cleanup = () => {
+            const cleanup = async () => {
                 location.hash = '';
+                await this.setTaskIsVisited()
             }
 
             element.addEventListener("hidePrevented.bs.modal", cleanup);

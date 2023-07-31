@@ -24,7 +24,7 @@ export default function PreviewModal() {
             return this.$store.previewModal.followups
         },
         get newTasks() {
-            return this.$store.previewModal.newTasks
+            return this.$store.tasksData.newTasks
         },
         async refresh() {
             this.followupScrollToLastMessage();
@@ -76,14 +76,11 @@ export default function PreviewModal() {
         },
         followupScrollToLastMessage() {
             const scrollContainer = document.getElementById("followups-scroll-container");
-            console.log('scroll container ',scrollContainer)
             if (scrollContainer) {
                 setTimeout(() => {
-                    console.log('scroll ? ');
                     scrollContainer.scrollTop = scrollContainer.scrollHeight;
                 }, 500)
             }
-
         },
         getTypeOfModalClass(isDocumented) {
             let typeOfModalClass = '';

@@ -52,7 +52,9 @@
         </template>
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                {% include 'projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html' %}
+                <template x-if="task.public">
+                    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html' %}
+                </template>
                 <div class="text-grey-dark d-flex align-items-center tiny me-3 responsive-flex-column">
                     <svg class="align-middle bi me-1"
                          width="18px"

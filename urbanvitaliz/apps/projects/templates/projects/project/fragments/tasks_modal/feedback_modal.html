@@ -18,7 +18,12 @@
                  fill="currentColor">
               <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lightbulb" />
             </svg>
-            <span class="align-middle">Archiver une recommandation</span>
+            <template x-if="$store.taskModal.feedbackModalStatus === DONE_STATUS">
+              <span class="align-middle">Ça a été utile / C'est fait</span>
+            </template>
+            <template x-if="$store.taskModal.feedbackModalStatus != DONE_STATUS">
+              <span class="align-middle">Ça n'était pas applicable</span>
+            </template>
           </h5>
           <button type="button"
                   class="btn-close"
@@ -26,36 +31,6 @@
                   aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-2">
-            <label class="form-label fw-bolder" for="invite-role">Raison de l'archivage</label>
-            <template x-if="$store.taskModal.feedbackModalStatus === DONE_STATUS">
-              <div class="position-relative bg-white border rounded p-3 mb-2">
-                <input checked
-                       type="radio"
-                       id="status-done"
-                       value="4"
-                       style="transform: scale(1.2)">
-                <label for="status-done" class="position-absolute w-100 h-100 top-0 left-0">
-                  <span class="visually-hidden">C'est fait / Ça a été utile</span>
-                </label>
-                <span class="ms-1">C'est fait / Ça a été utile</span>
-              </div>
-            </template>
-            <template x-if="$store.taskModal.feedbackModalStatus != DONE_STATUS">
-              <div class="position-relative bg-white border rounded p-3 mb-2">
-                <input checked
-                       type="radio"
-                       id="status-non-applicable"
-                       value="4"
-                       style="transform: scale(1.2)">
-                <label for="status-non-applicable"
-                       class="position-absolute w-100 h-100 top-0 left-0">
-                  <span class="visually-hidden">Ça n'était pas applicable</span>
-                </label>
-                <span class="ms-1">Ça n'était pas applicable</span>
-              </div>
-            </template>
-          </div>
           <div class="mb-3">
             <label class="form-label fw-bolder" for="invite-message">Précisez pourquoi - pour garder une trace :</label>
             <textarea x-model="feedbackComment"

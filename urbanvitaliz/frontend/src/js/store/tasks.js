@@ -43,8 +43,6 @@ document.addEventListener('alpine:init', () => {
         onFeedbackClick(task, status) {
             this.currentTask = task
             this.feedbackModalStatus = status
-            console.log('task ', this.currentTask)
-            console.log('status', this.feedbackModalStatus)
             this.feedbackModalHandle.show();
         }
     })
