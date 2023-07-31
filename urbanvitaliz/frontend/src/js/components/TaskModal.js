@@ -5,7 +5,7 @@ import { renderMarkdown } from '../utils/markdown'
 import { formatDate } from '../utils/date'
 import { resourcePreviewUrl, deleteTaskUrl } from '../utils/api'
 import { gravatar_url } from '../utils/gravatar'
-import { isStatusUpdate, statusText } from "../utils/taskStatus"
+import { isStatusUpdate, statusText, isArchivedStatus } from "../utils/taskStatus"
 
 export default function TaskModal() {
     return {
@@ -23,7 +23,8 @@ export default function TaskModal() {
         currentDeletingTask: {},
         currentFeedbackTask: {},
         feedbackComment:'',
-        feedbackStatus: TASK_STATUSES.DONE,
+        DONE_STATUS: TASK_STATUSES.DONE,
+        isArchivedStatus,
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await this.$store.tasksData.issueFollowup(e.detail.task, e.detail.status)
@@ -56,18 +57,14 @@ export default function TaskModal() {
             element.addEventListener("hidden.bs.modal", cleanup);
         },
         openFeedbackModal(e) {
-            console.log('task open feedback event ? :', e)
-            const task = e.detail
-            console.log('task open feedback modal ? :', task)
+            const task = e.detail.task
+            const status = e.detail.status
             this.currentFeedbackTask = task;
-            this.$store.taskModal.onFeedbackClick(task)
+            this.$store.taskModal.onFeedbackClick(task, status)
         },
         async onSubmitFeedback() {
-            await this.$store.tasksData.issueFollowup(this.currentFeedbackTask, this.feedbackStatus, this.feedbackComment)
-            // await this.getData();
-            this.feedbackStatus = 3;
+            await this.$store.tasksData.issueFollowup(this.$store.taskModal.currentTask, this.$store.taskModal.feedbackModalStatus, this.feedbackComment)
             this.feedbackComment = '';
-            this.currentFeedbackTask = null;
             this.$store.taskModal.feedbackModalHandle.hide();
             await this.$store.tasksView.updateView()
         },

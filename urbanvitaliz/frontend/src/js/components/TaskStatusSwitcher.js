@@ -13,6 +13,15 @@ function TaskStatusSwitcher(commentTextRef, commentTextFormRef) {
         },
         async handleStatusClick(task, status) {
             task.isLoading = true
+
+            if (status === STATUSES.DONE && !this.isArchivedStatus(task.status)) {
+                this.handleOpenFeedbackModal(task, status);
+            }
+            
+            if (this.isArchivedStatus(status)) {
+                this.handleOpenFeedbackModal(task, status);
+            }
+
             await this.$store.tasksData.issueFollowup(task, status);
             await this.$store.tasksView.updateViewWithTask(task.id)
             task.isLoading = false

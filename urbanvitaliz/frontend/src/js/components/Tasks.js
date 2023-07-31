@@ -69,9 +69,8 @@ export default function TasksApp(app) {
                 selector: "[data-bs-toggle='tooltip']"
             })
         },
-        handleOpenFeedbackModal(task) {
-            console.log('dispatch somthg', task);
-            console.log(this.$dispatch('open-feedback-modal', task))
+        handleOpenFeedbackModal(task, status) {
+            this.$dispatch('open-feedback-modal', { task: task, status: status})
         },
     };
 

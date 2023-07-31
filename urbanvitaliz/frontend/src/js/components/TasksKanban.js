@@ -56,11 +56,13 @@ export default function boardTasksApp(projectId) {
                 nextData.isLoading = true
             }
 
-            if (status instanceof Array) {
+            if (status === TASK_STATUSES.DONE && !this.isArchivedStatus(data.status)) {
+                this.handleOpenFeedbackModal(data, status);
+            } else if (status instanceof Array) {
                 if (this.isArchivedStatus(data.status) && nextData) {
                     await this.$store.tasksData.moveTask(data.id, nextData.id);
                 } else {
-                    this.handleOpenFeedbackModal(data);
+                    this.handleOpenFeedbackModal(data, TASK_STATUSES.NOT_INTERESTED);
                 }
             } else {
                 await this.$store.tasksData.issueFollowup(data, status);
@@ -68,7 +70,9 @@ export default function boardTasksApp(projectId) {
             }
 
             await this.$store.tasksView.updateView()
+
             data.isLoading = false
+
             if (nextData) {
                 nextData.isLoading = false
             }

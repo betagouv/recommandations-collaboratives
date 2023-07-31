@@ -14,8 +14,7 @@ export function statusText(status) {
 }
 
 export function isArchivedStatus(status) {
-    return status === TASK_STATUSES.DONE
-        || status === TASK_STATUSES.NOT_INTERESTED
+    return status === TASK_STATUSES.NOT_INTERESTED
         || status === TASK_STATUSES.ALREADY_DONE
 }
 

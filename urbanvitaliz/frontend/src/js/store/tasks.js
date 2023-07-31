@@ -30,18 +30,21 @@ document.addEventListener('alpine:init', () => {
         previewModalHandle: null,
         deleteModalHandle: null,
         feedbackModalHandle: null,
+        feedbackModalStatus: null,
 
         onPreviewClick(task) {
             this.currentTask = task
-            console.log('preview click ? ', this.currentTask);
             this.previewModalHandle.show();
         },
         onDeleteClick(task) {
             this.currentTask = task
             this.deleteModalHandle.show();
         },
-        onFeedbackClick(task) {
+        onFeedbackClick(task, status) {
             this.currentTask = task
+            this.feedbackModalStatus = status
+            console.log('task ', this.currentTask)
+            console.log('status', this.feedbackModalStatus)
             this.feedbackModalHandle.show();
         }
     })
