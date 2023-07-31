@@ -53,8 +53,6 @@ def invite_accept(request, invite_id):
                     last_name=form.cleaned_data.get("last_name"),
                 )
 
-                # FIXME what about an empty organization field?
-
                 org_name = form.cleaned_data.get("organization")
                 organization = addressbook_models.Organization.get_or_create(org_name)
                 organization.sites.add(request.site)

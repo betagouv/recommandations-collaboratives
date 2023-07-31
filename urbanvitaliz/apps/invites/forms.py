@@ -23,7 +23,7 @@ class InviteForm(forms.ModelForm):
 class InviteAcceptForm(forms.Form):
     """Complementary informations when accepting an invitation"""
 
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    organization = forms.CharField()
-    position = forms.CharField()
+    first_name = forms.CharField(required=True)
+    last_name = forms.CharField(required=True)
+    organization = forms.CharField(required=True)
+    position = forms.CharField(required=True)
