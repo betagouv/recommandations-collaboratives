@@ -18,13 +18,14 @@ document.addEventListener('alpine:init', () => {
             return Alpine.store('tasksData').newTasks
         },
 
-        init() {
+        async init() {
             const element = document.getElementById("task-modal");
             this.handle = new bootstrap.Modal(element);
 
             const cleanup = () => {
                 location.hash = '';
             }
+
             element.addEventListener("hidePrevented.bs.modal", cleanup);
             element.addEventListener('hidden.bs.modal', cleanup);
 
@@ -39,14 +40,13 @@ document.addEventListener('alpine:init', () => {
                     }
                 }
             });
-            
+
             const urlFromHash = location.hash.match(/^#action-(\d+)/);
             if (urlFromHash) {
                 this.taskId = parseInt(urlFromHash[1], 10)
                 this.open(parseInt(urlFromHash[1], 10));
             }
         },
-
         open(taskId) {
             this.isPaginated = false
             this.setLocation(taskId)
@@ -83,6 +83,11 @@ document.addEventListener('alpine:init', () => {
             Alpine.store('tasksData').markAllAsRead(this.taskId)
             this.followups = data
         },
+        async setTaskIsVisited() {
+            if (!Alpine.store('djangoData').isAdvisor) {
+                await Alpine.store('tasksData').patchTask(this.taskId, { visited: true });
+            }
+        }
     })
 })
 
