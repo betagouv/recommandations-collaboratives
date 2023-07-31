@@ -57,7 +57,7 @@
                          :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
                         <div class="d-flex flex-column">
                             <span class="align-middle text-grey-dark tiny"
-                                  x-text="`le ${formatDate(currentTask.created_on)}`"
+                                  x-text="`Émis le ${formatDate(currentTask.created_on)}`"
                                   style="line-height: 20px"></span>
                             {% include 'projects/project/fragments/task/task_user_card.html' %}
                             <div class="text-grey-dark d-flex align-items-center tiny me-3 responsive-flex-column mt-1">
