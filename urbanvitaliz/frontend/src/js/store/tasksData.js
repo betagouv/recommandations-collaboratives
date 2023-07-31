@@ -14,7 +14,7 @@ document.addEventListener('alpine:init', () => {
             Alpine.store('tasksView').displayedTasks = this.tasks
         },
         get newTasks() {
-            return this.tasks.filter(task => task.status === 0)
+            return this.tasks.filter(task => task.visited === false)
         },
         async loadTasks() {
             const json = await api.get(tasksUrl(this.projectId))
