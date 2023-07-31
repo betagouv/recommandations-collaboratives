@@ -15,9 +15,9 @@
     </div>
     <div class="d-flex flex-column flex-grow-1 ease-transition"
          :style="task.isLoading && 'opacity:0.3';">
-        <template x-if="task.status === 0 && task.public">
+        <template x-if="!task.visited && task.public">
             <div class="card-top-information left-0">
-                <span class="bg-blue text-white">Nouveau</span>
+                <span class="bg-blue text-white" x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lue par la collectivité' "></span>
             </div>
         </template>
         <template x-if="!task.public">

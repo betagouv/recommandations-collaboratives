@@ -77,7 +77,6 @@ document.addEventListener('alpine:init', () => {
         setLocation(taskId) {
             location.hash = `#action-${taskId}`;
         },
-
         async loadFollowups() {
             const { data } = await api.get(followupsUrl(this.projectId, this.taskId))
             Alpine.store('tasksData').markAllAsRead(this.taskId)
@@ -86,6 +85,7 @@ document.addEventListener('alpine:init', () => {
         async setTaskIsVisited() {
             if (!Alpine.store('djangoData').isAdvisor) {
                 await Alpine.store('tasksData').patchTask(this.taskId, { visited: true });
+                await Alpine.store('tasksView').updateView()
             }
         }
     })
