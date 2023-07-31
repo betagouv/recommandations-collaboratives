@@ -8,8 +8,8 @@ import { isStatusUpdate, statusText } from "../utils/taskStatus"
 export default function PreviewModal() {
     return {
         currentTaskNotifications: [],
-        pendingComment:'',
-        currentlyEditing:null,
+        pendingComment: '',
+        currentlyEditing: null,
         get index() {
             return this.$store.previewModal.index
         },
@@ -81,6 +81,23 @@ export default function PreviewModal() {
             }
 
         },
+        getTypeOfModalClass(isDocumented) {
+            let typeOfModalClass = '';
+
+            if (this.$store.previewModal.isPaginated) {
+                typeOfModalClass = 'is-paginated'
+            }
+
+            if (isDocumented) {
+                typeOfModalClass = 'is-documented'
+            }
+
+            if (this.$store.previewModal.isPaginated && isDocumented) {
+                typeOfModalClass = 'is-paginated-documented'
+            }
+
+            return typeOfModalClass
+        }
     }
 }
 
