@@ -8,8 +8,7 @@
             <h5 class="mb-0 fw-bold">
                 Vous avez
                 <!-- TODO : Extraire les formatteurs -->
-                <span x-text="`${$store.tasksData.newTasks.length > 0 ? $store.tasksData.newTasks.length + ' nouvelles' : $store.tasksData.newTasks.length + ' nouvelle'}`"></span>
-                recommandations
+                <span x-text="`${$store.tasksData.newTasks.length > 1 ? $store.tasksData.newTasks.length + ' nouvelles recommandations' : $store.tasksData.newTasks.length + ' nouvelle recommandation'}`"></span>
             </h5>
             <p class="text-info-custom my-0">
                 Consultez les nouvelles recommandations ajoutées par notre équipe conseil pour vous aider dans l’avancement de votre projet
