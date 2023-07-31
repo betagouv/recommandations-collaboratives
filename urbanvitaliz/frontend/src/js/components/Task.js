@@ -67,6 +67,9 @@ export default function Task(currentTask) {
             } else {
                 return '-grey-dark'
             }
+        },
+        getTaskMessageCountLabel(count) {
+            return count > 1 ? `${count} messages` : `${count} message`
         }
     }
 }

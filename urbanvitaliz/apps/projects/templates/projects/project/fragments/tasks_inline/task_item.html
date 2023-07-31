@@ -61,7 +61,7 @@
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
                     </svg>
                     <span class="tiny"
-                          x-text="task.resource_id ? task.comments_count + 1  + ' messages' : task.comments_count + ' messages'"></span>
+                          x-text="task.resource_id ? getTaskMessageCountLabel(task.comments_count + 1) : getTaskMessageCountLabel(task.comments_count)"></span>
                 </div>
             </div>
             <div class="tiny d-flex align-items-center">
