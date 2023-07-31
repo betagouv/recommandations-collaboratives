@@ -2,7 +2,7 @@
 
 <!-- Index of tasks kanban app -->
 <div x-data="KanbanTasks({{ project.id }})" x-init="initTooltips(); loadCanAdministrate(); loadUserProjectPerms(); loadIsSwitchtender(); loadUserId();"
-class="row">
+class="row pt-3">
     <template x-for="board in boards">
         <div class="col px-2">
             <div class="medium-border-radius drop-column bg-grey-light">

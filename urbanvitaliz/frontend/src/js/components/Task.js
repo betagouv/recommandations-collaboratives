@@ -5,6 +5,7 @@ import { formatDate } from '../utils/date'
 import { toArchiveTooltip } from '../utils/tooltip'
 import { renderMarkdown } from '../utils/markdown'
 import { gravatar_url } from '../utils/gravatar'
+import { truncate } from '../utils/tasks'
 
 export default function Task(currentTask) {
     return {
@@ -18,6 +19,7 @@ export default function Task(currentTask) {
         formatDate,
         gravatar_url,
         deleteTaskReminderUrl,
+        truncate,
         init() {
             this.currentTask = currentTask
         },
@@ -52,9 +54,6 @@ export default function Task(currentTask) {
 
             taskToChange.isLoading = true
             otherTaskToChange.isLoading = true
-        },
-        truncate(input, size = 30) {
-            return input.length > size ? `${input.substring(0, size)}...` : input;
         },
         formatDateDisplay(date) {
             return new Date(date).toLocaleDateString('fr-FR');

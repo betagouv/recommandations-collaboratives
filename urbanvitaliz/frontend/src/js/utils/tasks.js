@@ -35,3 +35,6 @@ export function isStatus(task, status) {
     return task.status === status
 }
  
+export function truncate(input, size = 30) {
+    return input.length > size ? `${input.substring(0, size)}...` : input;
+}

@@ -4,6 +4,7 @@ import { renderMarkdown } from '../utils/markdown'
 import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar'
 import { isStatusUpdate, statusText } from "../utils/taskStatus"
+import { truncate } from '../utils/tasks'
 
 export default function PreviewModal() {
     return {
@@ -34,6 +35,7 @@ export default function PreviewModal() {
         gravatar_url,
         isStatusUpdate,
         statusText,
+        truncate,
         newTasksNavigationText() {
             return `${this.index + 1} sur ${this.newTasks.length} recommandation${this.newTasks.length > 0 ? 's' : ''}`
         },
