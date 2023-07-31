@@ -60,7 +60,8 @@
                          fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
                     </svg>
-                    <span class="tiny"
+                    <span class="tiny hover-underline cursor-pointer"
+                          @click="handleOpenPreviewModal()"
                           x-text="task.resource_id ? getTaskMessageCountLabel(task.comments_count + 1) : getTaskMessageCountLabel(task.comments_count)"></span>
                 </div>
             </div>

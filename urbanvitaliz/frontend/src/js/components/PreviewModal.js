@@ -76,10 +76,12 @@ export default function PreviewModal() {
         },
         followupScrollToLastMessage() {
             const scrollContainer = document.getElementById("followups-scroll-container");
+            console.log('scroll container ',scrollContainer)
             if (scrollContainer) {
                 setTimeout(() => {
+                    console.log('scroll ? ');
                     scrollContainer.scrollTop = scrollContainer.scrollHeight;
-                }, 1)
+                }, 500)
             }
 
         },

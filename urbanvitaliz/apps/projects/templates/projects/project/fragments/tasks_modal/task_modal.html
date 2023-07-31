@@ -32,7 +32,7 @@
                         </div>
                     </template>
                     <!-- Modal body -->
-                    <div x-effect="taskId && $store.previewModal.loadFollowups() && $store.previewModal.setTaskIsVisited()"
+                    <div x-effect="taskId && $store.previewModal.loadFollowups() && $store.previewModal.setTaskIsVisited() && followupScrollToLastMessage()"
                          class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
                         <div class="d-flex flex-grow-1 align-items-stretch w-65">
