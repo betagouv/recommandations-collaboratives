@@ -27,7 +27,7 @@
                             :class="!currentUser.is_active && 'inative-status'"
                             class="text-nowrap text-capitalize ms-2"></strong>
                 </span>
-                <template x-if="currentUser.is_active && currentUser.profile.organization.name">
+                <template x-if="currentUser.is_active && currentUser.profile.organization && currentUser.profile.organization.name">
                     <span class="text-dark fw-normal font-italic font-very-small"
                           x-text="currentUser.profile.organization.name"></span>
                 </template>
@@ -52,7 +52,7 @@
                             :class="!currentUser.is_active && 'inative-status'"
                             class="text-nowrap text-capitalize ms-2"></strong>
                 </span>
-                <template x-if="currentUser.is_active && currentUser.profile.organization.name">
+                <template x-if="currentUser.is_active && currentUser.profile.organization && currentUser.profile.organization.name">
                     <span class="text-dark fw-normal font-italic font-very-small"
                           x-text="currentUser.profile.organization.name"></span>
                 </template>
