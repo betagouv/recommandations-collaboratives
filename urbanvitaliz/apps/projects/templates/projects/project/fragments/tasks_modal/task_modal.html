@@ -42,16 +42,16 @@
                                     aria-label="Close"></button>
                         </div>
                         <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content" :class="!contentIsLoading && 'visible'" x-effect="taskId && loadContent()">
-                            <template x-if="task.resource_id">
+                            <template x-if="task && taskId && task?.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
-                                        :src="resourcePreviewUrl(task.resource_id)"></iframe>
+                                        :src="resourcePreviewUrl(task?.resource_id)"></iframe>
                             </template>
-                            <template x-if="!task.resource_id">
+                            <template x-if="task && taskId && !task?.resource_id">
                                 <div class="w-100 text-break p-3">
                                     <div class="resource-details">
-                                        <h1 x-text="task.intent" class="mb-3"></h1>
+                                        <h1 x-text="task?.intent" class="mb-3"></h1>
                                     </div>
-                                    <p class="text-justified" x-html="renderMarkdown(task.content)"></p>
+                                    <p class="text-justified" x-html="renderMarkdown(task?.content)"></p>
                                 </div>
                             </template>
                         </div>
@@ -60,15 +60,15 @@
                              style="border-left: 1px solid #EEEEEE">
                             <div class="w-100">
                                 <div class="border-bottom-grey"
-                                     x-show="task.document && task.document.length > 0">
+                                     x-show="task?.document && task?.document.length > 0">
                                     <span class="py-2 d-block px-3 fw-medium title-info text-dark">Fichier(s) partagé(s)</span>
-                                    <template x-for="document in task.document" x-key="document.id">
+                                    <template x-for="document in task?.document" x-key="document.id">
                                         <div class="px-3">{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}</div>
                                     </template>
                                 </div>
                             </div>
                             <div class="task-modal-followups position-relative"
-                                 :class="getTypeOfModalClass(task.document && task.document.length > 0)"
+                                 :class="getTypeOfModalClass(task?.document && task?.document.length > 0)"
                                  id="followups-scroll-container">
                                 <div class="py-2 px-3 position-sticky top-0 d-flex justify-content-between bg-white z-index-100 border-bottom-grey">
                                     <span class="fw-medium title-info text-dark">Conversation</span>
@@ -83,13 +83,13 @@
                                     </div>
                                 </div>
                                 <div :class="!followupsIsLoading && 'visible'" class="followups-wrapper">
-                                    <template x-if="task.resource_id">
+                                    <template x-if="task?.resource_id">
                                         <div class="rounded bg-light p-2 m-3 message"
-                                             :class="$store.djangoData.canManageTasks && task.content === '' && 'border border-warning'">
-                                            <template x-if="task.content !== ''">
-                                                <p x-html="renderMarkdown(task.content)" class="mb-2"></p>
+                                             :class="$store.djangoData.canManageTasks && task?.content === '' && 'border border-warning'">
+                                            <template x-if="task && taskId && task?.content !== ''">
+                                                <p x-html="task && renderMarkdown(task?.content)" class="mb-2"></p>
                                             </template>
-                                            <template x-if="task.content === ''">
+                                            <template x-if="task?.content === ''">
                                                 <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
                                             </template>
                                             <div class="d-flex justify-content-between" style="font-size: 0.9em;">
@@ -100,14 +100,14 @@
                                             </div>
                                         </div>
                                     </template>
-                                    <template x-if="!task.resource_id">
+                                    <template x-if="!task?.resource_id">
                                         <div class="my-3">
                                             <div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
                                                 <span class="ms-1 fst-italic"
-                                                      x-text="`${task.created_by.first_name} ${task.created_by.last_name}`"
+                                                      x-text="`${task?.created_by.first_name} ${task?.created_by.last_name}`"
                                                       style="line-height: 20px"></span> a créé cette recommandation sans ressource
                                                 <span class="ms-1 text-muted"
-                                                      x-text="`le ${formatDate(task.created_on)}`"
+                                                      x-text="`le ${formatDate(task?.created_on)}`"
                                                       style="line-height: 20px"></span>
                                             </div>
                                         </div>
