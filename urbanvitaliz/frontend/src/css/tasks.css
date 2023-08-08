@@ -94,6 +94,22 @@ body.modal-open {
     }
 }
 
+.followups-wrapper {
+    opacity: 0;
+}
+
+.followups-wrapper.visible {
+    animation: status-appear 0.5s ease forwards;
+}
+
+.task-modal-content {
+    opacity: 0;
+}
+
+.task-modal-content.visible {
+    animation: status-appear 0.5s ease forwards;
+}
+
 
 @keyframes status-appear {
     from {

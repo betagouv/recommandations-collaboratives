@@ -11,6 +11,8 @@ export default function PreviewModal() {
         currentTaskNotifications: [],
         pendingComment: '',
         currentlyEditing: null,
+        followupsIsLoading: false,
+        contentIsLoading: false,
         get index() {
             return this.$store.previewModal.index
         },
@@ -74,12 +76,28 @@ export default function PreviewModal() {
             document.querySelector('#comment-text-ref .ProseMirror').focus();
             this.$dispatch('set-comment', this.task.content)
         },
-        followupScrollToLastMessage() {
+        loadContent() {
+            this.contentIsLoading = true
+            setTimeout(() => {
+                this.contentIsLoading = false
+            }, 300)
+        },
+        followupScrollToLastMessage(initPage = false) {
+
+            if (initPage) {
+                this.followupsIsLoading = true
+            }
+
             const scrollContainer = document.getElementById("followups-scroll-container");
             if (scrollContainer) {
                 setTimeout(() => {
                     scrollContainer.scrollTop = scrollContainer.scrollHeight;
-                }, 500)
+
+                    if (initPage) {
+                        this.followupsIsLoading = false
+                    }
+
+                }, initPage ? 500 : 1)
             }
         },
         getTypeOfModalClass(isDocumented) {
