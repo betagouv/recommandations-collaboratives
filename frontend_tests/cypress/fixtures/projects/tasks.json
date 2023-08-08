@@ -1,0 +1,102 @@
+[
+    {
+        "model": "projects.task",
+        "pk": 1,
+        "fields": {
+            "order": 1,
+            "site": 1,
+            "project": 2,
+            "public": true,
+            "priority": 1000,
+            "created_by": 2,
+            "created_on": "2022-05-05T08:12:54.709Z",
+            "updated_on": "2022-05-05T08:12:54.709Z",
+            "tags": "",
+            "intent": "Ma ressource sans recommandation",
+            "content": "Test edge ; test",
+            "deadline": null,
+            "resource": null,
+            "contact": null,
+            "visited": true,
+            "refused": false,
+            "done": false,
+            "status": 2,
+            "deleted": null
+        }
+    },
+    {
+        "model": "projects.task",
+        "pk": 2,
+        "fields": {
+            "order": 2,
+            "site": 1,
+            "project": 2,
+            "public": true,
+            "priority": 1000,
+            "created_by": 2,
+            "created_on": "2022-06-05T08:12:54.709Z",
+            "updated_on": "2022-06-05T08:12:54.709Z",
+            "tags": "",
+            "intent": "Ma ressource sans recommandation 2",
+            "content": "Test edge ; test",
+            "deadline": null,
+            "resource": null,
+            "contact": null,
+            "visited": true,
+            "refused": false,
+            "done": false,
+            "status": 1,
+            "deleted": null
+        }
+    },
+    {
+        "model": "projects.task",
+        "pk": 3,
+        "fields": {
+            "order": 3,
+            "site": 1,
+            "project": 2,
+            "public": true,
+            "priority": 1000,
+            "created_by": 2,
+            "created_on": "2022-06-05T08:12:54.709Z",
+            "updated_on": "2022-06-05T08:12:54.709Z",
+            "tags": "",
+            "intent": "Reco à modifier",
+            "content": "Reco à modifier",
+            "deadline": null,
+            "resource": null,
+            "contact": null,
+            "visited": true,
+            "refused": false,
+            "done": false,
+            "status": 1,
+            "deleted": null
+        }
+    },
+    {
+        "model": "projects.task",
+        "pk": 4,
+        "fields": {
+            "order": 1,
+            "site": 1,
+            "project": 2,
+            "public": true,
+            "priority": 1000,
+            "created_by": 2,
+            "created_on": "2022-05-05T08:12:54.709Z",
+            "updated_on": "2022-05-05T08:12:54.709Z",
+            "tags": "",
+            "intent": "Ma ressource à modifier",
+            "content": "Test edge ; test",
+            "deadline": null,
+            "resource": null,
+            "contact": null,
+            "visited": true,
+            "refused": false,
+            "done": false,
+            "status": 0,
+            "deleted": null
+        }
+    }
+]
