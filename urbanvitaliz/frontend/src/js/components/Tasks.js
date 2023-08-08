@@ -7,10 +7,6 @@ export default function TasksApp(app) {
     const taskApp = {
         //utils function
         currentlyHoveredElement: null,
-        canAdministrate: false,
-        canUseTasks: false,
-        canManageTasks: false,
-        isSwitchtender: false,
         userEmail: null,
         isArchivedStatus,
         data: [],
@@ -23,7 +19,7 @@ export default function TasksApp(app) {
             return a.order - b.order;
         },
         filterFn(d) {
-            return this.isSwitchtender ? true : (this.canAdministrate || d.public);
+            return this.$store.djangoData.isAdvisor ? true : d.public;
         },
         findByUuid(uuid) {
             return this.$store.tasksView.displayedTasks.find(d => d.uuid === uuid);
@@ -32,6 +28,7 @@ export default function TasksApp(app) {
             return this.$store.tasksView.displayedTasks.find(d => d.id === id);
         },
         get view() {
+            console.log('view : ');
             const result = this.$store.tasksView.displayedTasks.filter((d) => this.filterFn(d)).sort((a, b) => this.sortFn(a, b));
             return result;
         },

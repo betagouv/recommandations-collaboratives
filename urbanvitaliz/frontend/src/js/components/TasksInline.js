@@ -10,9 +10,6 @@ export default function TasksInline(projectId) {
         boards: [
             { status: [TASK_STATUSES.PROPOSED,TASK_STATUSES.INPROGRESS,TASK_STATUSES.BLOCKED,TASK_STATUSES.DONE,TASK_STATUSES.NOT_INTERESTED,TASK_STATUSES.ALREADY_DONE], title: "Nouvelles", color_class: "border-error", color: "#0d6efd" },
         ],
-        filterFn(d) {
-            return this.canAdministrate || d.public || !d.public;
-        },
         init() {
             this.boardsFiltered = this.boards
         },
