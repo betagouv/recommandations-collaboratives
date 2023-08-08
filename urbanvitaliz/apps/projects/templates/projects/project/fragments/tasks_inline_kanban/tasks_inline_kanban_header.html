@@ -1,7 +1,12 @@
 <div>
     <div class="d-flex align-items-center justify-content-between">
         <template x-if="$store.djangoData.isAdvisor">
-            <a href="{% url 'projects-project-create-task' project.id %}" class="button filled blue small inherit">Créer une recommandation</a>
+            <div>
+                <a href="{% url 'projects-project-create-task' project.id %}"
+                   class="button filled blue small inherit">Créer une recommandation</a>
+                <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                   class="button blue small inherit">Voir les recommandations suggérées automatiquement</a>
+            </div>
         </template>
         {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html' %}
     </div>
