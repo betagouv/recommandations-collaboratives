@@ -30,7 +30,11 @@ from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
+from urbanvitaliz.apps.projects.models import (
+    Project,
+    UserProjectStatus,
+    Task,
+)
 from urbanvitaliz.utils import (
     get_group_for_site,
     has_perm,
@@ -810,6 +814,18 @@ def update_note_for_organization(request, organization_id, note_id):
     )
 
     return update_note_for_object(request, note, "crm-organization-details")
+
+
+@login_required
+def crm_list_recommendation_without_resources(request):
+    """Return a page containing all recommendations with no resource attached"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    recommendations = Task.on_site.filter(public=True, resource=None).order_by(
+        "-created_on", "project"
+    )
+
+    return render(request, "crm/reco_without_resources.html", locals())
 
 
 @login_required

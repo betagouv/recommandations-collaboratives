@@ -28,6 +28,11 @@ urlpatterns = [
         views.crm_list_tags,
         name="crm-list-tags",
     ),
+    path(
+        r"crm/reco_without_resources",
+        views.crm_list_recommendation_without_resources,
+        name="crm-reco-without-resources",
+    ),
     #
     # users
     path(
