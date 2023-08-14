@@ -50,7 +50,7 @@ class OnboardingResponseForm(forms.ModelForm):
     )
 
     name = forms.CharField(label="Nom du projet", max_length=128, required=True)
-    location = forms.CharField(label="Adresse", required=True)
+    location = forms.CharField(label="Adresse", required=False)
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
     insee = forms.CharField(max_length=5, required=False, label="Code Insee")
 

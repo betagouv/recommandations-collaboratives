@@ -168,7 +168,7 @@
                         <label class="text-info-custom text-grey-dark" for="input-project-address">Adresse</label>
                         <input type="text" class="py-4 placeholder-grey form-control {% if form.location.errors %}is-invalid{% endif %}"
                             id="input-project-address" name="{{ form.location.name }}" placeholder="Adresse"
-                            value="{{ form.location.value|default:'' }}" required>
+                            value="{{ form.location.value|default:'' }}">
                             <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
                                 <p class="text-info-custom font-small text-grey-dark my-0 ">Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.</p>
                             </div>
