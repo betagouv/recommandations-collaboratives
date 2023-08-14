@@ -83,6 +83,11 @@ urlpatterns = [
     #
     # projects
     path(
+        r"crm/project/activity",
+        views.projects_activity_feed,
+        name="projects-activity-feed",
+    ),
+    path(
         r"crm/project/",
         views.project_list,
         name="crm-project-list",
@@ -174,5 +179,6 @@ urlpatterns = [
         views.project_list_by_tags_as_csv,
         name="crm-project-list-by-tags-csv",
     ),
+    
     path("crm/feed/", views.LatestNotesFeed(), name="crm-feed"),
 ]
