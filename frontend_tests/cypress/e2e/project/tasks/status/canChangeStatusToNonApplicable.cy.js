@@ -13,14 +13,17 @@ describe('I can go tasks tab', () => {
         cy.login("staff");
     })
 
-    it('opens a modal with the task', () => {
+    it('changes the status to non applicable', () => {
         cy.visit(`/project/${currentProject.pk}`)
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
 
         cy.contains("Thématique").should('have.class', 'active')
+        cy.contains(task4.fields.intent)
 
-        cy.contains(task1.fields.intent).click({ force: true })
-        cy.contains(task1.fields.intent)
+        cy.get(`#${task4.pk}`).contains('Non applicable').click({force:true});
+        cy.contains("Ça n'était pas applicable")
+        cy.get('.modal-footer').contains('Archiver').click({force:true});
+        cy.get(`#${task4.pk}`).contains('Non applicable').should('have.class', 'bg-grey-dark')
     })
 })

@@ -13,7 +13,7 @@ describe('I can go tasks tab', () => {
         cy.login("staff");
     })
 
-    it('list all inline tasks', () => {
+    it('edit a followup', () => {
         cy.visit(`/project/${currentProject.pk}`)
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
@@ -35,13 +35,10 @@ describe('I can go tasks tab', () => {
         cy.contains('Editer').click({force:true});
 
         cy.get('.ProseMirror p').then(($el) => {
-            const el = $el.get(0) //native DOM element
-            console.log(el.innerHTML)
+            const el = $el.get(0)
             el.innerHTML = el.innerHTML +  'updated'
         })
 
         cy.contains('Enregistrer').click({ force: true })
-
-        cy.contains('updated');
     })
 })

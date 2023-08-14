@@ -13,7 +13,7 @@ describe('I can go tasks tab', () => {
         cy.login("staff");
     })
 
-    it('list all inline tasks', () => {
+    it('posts a followup', () => {
         cy.visit(`/project/${currentProject.pk}`)
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
