@@ -32,5 +32,16 @@ describe('I can go tasks tab', () => {
 
         cy.contains('Enregistrer').click({ force: true })
 
+        cy.contains('Editer').click({force:true});
+
+        cy.get('.ProseMirror p').then(($el) => {
+            const el = $el.get(0) //native DOM element
+            console.log(el.innerHTML)
+            el.innerHTML = el.innerHTML +  'updated'
+        })
+
+        cy.contains('Enregistrer').click({ force: true })
+
+        cy.contains('updated');
     })
 })
