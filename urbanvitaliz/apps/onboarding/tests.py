@@ -247,8 +247,6 @@ def test_onboarding_known_not_logged_user_login_and_preserve_data(request, clien
         "last_name": "doe",
         "description": "a description of my new project",
         "response_0": "blah",
-        "impediment_kinds": ["Autre"],  # FIXME seems unused
-        "impediments": "some impediment",  # FIXME seems unused
     }
 
     # someone exists with this email (which is lower case)

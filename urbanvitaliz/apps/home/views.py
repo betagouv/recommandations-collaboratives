@@ -85,7 +85,7 @@ class StatisticsView(TemplateView):
             Q(members__in=staff_users)
             | Q(status="DRAFT")
             | Q(status="STUCK")
-            # FIXME ^ replace w/: | Q(status="STANDBY")
+            # FIXME ^ replace w/: | Q(status="STANDBY") -> OK
             | Q(exclude_stats=True)
         )
         context = super().get_context_data(**kwargs)
