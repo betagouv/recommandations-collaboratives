@@ -40,7 +40,7 @@ def active_project_processor(request):
     if active_project:
         try:
             site_config = get_site_config_or_503(request.site)
-            session, created = survey_models.Session.objects.get_or_create(
+            session, _ = survey_models.Session.objects.get_or_create(
                 project=active_project, survey=site_config.project_survey
             )
         except (survey_models.Survey.DoesNotExist, ImproperlyConfigured):

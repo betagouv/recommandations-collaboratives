@@ -209,7 +209,6 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
 
         return models.TaskFollowup.objects.filter(task_id=task_id)
 
-    # FIXME no permission check on this view
     def create(self, request, project_id, task_id):
         data = copy(request.data)
         data["task_id"] = task_id
