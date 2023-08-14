@@ -927,6 +927,27 @@ def project_list_by_tags_as_csv(request):
 
     return response
 
+@login_required
+def projects_activity_feed(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    ctype = ContentType.objects.get_for_model(Project)
+    
+    actions = (
+            Action.objects.filter(site=request.site)
+            .filter(
+                Q(target_content_type=ctype)
+                | Q(action_object_content_type=ctype)
+                | Q(actor_content_type=ctype)
+            )
+            .order_by("-timestamp")
+            .prefetch_related("actor", "action_object", "target")[:500]
+        )
+
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/projects_activity_feed.html", locals())
+
 
 ########################################################################
 # RSS Feeds
