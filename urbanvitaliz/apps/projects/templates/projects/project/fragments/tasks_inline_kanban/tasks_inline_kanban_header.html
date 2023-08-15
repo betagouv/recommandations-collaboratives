@@ -2,7 +2,7 @@
     <div class="d-flex align-items-center justify-content-between">
         <template x-if="$store.djangoData.isAdvisor">
             <div>
-                <a href="{% url 'projects-project-create-task' project.id %}"
+                <a id="create-task-button-bis" href="{% url 'projects-project-create-task' project.id %}"
                    class="button filled blue small inherit">Créer une recommandation</a>
                 <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
                    class="button blue small inherit">Voir les recommandations suggérées automatiquement</a>

@@ -7,7 +7,7 @@
         <p class="text-info-custom mb-0 mt-2">En suivant le projet, vous aurez accès aux discussions sur ce projet vous recevrez aussi des notifications sur les avancements de la collectivité.</p>
     </div>
     <div class="ps-4 w-25">
-        <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}">
+        <form method="POST" action="{% url 'projects-project-switchtender-join' project.id %}" id="positioning-form">
             {% csrf_token %}
             <button class="button py-2 px-1 green d-flex justify-content-center align-items-center my-2 w-100">
                 <span>Conseiller le projet</span>
