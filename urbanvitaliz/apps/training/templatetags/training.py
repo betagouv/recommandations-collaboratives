@@ -32,6 +32,7 @@ def challenge_acquire(challenge):
 @register.simple_tag
 def get_challenges_for(user, acquired=None):
     """Return acquired challenges for user"""
+    # TODO remove second parameter after discussion from the template
     return models.Challenge.acquired_objects.order_by("-acquired_on").filter(user=user)
 
 
