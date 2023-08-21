@@ -1,11 +1,18 @@
 {% load static %}
-
-<template x-cloak x-if="!hasAlreadyStartedTheChallenge && showTuto">
-    <div x-ref="startTourButton" @click="handleStartTour()"
-        class="hint-button align-items-center position-absolute t-0 l-0 p-2 appear-in-with-delay">
-        <span x-text="startButtonDescription"></span>
-        <svg class="ms-1 bi align-middle" width="25" height="25" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
-        </svg>
+<template x-cloak x-if="showTuto">
+    <div x-ref="startTourButton"
+         class="hint-button align-items-center position-absolute t-0 l-0 p-2 appear-in-with-delay">
+        <div @click="handleStartTour()">
+            <span x-text="startButtonDescription"></span>
+            <svg class="ms-1 bi align-middle"
+                 width="25"
+                 height="25"
+                 fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
+            </svg>
+        </div>
+        <div @click="handleEndChallenge()" class="d-flex">
+            <span class="text-red">non merci</span>
+        </div>
     </div>
 </template>
