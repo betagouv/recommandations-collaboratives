@@ -57,7 +57,6 @@ export default function boardTasksApp(projectId) {
             }
 
             if (status === TASK_STATUSES.DONE) {
-                console.log('here ?');
                 this.handleOpenFeedbackModal(data, status);
             }
             else if (status instanceof Array) {

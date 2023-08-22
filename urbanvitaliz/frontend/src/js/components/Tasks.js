@@ -28,7 +28,6 @@ export default function TasksApp(app) {
             return this.$store.tasksView.displayedTasks.find(d => d.id === id);
         },
         get view() {
-            console.log('view : ');
             const result = this.$store.tasksView.displayedTasks.filter((d) => this.filterFn(d)).sort((a, b) => this.sortFn(a, b));
             return result;
         },

@@ -41,11 +41,9 @@ export default function TaskModal() {
             const task = e.detail
             this.$store.taskModal.onDeleteClick(task)
             this.currentDeletingTask = task;
-            console.log(this.currentDeletingTask);
         },
         //feedback
         initFeedbackModal() {
-            console.log('init feedback modal ?')
             const element = document.getElementById("feedback-modal");
             this.$store.taskModal.feedbackModalHandle = new bootstrap.Modal(element);
             const cleanup = () => {
@@ -63,7 +61,6 @@ export default function TaskModal() {
             this.$store.taskModal.onFeedbackClick(task, status)
         },
         async onSubmitFeedback() {
-            console.log('this.$store.taskModal.feedbackModalStatus', this.$store.taskModal.feedbackModalStatus)
             await this.$store.tasksData.issueFollowup(this.$store.taskModal.currentTask, this.$store.taskModal.feedbackModalStatus, this.feedbackComment)
             this.feedbackComment = '';
             this.$store.taskModal.feedbackModalHandle.hide();

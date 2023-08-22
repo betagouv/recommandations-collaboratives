@@ -4,9 +4,6 @@ import Alpine from 'alpinejs'
 export default function TaskComment() {
     return {
         isEditing: false,
-        init() {
-            console.log('task comment init')
-        },
         async handleEditComment(comment, task) {
             this.isEditing = true
             task.isLoading = true
