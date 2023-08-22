@@ -947,7 +947,7 @@ class Document(models.Model):
 
 def truncate_string(s, max_length):
     """Truncate given string to max_length"""
-    if (len(s) + 1) < max_length:
+    if len(s) <= max_length:
         return s
     sub = s[:max_length]
     if s[max_length] != " ":
