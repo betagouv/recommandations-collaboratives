@@ -52,7 +52,7 @@
                     </button>
                 </li>
             </template>
-            <template x-if="!task.public">
+            <template x-if="!task.public && task.content">
                 <li>
                     <button id="publish-task-button" @click="onSetTaskPublic(task, true)"
                             class="bg-white appearance-none w-100 py-2 px-2 d-flex justify-content-start align-items-center border-bottom text-decoration-none">
