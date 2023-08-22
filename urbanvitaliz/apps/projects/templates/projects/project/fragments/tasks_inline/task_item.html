@@ -19,7 +19,7 @@
          :style="task.isLoading && 'opacity:0.3';">
         <template x-if="!task.visited && task.public">
             <div class="card-top-information left-0">
-                <span class="bg-blue text-white" x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lue par la collectivité' "></span>
+                <span class="bg-blue text-white" x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par la collectivité' "></span>
             </div>
         </template>
         <template x-if="!task.public">
