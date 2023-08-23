@@ -7,7 +7,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
-from notifications import notify
 
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.addressbook import models as addressbook_models
