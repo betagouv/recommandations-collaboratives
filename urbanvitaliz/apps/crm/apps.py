@@ -7,6 +7,8 @@ class CrmConfig(AppConfig):
     name = "urbanvitaliz.apps.crm"
 
     def ready(self):
+        from actstream import registry
+
         ProjectAnnotations = self.get_model("ProjectAnnotations")
         watson.register(
             ProjectAnnotations,
@@ -24,3 +26,4 @@ class CrmConfig(AppConfig):
                 "tags",
             ),
         )
+        registry.register(Note)

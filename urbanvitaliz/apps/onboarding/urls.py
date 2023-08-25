@@ -12,7 +12,7 @@ from django.urls import path
 
 from . import views
 
-# FIXME rename the following urls removing projects prefix
+# FIXME rename the following urls removing projects prefix -> OK
 
 urlpatterns = [
     path(

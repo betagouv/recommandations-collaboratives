@@ -123,8 +123,20 @@
 
 .appear-in-with-delay {
     opacity: 0;
-    transform: translate3d(-5px, 0, 0);
-    animation: appear-in 0.5s forwards ease 0.5s;
+    transform: translate3d(-5px,0,0);
+    animation: appear-in 0.5s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.35s;
+    animation-delay: 1s;
+}
+
+@keyframes appear-in {
+    from{
+        opacity: 0;
+        transform: translate3d(0,-10px,0);
+    }
+    to{
+        opacity: 1;
+        transform: translate3d(0,0,0);
+    }
 }
 
 .small-border-radius {

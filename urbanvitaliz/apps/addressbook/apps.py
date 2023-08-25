@@ -7,7 +7,11 @@ class AddressbookConfig(AppConfig):
     name = "urbanvitaliz.apps.addressbook"
 
     def ready(self):
+        from actstream import registry
+
+        Organization = self.get_model("Organization")
         watson.register(
-            self.get_model("Organization"),
+            Organization,
             fields=("name", "departments__name", "departments__code"),
         )
+        registry.register(Organization)

@@ -15,7 +15,7 @@
       <span class="text-grey-dark fw-light">
         <strong class="text-dark fw-bold">{{ action.actor.first_name|default:action.actor.email }}
         {{ action.actor.last_name|default:"" }}</strong>
-        <span class="text-dark fw-normal font-italic font-very-small">{{ action.actor.profile.organization_position|default:'' }}</span>
+        <span class="text-dark fw-normal font-italic font-very-small">{{ action.actor.profile.organization.name|default:'' }}</span>
         <span class="d-inline-block">
           <span class="d-inline">
             {% if action.verb == verbs.Project.INVITATION %}

@@ -28,6 +28,11 @@ urlpatterns = [
         views.crm_list_tags,
         name="crm-list-tags",
     ),
+    path(
+        r"crm/reco_without_resources",
+        views.crm_list_recommendation_without_resources,
+        name="crm-reco-without-resources",
+    ),
     #
     # users
     path(
@@ -77,6 +82,11 @@ urlpatterns = [
     ),
     #
     # projects
+    path(
+        r"crm/project/activity",
+        views.projects_activity_feed,
+        name="projects-activity-feed",
+    ),
     path(
         r"crm/project/",
         views.project_list,
@@ -169,5 +179,6 @@ urlpatterns = [
         views.project_list_by_tags_as_csv,
         name="crm-project-list-by-tags-csv",
     ),
+    
     path("crm/feed/", views.LatestNotesFeed(), name="crm-feed"),
 ]

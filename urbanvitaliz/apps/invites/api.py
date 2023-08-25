@@ -80,7 +80,7 @@ def invite_resend(invite):
     try:
         user = auth_models.User.objects.get(username=invite.email)
     except auth_models.User.DoesNotExist:
-        user = None  # FIXME pourquoi est ce que l'on continue ici?
+        user = None  # Used to generate autologging link
 
     return invite_send(invite, invited_user=user)
 

@@ -9,12 +9,13 @@ import csv
 import datetime
 from collections import Counter, OrderedDict
 
+from actstream import action
 from actstream.models import Action, actor_stream, target_stream
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
 from django.db import transaction
 from django.db.models import Count, Q
@@ -26,19 +27,16 @@ from django.views.generic.base import TemplateView
 from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
-from urbanvitaliz.apps.addressbook.models import Organization
-from urbanvitaliz.apps.addressbook import models as addressbook_models
-from urbanvitaliz.apps.home import models as home_models
-from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
-from urbanvitaliz.utils import (
-    get_group_for_site,
-    has_perm,
-    has_perm_or_403,
-    make_group_name_for_site,
-)
-from urbanvitaliz import verbs
 from watson import search as watson
+
+from urbanvitaliz import verbs
+from urbanvitaliz.apps.addressbook import models as addressbook_models
+from urbanvitaliz.apps.addressbook.models import Organization
+from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.projects.models import Project, Task, UserProjectStatus
+from urbanvitaliz.utils import (get_group_for_site, has_perm, has_perm_or_403,
+                                make_group_name_for_site)
 
 from . import filters, forms, models
 
@@ -727,6 +725,14 @@ def create_note_for_organization(request, organization_id):
 
 def notify_note_creation(request, note, target):
     """Notify crm users of new note creation"""
+    # TODO only create action stream not emails
+    action.send(
+        request.user,
+        verb=verbs.CRM.NOTE_CREATED,
+        action_object=note,
+        target=target,
+    )
+    return
     crm_users = get_users_with_perms(
         request.site, only_with_perms_in=["use_crm"]
     ).exclude(pk=request.user.pk)
@@ -810,6 +816,18 @@ def update_note_for_organization(request, organization_id, note_id):
     )
 
     return update_note_for_object(request, note, "crm-organization-details")
+
+
+@login_required
+def crm_list_recommendation_without_resources(request):
+    """Return a page containing all recommendations with no resource attached"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    recommendations = Task.on_site.filter(public=True, resource=None).order_by(
+        "-created_on", "project"
+    )
+
+    return render(request, "crm/reco_without_resources.html", locals())
 
 
 @login_required
@@ -910,6 +928,27 @@ def project_list_by_tags_as_csv(request):
         )
 
     return response
+
+@login_required
+def projects_activity_feed(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    ctype = ContentType.objects.get_for_model(Project)
+    
+    actions = (
+            Action.objects.filter(site=request.site)
+            .filter(
+                Q(target_content_type=ctype)
+                | Q(action_object_content_type=ctype)
+                | Q(actor_content_type=ctype)
+            )
+            .order_by("-timestamp")
+            .prefetch_related("actor", "action_object", "target")[:500]
+        )
+
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/projects_activity_feed.html", locals())
 
 
 ########################################################################

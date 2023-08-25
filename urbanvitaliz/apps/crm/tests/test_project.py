@@ -4,10 +4,9 @@ from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
-from urbanvitaliz.apps.addressbook import models as addressbook_models
+
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
@@ -374,7 +373,6 @@ def test_crm_search_by_user_name_on_current_site(request, client):
 
     jane = baker.make(auth_models.User, first_name="Jane", last_name="DOE")
     jane.profile.sites.add(other_site)
-
 
     data = {"query": "doe"}
 

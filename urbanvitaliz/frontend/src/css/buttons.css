@@ -17,6 +17,22 @@
     background-color: #e2effc;
 }
 
+.button.black {
+    border: 1px solid #222;
+    color: #222;
+}
+
+.button.black.filled {
+    background-color: #222;
+    color: white;
+    border: 1px solid transparent;
+}
+
+.button.black.filled:hover {
+    background-color: #3c3b3b;
+    color: white !important;
+}
+
 .button.blue:target {
     background-color: #e2effc;
 }
@@ -146,15 +162,15 @@
 
 .hint-button {
     position: absolute;
-    top: -55px;
+    bottom: 48px;
     left: -5px;
     border-radius: 2px;
     cursor: pointer;
     transition: all 0.25s ease;
     font-size: 14px;
-    font-weight: 600;
-    color: #222;
-    background-color: #FBD335;
+    font-weight: 500;
+    color: white;
+    background-color: #0063CB;
     z-index: 100;
     box-shadow: 0px 3px 8px -16px rgba(0, 0, 0, 0.32), 0px 8px 16px rgba(0, 0, 0, 0.1);
 }
@@ -170,7 +186,7 @@
     height: 15px;
 
     transform: rotate(45deg);
-    background-color: #FBD335;
+    background-color: #0063CB;
 }
 
 /* .hint-button:hover {
