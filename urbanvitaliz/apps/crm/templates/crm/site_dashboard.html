@@ -78,10 +78,9 @@
                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des tags du crm" icon="activity" %}
               </li>
               <li class="me-2 col-2 ">
-                  {% url 'crm-reco-without-resources' as url %}
-                  {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Recos sans ressource" icon="suit-club" %}
+                {% url 'crm-reco-without-resources' as url %}
+                {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Recos sans ressource" icon="suit-club" %}
               </li>
-
             </ul>
           </div>
           {% if is_staff or "manage_surveys" in user_site_perms %}
@@ -132,11 +131,17 @@
             <span class="align-middle">Activité de l'ensemble des projets</span>
           </h3>
           <ul class="bg-white pt-3 px-4 border rounded crm-activity">
-            {% for action in projects_stream|slice:":30" %}
-              {% include "crm/fragments/activity_action.html" %}
-            {% empty %}
-              -- Pas encore d'activité de la part du staff --
-            {% endfor %}
+            <div class="p-0 h-100 d-inline-flex flex-column justify-content-between align-items-center">
+              <article class="overflow-hidden">
+                {% for action in projects_stream|slice:":30" %}
+                  {% include "crm/fragments/activity_action.html" %}
+                {% empty %}
+                  -- Pas encore d'activité de la part du staff --
+                {% endfor %}
+              </article>
+              <a class="button filled grey small inherit fw-bold mt-4 mb-4"
+                 href="{% url 'projects-activity-feed' %}">Voir plus d'activité</a>
+            </div>
           </ul>
           <h3 class="mt-3">
             <svg class="bi align-middle" width="24" height="24">
@@ -152,28 +157,28 @@
                   <span class="text-info-custom text-grey-dark me-2 text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
                   <a class="font-small"
                      href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor.first_name|default:action.actor }}
-                    {{ action.actor.last_name|default:"" }}</a> 
-                    <span class="font-small">{{ action.verb }}</span>
-                  </li>
-                {% endif %}
-              {% empty %}
-                -- Pas encore d'activité, revenez plus tard ! --
-              {% endfor %}
-            </ul>
-            <h3 class="mt-3 d-inline-block">
-              <svg class="bi align-middle" width="24" height="24">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#journal-check" />
-              </svg>
-              <span class="align-middle">Mes dernières actions</span>
-            </h3>
-            <ul class="list-group">
-              {% for task in request.user.tasks_created.all|slice:":200" %}
-                <li class="list-group-item font-small">
-                  <a class="" href="{{ task.get_absolute_url }}">{{ task }}</a> ({{ task.project }})
+                  {{ action.actor.last_name|default:"" }}</a>
+                  <span class="font-small">{{ action.verb }}</span>
                 </li>
-              {% endfor %}
-            </ul>
-          </div>
+              {% endif %}
+            {% empty %}
+              -- Pas encore d'activité, revenez plus tard ! --
+            {% endfor %}
+          </ul>
+          <h3 class="mt-3 d-inline-block">
+            <svg class="bi align-middle" width="24" height="24">
+              <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#journal-check" />
+            </svg>
+            <span class="align-middle">Mes dernières actions</span>
+          </h3>
+          <ul class="list-group">
+            {% for task in request.user.tasks_created.all|slice:":200" %}
+              <li class="list-group-item font-small">
+                <a class="" href="{{ task.get_absolute_url }}">{{ task }}</a> ({{ task.project }})
+              </li>
+            {% endfor %}
+          </ul>
         </div>
       </div>
-    {% endblock %}
+    </div>
+  {% endblock %}

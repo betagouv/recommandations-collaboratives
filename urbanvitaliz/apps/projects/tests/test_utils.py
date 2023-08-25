@@ -71,3 +71,24 @@ def test_check_if_switchtends_any_project(request, client):
 
     assert utils.can_administrate_project(project=None, user=userA)
     assert not utils.can_administrate_project(project=None, user=userB)
+
+
+########################################################################
+# test for truncate string from models (to be moved to utils)
+########################################################################
+
+testdata = (
+    ("", 10, ""),  # empty string
+    ("abcd efg", 10, "abcd efg"),  # string smaller that max length
+    ("abcd efghi", 10, "abcd efghi"),  # string equals max length
+    ("abcd efg h ij", 10, "abcd efg h…"),  # last word complete
+    ("abcd efgh ij", 10, "abcd efgh…"),  # backtrack to full word
+)
+
+
+@pytest.mark.parametrize("string,length,expected", testdata)
+def test_truncate_string(string, length, expected):
+    assert models.truncate_string(string, length) == expected
+
+
+# eof

@@ -1,4 +1,5 @@
 import pytest
+from actstream import models as action_models
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites import models as site_models
@@ -6,8 +7,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
-from notifications import notify
 
+from urbanvitaliz import verbs
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
@@ -61,7 +62,7 @@ def test_crm_project_create_note(mocker, request, client):
     site = get_current_site(request)
     project = baker.make(projects_models.Project, sites=[site])
 
-    mocker.patch("notifications.notify.send")
+    # mocker.patch("notifications.notify.send")
 
     data = {"tags": ["canard"], "content": "hola"}
 
@@ -74,8 +75,8 @@ def test_crm_project_create_note(mocker, request, client):
     note = models.Note.objects.first()
     assert list(note.tags.names()) == data["tags"]
 
-    # crm users notification
-    notify.send.assert_called_once()
+    # note creation is traced as an action
+    assert action_models.Action.objects.filter(verb=verbs.CRM.NOTE_CREATED).count() == 1
 
 
 ########################################################################
@@ -187,7 +188,7 @@ def test_crm_organization_create_note(mocker, request, client):
     site = get_current_site(request)
     organization = baker.make(addressbook_models.Organization, sites=[site])
 
-    mocker.patch("notifications.notify.send")
+    # mocker.patch("notifications.notify.send")
 
     data = {"content": "hola"}
 
@@ -200,8 +201,8 @@ def test_crm_organization_create_note(mocker, request, client):
     note = models.Note.objects.first()
     assert note.content == data["content"]
 
-    # crm users notification
-    notify.send.assert_called_once()
+    # note creation is traced as an action
+    assert action_models.Action.objects.filter(verb=verbs.CRM.NOTE_CREATED).count() == 1
 
 
 ########################################################################
@@ -313,35 +314,14 @@ def test_crm_user_create_note_accessible_w_perm(request, client):
     assert response.status_code == 200
 
 
-# FIXME ce test est un non sens -- assert à l'opposé du nom
 @pytest.mark.django_db
-def test_crm_user_create_note_performed_no_notification(mocker, request, client):
-    site = get_current_site(request)
-    crm_user = baker.make(auth_models.User)
-    crm_user.profile.sites.add(site)
-
-    mocker.patch("notifications.notify.send")
-
-    data = {"content": "A note content"}
-
-    url = reverse("crm-user-note-create", args=[crm_user.id])
-    with login(client) as user:
-        assign_perm("use_crm", user, site)
-        response = client.post(url, data=data)
-
-    assert response.status_code == 302
-
-    notify.send.assert_called_once()
-
-
-@pytest.mark.django_db
-def test_crm_user_create_note_notify_crm_users(mocker, request, client):
+def test_crm_user_create_note(mocker, request, client):
     site = get_current_site(request)
     crm_user = baker.make(auth_models.User)
     crm_user.profile.sites.add(site)
     # profile = crm_user.profile
 
-    mocker.patch("notifications.notify.send")
+    # mocker.patch("notifications.notify.send")
 
     data = {"content": "A note content"}
 
@@ -358,7 +338,8 @@ def test_crm_user_create_note_notify_crm_users(mocker, request, client):
 
     assert response.status_code == 302
 
-    notify.send.assert_called_once()
+    # note creation is traced as an action
+    assert action_models.Action.objects.filter(verb=verbs.CRM.NOTE_CREATED).count() == 1
 
 
 ########################################################################

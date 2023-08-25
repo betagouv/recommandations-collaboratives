@@ -204,7 +204,7 @@ function PersonalAdvisorDashboard() {
             this.addCurrentStateToStore('departments', this.departments)
 
             //find department item from departments for each project and return if the department is active
-            return projects.filter(item => this.departments.find(department => department.code === item.project.commune.department.code).active)
+            return projects.filter(item => this.departments.find(department => department.code === item.project.commune.department.code)?.active)
         },
         handleProjectsSearch(event) {
 
