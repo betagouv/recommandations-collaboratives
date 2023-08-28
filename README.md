@@ -1,6 +1,5 @@
 # UrbanVitaliz
 
-
 ## Mission
 
 UrbanVitaliz est une équipe projet portée par le Cerema, en partenariat avec
@@ -11,8 +10,7 @@ L'objectif est de créer **un service public gratuit d'appui aux petites
 collectivités pour la reconversion des friches**, en lien avec les objectifs de
 sobriété foncière du gouvernement.
 
-
-##  Logiciel
+## Logiciel
 
 Le logiciel RECO-CO est l'outil support pour les collectivités et les
 conseiller·ère·s.
@@ -24,13 +22,12 @@ Son code est couvert par la licence AGPL v3.0.
 
 En savoir plus sur http://urbanvitaliz.fr
 
-
 ## Installation
 
 Deux choix :
- 1. Via virtualenv et pip3
- 2. Via Docker
 
+1.  Via virtualenv et pip3
+2.  Via Docker
 
 ### Virtualenv
 
@@ -44,7 +41,9 @@ Les fichiers docker se trouvent à la racine dans le dossier `docker`.
 
 En ligne de commandes, aller dans ce dossier et taper :
 
- > docker-compose up
+```sh
+docker-compose up
+```
 
 Après quelques minutes d'installation, vous devriez avoir un
 environnement prêt à configurer.
@@ -53,21 +52,27 @@ environnement prêt à configurer.
 
 Entrez dans le container `app` en tapant :
 
- > docker-compose exec app /bin/bash
+```sh
+docker-compose exec app /bin/bash
+```
 
 Rendez-vous dans le dossier `/workspace` et installez les dépendances à l'aide de :
 
- > pip3 install -r requirements.txt
- > pip3 install -r requirements-dev.txt
+```sh
+pip3 install -r requirements.txt
+pip3 install -r requirements-dev.txt
+```
 
 Puis, installez les dépendances javascript :
 
- > cd urbanvitaliz/frontend
- > yarn install
+```sh
+cd urbanvitaliz/frontend
+yarn install
+```
 
 #### Configuration de l'applicatif
 
-Rendez-vous dans le dossier `urbanvitaliz/settings/` et configurez le 
+Rendez-vous dans le dossier `urbanvitaliz/settings/` et configurez le
 fichier `development.py` pour les credientials suivantes:
 
 ```python
@@ -87,22 +92,27 @@ DATABASES = {
 
 Synchronisez la base de données en tapant depuis `workspace` :
 
- > ./manage.py migrate
+```sh
+./manage.py migrate
+```
 
 ## Lancement de l'applicatif
 
 Pour lancer l'applicatif en mode `développement`, générez les statiques à l'aide de :
 
- > cd urbanvitaliz/frontend && yarn dev
+```sh
+cd urbanvitaliz/frontend && yarn dev
+```
 
 (Laissez la commande ouverte)
 
 Puis, exécutez le backend :
 
- > ./manage.py runserver
+```sh
+./manage.py runserver
+```
 
 Vous devriez pouvoir vous connecter sur http://localhost:8000 !
-
 
 ## En cas de difficultés
 
