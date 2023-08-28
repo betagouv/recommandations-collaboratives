@@ -114,7 +114,7 @@ cd urbanvitaliz/frontend && yarn dev
 Puis, exécutez le backend :
 
 ```sh
-./manage.py runserver
+./manage.py runserver 0.0.0.0:8000
 ```
 
 Vous devriez pouvoir vous connecter sur http://localhost:8000 !
