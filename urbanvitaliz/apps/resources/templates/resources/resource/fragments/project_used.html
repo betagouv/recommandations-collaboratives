@@ -1,10 +1,15 @@
 <div>
-    <span class="align-middle text-info-custom text-grey-light">
+    <span class="align-middle text-info-custom text-grey-dark">
         Cette ressource a été recommandée sur les projets suivants :
     </span>
-    <ul class="mt-3 text-grey-light">
+    <ul class="mt-3 text-grey-dark d-flex flex-column">
         {% for project in projects_used_by %}
-        <li><a class="text-info-custom text-grey-light text-decoration-none" href="{% url 'projects-project-detail' project.pk %}">{{ project.name }}</a></li>
+            <li class="text-dark">
+                <div class="d-flex">
+                    <a class="text-info-custom text-grey-dark text-decoration-none hover-underline white-space-pre text-overflow-ellipsis overflow-hidden"
+                       href="{% url 'projects-project-detail' project.pk %}"><strong class="text-dark fw-normal">({{ project.commune.postal }}) {{ project.commune.name }}</strong> {{ project.name }}</a>
+                </div>
+            </li>
         {% endfor %}
     </ul>
 </div>
