@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -13,13 +13,14 @@ services:
         # Optional Node.js version to install
         NODE_VERSION: "lts/*"
     volumes:
-      - ..:/workspace:cached  
+      - ..:/workspace:cached
     command: sleep infinity
     network_mode: service:db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
       POSTGRES_PASSWORD: postgres
+      SECRET_KEY: SECRET_KEY
 
   db:
     image: postgres:13.5
