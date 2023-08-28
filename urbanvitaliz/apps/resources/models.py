@@ -8,24 +8,27 @@ created: 2021-06-16 10:57:13 CEST
 """
 import datetime
 
+import reversion
 from django.contrib.auth import models as auth
+from django.contrib.auth import models as auth_models
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.functions import Lower
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 from django.shortcuts import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from taggit.managers import TaggableManager
+from watson import search as watson
+
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
-from watson import search as watson
-from django.db.models.signals import post_migrate
-from django.dispatch import receiver
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth import models as auth_models
 
 from . import apps
+
 
 # We need the permission to be associated to the site and not to the projects
 @receiver(post_migrate)
@@ -125,6 +128,7 @@ class ResourceOnSiteManager(CurrentSiteManager, ResourceManagerWithQS):
     pass
 
 
+@reversion.register(fields=["title", "subtitle", "summary", "content"], ignore_duplicates=True)
 class Resource(models.Model):
     """Représente une ressource pour les utilisateur·ices d'UV"""
 

@@ -288,7 +288,9 @@ def resource_update(request, resource_id=None):
         if form.is_valid():
             resource = form.save(commit=False)
             resource.updated_on = timezone.now()
-            resource.save()
+            with reversion.create_revision():
+                resource.save()
+                reversion.set_user(request.user)
             form.save_m2m()
             return redirect(next_url)
     else:
@@ -306,7 +308,9 @@ def resource_create(request):
         if form.is_valid():
             resource = form.save(commit=False)
             resource.created_by = request.user
-            resource.save()
+            with reversion.create_revision():
+                resource.save()
+                reversion.set_user(request.user)
             resource.sites.add(request.site)
             form.save_m2m()
             next_url = reverse("resources-resource-detail", args=[resource.id])
