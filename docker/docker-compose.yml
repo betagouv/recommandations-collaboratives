@@ -15,12 +15,13 @@ services:
     volumes:
       - ..:/workspace:cached
     command: sleep infinity
-    network_mode: service:db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
       POSTGRES_PASSWORD: postgres
       SECRET_KEY: SECRET_KEY
+    ports:
+      - 8000:8000
 
   db:
     image: postgres:13.5
