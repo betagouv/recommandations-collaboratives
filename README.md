@@ -72,8 +72,13 @@ yarn install
 
 #### Configuration de l'applicatif
 
-Rendez-vous dans le dossier `urbanvitaliz/settings/` et configurez le
-fichier `development.py` pour les credientials suivantes:
+Copiez le fichier de configuration d'exemple :
+
+```sh
+cp urbanvitaliz/settings/development.py.example urbanvitaliz/settings/development.py
+```
+
+Puis modifiez la configuration de la base de données :
 
 ```python
 DATABASES = {

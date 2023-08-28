@@ -54,4 +54,5 @@ RECAPTCHA_REQUIRED_SCORE = 0
 # Vite
 DJANGO_VITE_DEV_MODE = True
 
+SILENCED_SYSTEM_CHECKS += ['captcha.recaptcha_test_key_error']
 # eof
