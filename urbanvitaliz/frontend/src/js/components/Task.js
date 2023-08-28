@@ -5,7 +5,7 @@ import { formatDate } from '../utils/date'
 import { toArchiveTooltip } from '../utils/tooltip'
 import { renderMarkdown } from '../utils/markdown'
 import { gravatar_url } from '../utils/gravatar'
-import { truncate } from '../utils/tasks'
+import { truncate } from '../utils/taskStatus'
 
 export default function Task(currentTask) {
     return {

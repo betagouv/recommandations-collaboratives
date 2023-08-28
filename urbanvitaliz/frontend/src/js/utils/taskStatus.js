@@ -1,5 +1,14 @@
 import { TASK_STATUSES } from '../config/statuses';
 
+export const STATUSES = {
+    PROPOSED: 0,
+    INPROGRESS: 1,
+    BLOCKED: 2,
+    DONE: 3,
+    NOT_INTERESTED: 4,
+    ALREADY_DONE: 5,
+}
+
 export const STATUS_TEXT = {
     0: "nouveau",
     1: "en cours",
@@ -13,11 +22,20 @@ export function statusText(status) {
     return STATUS_TEXT[status];
 }
 
+export function isStatus(task, status) {
+    return task.status === status
+}
+
 export function isArchivedStatus(status) {
-    return status === TASK_STATUSES.NOT_INTERESTED
-        || status === TASK_STATUSES.ALREADY_DONE
+    return status === STATUSES.DONE
+        || status === STATUSES.NOT_INTERESTED
+        || status === STATUSES.ALREADY_DONE
 }
 
 export function isStatusUpdate(followup) {
     return isArchivedStatus(followup.status) || followup.comment === "";
+}
+
+export function truncate(input, size = 30) {
+    return input.length > size ? `${input.substring(0, size)}...` : input;
 }

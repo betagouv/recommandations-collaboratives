@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs'
-import { STATUSES, isStatus, statusText } from '../utils/tasks'
+import { STATUSES, isStatus, statusText } from '../utils/taskStatus'
 
 function TaskStatusSwitcher(commentTextRef, commentTextFormRef) {
     return {
