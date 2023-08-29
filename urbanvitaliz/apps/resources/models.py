@@ -8,7 +8,6 @@ created: 2021-06-16 10:57:13 CEST
 """
 import datetime
 
-import reversion
 from django.contrib.auth import models as auth
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
@@ -128,7 +127,6 @@ class ResourceOnSiteManager(CurrentSiteManager, ResourceManagerWithQS):
     pass
 
 
-@reversion.register(fields=["title", "subtitle", "summary", "content"], ignore_duplicates=True)
 class Resource(models.Model):
     """Représente une ressource pour les utilisateur·ices d'UV"""
 

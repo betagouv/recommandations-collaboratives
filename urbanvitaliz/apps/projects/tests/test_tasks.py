@@ -416,6 +416,7 @@ def test_update_task_for_project_and_redirect(request, client):
 
     assert response.status_code == 302
 
+
 @pytest.mark.django_db
 def test_update_task_with_new_topic(request, client):
     task = Recipe(models.Task, site=get_current_site(request)).make()
@@ -756,6 +757,67 @@ def test_create_new_action_as_draft(request, client):
         )
     task = models.Task.on_site.all()[0]
     assert task.public is False
+    assert task.project == project
+    assert task.content == content
+    assert task.intent == intent
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_create_new_action_with_new_topic(request, client):
+    site = get_current_site(request)
+    project = Recipe(models.Project, sites=[site]).make()
+
+    intent = "My Intent"
+    content = "My Content"
+    topic = "A topic"
+
+    with login(client) as user:
+        utils.assign_advisor(user, project)
+
+        response = client.post(
+            reverse("projects-project-create-task", args=[project.id]),
+            data={
+                "push_type": "noresource",
+                "intent": intent,
+                "content": content,
+                "topic": topic,
+            },
+        )
+
+    # new topic is created and associated to task
+    assert models.Topic.objects.count() == 1
+    task = models.Task.on_site.first()
+    assert task.topic.name == topic.capitalize()
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_create_new_action_with_existing_topic(request, client):
+    site = get_current_site(request)
+    project = Recipe(models.Project, sites=[site]).make()
+    topic = Recipe(models.Topic, name="A topic", site=site).make()
+
+    intent = "My Intent"
+    content = "My Content"
+
+    with login(client) as user:
+        utils.assign_advisor(user, project)
+
+        response = client.post(
+            reverse("projects-project-create-task", args=[project.id]),
+            data={
+                "push_type": "noresource",
+                "intent": intent,
+                "content": content,
+                "topic": topic.name.upper(),
+            },
+        )
+
+    # existing topic is reused and associated to task
+    assert models.Topic.objects.count() == 1
+    task = models.Task.on_site.first()
+    assert task.topic == topic
     assert response.status_code == 302
 
 
