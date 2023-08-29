@@ -198,6 +198,14 @@ class Project(models.Model):
 
     sites = models.ManyToManyField(Site)
 
+    topics = models.ManyToManyField("Topic", related_name="projects", blank=True)
+
+    @property
+    def all_topics(self):
+        """Return all topics associated w/ project or its tasks"""
+        task_topics = Topic.objects.filter(tasks__project=self)
+        return task_topics.union(self.topics.all())
+
     notifications_as_target = CastedGenericRelation(
         notifications_models.Notification,
         related_query_name="target_projects",
@@ -429,6 +437,28 @@ class ProjectSwitchtender(models.Model):
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
 
+class TopicOnSiteManager(CurrentSiteManager):
+    pass
+
+
+class Topic(models.Model):
+    """Topic to classify projects and tasks.
+
+    Représente un thème / une thématique pour classifier projets et recommandations.
+    """
+
+    objects = TopicOnSiteManager()
+
+    name = models.CharField(max_length=255)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("name", "site")
+
+
+# TODO ProjectTopic are intented to be removed after proper integration of Topic
+
+
 class ProjectTopicOnSiteManager(CurrentSiteManager):
     pass
 
@@ -611,7 +641,7 @@ class DeletedTaskOnSiteManager(CurrentSiteManager, DeletedTaskManager):
 
 
 class Task(OrderedModel):
-    """Représente une action pour faire avancer un project"""
+    """Représente une recommandation/action pour faire avancer un project"""
 
     objects = TaskManager()
     deleted_objects = DeletedTaskManager()
@@ -638,6 +668,10 @@ class Task(OrderedModel):
     )
 
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+    topic = models.ForeignKey(
+        "Topic", on_delete=models.CASCADE, null=True, related_name="tasks"
+    )
 
     @property
     def closed(self):

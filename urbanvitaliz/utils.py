@@ -50,6 +50,8 @@ def get_group_for_site(name: str, site: Site) -> auth.Group:
 ########################################################################
 # View helpers
 ########################################################################
+
+
 def has_perm(user, permission, obj=None):
     """
     Check if this user has the required permission for the given
@@ -175,6 +177,8 @@ def login(
 ################################################################
 # Site configuration
 ################################################################
+
+
 # TODO move me to home/utils.py
 def get_site_config_or_503(site):
     try:
@@ -189,6 +193,8 @@ def get_site_config_or_503(site):
 #######################################################################
 # Database Helpers
 #######################################################################
+
+
 class CastedGenericRelation(GenericRelation):
     def get_joining_columns(self, reverse_join=False):
         return ()
