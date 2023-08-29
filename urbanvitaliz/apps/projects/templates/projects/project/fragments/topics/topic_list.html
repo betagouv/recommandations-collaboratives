@@ -6,7 +6,7 @@
     <div class="d-flex align-items-center justify-content-between w-100"
          style="margin-bottom: 7px">
         <h6 class="d-flex align-items-center justify-content-center text-uppercase fw-bold font-small mb-0">
-            <span>Sujets diagnostiqués</span>
+            <span>Thématiques abordées</span>
         </h6>
         {% if "change_topics" in user_project_perms and project.topics_on_site.count != 0  %}
             <a class="d-flex align-items-center"
@@ -21,10 +21,10 @@
     {% if project.topics_on_site.count == 0 %}
         <div class="project-card-details pt-4 py-4 d-flex flex-column align-items-center justify-content-center h-100"
              style="min-height: 100px">
-            <span class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">Les sujets n'ont pas encore été identifiés</span>
+            <span class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">Les thématiques n'ont pas encore été identifiés</span>
             {% if "change_topics" in user_project_perms %}
                 <a class="button mt-3"
-                   href="{% url "projects-project-topics" project.id %}">Identifier les sujets</a>
+                   href="{% url "projects-project-topics" project.id %}">Identifier les thématiques</a>
             {% endif %}
         </div>
     {% else %}
