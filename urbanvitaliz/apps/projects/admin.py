@@ -122,6 +122,16 @@ class UserProjectStatusAdmin(admin.ModelAdmin):
     list_filter = ["site"]
 
 
+@admin.register(models.Topic)
+class TopicAdmin(admin.ModelAdmin):
+    search_fields = ["name"]
+    list_filter = ["name", "site"]
+    list_display = ["name", "site"]
+
+    def project_name(self, o):
+        return o.project.name
+
+
 @admin.register(models.Note)
 class NoteAdmin(admin.ModelAdmin):
     search_fields = ["content", "tags", "project__name"]
