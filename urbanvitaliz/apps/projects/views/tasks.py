@@ -270,6 +270,13 @@ def update_task(request, task_id=None):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.updated_on = timezone.now()
+            # manage topic
+            name = form.cleaned_data["topic"]
+            topic, _ = models.Topic.objects.get_or_create(
+                name__iexact=name.lower(),
+                defaults={"name": name.capitalize(), "site": request.site},
+            )
+            instance.topic = topic
             instance.save()
             instance.project.updated_on = instance.updated_on
             instance.project.save()
@@ -313,6 +320,7 @@ def update_task(request, task_id=None):
 ########
 # Task Recommendation
 ########
+
 
 # liste de preflechage des recommendations
 @login_required

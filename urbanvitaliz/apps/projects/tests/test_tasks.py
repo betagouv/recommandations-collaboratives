@@ -401,6 +401,7 @@ def test_update_task_for_project_and_redirect(request, client):
     task = Recipe(models.Task, site=get_current_site(request)).make()
     updated_on_before = task.updated_on
     url = reverse("projects-update-task", args=[task.id])
+
     data = {"content": "this is some content"}
 
     with login(client) as user:
@@ -412,6 +413,44 @@ def test_update_task_for_project_and_redirect(request, client):
     assert task.content == data["content"]
     assert task.updated_on > updated_on_before
     assert task.project.updated_on == task.updated_on
+
+    assert response.status_code == 302
+
+@pytest.mark.django_db
+def test_update_task_with_new_topic(request, client):
+    task = Recipe(models.Task, site=get_current_site(request)).make()
+    url = reverse("projects-update-task", args=[task.id])
+
+    data = {"content": "this is some content", "topic": "A topic"}
+
+    with login(client) as user:
+        utils.assign_advisor(user, task.project)
+        response = client.post(url, data=data)
+
+    task = models.Task.on_site.get(id=task.id)
+    assert task.topic.name == data["topic"]
+
+    assert models.Topic.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_update_task_with_existing_topic(request, client):
+    site = get_current_site(request)
+    task = Recipe(models.Task, site=site).make()
+    url = reverse("projects-update-task", args=[task.id])
+
+    topic = baker.make(models.Topic, site=site, name="A topic")
+
+    data = {"content": "this is some content", "topic": topic.name.upper()}
+
+    with login(client) as user:
+        utils.assign_advisor(user, task.project)
+        response = client.post(url, data=data)
+
+    assert models.Topic.objects.count() == 1
+
+    task = models.Task.on_site.get(id=task.id)
+    assert task.topic == topic
 
     assert response.status_code == 302
 
