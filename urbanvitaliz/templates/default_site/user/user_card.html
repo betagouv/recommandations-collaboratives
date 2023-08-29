@@ -29,9 +29,9 @@
                     {% endif %}
                 </strong>
             </span>
-            {% if user.is_active and user.profile.organization.name %}
+            {% if user.profile.organization.name %}
                 <span class="text-dark fw-normal font-italic font-very-small">{{user.profile.organization.name}}</span>
-            {% elif user.is_active and project_owner and project.org_name  %}
+            {% elif project_owner and project.org_name  %}
                 <span class="text-dark fw-normal font-italic font-very-small">{{project.org_name}}</span>
             {% endif %}
         </div>
@@ -69,13 +69,13 @@
                         {% endif %}
                     </strong>
                 </span>
-                {% if user.is_active and user.profile.organization.name %}
+                {% if user.profile.organization.name %}
                     <span class="text-dark fw-normal font-italic font-very-small">{{user.profile.organization.name}}</span>
-                {% elif user.is_active and project_owner and project.org_name  %}
+                {% elif project_owner and project.org_name  %}
                     <span class="text-dark fw-normal font-italic font-very-small">{{project.org_name}}</span>
                 {% endif %}
             </div>
-            {% if user.is_active and user.profile.organization_position %}
+            {% if user.profile.organization_position %}
                 <span class="d-flex align-items-center justify-content-between text-blue font-very-small" style="margin-bottom: 0.35rem; margin-top: 0.75rem;">
                     <div class="d-flex align-items-center">
                         <svg class="bi align-middle me-2" width="18" height="18" fill="currentColor" style="margin-left: 0.12rem;">
