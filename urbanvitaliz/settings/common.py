@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "watson",
     "phonenumber_field",
     "cookie_consent",
+    "reversion",
     "urbanvitaliz.apps.onboarding",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
