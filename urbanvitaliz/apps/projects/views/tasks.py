@@ -104,7 +104,7 @@ def create_task(request, project_id=None):
                 action.site = request.site
                 action.created_by = request.user
                 # get or create topic
-                name = form.cleaned_data["topic"]
+                name = form.cleaned_data["topic_name"]
                 if name:
                     topic, _ = models.Topic.objects.get_or_create(
                         name__iexact=name.lower(),
