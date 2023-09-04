@@ -796,7 +796,7 @@ def test_create_new_action_with_new_topic(request, client):
                 "push_type": "noresource",
                 "intent": intent,
                 "content": content,
-                "topic": topic,
+                "topic_name": topic,
             },
         )
 
@@ -825,7 +825,7 @@ def test_create_new_action_with_existing_topic(request, client):
                 "push_type": "noresource",
                 "intent": intent,
                 "content": content,
-                "topic": topic.name.upper(),
+                "topic_name": topic.name.upper(),
             },
         )
 
