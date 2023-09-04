@@ -9,7 +9,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
-from django.forms import modelformset_factory
+from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 
@@ -24,7 +24,13 @@ from urbanvitaliz.utils import (
 )
 
 from .. import models
-from ..forms import PrivateNoteForm, ProjectTagsForm, ProjectTopicsForm, PublicNoteForm
+from ..forms import (
+    PrivateNoteForm,
+    ProjectTagsForm,
+    ProjectTopicsForm,
+    PublicNoteForm,
+    TopicForm,
+)
 from ..utils import (
     get_advisor_for_project,
     get_notification_recipients_for_project,
@@ -284,14 +290,10 @@ def project_create_or_update_topics(request, project_id=None):
 
     has_perm_or_403(request.user, "projects.change_topics", project)
 
-    TopicFormset = modelformset_factory(
-        models.ProjectTopic, fields=("label",), extra=6, max_num=6, can_delete=True
-    )
+    TopicFormset = formset_factory(TopicForm, extra=6, max_num=6, can_delete=True)
 
     if request.method == "POST":
-        topic_formset = TopicFormset(
-            request.POST, queryset=project.topics_on_site.all()
-        )
+        topic_formset = TopicFormset(request.POST)
         form = ProjectTopicsForm(request.POST, instance=project)
         if form.is_valid() and topic_formset.is_valid():
             project = form.save(commit=False)
@@ -300,16 +302,21 @@ def project_create_or_update_topics(request, project_id=None):
             project.save()
             form.save_m2m()
 
-            # Topics
-            # save new ones
-            for topic in topic_formset.save(commit=False):
-                topic.project = project
-                topic.site = request.site
-                topic.save()
-
-            # deleted flagged ones
-            for deleted_topic in topic_formset.deleted_objects:
-                deleted_topic.delete()
+            # Handle topics
+            # Add new ones to project or removed deleted ones.
+            for tform in topic_formset.extra_forms:
+                name = tform.cleaned_data.get("name")
+                if not name:
+                    continue  # no data in form,just skip it
+                topic, _ = models.Topic.objects.get_or_create(
+                    name__iexact=name.lower(),
+                    defaults={"name": name.capitalize(), "site": request.site},
+                )
+                to_remove = tform.cleaned_data["DELETE"]
+                if to_remove:
+                    project.topics.remove(topic)
+                else:
+                    project.topics.add(topic)
 
             return redirect(
                 reverse("projects-project-detail-overview", args=[project.pk])

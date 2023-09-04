@@ -118,7 +118,6 @@ class CreateActionWithoutResourceForm(forms.ModelForm):
 
 
 class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
-
     topic = forms.CharField(required=False)
 
     resource = (
@@ -175,6 +174,7 @@ class CreateActionsFromResourcesForm(forms.ModelForm):
 
 class CreateTaskForm(forms.ModelForm):
     """Form new project task creation"""
+
     # TODO seems to not be used any more
 
     content = MarkdownxFormField(required=False)
@@ -245,6 +245,12 @@ class ProjectTagsForm(forms.ModelForm):
     class Meta:
         model = models.Project
         fields = ["tags"]
+
+
+class TopicForm(forms.Form):
+    """Form for handling a topic """
+
+    name = forms.CharField(max_length=32, required=False, label="Thème")
 
 
 class ProjectTopicsForm(forms.ModelForm):
