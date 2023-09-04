@@ -435,6 +435,21 @@ def test_update_task_with_new_topic(request, client):
 
 
 @pytest.mark.django_db
+def test_update_task_with_existing_topic_on_get(request, client):
+    site = get_current_site(request)
+    topic = baker.make(models.Topic, site=site, name="A topic")
+    task = Recipe(models.Task, site=site, topic=topic).make()
+    url = reverse("projects-update-task", args=[task.id])
+
+    with login(client) as user:
+        utils.assign_advisor(user, task.project)
+        response = client.get(url, {"next": "next-url"})
+
+    assert response.status_code == 200
+    # test values are in form
+
+
+@pytest.mark.django_db
 def test_update_task_with_existing_topic(request, client):
     site = get_current_site(request)
     task = Recipe(models.Task, site=site).make()
