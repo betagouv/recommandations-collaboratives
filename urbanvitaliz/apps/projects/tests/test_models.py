@@ -10,6 +10,7 @@ created: 2023-08-29 13:59:10 CEST
 import pytest
 from django.conf import settings
 from django.contrib.sites import models as sites
+from django.utils import timezone
 from model_bakery import baker
 
 from .. import models
@@ -61,6 +62,23 @@ def test_project_all_topics_exclude_other_site_topics():
     project = baker.make(models.Project)
     project.sites.add(site)
     project.topics.add(topic)
+
+    # topic is not duplicated in all topics for project
+    with settings.SITE_ID.override(site.pk):
+        all_topics = list(project.all_topics)
+
+    assert all_topics == []
+
+
+@pytest.mark.django_db
+def test_project_all_topics_exclude_deleted_tasks():
+    site = baker.make(sites.Site)
+    topic = baker.make(models.Topic, site=site)
+    project = baker.make(models.Project)
+    project.sites.add(site)
+    task = baker.make(
+        models.Task, project=project, site=site, topic=topic, deleted=timezone.now()
+    )
 
     # topic is not duplicated in all topics for project
     with settings.SITE_ID.override(site.pk):
