@@ -193,7 +193,7 @@ class UpdateTaskForm(forms.ModelForm):
     """Form for task update"""
 
     content = MarkdownxFormField(required=False)
-    topic = forms.CharField(required=False)
+    topic_name = forms.CharField(required=False)
     next = forms.CharField(required=False)
 
     class Meta:

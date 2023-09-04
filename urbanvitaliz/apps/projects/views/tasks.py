@@ -279,7 +279,7 @@ def update_task(request, task_id=None):
             instance = form.save(commit=False)
             instance.updated_on = timezone.now()
             # manage topic
-            name = form.cleaned_data["topic"]
+            name = form.cleaned_data["topic_name"]
             if name:
                 topic, _ = models.Topic.objects.get_or_create(
                     name__iexact=name.lower(),
@@ -321,6 +321,7 @@ def update_task(request, task_id=None):
                 reverse("projects-project-detail-actions", args=[task.project_id])
             )
     else:
+        task.topic_name = task.topic.name if task.topic else None
         form = UpdateTaskForm(request.GET, instance=task)
         document_form = DocumentUploadForm()
     return render(request, "projects/project/task_update.html", locals())
