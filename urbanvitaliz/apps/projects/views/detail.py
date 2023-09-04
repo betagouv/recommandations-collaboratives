@@ -304,7 +304,7 @@ def project_create_or_update_topics(request, project_id=None):
 
             # Handle topics
             # Add new ones to project or removed deleted ones.
-            for tform in topic_formset.extra_forms:
+            for tform in topic_formset:
                 name = tform.cleaned_data.get("name")
                 if not name:
                     continue  # no data in form,just skip it
