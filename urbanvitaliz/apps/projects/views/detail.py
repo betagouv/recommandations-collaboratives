@@ -322,7 +322,7 @@ def project_create_or_update_topics(request, project_id=None):
                 reverse("projects-project-detail-overview", args=[project.pk])
             )
     else:
-        topic_formset = TopicFormset(queryset=project.topics_on_site.all())
+        topic_formset = TopicFormset()
         form = ProjectTopicsForm(instance=project)
 
     return render(request, "projects/project/topics.html", locals())
