@@ -321,8 +321,11 @@ def update_task(request, task_id=None):
                 reverse("projects-project-detail-actions", args=[task.project_id])
             )
     else:
-        task.topic_name = task.topic.name if task.topic else None
-        form = UpdateTaskForm(request.GET, instance=task)
+        initial = {
+            "topic_name": task.topic.name if task.topic else None,
+            "next": request.GET.get("next"),
+        }
+        form = UpdateTaskForm(instance=task, initial=initial)
         document_form = DocumentUploadForm()
     return render(request, "projects/project/task_update.html", locals())
 
