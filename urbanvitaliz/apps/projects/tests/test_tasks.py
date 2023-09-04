@@ -422,14 +422,14 @@ def test_update_task_with_new_topic(request, client):
     task = Recipe(models.Task, site=get_current_site(request)).make()
     url = reverse("projects-update-task", args=[task.id])
 
-    data = {"content": "this is some content", "topic": "A topic"}
+    data = {"content": "this is some content", "topic_name": "A topic"}
 
     with login(client) as user:
         utils.assign_advisor(user, task.project)
         response = client.post(url, data=data)
 
     task = models.Task.on_site.get(id=task.id)
-    assert task.topic.name == data["topic"]
+    assert task.topic.name == data["topic_name"]
 
     assert models.Topic.objects.count() == 1
 
@@ -442,7 +442,7 @@ def test_update_task_with_existing_topic(request, client):
 
     topic = baker.make(models.Topic, site=site, name="A topic")
 
-    data = {"content": "this is some content", "topic": topic.name.upper()}
+    data = {"content": "this is some content", "topic_name": topic.name.upper()}
 
     with login(client) as user:
         utils.assign_advisor(user, task.project)
