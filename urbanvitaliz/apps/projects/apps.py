@@ -20,6 +20,12 @@ class ProjectConfig(AppConfig):
             ),
         )
 
+        Topic = self.get_model("Topic")
+        watson.register(
+            Topic,
+            fields=("name", ),
+        )
+
         registry.register(Project)
         registry.register(self.get_model("Task"))
         registry.register(self.get_model("Note"))

@@ -309,8 +309,10 @@ def test_contact_update_and_redirect(request, client):
 
 
 ########################################################################
-# REST API: projects
+# REST API: searching organizations
 ########################################################################
+
+
 @pytest.mark.django_db
 def test_anonymous_can_use_organization_api(client):
     url = reverse("organizations-list")

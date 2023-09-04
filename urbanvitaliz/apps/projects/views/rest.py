@@ -19,22 +19,23 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from urbanvitaliz.utils import get_group_for_site
 from urbanvitaliz import verbs
+from urbanvitaliz.utils import TrigramSimilaritySearchFilter, get_group_for_site
 
 from .. import models, signals
 from ..serializers import (
-    ProjectSerializer,
     ProjectForListSerializer,
+    ProjectSerializer,
     TaskFollowupSerializer,
     TaskNotificationSerializer,
     TaskSerializer,
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
+    TopicSerializer,
 )
 
 ########################################################################
-# REST API
+# Project API
 ########################################################################
 
 
@@ -223,6 +224,11 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
+
+
+########################################################################
+# Task API
+########################################################################
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -559,5 +565,23 @@ def fetch_site_projects_with_ids(site, ids):
         )
     )
 
+
+########################################################################
+# Topic API
+########################################################################
+
+
+class TopicViewSet(viewsets.ReadOnlyModelViewSet):
+    """API endpoint that allows searching for topics"""
+
+    search_fields = ["name"]
+
+    filter_backends = [TrigramSimilaritySearchFilter]
+
+    serializer_class = TopicSerializer
+
+    def get_queryset(self):
+        """Return a list of all organizations."""
+        return models.Topic.objects.all()
 
 # eof
