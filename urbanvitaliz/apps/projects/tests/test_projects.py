@@ -1482,6 +1482,24 @@ def test_switchtender_writes_advisors_note(request, client):
 
 
 @pytest.mark.django_db
+def test_switchtender_view_project_topics(request, client):
+    site = get_current_site(request)
+    topic = Recipe(models.Topic, site=site, name="a nice topic").make()
+    project = Recipe(models.Project, sites=[site], topics=[topic]).make()
+
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, site)
+
+        response = client.get(
+            reverse("projects-project-topics", args=[project.id]),
+        )
+
+    assert response.status_code == 200
+    # TODO add this test when UI updated
+    # assertContains(response, topic.name)
+
+
+@pytest.mark.django_db
 def test_switchtender_add_new_topic_to_project(request, client):
     site = get_current_site(request)
     project = Recipe(models.Project, sites=[site]).make()
