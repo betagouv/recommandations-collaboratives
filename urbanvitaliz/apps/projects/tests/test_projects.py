@@ -1510,6 +1510,7 @@ def test_switchtender_add_new_topic_to_project(request, client):
         "form-INITIAL_FORMS": 0,
         "form-0-id": "",
         "form-0-name": "blah",
+        "form-0-DELETE": False,
     }
 
     with login(client, groups=["example_com_advisor"]) as user:
@@ -1541,6 +1542,7 @@ def test_switchtender_add_existing_topic_to_project(request, client):
         "form-INITIAL_FORMS": 0,
         "form-0-id": "",
         "form-0-name": topic.name,
+        "form-0-DELETE": False,
     }
 
     with login(client, groups=["example_com_advisor"]) as user:
@@ -1555,6 +1557,36 @@ def test_switchtender_add_existing_topic_to_project(request, client):
 
     assert models.Topic.objects.count() == 1
     assert topic in project.topics.all()
+
+
+@pytest.mark.django_db
+def test_switchtender_remove_topic_from_project(request, client):
+    site = get_current_site(request)
+
+    topic = Recipe(models.Topic, site=site, name="blah").make()
+    project = Recipe(models.Project, sites=[site], topics=[topic]).make()
+
+    data = {
+        "advisors_note": "",
+        "form-TOTAL_FORMS": 1,
+        "form-INITIAL_FORMS": 0,
+        "form-0-id": "",
+        "form-0-name": topic.name,
+        "form-0-DELETE": True,
+    }
+
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, site)
+
+        response = client.post(
+            reverse("projects-project-topics", args=[project.id]),
+            data=data,
+        )
+
+    assert response.status_code == 302
+
+    assert models.Topic.objects.count() == 1
+    assert topic not in project.topics.all()
 
 
 #################################################################

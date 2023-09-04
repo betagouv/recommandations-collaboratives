@@ -322,7 +322,8 @@ def project_create_or_update_topics(request, project_id=None):
                 reverse("projects-project-detail-overview", args=[project.pk])
             )
     else:
-        topic_formset = TopicFormset()
+        topics = [{"name": t.name} for t in project.topics.all()]
+        topic_formset = TopicFormset(initial=topics)
         form = ProjectTopicsForm(instance=project)
 
     return render(request, "projects/project/topics.html", locals())
