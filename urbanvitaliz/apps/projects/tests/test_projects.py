@@ -1455,6 +1455,8 @@ def test_staff_updates_tags(request, client):
 #################################################################
 # Topics
 #################################################################
+
+
 @pytest.mark.django_db
 def test_switchtender_writes_advisors_note(request, client):
     site = get_current_site(request)
