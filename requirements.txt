@@ -19,7 +19,6 @@ git+https://github.com/jazzband/django-dbtemplates.git@master#egg=django-dbtempl
 
 git+https://github.com/jazzband/django-cookie-consent@master#egg=django-cookie-consent
 
-django-reversion
 django_otp
 django-tagging==0.5.0
 django-taggit==3.0.0

@@ -61,6 +61,9 @@ router.register(
     r"organizations", addressbook_rest.OrganizationViewSet, basename="organizations"
 )
 router.register(
+    r"topics", projects_rest.TopicViewSet, basename="topics"
+)
+router.register(
     r"challenges/definitions",
     training_rest.ChallengeDefinitionViewSet,
     basename="challenge-definitions",

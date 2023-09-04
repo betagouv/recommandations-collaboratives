@@ -110,7 +110,7 @@ class PushTypeActionForm(forms.Form):
 class CreateActionWithoutResourceForm(forms.ModelForm):
     """Create an action for a project, without attached resource"""
 
-    topic = forms.CharField()
+    topic = forms.CharField(required=False)
 
     class Meta:
         model = models.Task
@@ -119,7 +119,7 @@ class CreateActionWithoutResourceForm(forms.ModelForm):
 
 class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
 
-    topic = forms.CharField()
+    topic = forms.CharField(required=False)
 
     resource = (
         forms.ModelChoiceField(

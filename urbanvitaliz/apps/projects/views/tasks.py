@@ -103,6 +103,14 @@ def create_task(request, project_id=None):
                 action.project = project
                 action.site = request.site
                 action.created_by = request.user
+                # get or create topic
+                name = form.cleaned_data["topic"]
+                if name:
+                    topic, _ = models.Topic.objects.get_or_create(
+                        name__iexact=name.lower(),
+                        defaults={"name": name.capitalize(), "site": request.site},
+                    )
+                    action.topic = topic
                 action.save()
                 action.top()
 
@@ -272,11 +280,12 @@ def update_task(request, task_id=None):
             instance.updated_on = timezone.now()
             # manage topic
             name = form.cleaned_data["topic"]
-            topic, _ = models.Topic.objects.get_or_create(
-                name__iexact=name.lower(),
-                defaults={"name": name.capitalize(), "site": request.site},
-            )
-            instance.topic = topic
+            if name:
+                topic, _ = models.Topic.objects.get_or_create(
+                    name__iexact=name.lower(),
+                    defaults={"name": name.capitalize(), "site": request.site},
+                )
+                instance.topic = topic
             instance.save()
             instance.project.updated_on = instance.updated_on
             instance.project.save()
