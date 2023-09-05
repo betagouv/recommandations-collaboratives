@@ -5,9 +5,6 @@ document.addEventListener('alpine:init', () => {
     Alpine.store('tasksView', {
         displayedTasks: [],
         currentView: 'inline',
-        init() {
-            console.log('tasks view store init ');
-        },
         async updateViewWithTask(taskId) {
             const updatedTasks = await Alpine.store('tasksData').loadTasks();
             const updatedTask = updatedTasks.find(task => task.id === taskId)
