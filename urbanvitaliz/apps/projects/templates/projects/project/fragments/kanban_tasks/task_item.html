@@ -42,7 +42,7 @@
 										</svg>
 									</a>
 								</template>
-								<template x-if="i < column(board.status).length - 1">
+								<template x-if="i < (column(board.status).length - 1)">
 									<a class="d-block p-1" @click="$store.tasksData.moveBelow(t, column(board.status)[i + 1])" style="cursor: pointer;">
 										<svg class="aling-middle bi ms-1" width="12px" height="12px" fill="currentColor">
 											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
