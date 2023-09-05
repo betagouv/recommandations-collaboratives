@@ -25,9 +25,7 @@ main {
 
     min-height: 100vh;
     height: -webkit-fill-available;
-    //  max-height: 100vh;
     overflow-x: auto;
-    //overflow-y: hidden;
 }
 
 
@@ -157,15 +155,3 @@ progress::-moz-progress-bar {
 .modal {
     z-index: 9889089;
 }
-
-// .modal-xl {
-//     &.modal-dialog {
-//         height: 90vh;
-//         overflow: hidden;
-//         display: flex;
-//     }
-
-//     .modal-body {
-//         overflow: scroll;
-//     }
-// }
