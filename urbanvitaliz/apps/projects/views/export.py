@@ -15,10 +15,15 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
+
 from urbanvitaliz.apps.crm import models as crm_models
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.utils import build_absolute_url, is_switchtender_or_403
-from urbanvitaliz.utils import get_group_for_site
+from urbanvitaliz.apps.tasks import models as task_models
+from urbanvitaliz.utils import (
+    build_absolute_url,
+    get_group_for_site,
+    is_switchtender_or_403,
+)
 
 from .. import models
 from ..utils import (
@@ -94,7 +99,7 @@ def project_list_export_csv(request):
 
         collaborators = get_collaborators_for_project(project)
 
-        followups = models.TaskFollowup.objects.filter(
+        followups = task_models.TaskFollowup.objects.filter(
             task__project=project,
             task__site=request.site,
         )
@@ -129,9 +134,9 @@ def project_list_export_csv(request):
                 published_tasks.exclude(created_by__is_staff=True).count(),
                 published_tasks.filter(
                     status__in=(
-                        models.Task.INPROGRESS,
-                        models.Task.BLOCKED,
-                        models.Task.DONE,
+                        task_models.Task.INPROGRESS,
+                        task_models.Task.BLOCKED,
+                        task_models.Task.DONE,
                     )
                 ).count(),
                 followups.exclude(status=None).exclude(who__in=switchtenders).count(),

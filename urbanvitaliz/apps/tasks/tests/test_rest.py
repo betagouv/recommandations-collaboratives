@@ -18,8 +18,11 @@ from rest_framework.test import APIClient
 
 from urbanvitaliz.utils import login
 from urbanvitaliz import verbs
+from urbanvitaliz.apps.projects import models as project_models
 
-from .. import models, utils
+from urbanvitaliz.apps.projects import utils
+
+from .. import models
 
 
 ########################################################################
@@ -34,7 +37,7 @@ from .. import models, utils
 def test_project_collaborator_can_see_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
@@ -54,7 +57,7 @@ def test_project_collaborator_can_see_project_tasks_for_site(request):
 def test_project_observer_can_see_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
@@ -75,7 +78,7 @@ def test_regional_actor_can_see_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
 
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
@@ -95,7 +98,7 @@ def test_regional_actor_can_see_project_tasks_for_site(request):
 def test_project_advisor_can_see_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
@@ -115,7 +118,7 @@ def test_project_advisor_can_see_project_tasks_for_site(request):
 def test_user_cannot_see_project_tasks_when_not_in_relation(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     baker.make(models.Task, project=project, site=site, public=True)
 
     client = APIClient()
@@ -134,7 +137,7 @@ def test_user_cannot_see_project_tasks_when_not_in_relation(request):
 def test_project_collaborator_can_update_project_task_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=False)
 
     utils.assign_collaborator(user, project)
@@ -158,7 +161,7 @@ def test_project_collaborator_can_update_project_task_for_site(request):
 def test_non_project_user_cannot_move_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, status="READY", sites=[site])
+    project = baker.make(project_models.Project, status="READY", sites=[site])
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
@@ -175,7 +178,7 @@ def test_non_project_user_cannot_move_project_tasks_for_site(request):
 def test_project_collaborator_cannot_move_unknown_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, status="READY", sites=[site])
+    project = baker.make(project_models.Project, status="READY", sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
     utils.assign_collaborator(user, project)
 
@@ -191,7 +194,7 @@ def test_project_collaborator_cannot_move_unknown_tasks_for_site(request):
 def test_project_collaborator_can_move_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, status="READY", sites=[site])
+    project = baker.make(project_models.Project, status="READY", sites=[site])
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
@@ -210,7 +213,7 @@ def test_project_collaborator_can_move_project_tasks_for_site(request):
 def test_project_observer_can_move_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
@@ -229,7 +232,7 @@ def test_project_observer_can_move_project_tasks_for_site(request):
 def test_project_advisor_can_move_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
@@ -255,7 +258,7 @@ def test_project_advisor_can_move_project_tasks_for_site(request):
 @pytest.mark.django_db
 def test_project_task_followup_list_closed_to_anonymous_user(request):
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
 
     client = APIClient()
@@ -269,7 +272,7 @@ def test_project_task_followup_list_closed_to_anonymous_user(request):
 def test_project_task_followup_list_closed_to_user_wo_permission(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
 
     client = APIClient()
@@ -284,7 +287,7 @@ def test_project_task_followup_list_closed_to_user_wo_permission(request):
 def test_project_task_followup_list_returns_followups_to_collaborator(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
     followup = baker.make(models.TaskFollowup, task=task, status=models.Task.PROPOSED)
 
@@ -320,7 +323,7 @@ def test_project_task_followup_list_returns_followups_to_collaborator(request):
 @pytest.mark.django_db
 def test_project_task_followup_create_closed_to_anonymous_user(request):
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
 
     client = APIClient()
@@ -335,7 +338,7 @@ def test_project_task_followup_create_closed_to_anonymous_user(request):
 def test_project_task_followup_create_is_processed_for_auth_user(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
 
     client = APIClient()
@@ -366,7 +369,7 @@ def test_project_task_followup_create_is_processed_for_auth_user(request):
 @pytest.mark.django_db
 def test_project_task_followup_update_closed_to_anonymous_user(request):
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
     followup = baker.make(models.TaskFollowup, task=task)
 
@@ -383,7 +386,7 @@ def test_project_task_followup_update_closed_to_anonymous_user(request):
 def test_project_task_followup_update_is_processed_for_auth_user(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
     followup = baker.make(models.TaskFollowup, task=task)
 
@@ -421,7 +424,7 @@ def test_project_task_followup_update_is_processed_for_auth_user(request):
 @pytest.mark.django_db
 def test_project_task_notifications_list_closed_to_anonymous_user(request):
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
 
     client = APIClient()
@@ -435,7 +438,7 @@ def test_project_task_notifications_list_closed_to_anonymous_user(request):
 def test_project_task_notifications_list_returns_notifications_of_advisor(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
 
     # a notification on task itself
@@ -478,7 +481,7 @@ def test_project_task_notifications_list_returns_notifications_of_advisor(reques
 def test_project_task_notifications_mark_read_updates_notifications_of_advisor(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(models.Project, sites=[site])
+    project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
 
     # a notification on task itself

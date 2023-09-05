@@ -20,15 +20,17 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.tasks import models as task_models
+from urbanvitaliz.apps.tasks import signals
 from urbanvitaliz.utils import get_group_for_site, login
 
-from .. import models, signals, utils
+from .. import models, utils
 
 # TODO when local authority can see & update her project
 # TODO check that project, note, and task belong to her

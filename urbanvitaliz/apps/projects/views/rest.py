@@ -28,6 +28,8 @@ from urbanvitaliz.apps.tasks.serializers import (
 )
 from urbanvitaliz.utils import TrigramSimilaritySearchFilter, get_group_for_site
 
+from urbanvitaliz.apps.tasks import signals as task_signals
+
 from .. import models, signals
 from ..serializers import (
     ProjectForListSerializer,
@@ -244,7 +246,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         updated_object = serializer.save()
 
         if original_object.public is False and updated_object.public is True:
-            signals.action_created.send(
+            task_signals.action_created.send(
                 sender=self,
                 task=updated_object,
                 project=updated_object.project,

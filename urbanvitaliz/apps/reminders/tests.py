@@ -17,6 +17,7 @@ from django.test import override_settings
 from model_bakery import baker
 from urbanvitaliz.apps.communication import api as communication_api
 from urbanvitaliz.apps.projects import models as projects
+from urbanvitaliz.apps.tasks import models as tasks
 
 from . import api, models
 
@@ -27,7 +28,7 @@ from . import api, models
 
 @pytest.mark.django_db
 def test_create_mail_reminder_using_provided_information():
-    task = baker.make(projects.Task)
+    task = baker.make(tasks.Task)
     recipient = "test@example.com"
     related = task
     delay = 14
@@ -46,7 +47,7 @@ def test_create_mail_reminder_using_provided_information():
 
 @pytest.mark.django_db
 def test_create_mail_reminder_replace_existing_ones():
-    task = baker.make(projects.Task)
+    task = baker.make(tasks.Task)
     recipient = "test@example.com"
     related = task
     delay = 14
@@ -81,7 +82,7 @@ def test_command_send_pending_reminder_with_reached_deadline(request, mocker):
     current_site = get_current_site(request)
     today = datetime.date.today()
     user = baker.make(auth_models.User, email="test@example.org")
-    task = baker.make(projects.Task, site=current_site)
+    task = baker.make(tasks.Task, site=current_site)
     reminder = baker.make(
         models.Reminder, recipient=user.email, deadline=today, related=task
     )
@@ -103,7 +104,7 @@ def test_command_send_pending_task_reminder_with_past_deadline(request, mocker):
     current_site = get_current_site(request)
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
     user = baker.make(auth_models.User, email="test@example.org")
-    task = baker.make(projects.Task, site=current_site)
+    task = baker.make(tasks.Task, site=current_site)
     baker.make(models.Reminder, recipient=user.email, deadline=yesterday, related=task)
 
     call_command("senddigests")

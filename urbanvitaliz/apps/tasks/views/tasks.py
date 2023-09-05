@@ -16,6 +16,7 @@ from django.utils import timezone
 from urbanvitaliz.apps.projects.utils import get_active_project_id
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.reminders import models as reminders_models
+from urbanvitaliz.apps.projects import models as project_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import (
@@ -50,7 +51,7 @@ from ..utils import create_reminder, remove_reminder
 @login_required
 def create_task(request, project_id=None):
     """Create task for given project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    project = get_object_or_404(project_models.Project, sites=request.site, pk=project_id)
 
     has_perm_or_403(request.user, "projects.manage_tasks", project)
 
@@ -70,7 +71,7 @@ def create_task(request, project_id=None):
                 "multiple": CreateActionsFromResourcesForm,
             }[push_type]
         except KeyError:
-            return render(request, "projects/project/task_create.html", locals())
+            return render(request, "tasks/tasks/task_create.html", locals())
 
         form = push_form_type(request.POST)
         if form.is_valid():
@@ -103,7 +104,7 @@ def create_task(request, project_id=None):
                 # get or create topic
                 name = form.cleaned_data["topic_name"]
                 if name:
-                    topic, _ = models.Topic.objects.get_or_create(
+                    topic, _ = project_models.Topic.objects.get_or_create(
                         name__iexact=name.lower(),
                         defaults={"name": name.capitalize(), "site": request.site},
                     )
@@ -144,7 +145,7 @@ def create_task(request, project_id=None):
     else:
         type_form = PushTypeActionForm(request.GET)
 
-    return render(request, "projects/project/task_create.html", locals())
+    return render(request, "tasks/tasks/task_create.html", locals())
 
 
 @login_required
@@ -278,7 +279,7 @@ def update_task(request, task_id=None):
             # manage topic
             name = form.cleaned_data["topic_name"]
             if name:
-                topic, _ = models.Topic.objects.get_or_create(
+                topic, _ = project_models.Topic.objects.get_or_create(
                     name__iexact=name.lower(),
                     defaults={"name": name.capitalize(), "site": request.site},
                 )
@@ -324,7 +325,7 @@ def update_task(request, task_id=None):
         }
         form = UpdateTaskForm(instance=task, initial=initial)
         document_form = DocumentUploadForm()
-    return render(request, "projects/project/task_update.html", locals())
+    return render(request, "tasks/tasks/task_update.html", locals())
 
 
 ########
@@ -340,7 +341,7 @@ def task_recommendation_list(request):
 
     recommendations = models.TaskRecommendation.on_site.all()
 
-    return render(request, "projects/tasks/recommendation_list.html", locals())
+    return render(request, "tasks/tasks/recommendation_list.html", locals())
 
 
 # ajout d'un  preflechage de recommendations
@@ -359,7 +360,7 @@ def task_recommendation_create(request):
             return redirect(reverse("projects-task-recommendation-list"))
     else:
         form = TaskRecommendationForm()
-    return render(request, "projects/tasks/recommendation_create.html", locals())
+    return render(request, "tasks/tasks/recommendation_create.html", locals())
 
 
 # mise à jour d'un  preflechage de recommendations
@@ -380,14 +381,14 @@ def task_recommendation_update(request, recommendation_id):
     else:
         form = TaskRecommendationForm(instance=recommendation)
 
-    return render(request, "projects/tasks/recommendation_update.html", locals())
+    return render(request, "tasks/tasks/recommendation_update.html", locals())
 
 
 # retourne pour le projet les suggestions du système
 @login_required
 def presuggest_task(request, project_id):
     """Suggest tasks"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    project = get_object_or_404(project_models.Project, sites=request.site, pk=project_id)
 
     has_perm_or_403(request.user, "projects.manage_tasks", project)
 
@@ -428,7 +429,7 @@ def presuggest_task(request, project_id):
                     )
                 )
 
-    return render(request, "projects/project/task_suggest.html", locals())
+    return render(request, "tasks/tasks/task_suggest.html", locals())
 
 
 @login_required
@@ -547,7 +548,7 @@ def followup_task_update(request, followup_id=None):
                 )
                 + f"#action-{followup.task.id}"
             )
-    return render(request, "projects/task/task_followup_update.html", locals())
+    return render(request, "tasks/task/task_followup_update.html", locals())
 
 
 def rsvp_followup_task(request, rsvp_id=None, status=None):
@@ -557,7 +558,7 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
     try:
         rsvp = models.TaskFollowupRsvp.objects.get(uuid=rsvp_id)
     except models.TaskFollowupRsvp.DoesNotExist:
-        return render(request, "projects/task/rsvp_followup_invalid.html", locals())
+        return render(request, "tasks/task/rsvp_followup_invalid.html", locals())
 
     task = rsvp.task
 
@@ -591,10 +592,10 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
             else:
                 api.remove_reminder_email(task)
 
-            return render(request, "projects/task/rsvp_followup_thanks.html", locals())
+            return render(request, "tasks/task/rsvp_followup_thanks.html", locals())
     else:
         form = RsvpTaskFollowupForm()
-    return render(request, "projects/task/rsvp_followup_confirm.html", locals())
+    return render(request, "tasks/task/rsvp_followup_confirm.html", locals())
 
 
 @login_required
@@ -602,7 +603,7 @@ def create_resource_action_for_current_project(request, resource_id=None):
     """Create action for given resource to project stored in session"""
     project_id = get_active_project_id(request)
     resource = get_object_or_404(resources.Resource, sites=request.site, pk=resource_id)
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    project = get_object_or_404(project_models.Project, sites=request.site, pk=project_id)
 
     has_perm_or_403(request.user, "projects.manage_tasks", project)
 

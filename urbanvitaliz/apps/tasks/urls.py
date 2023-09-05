@@ -101,6 +101,11 @@ urlpatterns = [
         tasks.rsvp_followup_task,
         name="projects-rsvp-followup-task",
     ),
+    path(
+        r"project/<int:project_id>/suggestions/",
+        tasks.presuggest_task,
+        name="projects-project-tasks-suggest",
+    ),
 ]
 
 # eof
