@@ -4,14 +4,15 @@ from generic_relations.relations import GenericRelatedField
 from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
+
 from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.projects.serializers import DocumentSerializer
-from urbanvitaliz.apps.projects.utils import (create_reminder,
-                                              get_collaborators_for_project)
+from urbanvitaliz.apps.projects.utils import get_collaborators_for_project
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
 from .models import Task, TaskFollowup
+from .utils import create_reminder
 
 
 class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):

@@ -13,7 +13,7 @@ from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from urbanvitaliz.apps.project.utils import get_active_project_id
+from urbanvitaliz.apps.projects.utils import get_active_project_id
 from urbanvitaliz.apps.reminders import api
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
@@ -25,11 +25,13 @@ from urbanvitaliz.utils import (
 )
 
 from .. import models, signals
+
+from urbanvitaliz.apps.projects.forms import DocumentUploadForm
+
 from ..forms import (
     CreateActionsFromResourcesForm,
     CreateActionWithoutResourceForm,
     CreateActionWithResourceForm,
-    DocumentUploadForm,
     PushTypeActionForm,
     RemindTaskForm,
     RsvpTaskFollowupForm,

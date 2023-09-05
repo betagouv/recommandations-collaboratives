@@ -13,6 +13,8 @@ from django.contrib import admin
 from django.db.models import Count, F, Q
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 
+from urbanvitaliz.apps.tasks import models as task_models
+
 from . import models
 
 
@@ -58,7 +60,7 @@ class RecommendationListFilter(admin.SimpleListFilter):
 
 
 class ProjectTaskTabularInline(OrderedTabularInline):
-    model = models.Task
+    model = task_models.Task
     fields = (
         "site",
         "intent",

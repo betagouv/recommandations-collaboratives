@@ -25,6 +25,7 @@ from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
+from urbanvitaliz.apps.projects  import models as projects_models
 from urbanvitaliz.apps.resources import models as resources
 
 
@@ -125,7 +126,7 @@ class Task(OrderedModel):
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     topic = models.ForeignKey(
-        "Topic", on_delete=models.CASCADE, null=True, related_name="tasks"
+        projects_models.Topic, on_delete=models.CASCADE, null=True, related_name="tasks"
     )
 
     @property
@@ -137,7 +138,7 @@ class Task(OrderedModel):
         return self.status in [Task.PROPOSED, Task.INPROGRESS, Task.BLOCKED]
 
     project = models.ForeignKey(
-        "Project", on_delete=models.CASCADE, related_name="tasks"
+        projects_models.Project, on_delete=models.CASCADE, related_name="tasks"
     )
     public = models.BooleanField(default=False, blank=True)
     priority = models.PositiveIntegerField(
@@ -191,7 +192,7 @@ class Task(OrderedModel):
         resources.Resource, on_delete=models.CASCADE, null=True, blank=True
     )
 
-    document = GenericRelation("Document")
+    document = GenericRelation(projects_models.Document)
 
     contact = models.ForeignKey(
         addressbook_models.Contact, on_delete=models.CASCADE, null=True, blank=True
@@ -213,6 +214,7 @@ class Task(OrderedModel):
     reminders = GenericRelation(reminders_models.Reminder, related_query_name="tasks")
 
     class Meta:
+        db_table = "projects_task"
         ordering = []
         verbose_name = "action"
         verbose_name_plural = "actions"
@@ -265,6 +267,7 @@ class TaskFollowup(models.Model):
     comment = models.TextField(default="", blank=True)
 
     class Meta:
+        db_table = "projects_taskfollowup"
         verbose_name = "suivi action"
         verbose_name_plural = "suivis actions"
 
@@ -296,6 +299,7 @@ class TaskFollowupRsvp(models.Model):
     created_on = models.DateTimeField(default=timezone.now)
 
     class Meta:
+        db_table = "projects_taskfollowuprsvp"
         verbose_name = "rsvp suivi action"
         verbose_name_plural = "rsvp suivis actions"
 
@@ -332,6 +336,9 @@ class TaskRecommendation(models.Model):
         blank=True,
         verbose_name="Départements concernés",
     )
+
+    class Meta:
+        db_table = "projects_taskrecommendation"
 
     def trigged_by(self):
         from urbanvitaliz.apps.survey import models as survey_models

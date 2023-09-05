@@ -9,17 +9,16 @@ from django.dispatch import receiver
 from django.utils import timezone
 from notifications import models as notifications_models
 from notifications.signals import notify
+
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.reminders import api as reminders_api
 from urbanvitaliz.apps.reminders import models as reminders_models
+from urbanvitaliz.apps.projects import models as project_models
+from urbanvitaliz.apps.projects.utils import get_notification_recipients_for_project
 from urbanvitaliz.utils import is_staff_for_site
 
 from . import models
-from .utils import (
-    create_reminder,
-    get_notification_recipients_for_project,
-    remove_reminder,
-)
+from .utils import create_reminder, remove_reminder
 
 ########################################################################
 # Actions
@@ -181,8 +180,8 @@ def notify_action_commented(sender, task, project, user, **kwargs):
 
 
 # In case of deletion
-@receiver(pre_delete, sender=models.Note, dispatch_uid="note_hard_delete_logs")
-@receiver(pre_save, sender=models.Note, dispatch_uid="note_soft_delete_logs")
+@receiver(pre_delete, sender=project_models.Note, dispatch_uid="note_hard_delete_logs")
+@receiver(pre_save, sender=project_models.Note, dispatch_uid="note_soft_delete_logs")
 def delete_activity_on_note_delete(sender, instance, **kwargs):
     if instance.deleted is None:
         return
@@ -196,7 +195,7 @@ def delete_activity_on_note_delete(sender, instance, **kwargs):
 
 
 @receiver(
-    pre_delete, sender=models.Project, dispatch_uid="project_delete_notifications"
+    pre_delete, sender=project_models.Project, dispatch_uid="project_delete_notifications"
 )
 def delete_notifications_on_project_delete(sender, instance, **kwargs):
     project_ct = ContentType.objects.get_for_model(instance)
