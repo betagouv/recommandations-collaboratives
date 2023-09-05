@@ -28,7 +28,6 @@ export default function TaskModal() {
         //Event listener dispatched by another component
         async handleIssueFollowup(e) {
             await this.$store.tasksData.issueFollowup(e.detail.task, e.detail.status)
-            // await this.getData()
         },
         initDeleteTaskConfirmationModal() {
             const element = document.getElementById("delete-task-confirmation-modal");
