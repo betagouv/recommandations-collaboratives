@@ -23,6 +23,7 @@ from urbanvitaliz.apps.home.urls import urlpatterns as home_urls
 from urbanvitaliz.apps.invites.urls import urlpatterns as invites_urls
 from urbanvitaliz.apps.onboarding.urls import urlpatterns as onboarding_urls
 from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
+from urbanvitaliz.apps.tasks.urls import urlpatterns as tasks_urls
 from urbanvitaliz.apps.projects.views import rest as projects_rest
 from urbanvitaliz.apps.addressbook import rest as addressbook_rest
 from urbanvitaliz.apps.training import rest as training_rest
@@ -110,6 +111,7 @@ urlpatterns.extend(magicauth_urls)
 urlpatterns.extend(home_urls)
 urlpatterns.extend(onboarding_urls)
 urlpatterns.extend(projects_urls)
+urlpatterns.extend(tasks_urls)
 urlpatterns.extend(resources_urls)
 urlpatterns.extend(addressbook_urls)
 urlpatterns.extend(survey_urls)
