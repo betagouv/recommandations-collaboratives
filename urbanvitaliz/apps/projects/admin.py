@@ -142,33 +142,6 @@ class NoteAdmin(admin.ModelAdmin):
         return o.project.name
 
 
-@admin.register(models.Task)
-class TaskAdmin(admin.ModelAdmin):
-    search_fields = ["content", "tags"]
-    list_filter = ["site", "deadline", "tags"]
-    list_display = ["created_on", "deadline", "project_name", "tags", "topic"]
-
-    actions = [csvexport]
-
-    def project_name(self, o):
-        return o.project.name
-
-
-@admin.register(models.TaskFollowup)
-class TaskFollowupAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(models.TaskFollowupRsvp)
-class TaskFollowupRsvpAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(models.TaskRecommendation)
-class TaskRecommendationAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(models.Document)
 class DocumentAdmin(admin.ModelAdmin):
     search_fields = ["description", "the_file"]

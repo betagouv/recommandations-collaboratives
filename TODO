@@ -1,0 +1,9 @@
+
+- initial migration is to rename project_task* intro tasks_task*
+
+keep following in project or move to tasks
+
+  - static/projects/js/kanban_tasks.js
+  - templates/projects/project/fragments/kanban_tasks/
+  - templates/projects/project/fragments/tasks_inline/
+  - templates/projects/project/fragments/tasks_inline/tasks_inline.html
