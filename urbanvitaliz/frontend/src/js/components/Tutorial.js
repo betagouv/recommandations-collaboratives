@@ -22,20 +22,17 @@ function Tutorial(challengeCode, autoStart = false) {
 
             const challengeDefinition = await this.getChallengeDefinition(challengeCode)
 
-            if (challengeDefinition) {
+            //Get current challenge for current user
+            //Can be empty object
+            const challenge = await this.getChallenge(this.challengeCode)
+            const userHasActiveChallenge = !(Object.keys(challenge).length === 0)
+
+            if (challengeDefinition && userHasActiveChallenge) {
                 this.showTuto = true
             } else {
                 return
             }
 
-            //Check if the user has already started the Challenge
-            const challenge = await this.getChallenge(this.challengeCode)
-
-            if (challenge && challenge.started_on) {
-                this.hasAlreadyStartedTheChallenge = true
-
-                return
-            }
 
             this.steps = tutorials[challengeDefinition.code].steps
             this.startButtonDescription = challengeDefinition.description
@@ -98,6 +95,11 @@ function Tutorial(challengeCode, autoStart = false) {
             this.startButton.style.display = "none"
             this.tour.start();
             await this.startChallenge(this.challengeCode)
+        },
+        async handleEndChallenge() {
+            this.startButton = this.$refs.startTourButton
+            this.startButton.style.display = "none"
+            await this.acquireChallenge(this.challengeCode)
         }
     }
 }

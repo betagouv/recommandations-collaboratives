@@ -10,10 +10,16 @@ Inspired by django-gamification (https://github.com/mattjegan/django-gamificatio
 """
 
 
-from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
+from django.contrib.sites.managers import CurrentSiteManager
 from django.db import models
+from django.utils import timezone
+
+
+########################################################################
+# Challenges definitions
+########################################################################
 
 
 class ChallengeDefinitionOnSiteManager(CurrentSiteManager):
@@ -32,6 +38,11 @@ class ChallengeDefinition(models.Model):
         "self", blank=True, null=True, on_delete=models.CASCADE
     )
 
+    # TODO repeating the challenge definition after inactivity of n weeks
+    # TODO inactivity or last acquired ?
+    # TODO or 0 to tell show it every time
+    week_inactivity_repeat = models.IntegerField(default=0)
+
     class Meta:
         unique_together = (("site", "code"),)
 
@@ -39,14 +50,31 @@ class ChallengeDefinition(models.Model):
         return self.name
 
 
+########################################################################
+# Tracking user challenges
+########################################################################
+
+
 class AcquiredChallengesManager(models.Manager):
-    """ """
+    """Manager for acquired challenges"""
 
     def get_queryset(self):
-        return super().get_queryset().exclude(acquired=None)
+        return super().get_queryset().exclude(acquired_on=None)
+
+
+class OpenChallengesManager(models.Manager):
+    """Manager for acquired challenges"""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(acquired_on=None)
 
 
 class Challenge(models.Model):
+    """Challenge tracks the completion of users"""
+
+    objects = OpenChallengesManager()
+    acquired_objects = AcquiredChallengesManager()
+
     challenge_definition = models.ForeignKey(
         ChallengeDefinition, on_delete=models.CASCADE
     )
@@ -61,8 +89,5 @@ class Challenge(models.Model):
         auth_models.User, on_delete=models.CASCADE, related_name="training_challenges"
     )
 
-    objects = models.Manager()
-    acquired_objects = AcquiredChallengesManager()
 
-    class Meta:
-        unique_together = (("challenge_definition", "user"),)
+# eof

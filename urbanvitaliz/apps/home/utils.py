@@ -33,28 +33,42 @@ def make_new_site(name: str, domain: str, sender_email: str, sender_name: str) -
     """Return a new site with given name/domain or None if exists"""
     if Site.objects.filter(domain=domain).count():
         return
-    site = Site.objects.create(name=name, domain=domain)
 
-    onboarding = onboarding_models.Onboarding.objects.create()
+    site, created = Site.objects.get_or_create(domain=domain, defaults={"name": name})
 
-    survey = survey_models.Survey.objects.create(
-        site=site,
-        name=f"Questionnaire {name}",
-    )
-    question_set = survey_models.QuestionSet.objects.create(
-        survey=survey, heading="Thématique d'exemple"
-    )
-    survey_models.Question.objects.create(
-        question_set=question_set, text="Ceci est une question exemple"
-    )
+    try:
+        models.SiteConfiguration.objects.get(site=site)
+    except models.SiteConfiguration.DoesNotExist:
+        onboarding = onboarding_models.Onboarding.objects.create(
+            form="[{'type': 'header', 'subtype': 'h1', 'label': 'Header'}, {'type':"
+            "'text', 'required': False, 'label': '<br>',"
+            "'className': 'form-control', 'name':"
+            "'text-1660055681026-0', 'subtype': 'text'}]"
+        )
 
-    models.SiteConfiguration.objects.create(
-        site=site,
-        sender_email=sender_email,
-        sender_name=sender_name,
-        onboarding=onboarding,
-        project_survey=survey,
-    )
+        survey, created = survey_models.Survey.objects.get_or_create(
+            site=site,
+            defaults={
+                "name": f"Questionnaire par défaut de {name}",
+            },
+        )
+
+        if created:
+            # if we just created the survey, create initial sample questions
+            question_set = survey_models.QuestionSet.objects.create(
+                survey=survey, heading="Thématique d'exemple"
+            )
+            survey_models.Question.objects.create(
+                question_set=question_set, text="Ceci est une question exemple"
+            )
+
+        models.SiteConfiguration.objects.create(
+            site=site,
+            project_survey=survey,
+            onboarding=onboarding,
+            sender_email=sender_email,
+            sender_name=sender_name,
+        )
 
     for name, permissions in models.SITE_GROUP_PERMISSIONS.items():
         group_name = make_group_name_for_site(name, site)

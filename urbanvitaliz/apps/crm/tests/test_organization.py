@@ -1,16 +1,15 @@
 import pytest
-from django.contrib.sites import models as site_models
 from django.contrib.auth import models as auth_models
+from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from pytest_django.asserts import assertContains, assertNotContains
+
 from urbanvitaliz.apps.addressbook import models as addressbook_models
-from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.utils import login
-
 
 ########################################################################
 # organization list
@@ -218,7 +217,7 @@ def test_crm_organisation_details_accessible_w_multiple_users(request, client):
 
 @pytest.mark.django_db
 def test_crm_organization_merge_page_requires_permission(request, client):
-    org = baker.make(addressbook_models.Organization)
+    baker.make(addressbook_models.Organization)
 
     url = reverse("crm-organization-merge")
 
