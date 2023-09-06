@@ -92,3 +92,10 @@
     }
 }
 
+.white-space-pre {
+    white-space: pre;
+}
+
+.text-overflow-ellipsis {
+    text-overflow: ellipsis;
+}
