@@ -103,6 +103,14 @@ def create_task(request, project_id=None):
                 action.project = project
                 action.site = request.site
                 action.created_by = request.user
+                # get or create topic
+                name = form.cleaned_data["topic_name"]
+                if name:
+                    topic, _ = models.Topic.objects.get_or_create(
+                        name__iexact=name.lower(),
+                        defaults={"name": name.capitalize(), "site": request.site},
+                    )
+                    action.topic = topic
                 action.save()
                 action.top()
 
@@ -270,6 +278,14 @@ def update_task(request, task_id=None):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.updated_on = timezone.now()
+            # manage topic
+            name = form.cleaned_data["topic_name"]
+            if name:
+                topic, _ = models.Topic.objects.get_or_create(
+                    name__iexact=name.lower(),
+                    defaults={"name": name.capitalize(), "site": request.site},
+                )
+                instance.topic = topic
             instance.save()
             instance.project.updated_on = instance.updated_on
             instance.project.save()
@@ -305,7 +321,11 @@ def update_task(request, task_id=None):
                 reverse("projects-project-detail-actions", args=[task.project_id])
             )
     else:
-        form = UpdateTaskForm(request.GET, instance=task)
+        initial = {
+            "topic_name": task.topic.name if task.topic else None,
+            "next": request.GET.get("next"),
+        }
+        form = UpdateTaskForm(instance=task, initial=initial)
         document_form = DocumentUploadForm()
     return render(request, "projects/project/task_update.html", locals())
 
@@ -313,6 +333,7 @@ def update_task(request, task_id=None):
 ########
 # Task Recommendation
 ########
+
 
 # liste de preflechage des recommendations
 @login_required
