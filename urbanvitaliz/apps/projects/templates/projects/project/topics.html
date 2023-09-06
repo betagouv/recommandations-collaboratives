@@ -2,6 +2,12 @@
 {% load static %}
 {% load humanize %}
 {% load sass_tags %}
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/topicSearch.js' %}
+{% endblock %}
+
 {% block css %}
     <link href="{% sass_src 'projects/css/project.scss' %}"
           rel="stylesheet"
@@ -34,21 +40,33 @@
                         {{ topic_formset.management_form }}
                         <ul class="flex-wrap d-flex topic-form p-0 list-unstyled">
                             {% for topic_form in topic_formset %}
-                                <li class="w-50">
+                                <li x-data='TopicSearch("{{topic_form.name.value|default:""}}")' class="w-50">
                                     <div class="rounded d-flex flex-column my-2 p-3 me-3 align-items-start border border-secondary">
                                         <div class="flex-1 w-100 topic-label">
                                             <label class="text-info-custom text-grey-dark mb-2">Thématiques abordées {{ forloop.counter }}</label>
                                             <input type="text"
                                                    class="py-2 form-control"
-                                                   id="{{ topic_form.label.id_for_label }}"
-                                                   name="{{ topic_form.label.html_name }}"
-                                                   value="{{ topic_form.label.value|default:'' }}"
-                                                   placeholder=""/>
-                                            {% if topic_form.label.errors %}
-                                                {% for error in topic_form.label.errors %}{{ error|escape }}{% endfor %}
+                                                   id="{{ topic_form.name.id_for_label }}"
+                                                   name="{{ topic_form.name.html_name }}"
+                                                   value="{{ topic_form.name.value|default:'' }}"
+                                                   placeholder="" 
+                                                   x-model="topic"
+                                                   x-on:input.change.debounce="handleTopicChange"
+                                                   />
+                                            {% if topic_form.name.errors %}
+                                                {% for error in topic_form.name.errors %}{{ error|escape }}{% endfor %}
                                             {% endif %}
                                         </div>
-                                        {{ topic_form.id }}
+                                        <template x-if="results.length > 0">
+                                            <div class="d-flex align-items-center flex-wrap mt-2 mb-2">
+                                                <span class="d-block text-blue text-info-custom text-grey-dark font-small fw-normal">Suggestions de noms de thématique :</span>
+                                                <template x-for="result in results">
+                                                    <div class="d-flex align-item-center flex-wrap mx-1 mt-1">
+                                                        <button @click.prevent="handleResultClick(result.name)" class="button secondary blue small" x-text="result.name"></button>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
                                         <div class="topic-delete d-flex justify-content-end w-100">
                                             <div class="w-full mt-2 border border-danger rounded flag red d-flex align-items-center justify-content-start">
                                                 <svg class="bi align-middle me-2" width="25" height="25">
@@ -70,7 +88,7 @@
                     </div>
                     <button id="advisor-note" type="submit" class="button filled mb-4">Enregistrer</button>
                 </div>
-                <hr/>
+                <hr />
                 <h4 class="d-block mb-3">
                     <svg class="bi " width="32" height="32" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-square" />

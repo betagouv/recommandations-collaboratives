@@ -45,6 +45,11 @@ export function searchOrganizationsUrl(search) {
     return `/api/organizations/?search=${search}`
 }
 
+// Organization
+export function searchTopicsUrl(search) {
+    return `/api/topics/?search=${search}`
+}
+
 // Tasks : 
 export function taskUrl(projectId, taskId) {
     return `/api/projects/${projectId}/tasks/${taskId}/`
