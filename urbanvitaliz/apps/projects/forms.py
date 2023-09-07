@@ -110,12 +110,16 @@ class PushTypeActionForm(forms.Form):
 class CreateActionWithoutResourceForm(forms.ModelForm):
     """Create an action for a project, without attached resource"""
 
+    topic_name = forms.CharField(required=False)
+
     class Meta:
         model = models.Task
         fields = ["intent", "content", "public"]
 
 
 class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
+    topic_name = forms.CharField(required=False)
+
     resource = (
         forms.ModelChoiceField(
             queryset=resources_models.Resource.objects.exclude(
@@ -171,6 +175,8 @@ class CreateActionsFromResourcesForm(forms.ModelForm):
 class CreateTaskForm(forms.ModelForm):
     """Form new project task creation"""
 
+    # TODO seems to not be used any more
+
     content = MarkdownxFormField(required=False)
 
     class Meta:
@@ -187,6 +193,7 @@ class UpdateTaskForm(forms.ModelForm):
     """Form for task update"""
 
     content = MarkdownxFormField(required=False)
+    topic_name = forms.CharField(required=False)
     next = forms.CharField(required=False)
 
     class Meta:
@@ -238,6 +245,12 @@ class ProjectTagsForm(forms.ModelForm):
     class Meta:
         model = models.Project
         fields = ["tags"]
+
+
+class TopicForm(forms.Form):
+    """Form for handling a topic """
+
+    name = forms.CharField(max_length=32, required=False, label="Thème")
 
 
 class ProjectTopicsForm(forms.ModelForm):

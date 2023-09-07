@@ -16,7 +16,15 @@ from .models import Document, Project, Task, TaskFollowup, UserProjectStatus, No
 from .utils import create_reminder, get_collaborators_for_project
 from urbanvitaliz.utils import get_group_for_site
 
-from .models import Document, Note, Project, Task, TaskFollowup, UserProjectStatus
+from .models import (
+    Document,
+    Note,
+    Project,
+    Task,
+    TaskFollowup,
+    UserProjectStatus,
+    Topic,
+)
 from .utils import create_reminder, get_collaborators_for_project
 
 
@@ -352,6 +360,13 @@ def format_switchtenders(project):
         }
         for s in project.switchtenders.all()
     ]
+
+
+class TopicSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Topic
+
+        fields = ["name"]
 
 
 # eof
