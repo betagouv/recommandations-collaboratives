@@ -1,19 +1,16 @@
 {% load static %}
 <template x-if="$store.tasksData.newTasks.length > 0 && !$store.djangoData.isAdvisor">
-    <div class="flag dark-blue mb-4 d-flex align-items-center justify-content-start text-white small-border-radius mt-4">
-        <img width="147" height="147" src="{% static 'projects/img/tasks_inline_kanban_banner.svg'  %}" />
-        <div class="ms-4">
-            <h5 class="mb-0 fw-bold">
+    <div class="py-1 flag dark-blue mb-2 d-flex align-items-center justify-content-start text-white small-border-radius mt-4">
+        <img width="65" height="65" src="{% static 'projects/img/tasks_inline_kanban_banner.svg'  %}" />
+        <div class="ms-4 d-flex justify-content-between align-items-center w-100">
+            <h6 class="mb-0 fw-bold">
                 Vous avez
                 <!-- TODO : Extraire les formatteurs -->
                 <span x-text="`${$store.tasksData.newTasks.length > 1 ? $store.tasksData.newTasks.length + ' nouvelles recommandations' : $store.tasksData.newTasks.length + ' nouvelle recommandation'}`"></span>
-            </h5>
-            <p class="text-info-custom my-0">
-                Ces recommandations sont émises par notre équipe conseil pour répondre aux besoins que vous avez exprimés.
-            </p>
+            </h6>
             <button @click="$store.previewModal.openWithPagination()"
                     style="color: #0063CB !important"
-                    class="button filled white small inherit mt-3 fw-bold">Consultez les recommandations</button>
+                    class="button filled white small inherit fw-bold">Consultez les recommandations</button>
         </div>
     </div>
 </template>

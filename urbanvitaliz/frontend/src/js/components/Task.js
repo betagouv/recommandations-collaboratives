@@ -69,6 +69,9 @@ export default function Task(currentTask) {
         },
         getTaskMessageCountLabel(count) {
             return count > 1 ? `${count} messages` : `${count} message`
+        },
+        getTaskNewMessageCountLabel(count) {
+            return count > 1 ? `(${count} nouveaux)` : `(${count} nouveau)`
         }
     }
 }

@@ -4,12 +4,12 @@
         <button @click="$store.tasksView.switchView()"
                 :class="{ 'active' : $store.tasksView.currentView === 'inline' }"
                 class="button">
-            <span>Thématique</span>
+            <span>Liste</span>
         </button>
         <button @click="$store.tasksView.switchView()"
                 :class="{ 'active' : $store.tasksView.currentView === 'kanban' }"
                 class="button">
-            <span>Statut d’avancement</span>
+            <span>Tableau</span>
         </button>
     </div>
 </div>

@@ -6,8 +6,7 @@
 <div x-data="Task(task)"
      :class="`border${getTaskColor(task)}`"
      class="rounded mb-3 px-3 d-flex pt-3 pb-3 justify-content-between align-items-start task-item"
-     :id="task.id"
-     >
+     :id="task.id">
     <div x-show="task.isLoading"
          class="ms-2 item-loader z-index-1"
          style="width: 24px;
@@ -19,7 +18,8 @@
          :style="task.isLoading && 'opacity:0.3';">
         <template x-if="!task.visited && task.public">
             <div class="card-top-information left-0">
-                <span class="bg-blue text-white" x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par la collectivité' "></span>
+                <span class="bg-blue text-white"
+                      x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par la collectivité' "></span>
             </div>
         </template>
         <template x-if="!task.public">
@@ -67,6 +67,11 @@
                     <span class="tiny hover-underline cursor-pointer"
                           @click="handleOpenPreviewModal()"
                           x-text="task.resource_id ? getTaskMessageCountLabel(task.comments_count + 1) : getTaskMessageCountLabel(task.comments_count)"></span>
+                    <template x-if="task.notifications.count > 0">
+                        <span class="tiny hover-underline cursor-pointer text-blue fw-medium ms-1"
+                              @click="handleOpenPreviewModal()"
+                              x-text="task.resource_id ? getTaskNewMessageCountLabel(task.notifications.count) : getTaskNewMessageCountLabel(task.notifications.count)"></span>
+                    </template>
                 </div>
             </div>
             <div class="tiny d-flex align-items-center">
