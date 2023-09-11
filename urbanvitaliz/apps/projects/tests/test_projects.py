@@ -210,6 +210,7 @@ def test_draft_project_list_available_for_staff(request, client):
 # Project details
 ########################################################################
 
+
 # Overview
 @pytest.mark.django_db
 def test_project_overview_not_available_for_unprivileged_user(request, client):
@@ -1454,6 +1455,8 @@ def test_staff_updates_tags(request, client):
 #################################################################
 # Topics
 #################################################################
+
+
 @pytest.mark.django_db
 def test_switchtender_writes_advisors_note(request, client):
     site = get_current_site(request)
@@ -1479,7 +1482,25 @@ def test_switchtender_writes_advisors_note(request, client):
 
 
 @pytest.mark.django_db
-def test_switchtender_add_topics(request, client):
+def test_switchtender_view_project_topics(request, client):
+    site = get_current_site(request)
+    topic = Recipe(models.Topic, site=site, name="a nice topic").make()
+    project = Recipe(models.Project, sites=[site], topics=[topic]).make()
+
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, site)
+
+        response = client.get(
+            reverse("projects-project-topics", args=[project.id]),
+        )
+
+    assert response.status_code == 200
+    # TODO add this test when UI updated
+    # assertContains(response, topic.name)
+
+
+@pytest.mark.django_db
+def test_switchtender_add_new_topic_to_project(request, client):
     site = get_current_site(request)
     project = Recipe(models.Project, sites=[site]).make()
 
@@ -1488,7 +1509,8 @@ def test_switchtender_add_topics(request, client):
         "form-TOTAL_FORMS": 1,
         "form-INITIAL_FORMS": 0,
         "form-0-id": "",
-        "form-0-label": "blah",
+        "form-0-name": "blah",
+        "form-0-DELETE": False,
     }
 
     with login(client, groups=["example_com_advisor"]) as user:
@@ -1500,9 +1522,71 @@ def test_switchtender_add_topics(request, client):
         )
 
     assert response.status_code == 302
-    topic = models.ProjectTopic.objects.all()[0]
-    assert topic.project == project
-    assert topic.label == data["form-0-label"]
+
+    assert models.Topic.objects.count() == 1
+    topic = models.Topic.objects.first()
+    assert topic.name == data["form-0-name"].capitalize()
+    assert topic in project.topics.all()
+
+
+@pytest.mark.django_db
+def test_switchtender_add_existing_topic_to_project(request, client):
+    site = get_current_site(request)
+
+    topic = Recipe(models.Topic, site=site, name="blah").make()
+    project = Recipe(models.Project, sites=[site]).make()
+
+    data = {
+        "advisors_note": "",
+        "form-TOTAL_FORMS": 1,
+        "form-INITIAL_FORMS": 0,
+        "form-0-id": "",
+        "form-0-name": topic.name,
+        "form-0-DELETE": False,
+    }
+
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, site)
+
+        response = client.post(
+            reverse("projects-project-topics", args=[project.id]),
+            data=data,
+        )
+
+    assert response.status_code == 302
+
+    assert models.Topic.objects.count() == 1
+    assert topic in project.topics.all()
+
+
+@pytest.mark.django_db
+def test_switchtender_remove_topic_from_project(request, client):
+    site = get_current_site(request)
+
+    topic = Recipe(models.Topic, site=site, name="blah").make()
+    project = Recipe(models.Project, sites=[site], topics=[topic]).make()
+
+    data = {
+        "advisors_note": "",
+        "form-TOTAL_FORMS": 1,
+        "form-INITIAL_FORMS": 0,
+        "form-0-id": "",
+        "form-0-name": topic.name,
+        "form-0-DELETE": True,
+    }
+
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, site)
+
+        response = client.post(
+            reverse("projects-project-topics", args=[project.id]),
+            data=data,
+        )
+
+    assert response.status_code == 302
+
+    assert models.Topic.objects.count() == 1
+    assert topic not in project.topics.all()
 
 
 #################################################################
@@ -1686,7 +1770,6 @@ def test_switchtender_stop_advising_or_observing_project_shows_no_interest(
 
 @pytest.mark.django_db
 def test_project_list_excludes_non_site_projects_for_user():
-
     current_site = sites.Site.objects.get_current()
     other_site = Recipe(sites.Site, domain="other.site").make()
 
