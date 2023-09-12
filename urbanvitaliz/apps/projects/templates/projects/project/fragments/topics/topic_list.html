@@ -21,7 +21,7 @@
     {% if project.all_topics.count == 0 %}
         <div class="project-card-details pt-4 py-4 d-flex flex-column align-items-center justify-content-center h-100"
              style="min-height: 100px">
-            <span class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">Les thématiques n'ont pas encore été identifiés</span>
+            <span class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">Les thématiques n'ont pas encore été identifiées</span>
             {% if "change_topics" in user_project_perms %}
                 <a class="button mt-3"
                    href="{% url "projects-project-topics" project.id %}">Identifier les thématiques</a>
