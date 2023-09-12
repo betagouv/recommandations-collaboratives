@@ -400,12 +400,16 @@ def delete_task_history(
     suppress_reminders=True,
     suppress_actions=True,
     after=None,
+    verb=None,
 ):
     """Remove all logging history and notification if a task is deleted"""
     task_ct = ContentType.objects.get_for_model(task)
     notifications = notifications_models.Notification.on_site.filter(
         action_object_content_type_id=task_ct.pk, action_object_object_id=task.pk
     )
+    if verb:
+        notifications = notifications.filter(verb=verb)
+
     actions = action_object_stream(task)
 
     if after:
@@ -440,7 +444,7 @@ def delete_notifications_on_cancel_publishing(sender, instance, **kwargs):
             instance,
             suppress_actions=False,
             suppress_reminders=False,
-            after=timezone.now() - datetime.timedelta(minutes=30),
+            verb=verbs.Recommendation.CREATED,
         )
 
 
@@ -504,6 +508,7 @@ def note_created_challenged(sender, note, project, user, **kwargs):
 # UserProjectStatus
 ################################################################
 
+
 @receiver(project_userprojectstatus_updated)
 def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs):
     if old_one and new_one:
@@ -519,6 +524,7 @@ def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs)
 ################################################################
 # File Upload
 ################################################################
+
 
 @receiver(document_uploaded)
 def project_document_uploaded(sender, instance, **kwargs):
@@ -551,6 +557,7 @@ def project_document_uploaded(sender, instance, **kwargs):
 ################################################################
 # Project Survey events
 ################################################################
+
 
 @receiver(
     survey_signals.survey_session_updated,

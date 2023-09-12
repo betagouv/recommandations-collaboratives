@@ -1,25 +1,23 @@
 {% extends "base.html" %}
 {% load django_vite %}
 {% load static %}
-
 {% block js %}
     {% vite_asset 'js/apps/advisorDashboard.js' %}
 {% endblock %}
-
-
 {% block content %}
-<div class="font-marianne p-0">
-    <div x-data="PersonalAdvisorDashboard" x-init='getData("{{request.user}}");'>
-        {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_header.html' %}
-        <div class="d-flex align-items-start">
-            <div class="personal-dashboard-container-inner px-3 pt-3 w-75">
-                {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_map.html' %}
-                {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_project_list.html' %}
-            </div>
-            <div class="w-25 px-3">
-                {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_activity.html' %}
+    <div class="font-marianne p-0">
+        <div x-data="PersonalAdvisorDashboard"
+             x-init='getData("{{ request.user }}");'>
+            {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_header.html' %}
+            <div class="d-flex align-items-start">
+                <div class="personal-dashboard-container-inner px-3 pt-3 w-75">
+                    {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_map.html' %}
+                    {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_project_list.html' %}
+                </div>
+                <div class="w-25 px-3">
+                    {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_activity.html' %}
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

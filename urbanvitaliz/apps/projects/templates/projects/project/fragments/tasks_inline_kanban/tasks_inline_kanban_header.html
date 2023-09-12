@@ -1,0 +1,26 @@
+<div class="w-100">
+    <div class="d-flex align-items-center justify-content-between w-100">
+        <template x-if="$store.djangoData.isAdvisor">
+            <div class="d-flex align-items-center w-100 justify-content-between">
+                <div class="d-flex flex-column">
+                    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html' %}
+                    <div>
+                        <a id="create-task-button-bis"
+                           href="{% url 'projects-project-create-task' project.id %}"
+                           class="button filled blue small inherit">Créer une recommandation</a>
+                        <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                           class="button blue small inherit">Voir les recommandations suggérées automatiquement</a>
+                    </div>
+                </div>
+                {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html' %}
+            </div>
+        </template>
+        <template x-if="!$store.djangoData.isAdvisor">
+            <div class="d-flex justify-content-between align-items-center w-100">
+                {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html' %}
+                {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html' %}
+            </div>
+        </template>
+    </div>
+    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_new_tasks_banner.html' %}
+</div>

@@ -10,11 +10,16 @@ created : 2021-06-01 09:54:36 CEST
 import os
 from distutils.core import run_setup
 
-import pytest
+from dotenv import load_dotenv
+import requests
+import json
 from fabric import task
 from invoke import run as local
 
 import urbanvitaliz
+
+
+load_dotenv()
 
 PACKAGE = f"urbanvitaliz-django-{urbanvitaliz.VERSION}.tar.gz"
 
@@ -69,6 +74,81 @@ def deploy(cnx, site=None):
         f"cd urbanvitaliz-{site} "
         f"&& ./venv/bin/pip install ./dist/{PACKAGE}"
         "&& ./manage.py migrate"
+        "&& ./manage.py compilescss"
+        "&& ./manage.py collectstatic --noinput"
+    )
+
+
+def ad_staging_create_database(db_name: str):
+    """Create a new database on alwaysdata infrastructure"""
+    address = "https://api.alwaysdata.com/v1/database/"
+    fullname = f"uvstaging_{db_name}"
+    database = {
+        "name": fullname,
+        "type": "POSTGRESQL",
+        "locale": "fr_FR.utf8",
+        "extensions": ["pg_trgm", "postgis", "postgis_topology", "unaccent"],
+        "permissions": {"uvstaging": "FULL"},
+    }
+    data = json.dumps(database)
+
+    credentials = (
+        "{API_KEY} account=uvstaging".format(
+            API_KEY=os.getenv("AD_RECOCO_STAGING_CREDENTIALS")
+        ),
+        "",
+    )
+
+    requests.post(address, auth=credentials, data=data)
+
+
+def ad_staging_drop_database(db_name: str):
+    api_root = "https://api.alwaysdata.com/"
+
+    credentials = (
+        "{API_KEY} account=uvstaging".format(
+            API_KEY=os.getenv("AD_RECOCO_STAGING_CREDENTIALS")
+        ),
+        "",
+    )
+
+    response = requests.get(f"{api_root}/v1/database/", auth=credentials)
+    db_json = response.json()
+
+    for db in db_json:
+        if db["name"] == f"uvstaging_{db_name}":
+            response = requests.delete(
+                f"{api_root}{db['href']}",
+                auth=credentials,
+            )
+            print(response)
+            return
+
+
+@task
+def replicate_prod_to_staging(cnx, site=None):
+    if site != "production":
+        print("This can only be run on the prod site.")
+
+    cnx.run("./replicate_staging_to_prod.sh")
+
+
+@task
+def load_prod_db_to_staging(cnx, site=None):
+    db_name = "development"
+
+    if site != "development":
+        print("This can only be run on the dev site.")
+
+    ad_staging_drop_database(db_name)
+    ad_staging_create_database(db_name)
+
+    cnx.run("./load_prod_dump_to_db.sh")
+
+    cnx.run(f"cd urbanvitaliz-{site}/multisites" "&& git pull")
+
+    cnx.run(
+        f"cd urbanvitaliz-{site} "
         "&& ./manage.py compilescss"
         "&& ./manage.py collectstatic --noinput"
     )

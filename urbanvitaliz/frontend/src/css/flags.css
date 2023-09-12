@@ -6,6 +6,10 @@
     background-color: #E8EDFF;
 }
 
+.flag.dark-blue {
+    background: #0063CB;
+}
+
 .flag.grey {
     background-color: #F6F6F6;
 }

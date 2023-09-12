@@ -26,4 +26,4 @@ restart.sh
 multisites
 .DS_Store
 venv
-static
+/static/
