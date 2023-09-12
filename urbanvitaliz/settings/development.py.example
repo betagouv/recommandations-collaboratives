@@ -54,4 +54,8 @@ RECAPTCHA_REQUIRED_SCORE = 0
 # Vite
 DJANGO_VITE_DEV_MODE = True
 
+# Uncomment Gdal and Geos libraries paths on MacOS
+# GDAL_LIBRARY_PATH="/opt//homebrew/lib/libgdal.dylib"
+# GEOS_LIBRARY_PATH="/opt//homebrew/lib/libgeos_c.dylib"
+
 # eof
