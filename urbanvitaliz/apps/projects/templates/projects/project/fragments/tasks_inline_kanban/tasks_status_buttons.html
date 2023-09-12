@@ -1,0 +1,5 @@
+<div x-data="TaskStatusSwitcher" class="d-flex align-items-center">
+    <button class="button tiny black inherit fw-medium me-2" :class="activeStatus(task, STATUSES.INPROGRESS) && 'bg-blue text-white border-blue pointer-events-none'" x-text="statusText(STATUSES.INPROGRESS)" @click="handleStatusClick(task, STATUSES.INPROGRESS)">En cours</button>
+    <button class="button tiny black inherit fw-medium me-2" :class="activeStatus(task, STATUSES.DONE) && 'bg-green-dark text-white border-green-dark pointer-events-none'" x-text="statusText(STATUSES.DONE)" @click="handleStatusClick(task, STATUSES.DONE)">Fait</button>
+    <button class="button tiny black inherit fw-medium me-2" :class="activeStatus(task, STATUSES.NOT_INTERESTED) && 'bg-grey-dark text-white border-grey-dark pointer-events-none'" x-text="statusText(STATUSES.NOT_INTERESTED)" @click="handleStatusClick(task, STATUSES.NOT_INTERESTED)">Non applicable</button>
+</div>

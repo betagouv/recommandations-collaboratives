@@ -1,5 +1,7 @@
 /* AlpineJS */
-[x-cloak] { display: none !important; }
+[x-cloak] {
+    display: none !important;
+}
 
 .onboarding-response-form label {
     font-family: 'Marianne';
@@ -31,16 +33,16 @@
     transition: background 0.25s ease;
 }
 
-.hover-crm-tool div{
+.hover-crm-tool div {
     transition: background 0.25s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.hover-crm-tool span{
+.hover-crm-tool span {
     transition: color 0.25s ease;
 }
 
-.hover-crm-tool:hover span{
+.hover-crm-tool:hover span {
     color: #222 !important;
 }
 
@@ -52,23 +54,72 @@
     text-decoration: underline !important;
 }
 
-.component-focus{
+.component-focus {
     box-shadow: 0 0 1px 4px #cce3fb;
     animation: component-pulse 1s 3 linear;
     background-color: #fff;
 }
 
+.hover-border-bottom {
+    border-bottom: 1px solid transparent;
+    transition: border 0.25s ease;
+}
+
+.border-bottom-grey {
+    border-bottom: 1px solid #EEE;
+}
+
+.ease-transition {
+    transition: all 0.25s ease;
+}
+
+.hover-border-bottom:hover {
+    border-bottom: 1px solid #222;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.common-dropdown {
+    position: absolute;
+    z-index: 100;
+
+    right: 0;
+    top: 112%;
+
+    background-color: white;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.16), 0px 1px 0px -2px rgba(0, 0, 0, 0.16), 0px 1px 4px rgba(0, 0, 0, 0.23);
+    border-radius: 4px;
+
+    overflow: hidden;
+}
+
+.common-dropdown.show {
+    display: flex;
+}
+
+.common-dropdown li a:hover, .common-dropdown li button:hover {
+    background-color: #e6e6e6 !important;
+}
+
+.common-dropdown li a:hover span, .common-dropdown li button:hover span {
+    color: #222 !important;
+}
+
 @keyframes component-pulse {
-    0%{
+    0% {
         box-shadow: 0 0 1px 4px #cce3fb;
         background-color: #fff;
     }
+
     50% {
         box-shadow: 0 0 1px 4px #fff;
         background-color: #cce3fb;
 
     }
-    100%{
+
+    100% {
         box-shadow: 0 0 1px 4px #cce3fb;
         background-color: #fff;
     }
@@ -89,6 +140,106 @@
     to{
         opacity: 1;
         transform: translate3d(0,0,0);
+    }
+}
+
+.medium-border-radius {
+    border-radius: 4px;
+}
+
+.border-grey {
+    border: 1px solid #EEE;
+}
+
+.border-grey-dark {
+    border: 1px solid #929292;
+    border-color: #929292 !important;
+}
+
+.border-blue {
+    border: solid 1px #0063CB;
+    border-color: #0063CB !important;
+}
+
+.border-green-dark {
+    border: solid 1px #27A658;
+    border-color: #27A658 !important;
+}
+
+.border-yellow {
+    border: solid 1px #FDCD6D;
+    border-color: #FDCD6D !important;
+}
+
+.border-orange {
+    border: solid 1px #FA7A35;
+}
+
+.pointer-events-none {
+    pointer-events: none;
+}
+
+.card-top-information {
+    position: absolute;
+    top: -14px;
+}
+
+.card-top-information span {
+    padding: 0.20rem 0.40rem;
+    color: white;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 2px;
+}
+
+.item-loader {
+    position: absolute;
+    top: calc(50% - 12px);
+    left: calc(50% - 12px);
+}
+
+.item-is-loading {
+    opacity: 0.3;
+}
+
+.z-index-1 {
+    z-index: 1;
+}
+
+.z-index-10 {
+    z-index: 10;
+}
+
+.z-index-100 {
+    z-index: 100;
+}
+
+.h-90vh {
+    height: 90vh;
+}
+
+.h-100vh {
+    height: 100vh;
+}
+
+.w-35 {
+    width: 35%;
+}
+
+.w-65 {
+    width: 65%;
+}
+
+@keyframes appear-in {
+    from {
+        opacity: 0;
+        transform: translate3d(-5px, 0, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
     }
 }
 

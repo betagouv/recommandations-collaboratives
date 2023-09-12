@@ -127,9 +127,31 @@ def ad_staging_drop_database(db_name: str):
 
 @task
 def replicate_prod_to_staging(cnx, site=None):
-    #    ad_staging_create_database("truc")
-    ad_staging_drop_database("truc")
-    # cnx.run(f"./replicate_staging_to_prod.sh")
+    if site != "production":
+        print("This can only be run on the prod site.")
+
+    cnx.run("./replicate_staging_to_prod.sh")
+
+
+@task
+def load_prod_db_to_staging(cnx, site=None):
+    db_name = "development"
+
+    if site != "development":
+        print("This can only be run on the dev site.")
+
+    ad_staging_drop_database(db_name)
+    ad_staging_create_database(db_name)
+
+    cnx.run("./load_prod_dump_to_db.sh")
+
+    cnx.run(f"cd urbanvitaliz-{site}/multisites" "&& git pull")
+
+    cnx.run(
+        f"cd urbanvitaliz-{site} "
+        "&& ./manage.py compilescss"
+        "&& ./manage.py collectstatic --noinput"
+    )
 
 
 # eof
