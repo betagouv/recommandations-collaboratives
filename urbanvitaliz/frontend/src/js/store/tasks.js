@@ -1,18 +1,48 @@
 import Alpine from 'alpinejs'
-import api, { tasksUrl } from '../utils/api'
-import { generateUUID } from '../utils/uuid'
 
-Alpine.store('tasks', {
-    tasks: [],
-    async getTasks(projectId) {
-        const json = await api.get(tasksUrl(projectId))
+document.addEventListener('alpine:init', () => {
 
-        const data = json.data.map(d => Object.assign(d, {
-            uuid: generateUUID()
-        }));
+    Alpine.store('tasksView', {
+        displayedTasks: [],
+        currentView: 'inline',
+        async updateViewWithTask(taskId) {
+            const updatedTasks = await Alpine.store('tasksData').loadTasks();
+            const updatedTask = updatedTasks.find(task => task.id === taskId)
+            this.displayedTasks = this.displayedTasks.map(task => task.id === taskId ? updatedTask : task)
+        },
+        async updateView() {
+            this.displayedTasks = await Alpine.store('tasksData').loadTasks();
+        },
+        findById(taskId) {
+            return this.displayedTasks.find(task => task.id === taskId)
+        },
+        switchView() {
+            this.currentView === 'inline' ? this.currentView = 'kanban' : this.currentView = 'inline'
+        },
+    })
 
-        return this.tasks = data;
-    }
+    Alpine.store('taskModal', {
+        currentTask: null,
+
+        previewModalHandle: null,
+        deleteModalHandle: null,
+        feedbackModalHandle: null,
+        feedbackModalStatus: null,
+
+        onPreviewClick(task) {
+            this.currentTask = task
+            this.previewModalHandle.show();
+        },
+        onDeleteClick(task) {
+            this.currentTask = task
+            this.deleteModalHandle.show();
+        },
+        onFeedbackClick(task, status) {
+            this.currentTask = task
+            this.feedbackModalStatus = status
+            this.feedbackModalHandle.show();
+        }
+    })
 })
 
-export default Alpine.store('tasks')
+export default Alpine.store('tasksView')

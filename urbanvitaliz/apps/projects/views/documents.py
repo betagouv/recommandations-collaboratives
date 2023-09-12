@@ -4,7 +4,7 @@
 Views for projects application
 
 author  : guillaume.libersat@beta.gouv.fr
-created : 2022-11-28 14:14:20 CEST 
+created : 2022-11-28 14:14:20 CEST
 """
 
 from django.contrib import messages
@@ -39,12 +39,12 @@ def document_list(request, project_id=None):
     pinned_files = all_files.filter(pinned=True)
     links = models.Document.on_site.filter(project_id=project.pk).exclude(the_link=None)
 
-    # Mark this project notifications as read
+    # Mark this project document notifications as read
     if not request.user.is_hijacked:
         project_ct = ContentType.objects.get_for_model(project)
-        note_ct = ContentType.objects.get_for_model(models.Document)
+        document_ct = ContentType.objects.get_for_model(models.Document)
         request.user.notifications.unread().filter(
-            action_object_content_type=note_ct,
+            action_object_content_type=document_ct,
             target_content_type=project_ct.pk,
             target_object_id=project.pk,
         ).mark_all_as_read()

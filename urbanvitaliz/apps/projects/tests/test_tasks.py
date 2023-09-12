@@ -18,6 +18,7 @@ from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
 from rest_framework.test import APIClient
+from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.resources import models as resources
@@ -426,7 +427,7 @@ def test_update_task_with_new_topic(request, client):
 
     with login(client) as user:
         utils.assign_advisor(user, task.project)
-        response = client.post(url, data=data)
+        client.post(url, data=data)
 
     task = models.Task.on_site.get(id=task.id)
     assert task.topic.name == data["topic_name"]
@@ -648,24 +649,35 @@ def test_notifications_are_deleted_on_task_soft_delete(request):
 
 
 @pytest.mark.django_db
-def test_notifications_are_deleted_when_cancelling_publishing(request):
+def test_created_notifications_are_deleted_when_cancelling_publishing(request):
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     recipient = Recipe(auth.User).make()
 
     task = Recipe(models.Task, public=True, site=get_current_site(request)).make()
 
+    verb_other_than_created = "notif qui reste"
+
     notify.send(
         sender=user,
         recipient=recipient,
-        verb="a reçu une notif",
+        verb=verb_other_than_created,
         action_object=task,
         target=task.project,
     )
 
-    assert recipient.notifications.count() == 1
+    notify.send(
+        sender=user,
+        recipient=recipient,
+        verb=verbs.Recommendation.CREATED,
+        action_object=task,
+        target=task.project,
+    )
+
+    assert recipient.notifications.count() == 2
     task.public = False
     task.save()
-    assert recipient.notifications.count() == 0
+    assert recipient.notifications.count() == 1
+    assert recipient.notifications.first().verb == verb_other_than_created
 
 
 @pytest.mark.django_db

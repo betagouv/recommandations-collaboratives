@@ -24,3 +24,4 @@ node_modules/
 coverage.xml
 restart.sh
 multisites
+/static/

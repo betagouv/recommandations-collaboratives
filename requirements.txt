@@ -27,6 +27,7 @@ psycopg2-binary
 django-leaflet
 django-admin-csvexport
 djangorestframework
+djangorestframework-xml
 rest-framework-generic-relations
 django-filter
 dynamic-django-forms

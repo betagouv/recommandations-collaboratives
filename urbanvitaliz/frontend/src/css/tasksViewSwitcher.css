@@ -1,0 +1,20 @@
+.tasks-view-switcher {
+    display: flex;
+}
+
+.tasks-view-switcher button.active{
+    background-color:#0063CB !important;
+    color: white !important;
+    font-weight: 400 !important;
+}
+
+.tasks-view-switcher button:first-child{
+    border-top-left-radius: 99px;
+    border-bottom-left-radius: 99px;
+    border-right: none;
+}
+
+.tasks-view-switcher button:last-child{
+    border-top-right-radius: 99px;
+    border-bottom-right-radius: 99px;
+}
