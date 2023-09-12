@@ -1,22 +1,26 @@
 {% load static %}
 {% load django_vite %}
 {% load guardian_tags %}
-
 {% block js %}
     {% vite_asset 'js/apps/projectShare.js' %}
 {% endblock %}
-
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-
 {% with request.resolver_match.url_name as url_name %}
     <div x-data="ProjectShare"
          class="col-12 d-flex justify-content-between align-items-start">
-        <div class=" d-flex flex-column mb-4">
-            <h2>{{ project.name }}</h2>
+        <div class=" d-flex flex-column mb-2">
+            <div class="d-flex align-items-center">
+                <div class="project-link d-flex align-items-center">
+                    <span class="fw-bold title-info text-dark me-2 location">{{ project.commune.name }}</span>
+                    <span class="text-info-custom text-grey-dark name">{{ project.name }}</span>
+                </div>
+            </div>
             <div class="d-flex">
-                <p class="text-secondary">
-                    {{ project.location }}
+                <p class="tiny text-grey-dark">
+                    <svg class="bi" width="15" height="15" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#geo-alt-fill" />
+                    </svg>
                     {% if project.commune %}
                         {{ project.commune.name }} —   {{ project.commune.postal }}, {{ project.commune.department }} - {{ project.commune.department.region }} - INSEE: {{ project.commune.insee }}
                     </p>
@@ -27,11 +31,11 @@
                     <ul class="d-flex list-unstyled m-0 p-0 flex-wrap mb-3">
                         {% for tag in project.tags.all %}<li class="mx-1 my-1 badge rounded-pill bg-dark">{{ tag }}</li>{% endfor %}
                         <a class="d-flex align-items-center"
-                       href="{% url "projects-project-tags" project.id %}">
-                        <svg class="bi ms-2 " width="15" height="15" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
-                        </svg>
-                    </a>
+                           href="{% url "projects-project-tags" project.id %}">
+                            <svg class="bi ms-2 " width="15" height="15" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
+                            </svg>
+                        </a>
                     </ul>
                 </div>
             {% endif %}

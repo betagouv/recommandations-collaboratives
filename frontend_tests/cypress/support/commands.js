@@ -61,8 +61,6 @@ Cypress.Commands.add('logout', () => {
 
 Cypress.Commands.add("createProject", (index) => {
 
-    console.log('project', project);
-
     cy.visit('/')
 
     cy.get('a').should('have.class', 'fr-btn fr-text--xl custom-button').contains('Solliciter UrbanVitaliz').click({ force: true })
@@ -102,9 +100,66 @@ Cypress.Commands.add("createProject", (index) => {
 
     cy.contains('Envoyer ma demande').click({ force: true });
 
-    cy.get('.introjs-skipbutton').click({ force: true })
-
     cy.contains(`${project.name} ${index}`).click({ force: true })
+})
+
+Cypress.Commands.add('becomeAdvisor', () => {
+    cy.get("body").then(body => {
+        if (body.find('#positioning-form').length > 0) {
+            cy.contains('Conseiller le projet').click({ force: true })
+        } else {
+            assert.isOk('advisor', 'already advisor');
+        }
+    })
+
+})
+
+Cypress.Commands.add('createTask', (index) => {
+
+    cy.get("body").then(body => {
+        if (body.find('#create-task-button').length > 0) {
+            cy.contains("Émettre une recommandation").click({ force: true })
+
+            cy.get("#push-noresource").click({ force: true });
+
+            cy.get('#intent')
+                .type(`reco test ${index}`, { force: true })
+                .should('have.value', `reco test ${index}`)
+
+            cy.get('textarea')
+                .type(`reco test from action description`, { force: true })
+                .should('have.value', `reco test from action description`)
+
+            cy.get("[type=submit]").click({ force: true });
+
+            cy.url().should('include', '/actions')
+
+            cy.contains('reco test from action')
+        } else if (body.find('#create-task-button-bis').length > 0) {
+            cy.contains("Créer une recommandation").click({ force: true })
+
+            cy.get("#push-noresource").click({ force: true });
+
+            cy.get('#intent')
+                .type(`reco test ${index}`, { force: true })
+                .should('have.value', `reco test ${index}`)
+
+            cy.get('textarea')
+                .type(`reco test from action description`, { force: true })
+                .should('have.value', `reco test from action description`)
+
+            cy.get("[type=submit]").click({ force: true });
+
+            cy.url().should('include', '/actions')
+
+            cy.contains('reco test from action')
+        }
+        else {
+            assert.isOk('task', "can't create task");
+        }
+    })
+
+
 })
 
 Cypress.Commands.add('approveProject', (index) => {
@@ -125,6 +180,6 @@ Cypress.Commands.add('approveProject', (index) => {
 
 Cypress.Commands.add('navigateToProject', (index) => {
     cy.visit(`/`)
-    cy.get('#projects-list-button').click({force:true})
+    cy.get('#projects-list-button').click({ force: true })
     cy.contains(`${project.name} ${index}`).click({ force: true })
 })
