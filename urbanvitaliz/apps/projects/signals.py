@@ -504,6 +504,7 @@ def note_created_challenged(sender, note, project, user, **kwargs):
 # UserProjectStatus
 ################################################################
 
+
 @receiver(project_userprojectstatus_updated)
 def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs):
     if old_one and new_one:
@@ -519,6 +520,7 @@ def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs)
 ################################################################
 # File Upload
 ################################################################
+
 
 @receiver(document_uploaded)
 def project_document_uploaded(sender, instance, **kwargs):
@@ -551,6 +553,7 @@ def project_document_uploaded(sender, instance, **kwargs):
 ################################################################
 # Project Survey events
 ################################################################
+
 
 @receiver(
     survey_signals.survey_session_updated,

@@ -328,7 +328,6 @@ class TaskNotificationViewSet(
 
         followup_ids = list(task.followups.all().values_list("id", flat=True))
 
-        # FIXME cannot find who create notifications on followups
         followup_actions = notifications.filter(
             action_object_content_type=followup_ct.pk,
             action_object_object_id__in=followup_ids,
@@ -583,5 +582,6 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         """Return a list of all organizations."""
         return models.Topic.objects.all()
+
 
 # eof
