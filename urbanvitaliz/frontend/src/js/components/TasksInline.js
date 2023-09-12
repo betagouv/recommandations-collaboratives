@@ -2,17 +2,14 @@ import Alpine from 'alpinejs'
 import TaskApp from './Tasks'
 import { TASK_STATUSES } from '../config/statuses';
 
-function TasksInline(projectId) {
+export default function TasksInline(projectId) {
 
     const app = {
         filterIsDraft: false,
         boardsFiltered: [],
         boards: [
-            { status: [TASK_STATUSES.PROPOSED], title: "Nouvelles", color_class: "border-error", color: "#0d6efd" },
+            { status: [TASK_STATUSES.PROPOSED,TASK_STATUSES.INPROGRESS,TASK_STATUSES.BLOCKED,TASK_STATUSES.DONE,TASK_STATUSES.NOT_INTERESTED,TASK_STATUSES.ALREADY_DONE], title: "Nouvelles", color_class: "border-error", color: "#0d6efd" },
         ],
-        filterFn(d) {
-            return this.canAdministrate || d.public || !d.public;
-        },
         init() {
             this.boardsFiltered = this.boards
         },
@@ -25,15 +22,9 @@ function TasksInline(projectId) {
             this.updateView()
         },
         async publishTask(taskId) {
-            await this.patchTask(taskId, { public: true });
-            await this.getData();
-            this.updateView()
-        },
-        //Custom behaviour
-        onPreviewClick(id) {
-            this.currentTaskId = id;
-            this.openPreviewModal();
-            this.filterIsDraft = false
+            await this.$store.tasksData.patchTask(taskId, { public: true });
+            await this.$store.tasksData.loadTasks();
+            // this.updateView()
         },
         updateView() {
             if (!this.filterIsDraft) return
