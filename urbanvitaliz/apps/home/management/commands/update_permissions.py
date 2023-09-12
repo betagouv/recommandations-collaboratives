@@ -13,9 +13,11 @@ from django.core.management.base import BaseCommand
 from guardian.shortcuts import assign_perm
 from urbanvitaliz.apps.home.models import SITE_GROUP_PERMISSIONS
 from urbanvitaliz.apps.projects.models import Project, ProjectSwitchtender
-from urbanvitaliz.apps.projects.utils import (assign_advisor,
-                                              assign_collaborator,
-                                              assign_observer)
+from urbanvitaliz.apps.projects.utils import (
+    assign_advisor,
+    assign_collaborator,
+    assign_observer,
+)
 from urbanvitaliz.utils import get_group_for_site
 
 
@@ -65,7 +67,7 @@ def assign_group_permissions_by_sites():
         print("site:", site)
         with settings.SITE_ID.override(site.id):
             for group_name, permissions in SITE_GROUP_PERMISSIONS.items():
-                group = get_group_for_site(group_name, site)
+                group = get_group_for_site(group_name, site, create=True)
                 for perm_name in permissions:
                     print("group:", group, "perm:", perm_name, "site:", site.name)
                     assign_perm(perm_name, group, obj=site)
