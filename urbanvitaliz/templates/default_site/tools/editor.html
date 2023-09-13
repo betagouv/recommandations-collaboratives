@@ -1,8 +1,7 @@
 {% load static %}
 <div {% if escapejs %} x-data='editor("{{ input_value|escapejs }}")' {% elif is_task_comment %}x-data='editor(task.content)' {% else %} x-data='editor({{ input_value }})'{% endif %}
      class="w-100"
-     @set-comment.window="setMarkdownContentFromTaskModal($event)"
-     >
+     @set-comment.window="setMarkdownContentFromTaskModal($event)">
   <template x-if="isLoaded()">
     <div class="tiptap-menu">
       <button @click.prevent
@@ -49,11 +48,9 @@
     </div>
   </template>
   <div class="position-relative">
-
     <div class="tiptap-editor {% if wide %}is-wide{% endif %}"
          x-ref="element"
          id="comment-text-ref"></div>
-         
     {% if is_task_comment %}
       <div class="d-flex justify-content-end">
         <button class="button filled blue small inherit"
@@ -69,12 +66,12 @@
     {% if errors %}
       {% for error in errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
     {% endif %}
-    {% if input_value %}
+    {% if not is_task_comment and not is_task_modal_comment %}
       <textarea style="height: 0"
                 class="position-absolute top-0 opacity-0"
                 x-model="markdownContent"
                 name="{{input_name}}"
-                :required="push_type == 'noresource' || (push_type == 'single' && public)"
+                :required="push_type == 'noresource' || (push_type == 'single' && public) || false"
                 {% if input_required %} required {% endif %}></textarea>
     {% endif %}
   </div>
