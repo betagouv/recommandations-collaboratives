@@ -27,7 +27,7 @@ for site in Site.objects.all():
             # update missing phone number
             profile = pm.member.profile
             org = addressbook_models.Organization.get_or_create(pm.project.org_name)
-            org.sites.add()
+            org.sites.add(site)
             profile.organization = org
             profile.save()
 
