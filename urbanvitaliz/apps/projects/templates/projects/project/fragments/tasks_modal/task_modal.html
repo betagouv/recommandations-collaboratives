@@ -35,13 +35,16 @@
                     <div x-effect="taskId && $store.previewModal.loadFollowups() && followupScrollToLastMessage(true)"
                          class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
-                        <div class="position-absolute top-0 end-0 px-3 py-2" style="z-index: 1000 !important;">
+                        <div class="position-absolute top-0 end-0 px-3 py-2"
+                             style="z-index: 1000 !important">
                             <button type="button"
                                     class="btn-close"
                                     data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                         </div>
-                        <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content" :class="!contentIsLoading && 'visible'" x-effect="taskId && loadContent()">
+                        <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content"
+                             :class="!contentIsLoading && 'visible'"
+                             x-effect="taskId && loadContent()">
                             <template x-if="task && taskId && task?.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
                                         :src="resourcePreviewUrl(task?.resource_id)"></iframe>
@@ -51,7 +54,8 @@
                                     <div class="resource-details">
                                         <h1 x-text="task?.intent" class="mb-3"></h1>
                                     </div>
-                                    <p class="text-justified" x-html="renderMarkdown(task?.content)"></p>
+                                    <p class="text-justified overflow-hidden text-break"
+                                       x-html="renderMarkdown(task?.content)"></p>
                                 </div>
                             </template>
                         </div>
@@ -87,15 +91,22 @@
                                         <div class="rounded bg-light p-2 m-3 message"
                                              :class="$store.djangoData.canManageTasks && task?.content === '' && 'border border-warning'">
                                             <template x-if="task && taskId && task?.content !== ''">
-                                                <p x-html="task && renderMarkdown(task?.content)" class="mb-2"></p>
+                                                <p x-html="task && renderMarkdown(task?.content)"
+                                                   class="mb-2 overflow-hidden text-break"></p>
                                             </template>
                                             <template x-if="task?.content === ''">
                                                 <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
                                             </template>
-                                            <div class="d-flex justify-content-between" style="font-size: 0.9em;">
-                                                {% include 'projects/project/fragments/task/task_user_card.html' %}
+                                            <div class="d-flex justify-content-between align-items-center"
+                                                 style="font-size: 0.9em">
+                                                <div class="d-flex flex-column">
+                                                    {% include 'projects/project/fragments/task/task_user_card.html' %}
+                                                    <span class="text-muted tiny"
+                                                          x-text="`le ${formatDate(task?.created_on)}`"
+                                                          style="line-height: 20px"></span>
+                                                </div>
                                                 <template x-if="$store.djangoData.canManageTasks">
-                                                    <a class="text-muted cursor-pointer" @click="onEditContent()">Editer</a>
+                                                    <a class="text-muted cursor-pointer tiny" @click="onEditContent()">Editer</a>
                                                 </template>
                                             </div>
                                         </div>
@@ -106,7 +117,7 @@
                                                 <span class="ms-1 fst-italic"
                                                       x-text="`${task?.created_by.first_name} ${task?.created_by.last_name}`"
                                                       style="line-height: 20px"></span> a créé cette recommandation sans ressource
-                                                <span class="ms-1 text-muted"
+                                                <span class="text-muted"
                                                       x-text="`le ${formatDate(task?.created_on)}`"
                                                       style="line-height: 20px"></span>
                                             </div>
@@ -122,10 +133,16 @@
                                                     <div class="rounded bg-light p-2 m-3 message"
                                                          :class="hasNotification(f.id) && 'border border-warning'">
                                                         <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
-                                                        <div class="d-flex justify-content-between" style="font-size: 0.9em;">
-                                                            {% include 'projects/project/fragments/task/task_user_card.html' with followup_user=True %}
+                                                        <div class="d-flex justify-content-between align-items-center"
+                                                             style="font-size: 0.9em">
+                                                            <div class="d-flex flex-column">
+                                                                {% include 'projects/project/fragments/task/task_user_card.html' with followup_user=True %}
+                                                                <span class="text-muted tiny"
+                                                                      x-text="`le ${formatDate(f.timestamp)}`"
+                                                                      style="line-height: 20px"></span>
+                                                            </div>
                                                             <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
-                                                                <a class="text-muted cursor-pointer" @click="onEditComment(f)">Editer</a>
+                                                                <a class="text-muted cursor-pointer tiny" @click="onEditComment(f)">Editer</a>
                                                             </template>
                                                         </div>
                                                     </div>
@@ -142,11 +159,17 @@
                                                         </div>
                                                         <template x-if="f.comment !== ''">
                                                             <div class="rounded bg-light p-2 m-3 message">
-                                                                <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
+                                                                <p x-html="renderMarkdown(f.comment)"
+                                                                   class="mb-2 text-break overflow-hidden"></p>
                                                                 <div class="d-flex justify-content-between" style="font-size: 0.9em;">
-                                                                    {% include 'projects/project/fragments/task/task_user_card.html' with followup_user=True %}
+                                                                    <div class="d-flex flex-column">
+                                                                        {% include 'projects/project/fragments/task/task_user_card.html' with followup_user=True %}
+                                                                        <span class="text-muted tiny"
+                                                                              x-text="`le ${formatDate(f.timestamp)}`"
+                                                                              style="line-height: 20px"></span>
+                                                                    </div>
                                                                     <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
-                                                                        <a class="text-muted cursor-pointer" @click="onEditComment(f)">Editer</a>
+                                                                        <a class="text-muted cursor-pointer tiny" @click="onEditComment(f)">Editer</a>
                                                                     </template>
                                                                 </div>
                                                             </div>
