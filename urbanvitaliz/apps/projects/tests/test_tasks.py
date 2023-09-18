@@ -258,6 +258,42 @@ def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(
     assert response.status_code == 302
 
 
+@pytest.mark.django_db
+def test_visit_task_for_project_no_action_when_hijack(request, client):
+    resource = resources.Resource()
+    resource.save()
+
+    owner = baker.make(auth.User)
+    project = Recipe(
+        models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+    ).make()
+
+    utils.assign_collaborator(owner, project, is_owner=True)
+
+    task = Recipe(
+        models.Task,
+        site=get_current_site(request),
+        project=project,
+        visited=False,
+        resource=resource,
+    ).make()
+
+    with login(client, username="hijacker", is_staff=True):
+        # hijack user
+        url = reverse("hijack:acquire")
+        response = client.post(url, data={"user_pk": owner.pk})
+        # perform request
+        response = client.get(
+            reverse("projects-visit-task", args=[task.id]),
+        )
+
+    # task visited status is unchanged
+    task = models.Task.on_site.first()
+    assert task.visited is False
+
+
 #
 # mark as done
 @pytest.mark.django_db
