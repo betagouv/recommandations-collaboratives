@@ -159,7 +159,7 @@ def visit_task(request, task_id):
 
     is_switchtender = check_if_advisor(request.user)
 
-    if not task.visited and not is_switchtender:
+    if not task.visited and not is_switchtender and not request.user.is_hijacked:
         task.visited = True
         task.save()
 

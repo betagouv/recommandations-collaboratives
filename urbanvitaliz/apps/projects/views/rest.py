@@ -340,7 +340,11 @@ class TaskNotificationViewSet(
         detail=False,
     )
     def mark_all_as_read(self, request, project_id, task_id):
-        self.get_queryset().mark_all_as_read(request.user)
+        is_hijacked = getattr(request.user, "is_hijacked", False)
+
+        if not is_hijacked:
+            self.get_queryset().mark_all_as_read(request.user)
+
         return Response({}, status=status.HTTP_200_OK)
 
     serializer_class = TaskNotificationSerializer
