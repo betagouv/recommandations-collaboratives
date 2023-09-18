@@ -100,6 +100,12 @@
                 <div class="col-4 bg-grey-light p-4">
                     <div class="mb-4">
                         <div class="d-flex flex-column">
+                            <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Localisation</h6>
+                            {% include 'projects/project/fragments/project_location.html' with project=project %}
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex flex-column">
                             <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Référent collectivité</h6>
                             {% include 'projects/project/fragments/project_owner.html' with project=project %}
                             {% if project.owner %}

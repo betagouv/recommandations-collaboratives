@@ -1,0 +1,17 @@
+{% load static %}
+{% load django_vite %}
+
+{% block js %}
+    {% vite_asset 'js/apps/map.js' %}
+{% endblock %}
+<div x-cloak class="p-0 project-location-map-container" :class="{'is-small':mapIsSmall}">
+    <div class="h-100 w-100" x-ref="map" id="map" class="project-location-map"></div>
+    <div class="map-increase-height-button" x-on:click="handleMapOpen">
+        <svg :class="!mapIsSmall ? 'd-none' : 'd-block'" width="15" height="15" fill="#000000" style="z-index:1">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrows-fullscreen" />
+        </svg>
+        <svg :class="!mapIsSmall ? 'd-block' : 'd-none'"  width="15" height="15" fill="#000000" style="z-index:1">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#fullscreen-exit" />
+        </svg>
+    </div>
+</div>

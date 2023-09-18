@@ -1,0 +1,5 @@
+{% load static %}
+
+{% if project.location %}
+    {% include 'projects/project/fragments/project_location_map.html' with project=project %}
+{% endif %}
