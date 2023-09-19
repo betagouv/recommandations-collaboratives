@@ -1,11 +1,8 @@
 import projects from '../../../../fixtures/projects/projects.json'
 import tasks from '../../../../fixtures/projects/tasks.json'
 
-const currentProject = projects[1];
-const task1 = tasks[0]
-const task2 = tasks[1]
-const task3 = tasks[2]
-const task4 = tasks[3]
+const currentProject = projects[8];
+const currentTask = tasks[6]
 
 
 describe('I can go tasks tab', () => {
@@ -18,12 +15,22 @@ describe('I can go tasks tab', () => {
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
 
-        cy.contains("Thématique").should('have.class', 'active')
-        cy.contains(task4.fields.intent)
+        cy.contains("Liste").should('have.class', 'active')
+        cy.contains(currentTask.fields.intent)
 
-        cy.get(`#${task4.pk}`).contains('Non applicable').click({force:true});
+        cy.get(`#${currentTask.pk}`).contains('non applicable').click({ force: true });
         cy.contains("Ça n'était pas applicable")
-        cy.get('.modal-footer').contains('Archiver').click({force:true});
-        cy.get(`#${task4.pk}`).contains('Non applicable').should('have.class', 'bg-grey-dark')
+
+        cy.document().then((doc) => {
+            doc.getElementById(`${currentTask.pk}-4-button`).click();
+        })
+
+        cy.get(`#${currentTask.pk}`).contains('non applicable').should('have.class', 'bg-grey-dark')
+
+        cy.contains(currentTask.fields.intent).click({ force: true })
+        cy.contains(currentTask.fields.intent)
+
+        const now = new Date();
+        cy.contains(`a changé le statut de la recommandation en non applicable le ${now.toLocaleDateString()}`)
     })
 })
