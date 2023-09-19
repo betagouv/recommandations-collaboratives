@@ -1,5 +1,12 @@
 {% load static %}
-
-{% if project.location %}
-    {% include 'projects/project/fragments/project_location_map.html' with project=project %}
-{% endif %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/apps/projectLocation.js' %}
+{% endblock %}
+{% block content %}
+    {% if project %}
+        <div x-data="ProjectLocation" x-init='init({{ project.id }});'>
+            {% include 'projects/project/fragments/project_location_map.html' %}
+        </div>
+    {% endif %}
+{% endblock %}
