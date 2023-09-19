@@ -44,11 +44,10 @@ def project_list_export_csv(request):
 
     today = datetime.datetime.today().date()
 
+    content_disposition = f'attachment; filename="urbanvitaliz-projects-{today}.csv"'
     response = HttpResponse(
         content_type="text/csv",
-        headers={
-            "Content-Disposition": f'attachment; filename="urbanvitaliz-projects-{today}.csv"'
-        },
+        headers={"Content-Disposition": content_disposition},
     )
 
     writer = csv.writer(response, quoting=csv.QUOTE_ALL)
@@ -125,8 +124,10 @@ def project_list_export_csv(request):
                 project.phone,
                 switchtenders_txt,
                 project.status,
-                published_tasks.count(),
-                published_tasks.exclude(created_by__is_staff=True).count(),
+                published_tasks.exclude(status=models.Task.NOT_INTERESTED).count(),
+                published_tasks.exclude(status=models.Task.NOT_INTERESTED)
+                .exclude(created_by__is_staff=True)
+                .count(),
                 published_tasks.filter(
                     status__in=(
                         models.Task.INPROGRESS,
