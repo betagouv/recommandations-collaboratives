@@ -1,3 +1,3 @@
-import '../../css/map.css'
 import '../components/ProjectLocation'
-import '../../css/personalAdvisorDashboard.css'
+import '../../css/map.css'
+import '../../css/projectLocation.css'
