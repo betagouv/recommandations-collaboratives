@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
     {% if project %}
-        <div x-data="ProjectLocation" x-init='init({{ project.id }});'>
+        <div x-data='ProjectLocation("{{project.commune.longitude}}", "{{project.commune.longitude}}", "{{project.status}}")'>
             {% include 'projects/project/fragments/project_location_map.html' %}
         </div>
     {% endif %}
