@@ -50,7 +50,7 @@
                                         :src="resourcePreviewUrl(task?.resource_id)"></iframe>
                             </template>
                             <template x-if="task && taskId && !task?.resource_id">
-                                <div class="w-100 text-break p-3">
+                                <div class="w-100 text-break p-3" style="max-height: 90vh; overflow-y: scroll;">
                                     <div class="resource-details">
                                         <h1 x-text="task?.intent" class="mb-3"></h1>
                                     </div>
