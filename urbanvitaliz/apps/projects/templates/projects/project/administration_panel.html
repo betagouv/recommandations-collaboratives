@@ -259,7 +259,7 @@
           <p class="text-info-custom mb-4 mt-1">Invitations en attente de conseiller·e·s</p>
           <ul class="list-group">
             {% for invite in pending_invites %}
-              {% if invite.role == "SWITCHTENDER" %}
+              {% if invite.role == "SWITCHTENDER" or invite.role == "OBSERVER" %}
                 <li class="d-flex justify-content-between align-items-start mb-1">
                   {% include 'projects/project/fragments/user_invited.html' with user_invited=invite %}
                   <div class="d-flex align-items-center">
