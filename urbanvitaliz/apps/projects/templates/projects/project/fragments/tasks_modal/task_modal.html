@@ -136,7 +136,7 @@
                                                         <div class="d-flex justify-content-between align-items-center"
                                                              style="font-size: 0.9em">
                                                             <div class="d-flex flex-column">
-                                                                {% include 'projects/project/fragments/task/task_user_card.html' with followup_user=True %}
+                                                                {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
                                                                 <span class="text-muted tiny"
                                                                       x-text="`le ${formatDate(f.timestamp)}`"
                                                                       style="line-height: 20px"></span>
@@ -163,7 +163,7 @@
                                                                    class="mb-2 text-break overflow-hidden"></p>
                                                                 <div class="d-flex justify-content-between" style="font-size: 0.9em;">
                                                                     <div class="d-flex flex-column">
-                                                                        {% include 'projects/project/fragments/task/task_user_card.html' with followup_user=True %}
+                                                                        {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
                                                                         <span class="text-muted tiny"
                                                                               x-text="`le ${formatDate(f.timestamp)}`"
                                                                               style="line-height: 20px"></span>

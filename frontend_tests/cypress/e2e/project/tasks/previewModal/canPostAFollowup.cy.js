@@ -1,11 +1,10 @@
 import projects from '../../../../fixtures/projects/projects.json'
 import tasks from '../../../../fixtures/projects/tasks.json'
+import users from '../../../../fixtures/users/users.json'
 
 const currentProject = projects[1];
 const task1 = tasks[0]
-const task2 = tasks[1]
-const task3 = tasks[2]
-const task4 = tasks[3]
+const currentUser = users[0]
 
 
 describe('I can go tasks tab', () => {
@@ -18,7 +17,7 @@ describe('I can go tasks tab', () => {
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
 
-        cy.contains("Thématique").should('have.class', 'active')
+        cy.contains("Liste").should('have.class', 'active')
 
         cy.contains(task1.fields.intent).click({ force: true })
         cy.contains(task1.fields.intent)
@@ -31,6 +30,8 @@ describe('I can go tasks tab', () => {
         })
 
         cy.contains('Enregistrer').click({ force: true })
+        cy.contains(`${currentUser.fields.first_name}`)
+        cy.contains(`${currentUser.fields.last_name}`)
 
         cy.contains(`test ${now}`)
     })
