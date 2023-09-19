@@ -12,6 +12,10 @@
     text-transform: uppercase;
 }
 
+.text-transform-none {
+    text-transform: none;
+}
+
 .text-info-custom {
     font-family: 'Marianne';
     font-style: normal;
@@ -36,7 +40,7 @@
     font-size: 13px;
 }
 
-.tiny{
+.tiny {
     font-size: 12px;
 }
 
