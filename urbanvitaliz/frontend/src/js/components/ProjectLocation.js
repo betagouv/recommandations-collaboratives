@@ -2,8 +2,6 @@ import Alpine from 'alpinejs'
 
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css'
-import 'leaflet-control-geocoder/dist/Control.Geocoder.css'
-import 'leaflet-control-geocoder';
 import 'leaflet-providers'
 
 import { statusToColorClass } from '../utils/statusToText'
