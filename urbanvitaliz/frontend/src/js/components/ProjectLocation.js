@@ -12,9 +12,11 @@ import { statusToColorClass } from '../utils/statusToText'
 function ProjectLocation(nameProject, status, nameCommune, postal, longitude, latitude) {
 	return {
 		mapIsSmall: true,
+		project: null,
+		projectMapModal: null,
 
 		async init() {
-			let project = {
+			this.project = {
 				name: nameProject,
 				status,
 				commune: {
@@ -24,17 +26,30 @@ function ProjectLocation(nameProject, status, nameCommune, postal, longitude, la
 					longitude: longitude ? parseFloat(longitude) :1.20,
 				}
 			}
-			const	Map = initMap(project.commune.latitude, project.commune.longitude);
-			initMapLayers(Map, project)
+			const options = mapOptions({interactive: false});
+			const	Map = initMap('map', this.project.commune.latitude, this.project.commune.longitude, options);
+			initMapLayers(Map, this.project);
+			this.initProjectMapModal();
 			//Center Map
-			Map.panTo(new L.LatLng(project.commune.latitude, project.commune.longitude));
+			Map.panTo(new L.LatLng(this.project.commune.latitude, this.project.commune.longitude));
+		},
+		initProjectMapModal() {
+			const element = document.getElementById("project-map-modal");
+			this.projectMapModal = new bootstrap.Modal(element);
+		},
+		openProjectMapModal() {
+			this.interactive = true;
+			this.mapIsSmall = false;
+			const options = mapOptions({interactive: false});
+			// const	Map = initMap('map-modal', this.project.commune.latitude, this.project.commune.longitude, options);
+			this.projectMapModal.show();
 		},
 	}
 }
 
 // Map base layer 
-function initMap(latitude, longitude) {
-	const map = L.map('map').setView([latitude, longitude], 7);
+function initMap(idMap, latitude, longitude, options) {
+	const map = L.map(idMap, options).setView([latitude, longitude],12);
 	setTimeout(function(){  map.invalidateSize()}, 0); // forces map redraw to fit container
 
 	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
@@ -44,7 +59,7 @@ function initMap(latitude, longitude) {
 	
 	L.tileLayer.provider('OpenStreetMap.France').addTo(map);
 
-	return map
+	return map;
 }
 
 // Crete layers composed with markers
@@ -70,6 +85,18 @@ function markerPopupTemplate(project) {
 			</main>
 		</div>
 	`
+}
+
+function mapOptions({interactive}) {
+	return {
+		dragging: interactive,
+		touchZoom: interactive,
+		doubleClickZoom: interactive,
+		scrollWheelZoom: interactive,
+		boxZoom: interactive,
+		keyboard: interactive,
+		zoomControl: interactive
+	}
 }
 
 Alpine.data("ProjectLocation", ProjectLocation)

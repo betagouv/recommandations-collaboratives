@@ -1,0 +1,16 @@
+{% load static %}
+
+<div x-cloak class="p-0 project-map-container" :class="{'is-small':mapIsSmall}" >
+    <div class="h-100 w-100" x-ref="map" id="map" class="project-map"></div>
+    <div class="flex-shrink-0 ps-2">
+        <a style="cursor: pointer"
+            @click="openProjectMapModal"
+            data-toggle="modal"
+            data-target="#projectMapModal"
+            class="open-map-modal-button">
+            <span>Voir la carte</span>
+        </a>
+        {% include "projects/project/fragments/project_map_modal.html" %}
+    </div>
+</div>
+

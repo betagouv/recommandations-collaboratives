@@ -15,5 +15,21 @@
 }
 
 .project-map-container.is-small {
-    height: 220px;
+    height: 260px;
+}
+
+.open-map-modal-button {
+    position: absolute;
+    right: 15px;
+    bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: white;
+    padding: 10px;
+    border-radius: 6px;
+    border:2px solid #ccc;
+
+    cursor: pointer;
 }
