@@ -13,7 +13,8 @@ function ProjectLocation(nameProject, status, nameCommune, postal, longitude, la
 	return {
 		mapIsSmall: true,
 		project: null,
-		projectMapModal: null,
+		mapModal: null,
+		interactiveMap: null,
 
 		async init() {
 			this.project = {
@@ -27,30 +28,47 @@ function ProjectLocation(nameProject, status, nameCommune, postal, longitude, la
 				}
 			}
 			const options = mapOptions({interactive: false});
-			const	Map = initMap('map', this.project.commune.latitude, this.project.commune.longitude, options);
+			const zoom = 5;
+			const	Map = initMap('map', this.project.commune.latitude, this.project.commune.longitude, options, zoom);
+			
 			initMapLayers(Map, this.project);
-			this.initProjectMapModal();
+			
+			// forces map redraw to fit container
+			setTimeout(function(){  Map.invalidateSize()}, 0); 
 			//Center Map
 			Map.panTo(new L.LatLng(this.project.commune.latitude, this.project.commune.longitude));
+
+			this.initProjectMapModal();
 		},
+
 		initProjectMapModal() {
 			const element = document.getElementById("project-map-modal");
-			this.projectMapModal = new bootstrap.Modal(element);
+			this.mapModal = new bootstrap.Modal(element);
+
+			const options = mapOptions({interactive: true});
+			const zoom = 7;
+			this.interactiveMap = initMap('map-modal', this.project.commune.latitude, this.project.commune.longitude, options, zoom);
+			this.interactiveMap.setMinZoom(zoom - 2);
+			this.interactiveMap.setMaxZoom(zoom + 6);
+
+			const map = this.interactiveMap;
+			element.addEventListener('shown.bs.modal', function (event) {
+				 // forces map redraw to fit container
+				setTimeout(function(){  map.invalidateSize()}, 0);
+			})
+			initMapLayers(this.interactiveMap, this.project);
 		},
+
 		openProjectMapModal() {
-			this.interactive = true;
 			this.mapIsSmall = false;
-			const options = mapOptions({interactive: false});
-			// const	Map = initMap('map-modal', this.project.commune.latitude, this.project.commune.longitude, options);
-			this.projectMapModal.show();
+			this.mapModal.show();
 		},
 	}
 }
 
 // Map base layer 
-function initMap(idMap, latitude, longitude, options) {
-	const map = L.map(idMap, options).setView([latitude, longitude],12);
-	setTimeout(function(){  map.invalidateSize()}, 0); // forces map redraw to fit container
+function initMap(idMap, latitude, longitude, options, zoom) {
+	const map = L.map(idMap, options).setView([latitude, longitude], zoom);
 
 	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
 		maxZoom: 20,
@@ -62,7 +80,7 @@ function initMap(idMap, latitude, longitude, options) {
 	return map;
 }
 
-// Crete layers composed with markers
+// Create layers composed with markers
 function initMapLayers(map, project) {
 		const { latitude, longitude } = project.commune;
 		let marker = L.marker([latitude, longitude], { icon: createMarkerIcon(project.status) }).addTo(map)
