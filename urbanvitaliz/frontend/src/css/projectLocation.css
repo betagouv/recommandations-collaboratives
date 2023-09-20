@@ -15,8 +15,8 @@
 }
 
 .map-modal .modal-content {
-   height: 65vh;
- }
+    height: 65vh;
+}
 
 .map-modal .modal-body {
     height:100%;
@@ -43,7 +43,7 @@
 
     background-color: white;
     padding: 10px;
-    border:2px solid #ccc;
+    border: 1px solid #E5E5E5;
 
     cursor: pointer;
 }
