@@ -5,7 +5,14 @@
 {% endblock %}
 {% block content %}
     {% if project %}
-        <div x-data='ProjectLocation("{{project.commune.longitude}}", "{{project.commune.longitude}}", "{{project.status}}")'>
+        <div x-data='ProjectLocation(
+                "{{project.name}}",
+                "{{project.status}}",
+                "{{project.commune.name}}",
+                "{{project.commune.postal}}",
+                "{{project.commune.longitude}}",
+                "{{project.commune.latitude}}"
+            )'>
             {% include 'projects/project/fragments/project_location_map.html' %}
         </div>
     {% endif %}
