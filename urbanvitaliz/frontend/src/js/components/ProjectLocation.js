@@ -20,7 +20,7 @@ function ProjectLocation(projectOptions) {
 				longitude: projectOptions.longitude ? parseFloat(projectOptions.longitude) :1.20,
 			}
 			const options = mapOptions({interactive: false});
-			const zoom = 5;
+			const zoom = 10;
 			const Map = initMap('map', this.project.latitude, this.project.longitude, options, zoom);
 			
 			initMapLayers(Map, this.project);
@@ -38,10 +38,10 @@ function ProjectLocation(projectOptions) {
 			this.mapModal = new bootstrap.Modal(element);
 
 			const options = mapOptions({interactive: true});
-			const zoom = 7;
+			const zoom = 13;
 			this.interactiveMap = initMap('map-modal', this.project.latitude, this.project.longitude, options, zoom);
 			this.interactiveMap.panTo(new L.LatLng(this.project.latitude, this.project.longitude));
-			this.interactiveMap.setMinZoom(zoom - 2);
+			this.interactiveMap.setMinZoom(zoom - 7);
 			this.interactiveMap.setMaxZoom(zoom + 6);
 
 			const map = this.interactiveMap;
