@@ -20,6 +20,8 @@ INSTALLED_APPS += ("debug_toolbar",)
 
 MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
 
+INTERNAL_IPS = []
+
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK": lambda r: r.environ.get("SERVER_NAME", None)
     != "testserver"
@@ -58,4 +60,5 @@ DJANGO_VITE_DEV_MODE = True
 # GDAL_LIBRARY_PATH="/opt//homebrew/lib/libgdal.dylib"
 # GEOS_LIBRARY_PATH="/opt//homebrew/lib/libgeos_c.dylib"
 
+SILENCED_SYSTEM_CHECKS += ['captcha.recaptcha_test_key_error']
 # eof
