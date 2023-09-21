@@ -9,7 +9,7 @@ for site in Site.objects.all():
 
     with settings.SITE_ID.override(site.pk):
 
-        # collect peojects w/o submitted_by
+        # collect projects w/o submitted_by
 
         projects = projects_models.Project.objects.filter(submitted_by=None)
 
@@ -23,8 +23,10 @@ for site in Site.objects.all():
             # if there is a project last_name and it differs from owner skip
             if p.last_name and p.last_name.lower() != p.owner.last_name.lower():
                 continue
-            # we consider current owner to be sumitter
+            # we consider current owner to be submitter
             p.submitted_by = p.owner
             p.save()
+
+            print("updated:", p.id, p.submitted_by)
 
 # eof
