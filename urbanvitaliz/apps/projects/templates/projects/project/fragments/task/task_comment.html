@@ -7,8 +7,7 @@
             {% include 'projects/project/fragments/task/task_user_card.html' %}
             {% if "manage_tasks" in user_project_perms and not disable_edit %}
                 <button class="position-absolute bottom-0 mb-3 me-3 right-0 end-0 border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey"
-                        @click.stop
-                        @click="isEditing = true">
+                        @click.stop="isEditing = true">
                     <svg class="bi" width="12px" height="12px" fill="#929292">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
                     </svg>
@@ -21,16 +20,14 @@
             <div class="d-flex flex-column align-items-center justify-content-center w-100 py-4">
                 <span class="text-info-custom text-orange name fw-normal mb-2">Pas de commentaire initial</span>
                 <button class="button filled blue small inherit"
-                        @click.stop
-                        @click="isEditing = true">Ajouter un commentaire</button>
+                        @click.stop="isEditing = true">Ajouter un commentaire</button>
             </div>
         </div>
     </template>
     <template x-if="isEditing">
         <div class="py-3 px-3 mb-2 border-blue task-comment medium-border-radius position-relative">
             <button class="position-absolute top-0 mt-3 me-3 right-0 end-0 border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey"
-                    @click.stop
-                    @click="isEditing = false">
+                    @click.stop="isEditing = false">
                 <svg class="bi" width="12px" height="12px" fill="#929292">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x" />
                 </svg>
