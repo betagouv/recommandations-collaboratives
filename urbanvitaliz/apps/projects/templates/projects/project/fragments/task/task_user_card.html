@@ -7,7 +7,7 @@
      class="user-card position-relative d-flex my-1 flex-column justify-content-between align-items-start">
     <div class="position-relative d-flex align-items-center justify-content-between">
         <div x-ref="user"
-             @click="onUserClick"
+             @click.stop="onUserClick"
              class="d-flex align-items-center flex-wrap user-info">
             <span class="me-1 d-flex align-items-center font-very-small">
                 <img class="rounded-circle d-inline-block"
@@ -31,7 +31,7 @@
     <div x-cloak
          x-ref="userTooltip"
          id="user-tooltip"
-         @click.outside="onOutsideUserClick"
+         @click.stop.outside="onOutsideUserClick"
          class="user-card-popup flex-column {% if followup_user %}w-100{% endif %}">
         <div class="d-flex align-items-center flex-wrap">
             <span class="me-2 d-flex align-items-center font-very-small">
@@ -83,7 +83,7 @@
                            x-text="truncate(currentUser.email,30)"></a>
                     </div>
                     <button class="ms-4 px-2 py-0 btn small btn-outline-primary"
-                            @click="clipboardCopy(`L'email`, currentUser.email)">
+                            @click.stop="clipboardCopy(`L'email`, currentUser.email)">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
                         </svg>
@@ -104,7 +104,7 @@
                            x-text="currentUser.profile.phone_no"></a>
                     </div>
                     <button class="ms-4 px-2 py-0 btn small btn-outline-primary"
-                            @click="clipboardCopy('Le numéro de téléphone', '{{ user.profile.phone_no }}')">
+                            @click.stop="clipboardCopy('Le numéro de téléphone', '{{ user.profile.phone_no }}')">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
                         </svg>
