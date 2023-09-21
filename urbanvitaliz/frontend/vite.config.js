@@ -49,6 +49,7 @@ module.exports = {
                 tutorial: resolve('./src/js/apps/tutorial.js'),
                 contactList: resolve('./src/js/apps/contactList.js'),
                 projectDetailsCss: resolve('./src/css/projectDetails.css'),
+                projectLocation: resolve('./src/js/apps/projectLocation.js'),
             },
             output: {
                 chunkFileNames: undefined,

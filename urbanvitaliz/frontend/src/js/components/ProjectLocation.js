@@ -6,8 +6,7 @@ import 'leaflet-providers'
 
 import { statusToColorClass } from '../utils/statusToText'
 
-
-function ProjectLocation(nameProject, status, nameCommune, postal, longitude, latitude) {
+function ProjectLocation(projectOptions) {
 	return {
 		mapIsSmall: true,
 		project: null,
@@ -16,25 +15,20 @@ function ProjectLocation(nameProject, status, nameCommune, postal, longitude, la
 
 		async init() {
 			this.project = {
-				name: nameProject,
-				status,
-				commune: {
-					name: nameCommune,
-					postal,
-					latitude: latitude ? parseFloat(latitude) : 46.51,
-					longitude: longitude ? parseFloat(longitude) :1.20,
-				}
+				...projectOptions,
+				latitude: projectOptions.latitude ? parseFloat(projectOptions.latitude) : 46.51,
+				longitude: projectOptions.longitude ? parseFloat(projectOptions.longitude) :1.20,
 			}
 			const options = mapOptions({interactive: false});
 			const zoom = 5;
-			const	Map = initMap('map', this.project.commune.latitude, this.project.commune.longitude, options, zoom);
+			const Map = initMap('map', this.project.latitude, this.project.longitude, options, zoom);
 			
 			initMapLayers(Map, this.project);
 			
 			// forces map redraw to fit container
 			setTimeout(function(){  Map.invalidateSize()}, 0); 
 			//Center Map
-			Map.panTo(new L.LatLng(this.project.commune.latitude, this.project.commune.longitude));
+			Map.panTo(new L.LatLng(this.project.latitude, this.project.longitude));
 
 			this.initProjectMapModal();
 		},
@@ -45,7 +39,8 @@ function ProjectLocation(nameProject, status, nameCommune, postal, longitude, la
 
 			const options = mapOptions({interactive: true});
 			const zoom = 7;
-			this.interactiveMap = initMap('map-modal', this.project.commune.latitude, this.project.commune.longitude, options, zoom);
+			this.interactiveMap = initMap('map-modal', this.project.latitude, this.project.longitude, options, zoom);
+			this.interactiveMap.panTo(new L.LatLng(this.project.latitude, this.project.longitude));
 			this.interactiveMap.setMinZoom(zoom - 2);
 			this.interactiveMap.setMaxZoom(zoom + 6);
 
@@ -80,7 +75,7 @@ function initMap(idMap, latitude, longitude, options, zoom) {
 
 // Create layers composed with markers
 function initMapLayers(map, project) {
-		const { latitude, longitude } = project.commune;
+		const { latitude, longitude } = project;
 		let marker = L.marker([latitude, longitude], { icon: createMarkerIcon(project.status) }).addTo(map)
 
 		marker.bindPopup(markerPopupTemplate(project))
@@ -97,7 +92,7 @@ function markerPopupTemplate(project) {
 		<div class="marker-popup">
 			<main class="d-flex flex-column">
 				<p class="m-0 mb-2 fs-6 fw-bold">Commune</p>
-				<p class="m-0 fs-7 text-capitalize">${project.commune.name} (${project.commune.postal})</p>
+				<p class="m-0 fs-7 text-capitalize">${project.nameProject} (${project.nameCommune})</p>
 			</main>
 		</div>
 	`

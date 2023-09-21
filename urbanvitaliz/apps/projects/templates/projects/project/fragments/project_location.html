@@ -1,19 +1,28 @@
 {% load static %}
 {% load django_vite %}
+{{ project.name|json_script:"nameProject" }}
+{{ project.status|json_script:"status" }}
+{{ project.location|json_script:"location" }}
+{{ project.commune.name|json_script:"nameCommune" }}
+{{ project.commune.postal|json_script:"postal" }}
+{{ project.commune.latitude|json_script:"latitude" }}
+{{ project.commune.longitude|json_script:"longitude" }}
 {% block js %}
     {% vite_asset 'js/apps/projectLocation.js' %}
+    <script>
+        const projectOptions = {
+            nameProject: JSON.parse(document.getElementById('nameProject').textContent),
+            status: JSON.parse(document.getElementById('status').textContent),
+            nameCommune: JSON.parse(document.getElementById('nameCommune').textContent),
+            postal: JSON.parse(document.getElementById('postal').textContent),
+            longitude: JSON.parse(document.getElementById('longitude').textContent),
+            latitude: JSON.parse(document.getElementById('latitude').textContent),
+        }
+    </script>
 {% endblock %}
 {% block content %}
-    {% if project %}
-        <div x-data='ProjectLocation(
-                "{{project.name}}",
-                "{{project.status}}",
-                "{{project.commune.name}}",
-                "{{project.commune.postal}}",
-                "{{project.commune.longitude}}",
-                "{{project.commune.latitude}}"
-            )'>
-            {% include 'projects/project/fragments/project_map.html' %}
-        </div>
-    {% endif %}
+    <div x-data='ProjectLocation(projectOptions)'>
+        {% include 'projects/project/fragments/project_map.html' %}
+        {% include 'projects/project/fragments/project_location_details.html' %}
+    </div>
 {% endblock %}
