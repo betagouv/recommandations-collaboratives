@@ -15,7 +15,12 @@
 }
 
 .map-modal .modal-content {
-    height: 65vh;
+    height: 75vh;
+    border-radius: 0;
+}
+
+.map-modal .modal-header h6 {
+  font-size: 14px;
 }
 
 .map-modal .modal-body {
