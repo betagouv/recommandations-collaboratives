@@ -65,7 +65,7 @@
         "fields": {
             "user": 5,
             "organization": 2,
-            "phone_no": "0101010101",
+            "phone_no": "",
             "organization_position": null,
             "deleted": null,
             "departments": [

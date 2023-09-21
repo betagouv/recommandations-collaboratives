@@ -43,6 +43,7 @@
           <button type="button"
                   type="submit"
                   class="btn btn-primary"
+                  :id="`${currentFeedbackTask.id}-${$store.taskModal.feedbackModalStatus}-button`"
                   @click="onSubmitFeedback">Archiver</button>
         </div>
       </div>

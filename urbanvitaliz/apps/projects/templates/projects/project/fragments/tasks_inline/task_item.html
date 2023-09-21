@@ -5,7 +5,8 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
      :class="`border${getTaskColor(task)}`"
-     class="rounded mb-3 px-3 d-flex pt-3 pb-3 justify-content-between align-items-start task-item"
+     class="rounded mb-3 px-3 d-flex pt-3 pb-3 justify-content-between align-items-start task-item cursor-pointer hover-shadow hover-border-blue transition-all"
+     @click="handleOpenPreviewModal()"
      :id="task.id">
     <div x-show="task.isLoading"
          class="ms-2 item-loader z-index-1"
@@ -30,8 +31,7 @@
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex w-100 justify-content-between align-items-center">
                 <div class="d-flex w-100 align-items-center">
-                    <span class="mt-0 pt-0mb-0 fw-bold title-info text-dark cursor-pointer hover-border-bottom"
-                          @click="handleOpenPreviewModal()"
+                    <span class="mt-0 pt-0 mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
                           x-text="task.intent"></span>
                 </div>
             </div>
@@ -41,11 +41,11 @@
         </div>
         <article class="mt-1 mb-2">
             <template x-if="task.resource_id && task.resource && task.resource.subtitle">
-                <div x-html="truncate(renderMarkdown(task.resource.subtitle),500)"
+                <div x-html="truncate(renderMarkdown(task.resource.subtitle),100)"
                      class="text-info-custom fw-light font-small text-dark m-0 p-0"></div>
             </template>
             <template x-if="!task.resource_id && task.content">
-                <div x-html="truncate(renderMarkdown(task.content),500)"
+                <div x-html="truncate(renderMarkdown(task.content),100)"
                      class="text-info-custom fw-light font-small text-dark mb-2 p-0"></div>
             </template>
         </article>

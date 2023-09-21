@@ -9,9 +9,9 @@ export default function boardTasksApp(projectId) {
     const app = {
         boards: [
             { status: TASK_STATUSES.PROPOSED, title: "Sans statut", color_class: "bg-white", color: "#fff" },
-            { status: TASK_STATUSES.INPROGRESS, title: "En cours", color_class: "bg-blue", color: "#0974F6" },
+            { status: [TASK_STATUSES.BLOCKED, TASK_STATUSES.INPROGRESS], title: "En cours", color_class: "bg-blue", color: "#0974F6" },
             { status: TASK_STATUSES.DONE, title: "Fait", color_class: "bg-green-dark", color: "#27A658" },
-            { status: [TASK_STATUSES.BLOCKED, TASK_STATUSES.NOT_INTERESTED, TASK_STATUSES.ALREADY_DONE], title: "Non applicable", color_class: "bg-grey-dark", color: "#929292" },
+            { status: [TASK_STATUSES.NOT_INTERESTED, TASK_STATUSES.ALREADY_DONE], title: "Non applicable", color_class: "bg-grey-dark", color: "#929292" },
         ],
         onDragStart(event, uuid) {
             event.dataTransfer.clearData();

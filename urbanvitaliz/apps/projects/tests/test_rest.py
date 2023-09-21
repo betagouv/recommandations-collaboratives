@@ -1153,6 +1153,46 @@ def test_project_task_notifications_mark_read_updates_notifications_of_advisor(r
     assert user.notifications.unread().count() == 0
 
 
+@pytest.mark.django_db
+def test_project_task_notifications_doesn_mark_read_updates_notifications_is_hijacked(
+    request,
+):
+    user = baker.make(auth_models.User, username="user")
+    site = get_current_site(request)
+    project = baker.make(models.Project, sites=[site])
+    task = baker.make(models.Task, project=project, site=site, public=True)
+
+    # a notification on task itself
+    notify.send(
+        sender=baker.make(auth_models.User),
+        recipient=user,
+        verb=verbs.Recommendation.CREATED,
+        action_object=task,
+        target=project,
+        private=False,
+    )
+
+    assert user.notifications.unread().count() == 1
+
+    # FIXME here the point should be to state the specific permission
+    utils.assign_advisor(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    # Simulate django-hijack behaviour
+    user.is_hijacked = True
+
+    url = reverse(
+        "project-tasks-notifications-mark-all-as-read", args=[project.id, task.id]
+    )
+    response = client.post(url)
+
+    assert response.status_code == 200
+    assert response.data == {}
+    assert user.notifications.unread().count() == 1
+
+
 ########################################################################
 # REST API: searching topics
 ########################################################################

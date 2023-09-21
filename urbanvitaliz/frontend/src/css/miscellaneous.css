@@ -65,6 +65,18 @@
     transition: border 0.25s ease;
 }
 
+.hover-border-blue:hover {
+    border-color: #0063CB !important;
+}
+
+.hover-bg-grey-light:hover {
+    background-color: #ecf5ff;
+}
+
+.transition-all {
+    transition: all 0.100s ease;
+}
+
 .border-bottom-grey {
     border-bottom: 1px solid #EEE;
 }
@@ -99,12 +111,18 @@
     display: flex;
 }
 
-.common-dropdown li a:hover, .common-dropdown li button:hover {
+.common-dropdown li a:hover,
+.common-dropdown li button:hover {
     background-color: #e6e6e6 !important;
 }
 
-.common-dropdown li a:hover span, .common-dropdown li button:hover span {
+.common-dropdown li a:hover span,
+.common-dropdown li button:hover span {
     color: #222 !important;
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
 }
 
 @keyframes component-pulse {
@@ -127,19 +145,20 @@
 
 .appear-in-with-delay {
     opacity: 0;
-    transform: translate3d(-5px,0,0);
+    transform: translate3d(-5px, 0, 0);
     animation: appear-in 0.5s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.35s;
     animation-delay: 1s;
 }
 
 @keyframes appear-in {
-    from{
+    from {
         opacity: 0;
-        transform: translate3d(0,-10px,0);
+        transform: translate3d(0, -10px, 0);
     }
-    to{
+
+    to {
         opacity: 1;
-        transform: translate3d(0,0,0);
+        transform: translate3d(0, 0, 0);
     }
 }
 

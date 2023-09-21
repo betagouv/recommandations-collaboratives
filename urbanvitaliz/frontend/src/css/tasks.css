@@ -121,3 +121,7 @@ body.modal-open {
         transform: translate3d(0,0,0);
     }
 }
+
+.followups-wrapper {
+    padding-top: 40px;
+}

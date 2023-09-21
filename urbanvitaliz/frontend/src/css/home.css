@@ -11,6 +11,15 @@
     border-radius: 1px;
 }
 
+.custom-banner.left-banner {
+    left: -10px;
+    right: inherit;
+}
+
+.custom-banner.left-banner::after {
+    left: 0;
+}
+
 .custom-banner::after {
     content: '';
 
@@ -24,4 +33,16 @@
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
     border-top: 10px solid #3558A2;
+}
+
+@media (max-width: 48em) {
+    .custom-banner  {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+    }
+
+    .custom-banner  a{
+        margin-top: 15px;
+    }
 }

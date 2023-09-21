@@ -1,11 +1,8 @@
 import projects from '../../../../fixtures/projects/projects.json'
 import tasks from '../../../../fixtures/projects/tasks.json'
 
-const currentProject = projects[1];
-const task1 = tasks[0]
-const task2 = tasks[1]
-const task3 = tasks[2]
-const task4 = tasks[3]
+const currentProject = projects[6];
+const currentTask = tasks[4]
 
 
 describe('I can go tasks tab', () => {
@@ -18,10 +15,17 @@ describe('I can go tasks tab', () => {
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
 
-        cy.contains("Thématique").should('have.class', 'active')
-        cy.contains(task4.fields.intent)
+        cy.contains("Liste").should('have.class', 'active')
+        cy.contains(currentTask.fields.intent)
 
-        cy.get(`#${task4.pk}`).contains('En cours').click({force:true});
-        cy.get(`#${task4.pk}`).contains('En cours').should('have.class', 'bg-blue')
+        cy.get(`#${currentTask.pk}`).contains('en cours').click({ force: true });
+        cy.get(`#${currentTask.pk}`).contains('en cours').should('have.class', 'bg-blue')
+
+        cy.contains(currentTask.fields.intent).click({ force: true })
+        cy.contains(currentTask.fields.intent)
+
+        const now = new Date();
+        cy.contains(`a changé le statut de la recommandation en en cours le ${now.toLocaleDateString()}`)
+
     })
 })

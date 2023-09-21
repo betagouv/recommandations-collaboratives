@@ -1,0 +1,54 @@
+/* used to be able to use position sticky on children */
+[x-cloak] {
+    display: none;
+}
+
+.project-map-container {
+    position: relative;
+    height: 260px;
+    width: 100%;
+    z-index: 100;
+
+    border-radius: 4px;
+    overflow: hidden;
+    transition: height 0.25s ease;
+}
+
+.map-modal .modal-content {
+    height: 75vh;
+    border-radius: 0;
+}
+
+.map-modal .modal-header h6 {
+  font-size: 14px;
+}
+
+.map-modal .modal-body {
+    height:100%;
+}
+
+.map-modal  .project-map-container {
+    height:100%;
+}
+
+.map-overlay {
+    position: absolute;
+    right: 10px;
+    bottom: 30px;
+    z-index: 1000;
+}
+
+.open-map-modal-button {
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #E5E5E5;
+
+    cursor: pointer;
+}

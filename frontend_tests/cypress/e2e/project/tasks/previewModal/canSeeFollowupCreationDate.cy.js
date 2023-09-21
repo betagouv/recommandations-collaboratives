@@ -1,18 +1,15 @@
 import projects from '../../../../fixtures/projects/projects.json'
 import tasks from '../../../../fixtures/projects/tasks.json'
-import users from '../../../../fixtures/users/users.json'
 
 const currentProject = projects[1];
 const task1 = tasks[0]
-const currentUser = users[0]
-
 
 describe('I can go tasks tab', () => {
     beforeEach(() => {
         cy.login("staff");
     })
 
-    it('posts a followup', () => {
+    it('see creation date of a followup', () => {
         cy.visit(`/project/${currentProject.pk}`)
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
@@ -30,9 +27,6 @@ describe('I can go tasks tab', () => {
         })
 
         cy.contains('Enregistrer').click({ force: true })
-        cy.contains(`${currentUser.fields.first_name}`)
-        cy.contains(`${currentUser.fields.last_name}`)
-
-        cy.contains(`test ${now}`)
+        cy.contains(now.toLocaleDateString())
     })
 })
