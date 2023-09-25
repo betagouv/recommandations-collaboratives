@@ -125,3 +125,65 @@ body.modal-open {
 .followups-wrapper {
     padding-top: 40px;
 }
+
+.is-new-followup {
+    position: relative;
+    border: solid 1px #0063CB;
+    background: #eaf4ff !important;
+}
+
+.is-new-followup::before {
+    content: 'Nouveau';
+    position: absolute;
+
+    top: -10px;
+    right: -1px;
+
+    background-color: #0063CB;
+
+    padding: 0.2rem 0.4rem;
+    color: white;
+    font-size: 8px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 2px;
+}
+
+.is-new-followup-status .followup-status-message {
+    color: #0063CB;
+    font-weight: 500;
+}
+
+.is-new-followup-status .message {
+    position: relative;
+    border: solid 1px #0063CB;
+    background: #eaf4ff !important;
+}
+
+.is-new-followup-status .message::after {
+    content: '';
+    position: absolute;
+    left: calc(50% - 5px);
+    top: -10px;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #0063CB;
+}
+
+.is-new-followup-status .message::before {
+    content: 'Nouveau';
+    position: absolute;
+
+    top: -10px;
+    right: -1px;
+
+    background-color: #0063CB;
+
+    padding: 0.2rem 0.4rem;
+    color: white;
+    font-size: 8px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 2px;
+}
+

@@ -32,7 +32,7 @@
                         </div>
                     </template>
                     <!-- Modal body -->
-                    <div x-effect="taskId && $store.previewModal.loadFollowups() && followupScrollToLastMessage(true)"
+                    <div x-effect="taskId && $store.previewModal.loadFollowups() && $store.previewModal.loadNotifications() && followupScrollToLastMessage(true)"
                          class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
                         <div class="position-absolute top-0 end-0 px-3 py-2"
@@ -131,7 +131,7 @@
                                             <div class="position-relative">
                                                 <template x-if="!isStatusUpdate(f)">
                                                     <div class="rounded bg-light p-2 m-3 message"
-                                                         :class="hasNotification(f.id) && 'border border-warning'">
+                                                         :class="hasNotification(f.id) && 'is-new-followup'">
                                                         <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
                                                         <div class="d-flex justify-content-between align-items-center"
                                                              style="font-size: 0.9em">
@@ -148,8 +148,8 @@
                                                     </div>
                                                 </template>
                                                 <template x-if="isStatusUpdate(f) && f.status || isStatusUpdate(f) && f.status == 0">
-                                                    <div class="my-3" :class="hasNotification(f.id) && 'text-warning'">
-                                                        <div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
+                                                    <div class="my-3" :class="hasNotification(f.id) && 'is-new-followup-status'">
+                                                        <div class="mx-3 mb-1 text-center followup-status-message" style="font-size: 0.8em;">
                                                             <span class="ms-1 fst-italic"
                                                                   x-text="`${f.who.first_name} ${f.who.last_name}`"
                                                                   style="line-height: 20px"></span> a changé le statut de la recommandation en <span class="fw-bold" x-text="statusText(f.status)"></span>

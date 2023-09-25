@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs'
-import api, { followupsUrl } from '../utils/api'
+import api, { followupsUrl, taskNotificationsUrl } from '../utils/api'
 
 document.addEventListener('alpine:init', () => {
     Alpine.store('previewModal', {
@@ -81,7 +81,12 @@ document.addEventListener('alpine:init', () => {
         async loadFollowups() {
             const { data } = await api.get(followupsUrl(this.projectId, this.taskId))
             Alpine.store('tasksData').markAllAsRead(this.taskId)
+            await Alpine.store('tasksView').updateView()
             this.followups = data
+        },
+        async loadNotifications() {
+            const { data } = await api.get(taskNotificationsUrl(this.projectId, this.taskId))
+            this.notifications = data;
         },
         async setTaskIsVisited() {
             if (!Alpine.store('djangoData').isAdvisor) {
