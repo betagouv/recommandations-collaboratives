@@ -19,9 +19,15 @@ document.addEventListener('alpine:init', () => {
             return this.tasks.filter(task => task.visited === false && task.public)
         },
         getTopics() {
-            let topics = []
+            let topics = ["Sans thématique"]
 
-            this.tasks.forEach(task => !!(topics.find(topic => topic === task.topic.name)) ? null : topics.push(task.topic.name));
+            this.tasks.forEach(task => {
+                if (task.topic) {
+                    if (!(topics.find(topic => topic === task.topic.name))) {
+                        topics.push(task.topic.name)
+                    }
+                }
+            })
 
             this.topics = topics
 

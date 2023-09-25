@@ -35,7 +35,13 @@ export default function TasksInline(projectId) {
             console.log('topic : ', topic)
             console.log('data', this.data);
 
-            return this.view.filter(data => data.topic.name === topic)
+            return this.view.filter(data => {
+                if (data.topic) {
+                    return data.topic.name === topic
+                } else if (topic === "Sans thématique") {
+                    return data
+                }
+            })
         }
     }
 
