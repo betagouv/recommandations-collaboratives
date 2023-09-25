@@ -9,13 +9,26 @@ document.addEventListener('alpine:init', () => {
         },
 
         tasks: [],
+        topics: [],
         async init() {
             await this.loadTasks()
             Alpine.store('tasksView').displayedTasks = this.tasks
+            this.getTopics();
         },
         get newTasks() {
             return this.tasks.filter(task => task.visited === false && task.public)
         },
+        getTopics() {
+            let topics = []
+
+            this.tasks.forEach(task => !!(topics.find(topic => topic === task.topic.name)) ? null : topics.push(task.topic.name));
+
+            this.topics = topics
+
+            console.log('topics : ', this.topics);
+        },
+        //get each thematics for each project
+        //
         async loadTasks() {
             const json = await api.get(tasksUrl(this.projectId))
 
@@ -62,7 +75,7 @@ document.addEventListener('alpine:init', () => {
             const body = { comment, status }
 
             if (body.status === task.status && body.comment === "") return;
-            
+
             await api.post(followupsUrl(this.projectId, task.id), body)
         },
         async editComment(taskId, followupId, comment) {

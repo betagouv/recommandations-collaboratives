@@ -44,6 +44,13 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 
     uploaded_by = UserSerializer(read_only=True, many=False)
 
+class TopicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = [
+            "id",
+            "name",
+        ]
 
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -202,8 +209,12 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
 
         task = followup.task
 
+        print('task', task)
+        print('followup status : ', followup.status);
+
         if followup.status not in [Task.ALREADY_DONE, Task.NOT_INTERESTED, Task.DONE]:
             if followup.who in get_collaborators_for_project(followup.task.project):
+                print('HEREEEEEEE ??????');
                 create_reminder(
                     7 * 6, task, followup.who, origin=reminders_models.Reminder.SYSTEM
                 )
@@ -233,6 +244,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "notifications",
             "followups_count",
             "comments_count",
+            "topic"
         ]
 
     created_by = UserSerializer(read_only=True, many=False)
@@ -241,6 +253,8 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
     document = DocumentSerializer(read_only=True, many=True)
 
     resource = ResourceSerializer(read_only=True, many=False)
+
+    topic = TopicSerializer(read_only=True, many=False)
 
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()
