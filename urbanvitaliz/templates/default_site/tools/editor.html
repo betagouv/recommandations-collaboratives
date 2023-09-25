@@ -8,7 +8,7 @@
               :class="{ 'is-active': isActive('heading', { level: 3 }, updatedAt) }">
         <span style="font-weight:500">Titre</span>
       </button>
-      <button @click.stop="toggleBold()"
+      <button @click.stop.prevent="toggleBold()"
               :class="{ 'is-active' : isActive('bold', updatedAt) }">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#type-bold" />
