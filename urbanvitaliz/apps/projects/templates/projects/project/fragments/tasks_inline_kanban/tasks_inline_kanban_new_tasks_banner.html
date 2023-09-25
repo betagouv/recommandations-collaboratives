@@ -6,7 +6,7 @@
             <h6 class="mb-0 fw-bold">
                 Vous avez
                 <!-- TODO : Extraire les formatteurs -->
-                <span x-text="`${$store.tasksData.newTasks.length > 1 ? $store.tasksData.newTasks.length + ' nouvelles recommandations' : $store.tasksData.newTasks.length + ' nouvelle recommandation'}`"></span>
+                <span x-text="`${$store.tasksData.newTasks.length > 1 ? $store.tasksData.newTasks.length + ' recommandations non lues' : $store.tasksData.newTasks.length + ' recommandation non lue'} sur ${$store.tasksData.tasks.length}`"></span>
             </h6>
             <button @click="$store.previewModal.openWithPagination()"
                     style="color: #0063CB !important"
