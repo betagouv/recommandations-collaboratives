@@ -135,8 +135,14 @@ def project_list_export_csv(request):
                         models.Task.DONE,
                     )
                 ).count(),
-                followups.exclude(status=None).exclude(who__in=switchtenders).count(),
-                followups.exclude(comment="").exclude(who__in=switchtenders).count(),
+                followups.exclude(status=None)
+                .exclude(task__status=models.Task.NOT_INTERESTED)
+                .exclude(who__in=switchtenders)
+                .count(),
+                followups.exclude(task__status=models.Task.NOT_INTERESTED)
+                .exclude(comment="")
+                .exclude(who__in=switchtenders)
+                .count(),
                 (
                     followups.exclude(comment="")
                     .filter(who__in=switchtenders, who__is_staff=False)
