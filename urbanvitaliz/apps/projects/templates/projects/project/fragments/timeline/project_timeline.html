@@ -10,8 +10,8 @@
             Activité du projet
         </h6>
     </div>
-    <div class="p-0 h-100 d-inline-flex flex-column justify-content-between align-items-center">
-        <article class="overflow-hidden timeline-blur">
+    <div class="p-0 h-100 w-100 d-inline-flex flex-column justify-content-between align-items-center">
+        <article class="overflow-hidden timeline-blur w-100">
             
             {% regroup stream by timestamp.date as stream_by_day %}
 
@@ -26,7 +26,7 @@
                         </div>
                     </li>
                 {% empty %}
-                    <span class="text-custom-info text-grey-dark fw-light">Vous trouverez ici l'activité de vos projets suivis</span>
+                    <span class="text-custom-info text-grey-dark fw-light mb-4">Vous trouverez ici l'activité de vos projets suivis</span>
                 {% endfor %}
             </ul>
         </article>

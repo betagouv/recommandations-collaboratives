@@ -23,7 +23,7 @@
                 <span>a invité
                   <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
                   <strong class="text-dark">
-                    {% if action.action_object.role == "SWITCHTENDER" %}
+                    {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
                       conseiller·e
                     {% else %}
                       collectivité
