@@ -209,12 +209,8 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
 
         task = followup.task
 
-        print('task', task)
-        print('followup status : ', followup.status);
-
         if followup.status not in [Task.ALREADY_DONE, Task.NOT_INTERESTED, Task.DONE]:
             if followup.who in get_collaborators_for_project(followup.task.project):
-                print('HEREEEEEEE ??????');
                 create_reminder(
                     7 * 6, task, followup.who, origin=reminders_models.Reminder.SYSTEM
                 )
