@@ -29,7 +29,7 @@ document.addEventListener('alpine:init', () => {
                 }
             })
 
-            topics.push("Sans thématique")
+            topics.push("Tous sujets")
 
             this.topics = topics
         },

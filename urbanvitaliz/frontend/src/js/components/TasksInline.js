@@ -35,7 +35,7 @@ export default function TasksInline(projectId) {
             return this.view.filter(data => {
                 if (data.topic) {
                     return data.topic.name === topic
-                } else if (topic === "Sans thématique") {
+                } else if (topic === "Tous sujets") {
                     return data
                 }
             })
