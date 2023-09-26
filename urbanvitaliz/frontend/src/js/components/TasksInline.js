@@ -32,9 +32,6 @@ export default function TasksInline(projectId) {
             return this.data = this.data.filter((d) => d.public == !this.filterIsDraft);
         },
         filterTaskByTopic(topic) {
-            console.log('topic : ', topic)
-            console.log('data', this.data);
-
             return this.view.filter(data => {
                 if (data.topic) {
                     return data.topic.name === topic

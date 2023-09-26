@@ -19,7 +19,7 @@ document.addEventListener('alpine:init', () => {
             return this.tasks.filter(task => task.visited === false && task.public)
         },
         getTopics() {
-            let topics = ["Sans thématique"]
+            let topics = []
 
             this.tasks.forEach(task => {
                 if (task.topic) {
@@ -29,9 +29,9 @@ document.addEventListener('alpine:init', () => {
                 }
             })
 
-            this.topics = topics
+            topics.push("Sans thématique")
 
-            console.log('topics : ', this.topics);
+            this.topics = topics
         },
         //get each thematics for each project
         //
