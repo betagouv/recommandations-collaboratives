@@ -5,6 +5,7 @@
 {{ project.location|json_script:"location" }}
 {{ project.commune.name|json_script:"nameCommune" }}
 {{ project.commune.postal|json_script:"postal" }}
+{{ project.commune.insee|json_script:"insee" }}
 {{ project.commune.latitude|json_script:"latitude" }}
 {{ project.commune.longitude|json_script:"longitude" }}
 {% block js %}
@@ -17,6 +18,7 @@
             commune: {
                 name: JSON.parse(document.getElementById('nameCommune').textContent),
                 postal: JSON.parse(document.getElementById('postal').textContent),
+                insee: JSON.parse(document.getElementById('insee').textContent),
                 longitude: JSON.parse(document.getElementById('longitude').textContent),
                 latitude: JSON.parse(document.getElementById('latitude').textContent),
             }
