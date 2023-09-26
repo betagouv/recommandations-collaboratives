@@ -38,6 +38,7 @@ def project_list_export_csv(request):
         models.Project.on_site.for_user(request.user)
         .exclude(status="DRAFT")
         .order_by("-created_on")
+        .prefetch_related("notes", "tasks")
     )
 
     project_ct = ContentType.objects.get_for_model(models.Project)
@@ -98,8 +99,7 @@ def project_list_export_csv(request):
             task__site=request.site,
         )
 
-        notes = models.Note.objects.filter(
-            project=project,
+        notes = project.notes.filter(
             created_by__in=switchtenders,
             created_by__is_staff=False,
         )
@@ -108,7 +108,7 @@ def project_list_export_csv(request):
             content_type_id=project_ct.pk, object_id=project.pk
         )
 
-        conversations = models.Note.objects.filter(project=project).filter(public=True)
+        conversations = project.notes.filter(public=True)
 
         published_tasks = project.tasks.filter(site=request.site).exclude(public=False)
 
