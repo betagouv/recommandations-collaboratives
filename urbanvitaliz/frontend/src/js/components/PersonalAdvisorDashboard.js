@@ -64,7 +64,11 @@ function PersonalAdvisorDashboard() {
             if (sameUser) {
                 return this.checkCurrentState();
             } else {
-                return this.addCurrentStateToStore('currentUser', currentUser)
+                //Changing current user and re-init current state
+                this.removeStateFromStore('departments')
+                this.removeStateFromStore('sort')
+                this.removeStateFromStore('search')
+                this.addCurrentStateToStore('currentUser', currentUser)
             }
         },
         checkCurrentState() {
@@ -234,6 +238,9 @@ function PersonalAdvisorDashboard() {
         },
         readCurrentStateFromStore(item) {
             return localStorage.getItem(item);
+        },
+        removeStateFromStore(item) {
+            return localStorage.removeItem(item)
         },
         handleProjectsSelect(event) {
             this.currentSort = this.getCurrentSortFn(event.target.value)
