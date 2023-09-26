@@ -970,6 +970,9 @@ class Document(models.Model):
         verbose_name = "document"
         verbose_name_plural = "documents"
 
+    def get_absolute_url(self):
+        return reverse("projects-project-detail-documents", kwargs={"project_id": self.project.pk})
+
     def __str__(self):  # pragma: nocover
         return f"Document {self.id}"
 
