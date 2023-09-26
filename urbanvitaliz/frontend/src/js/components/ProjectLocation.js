@@ -16,31 +16,38 @@ function ProjectLocation(projectOptions) {
 		async init() {
 			this.project = {
 				...projectOptions,
-				latitude: projectOptions.latitude ? parseFloat(projectOptions.latitude) : 46.51,
-				longitude: projectOptions.longitude ? parseFloat(projectOptions.longitude) :1.20,
+				commune: {
+					...projectOptions.commune,
+					latitude: projectOptions.commune.latitude ? parseFloat(projectOptions.commune.latitude) : 46.51,
+					longitude: projectOptions.commune.longitude ? parseFloat(projectOptions.commune.longitude) :1.20,
+				}
 			}
 			const options = mapOptions({interactive: false});
 			const zoom = 10;
-			const Map = initMap('map', this.project.latitude, this.project.longitude, options, zoom);
+			const { latitude, longitude } = this.project.commune;
+
+			const Map = initMap('map', latitude, longitude, options, zoom);
 			
 			initMapLayers(Map, this.project);
 			
 			// forces map redraw to fit container
 			setTimeout(function(){  Map.invalidateSize()}, 0); 
 			//Center Map
-			Map.panTo(new L.LatLng(this.project.latitude, this.project.longitude));
+			Map.panTo(new L.LatLng(latitude, longitude));
 
-			this.initProjectMapModal();
+			this.initProjectMapModal(this.project);
 		},
 
-		initProjectMapModal() {
+		initProjectMapModal(project) {
 			const element = document.getElementById("project-map-modal");
 			this.mapModal = new bootstrap.Modal(element);
 
 			const options = mapOptions({interactive: true});
 			const zoom = 13;
-			this.interactiveMap = initMap('map-modal', this.project.latitude, this.project.longitude, options, zoom);
-			this.interactiveMap.panTo(new L.LatLng(this.project.latitude, this.project.longitude));
+			const { latitude, longitude } = project.commune;
+
+			this.interactiveMap = initMap('map-modal', latitude, longitude, options, zoom);
+			this.interactiveMap.panTo(new L.LatLng(latitude, longitude));
 			this.interactiveMap.setMinZoom(zoom - 7);
 			this.interactiveMap.setMaxZoom(zoom + 6);
 
@@ -49,7 +56,7 @@ function ProjectLocation(projectOptions) {
 				 // forces map redraw to fit container
 				setTimeout(function(){  map.invalidateSize()}, 0);
 			})
-			initMapLayers(this.interactiveMap, this.project);
+			initMapLayers(this.interactiveMap, project);
 		},
 
 		openProjectMapModal() {
@@ -75,7 +82,7 @@ function initMap(idMap, latitude, longitude, options, zoom) {
 
 // Create layers composed with markers
 function initMapLayers(map, project) {
-		const { latitude, longitude } = project;
+		const { latitude, longitude } =  project.commune;
 		let marker = L.marker([latitude, longitude], { icon: createMarkerIcon(project.status) }).addTo(map)
 
 		marker.bindPopup(markerPopupTemplate(project))
@@ -91,8 +98,7 @@ function markerPopupTemplate(project) {
 	return `
 		<div class="marker-popup">
 			<main class="d-flex flex-column">
-				<p class="m-0 mb-2 fs-6 fw-bold">Commune</p>
-				<p class="m-0 fs-7 text-capitalize">${project.nameProject} (${project.nameCommune})</p>
+				<p class="m-0 fs-6"><span class="fw-bold">${project.name}</span> (${project.commune.name})</p>
 			</main>
 		</div>
 	`
