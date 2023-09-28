@@ -214,6 +214,7 @@ class Task(OrderedModel):
     reminders = GenericRelation(reminders_models.Reminder, related_query_name="tasks")
 
     class Meta:
+        managed = False
         db_table = "projects_task"
         ordering = []
         verbose_name = "action"
@@ -267,6 +268,7 @@ class TaskFollowup(models.Model):
     comment = models.TextField(default="", blank=True)
 
     class Meta:
+        managed = False
         db_table = "projects_taskfollowup"
         verbose_name = "suivi action"
         verbose_name_plural = "suivis actions"
@@ -299,6 +301,7 @@ class TaskFollowupRsvp(models.Model):
     created_on = models.DateTimeField(default=timezone.now)
 
     class Meta:
+        managed = False
         db_table = "projects_taskfollowuprsvp"
         verbose_name = "rsvp suivi action"
         verbose_name_plural = "rsvp suivis actions"
@@ -338,6 +341,7 @@ class TaskRecommendation(models.Model):
     )
 
     class Meta:
+        managed = False
         db_table = "projects_taskrecommendation"
 
     def trigged_by(self):
