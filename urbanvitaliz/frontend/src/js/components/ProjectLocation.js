@@ -9,7 +9,11 @@ import { statusToColorClass } from '../utils/statusToText'
 const codesComParis = ['75101','75102','75103','75104','75105','75106','75107','75108','75109','75110','75111','75112','75113','75114','75115','75116','75117','75118','75119','75120']
 const codesComLyon = ['69381','69382','69383','69384','69385','69386','69387','69388','69389']
 const codesComMarseille = ['13201','13202','13203','13204','13205','13206','13207','13208','13209','13210','13211','13212','13213','13214','13215','13216']
+
+
+// Doc: https://apicarto.ign.fr/api/doc/cadastre#/Commune/get_cadastre_commune
 const apiCadastre = 'https://apicarto.ign.fr/api/cadastre'
+
 
 function getGlobalCityCodeFromCodeInsee(codeInsee) {
 	if (codesComParis.includes(codeInsee)) {
@@ -27,7 +31,6 @@ function getCodeArrFromCodeInsee(codeInsee) {
 	return codeInsee.slice(-3)
 }
 
-// Src: https://apicarto.ign.fr/api/doc/cadastre#/Commune/get_cadastre_commune
 async function fetchCommuneIgn(insee) {
 	const apiEndpoint = `${apiCadastre}/commune?`;
 	const searchParams = {}
@@ -68,7 +71,9 @@ function ProjectLocation(projectOptions) {
 
 			const Map = initMap('map', this.project, options, zoom);
 			
-			const geoData = await fetchCommuneIgn(insee);
+			const geoData = {}
+			geoData.commune = await fetchCommuneIgn(insee);
+
 			initMapLayers(Map, this.project, geoData);
 			
 			// forces map redraw to fit container
@@ -124,15 +129,11 @@ function initMap(idMap, project, options, zoom) {
 
 // Create layers composed with markers
 function initMapLayers(map, project, geoData) {
-	if(project.location.latitude && project.location.latitude) {
-		// TODO: get longitude and latitude from exact location (street number + street name + commune)
-		const { latitude, longitude } =  project.location;
-		let marker = L.marker([latitude, longitude], { icon: createMarkerIcon(project.status) }).addTo(map)
-		marker.bindPopup(markerPopupTemplate(project))
-		L.layerGroup(marker)
+	if (geoData.commune) {
+		addLayerCommune(map, geoData.commune);
 	}
-	addLayerCommune(map, geoData)
 }
+
 
 function addLayerCommune(map, geoData) {
 	if(geoData.code && geoData.code === 400) {
@@ -143,22 +144,6 @@ function addLayerCommune(map, geoData) {
 	}
 }
 
-function createMarkerIcon(status) {
-	return L.divIcon({ className: 'map-marker ' + statusToColorClass(status) });
-}
-
-function markerPopupTemplate(project) {
-
-	return `
-		<div class="marker-popup">
-			<main class="d-flex flex-column">
-				<p class="m-0 fs-6 fw-bold">${project.name}</p>
-				<p class="m-0 fs-6">${project.location}</p>
-				<p class="m-0 fs-6">${project.commune.name} (${project.commune.postal})</p>
-			</main>
-		</div>
-	`
-}
 
 function mapOptions({interactive}) {
 	return {
