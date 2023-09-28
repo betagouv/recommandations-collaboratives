@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs'
 import TaskApp from './Tasks'
 import { TASK_STATUSES } from '../config/statuses';
+import { NO_TOPICS } from '../config/tasks';
 
 export default function TasksInline(projectId) {
 
@@ -35,8 +36,8 @@ export default function TasksInline(projectId) {
             return this.view.filter(data => {
                 if (data.topic) {
                     return data.topic.name === topic
-                } else if (topic === "Tous sujets") {
-                    return data
+                } else if (topic === NO_TOPICS) {
+                    return true
                 }
             })
         }

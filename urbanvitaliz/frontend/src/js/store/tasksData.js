@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs'
 import api, { tasksUrl, taskUrl, moveTaskUrl, followupsUrl, followupUrl, taskNotificationsUrl, markTaskNotificationsAsReadUrl } from '../utils/api'
 import { generateUUID } from '../utils/uuid'
+import { NO_TOPICS } from '../config/tasks'
 
 document.addEventListener('alpine:init', () => {
     Alpine.store('tasksData', {
@@ -29,7 +30,7 @@ document.addEventListener('alpine:init', () => {
                 }
             })
 
-            topics.push("Tous sujets")
+            topics.push(NO_TOPICS)
 
             this.topics = topics
         },
