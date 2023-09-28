@@ -25,7 +25,7 @@ from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.apps.projects  import models as projects_models
+from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.resources import models as resources
 
 
@@ -214,8 +214,6 @@ class Task(OrderedModel):
     reminders = GenericRelation(reminders_models.Reminder, related_query_name="tasks")
 
     class Meta:
-        managed = False
-        db_table = "projects_task"
         ordering = []
         verbose_name = "action"
         verbose_name_plural = "actions"
@@ -268,8 +266,6 @@ class TaskFollowup(models.Model):
     comment = models.TextField(default="", blank=True)
 
     class Meta:
-        managed = False
-        db_table = "projects_taskfollowup"
         verbose_name = "suivi action"
         verbose_name_plural = "suivis actions"
 
@@ -301,8 +297,6 @@ class TaskFollowupRsvp(models.Model):
     created_on = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        managed = False
-        db_table = "projects_taskfollowuprsvp"
         verbose_name = "rsvp suivi action"
         verbose_name_plural = "rsvp suivis actions"
 
@@ -339,10 +333,6 @@ class TaskRecommendation(models.Model):
         blank=True,
         verbose_name="Départements concernés",
     )
-
-    class Meta:
-        managed = False
-        db_table = "projects_taskrecommendation"
 
     def trigged_by(self):
         from urbanvitaliz.apps.survey import models as survey_models

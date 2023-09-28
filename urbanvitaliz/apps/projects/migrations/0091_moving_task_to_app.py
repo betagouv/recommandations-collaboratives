@@ -7,27 +7,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
     dependencies = [
         ("projects", "0090_topic_for_projects_and_tasks"),
+        # First create new table in tasks application
+        # and copy existing data (from projects tables to tasks ones)
+        ("tasks", "0001_initial"),
     ]
 
     operations = [
-        # update models as unmanaged, so that underlying tables are kept
-        migrations.AlterModelOptions(
-            name="Task",
-            options={"managed": False},
-        ),
-        migrations.AlterModelOptions(
-            name="TaskFollowup",
-            options={"managed": False},
-        ),
-        migrations.AlterModelOptions(
-            name="TaskFollowupRsvp",
-            options={"managed": False},
-        ),
-        migrations.AlterModelOptions(
-            name="TaskRecommendation",
-            options={"managed": False},
-        ),
-        # remove existing relations (generated)
         migrations.RemoveField(
             model_name="taskfollowup",
             name="task",
@@ -56,7 +41,6 @@ class Migration(migrations.Migration):
             model_name="taskrecommendation",
             name="site",
         ),
-        # remove models but not tables as unmanaged (generated)
         migrations.DeleteModel(
             name="Task",
         ),
