@@ -7,50 +7,55 @@ from django.db import migrations
 class Migration(migrations.Migration):
     dependencies = [
         ("projects", "0090_topic_for_projects_and_tasks"),
-        # First create new table in tasks application
-        # and copy existing data (from projects tables to tasks ones)
+        # First create new table in tasks application and rename tables
         ("tasks", "0001_initial"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="taskfollowup",
-            name="task",
-        ),
-        migrations.RemoveField(
-            model_name="taskfollowup",
-            name="who",
-        ),
-        migrations.RemoveField(
-            model_name="taskfollowuprsvp",
-            name="task",
-        ),
-        migrations.RemoveField(
-            model_name="taskfollowuprsvp",
-            name="user",
-        ),
-        migrations.RemoveField(
-            model_name="taskrecommendation",
-            name="departments",
-        ),
-        migrations.RemoveField(
-            model_name="taskrecommendation",
-            name="resource",
-        ),
-        migrations.RemoveField(
-            model_name="taskrecommendation",
-            name="site",
-        ),
-        migrations.DeleteModel(
-            name="Task",
-        ),
-        migrations.DeleteModel(
-            name="TaskFollowup",
-        ),
-        migrations.DeleteModel(
-            name="TaskFollowupRsvp",
-        ),
-        migrations.DeleteModel(
-            name="TaskRecommendation",
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.RemoveField(
+                    model_name="taskfollowup",
+                    name="task",
+                ),
+                migrations.RemoveField(
+                    model_name="taskfollowup",
+                    name="who",
+                ),
+                migrations.RemoveField(
+                    model_name="taskfollowuprsvp",
+                    name="task",
+                ),
+                migrations.RemoveField(
+                    model_name="taskfollowuprsvp",
+                    name="user",
+                ),
+                migrations.RemoveField(
+                    model_name="taskrecommendation",
+                    name="departments",
+                ),
+                migrations.RemoveField(
+                    model_name="taskrecommendation",
+                    name="resource",
+                ),
+                migrations.RemoveField(
+                    model_name="taskrecommendation",
+                    name="site",
+                ),
+                migrations.DeleteModel(
+                    name="Task",
+                ),
+                migrations.DeleteModel(
+                    name="TaskFollowup",
+                ),
+                migrations.DeleteModel(
+                    name="TaskFollowupRsvp",
+                ),
+                migrations.DeleteModel(
+                    name="TaskRecommendation",
+                ),
+            ],
+            # Do nothing as tables have already been renamed by task migration 0001
+            database_operations=[],
         ),
     ]
