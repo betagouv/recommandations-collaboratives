@@ -9,39 +9,41 @@ import { statusToColorClass } from '../utils/statusToText'
 const codesComParis = ['75101','75102','75103','75104','75105','75106','75107','75108','75109','75110','75111','75112','75113','75114','75115','75116','75117','75118','75119','75120']
 const codesComLyon = ['69381','69382','69383','69384','69385','69386','69387','69388','69389']
 const codesComMarseille = ['13201','13202','13203','13204','13205','13206','13207','13208','13209','13210','13211','13212','13213','13214','13215','13216']
-const apiCadastre = 'https://apicarto.ign.fr/api/cadastre/'
+const apiCadastre = 'https://apicarto.ign.fr/api/cadastre'
 
 function getGlobalCityCodeFromCodeInsee(codeInsee) {
-    if (codesComParis.includes(codeInsee)) {
-        return '75056'
-    }
-    if (codesComLyon.includes(codeInsee)) {
-        return '69123'
-    }
-    if (codesComMarseille.includes(codeInsee)) {
-        return '13055'
-    }
+	if (codesComParis.includes(codeInsee)) {
+		return '75056'
+	}
+	if (codesComLyon.includes(codeInsee)) {
+		return '69123'
+	}
+	if (codesComMarseille.includes(codeInsee)) {
+		return '13055'
+	}
 }
 
 function getCodeArrFromCodeInsee(codeInsee) {
-    return codeInsee.slice(-3)
+	return codeInsee.slice(-3)
 }
 
-async function fetchCommuneIgn(codeInsee) {
-    const apiEndpoint = `${apiCadastre}/commune?`;
-    const headers = new Headers({
-        "Content-Type": "application/json",
-    });
+// Src: https://apicarto.ign.fr/api/doc/cadastre#/Commune/get_cadastre_commune
+async function fetchCommuneIgn(insee) {
+	const apiEndpoint = `${apiCadastre}/commune?`;
 	const searchParams = {}
+
 	if (!getGlobalCityCodeFromCodeInsee(codeInsee)) {
-        searchParams['code_insee'] = codeInsee;
+        searchParams['code_insee'] = insee;
     } else {
-        const codeArr = getCodeArrFromCodeInsee(codeInsee);
-		const insee = getGlobalCityCodeFromCodeInsee(codeInsee);
+        var codeArr = getCodeArrFromCodeInsee(codeInsee);
+        var codeInsee = getGlobalCityCodeFromCodeInsee(codeInsee);
         searchParams['code_arr'] = codeArr;
         searchParams['code_insee'] = insee;
     }
-    return fetch(apiEndpoint + new URLSearchParams(searchParams)).then(response => response.json());
+
+	const communeGeo = await fetch(apiEndpoint + new URLSearchParams(searchParams)).then(response => response.json());
+
+	return communeGeo;
 }
 
 function ProjectLocation(projectOptions) {
@@ -61,27 +63,28 @@ function ProjectLocation(projectOptions) {
 				}
 			}
 			const options = mapOptions({interactive: false});
-			const zoom = 10;
-			const { latitude, longitude } = this.project.commune;
+			const zoom = 11;
+			const { latitude, longitude, insee } = this.project.commune;
 
 			const Map = initMap('map', this.project, options, zoom);
 			
-			initMapLayers(Map, this.project);
+			const geoData = await fetchCommuneIgn(insee);
+			initMapLayers(Map, this.project, geoData);
 			
 			// forces map redraw to fit container
 			setTimeout(function(){  Map.invalidateSize()}, 0); 
 			//Center Map
 			Map.panTo(new L.LatLng(latitude, longitude));
 
-			this.initProjectMapModal(this.project);
+			this.initProjectMapModal(this.project, geoData);
 		},
 
-		initProjectMapModal(project) {
+		initProjectMapModal(project, geoData) {
 			const element = document.getElementById("project-map-modal");
 			this.mapModal = new bootstrap.Modal(element);
 
 			const options = mapOptions({interactive: true});
-			const zoom = 13;
+			const zoom = 12;
 			const { latitude, longitude } = project.commune;
 
 			this.interactiveMap = initMap('map-modal', project, options, zoom);
@@ -94,7 +97,7 @@ function ProjectLocation(projectOptions) {
 				 // forces map redraw to fit container
 				setTimeout(function(){  map.invalidateSize()}, 0);
 			})
-			initMapLayers(this.interactiveMap, project);
+			initMapLayers(this.interactiveMap, project, geoData);
 		},
 
 		openProjectMapModal() {
@@ -120,25 +123,23 @@ function initMap(idMap, project, options, zoom) {
 }
 
 // Create layers composed with markers
-function initMapLayers(map, project) {
-	if(project.location) {  // TODO: use location for marker (?)
-		const { latitude, longitude } =  project.commune;
+function initMapLayers(map, project, geoData) {
+	if(project.location.latitude && project.location.latitude) {
+		// TODO: get longitude and latitude from exact location (street number + street name + commune)
+		const { latitude, longitude } =  project.location;
 		let marker = L.marker([latitude, longitude], { icon: createMarkerIcon(project.status) }).addTo(map)
 		marker.bindPopup(markerPopupTemplate(project))
 		L.layerGroup(marker)
-	} else if(project.commune.insee) {
-		addLayerCommune(map, project)
 	}
+	addLayerCommune(map, geoData)
 }
 
-function addLayerCommune(map, project) {
-	let { insee } =  project.commune;
-	const communeGeo = fetchCommuneIgn(insee)
-	if (communeGeo.code && communeGeo.code == 400) {
-		return false; // TODO: handle error
-	} else {
-		const communeLayer = L.geoJSON(null, communeGeo).addTo(map);
-		return communeLayer
+function addLayerCommune(map, geoData) {
+	if(geoData.code && geoData.code === 400) {
+		// TODO: handle error
+	}
+	if(geoData.features.length) {
+		L.geoJSON(geoData.features[0].geometry).addTo(map);
 	}
 }
 
@@ -151,7 +152,9 @@ function markerPopupTemplate(project) {
 	return `
 		<div class="marker-popup">
 			<main class="d-flex flex-column">
-				<p class="m-0 fs-6"><span class="fw-bold">${project.name}</span> (${project.commune.name})</p>
+				<p class="m-0 fs-6 fw-bold">${project.name}</p>
+				<p class="m-0 fs-6">${project.location}</p>
+				<p class="m-0 fs-6">${project.commune.name} (${project.commune.postal})</p>
 			</main>
 		</div>
 	`
