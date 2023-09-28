@@ -10,12 +10,24 @@
     background-color: #E5E5E5;
 }
 
+/* .bg-grey-dark-light {
+    background-color: #E5E5E5;
+} */
+
+.bg-grey-dark {
+    background-color: #929292;
+}
+
 .bg-yellow {
     background-color:#FDCD6D;
 }
 
 .bg-grey-light {
     background-color: #F6F6F6;
+}
+
+.bg-orange {
+    background-color:#FA7A35;
 }
 
 .bg-orange-light {
@@ -46,3 +58,6 @@
     fill: #929292;
 }
 
+.hover-bg-grey:hover {
+    background-color: #E5E5E5;
+}

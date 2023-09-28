@@ -90,7 +90,7 @@ class StatisticsView(TemplateView):
             | Q(exclude_stats=True)
         )
         context = super().get_context_data(**kwargs)
-        context["reco_following_pc"] = 90
+        context["reco_following_pc"] = 78
         context["collectivity_supported"] = the_projects.count()
         context["collectivity_with_reco"] = (
             tasks.Task.on_site.exclude(

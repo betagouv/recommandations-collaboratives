@@ -37,15 +37,18 @@ def make_group_name_for_site(name: str, site: Site) -> str:
     return f"{prefix}_{name}"
 
 
-def get_group_for_site(name: str, site: Site) -> auth.Group:
+def get_group_for_site(name: str, site: Site, create=False) -> auth.Group:
     """Return the Group with given name for site"""
     group_name = make_group_name_for_site(name, site)
     try:
         return auth.Group.objects.get(name=group_name)
     except auth.Group.DoesNotExist:
-        raise ImproperlyConfigured(
-            f"Please create the required groups for site'{site}'"
-        )
+        if not create:
+            raise ImproperlyConfigured(
+                f"Please create the required groups for site'{site}'"
+            )
+
+        return auth.Group.objects.create(name=group_name)
 
 
 ########################################################################

@@ -8,13 +8,7 @@ from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.tasks import models as task_models
 from urbanvitaliz.utils import get_group_for_site
 
-from .models import (
-    Document,
-    Note,
-    Project,
-    UserProjectStatus,
-    Topic,
-)
+from .models import Document, Note, Project, Topic, UserProjectStatus
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):

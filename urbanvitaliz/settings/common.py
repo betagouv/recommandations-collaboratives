@@ -305,4 +305,12 @@ PHONENUMBER_DEFAULT_REGION = "FR"
 # Hijack
 HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
 
+# Rest Framework
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+        "rest_framework_xml.renderers.XMLRenderer",
+    ]
+}
 # eof

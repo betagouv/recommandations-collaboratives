@@ -333,7 +333,6 @@ class TaskNotificationViewSet(
 
         followup_ids = list(task.followups.all().values_list("id", flat=True))
 
-        # FIXME cannot find who create notifications on followups
         followup_actions = notifications.filter(
             action_object_content_type=followup_ct.pk,
             action_object_object_id__in=followup_ids,
@@ -346,7 +345,11 @@ class TaskNotificationViewSet(
         detail=False,
     )
     def mark_all_as_read(self, request, project_id, task_id):
-        self.get_queryset().mark_all_as_read(request.user)
+        is_hijacked = getattr(request.user, "is_hijacked", False)
+
+        if not is_hijacked:
+            self.get_queryset().mark_all_as_read(request.user)
+
         return Response({}, status=status.HTTP_200_OK)
 
     serializer_class = TaskNotificationSerializer

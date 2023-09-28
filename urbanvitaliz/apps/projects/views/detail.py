@@ -16,7 +16,7 @@ from django.utils import timezone
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
-from urbanvitaliz.apps.tasks import models as task_models
+# from urbanvitaliz.apps.tasks import models as task_models
 from urbanvitaliz.utils import (
     get_site_config_or_503,
     has_perm,
@@ -99,10 +99,10 @@ def mark_notifications_as_seen(user, project):
     # Mark some notifications as seen (general ones)
     project_ct = ContentType.objects.get_for_model(project)
     notif_verbs = [
-        verbs.Conversation.PUBLIC_MESSAGE,
-        verbs.Document.ADDED,  # FIXME to remove
-        verbs.Document.ADDED_FILE,
-        verbs.Document.ADDED_LINK,
+        # verbs.Conversation.PUBLIC_MESSAGE,
+        # verbs.Document.ADDED,  # FIXME to remove
+        # verbs.Document.ADDED_FILE,
+        # verbs.Document.ADDED_LINK,
         verbs.Project.BECAME_SWITCHTENDER,
         verbs.Project.BECAME_ADVISOR,
         verbs.Project.BECAME_OBSERVER,
@@ -110,8 +110,8 @@ def mark_notifications_as_seen(user, project):
         verbs.Project.SUBMITTED_BY,
         verbs.Project.VALIDATED,
         verbs.Project.VALIDATED_BY,
-        verbs.Recommendation.COMMENTED,
-        verbs.Survey.UPDATED,
+        # verbs.Recommendation.COMMENTED,
+        # verbs.Survey.UPDATED,
     ]
     notifications = user.notifications.unread().filter(
         verb__in=notif_verbs,
@@ -151,6 +151,16 @@ def project_knowledge(request, project_id=None):
         project=project, survey=site_config.project_survey
     )
 
+    # Mark this project survey notifications as read
+    if not request.user.is_hijacked:
+        project_ct = ContentType.objects.get_for_model(project)
+        survey_ct = ContentType.objects.get_for_model(survey_models.Session)
+        request.user.notifications.unread().filter(
+            action_object_content_type=survey_ct,
+            target_content_type=project_ct.pk,
+            target_object_id=project.pk,
+        ).mark_all_as_read()
+
     return render(request, "projects/project/knowledge.html", locals())
 
 
@@ -172,14 +182,15 @@ def project_actions(request, project_id=None):
     # Set this project as active
     set_active_project_id(request, project.pk)
 
+    # FIXME check this really been deleted from develop
     # Mark this project action notifications as read
-    project_ct = ContentType.objects.get_for_model(project)
-    task_ct = ContentType.objects.get_for_model(task_models.Task)
-    task_notifications = request.user.notifications.unread().filter(
-        action_object_content_type=task_ct,
-        target_content_type=project_ct.pk,
-        target_object_id=project.pk,
-    )  # XXX Bug?
+    # project_ct = ContentType.objects.get_for_model(project)
+    # task_ct = ContentType.objects.get_for_model(task_models.Task)
+    # task_notifications = request.user.notifications.unread().filter(
+    #     action_object_content_type=task_ct,
+    #     target_content_type=project_ct.pk,
+    #     target_object_id=project.pk,
+    # )  # XXX Bug?
 
     return render(request, "projects/project/actions.html", locals())
 

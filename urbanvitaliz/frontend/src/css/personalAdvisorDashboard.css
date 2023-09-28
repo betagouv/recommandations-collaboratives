@@ -78,13 +78,22 @@ main {
 }
 
 .personal-dashboard-container-inner .project-link {
+    position: relative;
     text-decoration: none;
     border-bottom: 1px solid transparent;
-    transition: border 0.25s ease;
 }
 
-.personal-dashboard-container-inner .project-link:hover {
-    border-bottom: 1px solid #222;
+.personal-dashboard-container-inner .project-link::after {
+    content: '';
+    position: absolute;
+
+    bottom: 3px;
+    left: 0;
+
+    width: 100%;
+    height: 1px;
+
+    background-color: #0063CB;
 }
 
 .project-item {

@@ -111,7 +111,6 @@ def create_site_permissions(sender, **kwargs):
     )
 
 
-
 class ProjectManager(models.Manager):
     """Manager for all projects"""
 

@@ -43,17 +43,17 @@ def project_list_export_csv(request):
         models.Project.on_site.for_user(request.user)
         .exclude(status="DRAFT")
         .order_by("-created_on")
+        .prefetch_related("notes", "tasks")
     )
 
     project_ct = ContentType.objects.get_for_model(models.Project)
 
     today = datetime.datetime.today().date()
 
+    content_disposition = f'attachment; filename="urbanvitaliz-projects-{today}.csv"'
     response = HttpResponse(
         content_type="text/csv",
-        headers={
-            "Content-Disposition": f'attachment; filename="urbanvitaliz-projects-{today}.csv"'
-        },
+        headers={"Content-Disposition": content_disposition},
     )
 
     writer = csv.writer(response, quoting=csv.QUOTE_ALL)
@@ -104,8 +104,7 @@ def project_list_export_csv(request):
             task__site=request.site,
         )
 
-        notes = models.Note.objects.filter(
-            project=project,
+        notes = project.notes.filter(
             created_by__in=switchtenders,
             created_by__is_staff=False,
         )
@@ -114,7 +113,7 @@ def project_list_export_csv(request):
             content_type_id=project_ct.pk, object_id=project.pk
         )
 
-        conversations = models.Note.objects.filter(project=project).filter(public=True)
+        conversations = project.notes.filter(public=True)
 
         published_tasks = project.tasks.filter(site=request.site).exclude(public=False)
 
@@ -130,8 +129,10 @@ def project_list_export_csv(request):
                 project.phone,
                 switchtenders_txt,
                 project.status,
-                published_tasks.count(),
-                published_tasks.exclude(created_by__is_staff=True).count(),
+                published_tasks.exclude(status=task_models.Task.NOT_INTERESTED).count(),
+                published_tasks.exclude(status=task_models.Task.NOT_INTERESTED)
+                .exclude(created_by__is_staff=True)
+                .count(),
                 published_tasks.filter(
                     status__in=(
                         task_models.Task.INPROGRESS,
@@ -139,8 +140,14 @@ def project_list_export_csv(request):
                         task_models.Task.DONE,
                     )
                 ).count(),
-                followups.exclude(status=None).exclude(who__in=switchtenders).count(),
-                followups.exclude(comment="").exclude(who__in=switchtenders).count(),
+                followups.exclude(status=None)
+                .exclude(task__status=task_models.Task.NOT_INTERESTED)
+                .exclude(who__in=switchtenders)
+                .count(),
+                followups.exclude(task__status=task_models.Task.NOT_INTERESTED)
+                .exclude(comment="")
+                .exclude(who__in=switchtenders)
+                .count(),
                 (
                     followups.exclude(comment="")
                     .filter(who__in=switchtenders, who__is_staff=False)

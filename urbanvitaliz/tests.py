@@ -1,12 +1,16 @@
 import pytest
 from django.conf import settings
+from django.shortcuts import reverse
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites_models
 from django.contrib.sites.shortcuts import get_current_site
 from guardian.shortcuts import assign_perm
+from rest_framework.test import APIClient
 from model_bakery.recipe import Recipe
+from model_bakery import baker
 
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.resources import models as resources_models
 from urbanvitaliz.utils import login
 
 
@@ -136,3 +140,28 @@ def test_site_staff_cannot_bypass_perm_for_other_site(client, request):
     with login(client, groups=["example_com_staff"]) as user:
         with settings.SITE_ID.override(site.pk):
             assert not utils.has_perm(user, perm_name, site2)
+
+
+@pytest.mark.django_db
+def test_rest_api_responds_to_xml_content_type(client, request):
+    """
+    Make sure we can get a XML version of the body by appending ?format=xml
+    to the REST API request paths.
+    """
+    Recipe(
+        resources_models.Resource,
+        status=resources_models.Resource.PUBLISHED,
+        sites=[get_current_site(request)],
+        title="A Nice title",
+    ).make()
+    user = baker.make(auth.User, email="me@example.com")
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("resources-list")
+    response = client.get(f"{url}?format=xml")
+
+    assert response.status_code == 200
+    assert "application/xml" in response.headers["content-type"]
+    assert len(response.data) == 1

@@ -21,6 +21,7 @@ from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
 from rest_framework.test import APIClient
 from urbanvitaliz.apps.communication import models as communication
+from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.reminders import models as reminders_models
@@ -169,7 +170,9 @@ def test_task_suggestion_available_with_filled_project(request, client):
 
     commune = Recipe(geomatics.Commune).make()
     Recipe(models.TaskRecommendation, condition="").make()
-    project = Recipe(project_models.Project, sites=[current_site], commune=commune).make()
+    project = Recipe(
+        project_models.Project, sites=[current_site], commune=commune
+    ).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client) as user:
         utils.assign_observer(user, project, current_site)
@@ -190,7 +193,9 @@ def test_task_suggestion_available_with_localized_reco(request, client):
             dept,
         ],
     ).make()
-    project = Recipe(project_models.Project, sites=[current_site], commune=commune).make()
+    project = Recipe(
+        project_models.Project, sites=[current_site], commune=commune
+    ).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client) as user:
         utils.assign_observer(user, project, current_site)
@@ -262,6 +267,42 @@ def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(
     task = models.Task.on_site.all()[0]
     assert task.visited is True
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_visit_task_for_project_no_action_when_hijack(request, client):
+    resource = resources.Resource()
+    resource.save()
+
+    owner = baker.make(auth.User)
+    project = Recipe(
+        project_models.Project,
+        sites=[get_current_site(request)],
+        status="READY",
+    ).make()
+
+    utils.assign_collaborator(owner, project, is_owner=True)
+
+    task = Recipe(
+        models.Task,
+        site=get_current_site(request),
+        project=project,
+        visited=False,
+        resource=resource,
+    ).make()
+
+    with login(client, username="hijacker", is_staff=True):
+        # hijack user
+        url = reverse("hijack:acquire")
+        client.post(url, data={"user_pk": owner.pk})
+        # perform request
+        client.get(
+            reverse("projects-visit-task", args=[task.id]),
+        )
+
+    # task visited status is unchanged
+    task = models.Task.on_site.first()
+    assert task.visited is False
 
 
 #
@@ -655,24 +696,35 @@ def test_notifications_are_deleted_on_task_soft_delete(request):
 
 
 @pytest.mark.django_db
-def test_notifications_are_deleted_when_cancelling_publishing(request):
+def test_created_notifications_are_deleted_when_cancelling_publishing(request):
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     recipient = Recipe(auth.User).make()
 
     task = Recipe(models.Task, public=True, site=get_current_site(request)).make()
 
+    verb_other_than_created = "notif qui reste"
+
     notify.send(
         sender=user,
         recipient=recipient,
-        verb="a reçu une notif",
+        verb=verb_other_than_created,
         action_object=task,
         target=task.project,
     )
 
-    assert recipient.notifications.count() == 1
+    notify.send(
+        sender=user,
+        recipient=recipient,
+        verb=verbs.Recommendation.CREATED,
+        action_object=task,
+        target=task.project,
+    )
+
+    assert recipient.notifications.count() == 2
     task.public = False
     task.save()
-    assert recipient.notifications.count() == 0
+    assert recipient.notifications.count() == 1
+    assert recipient.notifications.first().verb == verb_other_than_created
 
 
 @pytest.mark.django_db

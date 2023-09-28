@@ -18,7 +18,7 @@
     <div class="w-75 d-flex flex-column justify-content-start">
 
         <div class="d-flex justify-content-between align-items-center px-4 pt-4">
-            <h2>Recommandations sans ressource</h2>
+            <h2>Recommandations sans ressource ({{ recommendations.count }})</h2>
         </div>
         <table class="table table-striped">
             <thead>
@@ -33,13 +33,15 @@
             <tbody>
                 {% for reco in recommendations %}
                 <tr>
-                    <td>{{ reco.project }}</td>
+                    <td>{{ reco.project }}<a href="{% url 'projects-project-detail'  reco.project.pk %}" target="_new">[&nearr;]</a> </td>
                     <td>{{ reco.created_on }}</td>
                     <td>{{ reco.created_by }}</td>
                     <td>
                         <a href="{{ reco.get_absolute_url }}"><strong>{{ reco.intent|default:"Sans nom" }}</strong></a>
                         <br/>
-                        {{ reco.content }}
+                       <blockquote class="blockquote">
+                        {{ reco.content_rendered|striptags|truncatewords:50 }}
+                       </blockquote>
                     </td>
                 </tr>
                 {% endfor %}

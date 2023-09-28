@@ -474,7 +474,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
         )
 
     serializer_class = ResourceSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 # eof

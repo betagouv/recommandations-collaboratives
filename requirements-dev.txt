@@ -18,3 +18,4 @@ pytest-sugar
 pytest-xdist
 pytz
 semgrep
+python-dotenv

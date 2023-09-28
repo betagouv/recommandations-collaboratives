@@ -36,8 +36,12 @@ from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
 from urbanvitaliz.apps.tasks.models import Task
-from urbanvitaliz.utils import (get_group_for_site, has_perm, has_perm_or_403,
-                                make_group_name_for_site)
+from urbanvitaliz.utils import (
+    get_group_for_site,
+    has_perm,
+    has_perm_or_403,
+    make_group_name_for_site,
+)
 
 from . import filters, forms, models
 
@@ -824,8 +828,12 @@ def crm_list_recommendation_without_resources(request):
     """Return a page containing all recommendations with no resource attached"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    recommendations = Task.on_site.filter(public=True, resource=None).order_by(
-        "-created_on", "project"
+    search_form = forms.CRMSearchForm()
+
+    recommendations = (
+        Task.on_site.filter(public=True, resource=None)
+        .exclude(project__exclude_stats=True)
+        .order_by("-created_on", "project")
     )
 
     return render(request, "crm/reco_without_resources.html", locals())
@@ -930,6 +938,7 @@ def project_list_by_tags_as_csv(request):
 
     return response
 
+
 @login_required
 def projects_activity_feed(request):
     has_perm_or_403(request.user, "use_crm", request.site)
@@ -937,15 +946,15 @@ def projects_activity_feed(request):
     ctype = ContentType.objects.get_for_model(Project)
 
     actions = (
-            Action.objects.filter(site=request.site)
-            .filter(
-                Q(target_content_type=ctype)
-                | Q(action_object_content_type=ctype)
-                | Q(actor_content_type=ctype)
-            )
-            .order_by("-timestamp")
-            .prefetch_related("actor", "action_object", "target")[:500]
+        Action.objects.filter(site=request.site)
+        .filter(
+            Q(target_content_type=ctype)
+            | Q(action_object_content_type=ctype)
+            | Q(actor_content_type=ctype)
         )
+        .order_by("-timestamp")
+        .prefetch_related("actor", "action_object", "target")[:500]
+    )
 
     search_form = forms.CRMSearchForm()
 

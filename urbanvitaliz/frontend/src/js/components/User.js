@@ -5,11 +5,12 @@ import { gravatar_url } from '../utils/gravatar';
 
 Alpine.data("User", User)
 
-function User() {
+function User(user) {
     return {
         popper: null,
         isOpening: false,
         gravatar_url,
+        currentUser: user,
         init() {
             const popper = createPopper(this.$refs.user, this.$refs.userTooltip, {
                 placement: 'top-start',
