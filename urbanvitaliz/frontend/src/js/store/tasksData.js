@@ -14,12 +14,12 @@ document.addEventListener('alpine:init', () => {
         async init() {
             await this.loadTasks()
             Alpine.store('tasksView').displayedTasks = this.tasks
-            this.getTopics();
+            this.extractTopicFromTasks();
         },
         get newTasks() {
             return this.tasks.filter(task => task.visited === false && task.public)
         },
-        getTopics() {
+        extractTopicFromTasks() {
             let topics = []
 
             this.tasks.forEach(task => {
