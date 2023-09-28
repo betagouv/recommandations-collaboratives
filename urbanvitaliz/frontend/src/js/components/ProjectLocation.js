@@ -41,7 +41,7 @@ async function fetchCommuneIgn(insee) {
         var codeArr = getCodeArrFromCodeInsee(codeInsee);
         var codeInsee = getGlobalCityCodeFromCodeInsee(codeInsee);
         searchParams['code_arr'] = codeArr;
-        searchParams['code_insee'] = insee;
+        searchParams['code_insee'] = codeInsee;
     }
 
 	const communeGeo = await fetch(apiEndpoint + new URLSearchParams(searchParams)).then(response => response.json());
