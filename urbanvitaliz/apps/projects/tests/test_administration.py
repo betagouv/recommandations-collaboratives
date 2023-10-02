@@ -13,6 +13,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -24,6 +25,7 @@ from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects.utils import assign_advisor, assign_collaborator
 from urbanvitaliz.utils import login
+
 
 from .. import models
 
@@ -226,10 +228,7 @@ def test_promote_referent_available_for_advisor(request, client):
 
     powner = baker.make(projects_models.ProjectMember, project=project, is_owner=False)
     pmember = baker.make(
-        projects_models.ProjectMember,
-        project=project,
-        member=crm_user,
-        is_owner=False
+        projects_models.ProjectMember, project=project, member=crm_user, is_owner=False
     )
 
     url = reverse("projects-project-promote-referent", args=[project.id, crm_user.id])
@@ -591,6 +590,143 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker):
     assert response.status_code == 302
 
     communication_api.send_email.assert_called_once()
+
+
+#################################################################
+# Project suspension
+#################################################################
+
+
+@pytest.mark.django_db
+def test_owner_can_set_project_inactive_without_reason(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+    )
+
+    url = reverse(
+        "projects-project-set-inactive",
+        args=[project.id],
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+        response = client.post(url)
+
+    assert response.status_code == 202
+
+    project = models.Project.on_site.get(id=project.id)
+
+    assert project.inactive_since is not None
+    assert project.inactive_reason == ""
+
+
+@pytest.mark.django_db
+def test_owner_can_set_project_inactive_with_reason(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+    )
+
+    url = reverse(
+        "projects-project-set-inactive",
+        args=[project.id],
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+        response = client.post(url, data={"inactive_reason": "because"})
+
+    assert response.status_code == 202
+
+    project = models.Project.on_site.get(id=project.id)
+
+    assert project.inactive_since is not None
+    assert project.inactive_reason == "because"
+
+
+@pytest.mark.django_db
+def test_owner_can_set_project_active(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        inactive_since=timezone.now(),
+    )
+
+    url = reverse(
+        "projects-project-set-active",
+        args=[project.id],
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+        response = client.post(url)
+
+    assert response.status_code == 202
+
+    project = models.Project.on_site.get(id=project.id)
+
+    assert project.inactive_since is None
+
+
+@pytest.mark.django_db
+def test_regular_collaborator_cannot_set_project_inactive(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+    )
+
+    url = reverse(
+        "projects-project-set-inactive",
+        args=[project.id],
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=False)
+
+        response = client.post(url)
+        assert response.status_code == 403
+
+    project = models.Project.on_site.get(id=project.id)
+    assert project.inactive_since is None
+
+
+@pytest.mark.django_db
+def test_regular_collaborator_cannot_set_project_active(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        inactive_since=timezone.now(),
+    )
+
+    url = reverse(
+        "projects-project-set-active",
+        args=[project.id],
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=False)
+
+        response = client.post(url)  # inactive = None
+        assert response.status_code == 403
+
+    updated = models.Project.on_site.get(id=project.id)
+    assert updated.inactive_since == project.inactive_since
 
 
 # eof

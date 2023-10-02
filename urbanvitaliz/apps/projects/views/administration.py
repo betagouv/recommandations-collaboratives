@@ -12,7 +12,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -27,7 +27,11 @@ from urbanvitaliz.apps.invites.api import (
     invite_revoke,
 )
 from urbanvitaliz.apps.invites.forms import InviteForm
-from urbanvitaliz.utils import has_perm_or_403, is_staff_for_site_or_403
+from urbanvitaliz.utils import (
+    has_perm_or_403,
+    is_staff_for_site_or_403,
+    is_staff_for_site,
+)
 from urbanvitaliz import verbs
 
 from .. import forms, models
@@ -380,6 +384,52 @@ def access_advisor_delete(request, project_id: int, email: str):
     )
 
     return redirect(reverse("projects-project-administration", args=[project_id]))
+
+
+#############################################################
+# Suspend/Delete/Danger zone
+#############################################################
+@login_required
+@require_http_methods(["POST"])
+def set_project_inactive(request, project_id: int):
+    """Declare a project inactive. This means no more notifications for collaborators
+    and a special state, allowing only partial actions."""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    if not (
+        request.user == project.owner or is_staff_for_site(request.user, request.site)
+    ):
+        raise PermissionDenied("L'information demandée n'est pas disponible")
+
+    form = forms.ProjectActiveForm(request.POST, instance=project)
+
+    if form.is_valid():
+        project = form.save(commit=False)
+        project.inactive_since = timezone.now()
+        project.save()
+
+    else:
+        raise HttpResponseBadRequest("Formulaire invalide")
+
+    return HttpResponse(status=202)
+
+
+@login_required
+@require_http_methods(["POST"])
+def set_project_active(request, project_id: int):
+    """Declare a project active"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    if not (
+        request.user == project.owner or is_staff_for_site(request.user, request.site)
+    ):
+        raise PermissionDenied("L'information demandée n'est pas disponible")
+
+    project.inactive_since = None
+    project.inactive_reason = None
+    project.save()
+
+    return HttpResponse(status=202)
 
 
 # eof

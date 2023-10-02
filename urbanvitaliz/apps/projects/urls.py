@@ -206,6 +206,16 @@ urlpatterns = [
         administration.access_advisor_delete,
         name="projects-project-access-advisor-delete",
     ),
+    path(
+        r"project/<int:project_id>/administration/set-inactive",
+        administration.set_project_inactive,
+        name="projects-project-set-inactive",
+    ),
+    path(
+        r"project/<int:project_id>/administration/set-active",
+        administration.set_project_active,
+        name="projects-project-set-active",
+    ),
 ]
 
 # eof

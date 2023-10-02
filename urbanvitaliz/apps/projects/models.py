@@ -8,7 +8,6 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import os
-import uuid
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -24,15 +23,8 @@ from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
-from tagging.fields import TagField
-from tagging.models import TaggedItem
-from tagging.registry import register as tagging_register
 from taggit.managers import TaggableManager
-from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
-from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.apps.resources import models as resources
 
 from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor, has_perm
 
@@ -260,6 +252,18 @@ class Project(models.Model):
         return False
 
     exclude_stats = models.BooleanField(default=False, blank=True)
+
+    inactive_since = models.DateTimeField(
+        null=True, blank=True, verbose_name="Quand le projet a été déclaré inactif"
+    )
+    inactive_reason = models.CharField(
+        max_length=256,
+        blank=True,
+        null=True,
+        default="",
+        verbose_name="Raison de l'inactivité du projet",
+    )
+
     muted = models.BooleanField(
         default=False, blank=True, verbose_name="Ne pas envoyer de notifications"
     )
