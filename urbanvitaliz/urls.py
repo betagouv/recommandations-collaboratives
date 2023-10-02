@@ -25,6 +25,7 @@ from urbanvitaliz.apps.onboarding.urls import urlpatterns as onboarding_urls
 from urbanvitaliz.apps.projects.urls import urlpatterns as projects_urls
 from urbanvitaliz.apps.tasks.urls import urlpatterns as tasks_urls
 from urbanvitaliz.apps.projects.views import rest as projects_rest
+from urbanvitaliz.apps.tasks.views import rest as tasks_rest
 from urbanvitaliz.apps.addressbook import rest as addressbook_rest
 from urbanvitaliz.apps.training import rest as training_rest
 from urbanvitaliz.apps.resources import views as resources_views
@@ -36,19 +37,19 @@ router = routers.DefaultRouter()
 
 router.register(
     r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/followups",
-    projects_rest.TaskFollowupViewSet,
+    tasks_rest.TaskFollowupViewSet,
     basename="project-tasks-followups",
 )
 
 router.register(
     r"projects/(?P<project_id>[^/.]+)/tasks",
-    projects_rest.TaskViewSet,
+    tasks_rest.TaskViewSet,
     basename="project-tasks",
 )
 
 router.register(
     r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/notifications",
-    projects_rest.TaskNotificationViewSet,
+    tasks_rest.TaskNotificationViewSet,
     basename="project-tasks-notifications",
 )
 

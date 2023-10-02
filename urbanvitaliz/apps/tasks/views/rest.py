@@ -15,6 +15,8 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
+from urbanvitaliz.apps.projects import models as projects_models
+
 from .. import models, signals
 from ..serializers import (
     TaskFollowupSerializer,
@@ -81,7 +83,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
 
-        project = models.Project.on_site.get(pk=project_id)
+        project = projects_models.Project.on_site.get(pk=project_id)
 
         if not (
             self.request.user.has_perm("projects.view_tasks", project)
@@ -142,7 +144,11 @@ class TaskNotificationViewSet(
         detail=False,
     )
     def mark_all_as_read(self, request, project_id, task_id):
-        self.get_queryset().mark_all_as_read(request.user)
+        is_hijacked = getattr(request.user, "is_hijacked", False)
+
+        if not is_hijacked:
+            self.get_queryset().mark_all_as_read(request.user)
+
         return Response({}, status=status.HTTP_200_OK)
 
     serializer_class = TaskNotificationSerializer
@@ -167,11 +173,13 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
         task_id = int(self.kwargs["task_id"])
 
         user_projects = list(
-            models.Project.on_site.for_user(self.request.user).values_list(flat=True)
+            projects_models.Project.on_site.for_user(self.request.user).values_list(
+                flat=True
+            )
         )
 
         if project_id not in user_projects:
-            project = models.Project.objects.get(pk=project_id)
+            project = projects_models.Project.objects.get(pk=project_id)
             if not (
                 self.request.method == "GET"
                 and self.request.user.has_perm("projects.use_tasks", project)
