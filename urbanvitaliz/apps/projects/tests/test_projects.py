@@ -11,6 +11,7 @@ import csv
 import io
 
 import pytest
+from django.test import override_settings
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites
 from django.contrib.sites.shortcuts import get_current_site
@@ -109,13 +110,12 @@ def test_project_fails_unknown_sharing_link(request, client):
 
 
 @pytest.mark.django_db
+@override_settings(DEBUG=True)
 def test_existing_user_receives_email_on_login(client, settings, mailoutbox):  # noqa
     user = Recipe(auth.User, email="jdoe@example.com").make()
     url = reverse("magicauth-login")
 
-    settings.DEBUG = True
     response = client.post(url, data={"email": user.email})
-    settings.DEBUG = False
 
     assert response.status_code == 302
     assert len(mailoutbox) == 1
