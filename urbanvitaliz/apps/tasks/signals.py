@@ -13,7 +13,6 @@ from notifications.signals import notify
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.reminders import api as reminders_api
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.apps.projects import models as project_models
 from urbanvitaliz.apps.projects.utils import get_notification_recipients_for_project
 from urbanvitaliz.utils import is_staff_for_site
 
@@ -177,31 +176,6 @@ def notify_action_commented(sender, task, project, user, **kwargs):
         action_object=sender,
         target=project,
     )
-
-
-# In case of deletion
-@receiver(pre_delete, sender=project_models.Note, dispatch_uid="note_hard_delete_logs")
-@receiver(pre_save, sender=project_models.Note, dispatch_uid="note_soft_delete_logs")
-def delete_activity_on_note_delete(sender, instance, **kwargs):
-    if instance.deleted is None:
-        return
-
-    project_ct = ContentType.objects.get_for_model(instance)
-    notifications_models.Notification.on_site.filter(
-        target_content_type=project_ct.pk, target_object_id=instance.pk
-    ).delete()
-
-    action_object_stream(instance).delete()
-
-
-@receiver(
-    pre_delete, sender=project_models.Project, dispatch_uid="project_delete_notifications"
-)
-def delete_notifications_on_project_delete(sender, instance, **kwargs):
-    project_ct = ContentType.objects.get_for_model(instance)
-    notifications_models.Notification.on_site.filter(
-        target_content_type=project_ct.pk, target_object_id=instance.pk
-    ).delete()
 
 
 def delete_task_history(

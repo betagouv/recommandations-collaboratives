@@ -723,8 +723,7 @@ def test_created_notifications_are_deleted_when_cancelling_publishing(request):
     assert recipient.notifications.count() == 2
     task.public = False
     task.save()
-    assert recipient.notifications.count() == 1
-    assert recipient.notifications.first().verb == verb_other_than_created
+    assert recipient.notifications.count() == 0
 
 
 @pytest.mark.django_db

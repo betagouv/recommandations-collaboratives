@@ -2,6 +2,8 @@ import datetime
 
 import django.dispatch
 from actstream import action
+from django.db.models.signals import pre_delete, pre_save
+from actstream.models import action_object_stream
 from django.contrib.contenttypes.models import ContentType
 from django.dispatch import receiver
 from django.utils import timezone
@@ -11,6 +13,8 @@ from urbanvitaliz import verbs
 from urbanvitaliz.apps.survey import signals as survey_signals
 from urbanvitaliz.apps.training import utils as training_utils
 from urbanvitaliz.utils import is_staff_for_site
+
+from . import models
 
 from .utils import (
     get_collaborators_for_project,
@@ -79,6 +83,18 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
         action_object=project,
         target=project,
     )
+
+
+@receiver(
+    pre_delete,
+    sender=models.Project,
+    dispatch_uid="project_delete_notifications",
+)
+def delete_notifications_on_project_delete(sender, instance, **kwargs):
+    project_ct = ContentType.objects.get_for_model(instance)
+    notifications_models.Notification.on_site.filter(
+        target_content_type=project_ct.pk, target_object_id=instance.pk
+    ).delete()
 
 
 @receiver(project_switchtender_joined)
@@ -207,6 +223,20 @@ def log_reminder_created(sender, task, project, user, **kwargs):
 # Notes
 #####
 note_created = django.dispatch.Signal()
+
+# In case of deletion
+@receiver(pre_delete, sender=models.Note, dispatch_uid="note_hard_delete_logs")
+@receiver(pre_save, sender=models.Note, dispatch_uid="note_soft_delete_logs")
+def delete_activity_on_note_delete(sender, instance, **kwargs):
+    if instance.deleted is None:
+        return
+
+    project_ct = ContentType.objects.get_for_model(instance)
+    notifications_models.Notification.on_site.filter(
+        target_content_type=project_ct.pk, target_object_id=instance.pk
+    ).delete()
+
+    action_object_stream(instance).delete()
 
 
 @receiver(note_created)
