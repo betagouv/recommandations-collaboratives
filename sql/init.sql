@@ -16,6 +16,7 @@ GRANT ALL PRIVILEGES ON DATABASE "urbanvitaliz" to "urbanvitaliz";
 
 -- even on pg 15 stay on unsafe usage of public schema
 GRANT ALL PRIVILEGES ON SCHEMA public TO urbanvitaliz;
+ALTER SCHEMA public OWNER TO urbanvitaliz;
 
 -- Create a new schema with dedicated user as owner for safe usage
 CREATE SCHEMA urbanvitaliz AUTHORIZATION urbanvitaliz;
