@@ -46,8 +46,7 @@ document_uploaded = django.dispatch.Signal()
 
 @receiver(project_submitted)
 def log_project_submitted(sender, site, submitter, project, **kwargs):
-    # FIXME log user submitted_by project
-    action.send(project, verb=verbs.Project.SUBMITTED)
+    action.send(sender=submitter, verb=verbs.Project.SUBMITTED_BY, action_object=project, target=project) 
 
 
 @receiver(project_submitted)
@@ -66,7 +65,7 @@ def notify_moderators_project_submitted(sender, site, submitter, project, **kwar
 
 @receiver(project_validated)
 def log_project_validated(sender, site, moderator, project, **kwargs):
-    action.send(project, verb=verbs.Project.VALIDATED)
+    action.send(sender=moderator, verb=verbs.Project.VALIDATED_BY, action_object=project, target=project)
 
     if project.status == "DRAFT" or project.muted:
         return

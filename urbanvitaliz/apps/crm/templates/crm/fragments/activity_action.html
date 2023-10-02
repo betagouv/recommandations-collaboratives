@@ -47,7 +47,7 @@
                                             "{{ action.action_object }}"
                                         </a>
                                     {% endif %}
-                                    {% if action.target %}
+                                    {% if action.target and action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY %}
                                         <div class="d-inline-block ms-1">
                                             <span>à propos de</span>
                                             {% if action.target.get_absolute_url %}
