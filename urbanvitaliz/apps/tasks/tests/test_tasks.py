@@ -7,6 +7,8 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
+import datetime
+
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
@@ -18,13 +20,18 @@ from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
 from rest_framework.test import APIClient
+from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.reminders import models as reminders_models
+from urbanvitaliz.apps.projects import models as project_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
 
-from .. import models, utils
+from urbanvitaliz.apps.projects import utils
+
+from .. import models
 
 ########################################################################
 # Task Recommendation
@@ -125,7 +132,7 @@ def test_task_recommendation_is_updated(request, client):
 
 @pytest.mark.django_db
 def test_task_suggestion_not_available_for_non_switchtender(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client):
         response = client.get(url)
@@ -136,7 +143,7 @@ def test_task_suggestion_not_available_for_non_switchtender(request, client):
 def test_task_suggestion_when_no_survey(request, client):
     current_site = get_current_site(request)
 
-    project = Recipe(models.Project, sites=[current_site]).make()
+    project = Recipe(project_models.Project, sites=[current_site]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client) as user:
         utils.assign_observer(user, project, current_site)
@@ -149,7 +156,7 @@ def test_task_suggestion_available_with_bare_project(request, client):
     current_site = get_current_site(request)
 
     Recipe(models.TaskRecommendation, condition="").make()
-    project = Recipe(models.Project, sites=[current_site]).make()
+    project = Recipe(project_models.Project, sites=[current_site]).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client) as user:
         utils.assign_observer(user, project, current_site)
@@ -163,7 +170,9 @@ def test_task_suggestion_available_with_filled_project(request, client):
 
     commune = Recipe(geomatics.Commune).make()
     Recipe(models.TaskRecommendation, condition="").make()
-    project = Recipe(models.Project, sites=[current_site], commune=commune).make()
+    project = Recipe(
+        project_models.Project, sites=[current_site], commune=commune
+    ).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client) as user:
         utils.assign_observer(user, project, current_site)
@@ -184,7 +193,9 @@ def test_task_suggestion_available_with_localized_reco(request, client):
             dept,
         ],
     ).make()
-    project = Recipe(models.Project, sites=[current_site], commune=commune).make()
+    project = Recipe(
+        project_models.Project, sites=[current_site], commune=commune
+    ).make()
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client) as user:
         utils.assign_observer(user, project, current_site)
@@ -201,7 +212,7 @@ def test_visit_task_for_project_and_redirect_for_project_owner(request, client):
     owner = Recipe(auth.User).make()
 
     project = Recipe(
-        models.Project,
+        project_models.Project,
         sites=[get_current_site(request)],
         status="READY",
     ).make()
@@ -234,7 +245,7 @@ def test_visit_task_for_project_and_redirect_to_resource_for_project_owner(
 
     owner = baker.make(auth.User)
     project = Recipe(
-        models.Project,
+        project_models.Project,
         sites=[get_current_site(request)],
         status="READY",
     ).make()
@@ -265,7 +276,7 @@ def test_visit_task_for_project_no_action_when_hijack(request, client):
 
     owner = baker.make(auth.User)
     project = Recipe(
-        models.Project,
+        project_models.Project,
         sites=[get_current_site(request)],
         status="READY",
     ).make()
@@ -283,9 +294,9 @@ def test_visit_task_for_project_no_action_when_hijack(request, client):
     with login(client, username="hijacker", is_staff=True):
         # hijack user
         url = reverse("hijack:acquire")
-        response = client.post(url, data={"user_pk": owner.pk})
+        client.post(url, data={"user_pk": owner.pk})
         # perform request
-        response = client.get(
+        client.get(
             reverse("projects-visit-task", args=[task.id]),
         )
 
@@ -302,7 +313,7 @@ def test_new_task_toggle_done_for_project_and_redirect_for_project_owner(
 ):
     user = baker.make(auth.User)
     project = Recipe(
-        models.Project,
+        project_models.Project,
         status="READY",
         sites=[get_current_site(request)],
     ).make()
@@ -332,7 +343,7 @@ def test_done_task_toggle_done_for_project_and_redirect_for_project_owner(
 ):
     user = baker.make(auth.User)
     project = Recipe(
-        models.Project,
+        project_models.Project,
         status="READY",
         sites=[get_current_site(request)],
     ).make()
@@ -362,7 +373,7 @@ def test_refuse_task_for_project_and_redirect_for_project_owner(request, client)
     user = baker.make(auth.User)
 
     project = Recipe(
-        models.Project,
+        project_models.Project,
         status="READY",
         sites=[get_current_site(request)],
     ).make()
@@ -387,7 +398,7 @@ def test_already_done_task_for_project_and_redirect_for_project_owner(request, c
     user = baker.make(auth.User)
 
     project = Recipe(
-        models.Project,
+        project_models.Project,
         status="READY",
         sites=[get_current_site(request)],
     ).make()
@@ -468,13 +479,13 @@ def test_update_task_with_new_topic(request, client):
     task = models.Task.on_site.get(id=task.id)
     assert task.topic.name == data["topic_name"]
 
-    assert models.Topic.objects.count() == 1
+    assert project_models.Topic.objects.count() == 1
 
 
 @pytest.mark.django_db
 def test_update_task_with_existing_topic_on_get(request, client):
     site = get_current_site(request)
-    topic = baker.make(models.Topic, site=site, name="A topic")
+    topic = baker.make(project_models.Topic, site=site, name="A topic")
     task = Recipe(models.Task, site=site, topic=topic).make()
     url = reverse("projects-update-task", args=[task.id])
 
@@ -492,7 +503,7 @@ def test_update_task_with_existing_topic(request, client):
     task = Recipe(models.Task, site=site).make()
     url = reverse("projects-update-task", args=[task.id])
 
-    topic = baker.make(models.Topic, site=site, name="A topic")
+    topic = baker.make(project_models.Topic, site=site, name="A topic")
 
     data = {"content": "this is some content", "topic_name": topic.name.upper()}
 
@@ -500,7 +511,7 @@ def test_update_task_with_existing_topic(request, client):
         utils.assign_advisor(user, task.project)
         response = client.post(url, data=data)
 
-    assert models.Topic.objects.count() == 1
+    assert project_models.Topic.objects.count() == 1
 
     task = models.Task.on_site.get(id=task.id)
     assert task.topic == topic
@@ -524,7 +535,7 @@ def test_update_task_with_document(request, client):
 
     assert response.status_code == 302
 
-    document = models.Document.objects.first()
+    document = project_models.Document.objects.first()
     assert document
 
     task = models.Task.on_site.first()
@@ -576,7 +587,7 @@ def test_create_new_task_for_project_notify_collaborators(mocker, client, reques
     owner = baker.make(auth.User)
 
     project = Recipe(
-        models.Project,
+        project_models.Project,
         status="READY",
         sites=[get_current_site(request)],
     ).make()
@@ -604,7 +615,7 @@ def test_public_task_update_does_not_trigger_notifications(request, client):
     owner = baker.make(auth.User)
 
     project = Recipe(
-        models.Project,
+        project_models.Project,
         status="READY",
         sites=[get_current_site(request)],
     ).make()
@@ -636,7 +647,7 @@ def test_draft_task_update_triggers_notifications(request, client):
     owner = baker.make(auth.User)
 
     project = Recipe(
-        models.Project,
+        project_models.Project,
         status="READY",
         sites=[get_current_site(request)],
     ).make()
@@ -764,7 +775,7 @@ def test_notifications_are_deleted_on_task_hard_delete(request):
 
 @pytest.mark.django_db
 def test_create_task_not_available_for_non_staff_users(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-create-task", args=[project.id])
     with login(client):
         response = client.get(url)
@@ -773,7 +784,7 @@ def test_create_task_not_available_for_non_staff_users(request, client):
 
 @pytest.mark.django_db
 def test_create_task_available_for_switchtender(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-project-create-task", args=[project.id])
     with login(client) as user:
         utils.assign_advisor(user, project)
@@ -785,7 +796,7 @@ def test_create_task_available_for_switchtender(request, client):
 
 @pytest.mark.django_db
 def test_create_new_action_with_invalid_push_type(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
 
     with login(client) as user:
         utils.assign_advisor(user, project)
@@ -802,7 +813,7 @@ def test_create_new_action_with_invalid_push_type(request, client):
 
 @pytest.mark.django_db
 def test_create_new_action_as_draft(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
 
     intent = "My Intent"
     content = "My Content"
@@ -829,7 +840,7 @@ def test_create_new_action_as_draft(request, client):
 @pytest.mark.django_db
 def test_create_new_action_with_new_topic(request, client):
     site = get_current_site(request)
-    project = Recipe(models.Project, sites=[site]).make()
+    project = Recipe(project_models.Project, sites=[site]).make()
 
     intent = "My Intent"
     content = "My Content"
@@ -849,7 +860,7 @@ def test_create_new_action_with_new_topic(request, client):
         )
 
     # new topic is created and associated to task
-    assert models.Topic.objects.count() == 1
+    assert project_models.Topic.objects.count() == 1
     task = models.Task.on_site.first()
     assert task.topic.name == topic.capitalize()
     assert response.status_code == 302
@@ -858,8 +869,8 @@ def test_create_new_action_with_new_topic(request, client):
 @pytest.mark.django_db
 def test_create_new_action_with_existing_topic(request, client):
     site = get_current_site(request)
-    project = Recipe(models.Project, sites=[site]).make()
-    topic = Recipe(models.Topic, name="A topic", site=site).make()
+    project = Recipe(project_models.Project, sites=[site]).make()
+    topic = Recipe(project_models.Topic, name="A topic", site=site).make()
 
     intent = "My Intent"
     content = "My Content"
@@ -878,7 +889,7 @@ def test_create_new_action_with_existing_topic(request, client):
         )
 
     # existing topic is reused and associated to task
-    assert models.Topic.objects.count() == 1
+    assert project_models.Topic.objects.count() == 1
     task = models.Task.on_site.first()
     assert task.topic == topic
     assert response.status_code == 302
@@ -886,7 +897,7 @@ def test_create_new_action_with_existing_topic(request, client):
 
 @pytest.mark.django_db
 def test_create_new_action_without_resource(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
 
     intent = "My Intent"
     content = "My Content"
@@ -914,7 +925,7 @@ def test_create_new_action_without_resource(request, client):
 
 @pytest.mark.django_db
 def test_create_new_action_with_document(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
 
     intent = "My Intent"
     content = "My Content"
@@ -936,7 +947,7 @@ def test_create_new_action_with_document(request, client):
 
     assert response.status_code == 302
 
-    document = models.Document.objects.first()
+    document = project_models.Document.objects.first()
     assert document
 
     task = models.Task.on_site.first()
@@ -946,7 +957,7 @@ def test_create_new_action_with_document(request, client):
 @pytest.mark.django_db
 def test_create_new_action_with_single_resource(request, client):
     current_site = get_current_site(request)
-    project = Recipe(models.Project, sites=[current_site]).make()
+    project = Recipe(project_models.Project, sites=[current_site]).make()
     resource = Recipe(
         resources.Resource,
         sites=[current_site],
@@ -980,7 +991,7 @@ def test_create_new_action_with_single_resource(request, client):
 @pytest.mark.django_db
 def test_create_new_action_with_multiple_resources(request, client):
     current_site = get_current_site(request)
-    project = Recipe(models.Project, sites=[current_site]).make()
+    project = Recipe(project_models.Project, sites=[current_site]).make()
     resource1 = Recipe(
         resources.Resource,
         sites=[current_site],
@@ -1014,7 +1025,7 @@ def test_create_new_action_with_multiple_resources(request, client):
 
 @pytest.mark.django_db
 def test_sort_action_up(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
     taskA = Recipe(
         models.Task, site=get_current_site(request), project=project, priority=1000
     ).make()
@@ -1035,7 +1046,7 @@ def test_sort_action_up(request, client):
 
 @pytest.mark.django_db
 def test_sort_action_down(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
     taskA = Recipe(
         models.Task, site=get_current_site(request), project=project, priority=1000
     ).make()
@@ -1056,7 +1067,7 @@ def test_sort_action_down(request, client):
 
 @pytest.mark.django_db
 def test_sort_action_down_when_zero(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
     taskA = Recipe(
         models.Task, site=get_current_site(request), project=project, priority=0
     ).make()
@@ -1073,7 +1084,7 @@ def test_sort_action_down_when_zero(request, client):
 
 @pytest.mark.django_db
 def test_sort_action_up_when_no_follower(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    project = Recipe(project_models.Project, sites=[get_current_site(request)]).make()
     taskA = Recipe(
         models.Task, site=get_current_site(request), project=project, priority=1000
     ).make()
@@ -1175,11 +1186,116 @@ def test_update_task_followup_by_creator(request, client):
 ###############################################################
 # Reminders
 ###############################################################
+
+
+@pytest.mark.django_db
+def test_create_reminder_for_task(request, client):
+    baker.make(communication.EmailTemplate, name="rsvp_reco")
+
+    current_site = get_current_site(request)
+
+    project = baker.make(
+        project_models.Project,
+        status="READY",
+        sites=[current_site],
+    )
+    task = baker.make(models.Task, site=current_site, project=project)
+
+    url = reverse("projects-remind-task", args=[task.id])
+    data = {"days": 5}
+
+    with login(client) as user:
+        utils.assign_collaborator(user, project, is_owner=True)
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+    reminder = reminders.Reminder.to_send.all()[0]
+    assert models.TaskFollowupRsvp.objects.count() == 0
+    assert reminder.recipient == project.members.first().email
+    in_fifteen_days = datetime.date.today() + datetime.timedelta(days=data["days"])
+    assert reminder.deadline == in_fifteen_days
+
+
+@pytest.mark.django_db
+def test_create_reminder_without_delay_for_task(request, client):
+    baker.make(communication.EmailTemplate, name="rsvp_reco")
+
+    task = baker.make(
+        models.Task,
+        project__status="READY",
+        site=get_current_site(request),
+    )
+
+    url = reverse("projects-remind-task", args=[task.id])
+
+    with login(client) as user:
+        utils.assign_collaborator(user, task.project, is_owner=True)
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert reminders.Reminder.to_send.count() == 1
+    assert models.TaskFollowupRsvp.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_recreate_reminder_after_for_same_task(request, client):
+    baker.make(communication.EmailTemplate, name="rsvp_reco")
+
+    task = Recipe(
+        models.Task,
+        project__status="READY",
+        site=get_current_site(request),
+    ).make()
+
+    url = reverse("projects-remind-task", args=[task.id])
+    data = {"days": 5}
+    data2 = {"days": 10}
+    with login(client) as user:
+        utils.assign_collaborator(user, task.project, is_owner=True)
+
+        response = client.post(url, data=data)
+        response = client.post(url, data=data2)
+
+    assert response.status_code == 302
+    reminder = reminders.Reminder.to_send.all()[0]
+    assert reminders.Reminder.to_send.count() == 1
+    in_ten_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
+    assert reminder.deadline == in_ten_days
+    assert models.TaskFollowupRsvp.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_recreate_reminder_before_for_same_task(request, client):
+    baker.make(communication.EmailTemplate, name="rsvp_reco")
+
+    task = Recipe(
+        models.Task,
+        project__status="READY",
+        site=get_current_site(request),
+    ).make()
+
+    url = reverse("projects-remind-task", args=[task.id])
+    data = {"days": 5}
+    data2 = {"days": 2}
+    with login(client) as user:
+        utils.assign_collaborator(user, task.project, is_owner=True)
+
+        response = client.post(url, data=data)
+        response = client.post(url, data=data2)
+
+    assert response.status_code == 302
+    assert reminders.Reminder.to_send.count() == 1
+    reminder = reminders.Reminder.to_send.all()[0]
+    in_two_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
+    assert reminder.deadline == in_two_days
+    assert models.TaskFollowupRsvp.objects.count() == 0
+
+
 @pytest.mark.django_db
 def test_reminder_is_updated_when_a_followup_issued(request, client):
     owner = baker.make(auth.User)
     project = baker.make(
-        models.Project,
+        project_models.Project,
         sites=[get_current_site(request)],
     )
     utils.assign_collaborator(owner, project, is_owner=True)
@@ -1228,3 +1344,6 @@ def test_unassigned_user_should_not_see_recommendations(request):
         response = client.get(url)
 
     assert response.status_code == 403
+
+
+# eof

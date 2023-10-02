@@ -8,9 +8,7 @@ created: 2021-06-01 10:11:56 CEST
 """
 
 import csv
-import datetime
 import io
-import uuid
 
 import pytest
 from django.contrib.auth import models as auth
@@ -22,17 +20,17 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
-from urbanvitaliz.apps.communication import models as communication
+
+from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
-from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.onboarding import models as onboarding_models
-from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.resources import models as resources
+from urbanvitaliz.apps.tasks import models as task_models
+from urbanvitaliz.apps.tasks import signals
 from urbanvitaliz.utils import get_group_for_site, login
-from urbanvitaliz import verbs
 
-from .. import models, signals, utils
+from .. import models, utils
 
 # TODO when local authority can see & update her project
 # TODO check that project, note, and task belong to her
@@ -595,7 +593,7 @@ def test_project_detail_contains_informations(request, client):
     )
 
     project = Recipe(models.Project, sites=[current_site]).make()
-    task = Recipe(models.Task, project=project).make()
+    task = Recipe(task_models.Task, project=project).make()
     note = Recipe(models.Note, project=project).make()
     url = reverse("projects-project-detail-knowledge", args=[project.id])
     with login(client, groups=["example_com_advisor"]):
@@ -866,7 +864,7 @@ def test_notification_not_sent_when_project_is_draft(request):
     # Generate a notification
     signals.action_created.send(
         sender=test_notification_not_sent_when_project_is_draft,
-        task=models.Task.objects.create(
+        task=task_models.Task.objects.create(
             project=project,
             site=get_current_site(request),
             created_by=switchtender,
@@ -897,7 +895,7 @@ def test_notification_not_sent_when_project_is_muted(request):
     # Generate a notification
     signals.action_created.send(
         sender=test_notification_not_sent_when_project_is_draft,
-        task=models.Task.on_site.create(
+        task=task_models.Task.on_site.create(
             project=project, site=get_current_site(request), created_by=switchtender
         ),
         project=project,
@@ -919,278 +917,6 @@ def test_projects_feed_available_for_all_users(request, client):
     response = client.get(url)
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertContains(response, detail_url)
-
-
-########################################################################
-# reminder
-########################################################################
-
-
-@pytest.mark.django_db
-def test_create_reminder_for_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    current_site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        status="READY",
-        sites=[current_site],
-    )
-    task = baker.make(models.Task, site=current_site, project=project)
-
-    url = reverse("projects-remind-task", args=[task.id])
-    data = {"days": 5}
-
-    with login(client) as user:
-        utils.assign_collaborator(user, project, is_owner=True)
-        response = client.post(url, data=data)
-
-    assert response.status_code == 302
-    reminder = reminders.Reminder.to_send.all()[0]
-    assert models.TaskFollowupRsvp.objects.count() == 0
-    assert reminder.recipient == project.members.first().email
-    in_fifteen_days = datetime.date.today() + datetime.timedelta(days=data["days"])
-    assert reminder.deadline == in_fifteen_days
-
-
-@pytest.mark.django_db
-def test_create_reminder_without_delay_for_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    task = baker.make(
-        models.Task,
-        project__status="READY",
-        site=get_current_site(request),
-    )
-
-    url = reverse("projects-remind-task", args=[task.id])
-
-    with login(client) as user:
-        utils.assign_collaborator(user, task.project, is_owner=True)
-        response = client.post(url)
-
-    assert response.status_code == 302
-    assert reminders.Reminder.to_send.count() == 1
-    assert models.TaskFollowupRsvp.objects.count() == 0
-
-
-@pytest.mark.django_db
-def test_recreate_reminder_after_for_same_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    task = Recipe(
-        models.Task,
-        project__status="READY",
-        site=get_current_site(request),
-    ).make()
-
-    url = reverse("projects-remind-task", args=[task.id])
-    data = {"days": 5}
-    data2 = {"days": 10}
-    with login(client) as user:
-        utils.assign_collaborator(user, task.project, is_owner=True)
-
-        response = client.post(url, data=data)
-        response = client.post(url, data=data2)
-
-    assert response.status_code == 302
-    reminder = reminders.Reminder.to_send.all()[0]
-    assert reminders.Reminder.to_send.count() == 1
-    in_ten_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
-    assert reminder.deadline == in_ten_days
-    assert models.TaskFollowupRsvp.objects.count() == 0
-
-
-@pytest.mark.django_db
-def test_recreate_reminder_before_for_same_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    task = Recipe(
-        models.Task,
-        project__status="READY",
-        site=get_current_site(request),
-    ).make()
-
-    url = reverse("projects-remind-task", args=[task.id])
-    data = {"days": 5}
-    data2 = {"days": 2}
-    with login(client) as user:
-        utils.assign_collaborator(user, task.project, is_owner=True)
-
-        response = client.post(url, data=data)
-        response = client.post(url, data=data2)
-
-    assert response.status_code == 302
-    assert reminders.Reminder.to_send.count() == 1
-    reminder = reminders.Reminder.to_send.all()[0]
-    in_two_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
-    assert reminder.deadline == in_two_days
-    assert models.TaskFollowupRsvp.objects.count() == 0
-
-
-########################################################################
-# task followup
-########################################################################
-
-#
-# simple followup
-
-
-@pytest.mark.django_db
-def test_user_cannot_followup_on_non_existant_task(client):
-    url = reverse("projects-followup-task", args=[0])
-    with login(client):
-        response = client.post(url)
-    assert response.status_code == 404
-
-
-@pytest.mark.django_db
-def test_user_cannot_followup_on_someone_else_task(request, client):
-    task = baker.make(models.Task, site=get_current_site(request))
-    with login(client):
-        url = reverse("projects-followup-task", args=[task.id])
-        response = client.post(url)
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_user_can_followup_on_personal_task(request, client):
-    data = dict(comment="some comment")
-
-    owner = baker.make(auth.User)
-
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    )
-    task = baker.make(models.Task, site=get_current_site(request), project=project)
-
-    utils.assign_collaborator(owner, project, is_owner=True)
-
-    with login(client, user=owner) as user:
-        url = reverse("projects-followup-task", args=[task.id])
-        client.post(url, data=data)
-
-    followup = models.TaskFollowup.objects.all()[0]
-    assert followup.task == task
-    assert followup.status is None
-    assert followup.comment == data["comment"]
-    assert followup.who == user
-
-
-@pytest.mark.django_db
-def test_followup_triggers_notifications(request, client):
-    owner = baker.make(auth.User)
-    collab = baker.make(auth.User)
-    advisor = baker.make(auth.User)
-    site = get_current_site(request)
-    project = baker.make(
-        models.Project,
-        status="READY",
-        sites=[site],
-    )
-
-    utils.assign_collaborator(owner, project, is_owner=True)
-    utils.assign_collaborator(collab, project)
-    utils.assign_advisor(advisor, project, site)
-
-    data = dict(comment="some comment")
-
-    with login(client, user=owner):
-        task = baker.make(models.Task, site=get_current_site(request), project=project)
-        url = reverse("projects-followup-task", args=[task.id])
-        client.post(url, data=data)
-
-    assert advisor.notifications.unread().count() == 1
-    assert collab.notifications.unread().count() == 1
-    assert owner.notifications.unread().count() == 0
-
-
-@pytest.mark.django_db
-def test_user_is_redirected_after_followup_on_task(request, client):
-    owner = baker.make(auth.User)
-
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    )
-
-    utils.assign_collaborator(owner, project, is_owner=True)
-
-    task = baker.make(models.Task, site=get_current_site(request), project=project)
-
-    with login(client, user=owner):
-        url = reverse("projects-followup-task", args=[task.id])
-        response = client.post(url)
-
-    assert response.status_code == 302
-    assert response.url == reverse(
-        "projects-project-detail-actions", args=[task.project.id]
-    )
-
-
-#
-# rsvp followup
-
-
-@pytest.mark.django_db
-def test_user_cannot_followup_on_non_existant_rsvp(client):
-    bad_uuid = uuid.uuid4()
-    url = reverse(
-        "projects-rsvp-followup-task", args=[bad_uuid, models.Task.INPROGRESS]
-    )
-    with login(client):
-        response = client.post(url)
-    assert response.status_code == 200
-    assertContains(response, "pas valide")
-
-
-@pytest.mark.django_db
-def test_user_cannot_followup_on_rsvp_with_bad_status(client):
-    rsvp = baker.make(models.TaskFollowupRsvp)
-    with login(client):
-        url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, 0])
-        response = client.post(url)
-    assert response.status_code == 404
-
-
-@pytest.mark.django_db
-def test_user_can_followup_on_rsvp_using_mail_link(client):
-    status = models.Task.INPROGRESS
-
-    membership = baker.make(models.ProjectMember)
-    project = baker.make(models.Project, status="READY", projectmember_set=[membership])
-    task = baker.make(models.Task, project=project)
-    rsvp = baker.make(models.TaskFollowupRsvp, task=task)
-    url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
-
-    response = client.get(url)
-
-    assert response.status_code == 200
-    assertContains(response, '<form id="form-rsvp-followup-confirm"')
-
-
-@pytest.mark.django_db
-def test_user_can_followup_on_rsvp(client):
-    data = dict(comment="some comment")
-    status = models.Task.INPROGRESS
-
-    membership = baker.make(models.ProjectMember)
-    project = baker.make(models.Project, status="READY", projectmember_set=[membership])
-    task = baker.make(models.Task, project=project)
-    rsvp = baker.make(models.TaskFollowupRsvp, task=task, user=membership.member)
-    url = reverse("projects-rsvp-followup-task", args=[rsvp.uuid, status])
-    client.post(url, data=data)
-
-    assert models.TaskFollowupRsvp.objects.filter(uuid=rsvp.uuid).count() == 0
-    followup = models.TaskFollowup.objects.all()[0]
-    assert followup.task == task
-    assert followup.status == status
-    assert followup.comment == data["comment"]
-    assert followup.who == membership.member
 
 
 ########################################################################
@@ -1241,7 +967,7 @@ def test_switchtender_joins_project(request, client):
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
     Recipe(
-        models.TaskRecommendation,
+        task_models.TaskRecommendation,
         condition="",
         departments=[
             dept,
@@ -1268,7 +994,7 @@ def test_switchtender_leaves_project(request, client):
     commune = Recipe(geomatics.Commune).make()
     dept = Recipe(geomatics.Department).make()
     Recipe(
-        models.TaskRecommendation,
+        task_models.TaskRecommendation,
         condition="",
         departments=[
             dept,
@@ -1303,7 +1029,7 @@ def test_advisor_joins_trigger_notification_to_all(request, client):
     advisor = baker.make(auth.User)
 
     Recipe(
-        models.TaskRecommendation,
+        task_models.TaskRecommendation,
         condition="",
         departments=[
             dept,
@@ -1341,7 +1067,7 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(
     membership = baker.make(models.ProjectMember, is_owner=True)
 
     Recipe(
-        models.TaskRecommendation,
+        task_models.TaskRecommendation,
         condition="",
         departments=[
             dept,
@@ -1391,7 +1117,7 @@ def test_switchtender_exports_csv(request, client):
     Recipe(models.Project, name="Projet 2").make()
 
     # Make a task
-    Recipe(models.Task, public=True, project=p1).make()
+    Recipe(task_models.Task, public=True, project=p1).make()
 
     url = reverse("projects-project-list-export-csv")
     with login(client, groups=["example_com_advisor"]) as user:

@@ -2,6 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.tasks import models as tasks_models
 from urbanvitaliz.apps.survey import models as survey_models
 from urbanvitaliz.utils import check_if_advisor, get_site_config_or_503
 
@@ -53,9 +54,9 @@ def active_project_processor(request):
         )
 
         # Task notifications
-        task_ct = ContentType.objects.get_for_model(projects_models.Task)
+        task_ct = ContentType.objects.get_for_model(tasks_models.Task)
         task_followup_ct = ContentType.objects.get_for_model(
-            projects_models.TaskFollowup
+            tasks_models.TaskFollowup
         )
         action_notifications_count = (
             project_notifications.filter(

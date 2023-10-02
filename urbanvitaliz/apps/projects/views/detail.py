@@ -16,6 +16,7 @@ from django.utils import timezone
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.apps.survey import models as survey_models
+# from urbanvitaliz.apps.tasks import models as task_models
 from urbanvitaliz.utils import (
     get_site_config_or_503,
     has_perm,
@@ -180,6 +181,16 @@ def project_actions(request, project_id=None):
 
     # Set this project as active
     set_active_project_id(request, project.pk)
+
+    # FIXME check this really been deleted from develop
+    # Mark this project action notifications as read
+    # project_ct = ContentType.objects.get_for_model(project)
+    # task_ct = ContentType.objects.get_for_model(task_models.Task)
+    # task_notifications = request.user.notifications.unread().filter(
+    #     action_object_content_type=task_ct,
+    #     target_content_type=project_ct.pk,
+    #     target_object_id=project.pk,
+    # )  # XXX Bug?
 
     return render(request, "projects/project/actions.html", locals())
 

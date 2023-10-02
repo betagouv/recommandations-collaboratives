@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     "urbanvitaliz.apps.onboarding",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
+    "urbanvitaliz.apps.tasks",
     "urbanvitaliz.apps.resources",
     "urbanvitaliz.apps.geomatics",
     "urbanvitaliz.apps.addressbook",

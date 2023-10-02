@@ -73,6 +73,7 @@ def test_crm_project_create_note(mocker, request, client):
     assert response.status_code == 302
 
     note = models.Note.objects.first()
+    assert note.content == data["content"]
     assert list(note.tags.names()) == data["tags"]
 
     # note creation is traced as an action

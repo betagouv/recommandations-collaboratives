@@ -20,18 +20,23 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from urbanvitaliz import verbs
+from urbanvitaliz.apps.tasks import models as task_models
+from urbanvitaliz.apps.tasks.serializers import (
+    TaskFollowupSerializer,
+    TaskNotificationSerializer,
+    TaskSerializer,
+)
 from urbanvitaliz.utils import TrigramSimilaritySearchFilter, get_group_for_site
+
+from urbanvitaliz.apps.tasks import signals as task_signals
 
 from .. import models, signals
 from ..serializers import (
     ProjectForListSerializer,
     ProjectSerializer,
-    TaskFollowupSerializer,
-    TaskNotificationSerializer,
-    TaskSerializer,
+    TopicSerializer,
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
-    TopicSerializer,
 )
 
 ########################################################################
@@ -208,7 +213,7 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
             ):
                 raise PermissionDenied()
 
-        return models.TaskFollowup.objects.filter(task_id=task_id)
+        return task_models.TaskFollowup.objects.filter(task_id=task_id)
 
     def create(self, request, project_id, task_id):
         data = copy(request.data)
@@ -241,7 +246,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         updated_object = serializer.save()
 
         if original_object.public is False and updated_object.public is True:
-            signals.action_created.send(
+            task_signals.action_created.send(
                 sender=self,
                 task=updated_object,
                 project=updated_object.project,
@@ -269,7 +274,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         try:
             other_task = self.queryset.get(project_id=task.project_id, pk=other_pk)
-        except models.Task.DoesNotExist:
+        except task_models.Task.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if above_id:
@@ -297,7 +302,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             "-created_on", "-updated_on"
         )
 
-    queryset = models.Task.on_site
+    queryset = task_models.Task.on_site
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -314,12 +319,12 @@ class TaskNotificationViewSet(
 
     def get_queryset(self):
         task_id = int(self.kwargs["task_id"])
-        task = models.Task.objects.get(pk=task_id)
+        task = task_models.Task.objects.get(pk=task_id)
 
         notifications = self.request.user.notifications.unread()
 
-        task_ct = ContentType.objects.get_for_model(models.Task)
-        followup_ct = ContentType.objects.get_for_model(models.TaskFollowup)
+        task_ct = ContentType.objects.get_for_model(task_models.Task)
+        followup_ct = ContentType.objects.get_for_model(task_models.TaskFollowup)
 
         task_actions = notifications.filter(
             action_object_content_type=task_ct.pk,
