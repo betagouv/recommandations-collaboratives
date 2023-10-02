@@ -333,6 +333,10 @@ class Migration(migrations.Migration):
                     "ALTER TABLE projects_taskrecommendation_departments RENAME TO tasks_taskrecommendation_departments",
                     reverse_sql="ALTER TABLE tasks_taskrecommendation_departments RENAME TO projects_taskrecommendation_departments",
                 ),
+                migrations.RunSQL(
+                    "update django_content_type set app_label = 'tasks' where id in (select id from django_content_type where model like 'task%');",
+                    reverse_sql="update django_content_type set app_label = 'projects' where id in (select id from django_content_type where model like 'task%');",
+                ),
             ],
         ),
     ]
