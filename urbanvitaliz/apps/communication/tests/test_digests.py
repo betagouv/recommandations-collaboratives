@@ -21,7 +21,9 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects import signals as projects_signals
+from urbanvitaliz.apps.tasks import signals as tasks_signals
 from urbanvitaliz.apps.resources import models as resources_models
+from urbanvitaliz.apps.tasks import models as tasks_models
 from urbanvitaliz import verbs
 
 from .. import digests
@@ -47,9 +49,9 @@ def test_send_digests_for_new_reco(client, request):
     )
 
     # Generate a notification
-    projects_signals.action_created.send(
+    tasks_signals.action_created.send(
         sender=test_send_digests_for_new_reco,
-        task=projects_models.Task.objects.create(
+        task=tasks_models.Task.objects.create(
             project=project, site=get_current_site(request), created_by=switchtender
         ),
         project=project,
@@ -212,7 +214,7 @@ def test_notification_formatter():
     recipient = Recipe(auth.User).make()
     resource = Recipe(resources_models.Resource, title="Belle Ressource").make()
     task = Recipe(
-        projects_models.Task,
+        tasks_models.Task,
         intent="my intent",
         content="A very nice content",
         resource=resource,
@@ -222,7 +224,7 @@ def test_notification_formatter():
         projects_models.Note, content="my content", public=False
     ).make()
 
-    followup = Recipe(projects_models.TaskFollowup, task=task, comment="Hello!").make()
+    followup = Recipe(tasks_models.TaskFollowup, task=task, comment="Hello!").make()
     project = Recipe(
         projects_models.Project,
         name="Nice Project",
@@ -307,18 +309,18 @@ def test_notification_formatter():
             "action inconnue",
             project,
             (
-                f"Bob action inconnue Nice Project - SomeWhere",
+                "Bob action inconnue Nice Project - SomeWhere",
                 None,
             ),
         ),
     ]
 
-    for test in tests:
+    for t in tests:
         notify.send(
             sender=user,
             recipient=recipient,
-            verb=test[0],
-            action_object=test[1],
+            verb=t[0],
+            action_object=t[1],
             target=project,
         )
 

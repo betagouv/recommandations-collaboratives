@@ -2,35 +2,35 @@
 
 from django.db import migrations, transaction
 
-from ..models import Task
-
-
-def compute_status(apps, schema_editor):
-    """Compute status based existing fields"""
-    TaskModel = apps.get_model("projects", "Task")
-
-    with transaction.atomic():
-        for task in TaskModel.objects.all():
-            if task.done:
-                task.status = Task.DONE
-            elif task.refused:
-                task.status = Task.NOT_INTERESTED
-
-            task.save()
-
-
-def reverse_status(apps, schema_editor):
-    """Fill fields based on status"""
-    TaskModel = apps.get_model("projects", "Task")
-
-    with transaction.atomic():
-        for task in TaskModel.objects.all():
-            if task.status == Task.DONE:
-                task.done = True
-            elif task.status == Task.NOT_INTERESTED or task.status == Task.ALREADY_DONE:
-                task.refused = True
-
-            task.save()
+# from ..models import Task
+#
+#
+# def compute_status(apps, schema_editor):
+#     """Compute status based existing fields"""
+#     TaskModel = apps.get_model("projects", "Task")
+#
+#     with transaction.atomic():
+#         for task in TaskModel.objects.all():
+#             if task.done:
+#                 task.status = Task.DONE
+#             elif task.refused:
+#                 task.status = Task.NOT_INTERESTED
+#
+#             task.save()
+#
+#
+# def reverse_status(apps, schema_editor):
+#     """Fill fields based on status"""
+#     TaskModel = apps.get_model("projects", "Task")
+#
+#     with transaction.atomic():
+#         for task in TaskModel.objects.all():
+#             if task.status == Task.DONE:
+#                 task.done = True
+#             elif task.status == Task.NOT_INTERESTED or task.status == Task.ALREADY_DONE:
+#                 task.refused = True
+#
+#             task.save()
 
 
 class Migration(migrations.Migration):
@@ -40,5 +40,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(compute_status, reverse_status),
+        #migrations.RunPython(compute_status, reverse_status),
     ]

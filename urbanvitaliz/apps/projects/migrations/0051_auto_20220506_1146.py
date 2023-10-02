@@ -18,10 +18,10 @@ class Migration(migrations.Migration):
             name="taskrecommendation",
             managers=[
                 ("objects", django.db.models.manager.Manager()),
-                (
-                    "on_site",
-                    urbanvitaliz.apps.projects.models.TaskRecommendationOnSiteManager(),
-                ),
+#                 (
+#                     "on_site",
+#                     urbanvitaliz.apps.projects.models.TaskRecommendationOnSiteManager(),
+#                 ),
             ],
         ),
         migrations.AddField(

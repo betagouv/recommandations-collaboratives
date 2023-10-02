@@ -13,6 +13,8 @@ from django.contrib import admin
 from django.db.models import Count, F, Q
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 
+from urbanvitaliz.apps.tasks import models as task_models
+
 from . import models
 
 
@@ -58,7 +60,7 @@ class RecommendationListFilter(admin.SimpleListFilter):
 
 
 class ProjectTaskTabularInline(OrderedTabularInline):
-    model = models.Task
+    model = task_models.Task
     fields = (
         "site",
         "intent",
@@ -140,33 +142,6 @@ class NoteAdmin(admin.ModelAdmin):
 
     def project_name(self, o):
         return o.project.name
-
-
-@admin.register(models.Task)
-class TaskAdmin(admin.ModelAdmin):
-    search_fields = ["content", "tags"]
-    list_filter = ["site", "deadline", "tags"]
-    list_display = ["created_on", "deadline", "project_name", "tags", "topic"]
-
-    actions = [csvexport]
-
-    def project_name(self, o):
-        return o.project.name
-
-
-@admin.register(models.TaskFollowup)
-class TaskFollowupAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(models.TaskFollowupRsvp)
-class TaskFollowupRsvpAdmin(admin.ModelAdmin):
-    pass
-
-
-@admin.register(models.TaskRecommendation)
-class TaskRecommendationAdmin(admin.ModelAdmin):
-    pass
 
 
 @admin.register(models.Document)
