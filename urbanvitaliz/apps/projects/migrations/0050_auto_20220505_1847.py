@@ -18,11 +18,11 @@ class Migration(migrations.Migration):
             name="task",
             managers=[
                 ("objects", django.db.models.manager.Manager()),
-                ("on_site", urbanvitaliz.apps.projects.models.TaskOnSiteManager()),
-                (
-                    "deleted_on_site",
-                    urbanvitaliz.apps.projects.models.DeletedTaskOnSiteManager(),
-                ),
+                #    ("on_site", urbanvitaliz.apps.projects.models.TaskOnSiteManager()),
+                #    (
+                #        "deleted_on_site",
+                #        urbanvitaliz.apps.projects.models.DeletedTaskOnSiteManager(),
+                #    ),
             ],
         ),
         migrations.AddField(

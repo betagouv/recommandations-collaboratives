@@ -34,7 +34,8 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
-from urbanvitaliz.apps.projects.models import Project, Task, UserProjectStatus
+from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
+from urbanvitaliz.apps.tasks.models import Task
 from urbanvitaliz.utils import (
     get_group_for_site,
     has_perm,

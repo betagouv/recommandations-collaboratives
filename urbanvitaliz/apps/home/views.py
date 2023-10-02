@@ -20,6 +20,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from urbanvitaliz.apps.projects import models as projects
+from urbanvitaliz.apps.tasks import models as tasks
 from urbanvitaliz.apps.projects.utils import (
     can_administrate_project,
     get_active_project,
@@ -89,12 +90,12 @@ class StatisticsView(TemplateView):
             | Q(exclude_stats=True)
         )
         context = super().get_context_data(**kwargs)
-        context["reco_following_pc"] = 90
+        context["reco_following_pc"] = 78
         context["collectivity_supported"] = the_projects.count()
         context["collectivity_with_reco"] = (
-            projects.Task.on_site.exclude(
-                Q(status=projects.Task.NOT_INTERESTED)
-                | Q(status=projects.Task.ALREADY_DONE)
+            tasks.Task.on_site.exclude(
+                Q(status=tasks.Task.NOT_INTERESTED)
+                | Q(status=tasks.Task.ALREADY_DONE)
             )
             .exclude(
                 Q(project__members__in=staff_users)

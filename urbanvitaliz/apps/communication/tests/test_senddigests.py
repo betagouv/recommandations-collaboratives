@@ -18,6 +18,7 @@ from django.utils import timezone
 from model_bakery import baker
 
 from urbanvitaliz.apps.projects import models as project_models
+from urbanvitaliz.apps.tasks import models as task_models
 from urbanvitaliz.apps.projects.utils import assign_advisor
 from urbanvitaliz.utils import get_group_for_site
 
@@ -40,7 +41,7 @@ def test_command_send_digest_to_active_users(request, mocker):
     # FIXME pourquoi ne met pas aussi dans advisor group for site ?
     assign_advisor(advisor, project, site)
 
-    baker.make(project_models.Task, created_by=advisor, project=project, site=site)
+    baker.make(task_models.Task, created_by=advisor, project=project, site=site)
 
     out = io.StringIO()
 
@@ -108,7 +109,7 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker):
     # FIXME pourquoi ne met pas aussi dans advisor group for site ?
     assign_advisor(advisor, project, site)
 
-    baker.make(project_models.Task, created_by=advisor, project=project, site=site)
+    baker.make(task_models.Task, created_by=advisor, project=project, site=site)
 
     out = io.StringIO()
 
