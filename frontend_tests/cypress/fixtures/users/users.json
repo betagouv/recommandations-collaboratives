@@ -148,5 +148,23 @@
             "groups": [4],
             "user_permissions": []
         }
+    },
+    {
+        "model": "auth.user",
+        "pk": 9,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
+            "last_login": "2022-09-01T08:58:56.513Z",
+            "is_superuser": false,
+            "username": "nonactiveuser@test.fr",
+            "first_name": "nonactive",
+            "last_name": "user",
+            "email": "nonactiveuser@test.fr",
+            "is_staff": false,
+            "is_active": false,
+            "date_joined": "2021-07-09T09:29:47.252Z",
+            "groups": [],
+            "user_permissions": []
+        }
     }
 ]
