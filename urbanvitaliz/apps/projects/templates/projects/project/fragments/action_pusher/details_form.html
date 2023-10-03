@@ -78,7 +78,7 @@
                         {% if not disable_draft %}
                             <button @click="set_draft(true)" class="button small">Enregister comme Brouillon</button>
                         {% endif %}
-                        <button @click="set_draft(false)" type="submit" class="button filled small">Publier</button>
+                        <button data-test-id="publish-task-button" @click="set_draft(false)" type="submit" class="button filled small">Publier</button>
                     </div>
                 </template>
             </div>

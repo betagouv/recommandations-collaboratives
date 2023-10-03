@@ -57,7 +57,7 @@ Cypress.Commands.add("login", (role) => {
     })
 })
 
-Cypress.Commands.add('loginWithUi',(role) => {
+Cypress.Commands.add('loginWithUi', (role) => {
     const { username } = currentUser
 
     cy.visit('/accounts/login/')
@@ -139,7 +139,7 @@ Cypress.Commands.add('becomeAdvisor', () => {
 
 })
 
-Cypress.Commands.add('createTask', (label) => {
+Cypress.Commands.add('createTask', (label, topic = "") => {
 
     cy.get("body").then(body => {
         if (body.find('[data-test-id="submit-task-button"]').length > 0) {
@@ -154,6 +154,12 @@ Cypress.Commands.add('createTask', (label) => {
             cy.get('textarea')
                 .type(`reco test from action description`, { force: true })
                 .should('have.value', `reco test from action description`)
+
+            if (topic !== "") {
+                cy.get('#topic_name')
+                    .type(`${topic}`, { force: true })
+                    .should('have.value', `${topic}`)
+            }
 
             cy.get("[type=submit]").click({ force: true });
 

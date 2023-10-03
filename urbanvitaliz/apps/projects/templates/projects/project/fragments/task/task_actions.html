@@ -22,7 +22,7 @@
         </button>
     </template>
     <div x-data="{ open: false }" x-on:click.outside="open = false">
-        <button x-on:click.stop="open = !open"
+        <button data-test-id="open-task-actions-button" x-on:click.stop="open = !open"
                 :class="{'bg-grey':open}"
                 class="border tiny d-flex align-items-center justify-content-center px-2 py-2 hover-bg-grey">
             <svg class="bi" width="13" height="13" fill="#929292">
@@ -33,7 +33,7 @@
             :class="{'show':open}"
             class="common-dropdown list-unstyled flex-column">
             <li>
-                <a class="appearance-none w-100 py-2 px-2 d-flex justify-content-start align-items-center border-bottom text-decoration-none"
+                <a data-test-id="update-task-action-button" class="appearance-none w-100 py-2 px-2 d-flex justify-content-start align-items-center border-bottom text-decoration-none"
                     @click.stop
                    :href="editTaskUrl(task.id, '{{ request.path }}')">
                     <svg class="bi me-2" width="13" height="13" fill="#666666">
