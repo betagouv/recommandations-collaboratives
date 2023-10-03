@@ -13,7 +13,10 @@ from notifications.signals import notify
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.reminders import api as reminders_api
 from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.apps.projects.utils import get_notification_recipients_for_project
+from urbanvitaliz.apps.projects.utils import (
+    get_notification_recipients_for_project,
+    get_advisors_for_project,
+)
 from urbanvitaliz.utils import is_staff_for_site
 
 from . import models
@@ -59,7 +62,12 @@ def notify_action_created(sender, task, project, user, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
+    if project.inactive_since:
+        recipients = get_advisors_for_project(project)
+    else:
+        recipients = get_notification_recipients_for_project(project)
+
+    recipients = recipients.exclude(id=user.id)
 
     notify.send(
         sender=user,
@@ -167,7 +175,12 @@ def notify_action_commented(sender, task, project, user, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
+    if project.inactive_since:
+        recipients = get_advisors_for_project(project)
+    else:
+        recipients = get_notification_recipients_for_project(project)
+
+    recipients = recipients.exclude(id=user.id)
 
     notify.send(
         sender=user,

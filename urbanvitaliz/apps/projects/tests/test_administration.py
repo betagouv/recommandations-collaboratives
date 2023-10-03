@@ -12,20 +12,21 @@ import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
-
 from urbanvitaliz.apps.communication import api as communication_api
 from urbanvitaliz.apps.geomatics import models as geomatics
+from urbanvitaliz.apps.tasks import models as tasks_models
 from urbanvitaliz.apps.invites import models as invites_models
+from urbanvitaliz.apps.invites.api import invite_collaborator_on_project
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects.utils import assign_advisor, assign_collaborator
-from urbanvitaliz.utils import login
-
+from urbanvitaliz.utils import assign_site_staff, login
 
 from .. import models
 
@@ -593,8 +594,10 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker):
 
 
 #################################################################
-# Project suspension
+# Project (in)activation
 #################################################################
+
+# -- Inactivate project
 
 
 @pytest.mark.django_db
@@ -652,30 +655,30 @@ def test_owner_can_set_project_inactive_with_reason(request, client):
 
 
 @pytest.mark.django_db
-def test_owner_can_set_project_active(request, client):
+def test_site_staff_can_set_project_inactive(request, client):
     site = get_current_site(request)
 
     project = baker.make(
         models.Project,
         sites=[site],
         status="READY",
-        inactive_since=timezone.now(),
     )
 
     url = reverse(
-        "projects-project-set-active",
+        "projects-project-set-inactive",
         args=[project.id],
     )
 
     with login(client) as user:
-        assign_collaborator(user, project, is_owner=True)
+        assign_site_staff(site, user)
         response = client.post(url)
 
     assert response.status_code == 202
 
     project = models.Project.on_site.get(id=project.id)
 
-    assert project.inactive_since is None
+    assert project.inactive_since is not None
+    assert project.inactive_reason == ""
 
 
 @pytest.mark.django_db
@@ -703,6 +706,63 @@ def test_regular_collaborator_cannot_set_project_inactive(request, client):
     assert project.inactive_since is None
 
 
+# -- Activate project
+
+
+@pytest.mark.django_db
+def test_owner_can_set_project_active(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        inactive_since=timezone.now(),
+    )
+
+    url = reverse(
+        "projects-project-set-active",
+        args=[project.id],
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+        response = client.post(url)
+
+    assert response.status_code == 202
+
+    project = models.Project.on_site.get(id=project.id)
+
+    assert project.inactive_since is None
+
+
+@pytest.mark.django_db
+def test_site_staff_can_set_project_active(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        inactive_since=timezone.now(),
+    )
+
+    url = reverse(
+        "projects-project-set-active",
+        args=[project.id],
+    )
+
+    with login(client) as user:
+        assign_site_staff(site, user)
+        response = client.post(url)
+
+    assert response.status_code == 202
+
+    project = models.Project.on_site.get(id=project.id)
+
+    assert project.inactive_since is None
+
+
 @pytest.mark.django_db
 def test_regular_collaborator_cannot_set_project_active(request, client):
     site = get_current_site(request)
@@ -727,6 +787,109 @@ def test_regular_collaborator_cannot_set_project_active(request, client):
 
     updated = models.Project.on_site.get(id=project.id)
     assert updated.inactive_since == project.inactive_since
+
+
+# -- Notification dispatching when project is set inactive
+
+
+@pytest.mark.django_db
+def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactive(
+    request, client
+):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        inactive_since=timezone.now(),
+    )
+    task = baker.make(
+        tasks_models.Task, project=project, site=get_current_site(request)
+    )
+
+    owner = baker.make(auth_models.User, email="owner@notif.com")
+    assign_collaborator(owner, project, is_owner=True)
+
+    collaborator = baker.make(auth_models.User, email="collab@notif.com")
+    assign_collaborator(collaborator, project)
+
+    invited_collab = baker.make(auth_models.User, email="invited_collab@notif.com")
+
+    advisor = baker.make(auth_models.User, email="advisor@notif.com")
+    assign_advisor(advisor, project, site)
+
+    superuser = baker.make(auth_models.User, is_superuser=True)
+
+    invite = invite_collaborator_on_project(
+        site,
+        project,
+        "COLLABORATOR",
+        invited_collab.email,
+        "hey",
+        collaborator,
+    )
+
+    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+
+    triggers = [
+        {
+            "url-name": "projects-project-switchtender-join",
+            "url-args": {"project_id": project.pk},
+            "user": superuser,
+            "post-data": {},
+        },  # advisor joined ✓
+        {
+            "url-name": "projects-project-observer-join",
+            "url-args": {"project_id": project.pk},
+            "user": superuser,
+            "post-data": {},
+        },  # observer joined ✓
+        {
+            "url-name": "invites-invite-accept",
+            "url-args": {"invite_id": invite.pk},
+            "user": invited_collab,
+            "post-data": {},
+        },  # project member joined ✓
+        {
+            "url-name": "projects-conversation-create-message",
+            "url-args": {"project_id": project.pk},
+            "user": superuser,
+            "post-data": {"content": "this is some content"},
+        },  # public conversation posted ✓
+        {
+            "url-name": "projects-documents-upload-document",
+            "url-args": {"project_id": project.pk},
+            "user": superuser,
+            "post-data": {"description": "this is some content", "the_file": png},
+        },  # document uploaded ✓
+        {
+            "url-name": "projects-project-create-task",
+            "url-args": {"project_id": project.pk},
+            "user": superuser,
+            "post-data": {
+                "push_type": "noresource",
+                "intent": "yeah",
+                "content": "this is some content",
+                "public": True,
+            },
+        },  # reco published ✓
+        {
+            "url-name": "projects-followup-task",
+            "url-args": {"task_id": task.pk},
+            "user": superuser,
+            "post-data": {"comment": "hey"},
+        },  # reco commented ✓
+    ]
+
+    for trigger in triggers:
+        url = reverse(trigger["url-name"], kwargs=trigger["url-args"])
+        with login(client, user=trigger["user"]):
+            response = client.post(url, data=trigger["post-data"])
+            assert response.status_code == 302
+
+    assert collaborator.notifications.count() == 0
+    assert advisor.notifications.count() == len(triggers)
 
 
 # eof
