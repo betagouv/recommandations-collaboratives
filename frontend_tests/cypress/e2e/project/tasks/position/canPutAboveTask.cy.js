@@ -1,7 +1,7 @@
 describe('I can go to tasks tab', () => {
     beforeEach(() => {
         cy.login("jean");
-        cy.createProject(1)
+        cy.createProject("task above")
     })
 
     it('change task position above', () => {
