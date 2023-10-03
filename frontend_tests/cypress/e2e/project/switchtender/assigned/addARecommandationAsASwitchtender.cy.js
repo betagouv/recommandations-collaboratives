@@ -16,7 +16,7 @@ describe('I can create a recommandation with no resource as a switcthender', () 
 
         cy.url().should('include', '/actions')
 
-        cy.contains("Ajouter une recommandation").click({ force: true })
+        cy.get("[data-test-id='submit-task-button']").click({ force: true })
 
         cy.get("#push-noresource").click({ force: true });
 

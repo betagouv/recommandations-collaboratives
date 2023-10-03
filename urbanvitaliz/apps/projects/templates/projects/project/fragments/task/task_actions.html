@@ -65,7 +65,7 @@
                 </li>
             </template>
             <li>
-                <button @click.stop="handleOpenDeleteModal()"
+                <button data-test-id="delete-task-action-button" @click.stop="handleOpenDeleteModal()"
                         class="bg-white text-red-light appearance-none w-100 py-2 px-2 d-flex justify-content-start align-items-center border-bottom text-decoration-none">
                     <svg class="bi text-red-light me-2" width="13" height="13" fill="#E1000F">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />

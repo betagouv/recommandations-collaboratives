@@ -44,7 +44,7 @@
             {{ user.email|json_script:"userEmail" }}
 
             {% if is_switchtender and project.tasks.all.count == 0 %}
-            <div class="bg-light p-4 rounded-2">
+            <div data-test-id="no-tasks-banner" class="bg-light p-4 rounded-2">
                 <h3 class="fw-light">Pas encore de recommandations à la collectivité ?</h3>
                 <p class="fst-italic fw-light">
                     Soyez la première personne à proposer des recommandations ou des ressources à la collectivité !

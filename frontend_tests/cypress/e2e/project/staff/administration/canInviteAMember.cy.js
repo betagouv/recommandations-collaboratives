@@ -28,6 +28,6 @@ describe('I can go to administration area of a project and invite a member', () 
         cy.get('#invite-member-modal').contains("Envoyer l'invitation").click({ force: true })
         cy.contains(`Un courriel d'invitation à rejoindre le projet a été envoyé à ${userToInvite.fields.email}`)
 
-        cy.contains('Invitations participant·e·s').siblings('ul').children('li').contains(userToInvite.fields.email)
+        cy.get("[data-test-id='administration-member-invitation-list']").siblings('ul').children('li').contains(userToInvite.fields.email)
     })
 })
