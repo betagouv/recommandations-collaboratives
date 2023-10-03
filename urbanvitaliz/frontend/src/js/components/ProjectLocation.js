@@ -4,8 +4,6 @@ import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-providers'
 
-import { statusToColorClass } from '../utils/statusToText'
-
 const codesComParis = ['75101','75102','75103','75104','75105','75106','75107','75108','75109','75110','75111','75112','75113','75114','75115','75116','75117','75118','75119','75120']
 const codesComLyon = ['69381','69382','69383','69384','69385','69386','69387','69388','69389']
 const codesComMarseille = ['13201','13202','13203','13204','13205','13206','13207','13208','13209','13210','13211','13212','13213','13214','13215','13216']
@@ -129,13 +127,14 @@ function initMap(idMap, project, options, zoom) {
 
 // Create layers composed with markers
 function initMapLayers(map, project, geoData) {
-	if (geoData.commune) {
-		addLayerCommune(map, geoData.commune);
+	if (geoData.commune && geoData.commune.features.length) {
+		addLayerAreaCommune(map, geoData.commune);
+	} else if(project.commune.latitude && project.commune.longitude) {
+		addLayerAreaCircle(map, project)
 	}
 }
 
-
-function addLayerCommune(map, geoData) {
+function addLayerAreaCommune(map, geoData) {
 	if(geoData.code && geoData.code === 400) {
 		// TODO: handle error
 	}
@@ -143,6 +142,18 @@ function addLayerCommune(map, geoData) {
 		L.geoJSON(geoData.features[0].geometry).addTo(map);
 	}
 }
+
+// Create layers composed with markers
+function addLayerAreaCircle(map, project) {
+	const { latitude, longitude } = project.commune;
+	L.circle([latitude, longitude], {
+			color: '#0063CB',
+			fillColor: '#0063CB',
+			fillOpacity: 0.25,
+			radius: 5000
+	}).addTo(map);
+}
+
 
 
 function mapOptions({interactive}) {
