@@ -1,9 +1,11 @@
 <template x-for="topic in $store.tasksData.topics">
     <div>
-        <div class="d-flex align-items-center text-info-custom mt-2 mb-4">
-            <span class="topic-indicator bg-green me-2"></span>
-            <h5 x-text="topic" class="fw-medium text-gray-800 mb-0"></h5>
-        </div>
+        <template x-if="filterTaskByTopic(topic).length > 0">
+            <div class="d-flex align-items-center text-info-custom mt-2 mb-4">
+                <span class="topic-indicator bg-green me-2"></span>
+                <h5 x-text="topic" class="fw-medium text-gray-800 mb-0"></h5>
+            </div>
+        </template>
         <template x-for="(task, i) in filterTaskByTopic(topic)" :key="task.id">
             <div class="task-animation-appear-in position-relative my-4"
                  :style="`z-index:${10000-i}`">
