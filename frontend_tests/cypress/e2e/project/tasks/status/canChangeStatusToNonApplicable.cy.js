@@ -1,31 +1,23 @@
-import projects from '../../../../fixtures/projects/projects.json'
 import tasks from '../../../../fixtures/projects/tasks.json'
-
-const currentProject = projects[8];
 const currentTask = tasks[6]
 
-
-describe('I can go tasks tab', () => {
+describe('I can go to tasks tab', () => {
     beforeEach(() => {
-        cy.login("staff");
+        cy.login("jean");
     })
 
     it('changes the status to non applicable', () => {
-        cy.visit(`/project/${currentProject.pk}`)
+        cy.createProject("status not")
+        cy.becomeAdvisor();
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
-
-        cy.contains("Liste").should('have.class', 'active')
+        cy.createTask(currentTask.fields.intent);
+        cy.get('[data-test-id="list-tasks-switch-button"]').should('have.class', 'active')
         cy.contains(currentTask.fields.intent)
 
-        cy.get(`#${currentTask.pk}`).contains('non applicable').click({ force: true });
-        cy.contains("Ça n'était pas applicable")
-
-        cy.document().then((doc) => {
-            doc.getElementById(`${currentTask.pk}-4-button`).click();
-        })
-
-        cy.get(`#${currentTask.pk}`).contains('non applicable').should('have.class', 'bg-grey-dark')
+        cy.get('[data-test-id="not-interested-status-task-button"]').click({ force: true });
+        cy.get('[data-test-id="send-status-4-feedback-button"]').click({ force: true });
+        cy.get('[data-test-id="not-interested-status-task-button"]').should('have.class', 'bg-grey-dark')
 
         cy.contains(currentTask.fields.intent).click({ force: true })
         cy.contains(currentTask.fields.intent)

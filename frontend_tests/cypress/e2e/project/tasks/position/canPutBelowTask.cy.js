@@ -1,4 +1,4 @@
-describe('I can go tasks tab', () => {
+describe('I can go to tasks tab', () => {
     beforeEach(() => {
         cy.login("jean");
         cy.createProject(1)
@@ -14,7 +14,7 @@ describe('I can go tasks tab', () => {
         cy.createTask(1);
         cy.createTask(2);
 
-        cy.contains("Thématique").should('have.class', 'active')
+        cy.get('[data-test-id="list-tasks-switch-button"]').should('have.class', 'active')
 
         cy.get('#task-move-below').click({force:true});
     })

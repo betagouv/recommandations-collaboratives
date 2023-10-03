@@ -12,13 +12,10 @@ describe('I can go tasks tab', () => {
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
 
-        cy.contains("Thématique").should('have.class', 'active')
-        cy.contains("Statut d’avancement").click({ force: true })
-        cy.contains("Statut d’avancement").should('have.class', 'active')
+        cy.get('[data-test-id="kanban-tasks-switch-button"]').click({ force: true })
+        cy.get('[data-test-id="kanban-tasks-switch-button"]').should('have.class', 'active')
 
-        cy.contains("Thématique").click({ force: true })
-        cy.contains("Thématique").should('have.class', 'active')
-
-       
+        cy.get('[data-test-id="list-tasks-switch-button"]').click({ force: true })
+        cy.get('[data-test-id="list-tasks-switch-button"]').should('have.class', 'active')
     })
 })

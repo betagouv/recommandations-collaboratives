@@ -13,7 +13,7 @@ describe('I can go tasks tab', () => {
 
         cy.createTask(1);
 
-        cy.contains("Thématique").should('have.class', 'active')
+        cy.get('[data-test-id="list-tasks-switch-button"]').should('have.class', 'active')
 
         cy.get('#unpublish-task-button').click({force:true});
 

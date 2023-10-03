@@ -142,7 +142,7 @@
                                                                       style="line-height: 20px"></span>
                                                             </div>
                                                             <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
-                                                                <a class="text-muted cursor-pointer tiny" @click="onEditComment(f)">Editer</a>
+                                                                <a data-test-id="task-edit-followup-button" class="text-muted cursor-pointer tiny" @click="onEditComment(f)">Editer</a>
                                                             </template>
                                                         </div>
                                                     </div>

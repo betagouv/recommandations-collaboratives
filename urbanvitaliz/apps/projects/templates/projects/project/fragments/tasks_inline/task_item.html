@@ -25,7 +25,7 @@
         </template>
         <template x-if="!task.public">
             <div class="card-top-information left-0">
-                <span :class="`bg${getTaskColor(task)}`" class="text-dark">Brouillon</span>
+                <span data-test-id="task-draft-status" :class="`bg${getTaskColor(task)}`" class="text-dark">Brouillon</span>
             </div>
         </template>
         <div class="d-flex align-items-center justify-content-between">

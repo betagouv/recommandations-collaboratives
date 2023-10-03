@@ -84,7 +84,7 @@ Cypress.Commands.add('logout', () => {
     cy.contains('Déconnexion').click({ force: true })
 })
 
-Cypress.Commands.add("createProject", (index) => {
+Cypress.Commands.add("createProject", (label) => {
 
     cy.visit('/')
 
@@ -93,8 +93,8 @@ Cypress.Commands.add("createProject", (index) => {
     cy.url().should('include', '/onboarding/')
 
     cy.get('#id_name')
-        .type(`${project.name} ${index}`, { force: true })
-        .should('have.value', `${project.name} ${index}`)
+        .type(`${label}`, { force: true })
+        .should('have.value', `${label}`)
 
     cy.get('#input-project-address')
         .type(`${project.location}`, { force: true })
@@ -125,7 +125,7 @@ Cypress.Commands.add("createProject", (index) => {
 
     cy.contains('Envoyer ma demande').click({ force: true });
 
-    cy.contains(`${project.name} ${index}`).click({ force: true })
+    cy.contains(`${label}`).click({ force: true })
 })
 
 Cypress.Commands.add('becomeAdvisor', () => {
@@ -139,7 +139,7 @@ Cypress.Commands.add('becomeAdvisor', () => {
 
 })
 
-Cypress.Commands.add('createTask', (index) => {
+Cypress.Commands.add('createTask', (label) => {
 
     cy.get("body").then(body => {
         if (body.find('[data-test-id="submit-task-button"]').length > 0) {
@@ -148,8 +148,8 @@ Cypress.Commands.add('createTask', (index) => {
             cy.get("#push-noresource").click({ force: true });
 
             cy.get('#intent')
-                .type(`reco test ${index}`, { force: true })
-                .should('have.value', `reco test ${index}`)
+                .type(`${label}`, { force: true })
+                .should('have.value', `${label}`)
 
             cy.get('textarea')
                 .type(`reco test from action description`, { force: true })
@@ -166,8 +166,8 @@ Cypress.Commands.add('createTask', (index) => {
             cy.get("#push-noresource").click({ force: true });
 
             cy.get('#intent')
-                .type(`reco test ${index}`, { force: true })
-                .should('have.value', `reco test ${index}`)
+                .type(`${label}`, { force: true })
+                .should('have.value', `${label}`)
 
             cy.get('textarea')
                 .type(`reco test from action description`, { force: true })

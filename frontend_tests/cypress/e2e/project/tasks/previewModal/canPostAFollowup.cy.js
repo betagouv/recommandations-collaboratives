@@ -3,13 +3,13 @@ import tasks from '../../../../fixtures/projects/tasks.json'
 import users from '../../../../fixtures/users/users.json'
 
 const currentProject = projects[1];
-const task1 = tasks[0]
-const currentUser = users[0]
+const task3 = tasks[2]
+const currentUser = users[1]
 
 
 describe('I can go tasks tab', () => {
     beforeEach(() => {
-        cy.login("staff");
+        cy.login("jean");
     })
 
     it('posts a followup', () => {
@@ -17,10 +17,11 @@ describe('I can go tasks tab', () => {
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
 
-        cy.contains("Liste").should('have.class', 'active')
+        cy.get('[data-test-id="list-tasks-switch-button"]').should('have.class', 'active')
 
-        cy.contains(task1.fields.intent).click({ force: true })
-        cy.contains(task1.fields.intent)
+        cy.createTask(task3.fields.intent);
+        cy.contains(task3.fields.intent).click({ force: true })
+        cy.contains(task3.fields.intent)
 
         const now = new Date();
 
