@@ -78,6 +78,10 @@
                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des tags du crm" icon="activity" %}
               </li>
               <li class="me-2 col-2 ">
+                  {% url 'crm-list-topics' as url %}
+                  {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des thématiques" icon="boxes" %}
+              </li>
+              <li class="me-2 col-2 ">
                 {% url 'crm-reco-without-resources' as url %}
                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Recos sans ressource" icon="suit-club" %}
               </li>

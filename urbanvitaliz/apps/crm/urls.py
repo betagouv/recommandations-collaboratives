@@ -29,6 +29,11 @@ urlpatterns = [
         name="crm-list-tags",
     ),
     path(
+        r"crm/topics",
+        views.crm_list_topics,
+        name="crm-list-topics",
+    ),
+    path(
         r"crm/reco_without_resources",
         views.crm_list_recommendation_without_resources,
         name="crm-reco-without-resources",
@@ -179,6 +184,5 @@ urlpatterns = [
         views.project_list_by_tags_as_csv,
         name="crm-project-list-by-tags-csv",
     ),
-    
     path("crm/feed/", views.LatestNotesFeed(), name="crm-feed"),
 ]

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% load django_vite %}
+{% load static %}
+
+{% block js %}
+    {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/apps/tagCloud.js' %}
+{% endblock %}
+
+{% block content %}
+
+{{ topics|json_script:"topicsArray" }}
+
+<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
+    {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
+    <div class="w-75 d-flex flex-column justify-content-start">
+            {% url 'crm-search' as crmSearchUrl %}
+
+            <div class="d-flex flex-column font-marianne pt-4 px-4 ">
+                <h2 class="">
+                    <svg class="bi align-middle" width="25" height="25" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#tags"/>
+                    </svg>&nbsp;
+                    <span>Index des thématiques (projets et recommandations)</span></h2>
+                <div id="wordCloud" class="mb-4 pt-4 mx-auto fw-bold" x-data="WordCloud(topicsArray, '{{crmSearchUrl}}')">
+                </div>
+            </div>
+
+            <section class="w-100 d-flex flex-column justify-content-center font-marianne">
+                <div class="d-flex justify-content-center">
+                    <table class="w-100 my-auto table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">Nom</th>
+                            <th scope="col">Occurences</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, value in topics.items %}
+                                <tr>
+                                    <td><a href="{% url 'crm-search' %}?query={{key}}">{{key}}</a></td>
+                                    <td>{{value}}</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+    </div>
+</div>
+{% endblock %}

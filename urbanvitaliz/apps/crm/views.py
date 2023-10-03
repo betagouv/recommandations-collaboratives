@@ -34,7 +34,7 @@ from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
-from urbanvitaliz.apps.projects.models import Project, UserProjectStatus
+from urbanvitaliz.apps.projects.models import Project, UserProjectStatus, Topic
 from urbanvitaliz.apps.tasks.models import Task
 from urbanvitaliz.utils import (
     get_group_for_site,
@@ -873,6 +873,43 @@ def compute_tag_occurences(site):
 
     tags = Counter(**project_tags) + Counter(**note_tags)
     return OrderedDict(sorted(tags.items()))
+
+
+def compute_topics_occurences(site):
+    project_topics = dict(
+        (tag["name"], tag["occurrences"])
+        for tag in (
+            Topic.objects.filter(projects__sites=site)
+            .distinct()
+            .values("name")
+            .annotate(occurrences=Count("projects", distinct=True))
+        )
+    )
+
+    task_topics = dict(
+        (tag["name"], tag["occurrences"])
+        for tag in (
+            Topic.objects.filter(tasks__site=site)
+            .distinct()
+            .values("name")
+            .annotate(occurrences=Count("tasks", distinct=True))
+        )
+    )
+
+    topics = Counter(**project_topics) + Counter(**task_topics)
+    return OrderedDict(sorted(topics.items()))
+
+
+@login_required
+def crm_list_topics(request):
+    """Return a page containing all topics with their count"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    search_form = forms.CRMSearchForm()
+
+    topics = compute_topics_occurences(request.site)
+
+    return render(request, "crm/topics.html", locals())
 
 
 @login_required
