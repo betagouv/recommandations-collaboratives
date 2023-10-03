@@ -23,11 +23,15 @@ Dossier de tests : `frontend_tests/`
           }
     ```
 
-- Initialiser un server django en mode test avec la base de test et les différentes fixtures avec la commande : `npm run db:test:init`
-- Dans une nouvelle console, dans le dossier `frontend_tests/` lancer la commande de mise à jour des permissions: `db:test:update_permissions`
-- Vous pouvez maintenant exécuter les différents tests avec les commandes suivantes au choix :
-    - `npm run test_ui` -> pour lancer cypress avec une interface visuelle
-    - `npm run test` -> pour lancer cypress en ligne de commande
+Pour lancer les tests, il faut lancer plusiuers processus dans des consoles distinctes:
+
+- Console 1: Initialiser un server django en mode test avec la base de test et les différentes fixtures avec la commande : `npm run db:test:init`
+- Console 2:
+  - Dans le dossier `[root]/frontend_tests/` lancer la commande de mise à jour des permissions: `db:test:update_permissions`
+  - Dans le dossier `[root]/urbanvitaliz/frontend/` lancer la commande de dev front qui met les templates à dispoition de Django:  `npm run dev`
+- Console 3: Vous pouvez maintenant exécuter les différents tests avec les commandes suivantes au choix :
+  - `npm run test_ui` -> pour lancer cypress avec une interface visuelle
+  - `npm run test` -> pour lancer cypress en ligne de commande
 
 
 TODO : continue doc
