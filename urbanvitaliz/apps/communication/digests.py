@@ -18,6 +18,7 @@ from django.utils import timezone
 
 from urbanvitaliz import utils, verbs
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.tasks import models as tasks_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 
 from .api import send_email
@@ -31,7 +32,7 @@ def send_digests_for_task_reminders_by_user(user, dry_run=False):
     """
     Send a digest email per project with expired reminders
     """
-    task_ct = ContentType.objects.get_for_model(projects_models.Task)
+    task_ct = ContentType.objects.get_for_model(tasks_models.Task)
 
     now = timezone.now()
 
@@ -522,7 +523,6 @@ class NotificationFormatter:
 
         fmt = self.dispatch_table.get(notification.verb, _default)
         return fmt(notification)
-
 
     # ------ Formatter Utils -----#
     def _represent_user(self, user):

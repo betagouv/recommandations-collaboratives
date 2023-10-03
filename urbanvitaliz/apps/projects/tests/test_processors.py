@@ -18,6 +18,8 @@ from urbanvitaliz.utils import login
 from django.test import RequestFactory
 from notifications.signals import notify
 
+from urbanvitaliz.apps.tasks import models as task_models
+
 from .. import models, utils
 from .. import context_processors
 
@@ -32,7 +34,7 @@ def test_active_project_processor(request, client):
         baker.make(models.Document, project=project, the_link="http://nowhe.re"),
         baker.make(models.Note, project=project, public=True),
         baker.make(models.Note, project=project, public=False),
-        baker.make(models.Task, project=project, public=False),
+        baker.make(task_models.Task, project=project, public=False),
         # NOTE should we also add a Task w/ public=True ?
     )
 

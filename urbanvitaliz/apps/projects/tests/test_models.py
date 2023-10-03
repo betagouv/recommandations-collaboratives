@@ -13,6 +13,8 @@ from django.contrib.sites import models as sites
 from django.utils import timezone
 from model_bakery import baker
 
+from urbanvitaliz.apps.tasks import models as task_models
+
 from .. import models
 
 
@@ -26,7 +28,7 @@ def test_project_returns_its_topics_and_its_tasks_ones():
     project.topics.set(project_topics)
 
     task_topic = baker.make(models.Topic, site=site)
-    task = baker.make(models.Task, project=project, site=site, topic=task_topic)
+    task = baker.make(task_models.Task, project=project, site=site, topic=task_topic)
 
     # all topics of project should include its topics and its tasks' ones
     with settings.SITE_ID.override(site.pk):
@@ -45,7 +47,7 @@ def test_project_all_topics_are_not_duplicated():
     project.sites.add(site)
     project.topics.add(topic)
 
-    task = baker.make(models.Task, project=project, site=site, topic=topic)
+    task = baker.make(task_models.Task, project=project, site=site, topic=topic)
 
     # topic is not duplicated in all topics for project
     with settings.SITE_ID.override(site.pk):
@@ -77,7 +79,7 @@ def test_project_all_topics_exclude_deleted_tasks():
     project = baker.make(models.Project)
     project.sites.add(site)
     task = baker.make(
-        models.Task, project=project, site=site, topic=topic, deleted=timezone.now()
+        task_models.Task, project=project, site=site, topic=topic, deleted=timezone.now()
     )
 
     # topic is not duplicated in all topics for project

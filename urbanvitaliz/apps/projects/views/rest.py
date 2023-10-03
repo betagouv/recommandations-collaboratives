@@ -20,18 +20,17 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from urbanvitaliz import verbs
+from urbanvitaliz.apps.tasks import models as task_models
+from urbanvitaliz.apps.tasks import signals as task_signals
 from urbanvitaliz.utils import TrigramSimilaritySearchFilter, get_group_for_site
 
 from .. import models, signals
 from ..serializers import (
     ProjectForListSerializer,
     ProjectSerializer,
-    TaskFollowupSerializer,
-    TaskNotificationSerializer,
-    TaskSerializer,
+    TopicSerializer,
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
-    TopicSerializer,
 )
 
 ########################################################################
@@ -182,173 +181,6 @@ def update_projects_with_their_notifications(site, user, projects):
         p.notifications = notifications.get(str(p.id), empty)
         active = bool(collaborators.get(str(p.id)))
         p.notifications["has_collaborator_activity"] = active
-
-
-class TaskFollowupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for TaskFollowups
-    """
-
-    serializer_class = TaskFollowupSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        project_id = int(self.kwargs["project_id"])
-        task_id = int(self.kwargs["task_id"])
-
-        user_projects = list(
-            models.Project.on_site.for_user(self.request.user).values_list(flat=True)
-        )
-
-        if project_id not in user_projects:
-            project = models.Project.objects.get(pk=project_id)
-            if not (
-                self.request.method == "GET"
-                and self.request.user.has_perm("projects.use_tasks", project)
-            ):
-                raise PermissionDenied()
-
-        return models.TaskFollowup.objects.filter(task_id=task_id)
-
-    def create(self, request, project_id, task_id):
-        data = copy(request.data)
-        data["task_id"] = task_id
-        data["who_id"] = request.user.id
-
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        headers = self.get_success_headers(serializer.data)
-
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
-
-
-########################################################################
-# Task API
-########################################################################
-
-
-class TaskViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for project tasks
-    """
-
-    def perform_update(self, serializer):
-        original_object = self.get_object()
-        updated_object = serializer.save()
-
-        if original_object.public is False and updated_object.public is True:
-            signals.action_created.send(
-                sender=self,
-                task=updated_object,
-                project=updated_object.project,
-                user=self.request.user,
-            )
-
-    @action(
-        methods=["post"],
-        detail=True,
-    )
-    def move(self, request, project_id, pk):
-        task = self.get_object()
-
-        if not self.request.user.has_perm("projects.use_tasks", task.project):
-            # FIXME this line is not covered by a test
-            raise PermissionDenied()
-
-        above_id = request.POST.get("above", None)
-        below_id = request.POST.get("below", None)
-
-        if above_id:
-            other_pk = above_id
-        else:
-            other_pk = below_id
-
-        try:
-            other_task = self.queryset.get(project_id=task.project_id, pk=other_pk)
-        except models.Task.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        if above_id:
-            task.above(other_task)
-            return Response({"status": "insert above done"})
-
-        if below_id:
-            task.below(other_task)
-            return Response({"status": "insert below done"})
-
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    def get_queryset(self):
-        project_id = int(self.kwargs["project_id"])
-
-        project = models.Project.on_site.get(pk=project_id)
-
-        if not (
-            self.request.user.has_perm("projects.view_tasks", project)
-            or self.request.user.has_perm("sites.list_projects", self.request.site)
-        ):
-            raise PermissionDenied()
-
-        return self.queryset.filter(project_id=project_id).order_by(
-            "-created_on", "-updated_on"
-        )
-
-    queryset = models.Task.on_site
-    serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class TaskNotificationViewSet(
-    mixins.DestroyModelMixin,
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet,
-):
-    """
-    API endpoint for Task
-    """
-
-    def get_queryset(self):
-        task_id = int(self.kwargs["task_id"])
-        task = models.Task.objects.get(pk=task_id)
-
-        notifications = self.request.user.notifications.unread()
-
-        task_ct = ContentType.objects.get_for_model(models.Task)
-        followup_ct = ContentType.objects.get_for_model(models.TaskFollowup)
-
-        task_actions = notifications.filter(
-            action_object_content_type=task_ct.pk,
-            action_object_object_id=task_id,
-        )
-
-        followup_ids = list(task.followups.all().values_list("id", flat=True))
-
-        followup_actions = notifications.filter(
-            action_object_content_type=followup_ct.pk,
-            action_object_object_id__in=followup_ids,
-        )
-
-        return task_actions | followup_actions
-
-    @action(
-        methods=["post"],
-        detail=False,
-    )
-    def mark_all_as_read(self, request, project_id, task_id):
-        is_hijacked = getattr(request.user, "is_hijacked", False)
-
-        if not is_hijacked:
-            self.get_queryset().mark_all_as_read(request.user)
-
-        return Response({}, status=status.HTTP_200_OK)
-
-    serializer_class = TaskNotificationSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 
 ########################################################################
