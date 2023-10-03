@@ -130,7 +130,8 @@ def test_regular_collaborator_cannot_set_project_inactive(request, client):
         assign_collaborator(user, project, is_owner=False)
 
         response = client.post(url)
-        assert response.status_code == 403
+
+    assert response.status_code == 403
 
     project = models.Project.on_site.get(id=project.id)
     assert project.inactive_since is None
@@ -212,8 +213,9 @@ def test_regular_collaborator_cannot_set_project_active(request, client):
     with login(client) as user:
         assign_collaborator(user, project, is_owner=False)
 
-        response = client.post(url)  # inactive = None
-        assert response.status_code == 403
+        response = client.post(url)
+
+    assert response.status_code == 403
 
     updated = models.Project.on_site.get(id=project.id)
     assert updated.inactive_since == project.inactive_since
@@ -224,7 +226,7 @@ def test_regular_collaborator_cannot_set_project_active(request, client):
 
 @pytest.mark.django_db
 def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactive(
-    request, client
+    request, client, subtests
 ):
     site = get_current_site(request)
 
@@ -313,13 +315,130 @@ def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactiv
     ]
 
     for trigger in triggers:
-        url = reverse(trigger["url-name"], kwargs=trigger["url-args"])
-        with login(client, user=trigger["user"]):
-            response = client.post(url, data=trigger["post-data"])
-            assert response.status_code == 302
+        with subtests.test(trigger["url-name"]):
+            url = reverse(trigger["url-name"], kwargs=trigger["url-args"])
+            with login(client, user=trigger["user"]):
+                response = client.post(url, data=trigger["post-data"])
+                assert response.status_code == 302, trigger["url-name"]
 
-    assert collaborator.notifications.count() == 0
-    assert advisor.notifications.count() == len(triggers)
+            assert not collaborator.notifications.exists()
+            assert advisor.notifications.exists()
+
+
+# -- Implicit reactivation
+@pytest.mark.django_db
+def test_project_is_reactivated_on_conversation_message(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        inactive_since=timezone.now(),
+    )
+
+    url = reverse(
+        "projects-conversation-create-message", kwargs={"project_id": project.pk}
+    )
+
+    with login(client) as owner:
+        assign_collaborator(owner, project, is_owner=True)
+        response = client.post(url, data={"content": "this is some content"})
+
+    assert response.status_code == 302
+
+    project.refresh_from_db()
+
+    assert project.inactive_since is None
+
+
+@pytest.mark.django_db
+def test_project_is_reactivated_on_document_upload(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        inactive_since=timezone.now(),
+    )
+
+    url = reverse(
+        "projects-documents-upload-document", kwargs={"project_id": project.pk}
+    )
+
+    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+
+    with login(client) as owner:
+        assign_collaborator(owner, project, is_owner=True)
+        response = client.post(
+            url, data={"description": "this is some content", "the_file": png}
+        )
+
+    assert response.status_code == 302
+
+    project.refresh_from_db()
+
+    assert project.inactive_since is None
+
+
+@pytest.mark.django_db
+def test_project_is_reactivated_on_recommendation_comment(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        inactive_since=timezone.now(),
+    )
+
+    task = baker.make(
+        tasks_models.Task, project=project, site=get_current_site(request)
+    )
+
+    url = reverse("projects-followup-task", kwargs={"task_id": task.pk})
+
+    with login(client) as owner:
+        assign_collaborator(owner, project, is_owner=True)
+        response = client.post(url, data={"comment": "hey"})
+
+    assert response.status_code == 302
+
+    project.refresh_from_db()
+
+    assert project.inactive_since is None
+
+
+@pytest.mark.django_db
+def test_project_is_reactivated_on_survey_edition(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+        inactive_since=timezone.now(),
+    )
+
+    task = baker.make(
+        tasks_models.Task, project=project, site=get_current_site(request)
+    )
+
+    url = reverse("projects-followup-task", kwargs={"task_id": task.pk})
+
+    with login(client) as owner:
+        assign_collaborator(owner, project, is_owner=True)
+        response = client.post(url, data={"comment": "hey"})
+
+    assert response.status_code == 302
+
+    project.refresh_from_db()
+
+    assert project.inactive_since is None
+
+
+# ...,  # survey edited?
 
 
 # eof

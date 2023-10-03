@@ -18,9 +18,7 @@ from urbanvitaliz.utils import has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm
-from ..utils import (
-    set_active_project_id,
-)
+from ..utils import set_active_project_id, get_collaborators_for_project
 
 
 @login_required
@@ -70,6 +68,13 @@ def document_upload(request, project_id):
 
             try:
                 instance.save()
+
+                # Reactivate project if was set inactive
+                if (
+                    project.inactive_since
+                    and request.user in get_collaborators_for_project(project)
+                ):
+                    project.reactivate()
 
                 signals.document_uploaded.send(
                     sender=document_upload, instance=instance

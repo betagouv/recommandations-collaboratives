@@ -13,12 +13,13 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from django.utils import timezone
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
 from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.apps.projects.utils import assign_advisor
+from urbanvitaliz.apps.projects.utils import assign_advisor, assign_collaborator
 from urbanvitaliz.utils import login
 
 from .. import models
@@ -519,6 +520,32 @@ def test_refresh_signals(request, client):
     # Fetch persisted answer
     answer = models.Answer.objects.get(session=session, question=q1)
     assert answer.signals == "new-signal"
+
+
+# -- Project reactivation
+@pytest.mark.django_db
+def test_answered_question_reactivates_inactive_project(request, client):
+    current_site = get_current_site(request)
+    project = Recipe(
+        projects.Project, sites=[current_site], inactive_since=timezone.now()
+    ).make()
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(models.Session, survey=survey, project=project).make()
+
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    Recipe(models.Question, question_set=qs).make()
+
+    my_comment = "this is a comment"
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, project)
+        response = client.post(url, data={"comment": my_comment})
+
+    assert response.status_code == 302
+
+    project.refresh_from_db()
+    assert project.inactive_since is None
 
 
 # eof

@@ -264,6 +264,15 @@ class Project(models.Model):
         verbose_name="Raison de l'inactivité du projet",
     )
 
+    def reactivate(self):
+        """Switch back project to active state"""
+        if not self.inactive_since:
+            return
+
+        self.inactive_since = None
+        self.inactive_reason = None
+        self.save()
+
     muted = models.BooleanField(
         default=False, blank=True, verbose_name="Ne pas envoyer de notifications"
     )

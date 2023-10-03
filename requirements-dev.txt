@@ -16,6 +16,7 @@ pytest-icdiff
 pytest-mock
 pytest-sugar
 pytest-xdist
+pytest-subtests
 pytz
 semgrep
 python-dotenv

@@ -13,6 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.generic import DetailView, RedirectView
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.projects.utils import get_collaborators_for_project
 from urbanvitaliz.utils import get_site_config_or_503, has_perm_or_403
 
 from .. import forms, models, signals
@@ -68,6 +69,13 @@ def survey_question_details(request, session_id, question_id):
         form = forms.AnswerForm(question, answer, request.POST, request.FILES)
         if form.is_valid():
             form.update_session(session, request.user)
+
+            # Reactivate project if was set inactive
+            if (
+                session.project.inactive_since
+                and request.user in get_collaborators_for_project(session.project)
+            ):
+                session.project.reactivate()
 
             signals.survey_session_updated.send(
                 sender=survey_question_details,

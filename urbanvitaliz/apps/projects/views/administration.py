@@ -425,9 +425,7 @@ def set_project_active(request, project_id: int):
     ):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
-    project.inactive_since = None
-    project.inactive_reason = None
-    project.save()
+    project.reactivate()
 
     return HttpResponse(status=202)
 
