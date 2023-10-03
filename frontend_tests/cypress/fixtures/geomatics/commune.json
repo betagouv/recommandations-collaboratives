@@ -22,5 +22,17 @@
         },
         "model": "geomatics.commune",
         "pk": 1
+    },
+    {
+        "fields": {
+            "department": "42",
+            "insee": "42218",
+            "latitude": 45.4463958410,
+            "longitude": 4.39273574323,
+            "name": "commune localisée",
+            "postal": "42000"
+        },
+        "model": "geomatics.commune",
+        "pk": 2
     }
 ]
