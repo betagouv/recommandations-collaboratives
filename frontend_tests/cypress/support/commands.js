@@ -27,6 +27,9 @@ Cypress.Commands.add("login", (role) => {
         case "staff":
             username = users[0].fields.username
             break;
+        case "nonactive":
+            username = users[8].fields.username
+            break;
         default:
             break;
     }
@@ -52,6 +55,28 @@ Cypress.Commands.add("login", (role) => {
             cy.getCookie("csrftoken").should("exist");
         })
     })
+})
+
+Cypress.Commands.add('loginWithUi',(role) => {
+    const { username } = currentUser
+
+    cy.visit('/accounts/login/')
+
+    cy.url().should('include', '/accounts/login/')
+
+    cy.get('#id_login').type(username, { force: true }).should('have.value', username)
+
+    cy.get('#id_password').type("derpderp", { force: true }).should('have.value', "derpderp")
+
+    cy.get("[type=submit]").click({ force: true });
+
+    cy.contains(`Connexion avec ${username} réussie.`)
+
+    // // we should be redirected to /dashboard
+    cy.url().should('include', '/projects')
+
+    // // our auth cookie should be present
+    cy.getCookie('sessionid').should('exist')
 })
 
 Cypress.Commands.add('logout', () => {
@@ -117,7 +142,7 @@ Cypress.Commands.add('becomeAdvisor', () => {
 Cypress.Commands.add('createTask', (index) => {
 
     cy.get("body").then(body => {
-        if (body.find('#create-task-button').length > 0) {
+        if (body.find('[data-test-id="submit-task-button"]').length > 0) {
             cy.contains("Émettre une recommandation").click({ force: true })
 
             cy.get("#push-noresource").click({ force: true });
@@ -135,7 +160,7 @@ Cypress.Commands.add('createTask', (index) => {
             cy.url().should('include', '/actions')
 
             cy.contains('reco test from action')
-        } else if (body.find('#create-task-button-bis').length > 0) {
+        } else if (body.find('[data-test-id="create-task-button"]').length > 0) {
             cy.contains("Créer une recommandation").click({ force: true })
 
             cy.get("#push-noresource").click({ force: true });
@@ -158,8 +183,6 @@ Cypress.Commands.add('createTask', (index) => {
             assert.isOk('task', "can't create task");
         }
     })
-
-
 })
 
 Cypress.Commands.add('approveProject', (index) => {
