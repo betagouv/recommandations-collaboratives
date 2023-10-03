@@ -1,19 +1,25 @@
 {% load static %}
-
-<div class="p-0 project-map-container" :class="{'is-small':mapIsSmall}" >
-    <div x-cloak class="h-100 w-100" x-ref="map" id="map" class="project-map"></div>
+<div class="p-0 project-map-container"
+     :class="{'is-small':mapIsSmall}"
+     data-test-id="project-location">
+    <div x-cloak x-ref="map" id="map" class="h-100 w-100 project-map"></div>
     <div class="map-overlay">
         <a style="cursor: pointer"
-            @click="openProjectMapModal"
-            data-toggle="modal"
-            data-target="#projectMapModal"
-            class="open-map-modal-button">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-labelledby="iconTitle">
+           @click="openProjectMapModal"
+           data-toggle="modal"
+           data-target="#projectMapModal"
+           class="open-map-modal-button"
+           data-test-id="toggle-open-map-modal">
+            <svg width="32"
+                 height="32"
+                 viewBox="0 0 32 32"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg"
+                 aria-labelledby="iconTitle">
                 <title id="iconTitle">Ouvrir la carte interactive</title>
-                <path d="M24.0414 22.156L29.752 27.8653L27.8654 29.752L22.156 24.0413C20.0317 25.7443 17.3894 26.6705 14.6667 26.6667C8.04269 26.6667 2.66669 21.2907 2.66669 14.6667C2.66669 8.04266 8.04269 2.66666 14.6667 2.66666C21.2907 2.66666 26.6667 8.04266 26.6667 14.6667C26.6706 17.3893 25.7443 20.0317 24.0414 22.156ZM21.3667 21.1667C23.0588 19.4265 24.0038 17.0939 24 14.6667C24 9.50933 19.8227 5.33333 14.6667 5.33333C9.50935 5.33333 5.33335 9.50933 5.33335 14.6667C5.33335 19.8227 9.50935 24 14.6667 24C17.0939 24.0038 19.4265 23.0588 21.1667 21.3667L21.3667 21.1667ZM13.3334 13.3333V9.33333H16V13.3333H20V16H16V20H13.3334V16H9.33335V13.3333H13.3334Z" fill="#666666"/>
-            </svg>  
+                <path d="M24.0414 22.156L29.752 27.8653L27.8654 29.752L22.156 24.0413C20.0317 25.7443 17.3894 26.6705 14.6667 26.6667C8.04269 26.6667 2.66669 21.2907 2.66669 14.6667C2.66669 8.04266 8.04269 2.66666 14.6667 2.66666C21.2907 2.66666 26.6667 8.04266 26.6667 14.6667C26.6706 17.3893 25.7443 20.0317 24.0414 22.156ZM21.3667 21.1667C23.0588 19.4265 24.0038 17.0939 24 14.6667C24 9.50933 19.8227 5.33333 14.6667 5.33333C9.50935 5.33333 5.33335 9.50933 5.33335 14.6667C5.33335 19.8227 9.50935 24 14.6667 24C17.0939 24.0038 19.4265 23.0588 21.1667 21.3667L21.3667 21.1667ZM13.3334 13.3333V9.33333H16V13.3333H20V16H16V20H13.3334V16H9.33335V13.3333H13.3334Z" fill="#666666" />
+            </svg>
         </a>
     </div>
 </div>
 {% include "projects/project/fragments/project_map_modal.html" %}
-
