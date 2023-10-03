@@ -7,6 +7,7 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
+import uuid
 import datetime
 
 import pytest
@@ -24,7 +25,6 @@ from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
-from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.projects import models as project_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -1182,6 +1182,67 @@ def test_update_task_followup_by_creator(request, client):
     assert response.status_code == 302
 
 
+########################################################################
+# Task Followup Rsvp
+########################################################################
+
+
+@pytest.mark.django_db
+def test_accessing_rsvp_from_email_link_improper_status_404(request, client):
+    rsvp = baker.make(models.TaskFollowupRsvp)
+    status = 0
+
+    url = reverse("projects-rsvp-followup-task", args=[str(rsvp.uuid), status])
+    response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_accessing_rsvp_from_email_link_bad_uuid(request, client):
+    rsvp = baker.make(models.TaskFollowupRsvp)
+    status = models.Task.INPROGRESS
+    bad_uuid = uuid.uuid4()
+
+    url = reverse("projects-rsvp-followup-task", args=[bad_uuid, status])
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(response, "celui-ci n'est pas valide.")
+
+
+@pytest.mark.django_db
+def test_accessing_rsvp_from_email_link(request, client):
+    rsvp = baker.make(models.TaskFollowupRsvp)
+    status = models.Task.INPROGRESS
+
+    url = reverse("projects-rsvp-followup-task", args=[str(rsvp.uuid), status])
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assertContains(response, 'id="form-rsvp-followup-confirm"')
+
+
+@pytest.mark.django_db
+def test_using_rsvp_from_email_link_updates_task(request, client):
+    rsvp = baker.make(models.TaskFollowupRsvp)
+    status = models.Task.INPROGRESS
+
+    data = {"comment": "i am commenting my action"}
+    url = reverse("projects-rsvp-followup-task", args=[str(rsvp.uuid), status])
+    response = client.post(url, data=data)
+
+    assert response.status_code == 200
+    assertContains(response, "Merci")
+
+    # a new followup is created
+    followup = models.TaskFollowup.objects.get(task=rsvp.task)
+    assert followup.comment == data["comment"]
+    assert followup.status == status
+    # rsvp "one time" object is deleted
+    assert not models.TaskFollowupRsvp.objects.filter(uuid=rsvp.uuid).exists()
+
+
 ###############################################################
 # Reminders
 ###############################################################
@@ -1307,7 +1368,7 @@ def test_reminder_is_updated_when_a_followup_issued(request, client):
         url = reverse("projects-followup-task", args=[task.pk])
         response = client.post(url)
 
-    reminder = reminders_models.Reminder.objects.first()
+    reminder = reminders.Reminder.objects.first()
     assert response.status_code == 302
     assert reminder.recipient == owner.email
 
@@ -1315,6 +1376,8 @@ def test_reminder_is_updated_when_a_followup_issued(request, client):
 ###############################################################
 # API
 ###############################################################
+
+
 @pytest.mark.django_db
 def test_unassigned_switchtender_should_see_recommendations(request):
     site = get_current_site(request)
