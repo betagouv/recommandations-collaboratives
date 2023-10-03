@@ -127,20 +127,21 @@ function initMap(idMap, project, options, zoom) {
 
 // Create layers composed with markers
 function initMapLayers(map, project, geoData) {
-	if (geoData.commune && geoData.commune.features.length) {
+	try {
 		addLayerAreaCommune(map, geoData.commune);
-	} else if(project.commune.latitude && project.commune.longitude) {
-		addLayerAreaCircle(map, project)
+	} catch(e) {
+		if(project.commune.latitude && project.commune.longitude) {
+			addLayerAreaCircle(map, project)
+		}
 	}
 }
 
 function addLayerAreaCommune(map, geoData) {
-	if(geoData.code && geoData.code === 400) {
-		// TODO: handle error
+	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
+		throw Error(`Données IGN indisponibles pour la commune ${geoData.commune.name}`)
 	}
-	if(geoData.features.length) {
-		L.geoJSON(geoData.features[0].geometry).addTo(map);
-	}
+
+	L.geoJSON(geoData.features[0].geometry).addTo(map);
 }
 
 // Create layers composed with markers
@@ -150,7 +151,8 @@ function addLayerAreaCircle(map, project) {
 			color: '#0063CB',
 			fillColor: '#0063CB',
 			fillOpacity: 0.25,
-			radius: 5000
+			radius: 5000,
+			className: 'area-circle'
 	}).addTo(map);
 }
 

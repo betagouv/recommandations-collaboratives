@@ -27,7 +27,7 @@
 {% endblock %}
 {% block content %}
     <div x-data='ProjectLocation(projectOptions)'>
-        <div class="mb-2">{% include 'projects/project/fragments/project_map.html' %}</div>
+        <div class="mb-2" data-test-id="project-map-static">{% include 'projects/project/fragments/project_map.html' %}</div>
         {% include 'projects/project/fragments/project_location_details.html' %}
     </div>
 {% endblock %}
