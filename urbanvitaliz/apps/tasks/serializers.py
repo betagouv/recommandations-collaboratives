@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.projects.serializers import DocumentSerializer
+from urbanvitaliz.apps.resources.serializers import ResourceSerializer
 from urbanvitaliz.apps.projects.utils import get_collaborators_for_project
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
@@ -79,6 +80,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "document",
             "reminders",
             "resource_id",
+            "resource",
             "notifications",
             "followups_count",
             "comments_count",
@@ -88,6 +90,8 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
     reminders = ReminderSerializer(read_only=True, many=True)
 
     document = DocumentSerializer(read_only=True, many=True)
+
+    resource = ResourceSerializer(read_only=True, many=False)
 
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()
