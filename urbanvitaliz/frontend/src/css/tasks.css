@@ -194,3 +194,7 @@ body.modal-open {
     border-radius: 2px;
 }
 
+.icon-banner {
+    width: 65px;
+    height: 65px;
+}
