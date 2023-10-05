@@ -8,8 +8,9 @@ describe('I can see the location of a project on the project overview', () => {
 
 
     it(`displays no area indicator if the project's commune is not provided`, () => {
-        const currentProject = projects[10];
+        const currentProject = projects[12];
         cy.visit(`/project/${currentProject.pk}`).then(() => {
+            cy.wait(500); // TODO: fix by testing loading state (+ add loading spinner)
             cy.get('[data-test-id="project-map-static"]').find('.leaflet-overlay-pane').then(() => {
                 cy.get('.area-circle').should('not.exist');
             });
@@ -24,7 +25,7 @@ describe('I can see the location of a project on the project overview', () => {
     })
 
     it('displays the area of the commune if geolocation data exists', () => {
-        const currentProject = projects[9];
+        const currentProject = projects[11];
         cy.visit(`/project/${currentProject.pk}`).then(() => {
             cy.get('[data-test-id="project-map-static"]').find('.leaflet-overlay-pane').then(() => {
                 // TODO: find a way to test commune area overlay
@@ -34,7 +35,7 @@ describe('I can see the location of a project on the project overview', () => {
     })
 
     it(`opens a modal with an interactive map`, () => {
-        const currentProject = projects[9];
+        const currentProject = projects[11];
         cy.visit(`/project/${currentProject.pk}`).then(() => {
             cy.wait(500); // TODO: fix by testing loading state (+ add loading spinner)
             cy.get('[data-test-id="project-location"]').find('[data-test-id="toggle-open-map-modal"]').click({force: true});
