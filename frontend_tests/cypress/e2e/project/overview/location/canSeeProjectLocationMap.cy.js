@@ -17,7 +17,7 @@ describe('I can see the location of a project on the project overview', () => {
     })
 
     it(`displays an area circle around the centroid of the commune if geolocation does not exist `, () => {
-        const currentProject = projects[1];
+        const currentProject = projects[13];
         cy.visit(`/project/${currentProject.pk}`).then(() => {
             cy.get('[data-test-id="project-map-static"]').find('.leaflet-overlay-pane').find('.area-circle');
         })
