@@ -212,3 +212,28 @@ Cypress.Commands.add('navigateToProject', (index) => {
     cy.get('#projects-list-button').click({ force: true })
     cy.contains(`${project.name} ${index}`).click({ force: true })
 })
+
+/**
+ * Verify that image loads and that attribute corresponds to ARIA role.
+ * Possible alt values are: 
+ * - img-informative
+ * - img-presentation
+ * - img-functional
+ */
+Cypress.Commands.add('testImage', (img, type) => {
+    switch(type) {
+        case 'img-presentation': {
+            expect(img.alt).to.be.equal('');
+            // "naturalWidth" and "naturalHeight" are set when the image loads
+            expect(img.naturalWidth).to.be.greaterThan(0);
+            break;
+        }
+        case 'img-functional':
+        case 'img-informative': {
+            expect(img.alt).to.exist();
+            expect(img.alt).not.to.be.equal('');
+            expect(img.naturalWidth).to.be.greaterThan(0);
+            break;
+        }
+    }
+})
