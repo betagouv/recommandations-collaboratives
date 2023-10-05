@@ -14,7 +14,7 @@ describe('I can go to tasks tab', () => {
         // Test that icons are displayed correctly
         cy.get('[data-test-id="banner-new-tasks"]')
         .find('[data-test-id="img-presentation"]').then(($img) => {
-            cy.testImage($img[0], 'img-presentation');
+            cy.testImage($img[0], 'img-presentation', 'svg');
         })
     })
 })

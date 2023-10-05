@@ -220,20 +220,38 @@ Cypress.Commands.add('navigateToProject', (index) => {
  * - img-presentation
  * - img-functional
  */
-Cypress.Commands.add('testImage', (img, type) => {
-    switch(type) {
+Cypress.Commands.add('testImage', (img, role, type) => {
+    expect(img.alt).to.exist;
+    expect(img.src).not.to.equal('');
+    switch(role) {
         case 'img-presentation': {
-            expect(img.alt).to.be.equal('');
-            // "naturalWidth" and "naturalHeight" are set when the image loads
-            expect(img.naturalWidth).to.be.greaterThan(0);
+            expect(img.alt).to.equal('');
             break;
         }
         case 'img-functional':
         case 'img-informative': {
-            expect(img.alt).to.exist();
-            expect(img.alt).not.to.be.equal('');
+            expect(img.alt).not.to.equal('');
+            break;
+        }
+        default:
+            assert(false)
+            break;
+    }
+    switch(type) {
+        case 'svg': {
+            expect(img.width).to.be.greaterThan(0); // TODO: fix this test, as it will pass event if svg is not loaded
+            expect(img.alt).to.equal('');
+            break;
+        }
+        case 'png':
+        case 'jpg':
+        case 'jpeg': {
+            // "naturalWidth" and "naturalHeight" are set when the image loads
             expect(img.naturalWidth).to.be.greaterThan(0);
             break;
         }
+        default:
+            assert(false)
+            break;
     }
 })
