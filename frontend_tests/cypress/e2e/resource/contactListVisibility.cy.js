@@ -1,7 +1,7 @@
-import resource from '../../fixtures/resources/resources.json'
+import resources from '../../fixtures/resources/resources.json'
 import contacts from '../../fixtures/addressbook/contacts.json'
 
-const currentResource = resource[2]
+const currentResource = resources[1]
 
 describe('I can see the resource contact list if im logged', () => {
     beforeEach(() => {

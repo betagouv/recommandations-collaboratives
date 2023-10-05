@@ -1,31 +1,22 @@
-import projects from '../../../../fixtures/projects/projects.json'
 import tasks from '../../../../fixtures/projects/tasks.json'
-
-const currentProject = projects[7];
 const currentTask = tasks[5]
 
-
-describe('I can go tasks tab', () => {
+describe('I can go to tasks tab', () => {
     beforeEach(() => {
-        cy.login("staff");
+        cy.login("jean");
     })
 
     it('changes the status to done', () => {
-        cy.visit(`/project/${currentProject.pk}`)
+        cy.createProject("status done")
+        cy.becomeAdvisor();
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
-
-        cy.contains("Liste").should('have.class', 'active')
+        cy.createTask(currentTask.fields.intent);
+        cy.get('[data-test-id="list-tasks-switch-button"]').should('have.class', 'active')
         cy.contains(currentTask.fields.intent)
-
-        cy.get(`#${currentTask.pk}`).contains('faite').click({force:true});
-
-        cy.document().then((doc) => {
-            doc.getElementById(`${currentTask.pk}-3-button`).click();
-          })
-
-        
-        cy.get(`#${currentTask.pk}`).contains('faite').should('have.class', 'bg-green-dark')
+        cy.get('[data-test-id="done-status-task-button"]').click({ force: true });
+        cy.get('[data-test-id="send-status-3-feedback-button"]').click({ force: true });
+        cy.get('[data-test-id="done-status-task-button"]').should('have.class', 'bg-green-dark')
 
         cy.contains(currentTask.fields.intent).click({ force: true })
         cy.contains(currentTask.fields.intent)

@@ -11,7 +11,7 @@
         <span class="me-2 d-flex align-items-center w-100 justify-content-between">
             <div class="d-flex align-items-center">
                 <img class="rounded-circle me-2" src="{% gravatar_url project.owner.email size=24 %}" alt="{{action.actor}}">
-                <strong class="text-nowrap text-capitalize">
+                <strong data-test-id="project-owner-name-details" class="text-nowrap text-capitalize {% if not project.owner.is_active %}inative-status{% endif %}">
                     {{ project.owner.first_name|default:project.owner.username }}
                     {{ project.owner.last_name|default:"(A renseigner)" }}
                 </strong>

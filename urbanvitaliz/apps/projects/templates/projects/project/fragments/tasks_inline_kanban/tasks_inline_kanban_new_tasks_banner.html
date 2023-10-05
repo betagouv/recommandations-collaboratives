@@ -8,8 +8,7 @@
         <div class="ms-4 d-flex justify-content-between align-items-center w-100">
             <h6 class="mb-0 fw-bold">
                 Vous avez
-                <!-- TODO : Extraire les formatteurs -->
-                <span x-text="`${$store.tasksData.newTasks.length > 1 ? $store.tasksData.newTasks.length + ' nouvelles recommandations' : $store.tasksData.newTasks.length + ' nouvelle recommandation'}`"></span>
+                <span x-text="$store.utils.isPlural(`1 recommandation non lue`, `${$store.tasksData.newTasks.length} recommandations non lues`, $store.tasksData.newTasks.length)"></span>
             </h6>
             <button @click="$store.previewModal.openWithPagination()"
                     style="color: #0063CB !important"

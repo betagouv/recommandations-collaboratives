@@ -5,6 +5,7 @@ from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
 
+from urbanvitaliz.apps.projects.serializers import TopicSerializer
 from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.projects.serializers import DocumentSerializer
 from urbanvitaliz.apps.resources.serializers import ResourceSerializer
@@ -84,6 +85,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "notifications",
             "followups_count",
             "comments_count",
+            "topic",
         ]
 
     created_by = UserSerializer(read_only=True, many=False)
@@ -96,6 +98,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
+    topic = TopicSerializer(read_only=True)
 
     def get_notifications(self, obj):
         request = self.context.get("request")

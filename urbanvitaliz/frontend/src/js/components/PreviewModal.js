@@ -8,7 +8,6 @@ import { truncate } from '../utils/taskStatus'
 
 export default function PreviewModal() {
     return {
-        currentTaskNotifications: [],
         pendingComment: '',
         currentlyEditing: null,
         followupsIsLoading: false,
@@ -24,6 +23,9 @@ export default function PreviewModal() {
         },
         get followups() {
             return this.$store.previewModal.followups
+        },
+        get notifications() {
+            return this.$store.previewModal.notifications
         },
         get newTasks() {
             return this.$store.tasksData.newTasks
@@ -42,7 +44,7 @@ export default function PreviewModal() {
             return `${this.index + 1} sur ${this.newTasks.length} recommandation${this.newTasks.length > 0 ? 's' : ''}`
         },
         hasNotification(followupId) {
-            return this.currentTaskNotifications.filter(n => n.action_object.who && n.action_object.id === followupId).length > 0;
+            return this.notifications.filter(n => n.action_object.who && n.action_object.id === followupId).length > 0;
         },
         async onSubmitComment(content) {
             if (!this.currentlyEditing) {

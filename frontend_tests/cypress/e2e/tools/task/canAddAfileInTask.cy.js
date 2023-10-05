@@ -1,23 +1,17 @@
 import file from '../../../fixtures/documents/file.json'
-import projects from '../../../fixtures/projects/projects.json'
 
-const currentProject = projects[1];
-
-describe('I can add a file in a recommandation', () => {
+describe('I can add a file in a task', () => {
     beforeEach(() => {
         cy.login("jean");
+        cy.createProject("file in task")
+        cy.becomeAdvisor();
     })
 
     it('writes a message with a file', () => {
-        cy.visit('/projects')
-
-        cy.contains(currentProject.fields.name).click({force:true});
-
         cy.contains("Recommandations").click({ force: true })
-
         cy.url().should('include', '/actions')
 
-        cy.contains("Ajouter une recommandation").click({ force: true })
+        cy.get("[data-test-id='submit-task-button']").click({ force: true })
 
         cy.get("#push-noresource").click({ force: true });
 
@@ -37,6 +31,6 @@ describe('I can add a file in a recommandation', () => {
 
         cy.url().should('include', '/actions')
 
-        cy.contains(`fake recommandation content with no resource : ${now}`)
+        cy.contains(`fake recommandation content with no resource`)
     })
 })

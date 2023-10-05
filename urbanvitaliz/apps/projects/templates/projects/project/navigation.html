@@ -26,7 +26,7 @@
         {% endif %}
         {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
             <li id="overview-hint-1">
-                <a class="{% if overview %} active{% endif %}"
+                <a data-test-id="project-navigation-overview" class="{% if overview %} active{% endif %}"
                 href="{% url 'projects-project-detail-overview' project.pk %}">
                     Présentation
                 </a>
@@ -34,7 +34,7 @@
         {% endif %}
         {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
             <li class="position-relative survey" id="overview-hint-2">
-                <a class="text-nowrap {% if state_of_play %} active{% endif %}"
+                <a data-test-id="project-navigation-knowledge" class="text-nowrap {% if state_of_play %} active{% endif %}"
                 href="{% url 'projects-project-detail-knowledge' project.pk %}">
                     <p>État des lieux</p>
                     <div class="survey-completion">

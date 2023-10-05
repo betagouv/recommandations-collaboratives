@@ -28,6 +28,6 @@ describe('I can go to administration area of a project and invite a switchtender
         cy.get('.invite-switchtender-modal-button').click({ force: true })
         cy.contains(`Un courriel d'invitation à rejoindre le projet a été envoyé à ${userToInvite.fields.email}`)
 
-        cy.contains('Invitations conseiller·e·s').siblings('ul').children('li').contains(userToInvite.fields.email)
+        cy.get("[data-test-id='administration-advisor-invitation-list']").siblings('ul').children('li').contains(userToInvite.fields.email)
     })
 })

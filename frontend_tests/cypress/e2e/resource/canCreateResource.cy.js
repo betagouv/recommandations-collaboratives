@@ -22,9 +22,6 @@ describe('I can create a resource as a switchtender', () => {
             .type('etiquette1', { force: true })
             .should('have.value', 'etiquette1')
 
-        cy.get('#id_departments')
-            .select(1, {force:true})
-
         cy.get('#id_expires_on')
             .type('20/12/2022', { force: true })
             .should('have.value', '20/12/2022')

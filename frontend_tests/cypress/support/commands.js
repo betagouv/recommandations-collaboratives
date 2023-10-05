@@ -27,6 +27,9 @@ Cypress.Commands.add("login", (role) => {
         case "staff":
             username = users[0].fields.username
             break;
+        case "nonactive":
+            username = users[8].fields.username
+            break;
         default:
             break;
     }
@@ -54,12 +57,34 @@ Cypress.Commands.add("login", (role) => {
     })
 })
 
+Cypress.Commands.add('loginWithUi', (role) => {
+    const { username } = currentUser
+
+    cy.visit('/accounts/login/')
+
+    cy.url().should('include', '/accounts/login/')
+
+    cy.get('#id_login').type(username, { force: true }).should('have.value', username)
+
+    cy.get('#id_password').type("derpderp", { force: true }).should('have.value', "derpderp")
+
+    cy.get("[type=submit]").click({ force: true });
+
+    cy.contains(`Connexion avec ${username} réussie.`)
+
+    // // we should be redirected to /dashboard
+    cy.url().should('include', '/projects')
+
+    // // our auth cookie should be present
+    cy.getCookie('sessionid').should('exist')
+})
+
 Cypress.Commands.add('logout', () => {
     cy.get('#user-menu-button').click();
     cy.contains('Déconnexion').click({ force: true })
 })
 
-Cypress.Commands.add("createProject", (index) => {
+Cypress.Commands.add("createProject", (label) => {
 
     cy.visit('/')
 
@@ -68,8 +93,8 @@ Cypress.Commands.add("createProject", (index) => {
     cy.url().should('include', '/onboarding/')
 
     cy.get('#id_name')
-        .type(`${project.name} ${index}`, { force: true })
-        .should('have.value', `${project.name} ${index}`)
+        .type(`${label}`, { force: true })
+        .should('have.value', `${label}`)
 
     cy.get('#input-project-address')
         .type(`${project.location}`, { force: true })
@@ -100,7 +125,7 @@ Cypress.Commands.add("createProject", (index) => {
 
     cy.contains('Envoyer ma demande').click({ force: true });
 
-    cy.contains(`${project.name} ${index}`).click({ force: true })
+    cy.contains(`${label}`).click({ force: true })
 })
 
 Cypress.Commands.add('becomeAdvisor', () => {
@@ -114,35 +139,41 @@ Cypress.Commands.add('becomeAdvisor', () => {
 
 })
 
-Cypress.Commands.add('createTask', (index) => {
+Cypress.Commands.add('createTask', (label, topic = "") => {
 
     cy.get("body").then(body => {
-        if (body.find('#create-task-button').length > 0) {
+        if (body.find('[data-test-id="submit-task-button"]').length > 0) {
             cy.contains("Émettre une recommandation").click({ force: true })
 
             cy.get("#push-noresource").click({ force: true });
 
             cy.get('#intent')
-                .type(`reco test ${index}`, { force: true })
-                .should('have.value', `reco test ${index}`)
+                .type(`${label}`, { force: true })
+                .should('have.value', `${label}`)
 
             cy.get('textarea')
                 .type(`reco test from action description`, { force: true })
                 .should('have.value', `reco test from action description`)
+
+            if (topic !== "") {
+                cy.get('#topic_name')
+                    .type(`${topic}`, { force: true })
+                    .should('have.value', `${topic}`)
+            }
 
             cy.get("[type=submit]").click({ force: true });
 
             cy.url().should('include', '/actions')
 
             cy.contains('reco test from action')
-        } else if (body.find('#create-task-button-bis').length > 0) {
+        } else if (body.find('[data-test-id="create-task-button"]').length > 0) {
             cy.contains("Créer une recommandation").click({ force: true })
 
             cy.get("#push-noresource").click({ force: true });
 
             cy.get('#intent')
-                .type(`reco test ${index}`, { force: true })
-                .should('have.value', `reco test ${index}`)
+                .type(`${label}`, { force: true })
+                .should('have.value', `${label}`)
 
             cy.get('textarea')
                 .type(`reco test from action description`, { force: true })
@@ -158,8 +189,6 @@ Cypress.Commands.add('createTask', (index) => {
             assert.isOk('task', "can't create task");
         }
     })
-
-
 })
 
 Cypress.Commands.add('approveProject', (index) => {

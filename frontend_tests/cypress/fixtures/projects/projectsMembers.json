@@ -45,6 +45,24 @@
         }
     },
     {
+        "model": "projects.projectmember",
+        "pk": 6,
+        "fields": {
+            "member": 9,
+            "project": 10,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 7,
+        "fields": {
+            "member": 5,
+            "project": 11,
+            "is_owner": true
+        }
+    },
+    {
         "model": "projects.projectswitchtender",
         "pk": 1,
         "fields": {
