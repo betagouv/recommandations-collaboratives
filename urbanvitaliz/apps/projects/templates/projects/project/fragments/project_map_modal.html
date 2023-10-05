@@ -5,7 +5,7 @@
      aria-labelledby="project-map-modal-label"
      aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div data-test-id="project-location-modal" class="modal-content">
       <div class="modal-header">
         <h6 id="project-map-modal-label" class="fw-bold d-block mb-0">Localisation</h6>
         <button type="button"
@@ -13,13 +13,14 @@
                 data-bs-dismiss="modal"
                 aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div class="p-0 project-map-container" :class="{'is-small':mapIsSmall}">
+      <div class="modal-body p-0">
+        <div data-test-id="project-map-interactive"
+             class="p-0 project-map-container"
+             :class="{'is-small':mapIsSmall}">
           <div x-cloak
-               class="h-100 w-100"
                x-ref="map-modal"
                id="map-modal"
-               class="project-map"></div>
+               class="project-map h-100 w-100"></div>
         </div>
       </div>
       <div class="modal-footer justify-content-start">
