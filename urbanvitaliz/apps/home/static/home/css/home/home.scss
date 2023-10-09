@@ -1,0 +1,130 @@
+.custom-background-home-image {
+    background-image: url('../../img/home/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    padding-top: 250px;
+    margin-bottom: 50px;
+}
+
+@media (min-width: 48em) {
+    .custom-background-home-image {
+        padding-top: 250px;
+        margin-bottom: 150px;
+    }
+}
+
+.custom-background-home {
+    transform: translate3d(0, 0, 0);
+}
+
+@media (min-width: 48em) {
+    .custom-background-home {
+        transform: translate3d(0, 100px, 0);
+
+    }
+}
+
+#headline:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+    background-image: url('/static/img/home/background.jpg');
+    background-repeat: no-repeat;
+    background-position: 50% 0;
+    background-size: cover;
+}
+
+.headline-content {
+    position: relative;
+}
+
+span.step {
+    color: white;
+    padding-left: 10px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    background-color: #33475b;
+    border-radius: 10px 0 0 10px;
+    display: block;
+    position: relative;
+    line-height: 40px;
+
+    &:after {
+        content: "";
+        position: absolute;
+        right: -20px;
+        top: 0;
+        border-top: 20px solid transparent;
+        border-bottom: 20px solid transparent;
+        border-left: 20px solid #33475b;
+    }
+}
+
+.external-links>a {
+    display: inline-block;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-weight: 500;
+    text-decoration: none;
+    color: #666;
+}
+
+.user-quote>q {
+    line-height: 1.7em;
+}
+
+.custom-banner {
+    background-color: #3558A2;
+    color: white;
+    position: absolute;
+    right: -10px;
+    top: 15px;
+    padding: 10px 20px;
+    
+    display: flex;
+    align-items: center;
+    border-radius: 1px;
+}
+
+.custom-banner.left-banner {
+    left: -10px;
+    right: inherit;
+}
+
+.custom-banner.left-banner::after {
+    left: 0;
+}
+
+.custom-banner::after {
+    content: '';
+
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 1;
+
+    width: 0px;
+    height: 0px;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #3558A2;
+}
+
+@media (max-width: 48em) {
+    .custom-banner  {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+    }
+
+    .custom-banner  a{
+        margin-top: 15px;
+    }
+}
