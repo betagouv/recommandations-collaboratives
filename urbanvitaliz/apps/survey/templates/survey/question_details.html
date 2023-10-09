@@ -13,7 +13,8 @@
 
 {% block content %}
 
-<div x-data="Tutorial('survey', true)" class="col-11 py-5 mx-auto">
+
+<div x-data="Tutorial('survey', {{ session.answers.count }})" class="col-11 py-5 mx-auto">
 
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
