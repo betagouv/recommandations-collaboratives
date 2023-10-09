@@ -56,14 +56,20 @@ export default function boardTasksApp(projectId) {
                 nextData.isLoading = true
             }
 
+            if (status instanceof Array) {
+                if (status.find(s => s === TASK_STATUSES.NOT_INTERESTED)) {
+                    this.handleOpenFeedbackModal(data, TASK_STATUSES.NOT_INTERESTED);
+                } else if (status.find(s => s === TASK_STATUSES.INPROGRESS)) {
+                    await this.moveTask(data, TASK_STATUSES.INPROGRESS, nextData)
+                }
+            }
+
             if (status === TASK_STATUSES.DONE) {
                 this.handleOpenFeedbackModal(data, status);
             }
-            else if (status instanceof Array) {
-                this.handleOpenFeedbackModal(data, TASK_STATUSES.NOT_INTERESTED);
-            } else {
-                await this.$store.tasksData.issueFollowup(data, status);
-                if (nextData) await this.$store.tasksData.moveTask(data.id, nextData.id);
+
+            if (status === TASK_STATUSES.PROPOSED) {
+                await this.moveTask(data, TASK_STATUSES.INPROGRESS, nextData)
             }
 
             await this.$store.tasksView.updateView()
@@ -73,8 +79,13 @@ export default function boardTasksApp(projectId) {
             if (nextData) {
                 nextData.isLoading = false
             }
+        },
+        async moveTask(data, status, nextData) {
+            await this.$store.tasksData.issueFollowup(data, status);
+            if (nextData) await this.$store.tasksData.moveTask(data.id, nextData.id);
         }
     }
+
 
     return TaskApp(app, projectId)
 }
