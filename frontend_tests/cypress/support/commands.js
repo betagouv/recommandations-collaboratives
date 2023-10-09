@@ -212,3 +212,49 @@ Cypress.Commands.add('navigateToProject', (index) => {
     cy.get('#projects-list-button').click({ force: true })
     cy.contains(`${project.name} ${index}`).click({ force: true })
 })
+
+/**
+ * Verify that image loads and that attribute corresponds to ARIA role.
+ * Possible alt values are: 
+ * - img-informative
+ * - img-presentation
+ * - img-functional
+ */
+Cypress.Commands.add('testImage', { prevSubject: true }, (subject, role, type) => {
+    cy.wrap(subject)
+    .should(([img]) => {
+        expect(img.alt).to.exist;
+        expect(img.src).not.to.equal('');
+        switch(role) {
+            case 'img-presentation': {
+                expect(img.alt).to.equal('');
+                break;
+            }
+            case 'img-functional':
+            case 'img-informative': {
+                expect(img.alt).not.to.equal('');
+                break;
+            }
+            default:
+                assert(false)
+                break;
+        }
+        switch(type) {
+            case 'svg': {
+                expect(img.width).to.be.greaterThan(0); // TODO: fix this test, as it will pass even if svg is not loaded
+                expect(img.alt).to.equal('');
+                break;
+            }
+            case 'png':
+            case 'jpg':
+            case 'jpeg': {
+                // "naturalWidth" and "naturalHeight" are set when the image loads
+                expect(img.naturalWidth).to.be.greaterThan(0);
+                break;
+            }
+            default:
+                assert(false)
+                break;
+        }
+    })
+})
