@@ -7,7 +7,7 @@ created : 2022-07-20 12:27:25 CEST
 
 import csv
 import datetime
-from collections import Counter, OrderedDict
+from collections import Counter, OrderedDict, defaultdict
 
 from actstream import action
 from actstream.models import Action, actor_stream, target_stream
@@ -876,40 +876,94 @@ def compute_tag_occurences(site):
 
 
 def compute_topics_occurences(site):
-    project_topics = dict(
-        (tag["name"], tag["occurrences"])
-        for tag in (
-            Topic.objects.filter(projects__sites=site)
-            .distinct()
-            .values("name")
-            .annotate(occurrences=Count("projects", distinct=True))
-        )
+    project_topics = defaultdict(
+        list,
+        (
+            (topic.name, list(topic.projects.values_list("name", "id")))
+            for topic in (
+                Topic.objects.filter(projects__sites=site)
+                .prefetch_related("projects")
+                .distinct()
+            )
+        ),
     )
 
-    task_topics = dict(
-        (tag["name"], tag["occurrences"])
-        for tag in (
-            Topic.objects.filter(tasks__site=site)
-            .distinct()
-            .values("name")
-            .annotate(occurrences=Count("tasks", distinct=True))
-        )
+    task_topics = defaultdict(
+        list,
+        (
+            (topic.name, list(topic.tasks.values_list("intent", "id", "project__id")))
+            for topic in (
+                Topic.objects.filter(tasks__site=site)
+                .prefetch_related("tasks")
+                .distinct()
+            )
+        ),
     )
 
-    topics = Counter(**project_topics) + Counter(**task_topics)
+    topics = {}
+    for key in project_topics.keys() | task_topics.keys():
+        topics[key] = (
+            len(project_topics[key]) + len(task_topics[key]),
+            project_topics[key],
+            task_topics[key],
+        )
+
     return OrderedDict(sorted(topics.items()))
 
 
 @login_required
 def crm_list_topics(request):
-    """Return a page containing all topics with their count"""
+    """Return a page containing all topics with their count and attached objects"""
     has_perm_or_403(request.user, "use_crm", request.site)
 
     search_form = forms.CRMSearchForm()
 
     topics = compute_topics_occurences(request.site)
+    topics_wc = OrderedDict(sorted((key, value[0]) for key, value in topics.items()))
 
     return render(request, "crm/topics.html", locals())
+
+
+@login_required
+def crm_list_topics_as_csv(request):
+    """Return a CSV containing all topics with their count and attached objects"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    topics = compute_topics_occurences(request.site)
+
+    today = datetime.datetime.today().date()
+
+    content_disposition = (
+        f'attachment; filename="topics-for-projects-and-recos-{today}.csv"'
+    )
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={
+            "Content-Disposition": content_disposition,
+        },
+    )
+
+    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
+    writer.writerow(
+        [
+            "topic",
+            "usage_count",
+            "project_ids",
+            "reco_ids",
+        ]
+    )
+
+    for name, usage in topics.items():
+        writer.writerow(
+            [
+                name,
+                usage[0],
+                [project[1] for project in usage[1]],
+                [task[1] for task in usage[2]],
+            ]
+        )
+
+    return response
 
 
 @login_required
