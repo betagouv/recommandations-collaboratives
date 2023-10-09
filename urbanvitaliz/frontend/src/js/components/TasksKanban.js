@@ -52,24 +52,38 @@ export default function boardTasksApp(projectId) {
             const nextData = this.findByUuid(targetUuid)
 
             data.isLoading = true
+
             if (nextData) {
                 nextData.isLoading = true
             }
 
+            // In progress & not interest status
             if (status instanceof Array) {
                 if (status.find(s => s === TASK_STATUSES.NOT_INTERESTED)) {
-                    this.handleOpenFeedbackModal(data, TASK_STATUSES.NOT_INTERESTED);
+                    // prevent feedback modal to open if changing task to same status
+                    if (data.status != TASK_STATUSES.NOT_INTERESTED && data.status != TASK_STATUSES.ALREADY_DONE) {
+                        this.handleOpenFeedbackModal(data, TASK_STATUSES.NOT_INTERESTED);
+                    }
+                    else {
+                        await this.moveTask(data, TASK_STATUSES.NOT_INTERESTED, nextData)
+                    }
+
                 } else if (status.find(s => s === TASK_STATUSES.INPROGRESS)) {
                     await this.moveTask(data, TASK_STATUSES.INPROGRESS, nextData)
                 }
             }
 
             if (status === TASK_STATUSES.DONE) {
-                this.handleOpenFeedbackModal(data, status);
+                // prevent feedback modal to open if changing task to same status
+                if (data.status != TASK_STATUSES.DONE) {
+                    this.handleOpenFeedbackModal(data, status);
+                } else {
+                    await this.moveTask(data, TASK_STATUSES.DONE, nextData)
+                }
             }
 
             if (status === TASK_STATUSES.PROPOSED) {
-                await this.moveTask(data, TASK_STATUSES.INPROGRESS, nextData)
+                await this.moveTask(data, TASK_STATUSES.PROPOSED, nextData)
             }
 
             await this.$store.tasksView.updateView()
