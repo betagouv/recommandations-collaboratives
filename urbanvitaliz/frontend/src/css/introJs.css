@@ -7,10 +7,6 @@
 }
 
 .introjs-tooltip .tutorial-first-step h3{
-    border-bottom:#0063CB solid 1px;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-    display: block;
 }
 
 .introjs-helperLayer {
@@ -56,19 +52,18 @@
 .introjs-tooltiptext {
     font-family: 'Marianne', arial, sans-serif;
     font-size: 14px;
+    padding: 5px 20px;
+    padding-top: 15px;
 }
 
 .introjs-bullets ul li a.active {
     background: #0063CB;
 }
 
-.introjs-tooltiptext {
-    padding: 5px 20px;
-    padding-top: 15px;
-}
-
 .introjs-tooltip-header {
-    display: none;
+    border-bottom:#0063CB solid 1px;
+    padding-bottom:8px;
+    display: block;
 }
 
 .introjs-bullets {

@@ -42,7 +42,8 @@ function Tutorial(challengeCode, step=0) {
                 prevLabel: 'Précédent',
                 nextLabel: 'Suivant',
                 doneLabel: 'C\'est parti !',
-                steps: this.steps,
+                skipLabel: "✕",
+                steps: this.steps
             })
 
             this.tour.oncomplete(async () => {
