@@ -7,7 +7,7 @@ import api, { challengeUrl, challengeDefinitionUrl } from '../utils/api'
 //Custom introjs CSS
 import '../../css/introJs.css'
 
-function Tutorial(challengeCode, step=0) {
+function Tutorial(challengeCode, progress=0) {
     return {
         steps: [],
         hints: [],
@@ -50,7 +50,7 @@ function Tutorial(challengeCode, step=0) {
                 this.acquireChallenge(this.challengeCode)
             })
 
-            if (step === 0) {
+            if (progress === 0) {
                 this.tour.start();
                 await this.startChallenge(this.challengeCode)
             }

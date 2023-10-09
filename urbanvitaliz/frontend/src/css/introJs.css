@@ -61,9 +61,13 @@
 }
 
 .introjs-tooltip-header {
+    padding-bottom:5px;
+    display: block;
+}
+
+.intro-tutorial .introjs-tooltip-header {
     border-bottom:#0063CB solid 1px;
     padding-bottom:8px;
-    display: block;
 }
 
 .introjs-bullets {

@@ -2,7 +2,7 @@
     "survey": {
         "steps": [
             {
-                "title": "<div class='tutorial-first-step'><h3>Bienvenue sur l'état des lieux</h3></div>",
+                "title": "<div class='tutorial-first-step' data-test-id='survey-tutorial'><h3>Bienvenue sur l'état des lieux</h3></div>",
                 "intro": "<strong>Obtenez des recommandations plus efficaces</strong> en répondant à quelques questions ! <br/>Ce parcours vous guide pour structurer votre <strong>connaissance sur le projet</strong>.<br/>Vous pouvez quitter et reprendre le questionnaire à tout moment, et inviter des participants pour le remplir"
             },
             {
