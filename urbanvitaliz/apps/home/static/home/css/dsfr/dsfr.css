@@ -823,8 +823,6 @@ a {
   margin-bottom: 0.25rem;
   --icon-size: 1rem;
   content: var(--link-blank-content);
-  -webkit-mask-image: url("icons/system/external-link-line.svg");
-  mask-image: url("icons/system/external-link-line.svg");
 }
 
 .fr-raw-link {
@@ -18853,7 +18851,6 @@ textarea.fr-input {
     background-color: transparent;
     background-size: 100%;
     background-repeat: no-repeat;
-    background-image: url("icons/system/external-link-line.svg");
     width: 1rem;
     height: 1rem;
   }
