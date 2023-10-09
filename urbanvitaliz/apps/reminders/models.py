@@ -8,11 +8,14 @@ created : 2021-09-28 12:40:54 CEST
 """
 
 
+from datetime import timedelta
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.db import models
 from django.utils import timezone
-from urbanvitaliz.apps.communication import models as communication_models
+from urbanvitaliz.apps.projects import models as projects_models
 
 
 class ReminderManager(models.Manager):
@@ -27,6 +30,35 @@ class SentReminderManager(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().exclude(sent_on=None)
+
+
+class ProjectReminderState(models.Model):
+    """Reflect the reminding state of a project (3w, 6w, ...)"""
+
+    site = models.ForeignKey(
+        Site, on_delete=models.CASCADE, related_name="project_reminders_state"
+    )
+
+    project = models.OneToOneField(
+        projects_models.Project, related_name="reminder_state", on_delete=models.CASCADE
+    )
+
+    last_sent_on = models.DateField(
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="Quand les derniers rappels ont été envoyés",
+    )
+
+    state = models.PositiveIntegerField(
+        default=0,
+        editable=False,
+        verbose_name="Etat d'avancement de la fréquence des rappels",
+    )
+
+    @property
+    def next_reminders_on(self):
+        return self.last_sent_on + timedelta(weeks=3)  # TODO Implement
 
 
 class Reminder(models.Model):

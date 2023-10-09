@@ -273,6 +273,12 @@ class Project(models.Model):
         self.inactive_reason = None
         self.save()
 
+    last_member_activity_at = models.DateTimeField(
+        default=timezone.now,
+        editable=False,
+        verbose_name="Dernière activité de la collectivité",
+    )
+
     muted = models.BooleanField(
         default=False, blank=True, verbose_name="Ne pas envoyer de notifications"
     )
@@ -666,7 +672,9 @@ class Document(models.Model):
         verbose_name_plural = "documents"
 
     def get_absolute_url(self):
-        return reverse("projects-project-detail-documents", kwargs={"project_id": self.project.pk})
+        return reverse(
+            "projects-project-detail-documents", kwargs={"project_id": self.project.pk}
+        )
 
     def __str__(self):  # pragma: nocover
         return f"Document {self.id}"
