@@ -25,7 +25,7 @@
                                         <span>a invité
                                             <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
                                             <strong class="text-dark">
-                                                {% if action.action_object.role == "SWITCHTENDER" %}
+                                                {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
                                                     conseiller·e
                                                 {% else %}
                                                     collectivité
@@ -47,7 +47,7 @@
                                             "{{ action.action_object }}"
                                         </a>
                                     {% endif %}
-                                    {% if action.target %}
+                                    {% if action.target and action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY %}
                                         <div class="d-inline-block ms-1">
                                             <span>à propos de</span>
                                             {% if action.target.get_absolute_url %}

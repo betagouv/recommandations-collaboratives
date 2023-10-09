@@ -30,7 +30,7 @@ def create_reminder(days, task, user, origin):
         return
 
     api.create_reminder_email(
-        user.email,
+        recipient=user.email,
         related=task,
         origin=origin,
         delay=days,

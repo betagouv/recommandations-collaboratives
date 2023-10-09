@@ -597,11 +597,13 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
             rsvp.delete()  # we are done with this use only once object
 
             # Reminder update
+            # FIXME user is anonymous thus the reminder won't be created
             if task.status in [models.Task.INPROGRESS, models.Task.BLOCKED]:
                 create_reminder(
                     7 * 6, task, request.user, origin=reminders_models.Reminder.SYSTEM
                 )
             else:
+                # FIXME pourquoi ne pas utiliser le task utils remove_reminder ?
                 api.remove_reminder_email(task)
 
             return render(request, "tasks/task/rsvp_followup_thanks.html", locals())

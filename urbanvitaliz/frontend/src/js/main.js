@@ -2,6 +2,7 @@ import 'vite/modulepreload-polyfill';
 import './utils/globals'
 
 //Global Store
+import './store/utils'
 import './store/djangoData'
 import './store/app'
 

@@ -44,14 +44,14 @@
             {{ user.email|json_script:"userEmail" }}
 
             {% if is_switchtender and project.tasks.all.count == 0 %}
-            <div class="bg-light p-4 rounded-2">
+            <div data-test-id="no-tasks-banner" class="bg-light p-4 rounded-2">
                 <h3 class="fw-light">Pas encore de recommandations à la collectivité ?</h3>
                 <p class="fst-italic fw-light">
                     Soyez la première personne à proposer des recommandations ou des ressources à la collectivité !
                 </p>
 
                 {% if advising %}
-                <a href="{% url 'projects-project-create-task' project.id %}" class="btn btn-primary">Émettre une
+                <a data-test-id="submit-task-button" href="{% url 'projects-project-create-task' project.id %}" class="btn btn-primary">Émettre une
                     recommandation</a>
                 <a href="{% url 'projects-project-detail-knowledge' project.id %}" class="btn btn-secondary">Consulter
                     les détails du projet</a>

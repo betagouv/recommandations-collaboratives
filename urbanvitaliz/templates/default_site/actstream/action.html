@@ -4,9 +4,9 @@
 {% get_verbs as verbs %}
 <div class="d-block font-marianne">
   <div class="d-flex align-items-start mb-2">
-    <img class="align-middle rounded-circle d-inline-block  p-1 {% if not transparent_background %}bg-white{% endif %}"
-         width="35px"
-         :src='gravatar_url("{{ action.actor }}", 25, "{{ action.actor.first_name }}" + " " + "{{ action.actor.last_name }}")'
+    <img class="mt-1 align-middle rounded-circle d-inline-block {% if not transparent_background %}bg-white{% endif %}"
+         width="18px"
+         :src='$store.utils.gravatar_url("{{ action.actor }}", 18, "{{ action.actor.first_name }}" + " " + "{{ action.actor.last_name }}")'
          data-bs-toggle="tooltip"
          data-bs-placement="bottom"
          style="z-index: 1000"
@@ -23,7 +23,7 @@
                 <span>a invité
                   <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
                   <strong class="text-dark">
-                    {% if action.action_object.role == "SWITCHTENDER" %}
+                    {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
                       conseiller·e
                     {% else %}
                       collectivité

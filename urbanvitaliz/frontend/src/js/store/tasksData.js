@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs'
 import api, { tasksUrl, taskUrl, moveTaskUrl, followupsUrl, followupUrl, taskNotificationsUrl, markTaskNotificationsAsReadUrl } from '../utils/api'
 import { generateUUID } from '../utils/uuid'
+import { NO_TOPICS } from '../config/tasks'
 
 document.addEventListener('alpine:init', () => {
     Alpine.store('tasksData', {
@@ -9,13 +10,32 @@ document.addEventListener('alpine:init', () => {
         },
 
         tasks: [],
+        topics: [],
         async init() {
             await this.loadTasks()
             Alpine.store('tasksView').displayedTasks = this.tasks
+            this.extractTopicFromTasks();
         },
         get newTasks() {
             return this.tasks.filter(task => task.visited === false && task.public)
         },
+        extractTopicFromTasks() {
+            let topics = []
+
+            this.tasks.forEach(task => {
+                if (task.topic) {
+                    if (!(topics.find(topic => topic === task.topic.name))) {
+                        topics.push(task.topic.name)
+                    }
+                }
+            })
+
+            topics.push(NO_TOPICS)
+
+            this.topics = topics
+        },
+        //get each thematics for each project
+        //
         async loadTasks() {
             const json = await api.get(tasksUrl(this.projectId))
 
@@ -62,7 +82,7 @@ document.addEventListener('alpine:init', () => {
             const body = { comment, status }
 
             if (body.status === task.status && body.comment === "") return;
-            
+
             await api.post(followupsUrl(this.projectId, task.id), body)
         },
         async editComment(taskId, followupId, comment) {

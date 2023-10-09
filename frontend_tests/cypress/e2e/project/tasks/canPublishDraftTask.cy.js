@@ -1,7 +1,7 @@
-describe('I can go tasks tab', () => {
+describe('I can go to tasks tab', () => {
     beforeEach(() => {
         cy.login("jean");
-        cy.createProject(1)
+        cy.createProject("draft project")
     })
 
     it('publishes a task', () => {
@@ -11,12 +11,12 @@ describe('I can go tasks tab', () => {
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
 
-        cy.createTask(1);
+        cy.createTask("draft project");
 
-        cy.contains("Thématique").should('have.class', 'active')
+        cy.get('[data-test-id="list-tasks-switch-button"]').should('have.class', 'active')
         cy.get('#unpublish-task-button').click({force:true});
-        cy.contains('brouillon')
+        cy.get('[data-test-id="task-draft-status"]').should('be.visible')
         cy.get('#publish-task-button').click({force:true});
-        cy.contains('brouillon').should('not.exist')
+        cy.get('[data-test-id="task-draft-status"]').should('not.exist')
     })
 })

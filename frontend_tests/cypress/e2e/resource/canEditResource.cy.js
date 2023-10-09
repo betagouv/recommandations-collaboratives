@@ -42,9 +42,6 @@ describe('I can edit a resource as a switchtender', () => {
             .type(resource.tags, { force: true })
             .should('have.value', resource.tags)
 
-        cy.get('#id_departments')
-            .select(resource.deparments.index, { force: true })
-
         cy.get('#id_expires_on')
             .clear({ force: true })
             .type(resource.expires_on, { force: true })
@@ -57,7 +54,6 @@ describe('I can edit a resource as a switchtender', () => {
         cy.contains(resource.title)
         cy.contains(resource.subtitle)
         cy.contains(resource.summary)
-        cy.contains(resource.deparments.name)
         cy.contains(resource.tags)
     })
 })

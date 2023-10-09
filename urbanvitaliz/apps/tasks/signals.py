@@ -301,13 +301,11 @@ def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs)
 
     if not muted:
         # Notify about comment
-        if instance.comment != "":
-            action_commented.send(
-                sender=instance,
-                task=instance.task,
-                project=instance.task.project,
-                user=instance.who,
-            )
-
+        action_commented.send(
+            sender=instance,
+            task=instance.task,
+            project=instance.task.project,
+            user=instance.who,
+        )
 
 # eof

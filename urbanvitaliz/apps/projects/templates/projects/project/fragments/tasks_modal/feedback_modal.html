@@ -44,6 +44,7 @@
                   type="submit"
                   class="btn btn-primary"
                   :id="`${currentFeedbackTask.id}-${$store.taskModal.feedbackModalStatus}-button`"
+                  :data-test-id="`send-status-${$store.taskModal.feedbackModalStatus}-feedback-button`"
                   @click="onSubmitFeedback">Archiver</button>
         </div>
       </div>

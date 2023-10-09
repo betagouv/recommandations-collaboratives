@@ -229,5 +229,4 @@ class TopicSerializer(serializers.HyperlinkedModelSerializer):
 
         fields = ["name"]
 
-
 # eof

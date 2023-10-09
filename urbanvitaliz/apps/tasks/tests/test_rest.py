@@ -19,6 +19,7 @@ from rest_framework.test import APIClient
 from urbanvitaliz.utils import login
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.projects import models as project_models
+from urbanvitaliz.apps.resources import models as resource_models
 
 from urbanvitaliz.apps.projects import utils
 
@@ -51,6 +52,28 @@ def test_project_collaborator_can_see_project_tasks_for_site(request):
 
     assert response.status_code == 200
     assert set(e["id"] for e in response.data) == set(t.id for t in tasks)
+
+
+@pytest.mark.django_db
+def test_task_includes_resource_content_bug_fix(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, sites=[site])
+    resource = baker.make(resource_models.Resource, sites=[site])
+    baker.make(
+        models.Task, project=project, resource=resource, site=site, public=True
+    )
+    utils.assign_observer(user, project, site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 200
+
+    task = response.data[0]
+    assert task["resource"] is not None
 
 
 @pytest.mark.django_db

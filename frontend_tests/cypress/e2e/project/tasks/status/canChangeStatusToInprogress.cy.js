@@ -1,25 +1,23 @@
-import projects from '../../../../fixtures/projects/projects.json'
 import tasks from '../../../../fixtures/projects/tasks.json'
-
-const currentProject = projects[6];
 const currentTask = tasks[4]
 
 
-describe('I can go tasks tab', () => {
+describe('I can go to tasks tab', () => {
     beforeEach(() => {
-        cy.login("staff");
+        cy.login("jean");
     })
 
     it('changes the status to in progress', () => {
-        cy.visit(`/project/${currentProject.pk}`)
+        cy.createProject("status inprogress")
+        cy.becomeAdvisor();
         cy.contains('Recommandations').click({ force: true })
         cy.url().should('include', '/actions')
-
-        cy.contains("Liste").should('have.class', 'active')
+        cy.createTask(currentTask.fields.intent);
+        cy.get('[data-test-id="list-tasks-switch-button"]').should('have.class', 'active')
         cy.contains(currentTask.fields.intent)
 
-        cy.get(`#${currentTask.pk}`).contains('en cours').click({ force: true });
-        cy.get(`#${currentTask.pk}`).contains('en cours').should('have.class', 'bg-blue')
+        cy.get('[data-test-id="in-progress-status-task-button"]').click({ force: true });
+        cy.get('[data-test-id="in-progress-status-task-button"]').should('have.class', 'bg-blue')
 
         cy.contains(currentTask.fields.intent).click({ force: true })
         cy.contains(currentTask.fields.intent)
