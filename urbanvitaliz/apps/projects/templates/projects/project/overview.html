@@ -67,23 +67,21 @@
                 <div class="col-8">
                     <div class="d-flex">
                         {% if "use_advisor_note" in user_project_perms %}
-                        <div class="row w-100">
-                            <div class="col-12 col-lg-6 h-100 responsive-wrapper">
-                                <div class="h-100">
-                                    {% include 'projects/project/fragments/topics/topic_list.html' %}
+                            <div class="row w-100">
+                                <div class="col-12 col-lg-6 h-100 responsive-wrapper">
+                                    <div class="h-100">{% include 'projects/project/fragments/topics/topic_list.html' %}</div>
+                                </div>
+                                <div class="col-12 col-lg-6 h-100 responsive-wrapper">
+                                    {% include 'projects/project/fragments/advisor_note.html' %}
                                 </div>
                             </div>
-                            <div class="col-12 col-lg-6 h-100 responsive-wrapper">{% include 'projects/project/fragments/advisor_note.html' %}</div>
-                        </div>
                         {% else %}
-                            <div class="pe-4 w-100">
-                            {% include 'projects/project/fragments/topics/topic_list.html' %}
-                            </div>
+                            <div class="pe-4 w-100">{% include 'projects/project/fragments/topics/topic_list.html' %}</div>
                         {% endif %}
                     </div>
                     <div class="mt-4">
                         <div class="d-flex w-full flex-wrap">
-                            {% include 'projects/project/fragments/information_card.html' with full_width=True project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
+                            {% include 'projects/project/fragments/information_card.html' with full_width=True project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name data_test="context" %}
                             {% if onboarding_response %}
                                 {% include 'projects/project/fragments/information_card.html' with full_width=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
                             {% elif project.impediments %}
@@ -91,9 +89,7 @@
                             {% endif %}
                         </div>
                         {% if 'use_private_notes' in user_project_perms %}
-                            <div>
-                                {% include 'projects/project/fragments/timeline/project_timeline.html' %}
-                            </div>
+                            <div>{% include 'projects/project/fragments/timeline/project_timeline.html' %}</div>
                         {% endif %}
                     </div>
                 </div>
