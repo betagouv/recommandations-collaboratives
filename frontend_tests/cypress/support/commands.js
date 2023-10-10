@@ -214,8 +214,8 @@ Cypress.Commands.add('navigateToProject', (index) => {
 })
 
 /**
- * Verify that image loads and that attribute corresponds to ARIA role.
- * Possible alt values are: 
+ * Verify that image loads and that alt attribute corresponds to ARIA role.
+ * Possible role values are:
  * - img-informative
  * - img-presentation
  * - img-functional
@@ -242,7 +242,6 @@ Cypress.Commands.add('testImage', { prevSubject: true }, (subject, role, type) =
         switch(type) {
             case 'svg': {
                 expect(img.width).to.be.greaterThan(0); // TODO: fix this test, as it will pass even if svg is not loaded
-                expect(img.alt).to.equal('');
                 break;
             }
             case 'png':

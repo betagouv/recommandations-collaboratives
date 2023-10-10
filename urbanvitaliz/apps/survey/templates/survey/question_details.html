@@ -137,6 +137,7 @@
                              </a>
                         -->
                             <a id="button-skip"
+                               data-test-id="link-skip-survey-questionset"
                                class="btn btn-outline-secondary"
                                href="{% url 'survey-question-next' session.id question.id %}">
                                 <svg class="d-inline-block bi" width="16" height="16" fill="currentColor">
@@ -146,7 +147,9 @@
                                 Je ne sais pas, je passe
                             </a>
                         </div>
-                        <button class="btn btn-primary" type="submit">
+                        <button class="btn btn-primary"
+                                type="submit"
+                                data-test-id="button-submit-survey-questionset">
                             <svg class="d-inline-block bi me-1"
                                  width="16"
                                  height="16"
