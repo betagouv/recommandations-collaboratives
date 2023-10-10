@@ -34,6 +34,11 @@ urlpatterns = [
         name="crm-list-topics",
     ),
     path(
+        r"crm/topics/csv",
+        views.crm_list_topics_as_csv,
+        name="crm-list-topics-as-csv",
+    ),
+    path(
         r"crm/reco_without_resources",
         views.crm_list_recommendation_without_resources,
         name="crm-reco-without-resources",
