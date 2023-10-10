@@ -46,7 +46,9 @@
             <div class="text-danger text-end">{{ error }}</div>
             {% endfor %}
 
-            <button class="btn mt-2 btn-primary flex-align-end" type="submit">Envoyer</button>
+            <div class="d-flex justify-content-end mt-2">
+                <button x-data :disabled="$store.editor.currentMessage === ''" class="button filled" type="submit">Envoyer</button>
+            </div>
         </form>
         {% endif %}
 
