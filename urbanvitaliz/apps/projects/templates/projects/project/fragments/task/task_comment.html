@@ -1,7 +1,7 @@
 {% load static %}
 <div x-data="TaskComment()">
     <template x-if="task.content !== '' && !isEditing">
-        <div class="position-relative p-3 bg-grey-light rounded-3 p-3">
+        <div data-test-id="task-initial-comment" class="position-relative p-3 bg-grey-light rounded-3 p-3">
             <div x-html="truncate(renderMarkdown(task.content),100)"
                  class="text-info-custom font-small text-dark mb-3"></div>
             {% include 'projects/project/fragments/task/task_user_card.html' %}

@@ -8,7 +8,7 @@
         <svg class="bi me-1 text-muted" width="24" height="24" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search"/>
         </svg>
-        <input class="w-100 fs-5 form-control" type="text" x-on:input.debounce="searchResources()" x-model="search" placeholder="Rechercher une ressource...">
+        <input data-test-id="search-resource-input" class="w-100 fs-5 form-control" type="text" x-on:input.debounce="searchResources()" x-model="search" placeholder="Rechercher une ressource...">
     </div>
 
     {% for error in form.resource.errors %}

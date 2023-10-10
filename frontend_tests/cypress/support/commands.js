@@ -1,5 +1,7 @@
 import users from '../fixtures/users/users.json'
 import project from '../fixtures/projects/project.json'
+import resources from '../fixtures/resources/resources.json'
+const currentResource = resources[4]
 
 Cypress.Commands.add("login", (role) => {
 
@@ -139,17 +141,24 @@ Cypress.Commands.add('becomeAdvisor', () => {
 
 })
 
-Cypress.Commands.add('createTask', (label, topic = "") => {
+Cypress.Commands.add('createTask', (label, topic = "", withResource = false) => {
 
     cy.get("body").then(body => {
         if (body.find('[data-test-id="submit-task-button"]').length > 0) {
             cy.contains("Émettre une recommandation").click({ force: true })
 
-            cy.get("#push-noresource").click({ force: true });
 
-            cy.get('#intent')
-                .type(`${label}`, { force: true })
-                .should('have.value', `${label}`)
+            if (!withResource) {
+                cy.get("#push-noresource").click({ force: true });
+
+                cy.get('#intent')
+                    .type(`${label}`, { force: true })
+                    .should('have.value', `${label}`)
+            } else {
+                cy.get("#push-single").click({ force: true });
+                cy.get('[data-test-id="search-resource-input"]').type(currentResource.fields.title, { force: true })
+                cy.get(`#resource-${currentResource.pk}`).check({ force: true })
+            }
 
             cy.get('textarea')
                 .type(`reco test from action description`, { force: true })
@@ -222,39 +231,39 @@ Cypress.Commands.add('navigateToProject', (index) => {
  */
 Cypress.Commands.add('testImage', { prevSubject: true }, (subject, role, type) => {
     cy.wrap(subject)
-    .should(([img]) => {
-        expect(img.alt).to.exist;
-        expect(img.src).not.to.equal('');
-        switch(role) {
-            case 'img-presentation': {
-                expect(img.alt).to.equal('');
-                break;
+        .should(([img]) => {
+            expect(img.alt).to.exist;
+            expect(img.src).not.to.equal('');
+            switch (role) {
+                case 'img-presentation': {
+                    expect(img.alt).to.equal('');
+                    break;
+                }
+                case 'img-functional':
+                case 'img-informative': {
+                    expect(img.alt).not.to.equal('');
+                    break;
+                }
+                default:
+                    assert(false)
+                    break;
             }
-            case 'img-functional':
-            case 'img-informative': {
-                expect(img.alt).not.to.equal('');
-                break;
+            switch (type) {
+                case 'svg': {
+                    expect(img.width).to.be.greaterThan(0); // TODO: fix this test, as it will pass even if svg is not loaded
+                    expect(img.alt).to.equal('');
+                    break;
+                }
+                case 'png':
+                case 'jpg':
+                case 'jpeg': {
+                    // "naturalWidth" and "naturalHeight" are set when the image loads
+                    expect(img.naturalWidth).to.be.greaterThan(0);
+                    break;
+                }
+                default:
+                    assert(false)
+                    break;
             }
-            default:
-                assert(false)
-                break;
-        }
-        switch(type) {
-            case 'svg': {
-                expect(img.width).to.be.greaterThan(0); // TODO: fix this test, as it will pass even if svg is not loaded
-                expect(img.alt).to.equal('');
-                break;
-            }
-            case 'png':
-            case 'jpg':
-            case 'jpeg': {
-                // "naturalWidth" and "naturalHeight" are set when the image loads
-                expect(img.naturalWidth).to.be.greaterThan(0);
-                break;
-            }
-            default:
-                assert(false)
-                break;
-        }
-    })
+        })
 })
