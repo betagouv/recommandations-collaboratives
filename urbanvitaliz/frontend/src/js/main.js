@@ -3,6 +3,7 @@ import './utils/globals'
 
 //Global Store
 import './store/utils'
+import './store/editor'
 import './store/djangoData'
 import './store/app'
 

@@ -30,6 +30,9 @@ Alpine.data('editor', (content) => {
         onUpdate({ editor }) {
           _this.updatedAt = Date.now()
           _this.renderMarkdown();
+
+          _this.$store.editor.isEditing = editor.getMarkdown() != ''
+          _this.$store.editor.currentMessage = editor.getMarkdown()
         },
         onSelectionUpdate({ editor }) {
           _this.updatedAt = Date.now()
@@ -79,7 +82,7 @@ Alpine.data('editor', (content) => {
     unsetLink() {
       editor.chain().focus().unsetLink().run()
     },
-    setMarkdownContentFromTaskModal(event){
+    setMarkdownContentFromTaskModal(event) {
       editor.commands.setContent(event.detail);
     },
     renderMarkdown() {

@@ -49,12 +49,14 @@
     {% if is_task_comment %}
       <div class="d-flex justify-content-end">
         <button class="button filled blue small inherit"
+                :disabled="$store.editor.currentMessage === ''"
                 @click.stop="handleEditComment(markdownContent,task)">Enregistrer</button>
       </div>
     {% endif %}
     {% if is_task_modal_comment %}
       <div class="d-flex justify-content-end">
         <button class="button filled blue small inherit"
+                :disabled="$store.editor.currentMessage === ''"
                 @click.stop="onSubmitComment(markdownContent)">Enregistrer</button>
       </div>
     {% endif %}
