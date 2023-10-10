@@ -1,0 +1,80 @@
+[
+    {
+        "model": "training.challengedefinition",
+        "pk": 1,
+        "fields": {
+            "site": 1,
+            "code": "project-conversation-reader",
+            "name": "Lire les conversations publiques",
+            "description": "",
+            "icon_name": "chat",
+            "next_challenge": null,
+            "week_inactivity_repeat": 0
+        }
+    },
+    {
+        "model": "training.challengedefinition",
+        "pk": 2,
+        "fields": {
+            "site": 1,
+            "code": "project-conversation-writer",
+            "name": "Converser en public",
+            "description": "",
+            "icon_name": "chat-dots",
+            "next_challenge": null,
+            "week_inactivity_repeat": 0
+        }
+    },
+    {
+        "model": "training.challengedefinition",
+        "pk": 3,
+        "fields": {
+            "site": 1,
+            "code": "project-knowledge-reader",
+            "name": "Consulter l'état des lieux",
+            "description": "",
+            "icon_name": "layout-wtf",
+            "next_challenge": null,
+            "week_inactivity_repeat": 0
+        }
+    },
+    {
+        "model": "training.challengedefinition",
+        "pk": 4,
+        "fields": {
+            "site": 1,
+            "code": "project-advisor-overview",
+            "name": "Découvrir les fonctionnalités principales d'un projet",
+            "description": "Découvrir les fonctionnalités principales d'un projet",
+            "icon_name": null,
+            "next_challenge": null,
+            "week_inactivity_repeat": 0
+        }
+    },
+    {
+        "model": "training.challengedefinition",
+        "pk": 5,
+        "fields": {
+            "site": 1,
+            "code": "survey",
+            "name": "survey",
+            "description": "survey",
+            "icon_name": null,
+            "next_challenge": null,
+            "week_inactivity_repeat": 0
+        }
+    },
+    {
+        "model": "training.challengedefinition",
+        "pk": 22,
+        "fields": {
+            "site": 1,
+            "code": "tasks-discover",
+            "name": "Découvrez comment fonctionnent nos recommandations",
+            "description": "Découvrez comment fonctionnent nos recommandations",
+            "icon_name": null,
+            "next_challenge": null,
+            "week_inactivity_repeat": 52
+        }
+    }
+]

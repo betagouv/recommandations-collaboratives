@@ -1,6 +1,6 @@
 {% load static %}
-<template x-if="$store.tasksData.newTasks.length > 0 && !$store.djangoData.isAdvisor">
-    <div data-test-id="banner-new-tasks"
+<template x-if="$store.tasksData.newTasks.length > 0 && !$store.djangoData.isAdvisor" >
+    <div id="tasks-discover-step-1" data-test-id="banner-new-tasks"
          class="py-1 flag dark-blue mb-2 d-flex align-items-center justify-content-start text-white small-border-radius mt-4">
         <img src="{% static 'projects/img/icon_new_task.svg'  %}"
              alt=""

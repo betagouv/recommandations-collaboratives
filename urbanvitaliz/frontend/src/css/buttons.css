@@ -173,6 +173,20 @@
     background-color: #0063CB;
     z-index: 100;
     box-shadow: 0px 3px 8px -16px rgba(0, 0, 0, 0.32), 0px 8px 16px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+}
+
+.hint-button.center {
+    background-color: #1d8244;
+    top: 50%;
+    left: 50%;
+    bottom: auto;
+    transform: translate3d(-50%,-50%,0) !important;
+    text-align: center;
+}
+
+.hint-button.center::after {
+    display: none;
 }
 
 .hint-button::after{

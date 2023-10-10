@@ -6,10 +6,12 @@
 {% load sass_tags %}
 {% load django_vite %}
 {% load guardian_tags %}
+{% load projects_extra %}
 
 {% block js %}
-<script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock %}
 
 
@@ -29,10 +31,15 @@
 
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-
+{% get_advising_position user project as position %}
 
 <div class="col-12 mx-auto">
-    <div class="row">
+    <div x-data="Tutorial('tasks-discover')" class="row position-relative">
+        {% if not position.is_advisor and not position.is_observer and not is_regional_actor %}
+                <template x-if="$store.tasksData.newTasks.length > 0">
+                    {% include 'tutorial/tutorial_hint.html' with center=True %}
+                </template>
+        {% endif %}
         <div class="col">
             {% include 'projects/project/navigation.html' with recommandations=True %}
 

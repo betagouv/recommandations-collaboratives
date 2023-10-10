@@ -1,15 +1,16 @@
 {% load static %}
 <template x-cloak x-if="showTuto">
     <div x-ref="startTourButton"
-         class="hint-button align-items-center position-absolute t-0 l-0 p-3 appear-in-with-delay">
+         data-test-id="tutorial-hint"
+         class="hint-button align-items-center position-absolute t-0 l-0 p-3 appear-in-with-delay {% if center %}center{% endif %}">
         <span x-text="startButtonDescription"></span>
-        <div class="d-flex align-items-center mb-1 mt-2">
-            <div @click="handleStartTour()" class="me-2">
+        <div class="d-flex align-items-center mb-1 mt-2 {% if center %}justify-content-center{% endif %}">
+            <div data-test-id="start-tutorial-button" @click="handleStartTour()" class="me-2">
                 <button class="button filled white small tiny">
                     <span>Découvrir le tutoriel</span>
                 </button>
             </div>
-            <div @click="handleEndChallenge()" class="d-flex">
+            <div data-test-id="end-tutorial-button" @click="handleEndChallenge()" class="d-flex">
                 <button class="button white small tiny">
                     <span>non merci</span>
                 </button>

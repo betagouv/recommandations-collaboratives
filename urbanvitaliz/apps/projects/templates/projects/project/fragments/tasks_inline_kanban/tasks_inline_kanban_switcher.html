@@ -1,6 +1,6 @@
 <div class="d-flex align-items-center">
     <span class="text-custom-info text-grey-dark fw-light me-2">affiché par :</span>
-    <div class="tasks-view-switcher">
+    <div id="tasks-discover-step-4" class="tasks-view-switcher">
         <button data-test-id="list-tasks-switch-button" @click="$store.tasksView.switchView()"
                 :class="{ 'active' : $store.tasksView.currentView === 'inline' }"
                 class="button">

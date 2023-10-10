@@ -49,5 +49,25 @@
                 "element": "#overview-step-5"
             }
         ]
+    },
+    "tasks-discover": {
+        "steps": [
+            {
+                "intro": "<div data-test-id='tasks-discover-step-1'>Cliquez pour faire défiler les recommandations que vous n’avez pas encore lues.</div>",
+                "element": "#tasks-discover-step-1"
+            },
+            {
+                "intro": "Cliquez sur l'une des recommandations pour découvrir son contenu.",
+                "element": "#tasks-discover-step-2"
+            },
+            {
+                "intro": "En un clic, indiquez-nous où vous en êtes, ou si cela ne vous concerne pas.",
+                "element": "#tasks-discover-step-3"
+            },
+            {
+                "intro": "Vous pouvez aussi afficher vos recommandations selon leur statut d’avancement.",
+                "element": "#tasks-discover-step-4"
+            }
+        ]
     }
 }
