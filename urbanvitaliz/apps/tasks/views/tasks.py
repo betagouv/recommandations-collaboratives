@@ -51,7 +51,9 @@ from ..utils import create_reminder, remove_reminder
 @login_required
 def create_task(request, project_id=None):
     """Create task for given project"""
-    project = get_object_or_404(project_models.Project, sites=request.site, pk=project_id)
+    project = get_object_or_404(
+        project_models.Project, sites=request.site, pk=project_id
+    )
 
     has_perm_or_403(request.user, "projects.manage_tasks", project)
 
@@ -388,7 +390,9 @@ def task_recommendation_update(request, recommendation_id):
 @login_required
 def presuggest_task(request, project_id):
     """Suggest tasks"""
-    project = get_object_or_404(project_models.Project, sites=request.site, pk=project_id)
+    project = get_object_or_404(
+        project_models.Project, sites=request.site, pk=project_id
+    )
 
     has_perm_or_403(request.user, "projects.manage_tasks", project)
 
@@ -605,7 +609,9 @@ def create_resource_action_for_current_project(request, resource_id=None):
     """Create action for given resource to project stored in session"""
     project_id = get_active_project_id(request)
     resource = get_object_or_404(resources.Resource, sites=request.site, pk=resource_id)
-    project = get_object_or_404(project_models.Project, sites=request.site, pk=project_id)
+    project = get_object_or_404(
+        project_models.Project, sites=request.site, pk=project_id
+    )
 
     has_perm_or_403(request.user, "projects.manage_tasks", project)
 
