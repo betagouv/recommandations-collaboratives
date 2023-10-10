@@ -1,4 +1,5 @@
 from django.contrib.auth import models as auth_models
+from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from generic_relations.relations import GenericRelatedField
 from notifications import models as notifications_models
@@ -53,6 +54,15 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
         followup.save()
 
         task = followup.task
+
+        # update activity flags and states
+        if followup.who in get_collaborators_for_project(task.project):
+            task.project.last_members_activity_at = timezone.now()
+
+            if task.project.inactive_since:
+                task.project.reactivate()
+
+            task.project.save()
 
         if followup.status not in [Task.ALREADY_DONE, Task.NOT_INTERESTED, Task.DONE]:
             if followup.who in get_collaborators_for_project(followup.task.project):
