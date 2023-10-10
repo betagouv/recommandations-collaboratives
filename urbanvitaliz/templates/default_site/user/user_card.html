@@ -11,9 +11,11 @@
 <div x-data="User()"
      class="user-card position-relative d-flex my-1 flex-column justify-content-between align-items-start">
     <div class="position-relative d-flex align-items-center justify-content-between {% if user_activity %}w-100{% endif %}">
-        <div x-ref="user"
-             @click="onUserClick"
-             class="d-flex align-items-center flex-wrap user-info">
+        <button x-ref="user"
+                type="button"
+                @click="onUserClick"
+                class="d-flex align-items-center flex-wrap user-info border-0 p-0 bg-transparent"
+                data-test-id="button-open-tooltip-user-card">
             <span class="me-1 d-flex align-items-center font-very-small">
                 <img class="rounded-circle me-1 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}"
                      :src="gravatar_url('{{ user.email }}', 18, '{{ user.first_name }}' + ' ' + '{{ user.last_name }}')"
@@ -34,7 +36,7 @@
             {% elif project_owner and project.org_name %}
                 <span class="text-dark fw-normal font-italic font-very-small">{{ project.org_name }}</span>
             {% endif %}
-        </div>
+        </button>
         {% if 'use_crm' in user_site_perms and user_activity %}
             <a class="small ms-1" href="{% url 'crm-user-details' user.pk %}">
                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
@@ -47,6 +49,7 @@
          x-ref="userTooltip"
          id="user-tooltip"
          @click.outside="onOutsideUserClick"
+         data-test-id="tooltip-user-card"
          class="user-card-popup flex-column {% if not user.is_active %}{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border {% endif %}">
         {% if user.is_active and position.is_advisor %}
             <div class="user-role position-absolute">
