@@ -23,7 +23,7 @@ describe('I can fill a project survey', () => {
         cy.get('[data-test-id="survey-tutorial"]').should.exist;
     })
 
-    it('does not display the tutorial survey that already has answers', () => {
+    it('does not display the tutorial on a survey that already has answers', () => {
         cy.visit(`/project/${currentProject.pk}`)
 
         // Start the survey and answer 1 question
