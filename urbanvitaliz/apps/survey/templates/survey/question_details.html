@@ -8,7 +8,7 @@
 {% endblock %}
 </script>
 {% block content %}
-    <div x-data="Tutorial('survey', {{ active_project_survey_session.completion }})"
+    <div x-data="Tutorial('survey', {{ active_project_survey_session.completion }} === 0)"
          class="col-11 py-5 mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
