@@ -11,13 +11,10 @@ describe('I can go to overview tab', () => {
 
 
     it('show the profile of a non active project owner with the correct class', () => {
-        cy.visit(`/project/${currentProject.pk}`)
-
         cy.get('[data-test-id="project-owner-name-details"]').should('have.class', 'inactive-status')
     })
 
     it('show the tooltip of a non active user with the date of last connection', () => {
-        cy.visit(`/project/${currentProject.pk}`)
         cy.get('[data-test-id="project-information-card-context"] [data-test-id="button-open-tooltip-user-card"]')
             .click({ force: true })
             .then(() => {
