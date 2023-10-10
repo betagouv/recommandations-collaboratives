@@ -70,11 +70,13 @@ def document_upload(request, project_id):
                 instance.save()
 
                 # Reactivate project if was set inactive
-                if (
-                    project.inactive_since
-                    and request.user in get_collaborators_for_project(project)
-                ):
-                    project.reactivate()
+                if request.user in get_collaborators_for_project(project):
+                    project.last_members_activity_at = timezone.now()
+
+                    if project.inactive_since:
+                        project.reactivate()
+
+                    project.save()
 
                 signals.document_uploaded.send(
                     sender=document_upload, instance=instance

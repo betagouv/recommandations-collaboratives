@@ -20,7 +20,6 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
-from rest_framework.test import APIClient
 from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
@@ -1200,7 +1199,7 @@ def test_accessing_rsvp_from_email_link_improper_status_404(request, client):
 
 @pytest.mark.django_db
 def test_accessing_rsvp_from_email_link_bad_uuid(request, client):
-    rsvp = baker.make(models.TaskFollowupRsvp)
+    baker.make(models.TaskFollowupRsvp)
     status = models.Task.INPROGRESS
     bad_uuid = uuid.uuid4()
 
@@ -1373,39 +1372,63 @@ def test_reminder_is_updated_when_a_followup_issued(request, client):
     assert reminder.recipient == owner.email
 
 
-###############################################################
-# API
-###############################################################
+#################################################################
+# Activity flags
+#################################################################
+@pytest.mark.django_db
+def test_last_members_activity_is_updated_by_member_comment(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        project_models.Project,
+        sites=[site],
+        status="READY",
+    )
+
+    task = baker.make(models.Task, project=project, site=get_current_site(request))
+
+    url = reverse("projects-followup-task", kwargs={"task_id": task.pk})
+
+    before_update = timezone.now()
+
+    with login(client) as owner:
+        utils.assign_collaborator(owner, project, is_owner=True)
+        response = client.post(url, data={"comment": "hey"})
+
+    assert response.status_code == 302
+
+    project.refresh_from_db()
+
+    assert project.last_members_activity_at > before_update
 
 
 @pytest.mark.django_db
-def test_unassigned_switchtender_should_see_recommendations(request):
+def test_last_members_activity_not_updated_by_advisor_comment(request, client):
     site = get_current_site(request)
-    task = Recipe(models.Task, site=site, project__sites=[site]).make()
 
-    client = APIClient()
+    project_ts = timezone.now()
+    project = baker.make(
+        project_models.Project,
+        sites=[site],
+        status="READY",
+        last_members_activity_at=project_ts,
+    )
+    owner = baker.make(auth.User)
+    utils.assign_collaborator(owner, project, is_owner=True)  # for reminders to work
 
-    with login(client) as user:
-        utils.assign_advisor(user, task.project)
+    task = baker.make(models.Task, project=project, site=get_current_site(request))
 
-        url = reverse("project-tasks-list", args=[task.project.id])
-        response = client.get(url)
+    url = reverse("projects-followup-task", kwargs={"task_id": task.pk})
 
-    assert response.status_code == 200
+    with login(client) as advisor:
+        utils.assign_advisor(advisor, project)
+        response = client.post(url, data={"comment": "hey"})
 
+    assert response.status_code == 302
 
-@pytest.mark.django_db
-def test_unassigned_user_should_not_see_recommendations(request):
-    site = get_current_site(request)
-    task = Recipe(models.Task, site=site, project__sites=[site]).make()
+    project.refresh_from_db()
 
-    client = APIClient()
-
-    with login(client):
-        url = reverse("project-tasks-list", args=[task.project.id])
-        response = client.get(url)
-
-    assert response.status_code == 403
+    assert project.last_members_activity_at == project_ts
 
 
 # eof

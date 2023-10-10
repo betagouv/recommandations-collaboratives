@@ -513,12 +513,14 @@ def followup_task(request, task_id=None):
 
             followup.save()
 
-            # Reactivate project if was set inactive
-            if (
-                task.project.inactive_since
-                and request.user in get_collaborators_for_project(task.project)
-            ):
-                task.project.reactivate()
+            # update activity flags and states
+            if request.user in get_collaborators_for_project(task.project):
+                task.project.last_members_activity_at = timezone.now()
+
+                if task.project.inactive_since:
+                    task.project.reactivate()
+
+                task.project.save()
 
             if followup.status in (
                 models.Task.ALREADY_DONE,

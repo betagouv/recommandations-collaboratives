@@ -548,4 +548,68 @@ def test_answered_question_reactivates_inactive_project(request, client):
     assert project.inactive_since is None
 
 
+# -- Project activity flags
+@pytest.mark.django_db
+def test_last_members_activity_is_updated_by_survey_edition_from_member(
+    request, client
+):
+    current_site = get_current_site(request)
+    project = Recipe(
+        projects.Project, sites=[current_site], inactive_since=timezone.now()
+    ).make()
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(models.Session, survey=survey, project=project).make()
+
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    Recipe(models.Question, question_set=qs).make()
+
+    my_comment = "this is a comment"
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+
+    before_update = timezone.now()
+
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, project)
+        response = client.post(url, data={"comment": my_comment})
+
+    assert response.status_code == 302
+
+    project.refresh_from_db()
+    assert project.last_members_activity_at > before_update
+
+
+@pytest.mark.django_db
+def test_last_members_activity_not_updated_by_survey_edition_from_advisor(
+    request, client
+):
+    current_site = get_current_site(request)
+
+    project_ts = timezone.now()
+    project = Recipe(
+        projects.Project,
+        sites=[current_site],
+        inactive_since=timezone.now(),
+        last_members_activity_at=project_ts,
+    ).make()
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(models.Session, survey=survey, project=project).make()
+
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+    Recipe(models.Question, question_set=qs).make()
+
+    my_comment = "this is a comment"
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+
+    with login(client, is_staff=False) as user:
+        assign_advisor(user, project)
+        response = client.post(url, data={"comment": my_comment})
+
+    assert response.status_code == 302
+
+    project.refresh_from_db()
+    assert project.last_members_activity_at == project_ts
+
+
 # eof

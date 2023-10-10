@@ -273,7 +273,7 @@ class Project(models.Model):
         self.inactive_reason = None
         self.save()
 
-    last_member_activity_at = models.DateTimeField(
+    last_members_activity_at = models.DateTimeField(
         default=timezone.now,
         editable=False,
         verbose_name="Dernière activité de la collectivité",

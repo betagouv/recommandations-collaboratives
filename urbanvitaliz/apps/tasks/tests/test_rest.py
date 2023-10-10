@@ -15,16 +15,13 @@ from django.urls import reverse
 from model_bakery import baker
 from notifications.signals import notify
 from rest_framework.test import APIClient
-
-from urbanvitaliz.utils import login
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.projects import models as project_models
-from urbanvitaliz.apps.resources import models as resource_models
-
 from urbanvitaliz.apps.projects import utils
+from urbanvitaliz.apps.resources import models as resource_models
+from urbanvitaliz.utils import login
 
 from .. import models
-
 
 ########################################################################
 # tasks
@@ -60,9 +57,7 @@ def test_task_includes_resource_content_bug_fix(request):
     site = get_current_site(request)
     project = baker.make(project_models.Project, sites=[site])
     resource = baker.make(resource_models.Resource, sites=[site])
-    baker.make(
-        models.Task, project=project, resource=resource, site=site, public=True
-    )
+    baker.make(models.Task, project=project, resource=resource, site=site, public=True)
     utils.assign_observer(user, project, site)
 
     client = APIClient()
@@ -532,6 +527,39 @@ def test_project_task_notifications_mark_read_updates_notifications_of_advisor(r
     assert response.status_code == 200
     assert response.data == {}
     assert user.notifications.unread().count() == 0
+
+
+# -- recommendations
+
+
+@pytest.mark.django_db
+def test_unassigned_switchtender_should_see_recommendations(request):
+    site = get_current_site(request)
+    task = baker.make(models.Task, site=site, project__sites=[site])
+
+    client = APIClient()
+
+    with login(client) as user:
+        utils.assign_advisor(user, task.project)
+
+        url = reverse("project-tasks-list", args=[task.project.id])
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_unassigned_user_should_not_see_recommendations(request):
+    site = get_current_site(request)
+    task = baker.make(models.Task, site=site, project__sites=[site])
+
+    client = APIClient()
+
+    with login(client):
+        url = reverse("project-tasks-list", args=[task.project.id])
+        response = client.get(url)
+
+    assert response.status_code == 403
 
 
 # eof

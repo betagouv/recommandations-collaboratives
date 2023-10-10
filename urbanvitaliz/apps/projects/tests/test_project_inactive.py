@@ -410,35 +410,4 @@ def test_project_is_reactivated_on_recommendation_comment(request, client):
     assert project.inactive_since is None
 
 
-@pytest.mark.django_db
-def test_project_is_reactivated_on_survey_edition(request, client):
-    site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-        inactive_since=timezone.now(),
-    )
-
-    task = baker.make(
-        tasks_models.Task, project=project, site=get_current_site(request)
-    )
-
-    url = reverse("projects-followup-task", kwargs={"task_id": task.pk})
-
-    with login(client) as owner:
-        assign_collaborator(owner, project, is_owner=True)
-        response = client.post(url, data={"comment": "hey"})
-
-    assert response.status_code == 302
-
-    project.refresh_from_db()
-
-    assert project.inactive_since is None
-
-
-# ...,  # survey edited?
-
-
 # eof

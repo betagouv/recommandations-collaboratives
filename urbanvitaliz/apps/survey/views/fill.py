@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.utils import timezone
 from django.views.generic import DetailView, RedirectView
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects.utils import get_collaborators_for_project
@@ -71,11 +72,13 @@ def survey_question_details(request, session_id, question_id):
             form.update_session(session, request.user)
 
             # Reactivate project if was set inactive
-            if (
-                session.project.inactive_since
-                and request.user in get_collaborators_for_project(session.project)
-            ):
-                session.project.reactivate()
+            if request.user in get_collaborators_for_project(session.project):
+                session.project.last_members_activity_at = timezone.now()
+
+                if session.project.inactive_since:
+                    session.project.reactivate()
+
+                session.project.save()
 
             signals.survey_session_updated.send(
                 sender=survey_question_details,
