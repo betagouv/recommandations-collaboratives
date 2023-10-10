@@ -121,7 +121,7 @@
     color: #18753C !important;
 }
 
-.button.disabled{
+.button.disabled, .button:disabled{
     background-color: #EEEEEE;
     cursor: not-allowed;
     user-select: none;
