@@ -13,7 +13,9 @@
             "is_staff": true,
             "is_active": true,
             "date_joined": "2021-07-09T09:29:47.252Z",
-            "groups": [4],
+            "groups": [
+                4
+            ],
             "user_permissions": []
         }
     },
@@ -72,7 +74,7 @@
             "is_active": true,
             "date_joined": "2021-07-09T09:29:47.252Z",
             "groups": [
-              4  
+                4
             ],
             "user_permissions": []
         }
@@ -145,7 +147,9 @@
             "is_staff": false,
             "is_active": true,
             "date_joined": "2021-07-09T09:29:47.252Z",
-            "groups": [4],
+            "groups": [
+                4
+            ],
             "user_permissions": []
         }
     },
@@ -160,6 +164,24 @@
             "first_name": "nonactive",
             "last_name": "user",
             "email": "nonactiveuser@test.fr",
+            "is_staff": false,
+            "is_active": false,
+            "date_joined": "2021-07-09T09:29:47.252Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 10,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
+            "last_login": "2022-09-01T08:58:56.513Z",
+            "is_superuser": false,
+            "username": "deleted.user@test.fr",
+            "first_name": "Will Be Deleted",
+            "last_name": "Do not use",
+            "email": "deleted.user@test.fr",
             "is_staff": false,
             "is_active": false,
             "date_joined": "2021-07-09T09:29:47.252Z",

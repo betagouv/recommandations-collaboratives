@@ -14,16 +14,16 @@
     background-color: #27A658;
 }
 
-.inative-status-border {
+.inactive-status-border {
     border: solid 1px #929292;
 }
 
-.inative-status {
+.inactive-status {
     position: relative;
     color: #929292;
 }
 
-.inative-status::before {
+.inactive-status::before {
     content: '';
     position: absolute;
     width: 100%;

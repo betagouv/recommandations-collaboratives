@@ -19,7 +19,7 @@
                      :title="`${f.who.first_name} ${f.who.last_name}`"
                      tabindex="0" />
                 <strong x-text="`${f.who.first_name} ${f.who.last_name}`"
-                        :class="!f.who.is_active && 'inative-status'"
+                        :class="!f.who.is_active && 'inactive-status'"
                         class="text-nowrap text-capitalize ms-2"></strong>
             </span>
             <template x-if="f.who.is_active && f.who.profile.organization && f.who.profile.organization.name">
@@ -44,7 +44,7 @@
                      :title="`${f.who.first_name} ${f.who.last_name}`"
                      tabindex="0" />
                 <strong x-text="`${f.who.first_name} ${f.who.last_name}`"
-                        :class="!f.who.is_active && 'inative-status'"
+                        :class="!f.who.is_active && 'inactive-status'"
                         class="text-nowrap text-capitalize ms-2"></strong>
             </span>
             <template x-if="f.who.is_active && f.who.profile.organization && f.who.profile.organization.name">
