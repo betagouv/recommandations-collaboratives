@@ -18,7 +18,7 @@
                 <img class="rounded-circle me-1 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}"
                      :src="gravatar_url('{{ user.email }}', 18, '{{ user.first_name }}' + ' ' + '{{ user.last_name }}')"
                      alt="{{ action.actor }}">
-                <strong class="text-nowrap text-capitalize {% if not user.is_active %}inative-status{% endif %}">
+                <strong class="text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}">
                     {% if user.get_full_name %}
                         {{ user.get_full_name }}
                     {% elif project and project_owner and project.first_name and project.last_name %}
@@ -64,7 +64,7 @@
                 <img class="rounded-circle me-2 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}"
                      :src="gravatar_url('{{ user.email }}', 25, '{{ user.first_name }}' + ' ' + '{{ user.last_name }}')"
                      alt="{{ action.actor }}">
-                <strong class="text-nowrap text-capitalize {% if not user.is_active %}inative-status{% endif %}">
+                <strong class="text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}">
                     {% if user.get_full_name %}
                         {{ user.get_full_name }}
                     {% elif project and project.first_name and project.last_name %}

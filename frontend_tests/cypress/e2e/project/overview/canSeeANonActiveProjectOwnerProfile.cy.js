@@ -11,6 +11,6 @@ describe('I can go to overview tab', () => {
     it('show the profile of a non active project owner with the correct class', () => {
         cy.visit(`/project/${currentProject.pk}`)
 
-        cy.get('[data-test-id="project-owner-name-details"]').should('have.class', 'inative-status')
+        cy.get('[data-test-id="project-owner-name-details"]').should('have.class', 'inactive-status')
     })
 })
