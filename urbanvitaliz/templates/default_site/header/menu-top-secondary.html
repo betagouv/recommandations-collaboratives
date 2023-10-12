@@ -5,6 +5,7 @@
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% endif %}
     <ul class="list-unstyled mb-0 d-flex align-items-center"
+        data-test-id="secondary-menu"
         style="padding-left: 15px">
         <!-- Dashboard -->
         {% if is_switchtender or is_administrating_project %}
@@ -185,7 +186,7 @@
                  x-on:click.outside="open = false"
                  class="btn-group d-flex">
                 <a href="{% url 'resources-resource-search' %}"
-                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">
+                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}" data-test-id="link-ressources">
                     <span class="ms-1 align-middle">Ressources</span>
                 </a>
                 {% if "manage_resources" in user_site_perms %}
