@@ -19,7 +19,7 @@
                      :title="`${currentUser.first_name} ${currentUser.last_name}`"
                      tabindex="0" />
                 <strong x-text="`${currentUser.first_name} ${currentUser.last_name}`"
-                        :class="!currentUser.is_active && 'inative-status'"
+                        :class="!currentUser.is_active && 'inactive-status'"
                         class="text-nowrap text-capitalize ms-2"></strong>
             </span>
             <template x-if="currentUser.is_active && currentUser.profile.organization && currentUser.profile.organization.name">
@@ -44,7 +44,7 @@
                      :title="`${currentUser.first_name} ${currentUser.last_name}`"
                      tabindex="0" />
                 <strong x-text="`${currentUser.first_name} ${currentUser.last_name}`"
-                        :class="!currentUser.is_active && 'inative-status'"
+                        :class="!currentUser.is_active && 'inactive-status'"
                         class="text-nowrap text-capitalize ms-2"></strong>
             </span>
             <template x-if="currentUser.is_active && currentUser.profile.organization && currentUser.profile.organization.name">

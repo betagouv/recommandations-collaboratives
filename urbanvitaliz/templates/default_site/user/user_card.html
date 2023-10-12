@@ -11,30 +11,35 @@
 <div x-data="User()"
      class="user-card position-relative d-flex my-1 flex-column justify-content-between align-items-start">
     <div class="position-relative d-flex align-items-center justify-content-between {% if user_activity %}w-100{% endif %}">
-        <div x-ref="user"
-             @click="onUserClick"
-             class="d-flex align-items-center flex-wrap user-info">
+        <button x-ref="user"
+                type="button"
+                @click="onUserClick"
+                class="d-flex align-items-center flex-wrap user-info border-0 p-0 bg-transparent"
+                data-test-id="button-open-tooltip-user-card">
             <span class="me-1 d-flex align-items-center font-very-small">
                 <img class="rounded-circle me-1 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}"
                      :src="gravatar_url('{{ user.email }}', 18, '{{ user.first_name }}' + ' ' + '{{ user.last_name }}')"
                      alt="{{ action.actor }}">
-                <strong class="text-nowrap text-capitalize {% if not user.is_active %}inative-status{% endif %}">
-                    {% if user.get_full_name %}
-                        {{ user.get_full_name }}
-                    {% elif project and project_owner and project.first_name and project.last_name %}
-                        {{ project.first_name }}
-                        {{ project.last_name }}
-                    {% elif user.email %}
-                        {{ user.email }}
-                    {% endif %}
-                </strong>
+                {% if user %}
+                    <strong class="text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}"
+                            data-test-id="user-card-intro">
+                        {% if user.get_full_name %}
+                            {{ user.get_full_name }}
+                        {% elif project and project_owner and project.first_name and project.last_name %}
+                            {{ project.first_name }}
+                            {{ project.last_name }}
+                        {% elif user.email %}
+                            {{ user.email }}
+                        {% endif %}
+                    </strong>
+                {% endif %}
             </span>
             {% if user.profile.organization.name %}
                 <span class="text-dark fw-normal font-italic font-very-small">{{ user.profile.organization.name }}</span>
             {% elif project_owner and project.org_name %}
                 <span class="text-dark fw-normal font-italic font-very-small">{{ project.org_name }}</span>
             {% endif %}
-        </div>
+        </button>
         {% if 'use_crm' in user_site_perms and user_activity %}
             <a class="small ms-1" href="{% url 'crm-user-details' user.pk %}">
                 <svg class="bi me-1" width="16" height="16" fill="currentColor">
@@ -47,6 +52,7 @@
          x-ref="userTooltip"
          id="user-tooltip"
          @click.outside="onOutsideUserClick"
+         data-test-id="tooltip-user-card"
          class="user-card-popup flex-column {% if not user.is_active %}{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border {% endif %}">
         {% if user.is_active and position.is_advisor %}
             <div class="user-role position-absolute">
@@ -64,10 +70,10 @@
                 <img class="rounded-circle me-2 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}"
                      :src="gravatar_url('{{ user.email }}', 25, '{{ user.first_name }}' + ' ' + '{{ user.last_name }}')"
                      alt="{{ action.actor }}">
-                <strong class="text-nowrap text-capitalize {% if not user.is_active %}inative-status{% endif %}">
+                <strong class="text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}">
                     {% if user.get_full_name %}
                         {{ user.get_full_name }}
-                    {% elif project and project.first_name and project.last_name %}
+                    {% elif user and project and project.first_name and project.last_name %}
                         {{ project.first_name }}
                         {{ project.last_name }}
                     {% else %}
@@ -136,9 +142,14 @@
                     </button>
                 </span>
             {% endif %}
-            {% if not user.is_active %}
+            {% if user and not user.is_active %}
                 <span style="border-radius: 2px"
-                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap">Compte desactivé depuis le {{ user.profile.deleted }}</span>
+                      data-test-id="deactivated-user-details"
+                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap">Compte desactivé depuis {{ user.last_login.date|date:"F" }}  {{ user.last_login.date|date:"Y" }}</span>
+            {% elif not user %}
+                <span style="border-radius: 2px"
+                      data-test-id="deleted-user-details"
+                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap">Compte desactivé</span>
             {% endif %}
         </div>
     </div>

@@ -223,8 +223,8 @@ Cypress.Commands.add('navigateToProject', (index) => {
 })
 
 /**
- * Verify that image loads and that attribute corresponds to ARIA role.
- * Possible alt values are: 
+ * Verify that image loads and that alt attribute corresponds to ARIA role.
+ * Possible role values are:
  * - img-informative
  * - img-presentation
  * - img-functional
