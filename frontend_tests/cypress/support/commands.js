@@ -85,10 +85,7 @@ Cypress.Commands.add('logout', () => {
 })
 
 Cypress.Commands.add("createProject", (label) => {
-
-    cy.visit('/')
-
-    cy.get('a').should('have.class', 'fr-btn fr-text--xl custom-button').contains('Solliciter UrbanVitaliz').click({ force: true })
+    cy.get('[data-test-id="intro-uv"]').find('[data-test-id="intro-link-contact-uv"]').click({ force: true })
 
     cy.url().should('include', '/onboarding/')
 
