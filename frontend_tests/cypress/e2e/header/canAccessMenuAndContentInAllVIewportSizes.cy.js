@@ -10,11 +10,9 @@ describe('As a visitor, I can access the menu and content on different devices',
 	testLayouts.forEach((testItem) => {
 
 		it(`displays correctly on a ${testItem}`, () => {
-			let devices = [];
-			let layouts = [];
 			cy.fixture('utils/devices').then((testDevices) => {
-				devices = testDevices.devices.filter(({layout})=> layout === testItem);
-				layouts = testDevices.layouts.find(({name})=> name === testItem);
+				const devices = testDevices.devices.filter(({layout})=> layout === testItem);
+				const layouts = testDevices.layouts.find(({name})=> name === testItem);
 
 				devices.forEach(({ dimensions }) => {
 					const [width, height] = dimensions;
