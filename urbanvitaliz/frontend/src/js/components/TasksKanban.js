@@ -40,6 +40,9 @@ export default function boardTasksApp(projectId) {
             event.preventDefault();
             event.dataTransfer.dropEffect = "move";
         },
+        getTestId(status) {
+            return `data-target-${status}`;
+        },
         async onDrop(event, status, targetUuid) {
             event.preventDefault();
 
@@ -97,7 +100,7 @@ export default function boardTasksApp(projectId) {
         async moveTask(data, status, nextData) {
             await this.$store.tasksData.issueFollowup(data, status);
             if (nextData) await this.$store.tasksData.moveTask(data.id, nextData.id);
-        }
+        },
     }
 
 

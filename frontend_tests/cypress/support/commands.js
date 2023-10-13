@@ -121,7 +121,6 @@ Cypress.Commands.add("createProject", (label) => {
     cy.wait(500)
 
     cy.contains('Envoyer ma demande').click({ force: true });
-
     cy.contains(`${label}`).click({ force: true })
 })
 
