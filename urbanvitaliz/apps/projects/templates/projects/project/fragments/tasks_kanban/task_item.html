@@ -9,7 +9,7 @@
      @drop="onDrop(event, board.status, task.uuid)"
      @dragenter="onDragEnter(event)"
      @dragleave="onDragLeave(event)"
-     data-test-id="task-kanban-item-draggable">
+     data-test-id="draggable">
     <div x-show="task.isLoading"
          class="ms-2 item-loader z-index-1"
          style="width: 24px;

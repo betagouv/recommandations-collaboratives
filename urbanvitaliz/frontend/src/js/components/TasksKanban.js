@@ -40,9 +40,6 @@ export default function boardTasksApp(projectId) {
             event.preventDefault();
             event.dataTransfer.dropEffect = "move";
         },
-        getTestId(status) {
-            return `data-target-${status}`;
-        },
         async onDrop(event, status, targetUuid) {
             event.preventDefault();
 
