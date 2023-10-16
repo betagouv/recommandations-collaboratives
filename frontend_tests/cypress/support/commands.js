@@ -87,10 +87,7 @@ Cypress.Commands.add('logout', () => {
 })
 
 Cypress.Commands.add("createProject", (label) => {
-
-    cy.visit('/')
-
-    cy.get('a').should('have.class', 'fr-btn fr-text--xl custom-button').contains('Solliciter UrbanVitaliz').click({ force: true })
+    cy.get('[data-test-id="intro-uv"]').find('[data-test-id="intro-link-contact-uv"]').click({ force: true })
 
     cy.url().should('include', '/onboarding/')
 
@@ -126,7 +123,6 @@ Cypress.Commands.add("createProject", (label) => {
     cy.wait(500)
 
     cy.contains('Envoyer ma demande').click({ force: true });
-
     cy.contains(`${label}`).click({ force: true })
 })
 

@@ -52,18 +52,38 @@ export default function boardTasksApp(projectId) {
             const nextData = this.findByUuid(targetUuid)
 
             data.isLoading = true
+
             if (nextData) {
                 nextData.isLoading = true
             }
 
-            if (status === TASK_STATUSES.DONE) {
-                this.handleOpenFeedbackModal(data, status);
+            // In progress & not interest status
+            if (status instanceof Array) {
+                if (status.find(s => s === TASK_STATUSES.NOT_INTERESTED)) {
+                    // prevent feedback modal to open if changing task to same status
+                    if (data.status != TASK_STATUSES.NOT_INTERESTED && data.status != TASK_STATUSES.ALREADY_DONE) {
+                        this.handleOpenFeedbackModal(data, TASK_STATUSES.NOT_INTERESTED);
+                    }
+                    else {
+                        await this.moveTask(data, TASK_STATUSES.NOT_INTERESTED, nextData)
+                    }
+
+                } else if (status.find(s => s === TASK_STATUSES.INPROGRESS)) {
+                    await this.moveTask(data, TASK_STATUSES.INPROGRESS, nextData)
+                }
             }
-            else if (status instanceof Array) {
-                this.handleOpenFeedbackModal(data, TASK_STATUSES.NOT_INTERESTED);
-            } else {
-                await this.$store.tasksData.issueFollowup(data, status);
-                if (nextData) await this.$store.tasksData.moveTask(data.id, nextData.id);
+
+            if (status === TASK_STATUSES.DONE) {
+                // prevent feedback modal to open if changing task to same status
+                if (data.status != TASK_STATUSES.DONE) {
+                    this.handleOpenFeedbackModal(data, status);
+                } else {
+                    await this.moveTask(data, TASK_STATUSES.DONE, nextData)
+                }
+            }
+
+            if (status === TASK_STATUSES.PROPOSED) {
+                await this.moveTask(data, TASK_STATUSES.PROPOSED, nextData)
             }
 
             await this.$store.tasksView.updateView()
@@ -73,8 +93,13 @@ export default function boardTasksApp(projectId) {
             if (nextData) {
                 nextData.isLoading = false
             }
-        }
+        },
+        async moveTask(data, status, nextData) {
+            await this.$store.tasksData.issueFollowup(data, status);
+            if (nextData) await this.$store.tasksData.moveTask(data.id, nextData.id);
+        },
     }
+
 
     return TaskApp(app, projectId)
 }
