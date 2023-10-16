@@ -112,7 +112,7 @@ function boardProjectsApp() {
                 departments.push(deparmentItem)
             })
 
-            return this.departments = departments.sort((a, b) => a.name.localeCompare(b.name));
+            return this.departments = departments.sort((a, b) => a.name?.localeCompare(b.name));
         },
         constructRegionsFilter(departments, regions) {
             const currentRegions = []
@@ -186,7 +186,7 @@ function boardProjectsApp() {
         filterProjectsByDepartments(project) {
             return this.regions.find(
                 region => region.departments.find(
-                    department => department.code === project.commune.department.code)?.active)
+                    department => department.code === project?.commune?.department?.code)?.active)
         },
         sortFn(a, b) {
             if (b.notifications.count - a.notifications.count)
