@@ -97,7 +97,7 @@ export default function boardTasksApp(projectId) {
         async moveTask(data, status, nextData) {
             await this.$store.tasksData.issueFollowup(data, status);
             if (nextData) await this.$store.tasksData.moveTask(data.id, nextData.id);
-        }
+        },
     }
 
 

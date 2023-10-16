@@ -12,8 +12,8 @@ describe('I can fill a project survey', () => {
 
         cy.visit(`/project/${currentProject.pk}`)
 
-        cy.get('a').should('have.class', 'text-nowrap').contains('État des lieux').click({ force: true })
-        cy.contains("Compléter cette section").click({ force: true })
+        cy.get('[data-test-id="project-navigation-knowledge"]').click({ force: true })
+        cy.get('[data-test-id="link-fill-survey"]').click({ force: true })
 
         // cy.url().should('include', '/projects/survey/')
 
@@ -24,9 +24,9 @@ describe('I can fill a project survey', () => {
             .type('Fake comment on first survey question', { force: true })
             .should('have.value', 'Fake comment on first survey question')
 
-        cy.contains('Valider ma réponse').click({ force: true });
+        cy.get('[data-test-id="button-submit-survey-questionset"]').click({ force: true });
 
-        cy.contains("État des lieux").click({ force: true })
+        cy.get('[data-test-id="project-navigation-knowledge"]').click({ force: true })
         cy.url().should('include', '/connaissance')
         cy.contains('Propriété du site')
         cy.contains('100%')
