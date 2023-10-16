@@ -11,7 +11,7 @@ const codesComMarseille = ['13201','13202','13203','13204','13205','13206','1320
 
 // Doc: https://apicarto.ign.fr/api/doc/cadastre#/Commune/get_cadastre_commune
 const apiCadastre = 'https://apicarto.ign.fr/api/cadastre'
-
+const latLongFrance = [46.5, 1.20] // latitude and longitude of centroid of France
 
 function getGlobalCityCodeFromCodeInsee(codeInsee) {
 	if (codesComParis.includes(codeInsee)) {
@@ -53,21 +53,23 @@ function ProjectLocation(projectOptions) {
 		project: null,
 		mapModal: null,
 		interactiveMap: null,
+		zoom: 5,
 
 		async init() {
 			this.project = {
 				...projectOptions,
 				commune: {
 					...projectOptions.commune,
-					latitude: projectOptions.commune.latitude ? parseFloat(projectOptions.commune.latitude) : 46.51,
-					longitude: projectOptions.commune.longitude ? parseFloat(projectOptions.commune.longitude) :1.20,
+					latitude: projectOptions.commune.latitude ? parseFloat(projectOptions.commune.latitude) : null,
+					longitude: projectOptions.commune.longitude ? parseFloat(projectOptions.commune.longitude) : null,
 				}
 			}
 			const options = mapOptions({interactive: false});
-			const zoom = 11;
 			const { latitude, longitude, insee } = this.project.commune;
 
-			const Map = initMap('map', this.project, options, zoom);
+			this.zoom = latitude && longitude ? 11 : this.zoom;
+
+			const Map = initMap('map', this.project, options, this.zoom);
 			
 			const geoData = {}
 			geoData.commune = await fetchCommuneIgn(insee);
@@ -87,8 +89,9 @@ function ProjectLocation(projectOptions) {
 			this.mapModal = new bootstrap.Modal(element);
 
 			const options = mapOptions({interactive: true});
-			const zoom = 12;
-			const { latitude, longitude } = project.commune;
+			const zoom = this.zoom + 1;
+			const latitude = project.commune.latitude ?? latLongFrance[0];
+			const longitude = project.commune.longitude ?? latLongFrance[1];
 
 			this.interactiveMap = initMap('map-modal', project, options, zoom);
 			this.interactiveMap.panTo(new L.LatLng(latitude, longitude));
@@ -112,7 +115,8 @@ function ProjectLocation(projectOptions) {
 
 // Map base layer 
 function initMap(idMap, project, options, zoom) {
-	const { latitude, longitude } = project.commune;
+	const latitude = project.commune.latitude ?? latLongFrance[0];
+	const longitude = project.commune.longitude ?? latLongFrance[1];
 	const map = L.map(idMap, options).setView([latitude, longitude], zoom);
 
 	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {

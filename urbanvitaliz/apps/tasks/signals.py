@@ -59,6 +59,9 @@ def notify_action_created(sender, task, project, user, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
+    task.created_on = timezone.now()
+    task.save()
+
     recipients = get_notification_recipients_for_project(project).exclude(id=user.id)
 
     notify.send(
@@ -294,5 +297,6 @@ def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs)
             project=instance.task.project,
             user=instance.who,
         )
+
 
 # eof

@@ -76,6 +76,19 @@
         }
     },
     {
+        "model": "survey.questionset",
+        "pk": 2,
+        "fields": {
+            "survey": 1,
+            "heading": "Connaissance du terrain et du bâti",
+            "icon": "building",
+            "color": "#f58188",
+            "subheading": "",
+            "priority": 900,
+            "deleted": null
+        }
+    },
+    {
         "model": "survey.question",
         "pk": 1,
         "fields": {
@@ -93,6 +106,40 @@
         }
     },
     {
+        "model": "survey.question",
+        "pk": 4,
+        "fields": {
+            "precondition": "",
+            "priority": 500,
+            "question_set": 2,
+            "text": "Est-ce que le site est susceptible de revêtir une valeur archéologique ?",
+            "text_short": "Enjeu_archéo",
+            "how": "- Savoir si  le site est en zone de présomption de prescription archéologique, dans le PLU(i), au sein du “porter à connaissance” réalisé par les services de l’Etat\r\n- Retrouver les éventuels anciens diagnostics liés à un projet d’aménagement antérieur",
+            "why": "Pour anticiper les prescriptions éventuelles des services de l’État liés à la culture.\r\n\r\nCes services peuvent prescrire un diagnostic en fonction de la richesse pressentie du site, voire des fouilles archéologiques si le projet peut impacter les sols diagnostiqués.",
+            "is_multiple": false,
+            "deleted": null,
+            "upload_title": "",
+            "comment_title": "Précisions éventuelles"
+        }
+    },
+    {
+        "model": "survey.question",
+        "pk": 4,
+        "fields": {
+            "precondition": "",
+            "priority": 500,
+            "question_set": 2,
+            "text": "Est-ce que le site est susceptible de revêtir une valeur archéologique ?",
+            "text_short": "Enjeu_archéo",
+            "how": "- Savoir si  le site est en zone de présomption de prescription archéologique, dans le PLU(i), au sein du “porter à connaissance” réalisé par les services de l’Etat\r\n- Retrouver les éventuels anciens diagnostics liés à un projet d’aménagement antérieur",
+            "why": "Pour anticiper les prescriptions éventuelles des services de l’État liés à la culture.\r\n\r\nCes services peuvent prescrire un diagnostic en fonction de la richesse pressentie du site, voire des fouilles archéologiques si le projet peut impacter les sols diagnostiqués.",
+            "is_multiple": false,
+            "deleted": null,
+            "upload_title": "",
+            "comment_title": "Précisions éventuelles"
+        }
+    },
+    {
         "model": "survey.choice",
         "pk": 1,
         "fields": {
@@ -103,6 +150,19 @@
             "priority": 0,
             "deleted": null,
             "question": 1
+        }
+    },
+    {
+        "model": "survey.choice",
+        "pk": 15,
+        "fields": {
+            "value": "archéologie_non",
+            "signals": "",
+            "text": "Non, de manière certaine",
+            "conclusion": "Pas d'enjeu archéo",
+            "priority": 0,
+            "deleted": null,
+            "question": 4
         }
     },
     {
