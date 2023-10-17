@@ -71,7 +71,7 @@
                 {% for error in public_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                 {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
                 <div class="d-flex justify-content-end mt-4">
-                  <button form="conversation-form" class="button filled" type="submit">Envoyer</button>
+                  <button data-test-id="send-message-conversation" x-data :disabled="$store.editor.currentMessage === '' " form="conversation-form" class="button filled" type="submit">Envoyer</button>
                 </div>
               </form>
             </div>

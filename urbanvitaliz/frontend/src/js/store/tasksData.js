@@ -14,7 +14,8 @@ document.addEventListener('alpine:init', () => {
         async init() {
             await this.loadTasks()
             Alpine.store('tasksView').displayedTasks = this.tasks
-            this.extractTopicFromTasks();
+            // NOTE : rollback tasks topic display
+            // this.extractTopicFromTasks();
         },
         get newTasks() {
             return this.tasks.filter(task => task.visited === false && task.public)
@@ -34,8 +35,6 @@ document.addEventListener('alpine:init', () => {
 
             this.topics = topics
         },
-        //get each thematics for each project
-        //
         async loadTasks() {
             const json = await api.get(tasksUrl(this.projectId))
 

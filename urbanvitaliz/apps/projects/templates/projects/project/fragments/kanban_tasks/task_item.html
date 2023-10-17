@@ -1,146 +1,213 @@
 {% load static %}
 {% load guardian_tags %}
-
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-
-	<div :id="t.uuid" class="drag-targetable py-3" @dragover="onDragOver(event)"
-		@drop="onDrop(event, board.status, t.uuid)" @dragenter="onDragEnter(event)" @dragleave="onDragLeave(event)">
-		<div class="rounded bg-white shadow position-relative" :draggable="canUseTasks" @dragstart="onDragStart(event, t.uuid)"
-			@dragend="onDragEnd(event)">
-			<template x-if="t.notifications.count > 0">
-				<span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold"
-					style="font-size: 0.7em;" x-text="t.notifications.count"></span>
-			</template>
-			<div class="position-absolute top-0 left-0 d-flex" style="margin: -10px 0 0 5px;">
-				<template x-if="!t.public && !isArchivedStatus(t.status)">
-					<span class="rounded-pill px-2 bg-warning z-index-dropdown text-uppercase fw-bold text-white"
-						style="font-size: 0.7em;">Brouillon</span>
-				</template>
-				<template x-if="t.public && !t.visited && !isArchivedStatus(t.status)">
-					<span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white"
-						style="font-size: 0.7em;">Nouveau</span>
-				</template>
-				<template x-if="t.status === STATUSES.DONE || t.status === STATUSES.ALREADY_DONE">
-					<span class="rounded-pill px-2 bg-success z-index-dropdown text-uppercase fw-bold text-white"
-						style="font-size: 0.7em;">Fait</span>
-				</template>
-				<template x-if="t.status === STATUSES.NOT_INTERESTED">
-					<span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white"
-						style="font-size: 0.7em;">Non applicable</span>
-				</template>
-			</div>
-			<div class="p-2">
-				<div class="d-flex flex-row">
-					<div class="mt-1 d-flex flex-column justify-content-between">
-						{% if "use_tasks" in user_project_perms and not disable_edit %}
-							<div>
-								<template x-if="i > 0">
-									<a class="d-block p-1" @click="$store.tasksData.moveAbove(t, column(board.status)[i - 1])" style="cursor: pointer;">
-										<svg class="aling-middle bi ms-1" width="12px" height="12px" fill="currentColor">
-											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
-										</svg>
-									</a>
-								</template>
-								<template x-if="i < (column(board.status).length - 1)">
-									<a class="d-block p-1" @click="$store.tasksData.moveBelow(t, column(board.status)[i + 1])" style="cursor: pointer;">
-										<svg class="aling-middle bi ms-1" width="12px" height="12px" fill="currentColor">
-											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
-										</svg>
-									</a>
-								</template>
-							</div>
-							{% if is_switchtender %}
-								<template x-if="t.status < 3 && t.public">
-									<div class="me-2 text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta" style="background-color: rgba(0, 0, 0, 0.05); border-radius: 5px; cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="bottom" :title="toArchiveTooltip()" @click="openFeedbackModal(t)">
-										<svg class="aling-middle bi" width="25px" height="25px" fill="green">
-											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check" />
-										</svg>
-										<svg class="aling-middle bi" style="margin: 3px 0;" width="16px" height="16px" fill="currentColor">
-											<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
-										</svg>
-									</div>
-								</template>
-							{% endif %}
-						{% endif %}
-					</div>
-					<div class="flex-fill mt-1 ms-2" @click="onPreviewClick(t.id)" style="cursor: pointer; font-size: 0.9em;">
-						<h6 class="mb-0 fw-bold" x-text="t.intent"></h6>
-
-						<div class="rounded bg-light p-2 my-2" :class="canAdministrate && t.content === '' && 'border border-warning'">
-							<template x-if="canAdministrate && t.content === ''">
-								<p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
-							</template>
-							<template x-if="t.content !== ''">
-								<p x-html="truncate(renderMarkdown(t.content), 200)" class="mb-3"></p>
-							</template>
-							<div class="d-flex justify-content-between">
-								<div>
-									<img class="rounded-circle d-inline-block" width="20px" height="20px"
-									:src="gravatar_url(t.created_by.email, 25)" data-bs-toggle="tooltip" data-bs-placement="bottom"
-										:title="`${t.created_by.first_name} ${t.created_by.last_name}`" style="z-index: 1000;" tabindex="0" />
-									<span :class="!t.created_by.is_active && 'inative-status'" class="ms-1 fst-italic" x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
-									style="line-height: 20px"></span>
-									<template x-if="t.created_by.profile.organization">
-										<span x-text="t.created_by.profile.organization.name" class="fst-italic text-muted"></span>
-									</template>
-									<span class="ms-2 text-muted" x-text="`le ${formatDate(t.created_on)}`" style="line-height: 20px"></span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="border-top p-2 d-flex justify-content-between" style="font-size: 0.8em">
-				<div class="d-flex align-items-center">
-					<div class="text-primary position-relative" @click="onPreviewClick(t.id)" style="cursor: pointer;">
-						<svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
-							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat" />
-						</svg>
-						<span x-text="t.resource_id ? t.comments_count + 1  : t.comments_count"></span>
-					</div>
-				</div>
-
-				<div class="d-flex align-items-center"
-					x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
-					<div class="me-2" :class="hasReminders ? 'text-primary' : 'text-muted'" :style="isOldReminder(t.reminders[0]) ? 'color:#6c757d !important;' : ''" data-bs-toggle="tooltip"
-						data-bs-placement="bottom" :title="reminderTooltip(t)" @click="onReminderClick(t.id)"
-						style="cursor: pointer;">
-						<svg class="aling-middle bi ms-1" width="16px" height="16px" fill="currentColor">
-							<use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
-						</svg>
-					</div>
-					{% if "manage_tasks" in user_project_perms and not disable_edit %}
-					<div class="dropdown">
-						<a :id=`task-${t.id}-edit-button` class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button"
-							id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-							Éditer
-						</a>
-						<ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-							<li><a :id=`task-${t.id}-update-button` class="dropdown-item" :href="editTaskUrl(t.id)">Modifier</a></li>
-							<template x-if="t.content !== '' && !t.public">
-								<li><a class="dropdown-item" style="cursor: pointer;" @click="onSetTaskPublic(t.id, true)">Publier</a>
-								</li>
-							</template>
-							<template x-if="t.public">
-								<li><a class="dropdown-item" style="cursor: pointer;" @click="onSetTaskPublic(t.id, false)">Passer en
-										brouillon</a></li>
-							</template>
-							<li>
-								<form method="POST" :action="deleteTaskReminderUrl(t.id)">
-									{% csrf_token %}
-									<button class="dropdown-item">Supprimer le rappel</button>
-								</form>
-							</li>
-							
-							<li>
-								<a :id=`task-${t.id}-delete-button` class="dropdown-item text-danger" style="cursor: pointer;" @click="openDeleteTaskConfirmationModal(t)">Supprimer</a>
-							</li>
-						</ul>
-					</div>
-					{% endif %}
-				</div>
-			</div>
-		</div>
-	</div>
+<div :id="t.uuid"
+     class="drag-targetable py-3"
+     @dragover="onDragOver(event)"
+     @drop="onDrop(event, board.status, t.uuid)"
+     @dragenter="onDragEnter(event)"
+     @dragleave="onDragLeave(event)">
+  <div class="rounded bg-white shadow position-relative"
+       :draggable="canUseTasks"
+       @dragstart="onDragStart(event, t.uuid)"
+       @dragend="onDragEnd(event)">
+    <template x-if="t.notifications.count > 0">
+      <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold"
+            style="font-size: 0.7em"
+            x-text="t.notifications.count"></span>
+    </template>
+    <div class="position-absolute top-0 left-0 d-flex"
+         style="margin: -10px 0 0 5px">
+      <template x-if="!t.public && !isArchivedStatus(t.status)">
+        <span class="rounded-pill px-2 bg-warning z-index-dropdown text-uppercase fw-bold text-white"
+              style="font-size: 0.7em">Brouillon</span>
+      </template>
+      <template x-if="t.public && !t.visited && !isArchivedStatus(t.status)">
+        <span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white"
+              style="font-size: 0.7em">Nouveau</span>
+      </template>
+      <template x-if="t.status === STATUSES.DONE || t.status === STATUSES.ALREADY_DONE">
+        <span class="rounded-pill px-2 bg-success z-index-dropdown text-uppercase fw-bold text-white"
+              style="font-size: 0.7em">Fait</span>
+      </template>
+      <template x-if="t.status === STATUSES.NOT_INTERESTED">
+        <span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white"
+              style="font-size: 0.7em">Non applicable</span>
+      </template>
+    </div>
+    <div class="p-2">
+      <div class="d-flex flex-row">
+        <div class="mt-1 d-flex flex-column justify-content-between">
+          {% if "use_tasks" in user_project_perms and not disable_edit %}
+            <div>
+              <template x-if="i > 0">
+                <a class="d-block p-1"
+                   @click="$store.tasksData.moveAbove(t, column(board.status)[i - 1])"
+                   style="cursor: pointer">
+                  <svg class="aling-middle bi ms-1"
+                       width="12px"
+                       height="12px"
+                       fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
+                  </svg>
+                </a>
+              </template>
+              <template x-if="i < (column(board.status).length - 1)">
+                <a class="d-block p-1"
+                   @click="$store.tasksData.moveBelow(t, column(board.status)[i + 1])"
+                   style="cursor: pointer">
+                  <svg class="aling-middle bi ms-1"
+                       width="12px"
+                       height="12px"
+                       fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
+                  </svg>
+                </a>
+              </template>
+            </div>
+            {% if is_switchtender %}
+              <template x-if="t.status < 3 && t.public">
+                <div class="me-2 text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta"
+                     style="background-color: rgba(0, 0, 0, 0.05);
+                            border-radius: 5px;
+                            cursor: pointer"
+                     data-bs-toggle="tooltip"
+                     data-bs-placement="bottom"
+                     :title="toArchiveTooltip()"
+                     @click="openFeedbackModal(t)">
+                  <svg class="aling-middle bi" width="25px" height="25px" fill="green">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check" />
+                  </svg>
+                  <svg class="aling-middle bi"
+                       style="margin: 3px 0"
+                       width="16px"
+                       height="16px"
+                       fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
+                  </svg>
+                </div>
+              </template>
+            {% endif %}
+          {% endif %}
+        </div>
+        <div class="flex-fill mt-1 ms-2"
+             @click="onPreviewClick(t.id)"
+             style="cursor: pointer;
+                    font-size: 0.9em">
+          <h6 class="mb-0 fw-bold" x-text="t.intent"></h6>
+          <div class="rounded bg-light p-2 my-2"
+               :class="canAdministrate && t.content === '' && 'border border-warning'">
+            <template x-if="canAdministrate && t.content === ''">
+              <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
+            </template>
+            <template x-if="t.content !== ''">
+              <p x-html="truncate(renderMarkdown(t.content), 200)" class="mb-3"></p>
+            </template>
+            <div class="d-flex justify-content-between">
+              <div>
+                <img class="rounded-circle d-inline-block"
+                     width="20px"
+                     height="20px"
+                     :src="gravatar_url(t.created_by.email, 25)"
+                     data-bs-toggle="tooltip"
+                     data-bs-placement="bottom"
+                     :title="`${t.created_by.first_name} ${t.created_by.last_name}`"
+                     style="z-index: 1000"
+                     tabindex="0" />
+                <span :class="!t.created_by.is_active && 'inactive-status'"
+                      class="ms-1 fst-italic"
+                      x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
+                      style="line-height: 20px"></span>
+                <template x-if="t.created_by.profile.organization">
+                  <span x-text="t.created_by.profile.organization.name"
+                        class="fst-italic text-muted"></span>
+                </template>
+                <span class="ms-2 text-muted"
+                      x-text="`le ${formatDate(t.created_on)}`"
+                      style="line-height: 20px"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="border-top p-2 d-flex justify-content-between"
+         style="font-size: 0.8em">
+      <div class="d-flex align-items-center">
+        <div class="text-primary position-relative"
+             @click="onPreviewClick(t.id)"
+             style="cursor: pointer">
+          <svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat" />
+          </svg>
+          <span x-text="t.resource_id ? t.comments_count + 1  : t.comments_count"></span>
+        </div>
+      </div>
+      <div class="d-flex align-items-center"
+           x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
+        <div class="me-2"
+             :class="hasReminders ? 'text-primary' : 'text-muted'"
+             :style="isOldReminder(t.reminders[0]) ? 'color:#6c757d !important;' : ''"
+             data-bs-toggle="tooltip"
+             data-bs-placement="bottom"
+             :title="reminderTooltip(t)"
+             @click="onReminderClick(t.id)"
+             style="cursor: pointer">
+          <svg class="aling-middle bi ms-1"
+               width="16px"
+               height="16px"
+               fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
+          </svg>
+        </div>
+        {% if "manage_tasks" in user_project_perms and not disable_edit %}
+          <div class="dropdown">
+            <a :id=`task-${t.id}-edit-button` class="btn btn-sm btn-info dropdown-toggle" style="font-size: 0.8em;" href="#" role="button"
+              id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">Éditer</a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              <li>
+                <a :id
+                   task-
+                   t.id
+                   -update-button
+                   class="dropdown-item"
+                   :href="editTaskUrl(t.id)">Modifier</a>
+              </li>
+              <template x-if="t.content !== '' && !t.public">
+                <li>
+                  <a class="dropdown-item"
+                     style="cursor: pointer"
+                     @click="onSetTaskPublic(t.id, true)">Publier</a>
+                </li>
+              </template>
+              <template x-if="t.public">
+                <li>
+                  <a class="dropdown-item"
+                     style="cursor: pointer"
+                     @click="onSetTaskPublic(t.id, false)">Passer en
+                  brouillon</a>
+                </li>
+              </template>
+              <li>
+                <form method="POST" :action="deleteTaskReminderUrl(t.id)">
+                  {% csrf_token %}
+                  <button class="dropdown-item">Supprimer le rappel</button>
+                </form>
+              </li>
+              <li>
+                <a :id
+                   task-
+                   t.id
+                   -delete-button
+                   class="dropdown-item text-danger"
+                   style="cursor: pointer"
+                   @click="openDeleteTaskConfirmationModal(t)">Supprimer</a>
+              </li>
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

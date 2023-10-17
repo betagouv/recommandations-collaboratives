@@ -20,6 +20,23 @@
     }
 }
 
+
+.navbar-logo {
+    min-width: fit-content;
+    display: flex;
+}
+
+.secondary-navbar {
+    width: 100%;
+    padding-top: 0px;
+}
+
+.secondary-navbar ul {
+    flex-direction: column !important;
+    justify-content: start !important;
+    align-items: flex-start !important;
+}
+
 @media (max-width: 1350px) {
     .offcanvas-collapse .nav-item-admin span {
         display: none;
@@ -63,15 +80,9 @@
     }
 }
 
-@media (max-width: 625px) {
-    .logo-rf, .logo-cerema{
-        display: none;
-    }
-
-    .secondary-navbar ul{
-        flex-direction: column !important;
-        justify-content: start !important;
-        align-items: flex-start !important;
+@media (min-width: 690px) {
+    .secondary-navbar ul {
+        flex-direction: row !important;
     }
 
     .secondary-navbar li{
@@ -118,4 +129,48 @@
 
 .project-name-box {
     min-width: 15vw;
+}
+
+// Collapse secondary navigation
+
+.toggler-secondary {
+    display: inline;
+}
+
+.logo-uv {
+    height: 35px;
+    width: auto;
+}
+
+.navbar-logo {
+    display: flex;
+}
+
+.collapse {
+    display: none;
+}
+
+.collapse.show {
+    display: block;
+}
+
+.logo-rf, .logo-cerema {
+    display: none;
+}
+
+@media (min-width: 690px) {
+    .toggler-secondary {
+         display: none;
+    }
+
+    .collapse:not(.show) {
+         display: block;
+    }
+
+    .logo-uv {
+         height: 40px;
+    }
+    .logo-rf, .logo-cerema{
+         display: block;
+    }
 }

@@ -674,6 +674,41 @@ def test_draft_task_update_triggers_notifications(request, client):
 
 
 @pytest.mark.django_db
+def test_draft_task_publishing_updates_creation_date(request, client):
+    owner = baker.make(auth.User)
+
+    project = Recipe(
+        project_models.Project,
+        status="READY",
+        sites=[get_current_site(request)],
+        created_on=timezone.now() - datetime.timedelta(days=10),
+    ).make()
+
+    utils.assign_collaborator(owner, project, is_owner=True)
+
+    task = Recipe(
+        models.Task,
+        status=models.Task.PROPOSED,
+        project=project,
+        public=False,  # draft task
+        site=get_current_site(request),
+    ).make()
+
+    url = reverse("projects-update-task", args=(task.pk,))
+
+    data = {"content": "new-text", "public": True}
+    before_update = timezone.now()
+    with login(client) as user:
+        utils.assign_advisor(user, project)
+
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+    task.refresh_from_db()
+    assert task.created_on > before_update
+
+
+@pytest.mark.django_db
 def test_notifications_are_deleted_on_task_soft_delete(request):
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     recipient = Recipe(auth.User).make()

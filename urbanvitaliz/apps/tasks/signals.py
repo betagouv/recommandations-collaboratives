@@ -69,6 +69,9 @@ def notify_action_created(sender, task, project, user, **kwargs):
 
     recipients = recipients.exclude(id=user.id)
 
+    task.created_on = timezone.now()
+    task.save()
+
     notify.send(
         sender=user,
         recipient=recipients,
@@ -307,5 +310,6 @@ def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs)
             project=instance.task.project,
             user=instance.who,
         )
+
 
 # eof

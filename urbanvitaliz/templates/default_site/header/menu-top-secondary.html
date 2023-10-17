@@ -4,13 +4,14 @@
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% endif %}
-    <ul class="list-unstyled mb-0 d-flex justify-content-center align-items-center"
+    <ul class="list-unstyled mb-0 d-flex align-items-center"
+        data-test-id="secondary-menu"
         style="padding-left: 15px">
         <!-- Dashboard -->
         {% if is_switchtender or is_administrating_project %}
             <li class="nav-item dropdown nav-item-admin"
                 style="margin-right: 15px;
-                        margin-left: 15px;
+                       margin-left: 15px;
                        padding-bottom:20px;
                        border-bottom:solid 2px transparent;
                        {% if url_name == 'projects-project-list' %}border-bottom:solid 2px #0063CB;{% endif %}">
@@ -183,9 +184,9 @@
                    {% if url_name == 'resources-resource-search' %}border-bottom:solid 2px #0063CB;{% endif %}">
             <div x-data="{ open: false }"
                  x-on:click.outside="open = false"
-                 class="btn-group d-flex justify-content-center align-items-center">
+                 class="btn-group d-flex">
                 <a href="{% url 'resources-resource-search' %}"
-                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">
+                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}" data-test-id="link-ressources">
                     <span class="ms-1 align-middle">Ressources</span>
                 </a>
                 {% if "manage_resources" in user_site_perms %}

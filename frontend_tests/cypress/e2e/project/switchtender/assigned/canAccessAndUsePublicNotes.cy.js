@@ -12,7 +12,7 @@ describe('I can access and use public notes', () => {
 
         cy.visit('/projects')
 
-        cy.contains(currentProject.fields.name).click({force:true});
+        cy.contains(currentProject.fields.name).click({ force: true });
 
         cy.contains("Conversation").click({ force: true })
 
@@ -23,6 +23,8 @@ describe('I can access and use public notes', () => {
         cy.get('textarea')
             .type(`test : ${now}`, { force: true })
             .should('have.value', `test : ${now}`)
+
+        cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(`test : ${now}`, { force: true })
 
         cy.contains("Envoyer").click({ force: true })
 

@@ -7,7 +7,7 @@ import api, { challengeUrl, challengeDefinitionUrl } from '../utils/api'
 //Custom introjs CSS
 import '../../css/introJs.css'
 
-function Tutorial(challengeCode, autoStart = false) {
+function Tutorial(challengeCode, autoStart = false ) {
     return {
         steps: [],
         hints: [],
@@ -42,7 +42,8 @@ function Tutorial(challengeCode, autoStart = false) {
                 prevLabel: 'Précédent',
                 nextLabel: 'Suivant',
                 doneLabel: 'C\'est parti !',
-                steps: this.steps,
+                skipLabel: "✕",
+                steps: this.steps
             })
 
             this.tour.oncomplete(async () => {
