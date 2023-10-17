@@ -1,0 +1,98 @@
+{
+	"devices": [
+		{
+			"name": "Galaxy s5 - Android 5.0",
+			"dimensions": [
+				360,
+				640
+			],
+			"layout": "phone"
+		},
+		{
+			"name": "Galaxy s9 - Android 7.0",
+			"dimensions": [
+				360,
+				740
+			],
+			"layout": "phone"
+		},
+		{
+			"name": "iPad Pro 10.5",
+			"dimensions": [
+				834,
+				1112
+			],
+			"layout": "tablet"
+		},
+		{
+			"name": "iPad Pro 12.9",
+			"dimensions": [
+				1024,
+				1366
+			],
+			"layout": "tablet"
+		},
+		{
+			"name": "Kindle Fire HDX Linux",
+			"dimensions": [
+				800,
+				1280
+			],
+			"layout": "tablet"
+		},
+		{
+			"name": "iPhone 6/7/8 - iOS11",
+			"dimensions": [
+				375,
+				667
+			],
+			"layout": "phone"
+		},
+		{
+			"name": "iPhone 6/7/8 - iOS11+",
+			"dimensions": [
+				414,
+				736
+			],
+			"layout": "phone"
+		},
+		{
+			"name": "iPhone-X/XS - iOS12",
+			"dimensions": [
+				375,
+				812
+			],
+			"layout": "phone"
+		},
+		{
+			"name": "Desktop",
+			"dimensions": [
+				1240,
+				812
+			],
+			"layout": "desktop"
+		}
+	],
+	"layouts": [
+		{
+			"name": "phone",
+			"config": [
+				"portrait",
+				"landscape"
+			]
+		},
+		{
+			"name": "tablet",
+			"config": [
+				"portrait",
+				"landscape"
+			]
+		},
+		{
+			"name": "desktop",
+			"config": [
+				"portrait"
+			]
+		}
+	]
+}
