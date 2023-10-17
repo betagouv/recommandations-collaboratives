@@ -18,7 +18,7 @@ describe('I can fill a project survey', () => {
         cy.visit(`/project/${currentProject.pk}`);
 
         cy.get('[data-test-id="project-navigation-knowledge"]').click({ force: true });
-        cy.get('[data-test-id="link-fill-survey"]').click({ force: true });
+        cy.get('[data-test-id="link-fill-survey"]').first().click({ force: true });
         
         cy.get('[data-test-id="survey-tutorial"]').should.exist;
     })
@@ -28,7 +28,7 @@ describe('I can fill a project survey', () => {
 
         // Start the survey and answer 1 question
         cy.get('[data-test-id="project-navigation-knowledge"]').click({ force: true })
-        cy.get('[data-test-id="link-fill-survey"]').click({ force: true })
+        cy.get('[data-test-id="link-fill-survey"]').first().click({ force: true })
         cy.get('.introjs-skipbutton').click()
         cy.get('#form_answer-1')
             .check({ force: true })
@@ -37,7 +37,7 @@ describe('I can fill a project survey', () => {
         cy.get('[data-test-id="button-submit-survey-questionset"]').click({ force: true }).then(() => {
             cy.visit(`/project/${currentProject.pk}`)
             cy.get('[data-test-id="project-navigation-knowledge"]').click({ force: true })
-            cy.get('[data-test-id="link-fill-survey"]').click({ force: true })
+            cy.get('[data-test-id="link-fill-survey"]').first().click({ force: true })
             cy.get('[data-test-id="survey-tutorial"]').should('not.exist')
         });
     })
@@ -47,7 +47,7 @@ describe('I can fill a project survey', () => {
         cy.visit(`/project/${currentProject.pk}`)
 
         cy.get('[data-test-id="project-navigation-knowledge"]').click({ force: true })
-        cy.get('[data-test-id="link-fill-survey"]').click({ force: true })
+        cy.get('[data-test-id="link-fill-survey"]').first().click({ force: true })
 
         // cy.url().should('include', '/projects/survey/')
 

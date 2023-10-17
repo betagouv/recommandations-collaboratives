@@ -52,93 +52,94 @@
                                             {% endif %}
                                             <h6 class="m-0 d-inline align-middle text-uppercase">{{ answer.question.text_short|default:answer.question.text }}</h6>
                                             {% if "use_surveys" in user_project_perms %}</a>{% endif %}
-                                            <!-- ENDIF -->
-                                        </div>
-                                    {% endif %}
-                                    {% if show_answers or show_conclusion %}
-                                        <ul class="list-unstyled">
-                                            {% if "use_surveys" in user_project_perms and not show_question %}
-                                                <a class="link-edit stretched-link text-decoration-none"
-                                                   href="{% url 'survey-question-details' session.id answer.question.id %}">
-                                                {% endif %}
-                                                {% for choice in choices %}
-                                                    {% if show_answers %}<li>{{ choice.text }}</li>{% endif %}
-                                                    {% if show_conclusion  %}<li class="">{{ choice.conclusion|default:choice.text|capfirst }}</li>{% endif %}
-                                                {% endfor %}
-                                                {% if "use_surveys" in user_project_perms and not show_question %}</a>{% endif %}
-                                            </ul>
-                                        {% endif %}
-                                        {% if show_comment and answer.comment or not choices %}
-                                            <div>
-                                                <svg class="bi me-1 align-middle"
-                                                     width="16"
-                                                     height="16"
-                                                     fill="currentColor">
-                                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-right-quote"/>
-                                                </svg>
-                                                <span class="align-middle">{{ answer.comment|capfirst }}</span>
-                                            </div>
-                                        {% endif %}
-                                        {% if show_tags and answer.tags %}
-                                            <div>
-                                                <svg class="bi me-1 align-middle"
-                                                     width="16"
-                                                     height="16"
-                                                     fill="currentColor">
-                                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags"/>
-                                                </svg>
-                                                {% for tag in answer.tags %}<span class="badge bg-dark rounded-pill">{{ tag }}</span>{% endfor %}
-                                            </div>
-                                        {% endif %}
-                                        {% if answer.attachment %}
-                                            <div>
-                                                <span class="align-middle">
-                                                    <a style="position: relative;
-                                                              z-index:2;
-                                                              color: {{ question_set.color|default:'black' }} !important"
-                                                       target="_new"
-                                                       href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
-                                                    <!-- <span class="text-secondary">{{ answer.attachment.size }} Ko</span> -->
-                                                </span>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                {% if "view_surveys" in user_project_perms %}
-                                    <div class="flex-shrink-1 next-arrow">
-                                        {% if can_view_updated_answers and answer.updated_recently %}
-                                            <svg class="text-danger align-middle bi"
-                                                 width="14px"
-                                                 height="14px"
-                                                 fill="currentColor">
-                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#asterisk"/>
-                                            </svg>
-                                        {% endif %}
-                                        <svg class="align-middle bi"
-                                             width="26px"
-                                             height="26px"
-                                             fill="currentColor"
-                                             style="color: {{ question_set.color|default:'black' }} !important">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short"/>
-                                        </svg>
+                                        <!-- ENDIF -->
                                     </div>
                                 {% endif %}
-                            </li>
-                            {% if can_view_updated_answers and answer.updated_recently %}
-                                <li class="small bg-light-yellow p-1">
-                                    <div display="">
-                                        Mis à jour {{ answer.updated_on|naturalday }}
-                                        {% if answer.updated_by %}par {{ answer.updated_by }}{% endif %}
+                                {% if show_answers or show_conclusion %}
+                                    <ul class="list-unstyled">
+                                        {% if "use_surveys" in user_project_perms and not show_question %}
+                                            <a class="link-edit stretched-link text-decoration-none"
+                                               href="{% url 'survey-question-details' session.id answer.question.id %}">
+                                            {% endif %}
+                                            {% for choice in choices %}
+                                                {% if show_answers %}<li>{{ choice.text }}</li>{% endif %}
+                                                {% if show_conclusion %}<li class="">{{ choice.conclusion|default:choice.text|capfirst }}</li>{% endif %}
+                                            {% endfor %}
+                                            {% if "use_surveys" in user_project_perms and not show_question %}</a>{% endif %}
+                                    </ul>
+                                {% endif %}
+                                {% if show_comment and answer.comment or not choices %}
+                                    <div>
+                                        <svg class="bi me-1 align-middle"
+                                             width="16"
+                                             height="16"
+                                             fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-right-quote" />
+                                        </svg>
+                                        <span class="align-middle">{{ answer.comment|capfirst }}</span>
                                     </div>
-                                </li>
+                                {% endif %}
+                                {% if show_tags and answer.tags %}
+                                    <div>
+                                        <svg class="bi me-1 align-middle"
+                                             width="16"
+                                             height="16"
+                                             fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
+                                        </svg>
+                                        {% for tag in answer.tags %}<span class="badge bg-dark rounded-pill">{{ tag }}</span>{% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if answer.attachment %}
+                                    <div>
+                                        <span class="align-middle">
+                                            <a style="position: relative;
+                                                      z-index:2;
+                                                      color: {{ question_set.color|default:'black' }} !important"
+                                               target="_new"
+                                               href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
+                                            <!-- <span class="text-secondary">{{ answer.attachment.size }} Ko</span> -->
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% if "view_surveys" in user_project_perms %}
+                                <div class="flex-shrink-1 next-arrow">
+                                    {% if can_view_updated_answers and answer.updated_recently %}
+                                        <svg class="text-danger align-middle bi"
+                                             width="14px"
+                                             height="14px"
+                                             fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#asterisk" />
+                                        </svg>
+                                    {% endif %}
+                                    <svg class="align-middle bi"
+                                         width="26px"
+                                         height="26px"
+                                         fill="currentColor"
+                                         style="color: {{ question_set.color|default:'black' }} !important">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
+                                    </svg>
+                                </div>
                             {% endif %}
-                        {% endfor %}
-                    </ul>
-                </p>
-            </div>
-            {% if "use_surveys" in user_project_perms and completion < 100 %}
-                <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}"
-                   class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2"
-                   style="background-color: {{ question_set.color|default:'black' }} !important">Compléter cette section</a>
-            {% endif %}
+                        </li>
+                        {% if can_view_updated_answers and answer.updated_recently %}
+                            <li class="small bg-light-yellow p-1">
+                                <div display="">
+                                    Mis à jour {{ answer.updated_on|naturalday }}
+                                    {% if answer.updated_by %}par {{ answer.updated_by }}{% endif %}
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </p>
         </div>
+        {% if "use_surveys" in user_project_perms and completion < 100 %}
+            <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}"
+               class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2"
+               data-test-id="link-fill-survey"
+               style="background-color: {{ question_set.color|default:'black' }} !important">Compléter cette section</a>
+        {% endif %}
     </div>
+</div>
