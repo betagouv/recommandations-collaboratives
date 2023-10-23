@@ -8,7 +8,7 @@ class ReminderAdmin(admin.ModelAdmin):
     readonly_fields = ("kind", "sent_on", "project", "site", "state", "origin")
     search_fields = ["project__name"]
     list_filter = ["kind", "deadline", "sent_on", "site"]
-    list_display = ["project", "kind", "deadline", "sent_on"]
+    list_display = ["deadline", "project", "kind", "sent_on"]
 
 
 # eof

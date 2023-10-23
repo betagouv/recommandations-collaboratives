@@ -23,7 +23,9 @@ def make_or_update_reminder(site, project, kind, deadline):
     if site not in project.sites.all():
         return None
 
-    existing_reminder = models.Reminder.on_site_to_send.filter(project=project).first()
+    existing_reminder = models.Reminder.on_site_to_send.filter(
+        project=project, kind=kind
+    ).first()
 
     if existing_reminder:  # we have a reminder, update deadline
         existing_reminder.deadline = deadline
@@ -47,7 +49,8 @@ def make_or_update_new_recommendations_reminder(site, project):
     missed by the council
     """
     last_task = (
-        project.tasks.exclude(status__in=[Task.DONE, Task.NOT_INTERESTED])
+        project.tasks.filter(status__in=[Task.PROPOSED, Task.INPROGRESS])
+        .filter(site=site)
         .exclude(public=False)
         .order_by("-created_on")
         .first()
@@ -59,7 +62,7 @@ def make_or_update_new_recommendations_reminder(site, project):
     # FIXME(glibersat) Should not be hardcoded
     interval = datetime.timedelta(days=10)  # in days
 
-    deadline = last_task.created_on + interval
+    deadline = (last_task.created_on + interval).date()
 
     return make_or_update_reminder(site, project, models.Reminder.NEW_RECO, deadline)
 
