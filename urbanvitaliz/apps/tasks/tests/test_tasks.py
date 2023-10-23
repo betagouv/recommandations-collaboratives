@@ -20,10 +20,8 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
-from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.projects import models as project_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
@@ -1254,6 +1252,7 @@ def test_accessing_rsvp_from_email_link(request, client):
     response = client.get(url)
 
     assert response.status_code == 200
+
     assertContains(response, 'id="form-rsvp-followup-confirm"')
 
 
@@ -1275,136 +1274,6 @@ def test_using_rsvp_from_email_link_updates_task(request, client):
     assert followup.status == status
     # rsvp "one time" object is deleted
     assert not models.TaskFollowupRsvp.objects.filter(uuid=rsvp.uuid).exists()
-
-
-###############################################################
-# Reminders
-###############################################################
-
-
-@pytest.mark.django_db
-def test_create_reminder_for_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    current_site = get_current_site(request)
-
-    project = baker.make(
-        project_models.Project,
-        status="READY",
-        sites=[current_site],
-    )
-    task = baker.make(models.Task, site=current_site, project=project)
-
-    url = reverse("projects-remind-task", args=[task.id])
-    data = {"days": 5}
-
-    with login(client) as user:
-        utils.assign_collaborator(user, project, is_owner=True)
-        response = client.post(url, data=data)
-
-    assert response.status_code == 302
-    reminder = reminders.Reminder.to_send.all()[0]
-    assert models.TaskFollowupRsvp.objects.count() == 0
-    assert reminder.recipient == project.members.first().email
-    in_fifteen_days = datetime.date.today() + datetime.timedelta(days=data["days"])
-    assert reminder.deadline == in_fifteen_days
-
-
-@pytest.mark.django_db
-def test_create_reminder_without_delay_for_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    task = baker.make(
-        models.Task,
-        project__status="READY",
-        site=get_current_site(request),
-    )
-
-    url = reverse("projects-remind-task", args=[task.id])
-
-    with login(client) as user:
-        utils.assign_collaborator(user, task.project, is_owner=True)
-        response = client.post(url)
-
-    assert response.status_code == 302
-    assert reminders.Reminder.to_send.count() == 1
-    assert models.TaskFollowupRsvp.objects.count() == 0
-
-
-@pytest.mark.django_db
-def test_recreate_reminder_after_for_same_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    task = Recipe(
-        models.Task,
-        project__status="READY",
-        site=get_current_site(request),
-    ).make()
-
-    url = reverse("projects-remind-task", args=[task.id])
-    data = {"days": 5}
-    data2 = {"days": 10}
-    with login(client) as user:
-        utils.assign_collaborator(user, task.project, is_owner=True)
-
-        response = client.post(url, data=data)
-        response = client.post(url, data=data2)
-
-    assert response.status_code == 302
-    reminder = reminders.Reminder.to_send.all()[0]
-    assert reminders.Reminder.to_send.count() == 1
-    in_ten_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
-    assert reminder.deadline == in_ten_days
-    assert models.TaskFollowupRsvp.objects.count() == 0
-
-
-@pytest.mark.django_db
-def test_recreate_reminder_before_for_same_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    task = Recipe(
-        models.Task,
-        project__status="READY",
-        site=get_current_site(request),
-    ).make()
-
-    url = reverse("projects-remind-task", args=[task.id])
-    data = {"days": 5}
-    data2 = {"days": 2}
-    with login(client) as user:
-        utils.assign_collaborator(user, task.project, is_owner=True)
-
-        response = client.post(url, data=data)
-        response = client.post(url, data=data2)
-
-    assert response.status_code == 302
-    assert reminders.Reminder.to_send.count() == 1
-    reminder = reminders.Reminder.to_send.all()[0]
-    in_two_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
-    assert reminder.deadline == in_two_days
-    assert models.TaskFollowupRsvp.objects.count() == 0
-
-
-@pytest.mark.django_db
-def test_reminder_is_updated_when_a_followup_issued(request, client):
-    owner = baker.make(auth.User)
-    project = baker.make(
-        project_models.Project,
-        sites=[get_current_site(request)],
-    )
-    utils.assign_collaborator(owner, project, is_owner=True)
-
-    task = baker.make(models.Task, site=get_current_site(request), project=project)
-
-    with login(client) as user:
-        utils.assign_advisor(user, project)
-
-        url = reverse("projects-followup-task", args=[task.pk])
-        response = client.post(url)
-
-    reminder = reminders.Reminder.objects.first()
-    assert response.status_code == 302
-    assert reminder.recipient == owner.email
 
 
 #################################################################

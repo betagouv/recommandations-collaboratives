@@ -9,56 +9,63 @@ created: 2021-09-28 12:59:08 CEST
 
 import datetime
 
-from django.contrib.contenttypes.models import ContentType
-from urbanvitaliz.apps.communication import models as communication_models
+from django.utils import timezone
 
 from . import models
 
-
-def create_reminder_email(
-    recipient,
-    related,
-    origin=models.Reminder.SYSTEM,
-    delay=15,
-):
-    """Prepare an email raw or html to be sent in delay days, inspired by magicauth"""
-
-    # remove existing reminders for this recipient / related
-    # NOTE should we only delete objects farther than the new deadline ?
-    # NOTE discuss about only removing reminders from the same origin
-    if not related:
-        return
-    content_type = ContentType.objects.get_for_model(related)
-
-    # Remove old ones
-    models.Reminder.to_send.filter(
-        content_type=content_type, object_id=related.id, recipient=recipient
-    ).delete()
-
-    deadline = datetime.date.today() + datetime.timedelta(days=delay)
-
-    models.Reminder(
-        recipient=recipient,
-        deadline=deadline,
-        related=related,
-        origin=origin,
-    ).save()
+from urbanvitaliz.apps.tasks.models import Task
 
 
-def remove_reminder_email(related, recipient=None, origin=models.Reminder.SYSTEM):
-    """Remove reminder if one exist for this object [w/ given recipient, origin]"""
-    if not related:
-        return
-    content_type = ContentType.objects.get_for_model(related)
-    reminders = models.Reminder.to_send.filter(
-        content_type=content_type,
-        object_id=related.id,
+def make_or_update_reminder(site, project, kind, deadline):
+    if deadline < timezone.localdate():
+        return None
+
+    if site not in project.sites.all():
+        return None
+
+    existing_reminder = models.Reminder.on_site_to_send.filter(project=project).first()
+
+    if existing_reminder:  # we have a reminder, update deadline
+        existing_reminder.deadline = deadline
+        existing_reminder.save()
+        return existing_reminder
+
+    else:  # create a new reminder for the deadline
+        return models.Reminder.objects.create(
+            site=site,
+            project=project,
+            deadline=deadline,
+            kind=kind,
+            origin=models.Reminder.SYSTEM,
+        )
+
+    return None
+
+
+def make_or_update_new_recommendations_reminder(site, project):
+    """Given a project, generate reminders for new recommendations that may have been
+    missed by the council
+    """
+    last_task = (
+        project.tasks.exclude(status__in=[Task.DONE, Task.NOT_INTERESTED])
+        .exclude(public=False)
+        .order_by("-created_on")
+        .first()
     )
-    if recipient:
-        reminders = reminders.filter(recipient=recipient)
-    if origin:
-        reminders = reminders.filter(origin=origin)
-    reminders.delete()
+
+    if not last_task:
+        return None
+
+    # FIXME(glibersat) Should not be hardcoded
+    interval = datetime.timedelta(days=10)  # in days
+
+    deadline = last_task.created_on + interval
+
+    return make_or_update_reminder(site, project, models.Reminder.NEW_RECO, deadline)
+
+
+def make_whatups_reminders():
+    ...
 
 
 # eof

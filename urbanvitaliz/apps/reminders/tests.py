@@ -10,13 +10,14 @@ created: 2021-09-28 13:17:53 CEST
 import datetime
 
 import pytest
-from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.sites import models as sites_models
+from django.utils import timezone
 from django.core.management import call_command
 from django.test import override_settings
 from model_bakery import baker
 from urbanvitaliz.apps.communication import api as communication_api
-from urbanvitaliz.apps.projects import models as projects
+from urbanvitaliz.apps.projects import models as project_models
 from urbanvitaliz.apps.tasks import models as tasks
 
 from . import api, models
@@ -27,45 +28,122 @@ from . import api, models
 
 
 @pytest.mark.django_db
-def test_create_mail_reminder_using_provided_information():
-    task = baker.make(tasks.Task)
-    recipient = "test@example.com"
-    related = task
-    delay = 14
+def test_make_reminder(request):
+    current_site = get_current_site(request)
 
-    api.create_reminder_email(
-        recipient=recipient,
-        related=related,
-        delay=delay,
+    project = baker.make(project_models.Project, sites=[current_site])
+    kind = models.Reminder.NEW_RECO
+    deadline = datetime.date.today()
+
+    api.make_or_update_reminder(
+        site=current_site, project=project, deadline=deadline, kind=kind
     )
 
-    reminder = models.Reminder.to_send.all()[0]
+    reminder = models.Reminder.on_site_to_send.first()
 
-    assert reminder.recipient == recipient
-    assert reminder.deadline == datetime.date.today() + datetime.timedelta(days=delay)
+    assert reminder.deadline == deadline
+    assert reminder.project == project
+    assert reminder.kind == kind
+
+    assert models.Reminder.on_site_to_send.count() == 1
 
 
 @pytest.mark.django_db
-def test_create_mail_reminder_replace_existing_ones():
-    task = baker.make(tasks.Task)
-    recipient = "test@example.com"
-    related = task
-    delay = 14
+def test_make_reminder_on_wrong_site(request):
+    current_site = get_current_site(request)
 
-    baker.make(models.Reminder, related=task, recipient=recipient)
+    project = baker.make(project_models.Project, sites=[current_site])
+    other_site = baker.make(sites_models.Site)
+    kind = models.Reminder.NEW_RECO
+    deadline = datetime.date.today()
 
-    api.create_reminder_email(
-        recipient=recipient,
-        related=related,
-        delay=delay,
+    api.make_or_update_reminder(
+        site=other_site, project=project, deadline=deadline, kind=kind
     )
 
-    assert models.Reminder.to_send.count() == 1
+    models.Reminder.on_site_to_send.first()
 
-    reminder = models.Reminder.to_send.all()[0]
+    assert models.Reminder.on_site_to_send.count() == 0
 
-    assert reminder.recipient == recipient
-    assert reminder.deadline == datetime.date.today() + datetime.timedelta(days=delay)
+
+@pytest.mark.django_db
+def test_make_reminder_with_past_deadline(request):
+    current_site = get_current_site(request)
+
+    project = baker.make(project_models.Project, sites=[current_site])
+    other_site = baker.make(sites_models.Site)
+    kind = models.Reminder.NEW_RECO
+    deadline = datetime.date.today() - datetime.timedelta(days=1)
+
+    api.make_or_update_reminder(
+        site=other_site, project=project, deadline=deadline, kind=kind
+    )
+
+    models.Reminder.on_site_to_send.first()
+
+    assert models.Reminder.on_site_to_send.count() == 0
+
+
+@pytest.mark.django_db
+def test_update_reminder(request):
+    current_site = get_current_site(request)
+
+    project = baker.make(project_models.Project, sites=[current_site])
+    kind = models.Reminder.NEW_RECO
+    deadline = datetime.date.today()
+
+    baker.make(
+        models.Reminder, project=project, deadline=deadline - datetime.timedelta(days=6)
+    )
+
+    api.make_or_update_reminder(
+        site=current_site, project=project, deadline=deadline, kind=kind
+    )
+
+    reminder = models.Reminder.on_site_to_send.first()
+
+    assert reminder.deadline == deadline
+    assert reminder.project == project
+    assert reminder.kind == kind
+
+    assert models.Reminder.on_site_to_send.count() == 1
+
+
+@pytest.mark.django_db
+def test_update_reminder_dont_update_sent_one(request):
+    current_site = get_current_site(request)
+
+    project = baker.make(project_models.Project, sites=[current_site])
+    kind = models.Reminder.NEW_RECO
+    deadline = datetime.date.today()
+
+    baker.make(
+        models.Reminder,
+        site=current_site,
+        project=project,
+        deadline=deadline - datetime.timedelta(days=6),
+    )
+
+    baker.make(
+        models.Reminder,
+        site=current_site,
+        project=project,
+        deadline=deadline - datetime.timedelta(days=6),
+        sent_on=timezone.now(),
+    )
+
+    api.make_or_update_reminder(
+        site=current_site, project=project, deadline=deadline, kind=kind
+    )
+
+    reminder = models.Reminder.on_site_to_send.first()
+
+    assert reminder.deadline == deadline
+    assert reminder.project == project
+    assert reminder.kind == kind
+
+    assert models.Reminder.on_site_to_send.count() == 1
+    assert models.Reminder.on_site_sent.count() == 1
 
 
 ########################################################################
@@ -81,11 +159,8 @@ def test_create_mail_reminder_replace_existing_ones():
 def test_command_send_pending_reminder_with_reached_deadline(request, mocker):
     current_site = get_current_site(request)
     today = datetime.date.today()
-    user = baker.make(auth_models.User, email="test@example.org")
     task = baker.make(tasks.Task, site=current_site)
-    reminder = baker.make(
-        models.Reminder, recipient=user.email, deadline=today, related=task
-    )
+    reminder = baker.make(models.Reminder, deadline=today, related=task)
 
     mocker.patch("urbanvitaliz.apps.communication.api.send_debug_email")
 
@@ -103,9 +178,8 @@ def test_command_send_pending_reminder_with_reached_deadline(request, mocker):
 def test_command_send_pending_task_reminder_with_past_deadline(request, mocker):
     current_site = get_current_site(request)
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
-    user = baker.make(auth_models.User, email="test@example.org")
     task = baker.make(tasks.Task, site=current_site)
-    baker.make(models.Reminder, recipient=user.email, deadline=yesterday, related=task)
+    baker.make(models.Reminder, deadline=yesterday, related=task)
 
     call_command("senddigests")
 
@@ -119,7 +193,6 @@ def test_command_do_not_send_pending_reminder_with_future_deadline(mocker):
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     baker.make(
         models.Reminder,
-        recipient="test@example.org",
         deadline=tomorrow,
     )
 

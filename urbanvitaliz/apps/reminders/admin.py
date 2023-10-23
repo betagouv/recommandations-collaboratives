@@ -5,9 +5,10 @@ from . import models
 
 @admin.register(models.Reminder)
 class ReminderAdmin(admin.ModelAdmin):
-    search_fields = ["recipient"]
-    list_filter = ["deadline", "sent_on"]
-    list_display = ["recipient", "deadline", "sent_on"]
+    readonly_fields = ("kind", "sent_on", "project", "site", "state", "origin")
+    search_fields = ["project__name"]
+    list_filter = ["kind", "deadline", "sent_on", "site"]
+    list_display = ["project", "kind", "deadline", "sent_on"]
 
 
 # eof
