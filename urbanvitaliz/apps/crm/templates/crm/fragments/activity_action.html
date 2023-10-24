@@ -30,7 +30,13 @@
                                                 <strong class="text-dark">collectivité</strong>
                                             {% endif %}
                                             sur le project
-                                            <span style="color:red">TODO : retrieve project data for [[Ville - Nom du projet]]</span>
+                                            {% if action.target.commune %}
+                                                {% if action.target.get_absolute_url %}
+                                                    <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                                                {% else %}
+                                                    <strong class="fw-normal">{{ action.target }}</strong>
+                                                {% endif %}
+                                            {% endif %}
                                         </span>
                                     {% endif %}
                                 {% else %}
