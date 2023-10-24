@@ -1,3 +1,4 @@
+{# Activity notification template used in the global CRM activity stream (staff only) #}
 {% load activity_tags %}
 {% load humanize %}
 {% load gravatar %}
@@ -23,52 +24,54 @@
                                     {% if action.action_object.role %}
                                         <span>a invité
                                             <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
-                                            <strong class="text-dark">
-                                                {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
-                                                    conseiller·e
-                                                {% else %}
-                                                    collectivité
-                                                {% endif %}
-                                            </strong>
-                                            {% if action.target %}
-                                                <span class="target">
-                                                    sur invitation de {{ action.action_object.sender }}  <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-                                                </span>
+                                            {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
+                                                <strong class="text-dark">conseiller·e</strong>
+                                            {% else %}
+                                                <strong class="text-dark">collectivité</strong>
                                             {% endif %}
+                                            sur le project
+                                            <span style="color:red">TODO : retrieve project data for [[Ville - Nom du projet]]</span>
                                         </span>
                                     {% endif %}
                                 {% else %}
                                     {% if action.action_object.feed_label %}
+                                        {{ action.verb }}
                                         <a class="d-inline hover-underline"
                                            href="{{ action.action_object.get_absolute_url }}">
-                                            {{ action.verb }}
                                             {{ action.action_object.feed_label }}
                                         </a>
                                     {% else %}
                                         <span>{{ action.verb }}</span>
-                                        {% if action.verb != verbs.Project.SUBMITTED_BY %}
+                                        {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED %}
                                             <a class="d-inline hover-underline"
                                                href="{{ action.action_object.get_absolute_url }}">
                                                 "{{ action.action_object }}"
                                             </a>
                                         {% endif %}
                                     {% endif %}
-                                    {% if action.target and action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
-                                        <div class="d-inline-block ms-1">
-                                            <span>sur le projet</span>
-                                            {% if action.target.get_absolute_url %}
-                                                <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-                                            {% else %}
-                                                <strong class="fw-normal">{{ action.target }}</strong>
-                                            {% endif %}
-                                        </div>
+                                    {% if action.target %}
+                                        {% if action.verb == verbs.Project.JOINED %}
+                                            <span class="target">sur invitation de {{ action.sender }} <span style="color:red">TODO : retrieve sender data for [[Prénom Nom (org)]]</span>
+                                        </span>
+                                    {% else %}
+                                        {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.JOINED and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
+                                            <div class="d-inline-block ms-1">
+                                                <span>sur le projet</span>
+                                                {% if action.target.get_absolute_url %}
+                                                    <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                                                {% else %}
+                                                    <strong class="fw-normal">{{ action.target }}</strong>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
-                            </span>
+                            {% endif %}
                         </span>
                     </span>
-                </div>
+                </span>
             </div>
         </div>
     </div>
+</div>
 </li>
