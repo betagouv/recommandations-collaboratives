@@ -32,7 +32,7 @@
                                             </strong>
                                             {% if action.target %}
                                                 <span class="target">
-                                                    sur le projet <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                                                    sur invitation de {{ action.action_object.sender }}  <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                                                 </span>
                                             {% endif %}
                                         </span>
@@ -46,10 +46,12 @@
                                         </a>
                                     {% else %}
                                         <span>{{ action.verb }}</span>
-                                        <a class="d-inline hover-underline"
-                                           href="{{ action.action_object.get_absolute_url }}">
-                                            "{{ action.action_object }}"
-                                        </a>
+                                        {% if action.verb != verbs.Project.SUBMITTED_BY %}
+                                            <a class="d-inline hover-underline"
+                                               href="{{ action.action_object.get_absolute_url }}">
+                                                "{{ action.action_object }}"
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
                                     {% if action.target and action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
                                         <div class="d-inline-block ms-1">
