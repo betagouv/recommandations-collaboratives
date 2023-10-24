@@ -51,8 +51,9 @@
                                             "{{ action.action_object }}"
                                         </a>
                                     {% endif %}
-                                    {% if action.target and action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY %}
+                                    {% if action.target and action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
                                         <div class="d-inline-block ms-1">
+                                            <span>sur le projet</span>
                                             {% if action.target.get_absolute_url %}
                                                 <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                                             {% else %}
