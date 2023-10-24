@@ -12,8 +12,7 @@
             <div class="d-flex align-items-start">
                 <div class="font-small">
                     <span class="fw-normal">
-                        <a class=""
-                           href="{% url 'crm-user-details' action.actor.pk %}">
+                        <a class="" href="{% url 'crm-user-details' action.actor.pk %}">
                             {{ action.actor.first_name|default:action.actor }}
                             {{ action.actor.last_name|default:"" }}
                         </a>
@@ -49,10 +48,8 @@
                                     {% endif %}
                                     {% if action.target and action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY %}
                                         <div class="d-inline-block ms-1">
-                                            <span>à propos de</span>
                                             {% if action.target.get_absolute_url %}
-                                                <a class="hover-underline"
-                                                   href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                                                <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                                             {% else %}
                                                 <strong class="fw-normal">{{ action.target }}</strong>
                                             {% endif %}
