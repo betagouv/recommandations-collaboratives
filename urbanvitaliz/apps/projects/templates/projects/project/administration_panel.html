@@ -5,7 +5,6 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% block js %}
-  <script src="{% static 'projects/js/access_update.js' %}"></script>
   {% vite_asset 'js/apps/projectAdministration.js' %}
 {% endblock %}
 {% block project_detail %}
