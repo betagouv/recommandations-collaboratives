@@ -34,6 +34,9 @@
                                         </span>
                                     {% endif %}
                                 {% else %}
+                                    {% if action.verb == verbs.Document.ADDED %}
+                                        <span style="color:red">TODO : ADDED_FILE / ADDED_LINK action diff</span>
+                                    {% endif %}
                                     {% if action.action_object.feed_label %}
                                         {{ action.verb }}
                                         <a class="d-inline hover-underline"
@@ -51,9 +54,10 @@
                                     {% endif %}
                                     {% if action.target %}
                                         {% if action.verb == verbs.Project.JOINED %}
-                                            <span class="target">sur invitation de {{ action.sender }} <span style="color:red">TODO : retrieve sender data for [[Prénom Nom (org)]]</span>
-                                        </span>
-                                    {% else %}
+                                            <span class="target">sur invitation de {{ action.sender }}
+                                                <span style="color:red">TODO : retrieve sender data for [[Prénom Nom (org)]]</span>
+                                            </span>
+                                        {% endif %}
                                         {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.JOINED and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
                                             <div class="d-inline-block ms-1">
                                                 <span>sur le projet</span>
@@ -66,12 +70,11 @@
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
-                            {% endif %}
+                            </span>
                         </span>
                     </span>
-                </span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </li>
