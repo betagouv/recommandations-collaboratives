@@ -10,7 +10,7 @@ describe('I can go to administration area of a project and revoke an invite for 
     it('goes to the administration tab of a project and revoke the member invitation', () => {
 
         cy.visit(`/project/${currentProject.pk}`)
-        cy.get('.project-navigation').children('li').contains('Administration').click({ force: true })
+        cy.get("[data-test-id='navigation-administration-tab']").click({force:true})
         cy.url().should('include', '/administration')
 
         cy.contains('Inviter un membre de la collectivité').click({ force: true });
