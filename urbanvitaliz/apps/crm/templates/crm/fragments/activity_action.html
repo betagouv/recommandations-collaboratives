@@ -30,6 +30,11 @@
                                                     collectivité
                                                 {% endif %}
                                             </strong>
+                                            {% if action.target %}
+                                                <span class="target">
+                                                    sur le projet <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                                                </span>
+                                            {% endif %}
                                         </span>
                                     {% endif %}
                                 {% else %}
