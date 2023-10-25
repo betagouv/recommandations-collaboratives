@@ -54,7 +54,11 @@
                                         {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED %}
                                             <a class="d-inline hover-underline"
                                                href="{{ action.action_object.get_absolute_url }}">
-                                                "{{ action.action_object }}"
+                                                {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
+                                                    ici
+                                                {% else %}
+                                                    {% if action.action_object %}"{{ action.action_object }}"{% endif %}
+                                                {% endif %}
                                             </a>
                                         {% endif %}
                                     {% endif %}
@@ -66,7 +70,11 @@
                                         {% endif %}
                                         {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.JOINED and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
                                             <div class="d-inline-block ms-1">
-                                                <span>sur le projet</span>
+                                                {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
+                                                    <span>à propos de</span>
+                                                {% else %}
+                                                    <span>sur le projet</span>
+                                                {% endif %}
                                                 {% if action.target.get_absolute_url %}
                                                     <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                                                 {% else %}
