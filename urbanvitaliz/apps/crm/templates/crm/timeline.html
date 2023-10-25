@@ -31,6 +31,9 @@
                         </span>
                         {% if action.target %}
                             <span class="target">
+                                {% if action.verb != verbs.Project.BECAME_OBSERVER and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.LEFT_OBSERVING and action.verb != verbs.Project.LEFT_ADVISING %}
+                                    sur le projet
+                                {% endif %}
                                 <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                             </span>
                         {% endif %}
