@@ -189,7 +189,11 @@ function initMap(idMap, project, options, zoom) {
 // Create layers composed with markers
 function initMapLayers(map, project, geoData) {
 	try {
+<<<<<<< HEAD
 		addLayerMarkers(map, geoData.location, project);
+=======
+		addLayerLatLong(map, geoData.location, project);
+>>>>>>> a08c2bef ([geoloc] Fetch data from API Adresse, add marker layer)
 	} catch(e) {
 		try {
 			addLayerAreaCommune(map, geoData.commune);
