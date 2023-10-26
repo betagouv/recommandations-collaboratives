@@ -140,8 +140,9 @@
     {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %}
         <li>
             <a class="{% if administration_panel %} active{% endif %} align-items-center"
+               data-test-id="navigation-administration-tab"
                href="{% url 'projects-project-administration' project.pk %}">
-                <span class="text-nowrap">Administration</span>
+                <span class="text-nowrap">Paramètres</span>
             </a>
         </li>
     {% else %}

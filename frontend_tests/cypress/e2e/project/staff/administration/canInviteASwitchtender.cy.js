@@ -12,7 +12,7 @@ describe('I can go to administration area of a project and invite a switchtender
     it('goes to the administration tab of a project and invite a switchtender', () => {
 
         cy.visit(`/project/${currentProject.pk}`)
-        cy.get('.project-navigation').children('li').contains('Administration').click({ force: true })
+        cy.get("[data-test-id='navigation-administration-tab']").click({force:true})
         cy.url().should('include', '/administration')
 
         cy.contains('Inviter un conseiller').click({ force: true });
