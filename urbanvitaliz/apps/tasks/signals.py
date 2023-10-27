@@ -11,8 +11,6 @@ from notifications import models as notifications_models
 from notifications.signals import notify
 
 from urbanvitaliz import verbs
-from urbanvitaliz.apps.reminders import api as reminders_api
-from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.projects.utils import (
     get_notification_recipients_for_project,
     get_advisors_for_project,
@@ -20,7 +18,6 @@ from urbanvitaliz.apps.projects.utils import (
 from urbanvitaliz.utils import is_staff_for_site
 
 from . import models
-from .utils import create_reminder, remove_reminder
 
 ########################################################################
 # Actions
@@ -79,9 +76,6 @@ def notify_action_created(sender, task, project, user, **kwargs):
         action_object=task,
         target=project,
     )
-
-    # assign reminder in six weeks
-    create_reminder(6 * 7, task, project.owner, origin=reminders_models.Reminder.STAFF)
 
 
 @receiver(action_visited)
@@ -197,7 +191,6 @@ def notify_action_commented(sender, task, project, user, **kwargs):
 def delete_task_history(
     task,
     suppress_notifications=True,
-    suppress_reminders=True,
     suppress_actions=True,
     after=None,
 ):
@@ -218,9 +211,6 @@ def delete_task_history(
     if suppress_actions:
         actions.delete()
 
-    if suppress_reminders:
-        reminders_api.remove_reminder_email(task)
-
 
 @receiver(pre_save, sender=models.Task, dispatch_uid="task_soft_delete_notifications")
 def delete_notifications_on_soft_task_delete(sender, instance, **kwargs):
@@ -239,7 +229,6 @@ def delete_notifications_on_cancel_publishing(sender, instance, **kwargs):
         delete_task_history(
             instance,
             suppress_actions=False,
-            suppress_reminders=False,
             after=timezone.now() - datetime.timedelta(minutes=30),
         )
 
@@ -252,11 +241,6 @@ def delete_notifications_on_hard_task_delete(sender, instance, **kwargs):
 ######################################################################################
 # TaskFollowup / Task Status update
 ######################################################################################
-
-# TODO: we may need to rearm reminders when a followup was issued, to prevent sending it
-# too soon.
-
-
 @receiver(
     post_save, sender=models.TaskFollowup, dispatch_uid="taskfollowup_set_task_status"
 )
@@ -280,17 +264,6 @@ def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs)
     if instance.status is not None and instance.status != instance.task.status:
         instance.task.status = instance.status
         instance.task.save()
-
-        if instance.task.project.owner:
-            if instance.status not in (models.Task.NOT_INTERESTED, models.Task.BLOCKED):
-                create_reminder(
-                    7 * 6,
-                    instance.task,
-                    instance.task.project.owner,
-                    reminders_models.Reminder.SYSTEM,
-                )
-            else:
-                remove_reminder(instance.task, instance.task.project.owner)
 
         if not muted:
             if instance.status in task_status_signals.keys():

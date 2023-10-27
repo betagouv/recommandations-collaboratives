@@ -24,7 +24,6 @@ from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
-from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.resources import models as resources
 
@@ -210,8 +209,6 @@ class Task(OrderedModel):
     status = models.IntegerField(choices=STATUS_CHOICES, default=PROPOSED)
 
     deleted = models.DateTimeField(null=True, blank=True)
-
-    reminders = GenericRelation(reminders_models.Reminder, related_query_name="tasks")
 
     class Meta:
         ordering = []

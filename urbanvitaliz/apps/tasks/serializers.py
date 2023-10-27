@@ -11,11 +11,8 @@ from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.projects.serializers import DocumentSerializer
 from urbanvitaliz.apps.resources.serializers import ResourceSerializer
 from urbanvitaliz.apps.projects.utils import get_collaborators_for_project
-from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
 from .models import Task, TaskFollowup
-from .utils import create_reminder
 
 
 class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
@@ -64,12 +61,6 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
 
             task.project.save()
 
-        if followup.status not in [Task.ALREADY_DONE, Task.NOT_INTERESTED, Task.DONE]:
-            if followup.who in get_collaborators_for_project(followup.task.project):
-                create_reminder(
-                    7 * 6, task, followup.who, origin=reminders_models.Reminder.SYSTEM
-                )
-
         return followup
 
 
@@ -89,7 +80,6 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "intent",
             "content",
             "document",
-            "reminders",
             "resource_id",
             "resource",
             "notifications",
@@ -99,7 +89,6 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
         ]
 
     created_by = UserSerializer(read_only=True, many=False)
-    reminders = ReminderSerializer(read_only=True, many=True)
 
     document = DocumentSerializer(read_only=True, many=True)
 

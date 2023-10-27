@@ -17,7 +17,6 @@ from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from urbanvitaliz.apps.crm import models as crm_models
-from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.tasks import models as task_models
 from urbanvitaliz.utils import (
     build_absolute_url,
@@ -76,7 +75,7 @@ def project_list_export_csv(request):
             "nb_interactions_reco",
             "nb_commentaires_recos",
             "nb_commentaires_recos_nonstaff",
-            "nb_rappels",
+            # "nb_rappels",
             "nb_messages_conversation_conseillers_nonstaff",
             "nb_messages_conversation_collectivite",
             "nb_messages_suivis_int_nonstaff",
@@ -155,11 +154,11 @@ def project_list_export_csv(request):
                     .filter(who__in=switchtenders, who__is_staff=False)
                     .count()
                 ),
-                reminders_models.Reminder.objects.filter(
-                    tasks__site=request.site,
-                    tasks__project=project,
-                    origin=reminders_models.Reminder.SELF,
-                ).count(),  # Reminders
+                # reminders_models.Reminder.objects.filter(
+                #     tasks__site=request.site,
+                #     tasks__project=project,
+                #     origin=reminders_models.Reminder.SELF,
+                # ).count(),  # Reminders
                 notes.filter(public=True).count(),  # conversations conseillers
                 max(
                     0, conversations.filter(created_by__in=collaborators).count() - 1
