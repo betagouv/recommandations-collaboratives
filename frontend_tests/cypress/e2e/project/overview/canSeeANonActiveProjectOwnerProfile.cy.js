@@ -30,7 +30,7 @@ describe('I can go to overview tab', () => {
     it('show an anonymous user card if the user does not exist', () => {
         currentProject = projects[13]; // submitted_by: deleted.user@test.fr
 
-        // Firs: delete the user that submitted the project to test
+        // First: delete the user that submitted the project to test
         cy.visit('/nimda/auth/user/')
         cy.contains('deleted.user@test.fr').click({ force: true })
         cy.get('.deletelink').click({ force: true })

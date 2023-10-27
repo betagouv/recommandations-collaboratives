@@ -11,7 +11,7 @@ describe('I can access administration tab in a project as staff', () => {
 
         cy.visit(`/project/${currentProject.pk}`)
         // cy.contains('Administration').click({ force: true })
-        cy.get('.project-navigation').children('li').contains('Administration').click({force:true})
+        cy.get("[data-test-id='navigation-administration-tab']").click({force:true})
         cy.url().should('include', '/administration')
     })
 })
