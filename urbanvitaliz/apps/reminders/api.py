@@ -44,12 +44,30 @@ def make_or_update_reminder(site, project, kind, deadline):
     return None
 
 
+def get_due_reminder_for_project(site, project, kind):
+    """Return the current reminder (=not sent yet) for a given kind"""
+    try:
+        return models.Reminder.on_site_to_send.get(
+            project=project,
+            site=site,
+            kind=kind,
+            deadline__lte=timezone.localdate(),  # today
+        )
+    except models.Reminder.DoesNotExist:
+        return None
+
+
+#################################################################
+# New Recommendations Reminder
+#################################################################
+
+
 def make_or_update_new_recommendations_reminder(site, project):
     """Given a project, generate reminders for new recommendations that may have been
     missed by the council
     """
     last_task = (
-        project.tasks.filter(status__in=[Task.PROPOSED, Task.INPROGRESS])
+        project.tasks.filter(status__in=Task.OPEN_STATUSES)
         .filter(site=site)
         .exclude(public=False)
         .order_by("-created_on")
@@ -64,7 +82,36 @@ def make_or_update_new_recommendations_reminder(site, project):
 
     deadline = (last_task.created_on + interval).date()
 
-    return make_or_update_reminder(site, project, models.Reminder.NEW_RECO, deadline)
+    return make_or_update_reminder(
+        site=site, project=project, kind=models.Reminder.NEW_RECO, deadline=deadline
+    )
+
+
+def get_due_new_recommendations_reminder_for_project(site, project):
+    reminder = get_due_reminder_for_project(
+        site, project, kind=models.Reminder.NEW_RECO
+    )
+
+    if not reminder:
+        return None
+
+    # check if this reminder still makes sense ; i.e. we still have unattended
+    # Recommendations to remind. Delete it otherwise
+    if not (
+        project.tasks.filter(status__in=Task.OPEN_STATUSES)
+        .filter(site=site)
+        .exclude(public=False)
+        .count()
+    ):
+        reminder.delete()
+        return None
+
+    return reminder
+
+
+#################################################################
+# What's up? Reminder
+#################################################################
 
 
 def make_whatups_reminders():

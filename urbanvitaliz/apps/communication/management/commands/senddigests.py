@@ -34,30 +34,42 @@ class Command(BaseCommand):
         for site in Site.objects.all():
             with settings.SITE_ID.override(site.pk):
                 self.stdout.write("\n")
-                self.stdout.write(f"#### Sending digests for site <{site.domain}> ####\n")
+                self.stdout.write(
+                    f"#### Sending digests for site <{site.domain}> ####\n"
+                )
                 self.stdout.write("\n")
                 self.send_email_digests_for_site(site, dry_run)
 
     def send_email_digests_for_site(self, site, dry_run):
-        # FIXME Get all switchtenders BY SITE
-        advisor_group = get_group_for_site("advisor", site)
-        # sw_group = auth_models.Group.objects.get(name="switchtender")
+        advisor_group = get_group_for_site("advisor", site, create=True)
 
-        # only send emails to active users
-        active_users = auth_models.User.objects.filter(is_active=True)
+        # only send emails to active users and those actually linked to the current site
+        active_users = auth_models.User.objects.filter(
+            is_active=True, profile__sites=site
+        )
 
         # Send reminders
-        self.stdout.write("** Sending Task Reminders **\n")
-        for user in active_users:
-            if digests.send_digests_for_task_reminders_by_user(user, dry_run):
-                self.stdout.write(f"Sent reminder digest for {user}\n")
+        self.stdout.write("** Sending Project Reminders **\n")
+        for project in project_models.Project.on_site.all():
+            if digests.send_digests_reminders_by_project(project, dry_run):
+                self.stdout.write(
+                    f"Sent reminder digest for project {project.name}"
+                    f" ({project.pk}) -- to {project.owner.email}\n"
+                )
+            else:
+                self.stdout.write(
+                    f"Failed sending reminder digest for project {project.name}"
+                    f" ({project.pk}) -- NO OWNER\n"
+                )
 
         # Send project collaborators new recommendations
         self.stdout.write("** Sending new recommendations digests **\n")
         for project in project_models.Project.on_site.all():
             for user in project.members.filter(is_active=True):
                 if digests.send_digests_for_new_recommendations_by_user(user, dry_run):
-                    self.stdout.write(f"Sent new reco digest for {user} on {project.name}\n")
+                    self.stdout.write(
+                        f"Sent new reco digest for {user} on {project.name}\n"
+                    )
 
         # Digests for non switchtenders
         self.stdout.write("** Sending general digests **\n")
@@ -73,7 +85,9 @@ class Command(BaseCommand):
                 self.stdout.write(f"* Sent new site digest for {user}\n")
 
             if digests.send_digest_for_switchtender_by_user(user, dry_run):
-                self.stdout.write(f"* Sent general digest for switchtender (to {user})\n")
+                self.stdout.write(
+                    f"* Sent general digest for switchtender (to {user})\n"
+                )
 
 
 # eof

@@ -7,6 +7,7 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-11 15:26:00 CEST
 """
 
+import datetime
 import io
 
 import pytest
@@ -16,10 +17,10 @@ from django.core.management import call_command
 from django.test import override_settings
 from django.utils import timezone
 from model_bakery import baker
-
-from urbanvitaliz.apps.projects import models as project_models
+from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.reminders import models as reminders_models
+from urbanvitaliz.apps.projects.utils import assign_advisor, assign_collaborator
 from urbanvitaliz.apps.tasks import models as task_models
-from urbanvitaliz.apps.projects.utils import assign_advisor
 from urbanvitaliz.utils import get_group_for_site
 
 
@@ -36,7 +37,7 @@ def test_command_send_digest_to_active_users(request, mocker):
     user.profile.sites.add(site)
 
     project = baker.make(
-        project_models.Project, name="A project", sites=[site], members=[user]
+        projects_models.Project, name="A project", sites=[site], members=[user]
     )
     # FIXME pourquoi ne met pas aussi dans advisor group for site ?
     assign_advisor(advisor, project, site)
@@ -46,7 +47,8 @@ def test_command_send_digest_to_active_users(request, mocker):
     out = io.StringIO()
 
     mocker.patch(
-        "urbanvitaliz.apps.communication.digests.send_digests_for_task_reminders_by_user"
+        "urbanvitaliz.apps.communication.digests.send_digests_reminders_by_project",
+        return_value=False,
     )
     mocker.patch(
         "urbanvitaliz.apps.communication.digests.send_digests_for_new_recommendations_by_user"
@@ -104,7 +106,7 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker):
     profile.save()
 
     project = baker.make(
-        project_models.Project, name="A project", sites=[site], members=[user]
+        projects_models.Project, id=1, name="A project", sites=[site], members=[user]
     )
     # FIXME pourquoi ne met pas aussi dans advisor group for site ?
     assign_advisor(advisor, project, site)
@@ -114,10 +116,11 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker):
     out = io.StringIO()
 
     mocker.patch(
-        "urbanvitaliz.apps.communication.digests.send_digests_for_task_reminders_by_user"
+        "urbanvitaliz.apps.communication.digests.send_digests_reminders_by_project",
+        return_value=False,
     )
     mocker.patch(
-        "urbanvitaliz.apps.communication.digests.send_digests_for_new_recommendations_by_user"
+        "urbanvitaliz.apps.communication.digests.send_digests_for_new_recommendations_by_user",
     )
     mocker.patch(
         "urbanvitaliz.apps.communication.digests.send_digest_for_non_switchtender_by_user"
@@ -136,14 +139,78 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker):
     expected = """
 #### Sending digests for site <example.com> ####
 
-** Sending Task Reminders **
-Sent reminder digest for AnonymousUser
+** Sending Project Reminders **
+Failed sending reminder digest for project A project (1) -- NO OWNER
 ** Sending new recommendations digests **
 ** Sending general digests **
-Sent general digest for AnonymousUser
+Sent general digest
 ** Sending general switchtender digests **
 """
     assert output == expected
+
+
+#################################################################
+# Reminders
+#################################################################
+@pytest.mark.django_db
+@override_settings(BREVO_FORCE_DEBUG=True)
+def test_command_pending_recommendation_reminder_sent(request, mocker):
+    current_site = get_current_site(request)
+    yesterday = timezone.localdate() - datetime.timedelta(days=1)
+    user = baker.make(auth_models.User)
+    project = baker.make(projects_models.Project, sites=[current_site])
+    assign_collaborator(user, project, is_owner=False)
+    baker.make(
+        reminders_models.Reminder,
+        deadline=yesterday,
+        project=project,
+        site=current_site,
+    )
+
+    call_command("senddigests")
+
+    assert reminders_models.Reminder.to_send.count() == 0
+    assert reminders_models.Reminder.sent.count() == 1
+
+
+@pytest.mark.django_db
+@override_settings(BREVO_FORCE_DEBUG=True)
+def test_command_pending_recommendation_reminder_not_send_if_no_owner(request, mocker):
+    current_site = get_current_site(request)
+    yesterday = timezone.localdate() - datetime.timedelta(days=1)
+    user = baker.make(auth_models.User)
+    project = baker.make(projects_models.Project, sites=[current_site])
+    assign_collaborator(user, project, is_owner=False)
+    baker.make(
+        reminders_models.Reminder,
+        deadline=yesterday,
+        project=project,
+        site=current_site,
+    )
+
+    call_command("senddigests")
+
+    assert reminders_models.Reminder.to_send.count() == 1
+    assert reminders_models.Reminder.sent.count() == 0
+
+
+@pytest.mark.django_db
+@override_settings(BREVO_FORCE_DEBUG=True)
+def test_command_do_not_send_pending_reminder_with_future_deadline(mocker):
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    baker.make(
+        reminders_models.Reminder,
+        deadline=tomorrow,
+    )
+
+    mocker.patch("urbanvitaliz.apps.communication.api.send_debug_email")
+
+    call_command("senddigests")
+
+    assert reminders_models.Reminder.to_send.count() == 1
+    assert reminders_models.Reminder.sent.count() == 0
+
+    # communication_api.send_debug_email.assert_not_called()
 
 
 # eof

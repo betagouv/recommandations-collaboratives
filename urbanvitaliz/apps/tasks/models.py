@@ -113,6 +113,9 @@ class Task(OrderedModel):
     NOT_INTERESTED = 4
     ALREADY_DONE = 5
 
+    OPEN_STATUSES = [PROPOSED, INPROGRESS, BLOCKED]
+    CLOSED_STATUSES = [DONE, NOT_INTERESTED, ALREADY_DONE]
+
     STATUS_CHOICES = (
         (PROPOSED, "proposé"),
         (INPROGRESS, "en cours"),
@@ -130,11 +133,11 @@ class Task(OrderedModel):
 
     @property
     def closed(self):
-        return self.status in [Task.DONE, Task.NOT_INTERESTED, Task.ALREADY_DONE]
+        return self.status in self.CLOSED_STATUSES
 
     @property
     def open(self):
-        return self.status in [Task.PROPOSED, Task.INPROGRESS, Task.BLOCKED]
+        return self.status in self.OPEN_STATUSES
 
     project = models.ForeignKey(
         projects_models.Project, on_delete=models.CASCADE, related_name="tasks"
