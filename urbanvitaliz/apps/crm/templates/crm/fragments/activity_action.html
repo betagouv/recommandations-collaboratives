@@ -41,33 +41,40 @@
                                     {% endif %}
                                 {% else %}
                                     {% if action.verb == verbs.Document.ADDED %}
-                                        <span style="color:red">TODO : ADDED_FILE / ADDED_LINK action diff</span>
-                                    {% endif %}
-                                    {% if action.action_object.feed_label %}
-                                        {{ action.verb }}
+                                        a ajouté
+                                        {% if action.action_object.the_link %}un lien{% endif %}
+                                        {% if action.action_object.the_file %}un document{% endif %}
+                                        <a class="d-inline hover-underline"
+                                           href="{{ action.action_object.get_absolute_url }}">
+                                            {% if action.action_object %}"{{ action.action_object }}"{% endif %}
+                                        </a>
+                                        sur le projet
                                         <a class="d-inline hover-underline"
                                            href="{{ action.action_object.get_absolute_url }}">
                                             {{ action.action_object.feed_label }}
                                         </a>
                                     {% else %}
-                                        <span>{{ action.verb }}</span>
-                                        {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED %}
+                                        {% if action.action_object.feed_label %}
+                                            {% if action.verb != verbs.Document.ADDED %}{{ action.verb }}{% endif %}
                                             <a class="d-inline hover-underline"
                                                href="{{ action.action_object.get_absolute_url }}">
-                                                {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
-                                                    ici
-                                                {% else %}
-                                                    {% if action.action_object %}"{{ action.action_object }}"{% endif %}
-                                                {% endif %}
+                                                {{ action.action_object.feed_label }}
                                             </a>
+                                        {% else %}
+                                            <span>{{ action.verb }}</span>
+                                            {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED %}
+                                                <a class="d-inline hover-underline"
+                                                   href="{{ action.action_object.get_absolute_url }}">
+                                                    {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
+                                                        ici
+                                                    {% else %}
+                                                        {% if action.action_object %}"{{ action.action_object }}"{% endif %}
+                                                    {% endif %}
+                                                </a>
+                                            {% endif %}
                                         {% endif %}
                                     {% endif %}
                                     {% if action.target %}
-                                        {% if action.verb == verbs.Project.JOINED %}
-                                            <span class="target">sur invitation de {{ action.sender }}
-                                                <span style="color:red">TODO : retrieve sender data for [[Prénom Nom (org)]]</span>
-                                            </span>
-                                        {% endif %}
                                         {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.JOINED and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
                                             <div class="d-inline-block ms-1">
                                                 {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
