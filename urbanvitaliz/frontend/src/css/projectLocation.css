@@ -7,7 +7,6 @@
     position: relative;
     height: 260px;
     width: 100%;
-    z-index: 100;
 
     border-radius: 4px;
     overflow: hidden;
@@ -51,4 +50,9 @@
     border: 1px solid #E5E5E5;
 
     cursor: pointer;
+}
+
+/* Allows leaflet marker to be visible without affecting leaflet transforms */
+.leaflet-marker-icon.map-marker.leaflet-zoom-animated.leaflet-interactive {
+    transform: translateZ(1px) !important;
 }
