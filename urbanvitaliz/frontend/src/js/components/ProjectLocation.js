@@ -100,6 +100,7 @@ function ProjectLocation(projectOptions) {
 			const geoData = {}
 			geoData.commune = await fetchCommuneIgn(insee);
 			geoData.location = await fetchGeolocationByAddress(this.project.location)
+			initMapController(Map)
 			initMapLayers(Map, this.project, geoData);
 			
 			// forces map redraw to fit container
@@ -143,22 +144,21 @@ function ProjectLocation(projectOptions) {
 function initMap(idMap, project, options, zoom) {
 	const latitude = project.commune.latitude ?? latLongFrance[0];
 	const longitude = project.commune.longitude ?? latLongFrance[1];
-	const map = L.map(idMap, options).setView([latitude, longitude], zoom);
 
 	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
 		maxZoom: 20,
 		attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	});
 	
-	L.tileLayer.provider('OpenStreetMap.France').addTo(map);
+	const osm = L.tileLayer.provider('OpenStreetMap.France')
 
-	return map;
+	return L.map(idMap, {...options, layers:[osm]}).setView([latitude, longitude], zoom);
 }
 
 // Create layers composed with markers
 function initMapLayers(map, project, geoData) {
 	try {
-		addLayerLatLong(map, geoData.location, project);
+		addLayerMarkers(map, geoData.location, project);
 	} catch(e) {
 		try {
 			addLayerAreaCommune(map, geoData.commune);
@@ -170,6 +170,20 @@ function initMapLayers(map, project, geoData) {
 	}
 }
 
+
+function initMapController(map) {
+
+	L.geocoderBAN({ collapsed: false, style: 'searchBar' }).addTo(map)
+
+
+	// const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
+	// controller[0].classList.add('leaflet-control-geocoder-expanded');
+	// const inputController = controller[0].querySelector('input')
+	// inputController.addEventListener('blur', (e) => {
+	// 		controller[0].classList.add('leaflet-control-geocoder-expanded');
+	// })
+}
+
 function addLayerAreaCommune(map, geoData) {
 	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
 		throw Error(`Données IGN indisponibles pour la commune ${geoData.commune.name}`)
@@ -178,12 +192,13 @@ function addLayerAreaCommune(map, geoData) {
 	L.geoJSON(geoData.features[0].geometry).addTo(map);
 }
 
-function addLayerLatLong(map, geoData, project) {
+function addLayerMarkers(map, geoData, project) {
 	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
 		throw Error(`Données API Adresse indisponibles pour ' ${geoData.location}`)
 	}
 	const coordinates = geoData.features[0].geometry.coordinates
-  L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map)
+	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
+	marker.bindPopup(markerPopupTemplate(project))
 }
 // Create layers composed with markers
 function addLayerAreaCircle(map, project) {
@@ -198,27 +213,18 @@ function addLayerAreaCircle(map, project) {
 }
 
 
-function createMarkerIcon(project) {
-	return L.divIcon({ className: `map-marker ${project.status === "NEW" ? 'project-marker new-project-marker' : 'project-marker'}` });
+function createMarkerIcon() {
+	return L.divIcon({ className: `map-marker ${statusToColorClass(project.status)}` });
 }
 
 function markerPopupTemplate(project) {
-	const date = new Date(project.created_on).toLocaleDateString()
-
 	return `
-			<div class="marker-popup">
-					<header><h3><a href="/project/${project.id}/presentation">${project.name}</a></h3></header>
-					<main class="d-flex flex-column">
-							<p class="m-0 mb-2 fs-6 fw-bold">Organisation</p>
-							<p class="m-0 fs-7">${project.org_name}</p>
-							<hr/>
-							<p class="m-0 mb-2 fs-6 fw-bold">Lieu</p>
-							<p class="m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>
-							<hr/>
-							<p class="m-0 mb-2 fs-6 fw-bold">Date de dépot</p>
-							<p class="m-0 fs-7">${date}</p>
-					</main>
-			</div>
+		<div class="marker-popup">
+			<header><h3><a href="/project/${project.id}/presentation">${project.name}</a></h3></header>
+			<main class="d-flex flex-column">
+				<p class="m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>
+			</main>
+		</div>
 	`
 }
 
