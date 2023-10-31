@@ -1,4 +1,3 @@
-
 import * as L from 'leaflet';
 /**
  * Source: https://github.com/entrepreneur-interet-general/leaflet-geocoder-ban/blob/master/src/leaflet-geocoder-ban.js
@@ -11,7 +10,7 @@ L.GeocoderBAN = L.Control.extend({
 		placeholder: 'adresse',
 		resultsNumber: 7,
 		collapsed: true,
-		serviceUrl: 'https://api-adresse.data.gouv.fr/search/',
+		serviceUrl: 'https://api-adresse.data.gouv.fr',
 		minIntervalBetweenRequests: 250,
 		defaultMarkgeocode: true,
 		autofocus: true
@@ -219,20 +218,16 @@ L.GeocoderBAN = L.Control.extend({
 	}
 })
 
-const getJSON = function (url, params, callback) {
-	var xmlHttp = new XMLHttpRequest()
-	xmlHttp.onreadystatechange = function () {
-		if (xmlHttp.readyState !== 4) {
-			return
-		}
-		if (xmlHttp.status !== 200 && xmlHttp.status !== 304) {
-			return
-		}
-		callback(JSON.parse(xmlHttp.response))
+const getJSON = async function (url, params, callback) {
+	console.log('getJSON params');
+	console.log(params);
+	if (typeof params !== 'string' && params.length < 3) {
+		return
 	}
-	xmlHttp.open('GET', url + L.Util.getParamString(params), true)
-	xmlHttp.setRequestHeader('Accept', 'application/json')
-	xmlHttp.send(null)
+	const apiEndpoint = `${url}/search?`;
+	const searchParams = { q: params, limit: 10 } // TODO
+	const geoJSON = await fetch(apiEndpoint + new URLSearchParams(searchParams)).then(response => callback(response.json()));
+	return geoJSON;
 }
 
 L.geocoderBAN = function (options) {

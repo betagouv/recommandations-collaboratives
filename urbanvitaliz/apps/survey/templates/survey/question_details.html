@@ -79,12 +79,24 @@
                         {% for choice in form.fields.answer.choices %}
                             <li class="list-group-item py-3">
                                 {% if question.is_multiple %}
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           name="answer"
-                                           value="{{ choice.0 }}"
-                                           id="form_answer-{{ forloop.counter }}"
-                                           {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
+                                    {% if choice.0 == 'project_address' %}
+                                        <input class="form-text-input"
+                                               type="text"
+                                               name="answer"
+                                               value="{{ form.fields.answer.initial }}"
+                                               id="form_answer-{{ forloop.counter }}" />
+                                    {% else %}
+                                        {% if choice.0 == 'project_location' %}
+                                            {% include 'projects/project/fragments/geolocation/project_location_edit.html' %}
+                                        {% else %}
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   name="answer"
+                                                   value="{{ choice.0 }}"
+                                                   id="form_answer-{{ forloop.counter }}"
+                                                   {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
+                                        {% endif %}
+                                    {% endif %}
                                 {% else %}
                                     <input class="form-check-input"
                                            type="radio"
