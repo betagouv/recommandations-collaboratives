@@ -255,7 +255,8 @@
             </svg>
           </div>
         {% else %}
-          <p data-test-id="administration-advisor-invitation-list" class="text-info-custom mb-4 mt-1">Invitations en attente de conseiller·e·s</p>
+          <p data-test-id="administration-advisor-invitation-list"
+             class="text-info-custom mb-4 mt-1">Invitations en attente de conseiller·e·s</p>
           <ul class="list-group">
             {% for invite in pending_invites %}
               {% if invite.role == "SWITCHTENDER" or invite.role == "OBSERVER" %}
@@ -307,7 +308,8 @@
             </svg>
           </div>
         {% else %}
-          <p data-test-id="administration-member-invitation-list" class="text-info-custom mb-4 mt-1">Invitations en attente de membres collectivité</p>
+          <p data-test-id="administration-member-invitation-list"
+             class="text-info-custom mb-4 mt-1">Invitations en attente de membres collectivité</p>
           <ul class="list-group">
             {% for invite in pending_invites %}
               {% if invite.role == "COLLABORATOR" %}
@@ -344,6 +346,10 @@
           </ul>
         {% endif %}
       </div>
+    </div>
+    <div class="col">
+      <hr class="my-4" />
+      {% include 'projects/project/fragments/administration/active_project.html' %}
     </div>
   </div>
 {% endblock %}
