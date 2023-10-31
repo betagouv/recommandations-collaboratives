@@ -183,8 +183,8 @@ function initMapLayers(map, project, geoData) {
 }
 
 
-function initMapController(map, project) {
-	L.geocoderBAN({ collapsed: false, style: 'searchBar', className: statusToColorClass(project.status)}).addTo(map)
+function initMapController(map, project, geoData) {
+	L.geocoderBAN({ collapsed: false, style: 'searchBar', className: statusToColorClass(project.status), geoData }).addTo(map)
 
 
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
@@ -211,6 +211,7 @@ function addLayerMarkers(map, geoData, project) {
 	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
 }
+
 // Create layers composed with markers
 function addLayerAreaCircle(map, project) {
 	const { latitude, longitude } = project.commune;

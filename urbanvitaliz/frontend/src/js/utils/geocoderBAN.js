@@ -4,6 +4,7 @@ import * as L from 'leaflet';
  * Source: https://github.com/entrepreneur-interet-general/leaflet-geocoder-ban/blob/master/src/leaflet-geocoder-ban.js
  */
 
+const latLongFrance = [46.5, 1.20] // latitude and longitude of centroid of France
 L.GeocoderBAN = L.Control.extend({
 	options: {
 		position: 'topleft',
@@ -15,7 +16,8 @@ L.GeocoderBAN = L.Control.extend({
 		minIntervalBetweenRequests: 250,
 		defaultMarkgeocode: true,
 		autofocus: true,
-		className:''
+		className:'',
+		geoData: null
 	},
 	includes: L.Evented.prototype || L.Mixin.Events,
 	initialize: function (options) {
@@ -27,14 +29,17 @@ L.GeocoderBAN = L.Control.extend({
 	onAdd: function (map) {
 		var className = 'leaflet-control-geocoder-ban'
 		var container = this.container = L.DomUtil.create('div', className + ' leaflet-bar')
-		var icon = this.icon = L.DomUtil.create('button', className + '-icon', container)
+		var icon = this.icon = L.DomUtil.create('span', className + '-icon', container)
 		var form = this.form = L.DomUtil.create('div', className + '-form', container)
 		var input
 		
 		map.on('click', this.collapseHack, this)
 		
-		icon.innerHTML = '&nbsp;'
-		icon.type = 'button'
+		icon.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<path d="M8.76683 8.50069L11.0866 10.8205L10.3206 11.5865L8.00081 9.26671C7.1667 9.93404 6.10887 10.3333 4.95837 10.3333C2.26737 10.3333 0.083374 8.14925 0.083374 5.45825C0.083374 2.76725 2.26737 0.583252 4.95837 0.583252C7.64937 0.583252 9.83337 2.76725 9.83337 5.45825C9.83337 6.60875 9.43417 7.66657 8.76683 8.50069ZM7.68009 8.09877C8.34244 7.41616 8.75004 6.48504 8.75004 5.45825C8.75004 3.36336 7.05327 1.66659 4.95837 1.66659C2.86348 1.66659 1.16671 3.36336 1.16671 5.45825C1.16671 7.55315 2.86348 9.24992 4.95837 9.24992C5.98516 9.24992 6.91628 8.84231 7.59889 8.17997L7.68009 8.09877Z" fill="#666666"/>
+		</svg>
+		
+`
 		
 		input = this.input = L.DomUtil.create('input', '', form)
 		input.type = 'text'
@@ -44,10 +49,6 @@ L.GeocoderBAN = L.Control.extend({
 		className + '-alternatives ' + className + '-alternatives-minimized',
 		container)
 		
-		L.DomEvent.on(icon, 'click', function (e) {
-			this.toggle()
-			L.DomEvent.preventDefault(e)
-		}, this)
 		L.DomEvent.addListener(input, 'keyup', this.keyup, this)
 		
 		L.DomEvent.disableScrollPropagation(container)
@@ -59,31 +60,14 @@ L.GeocoderBAN = L.Control.extend({
 				setTimeout(function () { input.focus() }, 250)
 			}
 		}
-		if (this.options.style === 'searchBar') {
-			L.DomUtil.addClass(container, 'searchBar')
+		L.DomUtil.addClass(container, 'searchBar')
 			var rootEl = document.getElementsByClassName('leaflet-control-container')[0]
 			rootEl.appendChild(container)
 			return L.DomUtil.create('div', 'hidden')
-		} else {
-			return container
-		}
 	},
 	minimizeControl() {
-		if (this.options.style === 'control') {
-			this.collapse()
-		} else {
 			// for the searchBar: only hide results, not the bar
 			L.DomUtil.addClass(this.alts, 'leaflet-control-geocoder-ban-alternatives-minimized')
-		}
-	},
-	toggle: function () {
-		if (this.style != 'searchBar') {
-			if (L.DomUtil.hasClass(this.container, 'leaflet-control-geocoder-ban-expanded')) {
-				this.collapse()
-			} else {
-				this.expand()
-			}
-		}
 	},
 	expand: function () {
 		L.DomUtil.addClass(this.container, 'leaflet-control-geocoder-ban-expanded')

@@ -77,7 +77,7 @@
                     {% csrf_token %}
                     <ul class="list-group mt-3 mb-3">
                         {% for choice in form.fields.answer.choices %}
-                            <li class="list-group-item py-3">
+                            <li class="list-group-item  {% if choice.0 == 'project_location' %}p-0{% else %}py-3{% endif %}">
                                 {% if question.is_multiple %}
                                     {% if choice.0 == 'project_address' %}
                                         <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
