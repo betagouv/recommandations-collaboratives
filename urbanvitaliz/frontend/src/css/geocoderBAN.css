@@ -25,6 +25,7 @@
 	background-color: white;
 	background-repeat: no-repeat;
 	background-position: center;
+	margin-inline: var(--input-margin) 0
 }
 
 .leaflet-touch .leaflet-control-geocoder-ban-icon {
@@ -61,7 +62,7 @@
 .leaflet-control-geocoder-ban-alternatives {
 	display: block;
 	width: inherit;
-	max-height: 350px;
+	max-height: 300px;
 	list-style: none;
 	padding: 0;
 	margin: 0;
@@ -92,8 +93,7 @@
 	width: inherit;
 	cursor: pointer;
 	border-top: 1px solid #d0d0d0;
-	padding-block:  var(--input-padding);
-	padding-inline: var(--input-padding);
+	padding : var(--input-padding);
 }
 
 .leaflet-control-geocoder-ban-selected {
