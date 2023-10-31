@@ -1,7 +1,9 @@
 {% load static %}
-<div class="flag medium-border-radius border-red mb-4 d-flex align-items-start justify-content-between">
+<div x-data="StandByProject()"
+     class="flag medium-border-radius border-red mb-4 d-flex align-items-start justify-content-between">
     <div class="d-flex align-items-start">
-        <svg class="me-4" xmlns="http://www.w3.org/2000/svg"
+        <svg class="me-4"
+             xmlns="http://www.w3.org/2000/svg"
              width="48"
              height="48"
              viewBox="0 0 48 48"
@@ -21,6 +23,7 @@
         </div>
     </div>
     <div class="flex-grow-1">
-        <button class="button red filled flex-grow-1 text-nowrap inherit">Mettre le projet en pause</button>
+        <button @click="openStandByProjectConfirmationModal" class="button red filled flex-grow-1 text-nowrap inherit">Mettre le projet en pause</button>
     </div>
+    {% include 'projects/project/fragments/administration/stand_by_project_modal_confirmation.html' %}
 </div>
