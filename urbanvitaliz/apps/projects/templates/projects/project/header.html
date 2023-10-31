@@ -40,6 +40,7 @@
                 </div>
             {% endif %}
         </div>
+        {% include "projects/project/fragments/email_reminder/project_email_reminder.html" %}
         <div class="flex-shrink-0 ps-2">
             {% if 'actions' not in url_name and 'conversations' not in url_name and 'internal-followup' not in url_name %}
                 <a style="cursor: pointer"
