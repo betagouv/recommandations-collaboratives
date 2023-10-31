@@ -26,9 +26,10 @@
   </script>
 {% endblock %}
 {% block content %}
-  <div x-data='ProjectLocation(projectOptions, true)'>
+  <div x-data='ProjectLocation(projectOptions, true)'
+       class="ratio ratio-16x9">
     <div class="mb-2" data-test-id="project-map-static">
-      {% include 'projects/project/fragments/geolocation/project_map.html' %}
+      <div x-cloak x-ref="map" id="map" class="h-100 w-100 project-map"></div>
     </div>
     {% include 'projects/project/fragments/geolocation/project_location_details.html' %}
   </div>

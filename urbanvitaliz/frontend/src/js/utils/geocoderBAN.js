@@ -1,4 +1,5 @@
 import * as L from 'leaflet';
+
 /**
  * Source: https://github.com/entrepreneur-interet-general/leaflet-geocoder-ban/blob/master/src/leaflet-geocoder-ban.js
  */
@@ -10,10 +11,11 @@ L.GeocoderBAN = L.Control.extend({
 		placeholder: 'adresse',
 		resultsNumber: 7,
 		collapsed: true,
-		serviceUrl: 'https://api-adresse.data.gouv.fr',
+		serviceUrl: 'https://api-adresse.data.gouv.fr/search/',
 		minIntervalBetweenRequests: 250,
 		defaultMarkgeocode: true,
-		autofocus: true
+		autofocus: true,
+		className:''
 	},
 	includes: L.Evented.prototype || L.Mixin.Events,
 	initialize: function (options) {
@@ -211,23 +213,41 @@ L.GeocoderBAN = L.Control.extend({
 	markGeocode: function (feature) {
 		var latlng = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
 		this._map.setView(latlng, 14)
-		this.geocodeMarker = new L.Marker(latlng)
-			.bindPopup(feature.properties.label)
+		this.geocodeMarker = new L.Marker(latlng, {icon: createMarkerIcon(this.options.className)})
+			.bindPopup(markerPopupTemplate(feature.properties))
 			.addTo(this._map)
 			.openPopup()
 	}
 })
 
-const getJSON = async function (url, params, callback) {
-	console.log('getJSON params');
-	console.log(params);
-	if (typeof params !== 'string' && params.length < 3) {
-		return
+
+function createMarkerIcon(className) {
+	return L.divIcon({ className: `map-marker ${className}` });
+}
+
+function markerPopupTemplate(properties) {
+	return `
+			<div class="marker-popup">
+				<p class="m-0 fs-7">${properties.label}</p>
+			</div>
+	`
+}
+
+const getJSON = function (url, params, callback) {
+
+	var xmlHttp = new XMLHttpRequest()
+	xmlHttp.onreadystatechange = function () {
+		if (xmlHttp.readyState !== 4) {
+			return
+		}
+		if (xmlHttp.status !== 200 && xmlHttp.status !== 304) {
+			return
+		}
+		callback(JSON.parse(xmlHttp.response))
 	}
-	const apiEndpoint = `${url}/search?`;
-	const searchParams = { q: params, limit: 10 } // TODO
-	const geoJSON = await fetch(apiEndpoint + new URLSearchParams(searchParams)).then(response => callback(response.json()));
-	return geoJSON;
+	xmlHttp.open('GET', url + L.Util.getParamString(params), true)
+	xmlHttp.setRequestHeader('Accept', 'application/json')
+	xmlHttp.send(null)
 }
 
 L.geocoderBAN = function (options) {

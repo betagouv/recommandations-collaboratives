@@ -52,7 +52,9 @@
     cursor: pointer;
 }
 
-/* Allows leaflet marker to be visible without affecting leaflet transforms */
-.leaflet-marker-icon.map-marker.leaflet-zoom-animated.leaflet-interactive {
-    transform: translateZ(1px) !important;
+.project-map-readonly {
+    /* Allows leaflet marker to be visible without affecting leaflet transforms */
+    .leaflet-marker-icon.map-marker.leaflet-zoom-animated.leaflet-interactive {
+        transform: translateZ(1px) !important;
+    }
 }

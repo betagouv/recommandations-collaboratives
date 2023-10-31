@@ -105,23 +105,22 @@ function ProjectLocation(projectOptions, inputAddress=false) {
 			
 			const geoData = {}
 
-
 			geoData.commune = await fetchCommuneIgn(insee);
-
-			geoData.location = await fetchGeolocationByAddress(this.project.location)
+			geoData.location = await fetchGeolocationByAddress(this.project.location);
 
 			if(inputAddress) {
-				initMapController(Map)
+				initMapController(Map, this.project);
+			} else {
+				this.initProjectMapModal(this.project, geoData);
 			}
 			initMapLayers(Map, this.project, geoData);
+
+			// forces map redraw to fit container
+			setTimeout(function(){Map.invalidateSize()}, 0);
 
 			//Center Map
 			Map.panTo(new L.LatLng(latitude, longitude));
 
-			this.initProjectMapModal(this.project, geoData);
-
-			// forces map redraw to fit container
-			setTimeout(function(){Map.invalidateSize()}, 0);
 		},
 
 		initProjectMapModal(project, geoData) {
@@ -184,9 +183,8 @@ function initMapLayers(map, project, geoData) {
 }
 
 
-function initMapController(map) {
-
-	L.geocoderBAN({ collapsed: false, style: 'searchBar' }).addTo(map)
+function initMapController(map, project) {
+	L.geocoderBAN({ collapsed: false, style: 'searchBar', className: statusToColorClass(project.status)}).addTo(map)
 
 
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
