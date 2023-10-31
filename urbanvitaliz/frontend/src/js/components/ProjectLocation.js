@@ -49,6 +49,9 @@ function getCodeArrFromCodeInsee(codeInsee) {
 }
 
 async function fetchCommuneIgn(insee) {
+	if (insee.length !== 5) {
+		return
+	}
 	const apiEndpoint = `${apiCadastre}/commune?`;
 	const searchParams = {}
 
@@ -67,13 +70,16 @@ async function fetchCommuneIgn(insee) {
 }
 
 async function fetchGeolocationByAddress(address) {
+	if (address.length < 3) {
+		return
+	}
 	const apiEndpoint = `${apiAdresse}/search?`;
 	const searchParams = { q: address, limit: 10 } // TODO
 	const geoJSON = await fetch(apiEndpoint + new URLSearchParams(searchParams)).then(response => response.json());
 	return geoJSON;
 }
 
-function ProjectLocation(projectOptions) {
+function ProjectLocation(projectOptions, inputAddress=false) {
 	return {
 		mapIsSmall: true,
 		project: null,
@@ -98,17 +104,24 @@ function ProjectLocation(projectOptions) {
 			const Map = initMap('map', this.project, options, this.zoom);
 			
 			const geoData = {}
+
+
 			geoData.commune = await fetchCommuneIgn(insee);
+
 			geoData.location = await fetchGeolocationByAddress(this.project.location)
-			initMapController(Map)
+
+			if(inputAddress) {
+				initMapController(Map)
+			}
 			initMapLayers(Map, this.project, geoData);
-			
-			// forces map redraw to fit container
-			setTimeout(function(){Map.invalidateSize()}, 0);
+
 			//Center Map
 			Map.panTo(new L.LatLng(latitude, longitude));
 
 			this.initProjectMapModal(this.project, geoData);
+
+			// forces map redraw to fit container
+			setTimeout(function(){Map.invalidateSize()}, 0);
 		},
 
 		initProjectMapModal(project, geoData) {
@@ -176,12 +189,12 @@ function initMapController(map) {
 	L.geocoderBAN({ collapsed: false, style: 'searchBar' }).addTo(map)
 
 
-	// const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
-	// controller[0].classList.add('leaflet-control-geocoder-expanded');
-	// const inputController = controller[0].querySelector('input')
-	// inputController.addEventListener('blur', (e) => {
-	// 		controller[0].classList.add('leaflet-control-geocoder-expanded');
-	// })
+	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
+	controller[0].classList.add('leaflet-control-geocoder-expanded');
+	const inputController = controller[0].querySelector('input')
+	inputController.addEventListener('blur', (e) => {
+			controller[0].classList.add('leaflet-control-geocoder-expanded');
+	})
 }
 
 function addLayerAreaCommune(map, geoData) {
