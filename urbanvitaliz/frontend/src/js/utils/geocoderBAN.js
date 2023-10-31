@@ -8,7 +8,7 @@ L.GeocoderBAN = L.Control.extend({
 	options: {
 		position: 'topleft',
 		style: 'control',
-		placeholder: 'adresse',
+		placeholder: 'Rechercher une addresse ou des coordonnées',
 		resultsNumber: 7,
 		collapsed: true,
 		serviceUrl: 'https://api-adresse.data.gouv.fr/search/',
