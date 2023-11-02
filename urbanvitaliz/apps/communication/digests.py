@@ -30,9 +30,9 @@ from .api import send_email
 ########################################################################
 
 
-def send_digests_reminders_by_project(project, dry_run=False):
+def send_reminder_digests_by_project(project, dry_run=False):
     """
-    Send a digest email per project for each expired reminders
+    Send a digest emails per project for each expired reminders
     """
     current_site = Site.objects.get_current()
 
@@ -40,13 +40,18 @@ def send_digests_reminders_by_project(project, dry_run=False):
         print("[W] No owner, skipping project reminders")
         return False
 
+    send_new_recommendations_reminders_digest_by_project(
+        site=current_site, project=project, dry_run=dry_run
+    )
+
+
+def send_new_recommendations_reminders_digest_by_project(site, project, dry_run):
+    """Send 'New Recommendation' reminder for the given project"""
     # Refresh reminders first
-    make_or_update_new_recommendations_reminder(current_site, project)
+    make_or_update_new_recommendations_reminder(site, project)
 
     # Actually, send reminders
-    next_reminder = get_due_new_recommendations_reminder_for_project(
-        current_site, project
-    )
+    next_reminder = get_due_new_recommendations_reminder_for_project(site, project)
 
     if not next_reminder:
         print("[W] No due reminder, skipping")
@@ -55,7 +60,7 @@ def send_digests_reminders_by_project(project, dry_run=False):
     if not dry_run:
         tasks = (
             project.tasks.filter(status__in=tasks_models.Task.OPEN_STATUSES)
-            .filter(site=current_site)
+            .filter(site=site)
             .exclude(public=False)
             .order_by("-created_on")
         )

@@ -157,7 +157,7 @@ class Task(OrderedModel):
     )
 
     created_on = models.DateTimeField(
-        default=timezone.now, verbose_name="date de création"
+        default=timezone.now, verbose_name="date et heure de création"
     )
     updated_on = models.DateTimeField(
         default=timezone.now, verbose_name="Dernière mise à jour"

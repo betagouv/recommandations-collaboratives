@@ -338,6 +338,40 @@ def test_make_or_update_new_reco_reminder_with_task_off_site(request):
     assert models.Reminder.on_site_to_send.count() == 0
 
 
+@pytest.mark.django_db
+def test_make_or_update_new_reco_reminder_postpones_reminder_if_new_task(request):
+    current_site = get_current_site(request)
+    yesterday = timezone.localdate() - datetime.timedelta(days=1)
+    user = baker.make(auth_models.User)
+
+    project = baker.make(projects_models.Project, sites=[current_site])
+    assign_collaborator(user, project, is_owner=True)
+
+    task = baker.make(
+        tasks_models.Task,
+        project=project,
+        site=current_site,
+        status=tasks_models.Task.PROPOSED,
+        created_on=timezone.now(),
+        public=True,
+    )
+
+    reminder = baker.make(
+        models.Reminder,
+        deadline=yesterday,
+        project=project,
+        site=current_site,
+        kind=models.Reminder.NEW_RECO,
+    )
+
+    api.make_or_update_new_recommendations_reminder(
+        current_site, project, interval_in_days=10
+    )
+
+    reminder.refresh_from_db()
+    assert reminder.deadline == (task.created_on + datetime.timedelta(days=10)).date()
+
+
 ########################################################################
 # Getting reminders
 ########################################################################

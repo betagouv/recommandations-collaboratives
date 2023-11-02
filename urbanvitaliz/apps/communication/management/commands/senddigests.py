@@ -53,7 +53,7 @@ class Command(BaseCommand):
         for (
             project
         ) in project_models.Project.on_site.all():  # FIXME include inactive project?
-            if digests.send_digests_reminders_by_project(project, dry_run):
+            if digests.send_reminder_digests_by_project(project, dry_run):
                 self.stdout.write(
                     f"Sent reminder digest for project <{project.name}>"
                     f" ({project.pk}) -- to {project.owner.email}\n"

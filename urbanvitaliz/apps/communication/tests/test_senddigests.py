@@ -7,7 +7,6 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-11 15:26:00 CEST
 """
 
-import datetime
 import io
 
 import pytest
@@ -18,10 +17,11 @@ from django.test import override_settings
 from django.utils import timezone
 from model_bakery import baker
 from urbanvitaliz.apps.projects import models as projects_models
-from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.projects.utils import assign_advisor, assign_collaborator
 from urbanvitaliz.apps.tasks import models as task_models
 from urbanvitaliz.utils import get_group_for_site
+
+from .. import digests
 
 
 @pytest.mark.django_db
@@ -47,7 +47,7 @@ def test_command_send_digest_to_active_users(request, mocker):
     out = io.StringIO()
 
     mocker.patch(
-        "urbanvitaliz.apps.communication.digests.send_digests_reminders_by_project",
+        "urbanvitaliz.apps.communication.digests.send_reminder_digests_by_project",
         return_value=False,
     )
     mocker.patch(
@@ -116,7 +116,7 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker):
     out = io.StringIO()
 
     mocker.patch(
-        "urbanvitaliz.apps.communication.digests.send_digests_reminders_by_project",
+        "urbanvitaliz.apps.communication.digests.send_reminder_digests_by_project",
         return_value=False,
     )
     mocker.patch(
@@ -154,87 +154,54 @@ Sent general digest
 #################################################################
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_pending_recommendation_reminder_sent(request, mocker):
+def test_command_reminder_are_treated(request, mocker):
     current_site = get_current_site(request)
-    yesterday = timezone.localdate() - datetime.timedelta(days=1)
     user = baker.make(auth_models.User)
 
     project = baker.make(projects_models.Project, sites=[current_site])
     assign_collaborator(user, project, is_owner=True)
 
-    print("owner=", project.owner)
-
-    baker.make(
-        task_models.Task,
-        project=project,
-        site=current_site,
-        status=task_models.Task.PROPOSED,
-        created_on=yesterday - datetime.timedelta(days=10),
-        public=True,
-    )
-
-    baker.make(
-        reminders_models.Reminder,
-        deadline=yesterday,
-        project=project,
-        site=current_site,
-        kind=reminders_models.Reminder.NEW_RECO,
+    mocker.patch(
+        "urbanvitaliz.apps.communication.digests.send_reminder_digests_by_project"
     )
 
     call_command("senddigests")
 
-    assert reminders_models.Reminder.to_send.count() == 0
-    assert reminders_models.Reminder.sent.count() == 1
+    digests.send_reminder_digests_by_project.assert_called()
+
+
+@pytest.mark.django_db
+@override_settings(BREVO_FORCE_DEBUG=True)
+def test_command_pending_recommendation_reminder_sent(request, mocker):
+    current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+
+    project = baker.make(projects_models.Project, sites=[current_site])
+    assign_collaborator(user, project, is_owner=True)
+
+    mocker.patch(
+        "urbanvitaliz.apps.communication.digests.send_new_recommendations_reminders_digest_by_project"
+    )
+
+    call_command("senddigests")
+
+    digests.send_new_recommendations_reminders_digest_by_project.assert_called()
 
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_recommendation_reminder_not_send_if_no_owner(request, mocker):
     current_site = get_current_site(request)
-    yesterday = timezone.localdate() - datetime.timedelta(days=1)
-    user = baker.make(auth_models.User)
-    project = baker.make(projects_models.Project, sites=[current_site])
-    assign_collaborator(user, project, is_owner=False)
-    baker.make(
-        reminders_models.Reminder,
-        deadline=yesterday,
-        project=project,
-        site=current_site,
-        kind=reminders_models.Reminder.NEW_RECO,
+
+    baker.make(projects_models.Project, sites=[current_site])
+
+    mocker.patch(
+        "urbanvitaliz.apps.communication.digests.send_new_recommendations_reminders_digest_by_project"
     )
 
     call_command("senddigests")
 
-    assert reminders_models.Reminder.to_send.count() == 1
-    assert reminders_models.Reminder.sent.count() == 0
-
-
-@pytest.mark.django_db
-@override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_do_not_send_pending_reminder_with_future_deadline(request, mocker):
-    current_site = get_current_site(request)
-
-    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-
-    user = baker.make(auth_models.User)
-    project = baker.make(projects_models.Project, sites=[current_site])
-
-    assign_collaborator(user, project, is_owner=True)
-
-    baker.make(
-        reminders_models.Reminder,
-        deadline=tomorrow,
-        kind=reminders_models.Reminder.NEW_RECO,
-    )
-
-    mocker.patch("urbanvitaliz.apps.communication.api.send_debug_email")
-
-    call_command("senddigests")
-
-    assert reminders_models.Reminder.to_send.count() == 1
-    assert reminders_models.Reminder.sent.count() == 0
-
-    # communication_api.send_debug_email.assert_not_called()
+    digests.send_new_recommendations_reminders_digest_by_project.assert_not_called()
 
 
 # eof

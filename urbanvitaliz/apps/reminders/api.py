@@ -62,7 +62,7 @@ def get_due_reminder_for_project(site, project, kind):
 #################################################################
 
 
-def make_or_update_new_recommendations_reminder(site, project):
+def make_or_update_new_recommendations_reminder(site, project, interval_in_days=10):
     """Given a project, generate reminders for new recommendations that may have been
     missed by the council
     """
@@ -77,8 +77,7 @@ def make_or_update_new_recommendations_reminder(site, project):
     if not last_task:
         return None
 
-    # FIXME(glibersat) Should not be hardcoded
-    interval = datetime.timedelta(days=10)  # in days
+    interval = datetime.timedelta(days=interval_in_days)
 
     deadline = (last_task.created_on + interval).date()
 
