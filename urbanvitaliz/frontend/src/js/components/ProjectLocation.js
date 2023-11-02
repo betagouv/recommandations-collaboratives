@@ -145,10 +145,12 @@ function ProjectLocation(projectOptions, inputAddress=false) {
 			})
 			initMapLayers(this.interactiveMap, project, geoData);
 		},
+
 		 updateProjectLocation(endpoint)  {
 			// TODO: fix Save coordinates for project (depends on backend model update)
 			return async (coordinates) =>  api.patch(endpoint, { commune: { latitude: coordinates[0], longitude: coordinates[1] } })
 		},
+
 		initLocationEditMap(project, geoData, endpoint) {
 			const options = mapOptions({interactive: true, zoom:false});
 			const zoom = this.zoom + 1;
