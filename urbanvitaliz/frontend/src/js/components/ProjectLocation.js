@@ -101,7 +101,6 @@ function ProjectLocation(projectOptions, inputAddress=false) {
 
 			this.zoom = latitude && longitude ? 11 : this.zoom;
 
-			const Map = initMap('map', this.project, options, this.zoom);
 			
 			const geoData = {}
 
@@ -109,18 +108,18 @@ function ProjectLocation(projectOptions, inputAddress=false) {
 			geoData.location = await fetchGeolocationByAddress(this.project.location);
 
 			if(inputAddress) {
-				initMapController(Map, this.project);
+				this.initLocationEditMap(this.project, geoData);
 			} else {
+				const Map = initMap('map', this.project, options, this.zoom);
+				initMapLayers(Map, this.project, geoData);
+
+				// forces map redraw to fit container
+				setTimeout(function(){Map.invalidateSize()}, 0);
+
+				//Center Map
+				Map.panTo(new L.LatLng(latitude, longitude));
 				this.initProjectMapModal(this.project, geoData);
 			}
-			initMapLayers(Map, this.project, geoData);
-
-			// forces map redraw to fit container
-			setTimeout(function(){Map.invalidateSize()}, 0);
-
-			//Center Map
-			Map.panTo(new L.LatLng(latitude, longitude));
-
 		},
 
 		initProjectMapModal(project, geoData) {
@@ -143,6 +142,24 @@ function ProjectLocation(projectOptions, inputAddress=false) {
 				setTimeout(function(){  map.invalidateSize()}, 0);
 			})
 			initMapLayers(this.interactiveMap, project, geoData);
+		},
+
+		initLocationEditMap(project, geoData) {
+			const options = mapOptions({interactive: true, zoom:false});
+			const zoom = this.zoom + 1;
+			const latitude = project.commune.latitude ?? latLongFrance[0];
+			const longitude = project.commune.longitude ?? latLongFrance[1];
+
+			this.interactiveMap = initMap('map-location-edit', project, options, zoom);
+			this.interactiveMap.panTo(new L.LatLng(latitude, longitude));
+			this.interactiveMap.setMinZoom(zoom - 7);
+			this.interactiveMap.setMaxZoom(zoom + 6);
+			initMapLayers(this.interactiveMap, project, geoData);
+
+			initMapController(this.interactiveMap, this.project);
+
+			const map = this.interactiveMap;
+			setTimeout(function(){map.invalidateSize()}, 0);
 		},
 
 		openProjectMapModal() {
@@ -212,6 +229,16 @@ function addLayerMarkers(map, geoData, project) {
 	marker.bindPopup(markerPopupTemplate(project))
 }
 
+
+function addLayerInteractive(map, geoData, project) {
+	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
+		throw Error(`Données API Adresse indisponibles pour ' ${geoData.location}`)
+	}
+	const coordinates = geoData.features[0].geometry.coordinates
+	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
+	marker.bindPopup(markerPopupTemplate(project))
+}
+
 // Create layers composed with markers
 function addLayerAreaCircle(map, project) {
 	const { latitude, longitude } = project.commune;
@@ -240,7 +267,7 @@ function markerPopupTemplate(project) {
 	`
 }
 
-function mapOptions({interactive}) {
+function mapOptions({interactive, zoom}) {
 	return {
 		dragging: interactive,
 		touchZoom: interactive,
@@ -248,7 +275,7 @@ function mapOptions({interactive}) {
 		scrollWheelZoom: interactive,
 		boxZoom: interactive,
 		keyboard: interactive,
-		zoomControl: interactive
+		zoomControl: zoom
 	}
 }
 
