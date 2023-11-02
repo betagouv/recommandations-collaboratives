@@ -6,7 +6,6 @@
 {% block js %}
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock %}
-</script>
 {% block content %}
     <div x-data="Tutorial('survey', {{ active_project_survey_session.completion }} === 0)"
          class="col-11 py-5 mx-auto">
@@ -77,9 +76,9 @@
                     {% csrf_token %}
                     <ul class="list-group mt-3 mb-3">
                         {% for choice in form.fields.answer.choices %}
-                            <li class="list-group-item  {% if choice.0 == 'project_location' %}p-0{% else %}py-3{% endif %}">
+                            <li class="list-group-item py-3">
                                 {% if question.is_multiple %}
-                                    {% if choice.0 == 'project_address' %}
+                                    {% if choice.0 == "project_address" %}
                                         <label class="form-check-label" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
                                         <p id="form_hint-{{ forloop.counter }}">{{ choice.2|capfirst }}</p>
                                         <input class="form-control {% if form.address.errors %}is-invalid{% endif %}"
@@ -88,22 +87,21 @@
                                                id="form_answer-{{ forloop.counter }}"
                                                name="{{ form.address.name }}"
                                                placeholder="{{ question.address_title }}"
-                                               aria-described-by="form_hint-{{ forloop.counter }}" />
-                                        {{ form.comment.value|default:'' }}
+                                               disabled
+                                               aria-described-by="form_hint-{{ forloop.counter }}">
+                                        {{ session.project.location|default:'' }}
                                     </input>
-                                    {% for error in form.comment.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                                {% elif choice.0 == "project_location" %}
+                                    <label class="p-3 form-check-label" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
+                                    {% include 'projects/project/fragments/geolocation/project_location_edit.html' %}
                                 {% else %}
-                                    {% if choice.0 == 'project_location' %}
-                                        <label class="p-3 form-check-label" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
-                                        {% include 'projects/project/fragments/geolocation/project_location_edit.html' %}
-                                    {% else %}
-                                        <input class="form-check-input"
-                                               type="checkbox"
-                                               name="answer"
-                                               value="{{ choice.0 }}"
-                                               id="form_answer-{{ forloop.counter }}"
-                                               {% if choice.0 in form.fields.answer.initial %}checked{% endif %} />
-                                    {% endif %}
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           name="answer"
+                                           value="{{ choice.0 }}"
+                                           id="form_answer-{{ forloop.counter }}"
+                                           {% if choice.0 in form.fields.answer.initial %}checked{% endif %} />
+                                    <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
                                 {% endif %}
                             {% else %}
                                 <input class="form-check-input"
