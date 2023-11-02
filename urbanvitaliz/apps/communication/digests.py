@@ -20,7 +20,9 @@ from urbanvitaliz.apps.tasks import models as tasks_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.reminders.api import (
     make_or_update_new_recommendations_reminder,
+    make_or_update_whatsup_reminder,
     get_due_new_recommendations_reminder_for_project,
+    get_due_whatsup_reminder_for_project,
 )
 
 from .api import send_email
@@ -44,6 +46,10 @@ def send_reminder_digests_by_project(project, dry_run=False):
         site=current_site, project=project, dry_run=dry_run
     )
 
+    send_whatsup_reminders_digest_by_project(
+        site=current_site, project=project, dry_run=dry_run
+    )
+
 
 def send_new_recommendations_reminders_digest_by_project(site, project, dry_run):
     """Send 'New Recommendation' reminder for the given project"""
@@ -54,7 +60,7 @@ def send_new_recommendations_reminders_digest_by_project(site, project, dry_run)
     next_reminder = get_due_new_recommendations_reminder_for_project(site, project)
 
     if not next_reminder:
-        print("[W] No due reminder, skipping")
+        print("[W] No NEW_RECO due reminder, skipping")
         return False
 
     if not dry_run:
@@ -76,7 +82,43 @@ def send_new_recommendations_reminders_digest_by_project(site, project, dry_run)
         next_reminder.sent_on = timezone.now()
         next_reminder.save()
     else:
-        print(f"[I] Would have sent reminder <{next_reminder}>")
+        print(f"[I] Would have sent NEW_RECO reminder <{next_reminder}>")
+
+    return True
+
+
+def send_whatsup_reminders_digest_by_project(site, project, dry_run):
+    """Send 'What's up? reminder for the given project"""
+    # Refresh reminders first
+    make_or_update_whatsup_reminder(site, project)
+
+    # Actually, send reminders
+    next_reminder = get_due_whatsup_reminder_for_project(site, project)
+
+    if not next_reminder:
+        print("[W] No WHATSUP due reminder, skipping")
+        return False
+
+    if not dry_run:
+        tasks = (
+            project.tasks.filter(status__in=tasks_models.Task.OPEN_STATUSES)
+            .filter(site=site)
+            .exclude(public=False)
+            .order_by("-created_on")
+        )
+
+        digest = make_digest_of_project_recommendations(project, tasks, project.owner)
+        send_email(
+            "project_reminders_whats_up_digest",
+            {"name": normalize_user_name(project.owner), "email": project.owner.email},
+            params=digest,
+        )
+
+        # Mark as dispatched
+        next_reminder.sent_on = timezone.now()
+        next_reminder.save()
+    else:
+        print(f"[I] Would have sent WHATS_UP reminder <{next_reminder}>")
 
     return True
 

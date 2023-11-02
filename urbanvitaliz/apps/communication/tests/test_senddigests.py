@@ -183,9 +183,14 @@ def test_command_pending_recommendation_reminder_sent(request, mocker):
         "urbanvitaliz.apps.communication.digests.send_new_recommendations_reminders_digest_by_project"
     )
 
+    mocker.patch(
+        "urbanvitaliz.apps.communication.digests.send_whatsup_reminders_digest_by_project"
+    )
+
     call_command("senddigests")
 
     digests.send_new_recommendations_reminders_digest_by_project.assert_called()
+    digests.send_whatsup_reminders_digest_by_project.assert_called()
 
 
 @pytest.mark.django_db
@@ -198,10 +203,14 @@ def test_command_pending_recommendation_reminder_not_send_if_no_owner(request, m
     mocker.patch(
         "urbanvitaliz.apps.communication.digests.send_new_recommendations_reminders_digest_by_project"
     )
+    mocker.patch(
+        "urbanvitaliz.apps.communication.digests.send_whatsup_reminders_digest_by_project"
+    )
 
     call_command("senddigests")
 
     digests.send_new_recommendations_reminders_digest_by_project.assert_not_called()
+    digests.send_whatsup_reminders_digest_by_project.assert_not_called()
 
 
 # eof
