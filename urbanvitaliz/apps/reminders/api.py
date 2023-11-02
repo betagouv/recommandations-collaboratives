@@ -23,31 +23,51 @@ def make_or_update_reminder(site, project, kind, deadline):
     if site not in project.sites.all():
         return None
 
-    existing_reminder = models.Reminder.on_site_to_send.filter(
-        project=project, kind=kind
-    ).first()
+    existing_reminder = (
+        models.Reminder.on_site_to_send.filter(project=project, kind=kind)
+        .order_by("-deadline")
+        .first()
+    )
 
-    if existing_reminder:  # we have a reminder, update deadline
-        existing_reminder.deadline = deadline
-        existing_reminder.save()
-        return existing_reminder
+    task_count = (
+        project.tasks.filter(status__in=Task.OPEN_STATUSES)
+        .filter(site=site)
+        .exclude(public=False)
+        .count()
+    )
 
-    else:  # create a new reminder for the deadline
-        return models.Reminder.objects.create(
-            site=site,
-            project=project,
-            deadline=deadline,
-            kind=kind,
-            origin=models.Reminder.SYSTEM,
-        )
+    if task_count == 0 and not existing_reminder:
+        return None
 
-    return None
+    if existing_reminder:
+        # check if this reminder still makes sense ; i.e. we still have unattended
+        # Recommendations to remind. Delete it otherwise
+        if task_count == 0:
+            print(
+                f"[W] Deleting bogus {kind} reminder since no tasks are "
+                f"still active for project <{project.name}>"
+                f" ({project.pk})\n"
+            )
+            existing_reminder.delete()
+            return None
+        else:
+            existing_reminder.deadline = deadline
+            existing_reminder.save()
+            return existing_reminder
+
+    return models.Reminder.objects.create(
+        site=site,
+        project=project,
+        deadline=deadline,
+        kind=kind,
+        origin=models.Reminder.SYSTEM,
+    )
 
 
 def get_due_reminder_for_project(site, project, kind):
-    """Return the current reminder (=not sent yet) for a given kind"""
+    """Return the current reminder (=not sent yet) for a given kind."""
     try:
-        return models.Reminder.on_site_to_send.get(
+        reminder = models.Reminder.on_site_to_send.get(
             project=project,
             site=site,
             kind=kind,
@@ -56,15 +76,19 @@ def get_due_reminder_for_project(site, project, kind):
     except models.Reminder.DoesNotExist:
         return None
 
+    if not reminder:
+        print(f"[W] No due {kind} reminder!")
+        return None
+
+    return reminder
+
 
 #################################################################
 # New Recommendations Reminder
 #################################################################
-
-
-def make_or_update_new_recommendations_reminder(site, project, interval_in_days=10):
+def make_or_update_new_recommendations_reminder(site, project, interval_in_days=7 * 6):
     """Given a project, generate reminders for new recommendations that may have been
-    missed by the council
+    missed by the council. Default interval is 6 weeks.
     """
     last_task = (
         project.tasks.filter(status__in=Task.OPEN_STATUSES)
@@ -87,31 +111,7 @@ def make_or_update_new_recommendations_reminder(site, project, interval_in_days=
 
 
 def get_due_new_recommendations_reminder_for_project(site, project):
-    reminder = get_due_reminder_for_project(
-        site, project, kind=models.Reminder.NEW_RECO
-    )
-
-    if not reminder:
-        print("[W] No due reminder!")
-        return None
-
-    # check if this reminder still makes sense ; i.e. we still have unattended
-    # Recommendations to remind. Delete it otherwise
-    if not (
-        project.tasks.filter(status__in=Task.OPEN_STATUSES)
-        .filter(site=site)
-        .exclude(public=False)
-        .count()
-    ):
-        print(
-            "[W] Deleting bogus reminder since no tasks are "
-            "still active for project <{project.name}>"
-            f" ({project.pk})\n"
-        )
-        reminder.delete()
-        return None
-
-    return reminder
+    return get_due_reminder_for_project(site, project, kind=models.Reminder.NEW_RECO)
 
 
 #################################################################
@@ -119,8 +119,38 @@ def get_due_new_recommendations_reminder_for_project(site, project):
 #################################################################
 
 
-def make_whatups_reminders():
-    ...
+def make_or_update_whatsup_reminder(site, project):
+    """Given a project, generate a whats up email to the project owner to try to get her
+    attention back. Interval is configured by the SiteConfiguration model.
+    """
+    last_activity = project.last_members_activity_at
+
+    if not last_activity:
+        print("[W] Bogus project, no last members activity, skipping")
+        return None
+
+    # last_reminder = (
+    #     models.Reminder.on_site_sent.filter(project=project)
+    #     .order_by("-deadline")
+    #     .first()
+    # )
+
+    # interval_state = 0
+    # if last_reminder:
+    #     interval_state = last_reminder.state + 1
+
+    # FIXME(glibersat) Hardcoded: fetch real interval from SiteConfiguration
+    interval = datetime.timedelta(days=6 * 7)
+
+    deadline = (last_activity + interval).date()
+
+    return make_or_update_reminder(
+        site=site, project=project, kind=models.Reminder.WHATS_UP, deadline=deadline
+    )
+
+
+def get_due_whatsup_reminder_for_project(site, project):
+    return get_due_reminder_for_project(site, project, kind=models.Reminder.WHATS_UP)
 
 
 # eof

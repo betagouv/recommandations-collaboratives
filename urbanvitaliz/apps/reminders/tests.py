@@ -31,6 +31,14 @@ def test_make_reminder(request):
     current_site = get_current_site(request)
 
     project = baker.make(projects_models.Project, sites=[current_site])
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
     kind = models.Reminder.NEW_RECO
     deadline = datetime.date.today()
 
@@ -52,6 +60,14 @@ def test_make_reminder_on_wrong_site(request):
     current_site = get_current_site(request)
 
     project = baker.make(projects_models.Project, sites=[current_site])
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
     other_site = baker.make(sites_models.Site)
     kind = models.Reminder.NEW_RECO
     deadline = datetime.date.today()
@@ -70,6 +86,14 @@ def test_make_reminder_with_past_deadline(request):
     current_site = get_current_site(request)
 
     project = baker.make(projects_models.Project, sites=[current_site])
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
     other_site = baker.make(sites_models.Site)
     kind = models.Reminder.NEW_RECO
     deadline = datetime.date.today() - datetime.timedelta(days=1)
@@ -88,6 +112,13 @@ def test_update_reminder(request):
     current_site = get_current_site(request)
 
     project = baker.make(projects_models.Project, sites=[current_site])
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
     kind = models.Reminder.NEW_RECO
     deadline = datetime.date.today()
 
@@ -116,6 +147,14 @@ def test_update_reminder_doesnt_update_sent_one(request):
     current_site = get_current_site(request)
 
     project = baker.make(projects_models.Project, sites=[current_site])
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
     kind = models.Reminder.NEW_RECO
     deadline = datetime.date.today()
 
@@ -154,6 +193,14 @@ def test_update_reminder_doesnt_update_another_kind(request):
     current_site = get_current_site(request)
 
     project = baker.make(projects_models.Project, sites=[current_site])
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
     kind = models.Reminder.NEW_RECO
     deadline = datetime.date.today()
 
@@ -365,11 +412,269 @@ def test_make_or_update_new_reco_reminder_postpones_reminder_if_new_task(request
     )
 
     api.make_or_update_new_recommendations_reminder(
-        current_site, project, interval_in_days=10
+        current_site, project, interval_in_days=7 * 6
     )
 
     reminder.refresh_from_db()
-    assert reminder.deadline == (task.created_on + datetime.timedelta(days=10)).date()
+    assert (
+        reminder.deadline == (task.created_on + datetime.timedelta(days=7 * 6)).date()
+    )
+
+
+@pytest.mark.django_db
+def test_make_or_update_new_recommendations_reminder_is_deleted_if_no_task(
+    request, mocker
+):
+    current_site = get_current_site(request)
+
+    today = timezone.localdate()
+    project = baker.make(projects_models.Project, sites=[current_site])
+
+    baker.make(
+        models.Reminder,
+        deadline=today,
+        project=project,
+        site=current_site,
+        kind=models.Reminder.NEW_RECO,
+    )
+
+    reminder = api.make_or_update_new_recommendations_reminder(current_site, project)
+
+    assert reminder is None
+
+
+########################################################################
+# What's up reminders
+########################################################################
+@pytest.mark.django_db
+def test_make_or_update_whatsup_reminder_with_no_task(request):
+    current_site = get_current_site(request)
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        last_members_activity_at=timezone.now(),
+    )
+
+    api.make_or_update_whatsup_reminder(current_site, project)
+
+    assert models.Reminder.on_site_to_send.count() == 0
+
+
+@pytest.mark.django_db
+def test_make_or_update_whatsup_reminder_with_unpublished_task(request):
+    current_site = get_current_site(request)
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        last_members_activity_at=timezone.now(),
+    )
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        public=False,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
+    api.make_or_update_whatsup_reminder(current_site, project)
+
+    assert models.Reminder.on_site_to_send.count() == 0
+
+
+@pytest.mark.django_db
+def test_make_or_update_whatsup_reminder_with_task_in_uninteresting_states(request):
+    current_site = get_current_site(request)
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        last_members_activity_at=timezone.now(),
+    )
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.DONE,
+    )
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.NOT_INTERESTED,
+    )
+
+    api.make_or_update_whatsup_reminder(current_site, project)
+
+    assert models.Reminder.on_site_to_send.count() == 0
+
+
+@pytest.mark.django_db
+def test_make_or_update_whatsup_reminder_with_existing_reminder(request):
+    current_site = get_current_site(request)
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        last_members_activity_at=timezone.now(),
+    )
+
+    reminder = baker.make(
+        models.Reminder,
+        site=current_site,
+        project=project,
+        kind=models.Reminder.WHATS_UP,
+        deadline=timezone.localdate() - datetime.timedelta(days=6),
+    )
+
+    task = baker.make(
+        tasks_models.Task,
+        created_on=timezone.now(),
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
+    assert reminder.deadline < task.created_on.date()
+
+    api.make_or_update_whatsup_reminder(current_site, project)
+
+    reminder.refresh_from_db()
+
+    assert reminder.deadline >= task.created_on.date()
+
+    assert models.Reminder.on_site_to_send.count() == 1
+
+
+@pytest.mark.django_db
+def test_make_or_update_whatsup_reminder_with_tasks_uses_the_most_recent(request):
+    current_site = get_current_site(request)
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        last_members_activity_at=timezone.now(),
+    )
+    baker.make(
+        tasks_models.Task,
+        created_on=timezone.now() - datetime.timedelta(days=200),
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+    recent_task = baker.make(
+        tasks_models.Task,
+        created_on=timezone.now(),
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
+    api.make_or_update_whatsup_reminder(current_site, project)
+
+    assert models.Reminder.on_site_to_send.count() == 1
+    reminder = models.Reminder.on_site.first()
+    assert reminder.deadline >= recent_task.created_on.date()
+
+
+@pytest.mark.django_db
+def test_make_or_update_whatsup_reminder_with_task_on_site(request):
+    current_site = get_current_site(request)
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        last_members_activity_at=timezone.now(),
+    )
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        public=True,
+        site=current_site,
+    )
+
+    api.make_or_update_whatsup_reminder(current_site, project)
+
+    assert models.Reminder.on_site_to_send.count() == 1
+
+
+@pytest.mark.django_db
+def test_make_whatsup_reminder_with_task_off_site(request):
+    current_site = get_current_site(request)
+    other_site = baker.make(sites_models.Site)
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        last_members_activity_at=timezone.now(),
+    )
+    baker.make(
+        tasks_models.Task,
+        public=True,
+        project=project,
+        site=other_site,
+    )
+
+    api.make_or_update_whatsup_reminder(current_site, project)
+
+    assert models.Reminder.on_site_to_send.count() == 0
+
+
+@pytest.mark.django_db
+def test_make_or_update_whatsup_reminder_postpones_reminder_if_new_activity(request):
+    current_site = get_current_site(request)
+    yesterday = timezone.localdate() - datetime.timedelta(days=1)
+    user = baker.make(auth_models.User)
+
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        last_members_activity_at=timezone.now(),
+    )
+    assign_collaborator(user, project, is_owner=True)
+
+    baker.make(
+        tasks_models.Task,
+        project=project,
+        site=current_site,
+        status=tasks_models.Task.PROPOSED,
+        created_on=yesterday,
+        public=True,
+    )
+
+    reminder = baker.make(
+        models.Reminder,
+        deadline=project.last_members_activity_at - datetime.timedelta(days=1),
+        project=project,
+        site=current_site,
+        kind=models.Reminder.WHATS_UP,
+    )
+
+    project.last_members_activity_at = timezone.now()
+
+    api.make_or_update_whatsup_reminder(current_site, project)
+
+    reminder.refresh_from_db()
+    assert reminder.deadline > project.last_members_activity_at.date()
+
+
+@pytest.mark.django_db
+def test_make_or_update_whatsup_reminder_is_deleted_if_no_task(request, mocker):
+    current_site = get_current_site(request)
+
+    today = timezone.localdate()
+    project = baker.make(projects_models.Project, sites=[current_site])
+
+    baker.make(
+        models.Reminder,
+        deadline=today,
+        project=project,
+        site=current_site,
+        kind=models.Reminder.NEW_RECO,
+    )
+
+    reminder = api.make_or_update_whatsup_reminder(current_site, project)
+
+    assert reminder is None
 
 
 ########################################################################
@@ -489,61 +794,8 @@ def test_due_reminder_honors_current_site(request, mocker):
 
 
 #################################################################
-# Getting Recommendation Reminders
+# Getting Recommendation
 #################################################################
-@pytest.mark.django_db
-def test_due_new_recommendations_reminder_honors_task_status(request, mocker):
-    current_site = get_current_site(request)
-
-    today = timezone.localdate()
-    project = baker.make(projects_models.Project, sites=[current_site])
-
-    baker.make(
-        tasks_models.Task,
-        created_on=timezone.now(),
-        project=project,
-        public=True,
-        site=current_site,
-        status=tasks_models.Task.DONE,
-    )
-
-    kind = models.Reminder.NEW_RECO
-
-    baker.make(
-        models.Reminder,
-        deadline=today,
-        project=project,
-        site=current_site,
-        kind=kind,
-    )
-
-    reminder = api.get_due_new_recommendations_reminder_for_project(
-        current_site, project
-    )
-
-    assert reminder is None
-
-
-@pytest.mark.django_db
-def test_due_new_recommendations_reminder_is_deleted_if_no_task(request, mocker):
-    current_site = get_current_site(request)
-
-    today = timezone.localdate()
-    project = baker.make(projects_models.Project, sites=[current_site])
-
-    baker.make(
-        models.Reminder,
-        deadline=today,
-        project=project,
-        site=current_site,
-        kind=models.Reminder.NEW_RECO,
-    )
-
-    reminder = api.get_due_new_recommendations_reminder_for_project(
-        current_site, project
-    )
-
-    assert reminder is None
 
 
 ########################################################################
