@@ -1,5 +1,6 @@
 {% load static %}
 {% load django_vite %}
+{{ project.pk|json_script:"idProject" }}
 {{ project.name|json_script:"nameProject" }}
 {{ project.status|json_script:"status" }}
 {{ project.location|json_script:"location" }}
@@ -12,6 +13,7 @@
   {% vite_asset 'js/apps/projectLocation.js' %}
   <script>
         const projectOptions = {
+            id: JSON.parse(document.getElementById('idProject').textContent),
             name: JSON.parse(document.getElementById('nameProject').textContent),
             status: JSON.parse(document.getElementById('status').textContent),
             location: JSON.parse(document.getElementById('location').textContent),
