@@ -80,7 +80,10 @@
                             <li class="list-group-item  {% if choice.0 == 'project_location' %}p-0{% else %}py-3{% endif %}">
                                 {% if question.is_multiple %}
                                     {% if choice.0 == 'project_address' %}
-                                        <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
+                                        <label class="px-2 py-1 form-check-label w-75"
+                                               for="form_answer-{{ forloop.counter }}">
+                                            &nbsp;{{ choice.1|capfirst }}
+                                        </label>
                                         <p id="form_hint-{{ forloop.counter }}">{{ choice.2|capfirst }}</p>
                                         <input class="form-control {% if form.address.errors %}is-invalid{% endif %}"
                                                style="height: 40px"
@@ -94,7 +97,10 @@
                                     {% for error in form.comment.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                                 {% else %}
                                     {% if choice.0 == 'project_location' %}
-                                        <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
+                                        <label class="px-2 py-1 form-check-label w-75"
+                                               for="form_answer-{{ forloop.counter }}">
+                                            &nbsp;{{ choice.1|capfirst }}
+                                        </label>
                                         {% include 'projects/project/fragments/geolocation/project_location_edit.html' %}
                                     {% else %}
                                         <input class="form-check-input"
@@ -111,7 +117,7 @@
                                        name="answer"
                                        value="{{ choice.0 }}"
                                        id="form_answer-{{ forloop.counter }}"
-                                       {% ifequal form.fields.answer.initial choice.0 %}checked{% endifequal %}>
+                                       {% ifequal form.fields.answer.initial choice.0 %}checked{% endifequal %} />
                                 {{ form.fields.answer.selected }}
                                 <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
                             {% endif %}
@@ -136,7 +142,7 @@
                                id="attachment"
                                type="file"
                                name="attachment"
-                               value="kdl">
+                               value="kdl" />
                         {% if form.attachment.value %}
                             Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
                         {% endif %}
