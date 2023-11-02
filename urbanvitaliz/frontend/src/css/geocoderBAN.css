@@ -36,7 +36,15 @@
 .leaflet-control-geocoder-ban-form {
 	display: none;
 	vertical-align: middle;
+	width: calc(100% - 26px);
+  aspect-ratio: unset;
+
 }
+
+.leaflet-touch .leaflet-control-geocoder-ban-form {
+	width: calc(100% - 30px);
+}
+
 
 .leaflet-control-geocoder-ban-expanded {
 	margin-right: 10px;
