@@ -92,7 +92,10 @@
                                                aria-described-by="form_hint-{{ forloop.counter }}" />
                                     </input>
                                 {% elif choice.0 == "project_location" %}
-                                    <label class="p-3 form-check-label" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
+                                    <label class=" pb-3 pt-32 form-check-label"
+                                           for="form_answer-{{ forloop.counter }}">
+                                        &nbsp;{{ choice.1|capfirst }}
+                                    </label>
                                     {% include 'projects/project/fragments/geolocation/project_location_edit.html' with project=session.project %}
                                 {% else %}
                                     <input class="form-check-input"
