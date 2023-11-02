@@ -49,6 +49,7 @@ def send_digests_reminders_by_project(project, dry_run=False):
     )
 
     if not next_reminder:
+        print("[W] No due reminder, skipping")
         return False
 
     if not dry_run:
@@ -67,7 +68,8 @@ def send_digests_reminders_by_project(project, dry_run=False):
         )
 
         # Mark as dispatched
-        next_reminder.update(sent_on=timezone.now())
+        next_reminder.sent_on = timezone.now()
+        next_reminder.save()
     else:
         print(f"[I] Would have sent reminder <{next_reminder}>")
 

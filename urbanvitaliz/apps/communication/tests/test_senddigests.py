@@ -158,13 +158,27 @@ def test_command_pending_recommendation_reminder_sent(request, mocker):
     current_site = get_current_site(request)
     yesterday = timezone.localdate() - datetime.timedelta(days=1)
     user = baker.make(auth_models.User)
+
     project = baker.make(projects_models.Project, sites=[current_site])
-    assign_collaborator(user, project, is_owner=False)
+    assign_collaborator(user, project, is_owner=True)
+
+    print("owner=", project.owner)
+
+    baker.make(
+        task_models.Task,
+        project=project,
+        site=current_site,
+        status=task_models.Task.PROPOSED,
+        created_on=yesterday - datetime.timedelta(days=10),
+        public=True,
+    )
+
     baker.make(
         reminders_models.Reminder,
         deadline=yesterday,
         project=project,
         site=current_site,
+        kind=reminders_models.Reminder.NEW_RECO,
     )
 
     call_command("senddigests")
@@ -186,6 +200,7 @@ def test_command_pending_recommendation_reminder_not_send_if_no_owner(request, m
         deadline=yesterday,
         project=project,
         site=current_site,
+        kind=reminders_models.Reminder.NEW_RECO,
     )
 
     call_command("senddigests")
@@ -196,11 +211,20 @@ def test_command_pending_recommendation_reminder_not_send_if_no_owner(request, m
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_do_not_send_pending_reminder_with_future_deadline(mocker):
+def test_command_do_not_send_pending_reminder_with_future_deadline(request, mocker):
+    current_site = get_current_site(request)
+
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+
+    user = baker.make(auth_models.User)
+    project = baker.make(projects_models.Project, sites=[current_site])
+
+    assign_collaborator(user, project, is_owner=True)
+
     baker.make(
         reminders_models.Reminder,
         deadline=tomorrow,
+        kind=reminders_models.Reminder.NEW_RECO,
     )
 
     mocker.patch("urbanvitaliz.apps.communication.api.send_debug_email")

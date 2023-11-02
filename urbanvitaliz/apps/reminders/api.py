@@ -93,6 +93,7 @@ def get_due_new_recommendations_reminder_for_project(site, project):
     )
 
     if not reminder:
+        print("[W] No due reminder!")
         return None
 
     # check if this reminder still makes sense ; i.e. we still have unattended
@@ -103,6 +104,11 @@ def get_due_new_recommendations_reminder_for_project(site, project):
         .exclude(public=False)
         .count()
     ):
+        print(
+            "[W] Deleting bogus reminder since no tasks are "
+            "still active for project <{project.name}>"
+            f" ({project.pk})\n"
+        )
         reminder.delete()
         return None
 

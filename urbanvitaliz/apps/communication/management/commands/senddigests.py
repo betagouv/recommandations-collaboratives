@@ -50,21 +50,25 @@ class Command(BaseCommand):
 
         # Send reminders
         self.stdout.write("** Sending Project Reminders **\n")
-        for project in project_models.Project.on_site.all():
+        for (
+            project
+        ) in project_models.Project.on_site.all():  # FIXME include inactive project?
             if digests.send_digests_reminders_by_project(project, dry_run):
                 self.stdout.write(
-                    f"Sent reminder digest for project {project.name}"
+                    f"Sent reminder digest for project <{project.name}>"
                     f" ({project.pk}) -- to {project.owner.email}\n"
                 )
             else:
                 self.stdout.write(
-                    f"Failed sending reminder digest for project {project.name}"
-                    f" ({project.pk}) -- NO OWNER\n"
+                    f"No reminder digest to send for project <{project.name}>"
+                    f" ({project.pk})\n"
                 )
 
         # Send project collaborators new recommendations
         self.stdout.write("** Sending new recommendations digests **\n")
-        for project in project_models.Project.on_site.all():
+        for (
+            project
+        ) in project_models.Project.on_site.all():  # FIXME include inactive project?
             for user in project.members.filter(is_active=True):
                 if digests.send_digests_for_new_recommendations_by_user(user, dry_run):
                     self.stdout.write(
