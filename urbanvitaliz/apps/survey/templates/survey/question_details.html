@@ -80,10 +80,7 @@
                             <li class="list-group-item  {% if choice.0 == 'project_location' %}p-0{% else %}py-3{% endif %}">
                                 {% if question.is_multiple %}
                                     {% if choice.0 == 'project_address' %}
-                                        <label class="px-2 py-1 form-check-label w-75"
-                                               for="form_answer-{{ forloop.counter }}">
-                                            &nbsp;{{ choice.1|capfirst }}
-                                        </label>
+                                        <label class="form-check-label" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
                                         <p id="form_hint-{{ forloop.counter }}">{{ choice.2|capfirst }}</p>
                                         <input class="form-control {% if form.address.errors %}is-invalid{% endif %}"
                                                style="height: 40px"
@@ -97,10 +94,7 @@
                                     {% for error in form.comment.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                                 {% else %}
                                     {% if choice.0 == 'project_location' %}
-                                        <label class="px-2 py-1 form-check-label w-75"
-                                               for="form_answer-{{ forloop.counter }}">
-                                            &nbsp;{{ choice.1|capfirst }}
-                                        </label>
+                                        <label class="p-3 form-check-label" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
                                         {% include 'projects/project/fragments/geolocation/project_location_edit.html' %}
                                     {% else %}
                                         <input class="form-check-input"
