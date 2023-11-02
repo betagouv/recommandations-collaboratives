@@ -10,14 +10,14 @@ L.GeocoderBAN = L.Control.extend({
 		position: 'topleft',
 		style: 'control',
 		placeholder: 'Rechercher une adresse ou des coordonnées',
-		resultsNumber: 7,
+		resultsNumber: 10,
 		collapsed: true,
 		serviceUrl: 'https://api-adresse.data.gouv.fr/search/',
 		minIntervalBetweenRequests: 250,
 		defaultMarkgeocode: true,
 		autofocus: true,
 		className:'',
-		geoData: null
+		onUpdate: null
 	},
 	includes: L.Evented.prototype || L.Mixin.Events,
 	initialize: function (options) {
@@ -174,6 +174,8 @@ L.GeocoderBAN = L.Control.extend({
 		var clickHandler = function (e) {
 			this.minimizeControl()
 			this.geocodeResult(feature)
+			const coordinates = feature.geometry.coordinates
+			this.options.onUpdate(coordinates)
 		}
 		var mouseOverHandler = function (e) {
 			var s = document.getElementsByClassName('leaflet-control-geocoder-ban-selected')

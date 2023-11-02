@@ -6,6 +6,7 @@ import 'leaflet-control-geocoder';
 import 'leaflet-providers'
 
 import { statusToColorClass } from '../utils/statusToText'
+import api from '../utils/api'
 
 const codesComParis = ['75101','75102','75103','75104','75105','75106','75107','75108','75109','75110','75111','75112','75113','75114','75115','75116','75117','75118','75119','75120']
 const codesComLyon = ['69381','69382','69383','69384','69385','69386','69387','69388','69389']
@@ -106,9 +107,10 @@ function ProjectLocation(projectOptions, inputAddress=false) {
 
 			geoData.commune = await fetchCommuneIgn(insee);
 			geoData.location = await fetchGeolocationByAddress(this.project.location);
+			const endpoint = `/api/projects/${projectOptions.id}/`
 
 			if(inputAddress) {
-				this.initLocationEditMap(this.project, geoData);
+				this.initLocationEditMap(this.project, geoData, endpoint);
 			} else {
 				const Map = initMap('map', this.project, options, this.zoom);
 				initMapLayers(Map, this.project, geoData);
@@ -143,8 +145,11 @@ function ProjectLocation(projectOptions, inputAddress=false) {
 			})
 			initMapLayers(this.interactiveMap, project, geoData);
 		},
-
-		initLocationEditMap(project, geoData) {
+		 updateProjectLocation(endpoint)  {
+			// TODO: fix Save coordinates for project (depends on backend model update)
+			return async (coordinates) =>  api.patch(endpoint, { commune: { latitude: coordinates[0], longitude: coordinates[1] } })
+		},
+		initLocationEditMap(project, geoData, endpoint) {
 			const options = mapOptions({interactive: true, zoom:false});
 			const zoom = this.zoom + 1;
 			const latitude = project.commune.latitude ?? latLongFrance[0];
@@ -156,15 +161,10 @@ function ProjectLocation(projectOptions, inputAddress=false) {
 			this.interactiveMap.setMaxZoom(zoom + 6);
 			initMapLayers(this.interactiveMap, project, geoData);
 
-			initMapController(this.interactiveMap, this.project);
+			initMapController(this.interactiveMap, project, this.updateProjectLocation(endpoint));
 
 			const map = this.interactiveMap;
 			setTimeout(function(){map.invalidateSize()}, 0);
-		},
-
-		openProjectMapModal() {
-			this.mapIsSmall = false;
-			this.mapModal.show();
 		},
 	}
 }
@@ -199,15 +199,13 @@ function initMapLayers(map, project, geoData) {
 	}
 }
 
-
-function initMapController(map, project, geoData) {
-	L.geocoderBAN({ collapsed: false, style: 'searchBar', className: statusToColorClass(project.status), geoData }).addTo(map)
-
+function initMapController(map, project, geoData, onUpdate) {
+	L.geocoderBAN({ collapsed: false, style: 'searchBar', className: statusToColorClass(project.status), geoData, onUpdate }).addTo(map)
 
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
 	controller[0].classList.add('leaflet-control-geocoder-expanded');
 	const inputController = controller[0].querySelector('input')
-	inputController.addEventListener('blur', (e) => {
+	inputController.addEventListener('blur', async (e) => {
 			controller[0].classList.add('leaflet-control-geocoder-expanded');
 	})
 }
@@ -272,7 +270,7 @@ function mapOptions({interactive, zoom}) {
 		dragging: interactive,
 		touchZoom: interactive,
 		doubleClickZoom: interactive,
-		scrollWheelZoom: interactive,
+		scrollWheelZoom: false,
 		boxZoom: interactive,
 		keyboard: interactive,
 		zoomControl: zoom
