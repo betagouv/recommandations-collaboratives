@@ -8,12 +8,14 @@ created: 2021-09-28 12:59:08 CEST
 """
 
 import datetime
+import logging
 
 from django.utils import timezone
+from urbanvitaliz.apps.tasks.models import Task
 
 from . import models
 
-from urbanvitaliz.apps.tasks.models import Task
+logger = logging.getLogger("main")
 
 
 def make_or_update_reminder(site, project, kind, deadline):
@@ -43,18 +45,26 @@ def make_or_update_reminder(site, project, kind, deadline):
         # check if this reminder still makes sense ; i.e. we still have unattended
         # Recommendations to remind. Delete it otherwise
         if task_count == 0:
-            print(
-                f"[W] Deleting bogus {kind} reminder since no tasks are "
+            logger.warning(
+                f"Deleting bogus {kind} reminder since no tasks are "
                 f"still active for project <{project.name}>"
-                f" ({project.pk})\n"
+                f" ({project.pk})"
             )
             existing_reminder.delete()
             return None
         else:
-            existing_reminder.deadline = deadline
-            existing_reminder.save()
+            if existing_reminder.deadline != deadline:
+                existing_reminder.deadline = deadline
+                existing_reminder.save()
+                logger.info(
+                    f"Updating reminder <{existing_reminder.kind}> "
+                    f"for project <{project.name}>(id={project.pk})"
+                )
             return existing_reminder
 
+    logger.info(
+        f"Creating reminder <{kind}> for project <{project.name}> ({project.pk})"
+    )
     return models.Reminder.objects.create(
         site=site,
         project=project,
@@ -77,7 +87,7 @@ def get_due_reminder_for_project(site, project, kind):
         return None
 
     if not reminder:
-        print(f"[W] No due {kind} reminder!")
+        logger.debug(f"No due <{kind}> reminder!")
         return None
 
     return reminder
@@ -126,7 +136,10 @@ def make_or_update_whatsup_reminder(site, project):
     last_activity = project.last_members_activity_at
 
     if not last_activity:
-        print("[W] Bogus project, no last members activity, skipping")
+        logger.warning(
+            f"Bogus project <{project.name}>(id={project.id}), "
+            "no last members activity, skipping"
+        )
         return None
 
     # last_reminder = (

@@ -20,3 +20,4 @@ pytest-subtests
 pytz
 semgrep
 python-dotenv
+rich

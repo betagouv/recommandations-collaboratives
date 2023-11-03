@@ -27,6 +27,10 @@ from urbanvitaliz.apps.reminders.api import (
 
 from .api import send_email
 
+import logging
+
+logger = logging.getLogger("main")
+
 ########################################################################
 # Reminders
 ########################################################################
@@ -39,11 +43,16 @@ def send_reminder_digests_by_project(project, dry_run=False):
     current_site = Site.objects.get_current()
 
     if not project.owner:
-        print("[W] No owner, skipping project reminders")
+        logger.warning(
+            f"No owner for project <{project.name}>(id={project.id}), "
+            "skipping project reminders"
+        )
         return False
 
     if project.inactive_since or project.muted:
-        print("[W] Skipping inactive project")
+        logger.info(
+            f"Skipping inactive/muted project <{project.name}>(id={project.id})"
+        )
         return False
 
     send_new_recommendations_reminders_digest_by_project(
@@ -64,7 +73,7 @@ def send_new_recommendations_reminders_digest_by_project(site, project, dry_run)
     next_reminder = get_due_new_recommendations_reminder_for_project(site, project)
 
     if not next_reminder:
-        print("[W] No NEW_RECO due reminder, skipping")
+        logger.debug("No NEW_RECO due reminder, skipping")
         return False
 
     if not dry_run:
@@ -86,7 +95,7 @@ def send_new_recommendations_reminders_digest_by_project(site, project, dry_run)
         next_reminder.sent_on = timezone.now()
         next_reminder.save()
     else:
-        print(f"[I] Would have sent NEW_RECO reminder <{next_reminder}>")
+        logger.info(f"[DRY RUN] Would have sent NEW_RECO reminder <{next_reminder}>")
 
     return True
 
@@ -100,7 +109,7 @@ def send_whatsup_reminders_digest_by_project(site, project, dry_run):
     next_reminder = get_due_whatsup_reminder_for_project(site, project)
 
     if not next_reminder:
-        print("[W] No WHATSUP due reminder, skipping")
+        logger.debug("No WHATSUP due reminder, skipping")
         return False
 
     if not dry_run:
@@ -122,7 +131,7 @@ def send_whatsup_reminders_digest_by_project(site, project, dry_run):
         next_reminder.sent_on = timezone.now()
         next_reminder.save()
     else:
-        print(f"[I] Would have sent WHATS_UP reminder <{next_reminder}>")
+        logger.info(f"[DRY RUN] Would have sent WHATS_UP reminder <{next_reminder}>")
 
     return True
 
@@ -138,14 +147,16 @@ def send_reminder_digest_by_project_task(user, reminders, dry_run):
             project = projects_models.Project.objects.get(pk=project_id)
         except projects_models.Project.DoesNotExist:
             for reminder in project_reminders:
-                print(f"[W] Skipping reminder {reminder}")
+                logger.warning(f"[W] Skipping bogus reminder <{reminder}>")
                 skipped_reminders.append(reminder.pk)
             continue
 
         digest = make_digest_of_project_recommendations(project, reminders, user)
         if digest:
             if dry_run:
-                print(f"[ID] Would have sent {len(digest)} digests to {user}.")
+                logger.info(
+                    f"[DRY RUN] Would have sent {len(digest)} digests to {user}."
+                )
             else:
                 send_email(
                     "project_reminders_digest",
@@ -212,7 +223,9 @@ def send_recommendation_digest_by_project(user, notifications, dry_run):
                 params=digest,
             )
         else:
-            print(f"[DI] Would have sent {len(digest)} notifications for {user}.")
+            logger.info(
+                f"[DRY RUN] Would have sent {len(digest)} notifications for <{user}>."
+            )
 
     return skipped_projects
 
@@ -330,7 +343,9 @@ def send_new_site_digest_by_user(user, notifications, dry_run):
         digest = make_digest_for_new_site(notification, user)
         if digest:
             if dry_run:
-                print(f"[DI] Would have sent {len(digest)} notifications for {user}.")
+                logger.info(
+                    f"[DRY RUN] Would have sent {len(digest)} notifications for {user}."
+                )
             else:
                 send_email(
                     "new_site_for_switchtender",
@@ -464,7 +479,9 @@ def send_digest_by_user(
                 params=digest,
             )
         else:
-            print(f"[ID] Would have sent {len(digest)} notifications to {user}.")
+            logger.info(
+                f"[DRY RUN] Would have sent {len(digest)} notifications to <{user}>."
+            )
 
     if not dry_run:
         # Mark them as dispatched

@@ -16,6 +16,10 @@ from urbanvitaliz.apps.communication import digests
 from urbanvitaliz.apps.projects import models as project_models
 from urbanvitaliz.utils import get_group_for_site
 
+import logging
+
+logger = logging.getLogger("main")
+
 
 class Command(BaseCommand):
     help = "Send pending notifications as email digests"
@@ -33,11 +37,7 @@ class Command(BaseCommand):
     def send_email_digests(self, dry_run):
         for site in Site.objects.all():
             with settings.SITE_ID.override(site.pk):
-                self.stdout.write("\n")
-                self.stdout.write(
-                    f"#### Sending digests for site <{site.domain}> ####\n"
-                )
-                self.stdout.write("\n")
+                logger.info(f"\n#### Sending digests for site <{site.domain}> ####\n")
                 self.send_email_digests_for_site(site, dry_run)
 
     def send_email_digests_for_site(self, site, dry_run):
@@ -49,49 +49,36 @@ class Command(BaseCommand):
         )
 
         # Send reminders
-        self.stdout.write("** Sending Project Reminders **\n")
+        logger.info("** Sending Project Reminders **")
         for (
             project
         ) in project_models.Project.on_site.all():  # FIXME include inactive project?
-            if digests.send_reminder_digests_by_project(project, dry_run):
-                self.stdout.write(
-                    f"Sent reminder digest for project <{project.name}>"
-                    f" ({project.pk}) -- to {project.owner.email}\n"
-                )
-            else:
-                self.stdout.write(
-                    f"No reminder digest to send for project <{project.name}>"
-                    f" ({project.pk})\n"
-                )
+            digests.send_reminder_digests_by_project(project, dry_run)
 
         # Send project collaborators new recommendations
-        self.stdout.write("** Sending new recommendations digests **\n")
+        logger.info("** Sending new recommendations digests **")
         for (
             project
         ) in project_models.Project.on_site.all():  # FIXME include inactive project?
             for user in project.members.filter(is_active=True):
                 if digests.send_digests_for_new_recommendations_by_user(user, dry_run):
-                    self.stdout.write(
-                        f"Sent new reco digest for {user} on {project.name}\n"
-                    )
+                    logger.info(f"Sent new reco digest for {user} on {project.name}")
 
         # Digests for non switchtenders
-        self.stdout.write("** Sending general digests **\n")
+        logger.info("** Sending general digests **")
         for user in active_users.exclude(groups__in=[advisor_group]):
             if digests.send_digest_for_non_switchtender_by_user(user, dry_run):
-                self.stdout.write(f"Sent general digest for {user}\n")
+                logger.info(f"Sent general digest for {user}")
 
         # Digests for switchtenders
-        self.stdout.write("** Sending general switchtender digests **\n")
+        logger.info("** Sending general switchtender digests **")
         # XXX pourquoi groups__in=[] et non groups=advisor_group
         for user in active_users.filter(groups__in=[advisor_group]):
             if digests.send_digests_for_new_sites_by_user(user, dry_run):
-                self.stdout.write(f"* Sent new site digest for {user}\n")
+                logger.info(f"* Sent new site digest for {user}")
 
             if digests.send_digest_for_switchtender_by_user(user, dry_run):
-                self.stdout.write(
-                    f"* Sent general digest for switchtender (to {user})\n"
-                )
+                logger.info(f"* Sent general digest for switchtender (to {user})")
 
 
 # eof
