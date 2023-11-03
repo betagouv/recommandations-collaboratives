@@ -42,6 +42,10 @@ def send_reminder_digests_by_project(project, dry_run=False):
         print("[W] No owner, skipping project reminders")
         return False
 
+    if project.inactive_since or project.muted:
+        print("[W] Skipping inactive project")
+        return False
+
     send_new_recommendations_reminders_digest_by_project(
         site=current_site, project=project, dry_run=dry_run
     )

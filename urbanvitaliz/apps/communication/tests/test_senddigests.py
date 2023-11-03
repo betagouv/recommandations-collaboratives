@@ -39,7 +39,8 @@ def test_command_send_digest_to_active_users(request, mocker):
     project = baker.make(
         projects_models.Project, name="A project", sites=[site], members=[user]
     )
-    # FIXME pourquoi ne met pas aussi dans advisor group for site ?
+    # FIXME(raph) pourquoi ne met pas aussi dans advisor group for site ?
+    # 23/11/03: (glibersat) pas compris @raph
     assign_advisor(advisor, project, site)
 
     baker.make(task_models.Task, created_by=advisor, project=project, site=site)
@@ -199,6 +200,52 @@ def test_command_pending_recommendation_reminder_not_send_if_no_owner(request, m
     current_site = get_current_site(request)
 
     baker.make(projects_models.Project, sites=[current_site])
+
+    mocker.patch(
+        "urbanvitaliz.apps.communication.digests.send_new_recommendations_reminders_digest_by_project"
+    )
+    mocker.patch(
+        "urbanvitaliz.apps.communication.digests.send_whatsup_reminders_digest_by_project"
+    )
+
+    call_command("senddigests")
+
+    digests.send_new_recommendations_reminders_digest_by_project.assert_not_called()
+    digests.send_whatsup_reminders_digest_by_project.assert_not_called()
+
+
+@pytest.mark.django_db
+@override_settings(BREVO_FORCE_DEBUG=True)
+def test_command_pending_reminders_not_sent_if_project_inactive(request, mocker):
+    current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+
+    project = baker.make(
+        projects_models.Project, sites=[current_site], inactive_since=timezone.now()
+    )
+    assign_collaborator(user, project, is_owner=True)
+
+    mocker.patch(
+        "urbanvitaliz.apps.communication.digests.send_new_recommendations_reminders_digest_by_project"
+    )
+    mocker.patch(
+        "urbanvitaliz.apps.communication.digests.send_whatsup_reminders_digest_by_project"
+    )
+
+    call_command("senddigests")
+
+    digests.send_new_recommendations_reminders_digest_by_project.assert_not_called()
+    digests.send_whatsup_reminders_digest_by_project.assert_not_called()
+
+
+@pytest.mark.django_db
+@override_settings(BREVO_FORCE_DEBUG=True)
+def test_command_pending_reminders_not_sent_if_project_muted(request, mocker):
+    current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+
+    project = baker.make(projects_models.Project, sites=[current_site], muted=True)
+    assign_collaborator(user, project, is_owner=True)
 
     mocker.patch(
         "urbanvitaliz.apps.communication.digests.send_new_recommendations_reminders_digest_by_project"
