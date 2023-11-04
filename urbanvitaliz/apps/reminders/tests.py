@@ -445,6 +445,47 @@ def test_make_or_update_new_recommendations_reminder_is_deleted_if_no_task(
     assert models.Reminder.on_site.count() == 0
 
 
+@pytest.mark.django_db
+def test_make_or_update_new_reco_reminder_with_sent_reminder_honors_interval(
+    request,
+):
+    """Make sure we do not reschedule a reminder the day after the one sent"""
+    current_site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[current_site])
+
+    reminder = baker.make(
+        models.Reminder,
+        site=current_site,
+        project=project,
+        kind=models.Reminder.NEW_RECO,
+        sent_on=timezone.localdate() - datetime.timedelta(days=2),
+        deadline=timezone.localdate() - datetime.timedelta(days=6),
+    )
+
+    baker.make(
+        tasks_models.Task,
+        created_on=timezone.now() - datetime.timedelta(days=10),
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
+    api.make_or_update_new_recommendations_reminder(current_site, project)
+
+    reminder.refresh_from_db()
+
+    assert models.Reminder.on_site_to_send.count() == 1
+    assert models.Reminder.on_site_sent.count() == 1
+
+    next_reminder = models.Reminder.on_site_to_send.first()
+
+    assert (
+        next_reminder.deadline
+        == (reminder.sent_on + datetime.timedelta(days=6 * 7)).date()
+    )
+
+
 ########################################################################
 # What's up reminders
 ########################################################################
@@ -677,6 +718,51 @@ def test_make_or_update_whatsup_reminder_is_deleted_if_no_task(request, mocker):
     reminder = api.make_or_update_whatsup_reminder(current_site, project)
 
     assert reminder is None
+
+
+@pytest.mark.django_db
+def test_make_or_update_whatsup_reminder_with_sent_reminder_honors_interval(
+    request,
+):
+    """Make sure we do not reschedule a reminder the day after the one sent"""
+    current_site = get_current_site(request)
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        last_members_activity_at=timezone.now() - datetime.timedelta(days=10),
+    )
+
+    reminder = baker.make(
+        models.Reminder,
+        site=current_site,
+        project=project,
+        kind=models.Reminder.WHATS_UP,
+        sent_on=timezone.localdate() - datetime.timedelta(days=2),
+        deadline=timezone.localdate() - datetime.timedelta(days=6),
+    )
+
+    baker.make(
+        tasks_models.Task,
+        created_on=timezone.now() - datetime.timedelta(days=10),
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
+    api.make_or_update_whatsup_reminder(current_site, project)
+
+    reminder.refresh_from_db()
+
+    assert models.Reminder.on_site_to_send.count() == 1
+    assert models.Reminder.on_site_sent.count() == 1
+
+    next_reminder = models.Reminder.on_site_to_send.first()
+
+    assert (
+        next_reminder.deadline
+        == (reminder.sent_on + datetime.timedelta(days=6 * 7)).date()
+    )
 
 
 ########################################################################

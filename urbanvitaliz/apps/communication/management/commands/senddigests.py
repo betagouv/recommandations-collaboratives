@@ -48,14 +48,12 @@ class Command(BaseCommand):
             is_active=True, profile__sites=site
         )
 
-        # Send reminders
+        # Send reminders (new recommendation + whatsup)
         logger.info("** Sending Project Reminders **")
-        for (
-            project
-        ) in project_models.Project.on_site.all():  # FIXME include inactive project?
+        for project in project_models.Project.on_site.all():
             digests.send_reminder_digests_by_project(project, dry_run)
 
-        # Send project collaborators new recommendations
+        # Send project collaborators new recommendations digest
         logger.info("** Sending new recommendations digests **")
         for (
             project
@@ -65,7 +63,7 @@ class Command(BaseCommand):
                     logger.info(f"Sent new reco digest for {user} on {project.name}")
 
         # Digests for non switchtenders
-        logger.info("** Sending general digests **")
+        logger.info("** Sending general digests **")  # FIXME include inactive project?
         for user in active_users.exclude(groups__in=[advisor_group]):
             if digests.send_digest_for_non_switchtender_by_user(user, dry_run):
                 logger.info(f"Sent general digest for {user}")

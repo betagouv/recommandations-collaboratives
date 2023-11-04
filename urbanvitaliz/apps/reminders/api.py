@@ -19,9 +19,6 @@ logger = logging.getLogger("main")
 
 
 def make_or_update_reminder(site, project, kind, deadline):
-    if deadline < timezone.localdate():
-        return None
-
     if site not in project.sites.all():
         return None
 
@@ -63,7 +60,8 @@ def make_or_update_reminder(site, project, kind, deadline):
             return existing_reminder
 
     logger.info(
-        f"Creating reminder <{kind}> for project <{project.name}> ({project.pk})"
+        f"Creating reminder <{kind}> for project <{project.name}> "
+        f"({project.pk}) ; deadline={deadline}"
     )
     return models.Reminder.objects.create(
         site=site,
@@ -108,13 +106,25 @@ def make_or_update_new_recommendations_reminder(site, project, interval_in_days=
         .first()
     )
 
+    last_sent_reminder = (
+        models.Reminder.on_site_sent.filter(
+            kind=models.Reminder.NEW_RECO, project=project
+        )
+        .order_by("-sent_on")
+        .first()
+    )
+
     if last_task:
-        last_task_created_on = last_task.created_on
+        starting_point = last_task.created_on
     else:
-        last_task_created_on = timezone.now()
+        starting_point = timezone.now()
+
+    if last_sent_reminder:
+        if last_sent_reminder.sent_on > starting_point:
+            starting_point = last_sent_reminder.sent_on
 
     interval = datetime.timedelta(days=interval_in_days)
-    deadline = (last_task_created_on + interval).date()
+    deadline = (starting_point + interval).date()
 
     return make_or_update_reminder(
         site=site, project=project, kind=models.Reminder.NEW_RECO, deadline=deadline
@@ -139,15 +149,23 @@ def make_or_update_whatsup_reminder(site, project):
     if not last_activity:
         logger.warning(
             f"Bogus project <{project.name}>(id={project.id}), "
-            "no last members activity, skipping"
+            "no last members activity, using now()"
         )
-        return None
+        last_activity = timezone.now()
 
-    # last_reminder = (
-    #     models.Reminder.on_site_sent.filter(project=project)
-    #     .order_by("-deadline")
-    #     .first()
-    # )
+    starting_point = last_activity
+
+    last_sent_reminder = (
+        models.Reminder.on_site_sent.filter(
+            project=project, kind=models.Reminder.WHATS_UP
+        )
+        .order_by("-sent_on")
+        .first()
+    )
+
+    if last_sent_reminder:
+        if last_sent_reminder.sent_on > starting_point:
+            starting_point = last_sent_reminder.sent_on
 
     # interval_state = 0
     # if last_reminder:
@@ -156,7 +174,7 @@ def make_or_update_whatsup_reminder(site, project):
     # FIXME(glibersat) Hardcoded: fetch real interval from SiteConfiguration
     interval = datetime.timedelta(days=6 * 7)
 
-    deadline = (last_activity + interval).date()
+    deadline = (starting_point + interval).date()
 
     return make_or_update_reminder(
         site=site, project=project, kind=models.Reminder.WHATS_UP, deadline=deadline
