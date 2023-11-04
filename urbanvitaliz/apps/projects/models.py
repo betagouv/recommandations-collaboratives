@@ -347,6 +347,15 @@ class Project(models.Model):
     )
 
     @property
+    def next_reminder(self):
+        current_site = Site.objects.get_current()
+        return (
+            self.reminders.filter(site=current_site, sent_on=None)
+            .order_by("deadline")
+            .first()
+        )
+
+    @property
     def resources(self):
         return self.tasks.exclude(resource=None)
 

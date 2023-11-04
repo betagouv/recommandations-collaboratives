@@ -38,7 +38,7 @@ def make_or_update_reminder(site, project, kind, deadline):
         .count()
     )
 
-    if task_count == 0 and not existing_reminder:
+    if (existing_reminder is None) and task_count == 0:
         return None
 
     if existing_reminder:
@@ -46,8 +46,8 @@ def make_or_update_reminder(site, project, kind, deadline):
         # Recommendations to remind. Delete it otherwise
         if task_count == 0:
             logger.warning(
-                f"Deleting bogus {kind} reminder since no tasks are "
-                f"still active for project <{project.name}>"
+                f"Deleting bogus {kind} reminder since there are no more"
+                f"open tasks for project <{project.name}>"
                 f" ({project.pk})"
             )
             existing_reminder.delete()
@@ -108,12 +108,13 @@ def make_or_update_new_recommendations_reminder(site, project, interval_in_days=
         .first()
     )
 
-    if not last_task:
-        return None
+    if last_task:
+        last_task_created_on = last_task.created_on
+    else:
+        last_task_created_on = timezone.now()
 
     interval = datetime.timedelta(days=interval_in_days)
-
-    deadline = (last_task.created_on + interval).date()
+    deadline = (last_task_created_on + interval).date()
 
     return make_or_update_reminder(
         site=site, project=project, kind=models.Reminder.NEW_RECO, deadline=deadline

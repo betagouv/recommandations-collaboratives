@@ -268,7 +268,7 @@ def test_make_or_update_new_reco_reminder_with_unpublished_task(request):
 
 
 @pytest.mark.django_db
-def test_make_or_update_new_reco_reminder_with_task_in_uninteresting_states(request):
+def test_make_or_update_new_reco_reminder_with_task_in_closed_states(request):
     current_site = get_current_site(request)
     project = baker.make(projects_models.Project, sites=[current_site])
     baker.make(
@@ -438,9 +438,11 @@ def test_make_or_update_new_recommendations_reminder_is_deleted_if_no_task(
         kind=models.Reminder.NEW_RECO,
     )
 
+    assert models.Reminder.on_site.count() == 1
     reminder = api.make_or_update_new_recommendations_reminder(current_site, project)
 
     assert reminder is None
+    assert models.Reminder.on_site.count() == 0
 
 
 ########################################################################
