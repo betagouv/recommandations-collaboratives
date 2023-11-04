@@ -13,7 +13,6 @@ from itertools import groupby
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.urls import reverse
-from django.utils import timezone
 
 from urbanvitaliz import utils, verbs
 from urbanvitaliz.apps.tasks import models as tasks_models
@@ -63,6 +62,10 @@ def send_reminder_digests_by_project(project, dry_run=False):
         site=current_site, project=project, dry_run=dry_run
     )
 
+    # Reschedule next reminders
+    make_or_update_new_recommendations_reminder(current_site, project)
+    make_or_update_whatsup_reminder(current_site, project)
+
 
 def send_new_recommendations_reminders_digest_by_project(site, project, dry_run):
     """Send 'New Recommendation' reminder for the given project"""
@@ -70,10 +73,10 @@ def send_new_recommendations_reminders_digest_by_project(site, project, dry_run)
     make_or_update_new_recommendations_reminder(site, project)
 
     # Actually, send reminders
-    next_reminder = get_due_new_recommendations_reminder_for_project(site, project)
+    due_reminder = get_due_new_recommendations_reminder_for_project(site, project)
 
-    if not next_reminder:
-        logger.debug("No NEW_RECO due reminder, skipping")
+    if not due_reminder:
+        logger.debug("No NEW_RECO due reminder for project <{project.name}>, skipping")
         return False
 
     if not dry_run:
@@ -90,12 +93,12 @@ def send_new_recommendations_reminders_digest_by_project(site, project, dry_run)
             {"name": normalize_user_name(project.owner), "email": project.owner.email},
             params=digest,
         )
+        logger.info(f"Sent NEW_RECO reminder <{due_reminder}>")
 
         # Mark as dispatched
-        next_reminder.sent_on = timezone.now()
-        next_reminder.save()
+        due_reminder.mark_as_sent()
     else:
-        logger.info(f"[DRY RUN] Would have sent NEW_RECO reminder <{next_reminder}>")
+        logger.info(f"[DRY RUN] Would have sent NEW_RECO reminder <{due_reminder}>")
 
     return True
 
@@ -106,10 +109,10 @@ def send_whatsup_reminders_digest_by_project(site, project, dry_run):
     make_or_update_whatsup_reminder(site, project)
 
     # Actually, send reminders
-    next_reminder = get_due_whatsup_reminder_for_project(site, project)
+    due_reminder = get_due_whatsup_reminder_for_project(site, project)
 
-    if not next_reminder:
-        logger.debug("No WHATSUP due reminder, skipping")
+    if not due_reminder:
+        logger.debug("No WHATSUP due reminder for <{project.name}>, skipping")
         return False
 
     if not dry_run:
@@ -127,11 +130,12 @@ def send_whatsup_reminders_digest_by_project(site, project, dry_run):
             params=digest,
         )
 
+        logger.info(f"Sent WHATS_UP reminder <{due_reminder}>")
+
         # Mark as dispatched
-        next_reminder.sent_on = timezone.now()
-        next_reminder.save()
+        due_reminder.mark_as_sent()
     else:
-        logger.info(f"[DRY RUN] Would have sent WHATS_UP reminder <{next_reminder}>")
+        logger.info(f"[DRY RUN] Would have sent WHATS_UP reminder <{due_reminder}>")
 
     return True
 

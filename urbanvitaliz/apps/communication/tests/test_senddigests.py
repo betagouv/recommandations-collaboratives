@@ -8,6 +8,7 @@ created: 2023-07-11 15:26:00 CEST
 """
 
 import io
+import datetime
 
 import pytest
 from django.contrib.auth import models as auth_models
@@ -19,6 +20,7 @@ from model_bakery import baker
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects.utils import assign_advisor, assign_collaborator
 from urbanvitaliz.apps.tasks import models as task_models
+from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.utils import get_group_for_site
 
 from .. import digests
@@ -192,6 +194,35 @@ def test_command_pending_recommendation_reminder_sent(request, mocker):
 
     digests.send_new_recommendations_reminders_digest_by_project.assert_called()
     digests.send_whatsup_reminders_digest_by_project.assert_called()
+
+
+@pytest.mark.django_db
+@override_settings(BREVO_FORCE_DEBUG=True)
+def test_command_pending_reminder_sent_and_rescheduled(request, mocker):
+    current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        last_members_activity_at=timezone.now() - datetime.timedelta(days=70),
+    )
+
+    baker.make(
+        task_models.Task,
+        created_on=timezone.now() - datetime.timedelta(days=70),
+        project=project,
+        public=True,
+        site=current_site,
+        status=task_models.Task.INPROGRESS,
+    )
+
+    assign_collaborator(user, project, is_owner=True)
+
+    call_command("senddigests")
+
+    assert reminders_models.Reminder.on_site_to_send.count() == 2
+    assert reminders_models.Reminder.on_site_sent.count() == 2
 
 
 @pytest.mark.django_db
