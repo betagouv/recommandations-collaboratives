@@ -266,6 +266,10 @@
     }
 }
 
+.border-red {
+    border: 1px solid #CE0500;
+}
+
 .white-space-pre {
     white-space: pre;
 }
