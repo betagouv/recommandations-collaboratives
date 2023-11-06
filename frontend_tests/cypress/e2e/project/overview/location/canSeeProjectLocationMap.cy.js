@@ -17,7 +17,7 @@ describe('I can see the location of a project on the project overview', () => {
     })
 
     it(`displays an area circle around the centroid of the commune if geolocation does not exist `, () => {
-        const currentProject = projects[13];
+        const currentProject = projects[10];
         cy.visit(`/project/${currentProject.pk}`).then(() => {
             cy.get('[data-test-id="project-map-static"]').find('.leaflet-overlay-pane').find('.area-circle');
         })
@@ -36,7 +36,7 @@ describe('I can see the location of a project on the project overview', () => {
     it(`opens a modal with an interactive map`, () => {
         const currentProject = projects[11];
         cy.visit(`/project/${currentProject.pk}`).then(() => {
-            cy.wait(500); // TODO: fix by testing loading state (+ add loading spinner)
+            cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
             cy.get('[data-test-id="project-location"]').find('[data-test-id="toggle-open-map-modal"]').click({force: true});
             cy.get('[data-test-id="project-map-interactive"]').find('.leaflet-control-zoom')
         });

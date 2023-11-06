@@ -8,7 +8,8 @@
      @dragover="onDragOver(event)"
      @drop="onDrop(event, board.status, task.uuid)"
      @dragenter="onDragEnter(event)"
-     @dragleave="onDragLeave(event)">
+     @dragleave="onDragLeave(event)"
+     data-test-id="draggable">
     <div x-show="task.isLoading"
          class="ms-2 item-loader z-index-1"
          style="width: 24px;
@@ -32,10 +33,10 @@
                      @click="handleOpenPreviewModal()"
                      style="cursor: pointer;
                             font-size: 0.9em">
-                    <template x-if="task.topic">
+                    <template x-if="task.topic && task.topic.name">
                         <div class="d-flex align-items-center mb-1 mt-1">
                             <span class="topic-indicator bg-green me-2"></span>
-                            <h5 x-text="task.topic.name" class="fw-medium tiny text-gray-800 mb-0"></h5>
+                            <h5 data-test-id="task-kanban-topic" x-text="task.topic.name" class="fw-medium tiny text-gray-800 mb-0"></h5>
                         </div>
                     </template>
                     <h6 class="mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"

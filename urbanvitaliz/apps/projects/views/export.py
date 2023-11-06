@@ -50,7 +50,7 @@ def project_list_export_csv(request):
 
     today = datetime.datetime.today().date()
 
-    content_disposition = f'attachment; filename="urbanvitaliz-projects-{today}.csv"'
+    content_disposition = f'attachment; filename="projects-{today}.csv"'
     response = HttpResponse(
         content_type="text/csv",
         headers={"Content-Disposition": content_disposition},
@@ -61,6 +61,7 @@ def project_list_export_csv(request):
         [
             "departement",
             "commune_insee",
+            "commune_nom",
             "nom_friche",
             "detail_adresse",
             "date_contact",
@@ -121,6 +122,7 @@ def project_list_export_csv(request):
             [
                 project.commune.department.code if project.commune else "??",
                 project.commune.insee if project.commune else "??",
+                project.commune.name if project.commune else "??",
                 project.name,
                 project.location,
                 project.created_on.date(),

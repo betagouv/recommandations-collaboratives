@@ -28,11 +28,6 @@ main {
     overflow-x: auto;
 }
 
-
-.secondary-navbar {
-    padding-top: 0px;
-}
-
 /* Info boxes */
 .bd-callout {
 	  padding: 1.25rem;
@@ -154,4 +149,19 @@ progress::-moz-progress-bar {
 
 .modal {
     z-index: 9889089;
+}
+
+// Main content layout
+.main-content {
+    padding-top: 66px
+}
+
+.main-content.public-content {
+    padding-top: 80px;
+}
+
+@media (min-width: 690px) {
+    .main-content.public-content {
+        padding-top: 150px;
+    }
 }

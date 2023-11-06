@@ -1,28 +1,40 @@
 {% load static %}
 {% if user.is_authenticated %}
-    <a href="{% url 'home' %}"
-       class="d-flex align-middle align-items-center">
-        <img class="logo-uv"
-             src="{% static 'img/logo-small.png' %}"
-             width="auto"
-             height="40px"
-             alt="Logo UrbanVitaliz"/>
-    </a>
+     <a href="{% url 'home' %}"
+        class="d-flex align-middle align-items-center">
+          <img class="logo-uv"
+               src="{% static 'img/logo-small.png' %}"
+               width="auto"
+               height="40px"
+               alt="Logo UrbanVitaliz" />
+     </a>
 {% else %}
-    <a href="{% url 'home' %}"
-       class="d-flex align-middle p-3 align-items-center">
-        <img class="logo-rf"
-             src="{% static 'home/img/home/logo_rf.png' %}"
-             width="100px"
-             alt="Logo république française">
-        <img class="mx-4 logo-cerema"
-             src="{% static 'img/partners/logo_cerema.png' %}"
-             width="120px"
-             alt="Logo du Cerema">
-        <img class="logo-uv"
-             src="{% static 'img/logo-uv.png' %}"
-             width="auto"
-             height="40px"
-             alt="Logo UrbanVitaliz"/>
-    </a>
+     <div class="navbar-logo">
+          <button class="toggler-secondary"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#secondary-navbar"
+                  aria-controls="secondary-navbar"
+                  aria-expanded="false"
+                  aria-label="Ouvrir le Menu"
+                  data-test-id="toggler-secondary-menu">
+               <span class="navbar-toggler-icon"></span>
+          </button>
+          <a href="{% url 'home' %}"
+             class="d-flex align-middle p-3 align-items-center">
+               <img class="logo-rf"
+                    src="{% static 'home/img/home/logo_rf.png' %}"
+                    width="100px"
+                    alt="Logo république française">
+               <img class="mx-4 logo-cerema"
+                    src="{% static 'img/partners/logo_cerema.png' %}"
+                    width="120px"
+                    alt="Logo du Cerema">
+               <img class="logo-uv"
+                    src="{% static 'img/logo-uv.png' %}"
+                    width="auto"
+                    height="40px"
+                    alt="Logo UrbanVitaliz" />
+          </a>
+     </div>
 {% endif %}
