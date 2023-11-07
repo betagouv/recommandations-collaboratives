@@ -1,5 +1,4 @@
 <!-- Active project -->
-
 {% load static %}
 <div class="flag medium-border-radius border-blue mb-4 d-flex align-items-start justify-content-between">
     <div class="d-flex align-items-start">
@@ -23,6 +22,11 @@
         </div>
     </div>
     <div class="d-flex justify-content-end">
-        <button class="button blue filled flex-grow-1 text-nowrap inherit">Réactiver le projet</button>
+        <form id="project-activate"
+              method="POST"
+              action="{% url 'projects-project-set-active' project.pk %}">
+            {% csrf_token %}
+            <button class="button blue filled flex-grow-1 text-nowrap inherit">Réactiver le projet</button>
+        </form>
     </div>
 </div>

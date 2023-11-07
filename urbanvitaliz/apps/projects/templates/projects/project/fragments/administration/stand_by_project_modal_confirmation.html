@@ -20,19 +20,29 @@
                     <span class="text-info-custom fw-medium">Voulez-vous mettre le projet en pause ?</span>
                     <span class="font-small text-grey-dark mt-1">Une fois le projet en pause :</span>
                     <ul class="list-unstyled mt-2">
-                        <li class="bg-light p-2 medium-border-radius my-2"><span class="text-grey-dark text-nowrap">Vous ne recevrez plus de rappels.</span></li>
-                        <li class="bg-light p-2 medium-border-radius my-2"><span class="text-grey-dark text-nowrap">Vous ne recevrez plus de notification par email sur l'activité du projet.</span></li>
-                        <li class="bg-light p-2 medium-border-radius my-2"><span class="text-grey-dark text-nowrap">Vous pourrez réactiver le projet en retournant dans l’administration du projet.</span></li>
-                        <li class="bg-light p-2 medium-border-radius my-2"><span class="text-grey-dark text-nowrap">Le projet sera affiché comme "En pause" sur UrbanVitaliz.</span></li>
+                        <li class="bg-light p-2 medium-border-radius my-2">
+                            <span class="text-grey-dark text-nowrap">Vous ne recevrez plus de rappels.</span>
+                        </li>
+                        <li class="bg-light p-2 medium-border-radius my-2">
+                            <span class="text-grey-dark text-nowrap">Vous ne recevrez plus de notification par email sur l'activité du projet.</span>
+                        </li>
+                        <li class="bg-light p-2 medium-border-radius my-2">
+                            <span class="text-grey-dark text-nowrap">Vous pourrez réactiver le projet en retournant dans l’administration du projet.</span>
+                        </li>
+                        <li class="bg-light p-2 medium-border-radius my-2">
+                            <span class="text-grey-dark text-nowrap">Le projet sera affiché comme "En pause" sur UrbanVitaliz.</span>
+                        </li>
                     </ul>
                 </div>
-                <form method="POST" class="form mt-1 d-flex justify-content-between">
+                <form id="project-deactivate"
+                      method="POST"
+                      action="{% url 'projects-project-set-inactive' project.pk %}"
+                      class="form mt-1 d-flex justify-content-between">
                     {% csrf_token %}
                     <a class="button grey filled tiny text-nowrap inherit"
                        data-bs-dismiss="modal"
                        aria-label="Close">Annuler</a>
                     <button data-test-id="delete-task-modal-button"
-                            type="submit"
                             class="button filled blue tiny text-nowrap inherit">Mettre le projet en pause</button>
                 </form>
             </div>
