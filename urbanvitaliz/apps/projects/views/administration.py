@@ -273,15 +273,16 @@ def access_collaborator_resend_invite(request, project_id, invite_id):
 
 @login_required
 @require_http_methods(["POST"])
-def access_collaborator_delete(request, project_id: int, email: str):
+def access_collaborator_delete(request, project_id: int, username: str):
     """Delete a collectivity member from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    has_perm_or_403(request.user, "manage_collaborators", project)
-
     membership = get_object_or_404(
-        models.ProjectMember, project=project, member__username=email
+        models.ProjectMember, project=project, member__username=username
     )
+
+    if membership.member != request.user:
+        has_perm_or_403(request.user, "manage_collaborators", project)
 
     if request.method == "POST":
         if membership.is_owner:
@@ -295,11 +296,16 @@ def access_collaborator_delete(request, project_id: int, email: str):
             unassign_collaborator(membership.member, project)
             messages.success(
                 request,
-                "{0} a bien été supprimé de la liste des participants.".format(email),
+                "{0} a bien été supprimé de la liste des participants.".format(
+                    username
+                ),
                 extra_tags=["auth"],
             )
 
-    return redirect(reverse("projects-project-administration", args=[project_id]))
+    if membership.member != request.user:
+        return redirect(reverse("projects-project-administration", args=[project_id]))
+    else:
+        return redirect(reverse("home"))
 
 
 ##############################################################################
@@ -362,28 +368,37 @@ def access_advisor_resend_invite(request, project_id, invite_id):
 
 @login_required
 @require_http_methods(["POST"])
-def access_advisor_delete(request, project_id: int, email: str):
+def access_advisor_delete(request, project_id: int, username: str):
     """Delete an advisor from the project ACL"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-
-    has_perm_or_403(request.user, "manage_advisors", project)
 
     ps = get_object_or_404(
         models.ProjectSwitchtender,
         project=project,
-        switchtender__username=email,
+        switchtender__username=username,
         site=request.site,
     )
 
+    if request.user != ps.switchtender:
+        has_perm_or_403(request.user, "manage_advisors", project)
+
     unassign_advisor(ps.switchtender, project, request.site)
 
-    messages.success(
-        request,
-        f"{email} a bien été supprimé de la liste des conseiller·e·s.",
-        extra_tags=["auth"],
-    )
+    if request.user != ps.switchtender:
+        messages.success(
+            request,
+            f"{username} a bien été supprimé de la liste des conseiller·e·s.",
+            extra_tags=["auth"],
+        )
+        return redirect(reverse("projects-project-administration", args=[project_id]))
+    else:
+        messages.success(
+            request,
+            "Vous avez bien été supprimé de la liste des conseiller·e·s.",
+            extra_tags=["auth"],
+        )
 
-    return redirect(reverse("projects-project-administration", args=[project_id]))
+        return redirect(reverse("projects-project-detail", args=[project_id]))
 
 
 #############################################################

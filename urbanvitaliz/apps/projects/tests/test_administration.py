@@ -270,7 +270,7 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
 
     url = reverse(
         "projects-project-access-collectivity-delete",
-        args=[project.id, membership.member.email],
+        args=[project.id, membership.member.username],
     )
 
     with login(client) as user:
@@ -301,7 +301,7 @@ def test_collaborator_can_remove_other_collaborator_from_project(request, client
 
     url = reverse(
         "projects-project-access-collectivity-delete",
-        args=[project.id, collaborator.email],
+        args=[project.id, collaborator.username],
     )
 
     with login(client) as user:
@@ -313,6 +313,31 @@ def test_collaborator_can_remove_other_collaborator_from_project(request, client
 
     project = models.Project.on_site.get(id=project.id)
     assert collaborator not in project.projectmember_set.all()
+
+
+@pytest.mark.django_db
+def test_collaborator_can_remove_herself_project(request, client):
+    site = get_current_site(request)
+    project = Recipe(
+        models.Project,
+        sites=[site],
+        status="READY",
+    ).make()
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=False)
+        url = reverse(
+            "projects-project-access-collectivity-delete",
+            args=[project.id, user.username],
+        )
+
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert "login" not in response.url  # not a simple redirect to login
+
+    project = models.Project.on_site.get(id=project.id)
+    assert user not in project.projectmember_set.all()
 
 
 @pytest.mark.django_db
@@ -332,7 +357,7 @@ def test_advisor_can_remove_collaborator_from_project(request, client):
 
     url = reverse(
         "projects-project-access-collectivity-delete",
-        args=[project.id, collaborator.email],
+        args=[project.id, collaborator.username],
     )
 
     with login(client) as user:
@@ -362,7 +387,7 @@ def test_staff_can_remove_collaborator_from_project(request, client):
 
     url = reverse(
         "projects-project-access-collectivity-delete",
-        args=[project.id, collaborator.email],
+        args=[project.id, collaborator.username],
     )
 
     with login(client, groups=["example_com_staff"]):
@@ -390,7 +415,7 @@ def test_unprivileged_user_cannot_remove_collaborator_from_project(request, clie
 
     url = reverse(
         "projects-project-access-collectivity-delete",
-        args=[project.id, collaborator.email],
+        args=[project.id, collaborator.username],
     )
 
     with login(client):
@@ -424,7 +449,7 @@ def test_collaborator_cannot_remove_advisor_from_project(request, client):
 
     url = reverse(
         "projects-project-access-advisor-delete",
-        args=[project.id, advisor.email],
+        args=[project.id, advisor.username],
     )
 
     with login(client) as user:
@@ -454,7 +479,7 @@ def test_advisor_cannot_remove_advisor_from_project(request, client):
 
     url = reverse(
         "projects-project-access-advisor-delete",
-        args=[project.id, advisor.email],
+        args=[project.id, advisor.username],
     )
 
     with login(client) as user:
@@ -465,6 +490,30 @@ def test_advisor_cannot_remove_advisor_from_project(request, client):
 
     project = models.Project.on_site.get(id=project.id)
     assert advisor in project.switchtenders.all()
+
+
+@pytest.mark.django_db
+def test_advisor_can_remove_herself_from_project(request, client):
+    site = get_current_site(request)
+    project = Recipe(
+        models.Project,
+        sites=[site],
+        status="READY",
+    ).make()
+
+    with login(client) as user:
+        assign_advisor(user, project, site)
+        url = reverse(
+            "projects-project-access-advisor-delete",
+            args=[project.id, user.username],
+        )
+
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    project = models.Project.on_site.get(id=project.id)
+    assert user not in project.switchtenders.all()
 
 
 @pytest.mark.django_db
@@ -484,7 +533,7 @@ def test_staff_can_remove_advisor_from_project_on_site(request, client):
 
     url = reverse(
         "projects-project-access-advisor-delete",
-        args=[project.id, advisor.email],
+        args=[project.id, advisor.username],
     )
 
     with login(client, groups=["example_com_staff"]):
