@@ -24,6 +24,17 @@
         </div>
     </div>
     <div class="flex-grow-1">
-        <button class="button red filled flex-grow-1 text-nowrap inherit">Quitter le projet</button>
+        {% if not request.user.is_owner or not request.user.is_staff %}
+            <form id="projects-observer-leave" method="post">
+                {% csrf_token %}
+                {% if request.user.is_advisor %}
+                    <button formaction="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}"
+                            class="button red filled flex-grow-1 text-nowrap inherit">Quitter le projet</button>
+                {% else %}
+                    <button formaction="{% url 'projects-project-access-collectivity-delete' project.pk request.user.username %}"
+                            class="button red filled flex-grow-1 text-nowrap inherit">Quitter le projet</button>
+                {% endif %}
+            </form>
+        {% endif %}
     </div>
 </div>
