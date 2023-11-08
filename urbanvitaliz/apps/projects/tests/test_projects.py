@@ -1179,6 +1179,76 @@ def test_staff_updates_tags(request, client):
 
 
 #################################################################
+# Geolocation
+#################################################################
+@pytest.mark.django_db
+def test_unprivileged_user_cannot_update_location(request, client):
+    current_site = get_current_site(request)
+
+    project = Recipe(models.Project, sites=[current_site]).make()
+
+    data = {"x": 32.3, "y": -5.0}
+
+    with login(client):
+        response = client.post(
+            reverse("projects-project-location", args=[project.id]), data=data
+        )
+
+    assert response.status_code == 403
+
+    project.refresh_from_db()
+
+    assert project.location_x is None
+    assert project.location_y is None
+
+
+@pytest.mark.django_db
+def test_advisor_can_update_location(request, client):
+    current_site = get_current_site(request)
+
+    project = Recipe(models.Project, sites=[current_site]).make()
+
+    data = {"location_x": 32.3, "location_y": -5.0}
+
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, current_site)
+
+        response = client.post(
+            reverse("projects-project-location", args=[project.id]), data=data
+        )
+
+    assert response.status_code == 302
+
+    project.refresh_from_db()
+
+    assert project.location_x == data["location_x"]
+    assert project.location_y == data["location_y"]
+
+
+@pytest.mark.django_db
+def test_collaborator_can_update_location(request, client):
+    current_site = get_current_site(request)
+
+    project = Recipe(models.Project, sites=[current_site]).make()
+
+    data = {"location_x": 32.3, "location_y": -5.0}
+
+    with login(client) as user:
+        utils.assign_collaborator(user, project)
+
+        response = client.post(
+            reverse("projects-project-location", args=[project.id]), data=data
+        )
+
+    assert response.status_code == 302
+
+    project.refresh_from_db()
+
+    assert project.location_x == data["location_x"]
+    assert project.location_y == data["location_y"]
+
+
+#################################################################
 # Topics
 #################################################################
 

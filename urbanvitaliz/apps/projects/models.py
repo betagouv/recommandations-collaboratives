@@ -8,7 +8,6 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import os
-import uuid
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -24,15 +23,8 @@ from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
-from tagging.fields import TagField
-from tagging.models import TaggedItem
-from tagging.registry import register as tagging_register
 from taggit.managers import TaggableManager
-from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
-from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.apps.resources import models as resources
 
 from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor, has_perm
 
@@ -48,6 +40,7 @@ COLLABORATOR_DRAFT_PERMISSIONS = (
     "projects.view_tasks",
     "projects.use_surveys",
     "projects.view_surveys",
+    "projects.change_location",
 )
 
 COLLABORATOR_PERMISSIONS = (
@@ -73,6 +66,7 @@ ADVISOR_PERMISSIONS = [
     "projects.manage_documents",
     "projects.use_surveys",
     "projects.view_surveys",
+    "projects.change_location",
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
@@ -306,6 +300,12 @@ class Project(models.Model):
     )
 
     location = models.CharField(max_length=256, verbose_name="Localisation")
+    location_x = models.FloatField(
+        null=True, blank=True, verbose_name="Coordonnées géographiques (X)"
+    )
+    location_y = models.FloatField(
+        null=True, blank=True, verbose_name="Coordonnées géographiques (Y)"
+    )
     commune = models.ForeignKey(
         geomatics_models.Commune,
         null=True,
@@ -365,6 +365,8 @@ class Project(models.Model):
             ("invite_advisors", "Can invite advisors"),
             ("manage_collaborators", "Can manage collaborators"),
             ("manage_advisors", "Can manage advisors"),
+            # Geolocation
+            ("change_location", "Can change the geolocation"),
         )
 
     def __str__(self):  # pragma: nocover
@@ -653,7 +655,9 @@ class Document(models.Model):
         verbose_name_plural = "documents"
 
     def get_absolute_url(self):
-        return reverse("projects-project-detail-documents", kwargs={"project_id": self.project.pk})
+        return reverse(
+            "projects-project-detail-documents", kwargs={"project_id": self.project.pk}
+        )
 
     def __str__(self):  # pragma: nocover
         return f"Document {self.id}"
