@@ -24,7 +24,9 @@
             </div>
         </div>
         <div class="flex-grow-1">
-            <form id="projects-observer-leave" method="POST">
+            <form id="form-quit-project__admin"
+                  data-test-id="form-quit-project__admin"
+                  method="POST">
                 {% csrf_token %}
                 {% if position.is_advisor or position.is_observer and not is_regional_actor %}
                     <button formaction="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}"

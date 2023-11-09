@@ -26,11 +26,13 @@
                 </div>
             </div>
             <div class="d-flex justify-content-end">
-                <form id="project-activate-admin"
+                <form id="form-activate-project__admin"
+                      data-test-id="form-activate-project__admin"
                       method="POST"
                       action="{% url 'projects-project-set-active' project.pk %}">
                     {% csrf_token %}
-                    <button class="button blue filled flex-grow-1 text-nowrap inherit">Réactiver le projet</button>
+                    <button data-test-id="button-activate-project"
+                            class="button blue filled flex-grow-1 text-nowrap inherit">Réactiver le projet</button>
                 </form>
             </div>
         </div>

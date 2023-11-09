@@ -34,7 +34,8 @@
                         </li>
                     </ul>
                 </div>
-                <form id="project-deactivate"
+                <form id="form-deactivate-project__admin"
+                      data-test-id="form-deactivate-project__admin"
                       method="POST"
                       action="{% url 'projects-project-set-inactive' project.pk %}"
                       class="form mt-1 d-flex justify-content-between">
@@ -42,7 +43,7 @@
                     <a class="button grey filled tiny text-nowrap inherit"
                        data-bs-dismiss="modal"
                        aria-label="Close">Annuler</a>
-                    <button data-test-id="delete-task-modal-button"
+                    <button data-test-id="button-deactivate-project"
                             class="button filled blue tiny text-nowrap inherit">Mettre le projet en pause</button>
                 </form>
             </div>
