@@ -1,6 +1,7 @@
 {% load static %}
 {% if project.inactive_since != None %}
-  <aside class="flag d-flex slim grey flex-grow-1">
+  <aside class="flag d-flex slim grey flex-grow-1"
+         data-test-id="banner-activate-project">
     <svg class="me-4"
          width="48"
          height="46"
@@ -23,8 +24,8 @@
     </div>
     {% if show_action_button %}
       <div class="d-flex justify-content-end align-items-center">
-        <form id="form-activate-project__banner"
-              data-test-id="form-activate-project__banner"
+        <form id="form__banner-activate-project"
+              data-test-id="form__banner-activate-project"
               method="POST"
               action="{% url 'projects-project-set-active' project.pk %}">
           {% csrf_token %}

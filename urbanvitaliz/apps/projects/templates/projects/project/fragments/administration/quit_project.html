@@ -24,8 +24,8 @@
             </div>
         </div>
         <div class="flex-grow-1">
-            <form id="form-quit-project__admin"
-                  data-test-id="form-quit-project__admin"
+            <form id="form__admin-quit-project"
+                  data-test-id="form__admin-quit-project"
                   method="POST">
                 {% csrf_token %}
                 {% if position.is_advisor or position.is_observer and not is_regional_actor %}
