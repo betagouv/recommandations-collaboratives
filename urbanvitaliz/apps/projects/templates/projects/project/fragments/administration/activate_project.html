@@ -1,4 +1,4 @@
-<!-- Active project -->
+<!-- Activate project -->
 {% load static %}
 <div class="flag medium-border-radius border-blue mb-4 d-flex align-items-start justify-content-between">
     <div class="d-flex align-items-start">
@@ -22,7 +22,7 @@
         </div>
     </div>
     <div class="d-flex justify-content-end">
-        <form id="project-activate"
+        <form id="project-activate-admin"
               method="POST"
               action="{% url 'projects-project-set-active' project.pk %}">
             {% csrf_token %}
