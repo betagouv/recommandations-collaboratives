@@ -8,7 +8,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% with request.resolver_match.url_name as url_name %}
     {% block banner %}
-        {% if 'can_administrate_project' in user_project_perms %}
+        {% if user == project.owner or 'can_administrate_project' in user_project_perms %}
             {% include 'projects/project/fragments/project_active_status_banner.html' with show_action_button=1 %}
         {% else %}
             {% include 'projects/project/fragments/project_active_status_banner.html' %}
