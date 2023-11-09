@@ -27,7 +27,7 @@
               method="POST"
               action="{% url 'projects-project-set-active' project.pk %}">
           {% csrf_token %}
-          <button class="button blue filled text-nowrap inherit small">Réactiver le projet</button>
+          <button class="button blue outline text-nowrap inherit small">Réactiver le projet</button>
         </form>
       </div>
     {% endif %}
