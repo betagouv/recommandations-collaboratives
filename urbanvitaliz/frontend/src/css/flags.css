@@ -21,3 +21,20 @@
 .flag.orange {
     background-color: #ffeeb9;
 }
+
+.flag.slim {
+    padding: 10px 20px;
+}
+
+.flag.slim .title {
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.flag.slim > p {
+    margin-bottom: 0;
+}
+
+.flag.slim + * {
+    margin-block-start: 15px;
+}
