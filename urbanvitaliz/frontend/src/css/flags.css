@@ -35,6 +35,10 @@
     margin-bottom: 0;
 }
 
+.flag.slim {
+    margin-block-start: -15px;
+}
+
 .flag.slim + * {
     margin-block-start: 15px;
 }
