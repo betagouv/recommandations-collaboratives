@@ -10,7 +10,7 @@
                 <span class="tiny me-2">Le prochain rappel sera envoyé à <strong class="fw-medium">{{ user.username }}</strong> le  {{ reminder.deadline|default:"Aucun" }}</span>
             {% endwith %}
         {% else %}
-            <span class="tiny fw-medium text-blue">Aucun rappel prévu</span>
+            <span class="tiny fw-medium me-2">Aucun rappel prévu</span>
         {% endif %}
         <button x-ref="emailReminderButton"
                 @click="onEmailReminderButtonClick"
