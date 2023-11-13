@@ -10,6 +10,7 @@
 {% block project_detail %}
   {% get_obj_perms request.user for request.site as "user_site_perms" %}
   {% get_obj_perms request.user for project as "user_project_perms" %}
+  {% get_advising_position request.user project as position %}
   {% is_staff_for_current_site request.user as is_staff %}
   {% include 'projects/project/navigation.html' with administration_panel=True %}
   {{ project_form.postcode.value|json_script:"projectPostcode" }}
@@ -350,8 +351,8 @@
     <div class="col">
       <hr class="my-4" />
       {% include 'projects/project/fragments/administration/quit_project.html' %}
-      {% include 'projects/project/fragments/administration/active_project.html' %}
-      {% include 'projects/project/fragments/administration/stand_by_project.html' %}
+      {% include 'projects/project/fragments/administration/activate_project.html' with position=position %}
+      {% include 'projects/project/fragments/administration/stand_by_project.html' with position=position %}
     </div>
   </div>
 {% endblock %}
