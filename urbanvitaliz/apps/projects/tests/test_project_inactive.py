@@ -9,19 +9,20 @@ created: 2022-12-26 11:54:56 CEST
 
 
 import pytest
+from actstream.models import Action
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
-from urbanvitaliz.apps.tasks import models as tasks_models
+from urbanvitaliz import verbs
 from urbanvitaliz.apps.invites.api import invite_collaborator_on_project
 from urbanvitaliz.apps.projects.utils import assign_advisor, assign_collaborator
+from urbanvitaliz.apps.tasks import models as tasks_models
 from urbanvitaliz.utils import assign_site_staff, login
 
 from .. import models
-
 
 #################################################################
 # Project (in)activation
@@ -55,6 +56,52 @@ def test_owner_can_set_project_inactive_without_reason(request, client):
 
     assert project.inactive_since is not None
     assert project.inactive_reason == ""
+
+
+@pytest.mark.django_db
+def test_notify_and_trace_when_project_is_set_inactive(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+    )
+
+    collab = baker.make(auth_models.User, username="collab@project.info")
+    advisor = baker.make(auth_models.User, username="advisor@project.info")
+
+    url = reverse(
+        "projects-project-set-inactive",
+        args=[project.id],
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+        assign_collaborator(collab, project, is_owner=False)
+        assign_advisor(advisor, project)
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    # Notifications
+    assert user.notifications.count() == 0
+    assert collab.notifications.count() == 1
+    assert advisor.notifications.count() == 1
+
+    notif = advisor.notifications.first()
+
+    assert notif.actor == user
+    assert notif.verb == verbs.Project.SET_INACTIVE
+    assert notif.action_object == project
+    assert notif.target == project
+
+    # Action traces
+    assert Action.objects.count() == 1
+
+    action = Action.objects.first()
+
+    assert action.verb == verbs.Project.SET_INACTIVE
 
 
 @pytest.mark.django_db
@@ -165,6 +212,45 @@ def test_owner_can_set_project_active(request, client):
     project = models.Project.on_site.get(id=project.id)
 
     assert project.inactive_since is None
+
+
+@pytest.mark.django_db
+def test_trace_when_project_is_set_active(request, client):
+    site = get_current_site(request)
+
+    project = baker.make(
+        models.Project,
+        sites=[site],
+        status="READY",
+    )
+
+    collab = baker.make(auth_models.User, username="collab@project.info")
+    advisor = baker.make(auth_models.User, username="advisor@project.info")
+
+    url = reverse(
+        "projects-project-set-active",
+        args=[project.id],
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+        assign_collaborator(collab, project, is_owner=False)
+        assign_advisor(advisor, project)
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    # Notifications
+    assert user.notifications.count() == 0
+    assert collab.notifications.count() == 0
+    assert advisor.notifications.count() == 0
+
+    # Action traces
+    assert Action.objects.count() == 1
+
+    action = Action.objects.first()
+
+    assert action.verb == verbs.Project.SET_ACTIVE
 
 
 @pytest.mark.django_db

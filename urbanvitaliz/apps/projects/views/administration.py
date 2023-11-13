@@ -22,6 +22,7 @@ from notifications import models as notifications_models
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
+from notifications.signals import notify
 from urbanvitaliz.apps.invites.api import (
     invite_collaborator_on_project,
     invite_resend,
@@ -40,6 +41,7 @@ from ..utils import (
     refresh_user_projects_in_session,
     unassign_advisor,
     unassign_collaborator,
+    get_notification_recipients_for_project,
 )
 
 ########################################################################
@@ -435,7 +437,7 @@ def set_project_inactive(request, project_id: int):
     and a special state, allowing only partial actions."""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    if not (
+    if project.inactive_since or not (
         request.user == project.owner or is_staff_for_site(request.user, request.site)
     ):
         raise PermissionDenied("L'information demandée n'est pas disponible")
@@ -446,6 +448,27 @@ def set_project_inactive(request, project_id: int):
         project = form.save(commit=False)
         project.inactive_since = timezone.now()
         project.save()
+
+        # Notifications
+        recipients = get_notification_recipients_for_project(project)
+        recipients = recipients.exclude(id=request.user.id)
+
+        notify.send(
+            sender=request.user,
+            actor=request.user,
+            recipient=recipients,
+            verb=verbs.Project.SET_INACTIVE,
+            action_object=project,
+            target=project,
+        )
+
+        # Action trace
+        action.send(
+            request.user,
+            verb=verbs.Project.SET_INACTIVE,
+            action_object=project,
+            target=project,
+        )
 
     else:
         raise HttpResponseBadRequest("Formulaire invalide")
@@ -459,12 +482,20 @@ def set_project_active(request, project_id: int):
     """Declare a project active"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    if not (
+    if not project.inactive_since or not (
         request.user == project.owner or is_staff_for_site(request.user, request.site)
     ):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
     project.reactivate()
+
+    # Action trace
+    action.send(
+        request.user,
+        verb=verbs.Project.SET_ACTIVE,
+        action_object=project,
+        target=project,
+    )
 
     return redirect(reverse("projects-project-administration", args=(project.id,)))
 
