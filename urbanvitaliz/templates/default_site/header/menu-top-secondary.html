@@ -75,7 +75,7 @@
         {% endif %}
         <!-- Projects -->
         {% if active_project %}
-            {% if request.user in active_project.members.all and not 'projects-project-list-advisor' in url_name %}
+            {% if not 'projects-project-list-advisor' in url_name %}
                 <li style="margin-right: 15px;
                            padding-bottom:20px;
                            border-bottom:solid 2px transparent">
