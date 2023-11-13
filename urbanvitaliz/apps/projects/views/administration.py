@@ -41,7 +41,7 @@ from ..utils import (
     refresh_user_projects_in_session,
     unassign_advisor,
     unassign_collaborator,
-    get_notification_recipients_for_project,
+    get_advisors_for_project,
 )
 
 ########################################################################
@@ -450,7 +450,7 @@ def set_project_inactive(request, project_id: int):
         project.save()
 
         # Notifications
-        recipients = get_notification_recipients_for_project(project)
+        recipients = get_advisors_for_project(project)
         recipients = recipients.exclude(id=request.user.id)
 
         notify.send(

@@ -86,7 +86,7 @@ def test_notify_and_trace_when_project_is_set_inactive(request, client):
 
     # Notifications
     assert user.notifications.count() == 0
-    assert collab.notifications.count() == 1
+    assert collab.notifications.count() == 0
     assert advisor.notifications.count() == 1
 
     notif = advisor.notifications.first()
@@ -219,9 +219,7 @@ def test_trace_when_project_is_set_active(request, client):
     site = get_current_site(request)
 
     project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
+        models.Project, sites=[site], status="READY", inactive_since=timezone.now()
     )
 
     collab = baker.make(auth_models.User, username="collab@project.info")
