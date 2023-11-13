@@ -53,6 +53,7 @@ Cypress.Commands.add("login", (role) => {
                 csrfmiddlewaretoken: token
             }
         }).then(response => {
+            cy.visit('/')
             cy.getCookie("sessionid").should("exist");
             cy.getCookie("csrftoken").should("exist");
         })
@@ -71,6 +72,7 @@ Cypress.Commands.add('loginWithUi', (role) => {
     cy.get('#id_password').type("derpderp", { force: true }).should('have.value', "derpderp")
 
     cy.get("[type=submit]").click({ force: true });
+    cy.visit('/')
 
     cy.contains(`Connexion avec ${username} réussie.`)
 
@@ -129,6 +131,7 @@ Cypress.Commands.add("createProject", (label) => {
 })
 
 Cypress.Commands.add('becomeAdvisor', () => {
+    cy.visit('/')
     cy.get("body").then(body => {
         if (body.find('#positioning-form').length > 0) {
             cy.contains('Conseiller le projet').click({ force: true })
@@ -140,7 +143,7 @@ Cypress.Commands.add('becomeAdvisor', () => {
 })
 
 Cypress.Commands.add('createTask', (label, topic = "", withResource = false) => {
-
+    cy.visit('/')
     cy.get("body").then(body => {
         if (body.find('[data-test-id="submit-task-button"]').length > 0) {
             cy.contains("Émettre une recommandation").click({ force: true })

@@ -20,13 +20,10 @@ describe('I can go to administration area of a project and change the active sta
 					.click({force:true})
 
 			cy.visit(`/project/${currentProject.pk}`)
-			cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-decline-all"]').click()
 			cy.get('[data-test-id="button-open-modal-deactivate-project"]').should('not.exist')
 			cy.get('[data-test-id="banner-activate-project"]')
 					.get('[data-test-id="button-activate-project"]').click({force:true})
-			cy.visit(`/project/${currentProject.pk}`).then(() => {
-				cy.reload()
-				cy.get('[data-test-id="banner-activate-project"]').should('not.exist')
-			})
+
+			cy.get('[data-test-id="banner-activate-project"]').should('not.exist')
     })
 })

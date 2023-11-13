@@ -6,7 +6,6 @@ describe('I can go to overview tab', () => {
     beforeEach(() => {
         cy.login("staff");
         cy.visit(`/project/${currentProject.pk}`)
-        cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-decline-all"]').click()
     })
 
 

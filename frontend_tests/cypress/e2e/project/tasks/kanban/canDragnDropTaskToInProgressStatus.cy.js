@@ -8,7 +8,6 @@ describe('I can go to tasks tab', () => {
 
         cy.visit('/')
     
-        cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click({ force: true })
         cy.login("jean");
         cy.createProject("qsdzed")
     })
