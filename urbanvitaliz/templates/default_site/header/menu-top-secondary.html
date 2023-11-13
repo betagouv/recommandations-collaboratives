@@ -74,8 +74,8 @@
             </li>
         {% endif %}
         <!-- Projects -->
-        {% if active_project %}
-            {% if not 'projects-project-list-advisor' in url_name %}
+        {% if request.session.projects|length > 0 %}
+            {% if request.user in active_project.project_members.all and not 'projects-project-list-advisor' in url_name %}
                 <li style="margin-right: 15px;
                            padding-bottom:20px;
                            border-bottom:solid 2px transparent">
@@ -186,7 +186,8 @@
                  x-on:click.outside="open = false"
                  class="btn-group d-flex">
                 <a href="{% url 'resources-resource-search' %}"
-                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}" data-test-id="link-ressources">
+                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}"
+                   data-test-id="link-ressources">
                     <span class="ms-1 align-middle">Ressources</span>
                 </a>
                 {% if "manage_resources" in user_site_perms %}
