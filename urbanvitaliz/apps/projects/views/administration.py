@@ -12,7 +12,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404, HttpResponseBadRequest, HttpResponse
+from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -426,7 +426,7 @@ def set_project_inactive(request, project_id: int):
     else:
         raise HttpResponseBadRequest("Formulaire invalide")
 
-    return HttpResponse(status=202)
+    return redirect("projects-project-administration")
 
 
 @login_required
@@ -442,7 +442,7 @@ def set_project_active(request, project_id: int):
 
     project.reactivate()
 
-    return HttpResponse(status=202)
+    return redirect("projects-project-administration")
 
 
 # eof
