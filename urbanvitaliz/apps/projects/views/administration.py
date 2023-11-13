@@ -426,7 +426,7 @@ def set_project_inactive(request, project_id: int):
     else:
         raise HttpResponseBadRequest("Formulaire invalide")
 
-    return redirect("projects-project-administration")
+    return redirect(reverse("projects-project-administration", args=(project.id,)))
 
 
 @login_required
@@ -442,7 +442,7 @@ def set_project_active(request, project_id: int):
 
     project.reactivate()
 
-    return redirect("projects-project-administration")
+    return redirect(reverse("projects-project-administration", args=(project.id,)))
 
 
 # eof
