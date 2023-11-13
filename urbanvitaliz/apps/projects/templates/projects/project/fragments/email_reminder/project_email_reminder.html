@@ -57,7 +57,7 @@
             {% if request.user == project.owner or request.user.is_staff and "change_project" in user_project_perms %}
                 <span class="tiny fw-normal mb-1">Pour couper les notifications vous pouvez mettre le projet en pause <a href="{% url 'projects-project-administration' project.pk %}">dans l’adminstration</a></span>
             {% else %}
-                <span class="tiny fw-normal mb-1">Pour couper les notifications vous pouvez qutter le projet <a href="{% url 'projects-project-administration' project.pk %}">dans l’adminstration</a></span>
+                <span class="tiny fw-normal mb-1">Si vous ne souhaitez plus recevoir de notifications vous pouvez quitter le projet <a href="{% url 'projects-project-administration' project.pk %}">dans l’adminstration</a></span>
             {% endif %}
         </div>
     </div>
