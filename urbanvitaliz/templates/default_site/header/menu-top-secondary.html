@@ -74,8 +74,8 @@
             </li>
         {% endif %}
         <!-- Projects -->
-        {% if request.session.projects|length > 0 %}
-            {% if request.user in active_project.project_members.all and not 'projects-project-list-advisor' in url_name %}
+        {% if active_project %}
+            {% if request.user in active_project.members.all and not 'projects-project-list-advisor' in url_name %}
                 <li style="margin-right: 15px;
                            padding-bottom:20px;
                            border-bottom:solid 2px transparent">
