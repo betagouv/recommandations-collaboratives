@@ -1,8 +1,7 @@
 # encoding: utf-8
 
 """
-Views for projects application
-
+Views for projects
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
@@ -39,6 +38,7 @@ from ..utils import (
     is_regional_actor_for_project,
     unassign_advisor,
     unassign_collaborator,
+    refresh_user_projects_in_session,
 )
 
 ########################################################################
@@ -305,6 +305,7 @@ def access_collaborator_delete(request, project_id: int, username: str):
     if membership.member != request.user:
         return redirect(reverse("projects-project-administration", args=[project_id]))
     else:
+        refresh_user_projects_in_session(request, request.user)
         return redirect(reverse("home"))
 
 
