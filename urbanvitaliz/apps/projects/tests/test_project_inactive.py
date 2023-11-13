@@ -49,7 +49,7 @@ def test_owner_can_set_project_inactive_without_reason(request, client):
         assign_collaborator(user, project, is_owner=True)
         response = client.post(url)
 
-    assert response.status_code == 202
+    assert response.status_code == 302
 
     project = models.Project.on_site.get(id=project.id)
 
@@ -76,7 +76,7 @@ def test_owner_can_set_project_inactive_with_reason(request, client):
         assign_collaborator(user, project, is_owner=True)
         response = client.post(url, data={"inactive_reason": "because"})
 
-    assert response.status_code == 202
+    assert response.status_code == 302
 
     project = models.Project.on_site.get(id=project.id)
 
@@ -103,7 +103,7 @@ def test_site_staff_can_set_project_inactive(request, client):
         assign_site_staff(site, user)
         response = client.post(url)
 
-    assert response.status_code == 202
+    assert response.status_code == 302
 
     project = models.Project.on_site.get(id=project.id)
 
@@ -160,7 +160,7 @@ def test_owner_can_set_project_active(request, client):
         assign_collaborator(user, project, is_owner=True)
         response = client.post(url)
 
-    assert response.status_code == 202
+    assert response.status_code == 302
 
     project = models.Project.on_site.get(id=project.id)
 
@@ -187,7 +187,7 @@ def test_site_staff_can_set_project_active(request, client):
         assign_site_staff(site, user)
         response = client.post(url)
 
-    assert response.status_code == 202
+    assert response.status_code == 302
 
     project = models.Project.on_site.get(id=project.id)
 
