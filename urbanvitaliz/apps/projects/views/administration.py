@@ -9,6 +9,7 @@ from actstream import action
 from django.contrib import messages
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, HttpResponseBadRequest
@@ -17,7 +18,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from guardian.shortcuts import get_perms
-
+from notifications import models as notifications_models
+from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.invites import models as invites_models
 from urbanvitaliz.apps.invites.api import (
@@ -28,17 +30,16 @@ from urbanvitaliz.apps.invites.api import (
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.utils import (
     has_perm_or_403,
-    is_staff_for_site_or_403,
     is_staff_for_site,
+    is_staff_for_site_or_403,
 )
-from urbanvitaliz import verbs
 
 from .. import forms, models
 from ..utils import (
     is_regional_actor_for_project,
+    refresh_user_projects_in_session,
     unassign_advisor,
     unassign_collaborator,
-    refresh_user_projects_in_session,
 )
 
 ########################################################################
@@ -294,6 +295,15 @@ def access_collaborator_delete(request, project_id: int, username: str):
 
         elif membership in project.projectmember_set.exclude(is_owner=True):
             unassign_collaborator(membership.member, project)
+
+            # Delete user notification for this project
+            project_ct = ContentType.objects.get_for_model(models.Project)
+            notifications_models.Notification.on_site.filter(
+                recipient=membership.member,
+                target_content_type=project_ct.pk,
+                target_object_id=project.pk,
+            ).delete()
+
             messages.success(
                 request,
                 "{0} a bien été supprimé de la liste des participants.".format(
@@ -305,7 +315,7 @@ def access_collaborator_delete(request, project_id: int, username: str):
     if membership.member != request.user:
         return redirect(reverse("projects-project-administration", args=[project_id]))
     else:
-        refresh_user_projects_in_session(request, request.user)
+        refresh_user_projects_in_session(request, membership.member)
         return redirect(reverse("home"))
 
 
@@ -384,6 +394,19 @@ def access_advisor_delete(request, project_id: int, username: str):
         has_perm_or_403(request.user, "manage_advisors", project)
 
     unassign_advisor(ps.switchtender, project, request.site)
+
+    # Delete user notification for this project
+    project_ct = ContentType.objects.get_for_model(models.Project)
+    notifications_models.Notification.on_site.filter(
+        recipient=ps.switchtender,
+        target_content_type=project_ct.pk,
+        target_object_id=project.pk,
+    ).delete()
+
+    # Clean advisor dashboard entry
+    models.UserProjectStatus.objects.filter(
+        site=request.site, user=ps.switchtender, project=project
+    ).delete()
 
     if request.user != ps.switchtender:
         messages.success(

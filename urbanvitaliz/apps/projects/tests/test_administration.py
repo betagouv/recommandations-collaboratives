@@ -16,6 +16,7 @@ from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertRedirects
 from urbanvitaliz.apps.communication import api as communication_api
 from urbanvitaliz.apps.geomatics import models as geomatics
@@ -371,6 +372,45 @@ def test_advisor_can_remove_collaborator_from_project(request, client):
 
 
 @pytest.mark.django_db
+def test_unassigning_a_collaborator_cleans_notifications(request, client):
+    site = get_current_site(request)
+    collaborator = baker.make(
+        auth_models.User,
+        email="owner@ab.fr",
+        username="owner@ab.fr",
+    )
+    project = Recipe(
+        models.Project,
+        sites=[site],
+        status="READY",
+    ).make()
+    assign_collaborator(collaborator, project)
+
+    notify.send(
+        sender=collaborator,
+        actor=collaborator,
+        recipient=collaborator,
+        verb="noop",
+        target=project,
+    )
+
+    assert collaborator.notifications.count() == 1
+
+    url = reverse(
+        "projects-project-access-collectivity-delete",
+        args=[project.id, collaborator.username],
+    )
+
+    with login(client) as user:
+        assign_advisor(user, project, site)
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    assert collaborator.notifications.count() == 0
+
+
+@pytest.mark.django_db
 def test_staff_can_remove_collaborator_from_project(request, client):
     site = get_current_site(request)
     collaborator = baker.make(
@@ -514,6 +554,69 @@ def test_advisor_can_remove_herself_from_project(request, client):
 
     project = models.Project.on_site.get(id=project.id)
     assert user not in project.switchtenders.all()
+
+
+@pytest.mark.django_db
+def test_removing_advisor_cleans_notifications(request, client):
+    site = get_current_site(request)
+    project = Recipe(
+        models.Project,
+        sites=[site],
+        status="READY",
+    ).make()
+
+    with login(client) as user:
+        assign_advisor(user, project, site)
+
+        notify.send(
+            sender=user,
+            actor=user,
+            recipient=user,
+            verb="noop",
+            target=project,
+        )
+
+        assert user.notifications.count() == 1
+
+        url = reverse(
+            "projects-project-access-advisor-delete",
+            args=[project.id, user.username],
+        )
+
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert user.notifications.count() == 0
+
+
+@pytest.mark.django_db
+def test_removing_advisor_cleans_dashboard_entries(request, client):
+    site = get_current_site(request)
+    project = Recipe(
+        models.Project,
+        sites=[site],
+        status="READY",
+    ).make()
+
+    with login(client) as user:
+        assign_advisor(user, project, site)
+
+        models.UserProjectStatus.objects.get_or_create(
+            site=site,
+            user=user,
+            project=project,
+            defaults={"status": "TODO"},
+        )
+
+        url = reverse(
+            "projects-project-access-advisor-delete",
+            args=[project.id, user.username],
+        )
+
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert models.UserProjectStatus.objects.count() == 0
 
 
 @pytest.mark.django_db
