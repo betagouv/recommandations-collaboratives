@@ -7,6 +7,7 @@ import 'leaflet-providers'
 
 import { statusToColorClass } from '../utils/statusToText'
 import api from '../utils/api'
+import GeocoderBAN from '../utils/geocoderBAN'
 
 const codesComParis = ['75101','75102','75103','75104','75105','75106','75107','75108','75109','75110','75111','75112','75113','75114','75115','75116','75117','75118','75119','75120']
 const codesComLyon = ['69381','69382','69383','69384','69385','69386','69387','69388','69389']
@@ -202,8 +203,7 @@ function initMapLayers(map, project, geoData) {
 }
 
 function initMapController(map, project, geoData, onUpdate) {
-	L.geocoderBAN({ collapsed: false, style: 'searchBar', className: statusToColorClass(project.status), geoData, onUpdate }).addTo(map)
-
+	GeocoderBAN({ collapsed: false, style: 'searchBar', className: statusToColorClass(project.status), geoData, onUpdate }).addTo(map)
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
 	controller[0].classList.add('leaflet-control-geocoder-expanded');
 	const inputController = controller[0].querySelector('input')
