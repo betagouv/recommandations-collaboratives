@@ -192,3 +192,9 @@
 /* .hint-button:hover {
     background-color: #FBD335;
 } */
+
+.btn-sm--header  {
+	padding-block: 6.25px;
+	padding-inline: 12px;
+    margin: 0;
+}

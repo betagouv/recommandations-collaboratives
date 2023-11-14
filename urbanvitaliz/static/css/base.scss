@@ -160,6 +160,14 @@ progress::-moz-progress-bar {
     padding-top: 80px;
 }
 
+.project-header-sidebar > *  {
+	margin-block: 0;
+}
+
+.project-header-sidebar > * + * {
+	margin-block-start: 6.5px;
+}
+
 @media (min-width: 690px) {
     .main-content.public-content {
         padding-top: 150px;
