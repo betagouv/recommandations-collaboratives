@@ -24,7 +24,6 @@ from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
-from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.resources import models as resources
 
@@ -114,6 +113,9 @@ class Task(OrderedModel):
     NOT_INTERESTED = 4
     ALREADY_DONE = 5
 
+    OPEN_STATUSES = [PROPOSED, INPROGRESS, BLOCKED]
+    CLOSED_STATUSES = [DONE, NOT_INTERESTED, ALREADY_DONE]
+
     STATUS_CHOICES = (
         (PROPOSED, "proposé"),
         (INPROGRESS, "en cours"),
@@ -131,11 +133,11 @@ class Task(OrderedModel):
 
     @property
     def closed(self):
-        return self.status in [Task.DONE, Task.NOT_INTERESTED, Task.ALREADY_DONE]
+        return self.status in self.CLOSED_STATUSES
 
     @property
     def open(self):
-        return self.status in [Task.PROPOSED, Task.INPROGRESS, Task.BLOCKED]
+        return self.status in self.OPEN_STATUSES
 
     project = models.ForeignKey(
         projects_models.Project, on_delete=models.CASCADE, related_name="tasks"
@@ -155,7 +157,7 @@ class Task(OrderedModel):
     )
 
     created_on = models.DateTimeField(
-        default=timezone.now, verbose_name="date de création"
+        default=timezone.now, verbose_name="date et heure de création"
     )
     updated_on = models.DateTimeField(
         default=timezone.now, verbose_name="Dernière mise à jour"
@@ -210,8 +212,6 @@ class Task(OrderedModel):
     status = models.IntegerField(choices=STATUS_CHOICES, default=PROPOSED)
 
     deleted = models.DateTimeField(null=True, blank=True)
-
-    reminders = GenericRelation(reminders_models.Reminder, related_query_name="tasks")
 
     class Meta:
         ordering = []

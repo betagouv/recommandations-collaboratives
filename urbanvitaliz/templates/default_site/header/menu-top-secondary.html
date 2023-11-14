@@ -186,7 +186,8 @@
                  x-on:click.outside="open = false"
                  class="btn-group d-flex">
                 <a href="{% url 'resources-resource-search' %}"
-                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}" data-test-id="link-ressources">
+                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}"
+                   data-test-id="link-ressources">
                     <span class="ms-1 align-middle">Ressources</span>
                 </a>
                 {% if "manage_resources" in user_site_perms %}

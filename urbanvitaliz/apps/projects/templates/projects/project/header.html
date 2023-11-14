@@ -7,6 +7,13 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% with request.resolver_match.url_name as url_name %}
+    {% block banner %}
+        {% if user == project.owner or user.is_staff or 'can_administrate_project' in user_project_perms %}
+            {% include 'projects/project/fragments/project_active_status_banner.html' with show_action_button=True %}
+        {% else %}
+            {% include 'projects/project/fragments/project_active_status_banner.html' %}
+        {% endif %}
+    {% endblock %}
     <div x-data="ProjectShare"
          class="col-12 d-flex justify-content-between align-items-start">
         <div class=" d-flex flex-column mb-2">
@@ -39,6 +46,9 @@
                     </ul>
                 </div>
             {% endif %}
+        </div>
+        <div class="d-flex flex-row-reverse flex-grow-1 ps-2">
+            {% include "projects/project/fragments/email_reminder/project_email_reminder.html" %}
         </div>
         <div class="flex-shrink-0 ps-2">
             {% if 'actions' not in url_name and 'conversations' not in url_name and 'internal-followup' not in url_name %}

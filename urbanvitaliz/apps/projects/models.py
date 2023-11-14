@@ -8,7 +8,6 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import os
-import uuid
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -24,15 +23,8 @@ from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
-from tagging.fields import TagField
-from tagging.models import TaggedItem
-from tagging.registry import register as tagging_register
 from taggit.managers import TaggableManager
-from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
-from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.apps.resources import models as resources
 
 from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor, has_perm
 
@@ -260,6 +252,33 @@ class Project(models.Model):
         return False
 
     exclude_stats = models.BooleanField(default=False, blank=True)
+
+    inactive_since = models.DateTimeField(
+        null=True, blank=True, verbose_name="Quand le projet a été déclaré inactif"
+    )
+    inactive_reason = models.CharField(
+        max_length=256,
+        blank=True,
+        null=True,
+        default="",
+        verbose_name="Raison de l'inactivité du projet",
+    )
+
+    def reactivate(self):
+        """Switch back project to active state"""
+        if not self.inactive_since:
+            return
+
+        self.inactive_since = None
+        self.inactive_reason = None
+        self.save()
+
+    last_members_activity_at = models.DateTimeField(
+        default=timezone.now,
+        editable=False,
+        verbose_name="Dernière activité de la collectivité",
+    )
+
     muted = models.BooleanField(
         default=False, blank=True, verbose_name="Ne pas envoyer de notifications"
     )
@@ -326,6 +345,15 @@ class Project(models.Model):
         through="ProjectSwitchtender",
         verbose_name="Aiguilleu·r·se·s",
     )
+
+    @property
+    def next_reminder(self):
+        current_site = Site.objects.get_current()
+        return (
+            self.reminders.filter(site=current_site, sent_on=None)
+            .order_by("deadline")
+            .first()
+        )
 
     @property
     def resources(self):
@@ -653,7 +681,9 @@ class Document(models.Model):
         verbose_name_plural = "documents"
 
     def get_absolute_url(self):
-        return reverse("projects-project-detail-documents", kwargs={"project_id": self.project.pk})
+        return reverse(
+            "projects-project-detail-documents", kwargs={"project_id": self.project.pk}
+        )
 
     def __str__(self):  # pragma: nocover
         return f"Document {self.id}"

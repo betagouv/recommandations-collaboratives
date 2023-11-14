@@ -1,4 +1,5 @@
 from django.contrib.auth import models as auth_models
+from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from generic_relations.relations import GenericRelatedField
 from notifications import models as notifications_models
@@ -10,11 +11,8 @@ from urbanvitaliz.apps.home.serializers import UserSerializer
 from urbanvitaliz.apps.projects.serializers import DocumentSerializer
 from urbanvitaliz.apps.resources.serializers import ResourceSerializer
 from urbanvitaliz.apps.projects.utils import get_collaborators_for_project
-from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.apps.reminders.serializers import ReminderSerializer
 
 from .models import Task, TaskFollowup
-from .utils import create_reminder
 
 
 class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
@@ -54,11 +52,14 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
 
         task = followup.task
 
-        if followup.status not in [Task.ALREADY_DONE, Task.NOT_INTERESTED, Task.DONE]:
-            if followup.who in get_collaborators_for_project(followup.task.project):
-                create_reminder(
-                    7 * 6, task, followup.who, origin=reminders_models.Reminder.SYSTEM
-                )
+        # update activity flags and states
+        if followup.who in get_collaborators_for_project(task.project):
+            task.project.last_members_activity_at = timezone.now()
+
+            if task.project.inactive_since:
+                task.project.reactivate()
+
+            task.project.save()
 
         return followup
 
@@ -79,7 +80,6 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "intent",
             "content",
             "document",
-            "reminders",
             "resource_id",
             "resource",
             "notifications",
@@ -89,7 +89,6 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
         ]
 
     created_by = UserSerializer(read_only=True, many=False)
-    reminders = ReminderSerializer(read_only=True, many=True)
 
     document = DocumentSerializer(read_only=True, many=True)
 

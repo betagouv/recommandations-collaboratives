@@ -16,10 +16,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q
-from django.urls import reverse
 from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
 from urbanvitaliz import utils as uv_utils
-from urbanvitaliz.apps.reminders import api
 
 from . import models
 
@@ -248,6 +246,11 @@ def is_regional_actor_for_project_or_403(site, project, user, allow_national=Fal
 
 
 def get_switchtenders_for_project(project):
+    """XXX Compatibility"""
+    return get_advisors_for_project(project)
+
+
+def get_advisors_for_project(project):
     """Return all the switchtenders for a given project"""
     return auth_models.User.objects.filter(
         projects_switchtended_on_site__project=project,
