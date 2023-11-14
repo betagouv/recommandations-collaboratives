@@ -131,7 +131,7 @@
     border: solid 1px #EEEEEE;
 }
 
-.button:hover{
+.button:not(.btn-outline-primary):hover{
     background-color: #e2effc;
 }
 

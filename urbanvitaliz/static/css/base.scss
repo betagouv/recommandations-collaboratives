@@ -95,7 +95,7 @@ main {
 a {
     color: $blue;
 }
-a:hover {
+a:not(.btn-outline-primary):hover {
     color: $dark-blue !important;
 }
 
