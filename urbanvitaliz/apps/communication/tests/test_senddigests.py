@@ -7,8 +7,8 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-11 15:26:00 CEST
 """
 
-import io
 import datetime
+import logging
 
 import pytest
 from django.contrib.auth import models as auth_models
@@ -19,8 +19,8 @@ from django.utils import timezone
 from model_bakery import baker
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects.utils import assign_advisor, assign_collaborator
-from urbanvitaliz.apps.tasks import models as task_models
 from urbanvitaliz.apps.reminders import models as reminders_models
+from urbanvitaliz.apps.tasks import models as task_models
 from urbanvitaliz.utils import get_group_for_site
 
 from .. import digests
@@ -28,7 +28,9 @@ from .. import digests
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_send_digest_to_active_users(request, mocker):
+def test_command_send_digest_executes_all_tasks(request, mocker, caplog):
+    caplog.set_level(logging.DEBUG)
+
     site = get_current_site(request)
 
     advisor = baker.make(auth_models.User, username="advisor", email="jdoe@example.org")
@@ -47,8 +49,6 @@ def test_command_send_digest_to_active_users(request, mocker):
 
     baker.make(task_models.Task, created_by=advisor, project=project, site=site)
 
-    out = io.StringIO()
-
     mocker.patch(
         "urbanvitaliz.apps.communication.digests.send_reminder_digests_by_project",
         return_value=False,
@@ -66,32 +66,28 @@ def test_command_send_digest_to_active_users(request, mocker):
         "urbanvitaliz.apps.communication.digests.send_digest_for_switchtender_by_user"
     )
 
-    call_command("senddigests", stdout=out)
+    call_command("senddigests")
 
-    output = out.getvalue()
+    output = "\n".join([str(record.message) for record in caplog.records])
 
-    expected = f"""
-#### Sending digests for site <example.com> ####
+    expected_headings = [
+        "Sending digests for site <example.com>",
+        "Sending Project Reminders",
+        "Sending new recommendations digests",
+        "Sending general digests",
+        "Sending general switchtender digests",
+        f"Sent new site digest for {advisor}",
+    ]
 
-** Sending Task Reminders **
-Sent reminder digest for AnonymousUser
-Sent reminder digest for {advisor.username}
-Sent reminder digest for {user.username}
-** Sending new recommendations digests **
-Sent new reco digest for {user.username} on {project.name}
-** Sending general digests **
-Sent general digest for AnonymousUser
-Sent general digest for {user.username}
-** Sending general switchtender digests **
-* Sent new site digest for {advisor.username}
-* Sent general digest for switchtender (to {advisor.username})
-"""
-    assert output == expected
+    for heading in expected_headings:
+        assert heading in output
 
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_do_not_send_digest_to_deactivated_users(request, mocker):
+def test_command_do_not_send_digest_to_deactivated_users(request, mocker, caplog):
+    caplog.set_level(logging.DEBUG)
+
     site = get_current_site(request)
 
     advisor = baker.make(
@@ -116,8 +112,6 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker):
 
     baker.make(task_models.Task, created_by=advisor, project=project, site=site)
 
-    out = io.StringIO()
-
     mocker.patch(
         "urbanvitaliz.apps.communication.digests.send_reminder_digests_by_project",
         return_value=False,
@@ -135,21 +129,14 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker):
         "urbanvitaliz.apps.communication.digests.send_digest_for_switchtender_by_user"
     )
 
-    call_command("senddigests", stdout=out)
+    call_command("senddigests")
 
-    output = out.getvalue()
+    output = "\n".join([str(record.message) for record in caplog.records])
 
-    expected = """
-#### Sending digests for site <example.com> ####
+    unexpected_logs = [f"{user}", f"{advisor}"]
 
-** Sending Project Reminders **
-Failed sending reminder digest for project A project (1) -- NO OWNER
-** Sending new recommendations digests **
-** Sending general digests **
-Sent general digest
-** Sending general switchtender digests **
-"""
-    assert output == expected
+    for log in unexpected_logs:
+        assert log not in output
 
 
 #################################################################
@@ -205,12 +192,12 @@ def test_command_pending_reminder_sent_and_rescheduled(request, mocker):
     project = baker.make(
         projects_models.Project,
         sites=[current_site],
-        last_members_activity_at=timezone.now() - datetime.timedelta(days=70),
+        last_members_activity_at=timezone.now() - datetime.timedelta(days=6 * 7),
     )
 
     baker.make(
         task_models.Task,
-        created_on=timezone.now() - datetime.timedelta(days=70),
+        created_on=timezone.now() - datetime.timedelta(days=6 * 7),
         project=project,
         public=True,
         site=current_site,

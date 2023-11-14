@@ -12,6 +12,8 @@ import logging
 
 from django.utils import timezone
 from urbanvitaliz.apps.tasks.models import Task
+from urbanvitaliz.apps.home.models import SiteConfiguration
+
 
 from . import models
 
@@ -36,6 +38,17 @@ def make_or_update_reminder(site, project, kind, deadline):
     )
 
     if (existing_reminder is None) and task_count == 0:
+        return None
+
+    if deadline < timezone.localdate():
+        if existing_reminder:
+            existing_reminder.delete()
+            logger.warning(
+                f"Deleting reminder {kind} since it is too old "
+                f"for project <{project.name}>"
+                f" ({project.pk})"
+            )
+
         return None
 
     if existing_reminder:
@@ -167,14 +180,17 @@ def make_or_update_whatsup_reminder(site, project):
         if last_sent_reminder.sent_on > starting_point:
             starting_point = last_sent_reminder.sent_on
 
-    # interval_state = 0
-    # if last_reminder:
-    #     interval_state = last_reminder.state + 1
-
-    # FIXME(glibersat) Hardcoded: fetch real interval from SiteConfiguration
-    interval = datetime.timedelta(days=6 * 7)
+    # Get our reminder interval by the current site configuration
+    try:
+        conf = site.configuration
+        interval = datetime.timedelta(days=conf.reminder_interval)
+    except SiteConfiguration.DoesNotExist:
+        interval = datetime.timedelta(days=6 * 7)
 
     deadline = (starting_point + interval).date()
+
+    if deadline < timezone.localdate():
+        deadline = timezone.localdate()
 
     return make_or_update_reminder(
         site=site, project=project, kind=models.Reminder.WHATS_UP, deadline=deadline
