@@ -47,7 +47,6 @@ function PersonalAdvisorDashboard() {
             this.data = this.createProjectListWithNewActivities(projects);
 
             this.displayedData = this.data.sort(this.sortProjectDate)
-
             const { map, markersLayer } = initMap(projects)
 
             this.map = map
@@ -109,6 +108,8 @@ function PersonalAdvisorDashboard() {
         getProjectStatusColor(item) {
             if (item.status === "NEW") {
                 return 'text-new-project'
+            } else if (item.project.inactive_since) {
+                return 'text-paused-project'
             } else if (item.project.is_switchtender && !item.project.is_observer) {
                 return 'text-green'
             } else if (item.project.is_observer && item.project.is_switchtender) {

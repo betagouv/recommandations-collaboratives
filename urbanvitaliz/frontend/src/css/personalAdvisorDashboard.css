@@ -247,6 +247,11 @@ main {
     border-radius: 4px;
 }
 
+.project-card.pause {
+    background-color: #F6F6F6;
+    color: #222;
+}
+
 .project-card-top-information {
     position: absolute;
     top: -12px;
@@ -271,6 +276,11 @@ main {
 
 .project-card-top-information.new span{
     background-color: #FDCD6D;
+    color: #222;
+}
+
+.project-card-top-information.pause span{
+    background-color: #929292;
     color: #222;
 }
 
