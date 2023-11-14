@@ -3,7 +3,7 @@
 {% load guardian_tags %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-<div class="d-grid gap-2 my-3">
+<div class="d-grid gap-2 my-0-3">
     {% if "change_project" in user_project_perms and not is_switchtender %}
         {% if not disable_can_edit %}
             <span class="d-inline-block">
@@ -31,27 +31,26 @@
             {% endif %}
         {% endif %}
     {% endif %}
-
-        {% if "use_crm" in user_site_perms and not disable_crm %}
-            <span class="d-inline-block">
-                <a class="btn btn-outline-primary w-100 btn-sm"
-                href="{% url 'crm-project-details' project.pk %}">
-                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
-                    </svg>
-                    CRM
-                </a>
-            </span>
-        {% endif %}
-        {% if user.is_staff and not disable_administration %}
-            <span class="d-inline-block">
-                <a class="btn btn-outline-primary w-100 btn-sm"
-                   href="{% url 'projects-project-administration' project.pk %}">
-                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
-                    </svg>
-                    Administration
-                </a>
-            </span>
-        {% endif %}
+    {% if "use_crm" in user_site_perms and not disable_crm %}
+        <span class="d-inline-block">
+            <a class="btn btn-outline-primary w-100 btn-sm"
+               href="{% url 'crm-project-details' project.pk %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                </svg>
+                CRM
+            </a>
+        </span>
+    {% endif %}
+    {% if user.is_staff and not disable_administration %}
+        <span class="d-inline-block">
+            <a class="btn btn-outline-primary w-100 btn-sm"
+               href="{% url 'projects-project-administration' project.pk %}">
+                <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
+                </svg>
+                Administration
+            </a>
+        </span>
+    {% endif %}
 </div>
