@@ -47,7 +47,7 @@
                 </div>
             {% endif %}
         </div>
-        {% if request.user in project.members.all %}
+        {% if request.user in project.members.all or advising.is_advisor or advising.is_observer %}
             <div class="d-flex flex-row-reverse flex-grow-1 ps-2">
                 {% include "projects/project/fragments/email_reminder/project_email_reminder.html" %}
             </div>
