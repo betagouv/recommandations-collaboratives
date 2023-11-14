@@ -9,7 +9,8 @@
 }
 
 .tasks-view-switcher button.active:hover {
-    background-color: #103a78 !important;
+    color: #0063CB !important;
+    background-color: #e2effc !important;
 }
 
 
