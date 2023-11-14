@@ -1,11 +1,10 @@
 import * as L from 'leaflet';
 
 /**
- * Source: https://github.com/entrepreneur-interet-general/leaflet-geocoder-ban/blob/master/src/leaflet-geocoder-ban.js
+ * Adapted from source: https://github.com/entrepreneur-interet-general/leaflet-geocoder-ban/blob/master/src/leaflet-geocoder-ban.js
  */
 
-const latLongFrance = [46.5, 1.20] // latitude and longitude of centroid of France
-L.GeocoderBAN = L.Control.extend({
+const geocoder = new L.Control({
 	options: {
 		position: 'topleft',
 		style: 'control',
@@ -206,7 +205,6 @@ L.GeocoderBAN = L.Control.extend({
 	}
 })
 
-
 function createMarkerIcon(className) {
 	return L.divIcon({ className: `map-marker ${className}` });
 }
@@ -236,7 +234,5 @@ const getJSON = function (url, params, callback) {
 	xmlHttp.send(null)
 }
 
-L.geocoderBAN = function (options) {
-	return new L.GeocoderBAN(options)
-}
-export default L.geocoderBAN
+const GeocoderBAN = (options) => geocoder.initialize(options)
+export default GeocoderBAN
