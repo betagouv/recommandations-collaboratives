@@ -36,7 +36,7 @@
                 </svg>
             </button>
         </div>
-        {% if request.user == project.owner or request.user.is_staff and "change_project" in user_project_perms %}
+        {% if request.user == project.owner %}
             <div class="border-bottom-grey p-2 d-flex flex-column">
                 <span class="tiny fw-medium">Rappels</span>
                 <span class="tiny fw-normal mb-2">Vous recevez un rappel par email toutes les 6 à 12 semaines pour consulter et mettre à jour votre avancement sur les recommandations.</span>
@@ -54,7 +54,7 @@
             <span class="tiny fw-normal mb-2">Vous recevez une notification par email à chaque nouvelle activité sur le projet dans un récapitulatif journalier.</span>
         </div>
         <div class="border-bottom-grey p-2 d-flex flex-column">
-            {% if request.user == project.owner or request.user.is_staff and "change_project" in user_project_perms %}
+            {% if request.user == project.owner %}
                 <span class="tiny fw-normal mb-1">Pour couper les notifications vous pouvez mettre le projet en pause <a href="{% url 'projects-project-administration' project.pk %}#project-status-settings">dans l’adminstration</a></span>
             {% else %}
                 <span class="tiny fw-normal mb-1">Si vous ne souhaitez plus recevoir de notifications vous pouvez quitter le projet <a href="{% url 'projects-project-administration' project.pk %}#project-status-settings">dans l’adminstration</a></span>
