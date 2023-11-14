@@ -131,6 +131,7 @@ main {
 }
 
 .crm-header {
+    padding-top: 66px;
     background-color: white;
     border-bottom: 1px solid #e1e1e1;
     margin-bottom: 0 !important;
