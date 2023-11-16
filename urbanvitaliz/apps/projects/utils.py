@@ -351,7 +351,7 @@ def refresh_user_projects_in_session(request, user):
             "name": p.name,
             "id": p.id,
             "location": p.location,
-            "inactive_since": p.inactive_since,
+            "inactive": bool(p.inactive_since),
             "actions_open": p.tasks.open().count(),
         }
         for p in projects
