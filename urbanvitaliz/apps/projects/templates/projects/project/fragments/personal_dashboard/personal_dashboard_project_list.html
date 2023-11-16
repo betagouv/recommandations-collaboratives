@@ -21,8 +21,8 @@
             </div>
         </template>
         <template x-for="item in displayedData" :key="item.project.id">
-            <div :id=`project-${item.project.id}` class="project-card position-relative rounded bg-white mb-4 px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative cursor-pointer hover-shadow hover-border-blue transition-all" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"
-                :class="item.status === 'INACTIVE' ? 'pause' : ''">
+            <div :id=`project-${item.project.id}` class="project-card position-relative rounded mb-4 px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative cursor-pointer hover-shadow transition-all" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"
+                :class="getProjectStatusClass(item)">
                 <div x-show="item.isLoading"
                      class="ms-2 project-item-loader"
                      style="width: 24px;
@@ -32,22 +32,22 @@
                 </div>
                 <div :class="item.isLoading && 'project-item-is-loading'"
                      class="project-item d-flex flex-column justify-content-between align-items-start w-100">
-                    <template x-if="item.status === 'INACTIVE' ">
-                        <div class="project-card-top-information pause left-0">
+                    <template x-if="item.project.inactive_since !== null">
+                        <div class="project-card-top-information inactive left-0">
                             <span>Conseil en pause</span>
                         </div>
                     </template>
-                    <template x-if="item.status === 'NEW'">
+                    <template x-if="item.project.inactive_since == null && item.status === 'NEW'">
                         <div class="project-card-top-information new left-0">
                             <span>Nouveau projet</span>
                         </div>
                     </template>
-                    <template x-if="item.project.is_observer">
+                    <template x-if="item.project.inactive_since == null && item.project.is_observer">
                         <div class="project-card-top-information observer left-0">
                             <span>Observateur</span>
                         </div>
                     </template>
-                    <template x-if="item.project.is_switchtender && !item.project.is_observer">
+                    <template x-if="item.project.inactive_since == null && item.project.is_switchtender && !item.project.is_observer">
                         <div class="project-card-top-information advisor left-0">
                             <span>Conseiller</span>
                         </div>
@@ -57,10 +57,10 @@
                             <a class="project-link d-flex align-items-center"
                                :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', item.project.id)">
                                 <template x-if="item.project.commune">
-                                    <span class="fw-bold title-info text-blue me-2 location"
+                                    <span class="fw-bold title-info me-2 location"
                                           x-text="item.project.commune.name">1</span>
                                 </template>
-                                <span class="text-info-custom text-blue name" x-text="item.project.name">2</span>
+                                <span class="text-info-custom name" x-text="item.project.name">2</span>
                             </a>
                         </div>
                         <div class="d-flex align-items-center me-1">
@@ -106,9 +106,11 @@
                                       x-text="item.project.recommendation_count > 1 ? `${item.project.recommendation_count} recommandations` : `${item.project.recommendation_count} recommandation`"></span>
                                 <template x-if="getNewRecommendations(item) && (item.project.is_observer || item.project.is_switchtender)">
                                     <a class="text-decoration-none hover-underline"
-                                       :href="makeProjectURL('{% url 'projects-project-detail-actions' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)"
-      class="text-green fw-medium"
-      x-text="getNewRecommendations(item)"></span></a>
+                                       :href="makeProjectURL('{% url 'projects-project-detail-actions' 0 %}', item.project.id)">
+                                        <span :class="getProjectStatusColor(item)"
+                                              class="text-green fw-medium"
+                                              x-text="getNewRecommendations(item)"></span>
+                                    </a>
                                 </template>
                             </div>
                             <div class="d-flex align-items-center tiny me-3 responsive-flex-column">
@@ -122,9 +124,11 @@
                                       x-text="item.project.public_message_count <= 1 ? `${item.project.public_message_count} message conversation` : `${item.project.public_message_count} messages conversation`"></span>
                                 <template x-if="getUnreadPublicMessages(item) && (item.project.is_observer || item.project.is_switchtender)">
                                     <a class="text-decoration-none hover-underline"
-                                       :href="makeProjectURL('{% url 'projects-project-detail-conversations' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)"
-      class="text-green fw-medium"
-      x-text="getUnreadPublicMessages(item)"></span></a>
+                                       :href="makeProjectURL('{% url 'projects-project-detail-conversations' 0 %}', item.project.id)">
+                                        <span :class="getProjectStatusColor(item)"
+                                              class="text-green fw-medium"
+                                              x-text="getUnreadPublicMessages(item)"></span>
+                                    </a>
                                 </template>
                             </div>
                             <template x-if="item.project.is_observer || item.project.is_switchtender">
@@ -139,9 +143,11 @@
                                           x-text="item.project.private_message_count <= 1 ? `${item.project.private_message_count} message conseillers` : `${item.project.private_message_count} messages conseillers`"></span>
                                     <template x-if="getUnreadPrivateMessages(item) && (item.project.is_observer || item.project.is_switchtender)">
                                         <a class="text-decoration-none hover-underline"
-                                           :href="makeProjectURL('{% url 'projects-project-detail-internal-followup' 0 %}', item.project.id)"><span :class="getProjectStatusColor(item)"
-      class="text-green fw-medium"
-      x-text="getUnreadPrivateMessages(item)"></span></a>
+                                           :href="makeProjectURL('{% url 'projects-project-detail-internal-followup' 0 %}', item.project.id)">
+                                            <span :class="getProjectStatusColor(item)"
+                                                  class="text-green fw-medium"
+                                                  x-text="getUnreadPrivateMessages(item)"></span>
+                                        </a>
                                     </template>
                                 </div>
                             </template>
