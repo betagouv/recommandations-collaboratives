@@ -441,6 +441,7 @@ def test_user_project_status_contains_only_my_projects(request):
         "commune",
         "created_on",
         "id",
+        "inactive_since",
         "is_observer",
         "is_switchtender",
         "name",
