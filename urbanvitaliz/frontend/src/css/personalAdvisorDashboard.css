@@ -258,15 +258,9 @@ main {
 }
 
 .project-card.inactive {
-    background-color: #FFF;
     color: #222;
     border: 2px solid #222;
 }
-
-.project-card.inactive:hover {
-    border: 1px solid #222;
-}
-
 
 .project-card .project-link,
 .project-card .title-info {
