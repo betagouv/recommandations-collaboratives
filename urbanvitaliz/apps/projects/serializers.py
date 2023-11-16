@@ -179,6 +179,7 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
                 "created_on": data.project.created_on,
                 "updated_on": data.project.updated_on,
                 "switchtenders": format_switchtenders(data.project),
+                "inactive_since": data.project.inactive_since,
                 "is_switchtender": data.is_switchtender,
                 "is_observer": data.is_observer,
                 "commune": commune_data,
