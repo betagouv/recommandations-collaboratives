@@ -56,6 +56,7 @@ Cypress.Commands.add("login", (role) => {
             cy.visit('/')
             cy.getCookie("sessionid").should("exist");
             cy.getCookie("csrftoken").should("exist");
+            cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click({ force: true })
         })
     })
 })
@@ -81,6 +82,8 @@ Cypress.Commands.add('loginWithUi', (role) => {
 
     // // our auth cookie should be present
     cy.getCookie('sessionid').should('exist')
+
+    cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click({ force: true })
 })
 
 Cypress.Commands.add('logout', () => {
