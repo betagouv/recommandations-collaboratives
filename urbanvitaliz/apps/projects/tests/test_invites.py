@@ -110,7 +110,7 @@ def test_assigned_advisor_can_invite_collaborator_to_project(request, client):
 @pytest.mark.django_db
 def test_regional_actor_can_invite_collaborator_to_project(request, client):
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
+    Recipe(geomatics.Department).make()
 
     current_site = get_current_site(request)
 
@@ -138,7 +138,7 @@ def test_regional_actor_can_invite_collaborator_to_project(request, client):
 @pytest.mark.django_db
 def test_staff_can_invite_collaborator_to_project(request, client):
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
+    Recipe(geomatics.Department).make()
 
     current_site = get_current_site(request)
 
@@ -152,7 +152,7 @@ def test_staff_can_invite_collaborator_to_project(request, client):
     url = reverse("projects-project-access-collectivity-invite", args=[project.id])
     data = {"email": "test@example.com"}
 
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -162,7 +162,7 @@ def test_staff_can_invite_collaborator_to_project(request, client):
 
 @pytest.mark.django_db
 def test_owner_can_invite_collaborator_member_if_not_draft(request, client):
-    membership = baker.make(
+    baker.make(
         models.ProjectMember,
         is_owner=True,
         member__is_staff=False,
@@ -254,7 +254,7 @@ def test_assigned_advisor_can_invite_advisor_to_project(request, client):
 @pytest.mark.django_db
 def test_regional_actor_can_invite_advisor_to_project(request, client):
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
+    Recipe(geomatics.Department).make()
 
     current_site = get_current_site(request)
 
@@ -282,7 +282,7 @@ def test_regional_actor_can_invite_advisor_to_project(request, client):
 @pytest.mark.django_db
 def test_staff_can_invite_advisor_to_project(request, client):
     commune = Recipe(geomatics.Commune).make()
-    dept = Recipe(geomatics.Department).make()
+    Recipe(geomatics.Department).make()
 
     current_site = get_current_site(request)
 
@@ -296,7 +296,7 @@ def test_staff_can_invite_advisor_to_project(request, client):
     url = reverse("projects-project-access-advisor-invite", args=[project.id])
     data = {"email": "test@example.com"}
 
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -473,7 +473,7 @@ def test_staff_can_revoke_collaborator_invitation(request, client):
     url = reverse("projects-project-access-revoke-invite", args=[project.id, invite.pk])
     data = {"email": invited_email}
 
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
@@ -568,7 +568,7 @@ def test_staff_can_revoke_advisor_invitation(request, client):
     url = reverse("projects-project-access-revoke-invite", args=[project.id, invite.pk])
     data = {"email": invited_email}
 
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
