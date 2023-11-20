@@ -98,6 +98,13 @@ Cypress.Commands.add('acceptCookies', () => {
     cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click({ force: true })
 })
 
+/**
+ * Decline cookies banner
+ */
+Cypress.Commands.add('declineCookies', () => {
+    cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-decline-all"]').click({ force: true })
+})
+
 Cypress.Commands.add("createProject", (label) => {
     cy.visit('/')
 
