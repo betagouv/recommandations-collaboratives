@@ -3,7 +3,7 @@
     {% vite_asset 'js/apps/projectEmailReminder.js' %}
 {% endblock %}
 {% load static %}
-{% if request.user in project.projectmember.all %}
+{% if request.user in project.projectmember.all or position.is_advisor or position.is_observer %}
     <div x-data="ProjectEmailReminder()">
         <button x-ref="emailReminderButton"
                 @click="onEmailReminderButtonClick"
