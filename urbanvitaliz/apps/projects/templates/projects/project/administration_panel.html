@@ -348,11 +348,11 @@
         {% endif %}
       </div>
     </div>
-    <div class="col">
+    <section id="project-status-settings" class="col">
       <hr class="my-4" />
       {% include 'projects/project/fragments/administration/quit_project.html' %}
       {% include 'projects/project/fragments/administration/activate_project.html' with position=position %}
       {% include 'projects/project/fragments/administration/stand_by_project.html' with position=position %}
-    </div>
+    </section>
   </div>
 {% endblock %}

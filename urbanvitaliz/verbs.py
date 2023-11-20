@@ -7,8 +7,6 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-06-26 14:37:45 CEST
 """
 
-import enum
-
 
 class User:
     LOGIN = "s'est connecté·e"
@@ -65,6 +63,9 @@ class Project:
 
     # Only related to advisor kanban
     USER_STATUS_UPDATED = "a changé l'état de son suivi projet"
+
+    SET_INACTIVE = "a mis en pause le projet"
+    SET_ACTIVE = "a réactivé le projet"
 
 
 class Survey:
