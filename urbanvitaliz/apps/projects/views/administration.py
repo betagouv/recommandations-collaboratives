@@ -358,7 +358,10 @@ def access_advisor_resend_invite(request, project_id, invite_id):
     is_regional_actor or has_perm_or_403(request.user, "invite_advisors", project)
 
     invite = get_object_or_404(
-        invites_models.Invite, role="SWITCHTENDER", pk=invite_id, accepted_on=None
+        invites_models.Invite,
+        role__in=("OBSERVER", "SWITCHTENDER"),
+        pk=invite_id,
+        accepted_on=None,
     )  # should we keep switchtender?
 
     if invite_resend(invite):

@@ -47,7 +47,9 @@ def test_logged_in_user_can_use_project_api(client):
 @pytest.mark.django_db
 def test_project_list_includes_project_for_advisor(request, client):
     current_site = get_current_site(request)
-    project = baker.make(models.Project, commune__name="Lille", sites=[current_site])
+    project = baker.make(
+        models.Project, commune__name="Lille", sites=[current_site], status="READY"
+    )
     url = reverse("projects-list")
 
     with login(client, groups=["example_com_advisor"]):
@@ -59,7 +61,7 @@ def test_project_list_includes_project_for_advisor(request, client):
 @pytest.mark.django_db
 def test_project_list_includes_project_for_staff(request, client):
     current_site = get_current_site(request)
-    project = baker.make(models.Project, sites=[current_site])
+    project = baker.make(models.Project, sites=[current_site], status="READY")
     url = reverse("projects-list")
 
     with login(client, groups=["example_com_staff"]):
@@ -487,11 +489,36 @@ def test_user_project_status_contains_only_my_projects_for_site(request):
 
 
 @pytest.mark.django_db
+def test_user_project_status_dont_list_unmoderated_projects_for_regional_advisors(
+    request,
+):
+    project = baker.make(
+        models.Project,
+        sites=[get_current_site(request)],
+        commune__department__code="01",
+        status="DRAFT",
+    )
+
+    group = auth_models.Group.objects.get(name="example_com_advisor")
+    user = baker.make(auth_models.User, groups=[group])
+    user.profile.departments.add(project.commune.department)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("userprojectstatus-list")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
 def test_advisor_access_new_regional_project_status(request):
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
         commune__department__code="01",
+        status="TO_PROCESS",
     )
 
     group = auth_models.Group.objects.get(name="example_com_advisor")
