@@ -4,6 +4,7 @@ describe('As a visitor, I can access the menu and content on different devices',
 
 	before(() => {
 		cy.visit(`/`);
+    cy.acceptCookies()
 	});
 
 	testLayouts.forEach((testItem) => {
