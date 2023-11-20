@@ -37,7 +37,8 @@
                 <form id="form__admin-deactivate-project"
                       method="POST"
                       action="{% url 'projects-project-set-inactive' project.pk %}"
-                      class="form mt-1 d-flex justify-content-between">
+                      class="form mt-1 d-flex justify-content-between"
+                      data-test-id="form-pause-project">
                     {% csrf_token %}
                     <a class="button grey filled tiny text-nowrap inherit"
                        data-bs-dismiss="modal"

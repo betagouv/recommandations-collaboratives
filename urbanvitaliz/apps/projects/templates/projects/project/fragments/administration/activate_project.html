@@ -4,7 +4,8 @@
 {% if request.user == project.owner or request.user.is_staff and "change_project" in user_project_perms %}
     {% if project.inactive_since != None %}
         <!-- Activate project -->
-        <div class="flag medium-border-radius border-blue mb-4 d-flex align-items-start justify-content-between">
+        <div data-test-id="admin-banner-activate-project"
+             class="flag medium-border-radius border-blue mb-4 d-flex align-items-start justify-content-between">
             <div class="d-flex align-items-start">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      width="48"
@@ -26,8 +27,7 @@
                 </div>
             </div>
             <div class="d-flex justify-content-end">
-                <form id="form__admin-activate-project"
-                      data-test-id="form__admin-activate-project"
+                <form id="admin-activate-project"
                       method="POST"
                       action="{% url 'projects-project-set-active' project.pk %}">
                     {% csrf_token %}
