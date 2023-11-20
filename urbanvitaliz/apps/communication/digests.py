@@ -140,37 +140,6 @@ def send_whatsup_reminders_digest_by_project(site, project, dry_run):
     return True
 
 
-def send_reminder_digest_by_project_task(user, reminders, dry_run):
-    """Send an email per project/user containing its reminders."""
-
-    skipped_reminders = []
-    for project_id, project_reminders in groupby(
-        reminders, key=lambda x: x.related.project_id
-    ):
-        try:
-            project = projects_models.Project.objects.get(pk=project_id)
-        except projects_models.Project.DoesNotExist:
-            for reminder in project_reminders:
-                logger.warning(f"[W] Skipping bogus reminder <{reminder}>")
-                skipped_reminders.append(reminder.pk)
-            continue
-
-        digest = make_digest_of_project_recommendations(project, reminders, user)
-        if digest:
-            if dry_run:
-                logger.info(
-                    f"[DRY RUN] Would have sent {len(digest)} digests to {user}."
-                )
-            else:
-                send_email(
-                    "project_reminders_digest",
-                    {"name": normalize_user_name(user), "email": user.email},
-                    params=digest,
-                )
-
-    return skipped_reminders
-
-
 ########################################################################
 # reco digests
 ########################################################################
@@ -240,6 +209,9 @@ def make_digest_of_project_recommendations_from_notifications(
     """Return digest for project recommendations to be sent to user"""
     actions = [notification.action_object for notification in project_notifications]
 
+    # Display not visited first
+    actions.sort(key=lambda action: action.visited, revers=True)
+
     return make_digest_of_project_recommendations(project, actions, user)
 
 
@@ -267,17 +239,33 @@ def make_recommendations_digest(recommendations, user):
 
 def make_project_digest(project, user=None, url_name="overview"):
     """Return base information digest for project"""
-    project_link = utils.build_absolute_url(
+    project_url = utils.build_absolute_url(
         reverse(f"projects-project-detail-{url_name}", args=[project.id]),
         auto_login_user=user,
     )
+
+    public_conversation_url = utils.build_absolute_url(
+        reverse("projects-project-detail-conversations", args=[project.id]),
+        auto_login_user=user,
+    )
+
+    pause_project_url = (
+        utils.build_absolute_url(
+            reverse("projects-project-administration", args=[project.id]),
+            auto_login_user=user,
+        )
+        + "#project-status-settings"
+    )
+
     return {
         "name": project.name,
-        "url": project_link,
+        "url": project_url,
         "commune": {
             "postal": project.commune and project.commune.postal or "",
             "name": project.commune and project.commune.name or "",
         },
+        "public_conversation_url": public_conversation_url,
+        "pause_project_url": pause_project_url,
     }
 
 
@@ -306,6 +294,7 @@ def make_action_digest(action, user):
         },
         "intent": action.intent,
         "content": action.content[:50],
+        "visited": action.visited,
         "resource": {
             "title": action.resource and action.resource.title or "",
         },

@@ -21,6 +21,30 @@
 }
 
 
+.project-selector-dropdown {
+    width: 28vw;
+}
+
+.project-selector-dropdown  li.inactive {
+    background-color: #F6F6F6;
+    color: #222;
+    border: 2px solid #222;
+}
+
+.project-card-top-information.inactive span{
+    padding: 0.25rem 0.5rem;
+    color: white;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 2px;
+}
+
+.project-card-top-information.inactive span{
+    background-color: #E5E5E5;
+    color: #222;
+}
+
 .navbar-logo {
     min-width: fit-content;
     display: flex;

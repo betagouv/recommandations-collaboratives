@@ -275,7 +275,7 @@ def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs)
                     user=instance.who,
                 )
 
-    if not muted:
+    if not muted and instance.comment:
         # Notify about comment
         action_commented.send(
             sender=instance,
