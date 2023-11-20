@@ -33,7 +33,6 @@ function ProjectEmailReminder() {
             this.$refs.emailReminderTooltip.removeAttribute('data-show');
         },
         async onEmailReminderButtonClick() {
-            console.log('lol');
             await this.show()
             this.isOpening = true
         },
