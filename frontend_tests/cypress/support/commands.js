@@ -56,7 +56,7 @@ Cypress.Commands.add("login", (role) => {
             cy.visit('/')
             cy.getCookie("sessionid").should("exist");
             cy.getCookie("csrftoken").should("exist");
-            cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click({ force: true })
+            cy.acceptCookies()
         })
     })
 })
@@ -83,7 +83,7 @@ Cypress.Commands.add('loginWithUi', (role) => {
     // // our auth cookie should be present
     cy.getCookie('sessionid').should('exist')
 
-    cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click({ force: true })
+    cy.acceptCookies()
 })
 
 Cypress.Commands.add('logout', () => {
@@ -91,10 +91,15 @@ Cypress.Commands.add('logout', () => {
     cy.contains('Déconnexion').click({ force: true })
 })
 
+/**
+ * Consent to cookies banner
+ */
+Cypress.Commands.add('acceptCookies', () => {
+    cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click({ force: true })
+})
+
 Cypress.Commands.add("createProject", (label) => {
     cy.visit('/')
-
-    cy.get('[data-test-id="intro-uv"]').find('[data-test-id="intro-link-contact-uv"]').click({ force: true })
 
     cy.url().should('include', '/onboarding/')
 
