@@ -15,7 +15,7 @@ const domElements = {
 	BUTTON_ACTIVATE_PROJECT:'[data-test-id="button-activate-project"]',
 }
 
-class ProjectPreferences {
+class Project {
 	dom
 
 	constructor(dom) {
@@ -32,19 +32,19 @@ class ProjectPreferences {
 	}
 
 	/**
-	 * @param {*} callToAction 'exist' if user has rights to pause a Project, 'not.exists' if not
+	 * @param {*} condition 'exist' if user has rights to pause a Project, 'not.exists' if not
 	 */
-	checkProjectStatusBanner(callToAction='not.exist') {
+	checkProjectStatusBanner(condition='not.exist') {
 		cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE).then(() => {
-			cy.get(this.dom.BUTTON_ACTIVATE_PROJECT).should(callToAction)
+			cy.get(this.dom.BUTTON_ACTIVATE_PROJECT).should(condition)
 		})
 	}
 
 	/**
-	 * @param {*} callToAction 'exist' if user has rights to pause a Project, 'not.exists' if not
+	 * @param {*} condition 'exist' if user has rights to pause a Project, 'not.exists' if not
 	 */
-	checkDeactivateAction(callToAction='not.exist') {
-		cy.get(this.dom.ADMIN_BANNER_DEACTIVATE_PROJECT).should(callToAction)
+	checkDeactivateAction(condition='not.exist') {
+		cy.get(this.dom.ADMIN_BANNER_DEACTIVATE_PROJECT).should(condition)
 	}
 
 	deactivateProject() {
@@ -54,16 +54,18 @@ class ProjectPreferences {
 	}
 
 	activateProjectFromPreferences() {
-		cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE).find(this.dom.BUTTON_ACTIVATE_PROJECT).click({force:true})
-		cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE).should('not.exist')
+		cy.get(this.dom.ADMIN_BANNER_ACTIVATE_PROJECT).find(this.dom.BUTTON_ACTIVATE_PROJECT).click({force:true}).then(() => {
+			cy.get(this.dom.ADMIN_BANNER_ACTIVATE_PROJECT).should('not.exist')
+		})
 	}
 
 	activateProjectFromHeaderBanner() {
-		cy.get(this.dom.ADMIN_BANNER_ACTIVATE_PROJECT).find(this.dom.BUTTON_ACTIVATE_PROJECT).click({force:true})
-		cy.get(this.dom.ADMIN_BANNER_ACTIVATE_PROJECT).should('not.exist')
+		cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE).find(this.dom.BUTTON_ACTIVATE_PROJECT).click({force:true}).then(() => {
+			cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE).should('not.exist')
+		})
 	}
 }
 
-const projectPreferences = new ProjectPreferences(domElements)
+const projectPreferences = new Project(domElements)
 
 export default projectPreferences
