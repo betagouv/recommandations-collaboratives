@@ -7,10 +7,11 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
-import uuid
 import datetime
+import uuid
 
 import pytest
+from actstream.models import Action
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -20,16 +21,12 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
-from rest_framework.test import APIClient
-from urbanvitaliz.apps.communication import models as communication
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.projects import models as project_models
+from urbanvitaliz.apps.projects import utils
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
-
-from urbanvitaliz.apps.projects import utils
 
 from .. import models
 
@@ -1180,6 +1177,27 @@ def test_task_status_is_updated_when_a_followup_issued(request, client):
 
 
 @pytest.mark.django_db
+def test_task_status_change_is_traced_when_a_followup_issued(request, client):
+    with login(client) as user:
+        followup = Recipe(
+            models.TaskFollowup,
+            who=user,
+            task__project__status="READY",
+            status=1,
+            task__site=get_current_site(request),
+        ).make()
+        url = reverse("projects-task-followup-update", args=[followup.id])
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    assert Action.objects.count() == 1
+    action = Action.objects.first()
+
+    assert action.verb == "a classé la recommandation comme «en cours»"
+
+
+@pytest.mark.django_db
 def test_task_status_is_updated_when_a_followup_issued_on_muted_project(
     request, client
 ):
@@ -1255,6 +1273,7 @@ def test_accessing_rsvp_from_email_link(request, client):
     response = client.get(url)
 
     assert response.status_code == 200
+
     assertContains(response, 'id="form-rsvp-followup-confirm"')
 
 
@@ -1278,169 +1297,63 @@ def test_using_rsvp_from_email_link_updates_task(request, client):
     assert not models.TaskFollowupRsvp.objects.filter(uuid=rsvp.uuid).exists()
 
 
-###############################################################
-# Reminders
-###############################################################
-
-
+#################################################################
+# Activity flags
+#################################################################
 @pytest.mark.django_db
-def test_create_reminder_for_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    current_site = get_current_site(request)
+def test_last_members_activity_is_updated_by_member_comment(request, client):
+    site = get_current_site(request)
 
     project = baker.make(
         project_models.Project,
+        sites=[site],
         status="READY",
-        sites=[current_site],
-    )
-    task = baker.make(models.Task, site=current_site, project=project)
-
-    url = reverse("projects-remind-task", args=[task.id])
-    data = {"days": 5}
-
-    with login(client) as user:
-        utils.assign_collaborator(user, project, is_owner=True)
-        response = client.post(url, data=data)
-
-    assert response.status_code == 302
-    reminder = reminders.Reminder.to_send.all()[0]
-    assert models.TaskFollowupRsvp.objects.count() == 0
-    assert reminder.recipient == project.members.first().email
-    in_fifteen_days = datetime.date.today() + datetime.timedelta(days=data["days"])
-    assert reminder.deadline == in_fifteen_days
-
-
-@pytest.mark.django_db
-def test_create_reminder_without_delay_for_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    task = baker.make(
-        models.Task,
-        project__status="READY",
-        site=get_current_site(request),
     )
 
-    url = reverse("projects-remind-task", args=[task.id])
+    task = baker.make(models.Task, project=project, site=get_current_site(request))
 
-    with login(client) as user:
-        utils.assign_collaborator(user, task.project, is_owner=True)
-        response = client.post(url)
+    url = reverse("projects-followup-task", kwargs={"task_id": task.pk})
+
+    before_update = timezone.now()
+
+    with login(client) as owner:
+        utils.assign_collaborator(owner, project, is_owner=True)
+        response = client.post(url, data={"comment": "hey"})
 
     assert response.status_code == 302
-    assert reminders.Reminder.to_send.count() == 1
-    assert models.TaskFollowupRsvp.objects.count() == 0
+
+    project.refresh_from_db()
+
+    assert project.last_members_activity_at > before_update
 
 
 @pytest.mark.django_db
-def test_recreate_reminder_after_for_same_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
+def test_last_members_activity_not_updated_by_advisor_comment(request, client):
+    site = get_current_site(request)
 
-    task = Recipe(
-        models.Task,
-        project__status="READY",
-        site=get_current_site(request),
-    ).make()
-
-    url = reverse("projects-remind-task", args=[task.id])
-    data = {"days": 5}
-    data2 = {"days": 10}
-    with login(client) as user:
-        utils.assign_collaborator(user, task.project, is_owner=True)
-
-        response = client.post(url, data=data)
-        response = client.post(url, data=data2)
-
-    assert response.status_code == 302
-    reminder = reminders.Reminder.to_send.all()[0]
-    assert reminders.Reminder.to_send.count() == 1
-    in_ten_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
-    assert reminder.deadline == in_ten_days
-    assert models.TaskFollowupRsvp.objects.count() == 0
-
-
-@pytest.mark.django_db
-def test_recreate_reminder_before_for_same_task(request, client):
-    baker.make(communication.EmailTemplate, name="rsvp_reco")
-
-    task = Recipe(
-        models.Task,
-        project__status="READY",
-        site=get_current_site(request),
-    ).make()
-
-    url = reverse("projects-remind-task", args=[task.id])
-    data = {"days": 5}
-    data2 = {"days": 2}
-    with login(client) as user:
-        utils.assign_collaborator(user, task.project, is_owner=True)
-
-        response = client.post(url, data=data)
-        response = client.post(url, data=data2)
-
-    assert response.status_code == 302
-    assert reminders.Reminder.to_send.count() == 1
-    reminder = reminders.Reminder.to_send.all()[0]
-    in_two_days = datetime.date.today() + datetime.timedelta(days=data2["days"])
-    assert reminder.deadline == in_two_days
-    assert models.TaskFollowupRsvp.objects.count() == 0
-
-
-@pytest.mark.django_db
-def test_reminder_is_updated_when_a_followup_issued(request, client):
-    owner = baker.make(auth.User)
+    project_ts = timezone.now()
     project = baker.make(
         project_models.Project,
-        sites=[get_current_site(request)],
+        sites=[site],
+        status="READY",
+        last_members_activity_at=project_ts,
     )
-    utils.assign_collaborator(owner, project, is_owner=True)
+    owner = baker.make(auth.User)
+    utils.assign_collaborator(owner, project, is_owner=True)  # for reminders to work
 
-    task = baker.make(models.Task, site=get_current_site(request), project=project)
+    task = baker.make(models.Task, project=project, site=get_current_site(request))
 
-    with login(client) as user:
-        utils.assign_advisor(user, project)
+    url = reverse("projects-followup-task", kwargs={"task_id": task.pk})
 
-        url = reverse("projects-followup-task", args=[task.pk])
-        response = client.post(url)
+    with login(client) as advisor:
+        utils.assign_advisor(advisor, project)
+        response = client.post(url, data={"comment": "hey"})
 
-    reminder = reminders.Reminder.objects.first()
     assert response.status_code == 302
-    assert reminder.recipient == owner.email
 
+    project.refresh_from_db()
 
-###############################################################
-# API
-###############################################################
-
-
-@pytest.mark.django_db
-def test_unassigned_switchtender_should_see_recommendations(request):
-    site = get_current_site(request)
-    task = Recipe(models.Task, site=site, project__sites=[site]).make()
-
-    client = APIClient()
-
-    with login(client) as user:
-        utils.assign_advisor(user, task.project)
-
-        url = reverse("project-tasks-list", args=[task.project.id])
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_unassigned_user_should_not_see_recommendations(request):
-    site = get_current_site(request)
-    task = Recipe(models.Task, site=site, project__sites=[site]).make()
-
-    client = APIClient()
-
-    with login(client):
-        url = reverse("project-tasks-list", args=[task.project.id])
-        response = client.get(url)
-
-    assert response.status_code == 403
+    assert project.last_members_activity_at == project_ts
 
 
 # eof

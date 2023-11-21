@@ -8,6 +8,12 @@
     font-weight: 400 !important;
 }
 
+.tasks-view-switcher button.active:hover {
+    color: #0063CB !important;
+    background-color: #e2effc !important;
+}
+
+
 .tasks-view-switcher button:first-child{
     border-top-left-radius: 99px;
     border-bottom-left-radius: 99px;

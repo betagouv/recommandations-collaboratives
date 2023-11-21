@@ -118,6 +118,10 @@ class SiteConfiguration(models.Model):
     sender_email = models.EmailField()
     sender_name = models.CharField(max_length=30)
 
+    reminder_interval = models.IntegerField(
+        default=6 * 7, verbose_name="Interval des rappels", help_text="en jours"
+    )
+
     def __str__(self):
         return f"SiteConfiguration for '{self.site}'"
 

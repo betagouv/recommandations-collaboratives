@@ -250,6 +250,10 @@
     width: 65%;
 }
 
+.box-shadow-popup {
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+}
+
 @keyframes appear-in {
     from {
         opacity: 0;
@@ -260,6 +264,10 @@
         opacity: 1;
         transform: translate3d(0, 0, 0);
     }
+}
+
+.border-red {
+    border: 1px solid #CE0500;
 }
 
 .white-space-pre {

@@ -247,6 +247,31 @@ main {
     border-radius: 4px;
 }
 
+
+.project-card {
+    background-color: #FFF;
+    color: #222;
+}
+
+.project-card:hover {
+    border-color: #0063CB;
+}
+
+.project-card.inactive {
+    color: #222;
+    border: 2px solid #222;
+}
+
+.project-card .project-link,
+.project-card .title-info {
+    color: #0063CB;
+}
+
+.project-card.inactive .project-link,
+.project-card.inactive .title-info  {
+    color: #222;
+}
+
 .project-card-top-information {
     position: absolute;
     top: -12px;
@@ -271,6 +296,11 @@ main {
 
 .project-card-top-information.new span{
     background-color: #FDCD6D;
+    color: #222;
+}
+
+.project-card-top-information.inactive span{
+    background-color: #E5E5E5;
     color: #222;
 }
 
