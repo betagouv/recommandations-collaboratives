@@ -40,6 +40,7 @@ COLLABORATOR_DRAFT_PERMISSIONS = (
     "projects.view_tasks",
     "projects.use_surveys",
     "projects.view_surveys",
+    "projects.change_location",
 )
 
 COLLABORATOR_PERMISSIONS = (
@@ -65,6 +66,7 @@ ADVISOR_PERMISSIONS = [
     "projects.manage_documents",
     "projects.use_surveys",
     "projects.view_surveys",
+    "projects.change_location",
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
@@ -325,6 +327,12 @@ class Project(models.Model):
     )
 
     location = models.CharField(max_length=256, verbose_name="Localisation")
+    location_x = models.FloatField(
+        null=True, blank=True, verbose_name="Coordonnées géographiques (X)"
+    )
+    location_y = models.FloatField(
+        null=True, blank=True, verbose_name="Coordonnées géographiques (Y)"
+    )
     commune = models.ForeignKey(
         geomatics_models.Commune,
         null=True,
@@ -393,6 +401,8 @@ class Project(models.Model):
             ("invite_advisors", "Can invite advisors"),
             ("manage_collaborators", "Can manage collaborators"),
             ("manage_advisors", "Can manage advisors"),
+            # Geolocation
+            ("change_location", "Can change the geolocation"),
         )
 
     def __str__(self):  # pragma: nocover

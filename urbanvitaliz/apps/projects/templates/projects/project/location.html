@@ -1,0 +1,9 @@
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">Go!</button>
+
+</form>
