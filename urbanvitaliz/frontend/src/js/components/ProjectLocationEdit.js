@@ -8,13 +8,12 @@ import 'leaflet-providers'
 import geolocUtils from '../utils/geolocation/'
 import mapUtils from '../utils/map/'
 
-function ProjectLocation(projectOptions) {
+function ProjectLocationEdit(projectOptions) {
 	return {
 		mapIsSmall: true,
 		project: null,
-		mapModal: null,
 		editLocationModal: null,
-		interactiveMap: null,
+		map: null,
 		zoom: 5,
 
 		async init() {
@@ -28,7 +27,7 @@ function ProjectLocation(projectOptions) {
 					longitude: projectOptions.commune.longitude ? parseFloat(projectOptions.commune.longitude) : null,
 				}
 			}
-			const options = mapUtils.mapOptions({interactive: false});
+			const options = mapUtils.mapOptions({interactive: true, zoom:false});
 			const { latitude, longitude, insee } = this.project.commune;
 
 
@@ -39,7 +38,7 @@ function ProjectLocation(projectOptions) {
 			geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
 			geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location);
 
-			const Map = mapUtils.initMap('map', this.project, options, this.zoom);
+			const Map = mapUtils.initMap('map-location-edit', this.project, options, this.zoom);
 			mapUtils.initMapLayers(Map, this.project, geoData);
 
 			// forces map redraw to fit container
@@ -47,38 +46,40 @@ function ProjectLocation(projectOptions) {
 
 			//Center Map
 			Map.panTo(new L.LatLng(latitude, longitude));
-
-			this.initProjectMapModal(this.project, geoData);
+			this.map = Map;
+			this.initLocationEditMap(this.project, geoData);
 		},
 
-		initProjectMapModal(project, geoData) {
-			const element = document.getElementById("project-map-modal");
-			this.mapModal = new bootstrap.Modal(element);
-
-			const options = mapUtils.mapOptions({interactive: true});
-			const zoom = this.zoom + 1;
-			const latitude = project.commune.latitude ?? 	geolocUtils.LAT_LNG_FRANCE[0];
-			const longitude = project.commune.longitude ?? 	geolocUtils.LAT_LNG_FRANCE[1];
-
-			this.interactiveMap = mapUtils.initMap('map-modal', project, options, zoom);
-			this.interactiveMap.panTo(new L.LatLng(latitude, longitude));
-			this.interactiveMap.setMinZoom(zoom - 7);
-			this.interactiveMap.setMaxZoom(zoom + 6);
-
-			const map = this.interactiveMap;
-			element.addEventListener('shown.bs.modal', function (event) {
-				 // forces map redraw to fit container
-				setTimeout(function(){  map.invalidateSize()}, 0);
-			})
-			mapUtils.initMapLayers(this.interactiveMap, this.project, geoData);
-		},
-
-		openProjectMapModal() {
+		openEditLocationModal() {
 			this.mapIsSmall = false;
-			this.mapModal.show();
+			this.editLocationModal.show();
+		},
+
+		updateProjectLocation(coordinates)  {
+			// TODO: fix Save coordinates for project (depends on backend model update)
+			this.project.location_x = coordinates[0]
+			this.project.location_y = coordinates[1]
+			console.log('updateProjectLocation(coordinates)');
+			console.log(this.project.location_x );
+			console.log(this.project.location_y );
+			console.log('updateProjectLocation(coordinates)');
+			console.log(coordinates);
+		},
+
+		initLocationEditMap(project, geoData) {
+			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
+			mapUtils.initMapLayers(this.map, project, geoData);
+			mapUtils.initMapControllerBAN(this.map, project, geoData, onClick);
+
+			this.map.on('click', function(e) {
+				onClick(e.latlng)
+			});
+			const map = this.map;
+
+			setTimeout(function(){map.invalidateSize()}, 0);
 		},
 	}
 }
 
 
-Alpine.data("ProjectLocation", ProjectLocation)
+Alpine.data("ProjectLocationEdit", ProjectLocationEdit)

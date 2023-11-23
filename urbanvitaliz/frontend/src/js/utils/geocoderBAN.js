@@ -4,7 +4,6 @@ import * as L from 'leaflet';
  * Source: https://github.com/entrepreneur-interet-general/leaflet-geocoder-ban/blob/master/src/leaflet-geocoder-ban.js
  */
 
-const latLongFrance = [46.5, 1.20] // latitude and longitude of centroid of France
 L.GeocoderBAN = L.Control.extend({
 	options: {
 		position: 'topleft',
