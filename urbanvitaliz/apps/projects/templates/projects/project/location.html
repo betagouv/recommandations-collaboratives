@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+{% load projects_extra %}
+{% load django_vite %}
+{% current_project request.session as project %}
+{% block js %}
+  {{ project.name|json_script:"editNameProject" }}
+  {{ project.status|json_script:"editStatus" }}
+  {{ project.location|json_script:"editLocation" }}
+  {{ project.location_x|json_script:"editLocation_x" }}
+  {{ project.location_y|json_script:"editLocation_y" }}
+  {{ project.commune.name|json_script:"editNameCommune" }}
+  {{ project.commune.postal|json_script:"editPostal" }}
+  {{ project.commune.insee|json_script:"editInsee" }}
+  {{ project.commune.latitude|json_script:"editLatitude" }}
+  {{ project.commune.longitude|json_script:"editLongitude" }}
+  <script>
+        const projectOptions = {
+            name: JSON.parse(document.getElementById('editNameProject').textContent),
+            status: JSON.parse(document.getElementById('editStatus').textContent),
+            location: JSON.parse(document.getElementById('editLocation').textContent),
+            location_x: document.getElementById('editLocation_x')
+              ? JSON.parse(document.getElementById('editLocation_x').textContent)
+              : null,
+            location_y: document.getElementById('editLocation_y')
+              ? JSON.parse(document.getElementById('editLocation_y').textContent)
+              : null,
+            commune: {
+                name: JSON.parse(document.getElementById('editNameCommune').textContent),
+                postal: JSON.parse(document.getElementById('editPostal').textContent),
+                insee: JSON.parse(document.getElementById('editInsee').textContent),
+                latitude: JSON.parse(document.getElementById('editLatitude').textContent),
+                longitude: JSON.parse(document.getElementById('editLongitude').textContent),
+            }
+        }
+        console.log('projectOptions');
+        console.log(projectOptions);
+  </script>
+  {% vite_asset 'js/apps/projectLocationEdit.js' %}
+{% endblock %}
+{% block content %}
+  <div x-data='ProjectLocationEdit(projectOptions)'
+       data-test-id="project-location-edit">
+    <header class="location-header">
+      <h6 id="project-location-edit-label" class="fw-bold d-block mb-0">Localisation du Projet</h6>
+      {{ project.name }}
+      {{ project.status }}
+      {{ project.location }}
+      {{ project.location_x }}
+      {{ project.location_y }}
+    </header>
+    <div class="location-body p-0">
+      <div data-test-id="map-location-edit" class="p-0 project-map-container">
+        <div x-ref="map-location-edit"
+             id="map-location-edit"
+             class="project-map h-100 w-100"></div>
+      </div>
+      <div class="location-footer bg-white justify-content-start">
+        <form method="POST"
+              action="{% url 'projects-project-location' project.pk %}"
+              name="ProjectLocationForm">
+          {% csrf_token %}
+          <!-- {{ form.as_p }} -->
+          <label>
+            Coordonnées géographiques (X) :
+            <input type="text"
+                   name="location_x"
+                   :value="project.location_x"
+                   :placeholder="project.location_x" />
+          </label>
+          <label>
+            Coordonnées géographiques (Y) :
+            <input type="text"
+                   name="location_y"
+                   :value="project.location_y"
+                   :placeholder="project.location_y" />
+          </label>
+          <button>Sauvegarder la localisation</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
