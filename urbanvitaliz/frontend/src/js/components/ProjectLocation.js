@@ -15,7 +15,7 @@ function ProjectLocation(projectOptions) {
 		mapModal: null,
 		staticMap: null,
 		interactiveMap: null,
-		zoom: 5,
+		zoom: 6,
 
 		async init() {
 			this.project = {
@@ -23,15 +23,18 @@ function ProjectLocation(projectOptions) {
 				commune: {
 					...projectOptions.commune,
 					latitude: projectOptions.commune.latitude,
-					longitude: projectOptions.commune.longitude,
+					longitude: projectOptions.commune.longitude
 				}
 			}
 			const { latitude, longitude, insee } = this.project.commune;
-			this.zoom = latitude && longitude ? this.zoom + 1 : this.zoom;
-
+			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = {}
-			geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
-			geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location);
+			try {
+				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
+				geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location);
+			} catch(e) {
+				console.log(e)
+			}
 			this.initStaticMap(this.project, geoData);
 			this.initInteractiveMap(this.project, geoData);
 		},
@@ -39,11 +42,9 @@ function ProjectLocation(projectOptions) {
 		initStaticMap(project, geoData) {
 			const options = mapUtils.mapOptions({interactive: false});
 
-			const Map  = mapUtils.initMap('map-static', project, options, this.zoom);
+			const Map = mapUtils.initMap('map-static', project, options, this.zoom);
 			this.staticMap = Map;
 			mapUtils.initMapLayers(this.staticMap, project, geoData);
-
-			// forces map redraw to fit container
 		},
 
 		initInteractiveMap(project, geoData) {

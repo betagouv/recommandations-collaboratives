@@ -5,7 +5,7 @@ import geolocUtils from './geolocation/'
 
 function getDefaultLatLngForMap(project) {
 	const longitude = project.location_x ? project.location_x
-		: project.commune.latitude ? project.commune.latitude
+		: project.commune.longitude ? project.commune.longitude
 		: undefined;
 	const latitude = project.location_y ? project.location_y
 		: project.commune.latitude ? project.commune.latitude
@@ -28,7 +28,7 @@ function initMap(idMap, project, options, zoom) {
 
 	const osm = L.tileLayer.provider('OpenStreetMap.France')
 
-	return L.map(idMap, {...options, layers:[osm]}).setView([latitude, longitude], zoom);
+	return L.map(idMap, {...options, layers:[osm]}).setView(new L.LatLng(latitude, longitude), zoom);
 }
 
 // Create layers composed with markers
@@ -74,7 +74,7 @@ function addLayerMarkerProjectCoordinates(map, project) {
 
 function addLayerMarkerProjectLocation(map, project, geoData) {
 	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
-		throw Error(`Données API Adresse indisponibles pour "${geoData.location}"`)
+		throw Error(`Données API Adresse indisponibles pour "${project.name}"`)
 	}
 	const coordinates = geoData.features[0].geometry.coordinates
 	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
@@ -138,5 +138,7 @@ export default {
 	addLayerAreaCircle,
 	addLayerMarkerProjectLocation,
 	mapOptions,
-	getDefaultLatLngForMap
+	getDefaultLatLngForMap,
+	createMarkerIcon,
+	markerPopupTemplate
 }
