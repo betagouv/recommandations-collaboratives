@@ -57,6 +57,11 @@ urlpatterns = [
         name="projects-project-topics",
     ),
     path(
+        r"project/<int:project_id>/location",
+        detail.project_update_location,
+        name="projects-project-location",
+    ),
+    path(
         r"project/<int:project_id>/presentation",
         detail.project_overview,
         name="projects-project-detail-overview",
