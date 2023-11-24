@@ -48,11 +48,17 @@ function ProjectLocationEdit(projectOptions) {
 		},
 
 		initInteractiveMap(project, geoData) {
-			const options = mapUtils.mapOptions({interactive: true, zoom:true});
+			const options = mapUtils.mapOptions({interactive: true});
 			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project)
+			const zoom = this.zoom + 1;
 
 			const Map = mapUtils.initMap('map-location-edit', project, options, this.zoom);
 			mapUtils.initMapLayers(Map, project, geoData);
+			Map.setMinZoom(zoom - 7);
+			Map.setMaxZoom(zoom + 6);
+			L.control.zoom({
+				position: 'topright'
+			}).addTo(Map);
 
 			//Center Map
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
