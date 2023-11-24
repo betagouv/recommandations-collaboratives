@@ -31,9 +31,7 @@
 {% endblock %}
 {% block content %}
     <div x-data='ProjectLocation(projectOptions)'>
-        <div class="mb-2 project-map-readonly" data-test-id="project-map-static">
-            {% include 'projects/project/fragments/geolocation/project_map.html' %}
-        </div>
+        {% include 'projects/project/fragments/geolocation/project_map.html' %}
         {% include 'projects/project/fragments/geolocation/location_footer.html' %}
     </div>
 {% endblock %}

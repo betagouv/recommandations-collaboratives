@@ -3,10 +3,20 @@ import { statusToColorClass } from '../utils/statusToText'
 import GeocoderBAN from './geocoderBAN'
 import geolocUtils from './geolocation/'
 
+function getDefaultLatLngForMap(project) {
+	const latitude = project.location_x ? project.location_x
+	: project.commune.latitude ? project.commune.latitude
+	: geolocUtils.LAT_LNG_FRANCE[0];
+	const longitude = project.location_y ? project.location_y
+		: project.commune.longitude ? project.commune.longitude
+		: geolocUtils.LAT_LNG_FRANCE[1];
+
+	return [latitude, longitude]
+}
+
 // Map base layer
 function initMap(idMap, project, options, zoom) {
-	const latitude = project.commune.latitude ? project.commune.latitude : geolocUtils.LAT_LNG_FRANCE[0];
-	const longitude = project.commune.longitude ? project.commune.longitude : geolocUtils.LAT_LNG_FRANCE[1];
+	const [latitude, longitude] = getDefaultLatLngForMap(project)
 
 	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
 		maxZoom: 20,
@@ -50,30 +60,34 @@ function initMapControllerBAN(map, project, geoData, onUpdate) {
 	})
 }
 
-function addLayerAreaCommune(map, geoData) {
-	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
-		throw Error(`Données IGN indisponibles pour la commune ${geoData.commune.name}`)
+function addLayerMarkerProjectCoordinates(map, project) {
+	if(!project.location_x || !project.location_x) {
+		throw Error(`Coordonnées de localisation du projet indisponibles pour "${project.name}"`)
 	}
-
-	L.geoJSON(geoData.features[0].geometry).addTo(map);
+	const coordinates = [project.location_x, project.location_y]
+	console.log('addLayerMarkerProjectCoordinates - coordinates');
+	console.log(coordinates);
+	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
+	marker.bindPopup(markerPopupTemplate(project))
 }
 
 function addLayerMarkerProjectLocation(map, project, geoData) {
 	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
-		throw Error(`Données API Adresse indisponibles pour ${geoData.location}`)
+		throw Error(`Données API Adresse indisponibles pour "${geoData.location}"`)
 	}
 	const coordinates = geoData.features[0].geometry.coordinates
+	console.log('addLayerMarkerProjectLocation - coordinates');
+	console.log(coordinates);
 	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
 }
 
-function addLayerMarkerProjectCoordinates(map, project) {
-	if(!project.location_x || !project.location_x) {
-		throw Error(`Coordonnées de localisation du projet indisponibles pour ${project.name}`)
+function addLayerAreaCommune(map, geoData) {
+	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
+		throw Error(`Données IGN indisponibles pour la commune "${geoData.commune.name}"`)
 	}
-	const coordinates = [project.location_x, project.location_y]
-	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
-	marker.bindPopup(markerPopupTemplate(project))
+
+	L.geoJSON(geoData.features[0].geometry).addTo(map);
 }
 
 // Create layers composed with markers
@@ -95,9 +109,11 @@ function createMarkerIcon(project) {
 function markerPopupTemplate(project) {
 	return `
 		<div class="marker-popup">
-			<header><h3><a href="/project/${project.id}/presentation">${project.name}</a></h3></header>
+			<header><h6><a href="/project/${project.id}/presentation">${project.name}</a></h6></header>
 			<main class="d-flex flex-column">
 				<p class="m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>
+				<p class="m-0 fs-7 text-capitalize">Coordonnées géographiques (X) (${project?.location_x})</p>
+				<p class="m-0 fs-7 text-capitalize">Coordonnées géographiques (y) (${project?.location_y})</p>
 			</main>
 		</div>
 	`
@@ -122,5 +138,6 @@ export default {
 	addLayerAreaCommune,
 	addLayerAreaCircle,
 	addLayerMarkerProjectLocation,
-	mapOptions
+	mapOptions,
+	getDefaultLatLngForMap
 }

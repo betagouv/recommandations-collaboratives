@@ -13,7 +13,7 @@ function ProjectLocation(projectOptions) {
 		mapIsSmall: true,
 		project: null,
 		mapModal: null,
-		editLocationModal: null,
+		staticMap: null,
 		interactiveMap: null,
 		zoom: 5,
 
@@ -28,49 +28,50 @@ function ProjectLocation(projectOptions) {
 					longitude: projectOptions.commune.longitude ? parseFloat(projectOptions.commune.longitude) : null,
 				}
 			}
-			const options = mapUtils.mapOptions({interactive: false});
 			const { latitude, longitude, insee } = this.project.commune;
-
-
 			this.zoom = latitude && longitude ? 11 : this.zoom;
 
 			const geoData = {}
-
 			geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
 			geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location);
-
-			const Map = mapUtils.initMap('map', this.project, options, this.zoom);
-			mapUtils.initMapLayers(Map, this.project, geoData);
-
-			// forces map redraw to fit container
-			setTimeout(function(){Map.invalidateSize()}, 0);
-
-			//Center Map
-			Map.panTo(new L.LatLng(latitude, longitude));
-
-			this.initProjectMapModal(this.project, geoData);
+			this.initStaticMap(this.project, geoData);
+			this.initInteractiveMap(this.project, geoData);
 		},
 
-		initProjectMapModal(project, geoData) {
-			const element = document.getElementById("project-map-modal");
-			this.mapModal = new bootstrap.Modal(element);
+		initStaticMap(project, geoData) {
+			const options = mapUtils.mapOptions({interactive: false});
+			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project)
 
+			const Map  = mapUtils.initMap('map-static', project, options, this.zoom);
+			mapUtils.initMapLayers(Map, project, geoData);
+
+			// forces map redraw to fit container
+			Map.panTo(new L.LatLng(latitude, longitude));
+			setTimeout(function(){Map.invalidateSize()}, 0);
+			this.staticMap = Map;
+		},
+
+		initInteractiveMap(project, geoData) {
+			// Init Interactive Map
 			const options = mapUtils.mapOptions({interactive: true});
 			const zoom = this.zoom + 1;
-			const latitude = project.commune.latitude ?? 	geolocUtils.LAT_LNG_FRANCE[0];
-			const longitude = project.commune.longitude ?? 	geolocUtils.LAT_LNG_FRANCE[1];
+			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project)
 
-			this.interactiveMap = mapUtils.initMap('map-modal', project, options, zoom);
-			this.interactiveMap.panTo(new L.LatLng(latitude, longitude));
-			this.interactiveMap.setMinZoom(zoom - 7);
-			this.interactiveMap.setMaxZoom(zoom + 6);
+			const Map  = mapUtils.initMap('map-modal', project, options, zoom);
+			mapUtils.initMapLayers(Map, project, geoData);
+			Map.setMinZoom(zoom - 7);
+			Map.setMaxZoom(zoom + 6);
+			Map.panTo(new L.LatLng(latitude, longitude));
+			Map.setView([latitude, longitude]);
+			this.interactiveMap = Map;
 
-			const map = this.interactiveMap;
+			// Init Modal
+			const element = document.getElementById("project-map-modal");
+			this.mapModal = new bootstrap.Modal(element);
 			element.addEventListener('shown.bs.modal', function (event) {
 				 // forces map redraw to fit container
-				setTimeout(function(){  map.invalidateSize()}, 0);
+				setTimeout(function(){Map.invalidateSize()}, 0);
 			})
-			mapUtils.initMapLayers(this.interactiveMap, this.project, geoData);
 		},
 
 		openProjectMapModal() {
