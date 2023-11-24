@@ -45,17 +45,16 @@
 
 
 .marker-popup header {
-    min-height: auto;
-    padding: 15px 25px;
+    padding: 10px 15px;
     background-color: #bfd9ff;
 }
 
 .marker-popup main {
     min-height: auto;
-    padding: 15px 25px;
+    padding: 10px 15px;
 }
 
-.marker-popup main hr{
+.marker-popup main hr {
     margin: 0.5rem 0;
 }
 
