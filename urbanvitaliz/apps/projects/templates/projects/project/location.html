@@ -33,8 +33,6 @@
                 longitude: JSON.parse(document.getElementById('editLongitude').textContent),
             }
         }
-        console.log('projectOptions');
-        console.log(projectOptions);
   </script>
   {% vite_asset 'js/apps/projectLocationEdit.js' %}
 {% endblock %}
@@ -43,11 +41,6 @@
        data-test-id="project-location-edit">
     <header class="location-header">
       <h6 id="project-location-edit-label" class="fw-bold d-block mb-0">Localisation du Projet</h6>
-      {{ project.name }}
-      {{ project.status }}
-      {{ project.location }}
-      {{ project.location_x }}
-      {{ project.location_y }}
     </header>
     <div class="location-body p-0">
       <div data-test-id="map-location-edit" class="p-0 project-map-container">

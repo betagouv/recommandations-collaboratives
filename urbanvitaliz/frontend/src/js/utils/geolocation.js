@@ -7,7 +7,7 @@ const COMMUNES_PARIS = ['75101','75102','75103','75104','75105','75106','75107',
 // Doc: https://apicarto.ign.fr/api/doc/cadastre#/Commune/get_cadastre_commune
 const API_CADASTRE = 'https://apicarto.ign.fr/api/cadastre'
 const API_ADRESSE = 'https://api-adresse.data.gouv.fr'
-const LAT_LNG_FRANCE = [46.5, 1.20] // latitude and longitude of centroid of France
+const LAT_LNG_FRANCE = {lat: 46.5, lng: 1.20} // latitude and longitude of }centroid of France
 
 function getGlobalCityCodeFromCodeInsee(codeInsee) {
 	if (COMMUNES_PARIS.includes(codeInsee)) {

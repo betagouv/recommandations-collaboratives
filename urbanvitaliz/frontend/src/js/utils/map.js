@@ -4,12 +4,12 @@ import GeocoderBAN from './geocoderBAN'
 import geolocUtils from './geolocation/'
 
 function getDefaultLatLngForMap(project) {
-	const latitude = project.location_x ? project.location_x
-	: project.commune.latitude ? project.commune.latitude
-	: geolocUtils.LAT_LNG_FRANCE[0];
-	const longitude = project.location_y ? project.location_y
-		: project.commune.longitude ? project.commune.longitude
-		: geolocUtils.LAT_LNG_FRANCE[1];
+	const longitude = project.location_x ? project.location_x
+		: project.commune.latitude ? project.commune.latitude
+		: undefined;
+	const latitude = project.location_y ? project.location_y
+		: project.commune.latitude ? project.commune.latitude
+		: undefined;
 
 	return [latitude, longitude]
 }
@@ -17,7 +17,10 @@ function getDefaultLatLngForMap(project) {
 // Map base layer
 function initMap(idMap, project, options, zoom) {
 	const [latitude, longitude] = getDefaultLatLngForMap(project)
-
+	if(!latitude && !longitude) {
+		latitude = geolocUtils.LAT_LNG_FRANCE[0]
+		longitude = geolocUtils.LAT_LNG_FRANCE[1]
+	}
 	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
 		maxZoom: 20,
 		attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -65,8 +68,6 @@ function addLayerMarkerProjectCoordinates(map, project) {
 		throw Error(`Coordonnées de localisation du projet indisponibles pour "${project.name}"`)
 	}
 	const coordinates = [project.location_x, project.location_y]
-	console.log('addLayerMarkerProjectCoordinates - coordinates');
-	console.log(coordinates);
 	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
 }
@@ -76,8 +77,6 @@ function addLayerMarkerProjectLocation(map, project, geoData) {
 		throw Error(`Données API Adresse indisponibles pour "${geoData.location}"`)
 	}
 	const coordinates = geoData.features[0].geometry.coordinates
-	console.log('addLayerMarkerProjectLocation - coordinates');
-	console.log(coordinates);
 	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
 }
@@ -127,7 +126,7 @@ function mapOptions({interactive, zoom}) {
 		scrollWheelZoom: false,
 		boxZoom: interactive,
 		keyboard: interactive,
-		zoomControl: zoom
+		zoomControl: zoom,
 	}
 }
 

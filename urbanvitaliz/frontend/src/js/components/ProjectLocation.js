@@ -20,16 +20,14 @@ function ProjectLocation(projectOptions) {
 		async init() {
 			this.project = {
 				...projectOptions,
-				location_x: projectOptions.location_x ? parseFloat(projectOptions.location_x) : null,
-				location_y: projectOptions.location_y ? parseFloat(projectOptions.location_y) : null,
 				commune: {
 					...projectOptions.commune,
-					latitude: projectOptions.commune.latitude ? parseFloat(projectOptions.commune.latitude) : null,
-					longitude: projectOptions.commune.longitude ? parseFloat(projectOptions.commune.longitude) : null,
+					latitude: projectOptions.commune.latitude,
+					longitude: projectOptions.commune.longitude,
 				}
 			}
 			const { latitude, longitude, insee } = this.project.commune;
-			this.zoom = latitude && longitude ? 11 : this.zoom;
+			this.zoom = latitude && longitude ? this.zoom + 1 : this.zoom;
 
 			const geoData = {}
 			geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
@@ -40,33 +38,28 @@ function ProjectLocation(projectOptions) {
 
 		initStaticMap(project, geoData) {
 			const options = mapUtils.mapOptions({interactive: false});
-			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project)
 
 			const Map  = mapUtils.initMap('map-static', project, options, this.zoom);
-			mapUtils.initMapLayers(Map, project, geoData);
+			this.staticMap = Map;
+			mapUtils.initMapLayers(this.staticMap, project, geoData);
 
 			// forces map redraw to fit container
-			Map.panTo(new L.LatLng(latitude, longitude));
-			setTimeout(function(){Map.invalidateSize()}, 0);
-			this.staticMap = Map;
 		},
 
 		initInteractiveMap(project, geoData) {
 			// Init Interactive Map
 			const options = mapUtils.mapOptions({interactive: true});
-			const zoom = this.zoom + 1;
 			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project)
 
-			const Map  = mapUtils.initMap('map-modal', project, options, zoom);
-			mapUtils.initMapLayers(Map, project, geoData);
-			Map.setMinZoom(zoom - 7);
-			Map.setMaxZoom(zoom + 6);
+			const Map  = mapUtils.initMap('map-modal', project, options, this.zoom + 5);
+			this.interactiveMap = Map;
+			mapUtils.initMapLayers(this.interactiveMap, project, geoData);
+			this.interactiveMap.setMinZoom(this.zoom - 7);
+			this.interactiveMap.setMaxZoom(this.zoom + 6);
 			L.control.zoom({
 				position: 'topright'
-			}).addTo(Map);
-			Map.panTo(new L.LatLng(latitude, longitude));
-			Map.setView([latitude, longitude]);
-			this.interactiveMap = Map;
+			}).addTo(this.interactiveMap);
+			this.interactiveMap.panTo(new L.LatLng(latitude, longitude));
 
 			// Init Modal
 			const element = document.getElementById("project-map-modal");
