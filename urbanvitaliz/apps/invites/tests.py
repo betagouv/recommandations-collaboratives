@@ -12,12 +12,13 @@ import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.utils import timezone
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains, assertNotContains
-from urbanvitaliz.apps.projects import models as projects_models
-from urbanvitaliz.utils import login, has_perm
+from pytest_django.asserts import assertRedirects, assertNotContains, assertContains
 from urbanvitaliz.apps.addressbook import models as addressbook_models
+from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.utils import has_perm, login
 
 from . import api, models
 
@@ -124,6 +125,19 @@ def test_invite_available_for_everyone(request, client):
     url = reverse("invites-invite-details", args=[invite.pk])
     response = client.get(url)
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_invite_redirects_to_login_if_already_accepted(request, client):
+    invite = Recipe(
+        models.Invite, site=get_current_site(request), accepted_on=timezone.now()
+    ).make()
+
+    url = reverse("invites-invite-details", args=[invite.pk])
+    response = client.get(url)
+
+    login_url = reverse("account_login")
+    assertRedirects(response, login_url)
 
 
 @pytest.mark.django_db
