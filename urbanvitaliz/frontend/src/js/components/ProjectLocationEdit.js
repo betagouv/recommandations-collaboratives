@@ -18,17 +18,15 @@ function ProjectLocationEdit(projectOptions) {
 		async init() {
 			this.project = {
 				...projectOptions,
-				location_x: projectOptions.location_x ? parseFloat(projectOptions.location_x) : null,
-				location_y: projectOptions.location_y ? parseFloat(projectOptions.location_y) : null,
 				commune: {
 					...projectOptions.commune,
-					latitude: projectOptions.commune.latitude ? parseFloat(projectOptions.commune.latitude) : null,
-					longitude: projectOptions.commune.longitude ? parseFloat(projectOptions.commune.longitude) : null,
+					latitude: projectOptions.commune.latitude,
+					longitude: projectOptions.commune.longitude,
 				}
 			}
 			const { latitude, longitude, insee } = this.project.commune;
-			this.zoom = latitude && longitude ? 11 : this.zoom;
-
+			this.zoom = latitude && longitude ? this.zoom + 6 : this.zoom;
+			
 			const geoData = {}
 
 			geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
@@ -37,40 +35,30 @@ function ProjectLocationEdit(projectOptions) {
 		},
 
 		updateProjectLocation(coordinates)  {
-			// TODO: fix Save coordinates for project (depends on backend model update)
-			this.project.location_x = coordinates[0]
-			this.project.location_y = coordinates[1]
-			console.log('updateProjectLocation(coordinates)');
-			console.log(this.project.location_x );
-			console.log(this.project.location_y );
-			console.log('updateProjectLocation(coordinates)');
-			console.log(coordinates);
+			this.project.location_x = coordinates.lng
+			this.project.location_y = coordinates.lat
 		},
 
 		initInteractiveMap(project, geoData) {
 			const options = mapUtils.mapOptions({interactive: true});
-			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project)
-			const zoom = this.zoom + 1;
 
 			const Map = mapUtils.initMap('map-location-edit', project, options, this.zoom);
-			mapUtils.initMapLayers(Map, project, geoData);
-			Map.setMinZoom(zoom - 7);
-			Map.setMaxZoom(zoom + 6);
-			L.control.zoom({
-				position: 'topright'
-			}).addTo(Map);
-
 			//Center Map
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
-			mapUtils.initMapLayers(Map, project, geoData);
-			mapUtils.initMapControllerBAN(Map, project, geoData, onClick);
-
 			Map.on('click', function(e) {
 				onClick(e.latlng)
 			});
-			Map.panTo(new L.LatLng(latitude, longitude));
-			setTimeout(function(){Map.invalidateSize()}, 0);
 			this.map = Map;
+			
+			mapUtils.initMapLayers(this.map, project, geoData);
+			mapUtils.initMapControllerBAN(this.map, project, geoData, onClick);
+			this.map.setMinZoom(this.zoom - 7);
+			this.map.setMaxZoom(this.zoom + 6);
+			L.control.zoom({
+				position: 'topright'
+			}).addTo(this.map);
+
+			setTimeout(function(){Map.invalidateSize()}, 0);
 		},
 	}
 }

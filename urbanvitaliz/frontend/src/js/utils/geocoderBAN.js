@@ -174,7 +174,10 @@ L.GeocoderBAN = L.Control.extend({
 			this.minimizeControl()
 			this.geocodeResult(feature)
 			const coordinates = feature.geometry.coordinates
-			this.options.onUpdate(coordinates)
+			this.options.onUpdate({
+				lng: feature.geometry.coordinates[0],
+				lat: feature.geometry.coordinates[1]
+			})
 		}
 		var mouseOverHandler = function (e) {
 			var s = document.getElementsByClassName('leaflet-control-geocoder-ban-selected')
