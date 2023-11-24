@@ -14,6 +14,7 @@ function ProjectLocationEdit(projectOptions) {
 		project: null,
 		map: null,
 		zoom: 5,
+		markers: [],
 
 		async init() {
 			this.project = {
@@ -26,12 +27,14 @@ function ProjectLocationEdit(projectOptions) {
 			}
 			const { latitude, longitude, insee } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 6 : this.zoom;
-			
 			const geoData = {}
-
-			geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
-			geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location);
-			this.initInteractiveMap(this.project, geoData);
+			try {
+				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
+				geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location);
+			} catch(e) {
+				console.log(e)
+			}
+			this.initInteractiveMap(this.project, geoData, this.markers);
 		},
 
 		updateProjectLocation(coordinates)  {
@@ -39,14 +42,20 @@ function ProjectLocationEdit(projectOptions) {
 			this.project.location_y = coordinates.lat
 		},
 
-		initInteractiveMap(project, geoData) {
+		initInteractiveMap(project, geoData, markers) {
 			const options = mapUtils.mapOptions({interactive: true});
 
 			const Map = mapUtils.initMap('map-location-edit', project, options, this.zoom);
 			//Center Map
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
 			Map.on('click', function(e) {
+				if(markers[0]) {
+					L.clearMarkers(Map)
+				}
 				onClick(e.latlng)
+				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon(project) }).addTo(Map);
+				marker.bindPopup(mapUtils.markerPopupTemplate(project))
+				markers[marker]
 			});
 			this.map = Map;
 			
