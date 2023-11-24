@@ -20,21 +20,24 @@
 {# TODO: change to project.coordinates (only if present after location entry in EDL) #}
 {% if project.commune.latitude and project.commune.longitude %}
   <div class="d-flex align-items-baseline gap-1 text-muted">
-    <!-- <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" role="presentation">
+    <svg width="16"
+         height="16"
+         viewBox="0 0 16 16"
+         fill="none"
+         xmlns="http://www.w3.org/2000/svg"
+         role="presentation">
       >
       <path d="M8.66675 0.666748L8.66742 2.70809C11.0795 3.00918 12.9913 4.92117 13.2921 7.33342H15.3334V8.66675L13.2921 8.66742C12.991 11.0793 11.0793 12.991 8.66742 13.2921L8.66675 15.3334H7.33342V13.2921C4.92117 12.9913 3.00918 11.0795 2.70809 8.66742L0.666748 8.66675V7.33342H2.70801C3.00883 4.92094 4.92094 3.00883 7.33342 2.70801V0.666748H8.66675ZM8.00008 4.00008C5.79094 4.00008 4.00008 5.79094 4.00008 8.00008C4.00008 10.2092 5.79094 12.0001 8.00008 12.0001C10.2092 12.0001 12.0001 10.2092 12.0001 8.00008C12.0001 5.79094 10.2092 4.00008 8.00008 4.00008ZM8.00008 6.66675C8.73648 6.66675 9.33342 7.26368 9.33342 8.00008C9.33342 8.73648 8.73648 9.33342 8.00008 9.33342C7.26368 9.33342 6.66675 8.73648 6.66675 8.00008C6.66675 7.26368 7.26368 6.66675 8.00008 6.66675Z" fill="#666666" />
-    </svg> -->
+    </svg>
     <div class="d-flex flex-column">
-      <!-- <p class="mb-0">
-        lat: {{ project.commune.latitude|floatformat:2 }} ; lng: {{ project.commune.longitude|floatformat:2 }}
-      </p> -->
       {% if project.location_x and project.location_y %}
-        <a class="mx-3"
-           href="https://www.google.com/maps/search/?api=1&query={{ project.location_x|unlocalize }}%2C{{ project.location_y|unlocalize }}">Voir sur Google Maps</a>
+        <p class="mb-0">lat: {{ project.location_y|floatformat:2 }} ; lng: {{ project.location_x|floatformat:2 }}</p>
+        <a href="https://www.google.com/maps/search/?api=1&query={{ project.location_x|unlocalize }}%2C{{ project.location_y|unlocalize }}">Voir sur Google Maps</a>
       {% else %}
-        <a class="mx-3"
-           href="https://www.google.com/maps/search/?api=1&query={{ project.commune.latitude|unlocalize }}%2C{{ project.commune.longitude|unlocalize }}">Voir sur Google Maps</a>
-        <!-- <a style="cursor: pointer" href="{% url 'projects-project-location' project.pk %}" data-test-id="link-edit-location">Préciser la localisation du projet</a> -->
+        <p class="mb-0">
+          lat: {{ project.commune.latitude|floatformat:2 }} ; lng: {{ project.commune.longitude|floatformat:2 }}
+        </p>
+        <a href="https://www.google.com/maps/search/?api=1&query={{ project.commune.latitude|unlocalize }}%2C{{ project.commune.longitude|unlocalize }}">Voir sur Google Maps</a>
       {% endif %}
       {# TODO: change link to location edit page #}
       <a href="{% url 'projects-project-location' project.pk %}"
