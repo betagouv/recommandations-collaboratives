@@ -61,6 +61,9 @@ function ProjectLocation(projectOptions) {
 			mapUtils.initMapLayers(Map, project, geoData);
 			Map.setMinZoom(zoom - 7);
 			Map.setMaxZoom(zoom + 6);
+			L.control.zoom({
+				position: 'topright'
+			}).addTo(Map);
 			Map.panTo(new L.LatLng(latitude, longitude));
 			Map.setView([latitude, longitude]);
 			this.interactiveMap = Map;
