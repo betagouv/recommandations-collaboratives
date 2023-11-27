@@ -50,12 +50,13 @@ function ProjectLocationEdit(projectOptions) {
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
 			Map.on('click', function(e) {
 				if(markers[0]) {
-					L.clearMarkers(Map)
+					markers[0].clearLayers()
 				}
 				onClick(e.latlng)
 				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon(project) }).addTo(Map);
 				marker.bindPopup(mapUtils.markerPopupTemplate(project))
-				markers[marker]
+				let markerLayer = L.layerGroup([marker]).addTo(Map);
+				markers[0] = markerLayer
 			});
 			this.map = Map;
 			

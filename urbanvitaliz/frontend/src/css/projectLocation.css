@@ -36,19 +36,23 @@
 
 .location-header ,
 .location-footer {
+    flex-wrap: wrap;
     padding-block: 1.5em;
 }
 
 .form-coordinates {
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: 1.5em;
 }
 
 .form-coordinates > .button {
-    align-self: flex-end
+    align-self: flex-end;
+    width: 100%;
 }
 
 .coordinates {
+    flex-wrap: wrap;
     justify-content: flex-start;
     gap: 1.5em;
 }
@@ -56,9 +60,21 @@
 .coordinates > label {
     align-items: flex-start;
     justify-content: space-between;
+    width: 100%;
     gap: 1.5em;
 }
 
+@media screen and (width >= 840px) {
+    .coordinates > label {
+        width: auto;
+    }
+}
+
+@media screen and (width >= 1190px) {
+    .form-coordinates > .button {
+        width: auto;
+    }
+}
 
 .map-modal  .project-map-container {
     height:100%;
