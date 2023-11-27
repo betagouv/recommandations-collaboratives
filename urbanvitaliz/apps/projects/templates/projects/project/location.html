@@ -39,7 +39,7 @@
 {% block content %}
   <div x-data='ProjectLocationEdit(projectOptions)'
        data-test-id="project-location-edit"
-       class="col-10 offset-1">
+       class="project-location-edit col-10 offset-1">
     <header class="location-header">
       <h6 id="project-location-edit-label" class="fw-bold d-block mb-0">Localisation du Projet</h6>
     </header>
@@ -51,21 +51,21 @@
         <form method="POST"
               action="{% url 'projects-project-location' project.pk %}"
               name="ProjectLocationForm"
-              class="d-flex form-coordinates">
+              class="d-flex form-coordinates  text-muted">
           {% csrf_token %}
           <!-- {{ form.as_p }} -->
           <fieldset class="d-flex flex-column flex-grow-1">
             <p class="flex-grow-1">Placez la position du projet sur la carte</p>
             <div class="coordinates d-flex">
               <label class="d-flex">
-                Latitude :
+                Longitude :
                 <input type="text"
                        name="location_x"
                        :value="project.location_x"
                        :placeholder="project.location_x" />
               </label>
               <label class="d-flex">
-                Longitude :
+                Latitude :
                 <input type="text"
                        name="location_y"
                        :value="project.location_y"

@@ -36,7 +36,6 @@
            href="https://www.google.com/maps/search/?api=1&query={{ project.commune.latitude|unlocalize }}%2C{{ project.commune.longitude|unlocalize }}">Voir sur Google Maps</a>
         <!-- <a style="cursor: pointer" href="{% url 'projects-project-location' project.pk %}" data-test-id="link-edit-location">Préciser la localisation du projet</a> -->
       {% endif %}
-      {# TODO: change link to location edit page #}
       <a href="{% url 'projects-project-location' project.pk %}"
          class="link-project-location-edit mx-3"
          data-test-id="link-project-location-edit">Préciser la localisation du projet</a>

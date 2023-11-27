@@ -17,9 +17,8 @@
     </span>
   </p>
 </div>
-{# TODO: change to project.coordinates (only if present after location entry in EDL) #}
 {% if project.commune.latitude and project.commune.longitude %}
-  <div class="d-flex align-items-baseline gap-1 text-muted">
+  <div class="d-flex align-items-baseline gap-1 text-muted justify-flex-end flex-grow-1">
     <svg width="16"
          height="16"
          viewBox="0 0 16 16"
@@ -39,10 +38,9 @@
         </p>
         <a href="https://www.google.com/maps/search/?api=1&query={{ project.commune.latitude|unlocalize }}%2C{{ project.commune.longitude|unlocalize }}">Voir sur Google Maps</a>
       {% endif %}
-      {# TODO: change link to location edit page #}
-      <a href="{% url 'projects-project-location' project.pk %}"
-         class="link-project-location-edit"
-         data-test-id="link-project-location-edit">Préciser la localisation du projet</a>
     </div>
   </div>
+  <a href="{% url 'projects-project-location' project.pk %}"
+     class="link-project-location-edit col-3-offset-9"
+     data-test-id="link-project-location-edit">Préciser la localisation du projet</a>
 {% endif %}

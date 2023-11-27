@@ -26,12 +26,15 @@
     height:100%;
 }
 
-.project-map-container:not(.is-small) {
-    height: 65vh;
-}
-
 .project-map-container.is-small {
     max-height: 260px;
+}
+
+.project-map-modal,
+.project-location-edit {
+    .project-map-container:not(.is-small) {
+        height: 65vh;
+    }
 }
 
 .location-header ,

@@ -16,6 +16,7 @@ function ProjectLocation(projectOptions) {
 		staticMap: null,
 		interactiveMap: null,
 		zoom: 6,
+		markers: [],
 
 		async init() {
 			this.project = {
@@ -26,12 +27,12 @@ function ProjectLocation(projectOptions) {
 					longitude: projectOptions.commune.longitude
 				}
 			}
-			const { latitude, longitude, insee } = this.project.commune;
+			const { latitude, longitude, insee, name } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = {}
 			try {
 				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
-				geoData.location = await geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${insee}`);
+				geoData.location = await geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`);
 			} catch(e) {
 				console.log(e)
 			}

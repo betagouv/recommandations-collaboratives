@@ -75,18 +75,21 @@ function addLayerMarkerProjectCoordinates(map, project) {
 	if(!project.location_x || !project.location_x) {
 		throw Error(`Coordonnées de localisation du projet indisponibles pour "${project.name}"`)
 	}
-	const coordinates = [project.location_x, project.location_y]
+	const coordinates = [project.location_y, project.location_x]
 	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
+	L.layerGroup([marker]).addTo(map);
+	map.panTo(new L.LatLng(...coordinates));
 }
 
 function addLayerMarkerProjectLocation(map, project, geoData) {
 	if(geoData.code && geoData.code === 400 || geoData.features.length !== 1) {
 		throw Error(`Données API Adresse indisponibles pour "${project.name}"`)
 	}
-	const coordinates = geoData.location.coordinates
+	const coordinates = geoData.features[0].coordinates
 	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
+	map.panTo(new L.LatLng(...coordinates));
 }
 
 function addLayerAreaCommune(map, geoData) {
