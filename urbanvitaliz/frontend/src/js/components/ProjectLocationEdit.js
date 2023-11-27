@@ -53,7 +53,7 @@ function ProjectLocationEdit(projectOptions) {
 					markers[0].clearLayers()
 				}
 				onClick(e.latlng)
-				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon(project) }).addTo(Map);
+				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon('location-edit-marker') }).addTo(Map);
 				marker.bindPopup(mapUtils.markerPopupTemplate(project))
 				let markerLayer = L.layerGroup([marker]).addTo(Map);
 				markers[0] = markerLayer

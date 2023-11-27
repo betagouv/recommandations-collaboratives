@@ -62,7 +62,16 @@ function initMapLayers(map, project, geoData) {
 }
 
 function initMapControllerBAN(map, project, geoData, onUpdate) {
-	GeocoderBAN({ collapsed: false, style: 'searchBar', className: statusToColorClass(project.status), geoData, onUpdate }).addTo(map)
+	const geocoderOptions = {
+		collapsed: false,
+		style: 'searchBar',
+		className: 'location-edit-marker',
+		geoData,
+		onUpdate,
+		markerIcon: createMarkerIcon(project),
+		markerPopupTemplate: markerPopupTemplate(project) 
+	}
+	GeocoderBAN(geocoderOptions).addTo(map)
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
 	controller[0].classList.add('leaflet-control-geocoder-expanded');
 	const inputController = controller[0].querySelector('input')
@@ -76,7 +85,7 @@ function addLayerMarkerProjectCoordinates(map, project) {
 		throw Error(`Coordonnées de localisation du projet indisponibles pour "${project.name}"`)
 	}
 	const coordinates = [project.location_y, project.location_x]
-	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
+	const marker = L.marker(coordinates, { icon: createMarkerIcon('project-location-marker') }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
 	L.layerGroup([marker]).addTo(map);
 	map.panTo(new L.LatLng(...coordinates));
@@ -87,7 +96,7 @@ function addLayerMarkerProjectLocation(map, project, geoData) {
 		throw Error(`Données API Adresse indisponibles pour "${project.name}"`)
 	}
 	const coordinates = geoData.features[0].coordinates
-	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
+	const marker = L.marker(coordinates, { icon: createMarkerIcon('project-location-marker') }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
 	map.panTo(new L.LatLng(...coordinates));
 }
@@ -112,8 +121,8 @@ function addLayerAreaCircle(map, project) {
 	}).addTo(map);
 }
 
-function createMarkerIcon(project) {
-	return L.divIcon({ className: `map-marker ${statusToColorClass(project.status)}` });
+function createMarkerIcon(className) {
+	return L.divIcon({ className: `map-marker ${className}` });
 }
 
 function markerPopupTemplate(project) {

@@ -16,7 +16,9 @@ L.GeocoderBAN = L.Control.extend({
 		defaultMarkgeocode: true,
 		autofocus: true,
 		className:'',
-		onUpdate: null
+		onUpdate: null,
+		markerIcon:null,
+		markerPopupTemplate: null
 	},
 	includes: L.Evented.prototype || L.Mixin.Events,
 	initialize: function (options) {
@@ -207,19 +209,6 @@ L.GeocoderBAN = L.Control.extend({
 			.openPopup()
 	}
 })
-
-
-function createMarkerIcon(className) {
-	return L.divIcon({ className: `map-marker ${className}` });
-}
-
-function markerPopupTemplate(properties) {
-	return `
-			<div class="marker-popup">
-				<p class="m-0 fs-7">${properties.label}</p>
-			</div>
-	`
-}
 
 const getJSON = function (url, params, callback) {
 

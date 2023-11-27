@@ -32,6 +32,16 @@
     z-index: 10;
 }
 
+.project-location-marker.map-marker:after {
+    background-color: white;
+    border: solid 2px #222;
+}
+
+.location-edit-marker.map-marker:after {
+    background-color: #FDCD6D;
+    border: solid 2px #222;
+}
+
 .leaflet-popup-content-wrapper, .leaflet-popup-content-wrapper {
     padding: 0;
 }
