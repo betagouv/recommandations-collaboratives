@@ -119,8 +119,8 @@ function markerPopupTemplate(project) {
 			<header><h6><a href="/project/${project.id}/presentation">${project.name}</a></h6></header>
 			<main class="d-flex flex-column">
 				<p class="m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>
-				<p class="m-0 fs-7 text-capitalize">Coordonnées géographiques (X) (${project?.location_x})</p>
-				<p class="m-0 fs-7 text-capitalize">Coordonnées géographiques (y) (${project?.location_y})</p>
+				<p class="m-0 fs-7 text-capitalize">Lat: ${project?.location_x}</p>
+				<p class="m-0 fs-7 text-capitalize">Lng: ${project?.location_y}</p>
 			</main>
 		</div>
 	`

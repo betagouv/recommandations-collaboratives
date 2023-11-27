@@ -54,21 +54,24 @@
               class="d-flex form-coordinates">
           {% csrf_token %}
           <!-- {{ form.as_p }} -->
-          <fieldset class="coordinates d-flex flex-grow-1">
-            <label class="d-flex">
-              Latitude :
-              <input type="text"
-                     name="location_x"
-                     :value="project.location_x"
-                     :placeholder="project.location_x" />
-            </label>
-            <label class="d-flex">
-              Longitude :
-              <input type="text"
-                     name="location_y"
-                     :value="project.location_y"
-                     :placeholder="project.location_y" />
-            </label>
+          <fieldset class="d-flex flex-column flex-grow-1">
+            <p class="flex-grow-1">Placez la position du projet sur la carte</p>
+            <div class="coordinates d-flex">
+              <label class="d-flex">
+                Latitude :
+                <input type="text"
+                       name="location_x"
+                       :value="project.location_x"
+                       :placeholder="project.location_x" />
+              </label>
+              <label class="d-flex">
+                Longitude :
+                <input type="text"
+                       name="location_y"
+                       :value="project.location_y"
+                       :placeholder="project.location_y" />
+              </label>
+            </div>
           </fieldset>
           <button class="button">Sauvegarder la localisation</button>
         </form>
