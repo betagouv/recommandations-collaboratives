@@ -18,6 +18,7 @@ from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects, assertNotContains, assertContains
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.projects import models as projects_models
+from urbanvitaliz.apps.projects.utils import assign_collaborator, assign_advisor
 from urbanvitaliz.utils import has_perm, login
 
 from . import api, models
@@ -602,15 +603,68 @@ def test_accepting_invitation_updates_organization_with_current_site(request, cl
         "position": "Doing Stuff",
     }
 
-    orga = baker.make(addressbook_models.Organization, name=data["organization"])
+    baker.make(addressbook_models.Organization, name=data["organization"])
 
     url = reverse("invites-invite-accept", args=[invite.pk])
     response = client.post(url, data=data)
 
     assert response.status_code == 302
 
-    orga.refresh_from_db()
-    assert current_site in orga.sites.all()
+
+@pytest.mark.django_db
+def test_logged_in_user_accepts_invite_but_is_already_member(
+    request,
+    client,
+):
+    current_site = get_current_site(request)
+    with login(client, email="invited@here.tld") as user:
+        invite = Recipe(
+            models.Invite,
+            role="COLLABORATOR",
+            site=current_site,
+            email=user.email,
+            project__name="project",
+            project__location="here",
+        ).make()
+        assign_collaborator(user, invite.project, is_owner=False)
+
+        url = reverse("invites-invite-accept", args=[invite.pk])
+        response = client.post(url)
+
+    assert response.status_code == 302
+    invite = models.Invite.on_site.get(pk=invite.pk)
+    assert invite.accepted_on is not None
+    assert current_site in user.profile.sites.all()
+    assert user in invite.project.members.all()
+    assert user not in invite.project.switchtenders.all()
+
+
+@pytest.mark.django_db
+def test_logged_in_user_accepts_invite_but_is_already_advisor(
+    request,
+    client,
+):
+    current_site = get_current_site(request)
+    with login(client, email="invited@here.tld") as user:
+        invite = Recipe(
+            models.Invite,
+            role="OBSERVER",
+            site=current_site,
+            email=user.email,
+            project__name="project",
+            project__location="here",
+        ).make()
+        assign_advisor(user, invite.project, current_site)
+
+        url = reverse("invites-invite-accept", args=[invite.pk])
+        response = client.post(url)
+
+    assert response.status_code == 302
+    invite = models.Invite.on_site.get(pk=invite.pk)
+    assert invite.accepted_on is not None
+    assert current_site in user.profile.sites.all()
+    assert user in invite.project.switchtenders.all()
+    assert user not in invite.project.members.all()
 
 
 # eof

@@ -16,10 +16,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q
-from django.urls import reverse
 from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
 from urbanvitaliz import utils as uv_utils
-from urbanvitaliz.apps.reminders import api
 
 from . import models
 
@@ -39,8 +37,17 @@ def assign_collaborator(user, project, is_owner=False):
             print(f"Unable to find permission <{perm}>, aborting.")
             raise e
 
+    # if we already have an owner, don't allow her to be replaced
+    if is_owner:
+        if (
+            models.ProjectMember.objects.exclude(member=user)
+            .filter(project=project, is_owner=True)
+            .exists()
+        ):
+            is_owner = False
+
     _, created = models.ProjectMember.objects.get_or_create(
-        project=project, member=user, is_owner=is_owner
+        project=project, member=user, defaults={"is_owner": is_owner}
     )
 
     return created
