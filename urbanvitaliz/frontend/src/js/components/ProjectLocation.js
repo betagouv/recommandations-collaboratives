@@ -31,7 +31,7 @@ function ProjectLocation(projectOptions) {
 			const geoData = {}
 			try {
 				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
-				geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location);
+				geoData.location = await geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${insee}`);
 			} catch(e) {
 				console.log(e)
 			}
@@ -50,9 +50,9 @@ function ProjectLocation(projectOptions) {
 		initInteractiveMap(project, geoData) {
 			// Init Interactive Map
 			const options = mapUtils.mapOptions({interactive: true});
-			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project)
+			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project, geoData)
 
-			const Map  = mapUtils.initMap('map-modal', project, options, this.zoom + 5);
+			const Map  = mapUtils.initMap('map-modal', project, options, this.zoom + 3);
 			this.interactiveMap = Map;
 			mapUtils.initMapLayers(this.interactiveMap, project, geoData);
 			this.interactiveMap.setMinZoom(this.zoom - 7);

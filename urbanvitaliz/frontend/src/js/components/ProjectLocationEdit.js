@@ -26,7 +26,7 @@ function ProjectLocationEdit(projectOptions) {
 				}
 			}
 			const { latitude, longitude, insee } = this.project.commune;
-			this.zoom = latitude && longitude ? this.zoom + 6 : this.zoom;
+			this.zoom = latitude && longitude ? this.zoom + 10 : this.zoom;
 			const geoData = {}
 			try {
 				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);

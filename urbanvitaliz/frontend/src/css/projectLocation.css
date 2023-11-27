@@ -26,6 +26,40 @@
     height:100%;
 }
 
+.project-map-container:not(.is-small) {
+    height: 65vh;
+}
+
+.project-map-container.is-small {
+    max-height: 260px;
+}
+
+.location-header ,
+.location-footer {
+    padding-block: 1.5em;
+}
+
+.form-coordinates {
+    justify-content: space-between;
+    gap: 1.5em;
+}
+
+.form-coordinates > .button {
+    align-self: flex-end
+}
+
+.coordinates {
+    justify-content: flex-start;
+    gap: 1.5em;
+}
+
+.coordinates > label {
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5em;
+}
+
+
 .map-modal  .project-map-container {
     height:100%;
 }

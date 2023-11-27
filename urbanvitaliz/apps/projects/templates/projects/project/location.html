@@ -38,37 +38,39 @@
 {% endblock %}
 {% block content %}
   <div x-data='ProjectLocationEdit(projectOptions)'
-       data-test-id="project-location-edit">
+       data-test-id="project-location-edit"
+       class="col-10 offset-1">
     <header class="location-header">
       <h6 id="project-location-edit-label" class="fw-bold d-block mb-0">Localisation du Projet</h6>
     </header>
     <div class="location-body p-0">
-      <div data-test-id="map-location-edit" class="p-0 project-map-container">
-        <div x-ref="map-location-edit"
-             id="map-location-edit"
-             class="project-map h-100 w-100"></div>
+      <div data-test-id="map-location-edit" class="project-map-container">
+        <div x-ref="map-location-edit" id="map-location-edit" class="h-100 w-100"></div>
       </div>
       <div class="location-footer bg-white justify-content-start">
         <form method="POST"
               action="{% url 'projects-project-location' project.pk %}"
-              name="ProjectLocationForm">
+              name="ProjectLocationForm"
+              class="d-flex form-coordinates">
           {% csrf_token %}
           <!-- {{ form.as_p }} -->
-          <label>
-            Coordonnées géographiques (X) :
-            <input type="text"
-                   name="location_x"
-                   :value="project.location_x"
-                   :placeholder="project.location_x" />
-          </label>
-          <label>
-            Coordonnées géographiques (Y) :
-            <input type="text"
-                   name="location_y"
-                   :value="project.location_y"
-                   :placeholder="project.location_y" />
-          </label>
-          <button>Sauvegarder la localisation</button>
+          <fieldset class="coordinates d-flex flex-grow-1">
+            <label class="d-flex">
+              Latitude :
+              <input type="text"
+                     name="location_x"
+                     :value="project.location_x"
+                     :placeholder="project.location_x" />
+            </label>
+            <label class="d-flex">
+              Longitude :
+              <input type="text"
+                     name="location_y"
+                     :value="project.location_y"
+                     :placeholder="project.location_y" />
+            </label>
+          </fieldset>
+          <button class="button">Sauvegarder la localisation</button>
         </form>
       </div>
     </div>

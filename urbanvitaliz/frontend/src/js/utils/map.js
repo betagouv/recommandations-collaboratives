@@ -3,13 +3,25 @@ import { statusToColorClass } from '../utils/statusToText'
 import GeocoderBAN from './geocoderBAN'
 import geolocUtils from './geolocation/'
 
+
+function getDefaultLatLngForLayers(project, geoData) {
+	const longitude = project.location_x ? project.location_x
+	: geoData.location.longitude ? geoData.location.longitude
+		: undefined;
+	const latitude = project.location_y ? project.location_y
+	: geoData.location.latitude ? geoData.location.latitude
+		: undefined;
+
+	return [latitude, longitude]
+}
+
 function getDefaultLatLngForMap(project) {
 	const longitude = project.location_x ? project.location_x
 		: project.commune.longitude ? project.commune.longitude
-		: undefined;
+		: geolocUtils.LAT_LNG_FRANCE[0];
 	const latitude = project.location_y ? project.location_y
 		: project.commune.latitude ? project.commune.latitude
-		: undefined;
+		: geolocUtils.LAT_LNG_FRANCE[0];
 
 	return [latitude, longitude]
 }
@@ -17,10 +29,6 @@ function getDefaultLatLngForMap(project) {
 // Map base layer
 function initMap(idMap, project, options, zoom) {
 	const [latitude, longitude] = getDefaultLatLngForMap(project)
-	if(!latitude && !longitude) {
-		latitude = geolocUtils.LAT_LNG_FRANCE[0]
-		longitude = geolocUtils.LAT_LNG_FRANCE[1]
-	}
 	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
 		maxZoom: 20,
 		attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -38,7 +46,7 @@ function initMapLayers(map, project, geoData) {
 	} catch (e) {
 		console.log(e);
 		try {
-			addLayerMarkerProjectLocation(map, project, geoData.location);
+			addLayerMarkerProjectLocation(map, project, geoData);
 		} catch(e) {
 			console.log(e);
 			try {
@@ -73,10 +81,10 @@ function addLayerMarkerProjectCoordinates(map, project) {
 }
 
 function addLayerMarkerProjectLocation(map, project, geoData) {
-	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
+	if(geoData.code && geoData.code === 400 || geoData.features.length !== 1) {
 		throw Error(`Données API Adresse indisponibles pour "${project.name}"`)
 	}
-	const coordinates = geoData.features[0].geometry.coordinates
+	const coordinates = geoData.location.coordinates
 	const marker = L.marker(coordinates, { icon: createMarkerIcon(project) }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
 }
@@ -139,6 +147,7 @@ export default {
 	addLayerMarkerProjectLocation,
 	mapOptions,
 	getDefaultLatLngForMap,
+	getDefaultLatLngForLayers,
 	createMarkerIcon,
 	markerPopupTemplate
 }
