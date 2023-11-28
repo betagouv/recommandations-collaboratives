@@ -144,5 +144,28 @@
 }
 
 .map.card-text .answer {
-    margin-inline : 30px
+    display: flex;
+    position: relative;
+    margin-inline : 30px;
+    justify-content: space-between;
+}
+
+.modal-dialog  .map.card-text {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.modal-dialog  .map.card-text > * + * {
+   margin-inline-start: 40px;
+}
+
+.location-overview .modal-footer {
+    padding: 0 5px 5px;
+}
+
+.modal-footer  .map.card-text .answer {
+    display: none;
 }
