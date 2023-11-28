@@ -33,12 +33,12 @@
 }
 
 .project-location-marker.map-marker:after {
-    background-color: white;
-    border: solid 2px #222;
+    background-color: #0063CB;;
+    border: solid 2px white;
 }
 
 .location-edit-marker.map-marker:after {
-    background-color: #FDCD6D;
+    background-color: white;
     border: solid 2px #222;
 }
 
@@ -123,7 +123,7 @@
 }
 
 .map.card-text {
-    padding: 8px 12px;
+    padding: 8px 12px 15px;
     font-size: 14px;
     line-height: 24px;
     font-weight: 400;
@@ -139,14 +139,15 @@
     text-decoration: none;
 }
 
-.map.card-text svg {
-    margin: 5px;
+.map.card-text svg:not(.align-middle.bi) {
+    margin: 5px 3px;
 }
 
 .map.card-text .answer {
     display: flex;
     position: relative;
-    margin-inline : 30px;
+    margin-inline-start : 25px;
+    margin-inline-end : 15px;
     justify-content: space-between;
 }
 
@@ -159,7 +160,7 @@
 }
 
 .modal-dialog  .map.card-text > * + * {
-   margin-inline-start: 40px;
+    margin-inline-start: 40px;
 }
 
 .location-overview .modal-footer {

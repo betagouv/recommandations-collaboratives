@@ -45,25 +45,14 @@
       <a href="{% url 'projects-project-location' project.pk %}"
          class="link-project-location-edit link-edit stretched-link text-decoration-none"
          data-test-id="link-project-location-edit">Préciser la localisation du projet</a>
-      {% if "view_surveys" in user_project_perms %}
-        <div class="flex-shrink-1 next-arrow">
-          {% if can_view_updated_answers and answer.updated_recently %}
-            <svg class="text-danger align-middle bi"
-                 width="14px"
-                 height="14px"
-                 fill="currentColor">
-              <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#asterisk" />
-            </svg>
-          {% endif %}
-          <svg class="align-middle bi"
-               width="26px"
-               height="26px"
-               fill="currentColor"
-               style="color: {{ question_set.color|default:'black' }} !important">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
-          </svg>
-        </div>
+      <div class="flex-shrink-1 next-arrow">
+        <svg class="align-middle bi"
+             width="26px"
+             height="26px"
+             fill="currentColor">
+          <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
+        </svg>
       </div>
-    {% endif %}
+    </div>
   </div>
 {% endif %}
