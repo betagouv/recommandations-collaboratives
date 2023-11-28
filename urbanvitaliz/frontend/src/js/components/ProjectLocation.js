@@ -8,7 +8,7 @@ import 'leaflet-providers'
 import geolocUtils from '../utils/geolocation/'
 import mapUtils from '../utils/map/'
 
-function ProjectLocation(projectOptions) {
+function ProjectLocation(projectOptions, modal=true) {
 	return {
 		mapIsSmall: true,
 		project: null,
@@ -37,7 +37,9 @@ function ProjectLocation(projectOptions) {
 				console.log(e)
 			}
 			this.initStaticMap(this.project, geoData);
-			this.initInteractiveMap(this.project, geoData);
+			if(modal) {
+				this.initInteractiveMap(this.project, geoData);
+			}
 		},
 
 		initStaticMap(project, geoData) {

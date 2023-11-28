@@ -1,6 +1,6 @@
 {% load static %}
 {% load l10n %}
-<div class="d-flex align-items-baseline gap-1 text-muted">
+<div class="card-text map d-flex align-items-baseline gap-1 text-muted">
   <svg width="14"
        height="14"
        viewBox="0 0 14 14"
@@ -17,20 +17,3 @@
     </span>
   </p>
 </div>
-{# TODO: change to project.coordinates (only if present after location entry in EDL) #}
-{% if project.commune.latitude and project.commune.longitude %}
-  <div class="d-flex align-items-baseline gap-1 text-muted">
-    <div class="d-flex flex-column">
-      {% if project.location_x and project.location_y %}
-        <a class="mx-3"
-           href="https://www.google.com/maps/search/?api=1&query={{ project.location_x|unlocalize }}%2C{{ project.location_y|unlocalize }}">Voir sur Google Maps</a>
-      {% else %}
-        <a class="mx-3"
-           href="https://www.google.com/maps/search/?api=1&query={{ project.commune.latitude|unlocalize }}%2C{{ project.commune.longitude|unlocalize }}">Voir sur Google Maps</a>
-      {% endif %}
-      <a href="{% url 'projects-project-location' project.pk %}"
-         class="link-project-location-edit mx-3"
-         data-test-id="link-project-location-edit">Préciser la localisation du projet</a>
-    </div>
-  </div>
-{% endif %}

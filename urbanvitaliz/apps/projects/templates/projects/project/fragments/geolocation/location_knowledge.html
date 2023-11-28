@@ -30,8 +30,15 @@
     {% vite_asset 'js/apps/projectLocation.js' %}
 {% endblock %}
 {% block content %}
-    <div x-data='ProjectLocation(projectOptions)'>
-        {% include 'projects/project/fragments/geolocation/project_map.html' %}
+    <div x-data='ProjectLocation(projectOptions, false)'>
+        <div data-test-id="project-map-static"
+             class="p-0 project-map-container"
+             :class="{'is-small':mapIsSmall}">
+            <div x-cloak
+                 x-ref="map-static"
+                 id="map-static"
+                 class="project-map h-100 w-100"></div>
+        </div>
         {% include 'projects/project/fragments/geolocation/location_knowledge_footer.html' %}
     </div>
 {% endblock %}

@@ -30,7 +30,7 @@
     </script>
 {% endblock %}
 {% block content %}
-    <div x-data='ProjectLocation(projectOptions)'>
+    <div x-data='ProjectLocation(projectOptions)' class="location-overview">
         {% include 'projects/project/fragments/geolocation/project_map.html' %}
         {% include 'projects/project/fragments/geolocation/location_overview_footer.html' %}
     </div>
