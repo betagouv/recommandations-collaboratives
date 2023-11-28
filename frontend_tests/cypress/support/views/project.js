@@ -124,11 +124,14 @@ class Project {
 
 	/**
 	 * @param {*} email recipient email if a reminder is expected, null otherwise
+	 * @param {*} role to test what message is accessible to which user role
 	 */
-	checkNextEmailReminder(email=null) {
+	checkNextEmailReminder({email, role}) {
 		if(email) {
 			cy.get(this.dom.REMINDER_EMAIL_RECIPIENT).should('contain', email)
 			cy.get(this.dom.REMINDER_EMAIL_DATE).should('not.contain', 'Aucun')
+		} else if (role === 'staff') {
+			cy.get(this.dom.MESSAGE_NO_REMINDER).should('exist')
 		}
 	}
 
