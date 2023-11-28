@@ -210,7 +210,7 @@ def make_digest_of_project_recommendations_from_notifications(
     actions = [notification.action_object for notification in project_notifications]
 
     # Display not visited first
-    actions.sort(key=lambda action: action.visited, revers=True)
+    actions.sort(key=lambda action: action.visited, reverse=True)
 
     return make_digest_of_project_recommendations(project, actions, user)
 
