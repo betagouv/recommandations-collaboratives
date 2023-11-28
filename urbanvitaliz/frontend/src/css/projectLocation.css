@@ -31,7 +31,7 @@
 }
 
 .project-map-modal,
-.project-location-edit {
+.location-edit {
     .project-map-container:not(.is-small) {
         height: 340px;
     }
@@ -174,23 +174,28 @@
 }
 
 
+.location-edit .leaflet-popup-content,
 .location-knowledge .leaflet-popup-content,
 .location-overview .leaflet-popup-content {
     width: auto;
     min-width: 180px;
 }
 
+.location-edit .marker-popup header,
 .location-knowledge .marker-popup header,
 .location-overview .marker-popup header {
     width: auto;
     padding: 8px 14px
 }
 
+.location-edit .marker-popup h6,
 .location-knowledge .marker-popup h6,
 .location-overview .marker-popup h6  {
-    margin-bottom: 3px;
+    padding: 0 14px;
+    margin-bottom: 0;
 }
 
+.location-edit .marker-popup main,
 .location-knowledge .marker-popup main,
 .location-overview .marker-popup main {
     padding: 5px 12px 8px;
