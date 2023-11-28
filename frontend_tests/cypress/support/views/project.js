@@ -17,7 +17,7 @@ const domElements = {
 	BUTTON_ACTIVATE_PROJECT:'[data-test-id="button-activate-project"]',
 
 	// Email Reminder Settings
-	BUTTON_OPEN_REMINDER_SETTINGS:'data-test-id="button-open-reminder-settings"',
+	BUTTON_OPEN_REMINDER_SETTINGS:'[data-test-id="button-open-reminder-settings"]',
 	TOOLTIP_REMINDER_SETTINGS:'[ data-test-id="tooltip-reminder-settings"]',
 	BUTTON_CLOSE_REMINDER_SETTINGS:'[data-test-id="button-close-reminder-settings"]',
 	MESSAGE_REMINDER_SETTINGS:'[data-test-id="message-reminder-settings"]',
@@ -49,11 +49,13 @@ class Project {
 		cy.get(this.dom.ADMIN_BANNER_DEACTIVATE_PROJECT).get(this.dom.BUTTON_MODAL_DEACTIVATE_PROJECT).click({force:true})
 		cy.get(this.dom.FORM_PAUSE_PROJECT).get(this.dom.BUTTON_DEACTIVATE_PROJECT).click({force:true})
 		cy.get(this.dom.ADMIN_BANNER_DEACTIVATE_PROJECT).should('not.exist')
+		cy.get(this.dom.BUTTON_OPEN_REMINDER_SETTINGS).should('not.exist')
 	}
 
 	activateProjectFromPreferences() {
 		cy.get(this.dom.ADMIN_BANNER_ACTIVATE_PROJECT).find(this.dom.BUTTON_ACTIVATE_PROJECT).click({force:true}).then(() => {
 			cy.get(this.dom.ADMIN_BANNER_ACTIVATE_PROJECT).should('not.exist')
+			cy.get(this.dom.BUTTON_OPEN_REMINDER_SETTINGS).should('exist')
 		})
 	}
 
@@ -63,15 +65,15 @@ class Project {
 		})
 	}
 
-	openEmailReminderTooltip () {
+	openEmailReminderTooltip (condition='exist') {
 		cy.get(this.dom.BUTTON_OPEN_REMINDER_SETTINGS).click({force:true}).then(() => {
-			cy.find(this.dom.TOOLTIP_REMINDER_SETTINGS).should('exist')
+			cy.find(this.dom.TOOLTIP_REMINDER_SETTINGS).should(condition)
 		})
 	}
 
-	closeEmailReminderTooltip () {
+	closeEmailReminderTooltip (condition='not.exist') {
 		cy.get(this.dom.BUTTON_CLOSE_REMINDER_SETTINGS).click({force:true}).then(() => {
-			cy.find(this.dom.TOOLTIP_REMINDER_SETTINGS).should('not.exist')
+			cy.find(this.dom.TOOLTIP_REMINDER_SETTINGS).should(condition)
 		})
 	}
 
@@ -90,6 +92,10 @@ class Project {
 	 */
 	checkDeactivateAction(condition='not.exist') {
 		cy.get(this.dom.ADMIN_BANNER_DEACTIVATE_PROJECT).should(condition)
+	}
+
+	checkEmailReminderTooltip (condition='exist') {
+		cy.get(this.dom.BUTTON_OPEN_REMINDER_SETTINGS).should(condition)
 	}
 
 	/**
