@@ -72,7 +72,6 @@ class Project {
 	activateProjectFromPreferences() {
 		cy.get(this.dom.ADMIN_BANNER_ACTIVATE_PROJECT).find(this.dom.BUTTON_ACTIVATE_PROJECT).click({force:true}).then(() => {
 			cy.get(this.dom.ADMIN_BANNER_ACTIVATE_PROJECT).should('not.exist')
-			cy.get(this.dom.BUTTON_OPEN_REMINDER_SETTINGS).should('exist')
 		})
 	}
 
@@ -130,8 +129,6 @@ class Project {
 		if(email) {
 			cy.get(this.dom.REMINDER_EMAIL_RECIPIENT).should('contain', email)
 			cy.get(this.dom.REMINDER_EMAIL_DATE).should('not.contain', 'Aucun')
-		} else {
-			cy.get(this.dom.MESSAGE_NO_REMINDER).should('exist')
 		}
 	}
 

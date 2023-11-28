@@ -21,7 +21,6 @@ describe('As project owner, I can manage project email communication settings', 
 	it('Reminders settings popup is accessible and provides access to preferences panel', () => {
 		const currentProject = projects[17];
 		cy.login("bob");
-		cy.acceptCookies()
 		cy.visit(`/project/${currentProject.pk}`)
 		projectView.openEmailReminderTooltip('exist', ownerEmail)
 	})
