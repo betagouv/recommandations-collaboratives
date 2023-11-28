@@ -44,15 +44,12 @@ function initMapLayers(map, project, geoData) {
 	try {
 		addLayerMarkerProjectCoordinates(map, project);
 	} catch (e) {
-		console.log(e);
 		try {
 			addLayerMarkerProjectLocation(map, project, geoData);
 		} catch(e) {
-			console.log(e);
 			try {
 				addLayerAreaCommune(map, geoData.commune);
 			} catch(e) {
-				console.log(e);
 				if(project.commune.latitude && project.commune.longitude) {
 					addLayerAreaCircle(map, project)
 				}
