@@ -25,12 +25,12 @@ function ProjectLocationEdit(projectOptions) {
 					longitude: projectOptions.commune.longitude,
 				}
 			}
-			const { latitude, longitude, insee } = this.project.commune;
+			const { latitude, longitude, name, postal } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
 			const geoData = {}
 			try {
 				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
-				geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location);
+				geoData.location = await geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name ?? ''} ${postal ?? ''}`);
 			} catch(e) {
 				console.log(e)
 			}
