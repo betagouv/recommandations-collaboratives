@@ -173,9 +173,17 @@
     border: 1px solid #dee2e6;
 }
 
+
+.location-knowledge .leaflet-popup-content,
+.location-overview .leaflet-popup-content {
+    width: auto;
+    min-width: 180px;
+}
+
 .location-knowledge .marker-popup header,
 .location-overview .marker-popup header {
-    padding: 8px 12px
+    width: auto;
+    padding: 8px 14px
 }
 
 .location-knowledge .marker-popup h6,
