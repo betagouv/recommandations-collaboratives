@@ -187,5 +187,14 @@
             "project": 17,
             "site": 1
         }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 16,
+        "fields": {
+            "switchtender": 3,
+            "project": 18,
+            "site": 1
+        }
     }
 ]

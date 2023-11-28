@@ -18,13 +18,18 @@ const domElements = {
 
 	// Email Reminder Settings
 	BUTTON_OPEN_REMINDER_SETTINGS:'[data-test-id="button-open-reminder-settings"]',
-	TOOLTIP_REMINDER_SETTINGS:'[ data-test-id="tooltip-reminder-settings"]',
+	TOOLTIP_REMINDER_SETTINGS:'[data-test-id="tooltip-reminder-settings"]',
 	BUTTON_CLOSE_REMINDER_SETTINGS:'[data-test-id="button-close-reminder-settings"]',
 	MESSAGE_REMINDER_SETTINGS:'[data-test-id="message-reminder-settings"]',
 	REMINDER_EMAIL_RECIPIENT:'[data-test-id="email-recipient"]',
 	REMINDER_EMAIL_DATE:'[data-test-id="email-date"]',
 	MESSAGE_NO_REMINDER:'[data-test-id="no-reminders"]',
-	REMINDER_ACCESS: '[data-test-id="reminder-settings-access"]'
+	REMINDER_ACCESS: '[data-test-id="reminder-settings-access"]',
+
+	// Positioning Banner
+	HEADER_BANNER_ADVISING_POSITION:'[data-test-id="header-banner-advising-position"]',
+	BUTTON_JOIN_AS_ADVISOR:'[data-test-id="button-join-as-advisor"]',
+	BUTTON_JOIN_AS_OBSERVER:'[data-test-id="button-join-as-observer"]',
 }
 
 class Project {
@@ -45,6 +50,18 @@ class Project {
 	}
 
 	// Actions
+	joinAsAdvisor() {
+		cy.get(this.dom.BUTTON_JOIN_AS_ADVISOR).click({force:true}).then(() => {
+			cy.get(this.dom.HEADER_BANNER_ADVISING_POSITION).should('not.exist')
+		})
+	}
+
+	joinAsObserver() {
+		cy.get(this.dom.BUTTON_JOIN_AS_OBSERVER).click({force:true}).then(() => {
+			cy.get(this.dom.HEADER_BANNER_ADVISING_POSITION).should('not.exist')
+		})
+	}
+
 	deactivateProject() {
 		cy.get(this.dom.ADMIN_BANNER_DEACTIVATE_PROJECT).get(this.dom.BUTTON_MODAL_DEACTIVATE_PROJECT).click({force:true})
 		cy.get(this.dom.FORM_PAUSE_PROJECT).get(this.dom.BUTTON_DEACTIVATE_PROJECT).click({force:true})

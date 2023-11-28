@@ -1,7 +1,7 @@
 import projects from '../../../../fixtures/projects/projects.json'
 import projectView from '../../../../support/views/project'
 
-const currentProject = projects[15];
+const currentProject = projects[16]
 
 describe('As site staff, I can pause and reactivate a project', () => {
     beforeEach(() => {
