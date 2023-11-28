@@ -13,7 +13,7 @@ from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.projects.utils import assign_advisor
+from urbanvitaliz.apps.projects.utils import assign_advisor, assign_collaborator
 
 from .. import models, utils
 
@@ -71,6 +71,48 @@ def test_check_if_switchtends_any_project(request, client):
 
     assert utils.can_administrate_project(project=None, user=userA)
     assert not utils.can_administrate_project(project=None, user=userB)
+
+
+@pytest.mark.django_db
+def test_assign_nonowner_collaborator_while_already_owner(request, client):
+    current_site = get_current_site(request)
+
+    member = baker.make(auth.User)
+    project = baker.make(models.Project, sites=[current_site], status="READY")
+
+    assign_collaborator(member, project, is_owner=True)
+    assign_collaborator(member, project)
+
+
+@pytest.mark.django_db
+def test_assign_owner_collaborator_while_already_nonowner(request, client):
+    current_site = get_current_site(request)
+
+    member = baker.make(auth.User)
+    project = baker.make(models.Project, sites=[current_site], status="READY")
+
+    assign_collaborator(member, project, is_owner=False)
+    assign_collaborator(member, project, is_owner=True)
+
+
+@pytest.mark.django_db
+def test_assign_owner_collaborator_while_already_another_nonowner(request, client):
+    current_site = get_current_site(request)
+
+    owner = baker.make(auth.User)
+    member = baker.make(auth.User)
+    project = baker.make(models.Project, sites=[current_site], status="READY")
+
+    assign_collaborator(owner, project, is_owner=True)
+    assign_collaborator(member, project, is_owner=True)
+
+    assert project.projectmember_set.count() == 2
+
+    owner_ms = project.projectmember_set.get(member=owner)
+    member_ms = project.projectmember_set.get(member=member)
+
+    assert owner_ms.is_owner is True
+    assert member_ms.is_owner is False
 
 
 ########################################################################

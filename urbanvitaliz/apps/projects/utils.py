@@ -37,8 +37,17 @@ def assign_collaborator(user, project, is_owner=False):
             print(f"Unable to find permission <{perm}>, aborting.")
             raise e
 
+    # if we already have an owner, don't allow her to be replaced
+    if is_owner:
+        if (
+            models.ProjectMember.objects.exclude(member=user)
+            .filter(project=project, is_owner=True)
+            .exists()
+        ):
+            is_owner = False
+
     _, created = models.ProjectMember.objects.get_or_create(
-        project=project, member=user, is_owner=is_owner
+        project=project, member=user, defaults={"is_owner": is_owner}
     )
 
     return created
