@@ -1,7 +1,7 @@
 {% load static %}
 {% load l10n %}
 {% if 'change_location' in user_project_perms and project.location_x == None and project.location_y == None %}
-  <div class="card-text map d-flex flex-column gap-1 text-muted pt-3">
+  <div class="card-text project-card-details map d-flex flex-column gap-1 text-muted px-3 py-2">
     <p class="mb-0">La localisation de la friche n’a pas été renseignée</p>
     <a href="{% url 'projects-project-location' project.pk %}"
        class="link-project-location-edit text-decoration-none"
