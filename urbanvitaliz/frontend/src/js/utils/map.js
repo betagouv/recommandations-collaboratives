@@ -124,7 +124,7 @@ function createMarkerIcon(className) {
 
 function markerPopupTemplate(project) {
 	const lat = project?.location_x ? `<p class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(project?.location_x).toFixed(2)}</p>` : ''
-	const lng = project?.location_x ? `<p class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(project?.location_y).toFixed(2)}</p>` : ''
+	const lng = project?.location_x ? `<p class="m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(project?.location_y).toFixed(2)}</p>` : ''
 	return `
 		<div class="marker-popup">
 			<header><h6>${project.name}</a></h6></header>
