@@ -173,14 +173,17 @@
     border: 1px solid #dee2e6;
 }
 
-.project-location-edit .marker-popup header {
-    padding: 4px 12px
+.location-knowledge .marker-popup header,
+.location-overview .marker-popup header {
+    padding: 8px 12px
 }
 
-.project-location-edit .marker-popup h6 {
-    margin-bottom: 5px;
+.location-knowledge .marker-popup h6,
+.location-overview .marker-popup h6  {
+    margin-bottom: 3px;
 }
 
-.project-location-edit .marker-popup main {
-    padding: 5px 12px 8px
+.location-knowledge .marker-popup main,
+.location-overview .marker-popup main {
+    padding: 5px 12px 8px;
 }
