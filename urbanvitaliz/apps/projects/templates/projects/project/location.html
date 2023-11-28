@@ -2,19 +2,22 @@
 {% load static %}
 {% load projects_extra %}
 {% load django_vite %}
+{% load guardian_tags %}
 {% current_project request.session as project %}
-{% block js %}
-  {{ project.name|json_script:"editNameProject" }}
-  {{ project.status|json_script:"editStatus" }}
-  {{ project.location|json_script:"editLocation" }}
-  {{ project.location_x|json_script:"editLocation_x" }}
-  {{ project.location_y|json_script:"editLocation_y" }}
-  {{ project.commune.name|json_script:"editNameCommune" }}
-  {{ project.commune.postal|json_script:"editPostal" }}
-  {{ project.commune.insee|json_script:"editInsee" }}
-  {{ project.commune.latitude|json_script:"editLatitude" }}
-  {{ project.commune.longitude|json_script:"editLongitude" }}
-  <script>
+{% get_obj_perms request.user for project as "user_project_perms" %}
+{% if 'change_location' in user_project_perms %}
+  {% block js %}
+    {{ project.name|json_script:"editNameProject" }}
+    {{ project.status|json_script:"editStatus" }}
+    {{ project.location|json_script:"editLocation" }}
+    {{ project.location_x|json_script:"editLocation_x" }}
+    {{ project.location_y|json_script:"editLocation_y" }}
+    {{ project.commune.name|json_script:"editNameCommune" }}
+    {{ project.commune.postal|json_script:"editPostal" }}
+    {{ project.commune.insee|json_script:"editInsee" }}
+    {{ project.commune.latitude|json_script:"editLatitude" }}
+    {{ project.commune.longitude|json_script:"editLongitude" }}
+    <script>
         const projectOptions = {
             name: JSON.parse(document.getElementById('editNameProject').textContent),
             status: JSON.parse(document.getElementById('editStatus').textContent),
@@ -33,49 +36,50 @@
                 longitude: JSON.parse(document.getElementById('editLongitude').textContent),
             }
         }
-  </script>
-  {% vite_asset 'js/apps/projectLocationEdit.js' %}
-{% endblock %}
-{% block content %}
-  <div x-data='ProjectLocationEdit(projectOptions)'
-       data-test-id="project-location-edit"
-       class="project-location-edit col-10 offset-1">
-    <header class="location-header">
-      <h6 id="project-location-edit-label" class="fw-bold d-block mb-0">Localisation du Projet</h6>
-    </header>
-    <div class="location-body p-0">
-      <div data-test-id="map-location-edit" class="project-map-container">
-        <div x-ref="map-location-edit" id="map-location-edit" class="h-100 w-100"></div>
-      </div>
-      <div class="location-footer bg-white justify-content-start">
-        <form method="POST"
-              action="{% url 'projects-project-location' project.pk %}"
-              name="ProjectLocationForm"
-              class="d-flex form-coordinates  text-muted">
-          {% csrf_token %}
-          <!-- {{ form.as_p }} -->
-          <fieldset class="d-flex flex-column flex-grow-1">
-            <p class="flex-grow-1">Placez la position du projet sur la carte</p>
-            <div class="coordinates d-flex">
-              <label class="d-flex">
-                Longitude :
-                <input type="text"
-                       name="location_x"
-                       :value="project.location_x"
-                       :placeholder="project.location_x" />
-              </label>
-              <label class="d-flex">
-                Latitude :
-                <input type="text"
-                       name="location_y"
-                       :value="project.location_y"
-                       :placeholder="project.location_y" />
-              </label>
-            </div>
-          </fieldset>
-          <button class="button">Sauvegarder la localisation</button>
-        </form>
+    </script>
+    {% vite_asset 'js/apps/projectLocationEdit.js' %}
+  {% endblock %}
+  {% block content %}
+    <div x-data='ProjectLocationEdit(projectOptions)'
+         data-test-id="project-location-edit"
+         class="project-location-edit col-10 offset-1">
+      <header class="location-header">
+        <h6 id="project-location-edit-label" class="fw-bold d-block mb-0">Localisation du Projet</h6>
+      </header>
+      <div class="location-body p-0">
+        <div data-test-id="map-location-edit" class="project-map-container">
+          <div x-ref="map-location-edit" id="map-location-edit" class="h-100 w-100"></div>
+        </div>
+        <div class="location-footer bg-white justify-content-start">
+          <form method="POST"
+                action="{% url 'projects-project-location' project.pk %}"
+                name="ProjectLocationForm"
+                class="d-flex form-coordinates  text-muted">
+            {% csrf_token %}
+            <!-- {{ form.as_p }} -->
+            <fieldset class="d-flex flex-column flex-grow-1">
+              <p class="flex-grow-1">Placez la position du projet sur la carte</p>
+              <div class="coordinates d-flex">
+                <label class="d-flex">
+                  Longitude :
+                  <input type="text"
+                         name="location_x"
+                         :value="project.location_x"
+                         :placeholder="project.location_x" />
+                </label>
+                <label class="d-flex">
+                  Latitude :
+                  <input type="text"
+                         name="location_y"
+                         :value="project.location_y"
+                         :placeholder="project.location_y" />
+                </label>
+              </div>
+            </fieldset>
+            <button class="button">Sauvegarder la localisation</button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
-{% endblock %}
+  {% endblock %}
+{% endif %}

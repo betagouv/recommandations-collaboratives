@@ -1,5 +1,7 @@
 {% load static %}
 {% load l10n %}
+{% load guardian_tags %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="card-text map">
   <div class="d-flex gap-1 text-muted">
     <svg width="14"
@@ -41,18 +43,20 @@
         {% endif %}
       </div>
     </div>
-    <div class="answer">
-      <a href="{% url 'projects-project-location' project.pk %}"
-         class="link-project-location-edit link-edit stretched-link text-decoration-none"
-         data-test-id="link-project-location-edit">Préciser la localisation du projet</a>
-      <div class="flex-shrink-1 next-arrow">
-        <svg class="align-middle bi"
-             width="26px"
-             height="26px"
-             fill="currentColor">
-          <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
-        </svg>
+    {% if 'change_location' in user_project_perms %}
+      <div class="answer">
+        <a href="{% url 'projects-project-location' project.pk %}"
+           class="link-project-location-edit link-edit stretched-link text-decoration-none"
+           data-test-id="link-project-location-edit">Préciser la localisation du projet</a>
+        <div class="flex-shrink-1 next-arrow">
+          <svg class="align-middle bi"
+               width="26px"
+               height="26px"
+               fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
+          </svg>
+        </div>
       </div>
-    </div>
+    {% endif %}
   </div>
 {% endif %}
