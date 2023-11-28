@@ -132,6 +132,8 @@ class Project {
 			cy.get(this.dom.REMINDER_EMAIL_DATE).should('not.contain', 'Aucun')
 		} else if (role === 'staff') {
 			cy.get(this.dom.MESSAGE_NO_REMINDER).should('exist')
+		} else if (role === 'advisor') {
+			cy.get(this.dom.MESSAGE_NO_REMINDER).should('not.exist')
 		}
 	}
 

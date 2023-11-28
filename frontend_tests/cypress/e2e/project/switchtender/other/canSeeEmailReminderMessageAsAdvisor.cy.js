@@ -1,27 +1,29 @@
-import projects from '../../../fixtures/projects/projects.json'
-import projectView from '../../../support/views/project'
+import projects from '../../../../fixtures/projects/projects.json'
+import projectView from '../../../../support/views/project'
 
 const ownerEmail = 'bob@test.fr'
-describe('As staff, I can see project email reminders', () => {
+describe('As project advisor, I can see project email reminders', () => {
 
 	it('Displays no reminder message on projects with no scheduled emails', () => {
 		const currentProject = projects[16];
-		cy.login("staff");
+		cy.login("jean");
 		cy.visit(`/project/${currentProject.pk}`)
-		projectView.checkNextEmailReminder({role: 'staff'})
+		projectView.joinAsAdvisor()
+		projectView.checkNextEmailReminder({role: 'advisor'})
 	})
 
 	it('Displays a reminder message when an email is scheduled to be sent', () => {
 		const currentProject = projects[17];
-		cy.login("staff");
+		cy.login("jean");
 		cy.visit(`/project/${currentProject.pk}`)
+		projectView.joinAsAdvisor()
 		projectView.checkNextEmailReminder({email: ownerEmail})
 	})
 
 	it('Reminders settings popup is accessible and provides access to preferences panel', () => {
 		const currentProject = projects[17];
-		cy.login("staff");
+		cy.login("jean");
 		cy.visit(`/project/${currentProject.pk}`)
-		projectView.checkEmailReminderTooltip('not.exist')
+		projectView.checkEmailReminderTooltip()
 	})
 })
