@@ -16,6 +16,10 @@ const domElements = {
 	BUTTON_DEACTIVATE_PROJECT:'[data-test-id="button-deactivate-project"]',
 	BUTTON_ACTIVATE_PROJECT:'[data-test-id="button-activate-project"]',
 
+	// Quit project
+	ADMIN_BANNER_QUIT_PROJECT:'[data-test-id="admin-banner-quit-project"]',
+	BUTTON_QUIT_PROJECT:'[data-test-id="button-quit-project"]',
+
 	// Email Reminder Settings
 	BUTTON_OPEN_REMINDER_SETTINGS:'[data-test-id="button-open-reminder-settings"]',
 	TOOLTIP_REMINDER_SETTINGS:'[data-test-id="tooltip-reminder-settings"]',
@@ -80,6 +84,25 @@ class Project {
 			cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE).should('not.exist')
 		})
 	}
+
+	quitProject(role) {
+		switch(role) {
+			case 'advisor':
+				cy.get(this.dom.ADMIN_BANNER_QUIT_PROJECT).get(this.dom.BUTTON_QUIT_PROJECT).click({force:true})
+				cy.get(this.dom.BUTTON_JOIN_AS_OBSERVER).should('exist')
+				break;
+			case 'staff':
+				cy.get(this.dom.ADMIN_BANNER_QUIT_PROJECT).get(this.dom.BUTTON_QUIT_PROJECT).click({force:true})
+				break;
+			case 'member':
+				cy.get(this.dom.ADMIN_BANNER_QUIT_PROJECT).get(this.dom.BUTTON_QUIT_PROJECT).click({force:true})
+				cy.url().should('equal', 'http://example.localhost:8000/')
+				break;
+			default:
+				cy.get(this.dom.ADMIN_BANNER_QUIT_PROJECT).should('not.exist')
+		}
+	}
+
 
 	/**
 	 * @param {*} email recipient email if a reminder is expected, null otherwise
