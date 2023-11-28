@@ -128,7 +128,7 @@ function createMarkerIcon(className) {
 function markerPopupTemplate(project) {
 	return `
 		<div class="marker-popup">
-			<header><h6><a href="/project/${project.id}/presentation">${project.name}</a></h6></header>
+			<header><h6>${project.name}</a></h6></header>
 			<main class="d-flex flex-column">
 				<p class="m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>
 				<p class="m-0 fs-7 text-capitalize">Lat: ${project?.location_x}</p>

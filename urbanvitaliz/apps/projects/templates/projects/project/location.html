@@ -42,42 +42,52 @@
   {% block content %}
     <div x-data='ProjectLocationEdit(projectOptions)'
          data-test-id="project-location-edit"
-         class="project-location-edit col-10 offset-1">
-      <header class="location-header">
-        <h6 id="project-location-edit-label" class="fw-bold d-block mb-0">Localisation du Projet</h6>
-      </header>
-      <div class="location-body p-0">
-        <div data-test-id="map-location-edit" class="project-map-container">
-          <div x-ref="map-location-edit" id="map-location-edit" class="h-100 w-100"></div>
-        </div>
-        <div class="location-footer bg-white justify-content-start">
-          <form method="POST"
-                action="{% url 'projects-project-location' project.pk %}"
-                name="ProjectLocationForm"
-                class="d-flex form-coordinates  text-muted">
-            {% csrf_token %}
-            <!-- {{ form.as_p }} -->
-            <fieldset class="d-flex flex-column flex-grow-1">
-              <p class="flex-grow-1">Placez la position du projet sur la carte</p>
-              <div class="coordinates d-flex">
-                <label class="d-flex">
-                  Longitude :
-                  <input type="text"
-                         name="location_x"
-                         :value="project.location_x"
-                         :placeholder="project.location_x" />
-                </label>
-                <label class="d-flex">
-                  Latitude :
-                  <input type="text"
-                         name="location_y"
-                         :value="project.location_y"
-                         :placeholder="project.location_y" />
-                </label>
-              </div>
-            </fieldset>
-            <button class="button">Sauvegarder la localisation</button>
-          </form>
+         class="project-location-edit col-11 pt-3 pb-5 mx-auto">
+      <div class="row">
+        <header class="location-header qs-heading">
+          <h2 id="project-location-edit-label" class="fw-bold d-block mb-0">Où se situe votre projet ?</h2>
+        </header>
+      </div>
+      <div class="location-body row mt-5">
+        <div class="col col-lg-7 pe-5">
+          <p class="location-label">Adresse du projet</p>
+          <p class="location-address text-muted">
+            {{ project.location }}
+            {% if project.commune %}, {{ project.commune.postal|default:"" }} {{ project.commune.name|default:"" }}{% endif %}
+          </p>
+          <p class="location-label">Si la friche n’a pas d’adresse précise, vous pouvez entrer du texte du libre</p>
+          <div data-test-id="map-location-edit" class="project-map-container">
+            <div x-ref="map-location-edit" id="map-location-edit" class="h-100 w-100"></div>
+          </div>
+          <div class="location-footer bg-white">
+            <form method="POST"
+                  action="{% url 'projects-project-location' project.pk %}"
+                  name="ProjectLocationForm"
+                  class="d-flex form-coordinates text-muted flex-row-reverse">
+              {% csrf_token %}
+              <!-- {{ form.as_p }} -->
+              <fieldset class="d-flex w-100">
+                <p class="flex-grow-1">Placez la position du projet sur la carte</p>
+                <div class="coordinates d-flex">
+                  <label class="sr-only sr-only-focusable">
+                    Longitude :
+                    <input type="hidden"
+                           name="location_x"
+                           :value="project.location_x"
+                           :placeholder="project.location_x" />
+                  </label>
+                  <label class="sr-only sr-only-focusable">
+                    Latitude :
+                    <input type="hidden"
+                           name="location_y"
+                           :value="project.location_y"
+                           :placeholder="project.location_y" />
+                  </label>
+                </div>
+              </fieldset>
+              <button class="btn btn-primary">Sauvegarder la localisation</button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
