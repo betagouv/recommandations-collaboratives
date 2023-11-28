@@ -708,13 +708,28 @@ def test_anonymous_can_use_topic_api(client):
 def test_anonymous_can_search_topic_api(client, request):
     current_site = get_current_site(request)
 
-    baker.make(models.Topic, name="acme topic", site=current_site)
+    topic = baker.make(models.Topic, name="acme topic", site=current_site)
+    project = baker.make(models.Project)
+    topic.projects.add(project)
 
     url = reverse("topics-list")
     response = client.get(url, {"search": "acm topc"}, format="json")
 
     assert response.status_code == 200
     assert len(response.data) > 0
+
+
+@pytest.mark.django_db
+def test_unused_topics_are_not_suggested_via_rest_api(client, request):
+    current_site = get_current_site(request)
+
+    baker.make(models.Topic, name="acme topic", site=current_site)
+
+    url = reverse("topics-list")
+    response = client.get(url, {"search": "acm topc"}, format="json")
+
+    assert response.status_code == 200
+    assert len(response.data) == 0
 
 
 # eof
