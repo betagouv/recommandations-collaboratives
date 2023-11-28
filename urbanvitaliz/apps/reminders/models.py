@@ -91,7 +91,7 @@ class Reminder(models.Model):
     origin = models.IntegerField(choices=ORIGIN_CHOICES, default=0, editable=False)
     kind = models.IntegerField(choices=KIND_CHOICES, editable=False)
 
-    sent_on = models.DateTimeField(null=True, blank=True, editable=False)
+    sent_on = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = "rappel"
