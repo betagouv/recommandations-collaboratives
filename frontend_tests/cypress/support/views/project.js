@@ -82,10 +82,15 @@ class Project {
 		})
 	}
 
-	openEmailReminderTooltip (condition='exist') {
-		cy.get(this.dom.BUTTON_OPEN_REMINDER_SETTINGS).click({force:true}).then(() => {
-			cy.find(this.dom.TOOLTIP_REMINDER_SETTINGS).should(condition)
-		})
+	/**
+	 * @param {*} email recipient email if a reminder is expected, null otherwise
+	 */
+	openEmailReminderTooltip (condition='exist', email=null) {
+		cy.get(this.dom.BUTTON_OPEN_REMINDER_SETTINGS).click({force:true})
+		cy.get(this.dom.TOOLTIP_REMINDER_SETTINGS).should(condition)
+		if(email) {
+			cy.get(this.dom.MESSAGE_REMINDER_SETTINGS).should(condition)
+		}
 	}
 
 	closeEmailReminderTooltip (condition='not.exist') {
@@ -111,6 +116,9 @@ class Project {
 		cy.get(this.dom.ADMIN_BANNER_DEACTIVATE_PROJECT).should(condition)
 	}
 
+	/**
+	 * @param {*} condition 'exist' if the project is active and the user has access to notifications, 'not.exists' if not
+	 */
 	checkEmailReminderTooltip (condition='exist') {
 		cy.get(this.dom.BUTTON_OPEN_REMINDER_SETTINGS).should(condition)
 	}
