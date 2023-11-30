@@ -8,20 +8,20 @@ describe('As project owner, I can see project email reminders', () => {
 		const currentProject = projects[16];
 		cy.login("bob");
 		cy.visit(`/project/${currentProject.pk}`)
-		projectView.checkNextEmailReminder()
+		projectView.checkNextEmailReminder({})
 	})
 
 	it('Displays a reminder message when an email is scheduled to be sent', () => {
 		const currentProject = projects[17];
 		cy.login("bob");
 		cy.visit(`/project/${currentProject.pk}`)
-		projectView.checkNextEmailReminder(ownerEmail)
+		projectView.checkNextEmailReminder({email: ownerEmail})
 	})
 
 	it('Reminders settings popup is accessible and provides access to preferences panel', () => {
 		const currentProject = projects[17];
 		cy.login("bob");
 		cy.visit(`/project/${currentProject.pk}`)
-		projectView.openEmailReminderTooltip('exist', ownerEmail)
+		projectView.openEmailReminderTooltip('exist', {email: ownerEmail})
 	})
 })
