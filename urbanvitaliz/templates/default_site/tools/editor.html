@@ -1,7 +1,8 @@
 {% load static %}
 <div {% if escapejs %} x-data='editor("{{ input_value|escapejs }}")' {% elif is_task_comment %}x-data='editor(task.content)' {% else %} x-data='editor({{ input_value }})'{% endif %}
      class="w-100"
-     @set-comment.window="setMarkdownContentFromTaskModal($event)">
+     @set-comment.window="setMarkdownContentFromTaskModal($event)"
+     data-test-id="tiptap-editor">
   <template x-if="isLoaded()">
     <div class="tiptap-menu">
       <button @click.stop.prevent="toggleHeading({ level: 3 })"
@@ -50,15 +51,17 @@
     {% if is_task_comment %}
       <div class="d-flex justify-content-end">
         <button class="button filled blue small inherit"
-                :disabled="$store.editor.currentMessage === ''"
-                @click.stop="handleEditComment(markdownContent,task)">Enregistrer</button>
+                :disabled="$store.editor.isSubmitted === true"
+                @click.stop="handleEditComment(markdownContent,task)"
+                data-test-id="button-submit-edit">Enregistrer</button>
       </div>
     {% endif %}
     {% if is_task_modal_comment %}
       <div class="d-flex justify-content-end">
         <button class="button filled blue small inherit"
-                :disabled="$store.editor.currentMessage === ''"
-                @click.stop="onSubmitComment(markdownContent)">Enregistrer</button>
+                :disabled="$store.editor.isSubmitted === true"
+                @click.stop="onSubmitComment(markdownContent)"
+                data-test-id="button-submit-new">Enregistrer</button>
       </div>
     {% endif %}
     {% if errors %}

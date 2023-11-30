@@ -7,10 +7,11 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
-import uuid
 import datetime
+import uuid
 
 import pytest
+from actstream.models import Action
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -26,10 +27,9 @@ from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.reminders import models as reminders
 from urbanvitaliz.apps.projects import models as project_models
+from urbanvitaliz.apps.projects import utils
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.utils import login
-
-from urbanvitaliz.apps.projects import utils
 
 from .. import models
 
@@ -1177,6 +1177,27 @@ def test_task_status_is_updated_when_a_followup_issued(request, client):
 
     assert followup.task.status == followup.status
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_task_status_change_is_traced_when_a_followup_issued(request, client):
+    with login(client) as user:
+        followup = Recipe(
+            models.TaskFollowup,
+            who=user,
+            task__project__status="READY",
+            status=1,
+            task__site=get_current_site(request),
+        ).make()
+        url = reverse("projects-task-followup-update", args=[followup.id])
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    assert Action.objects.count() == 1
+    action = Action.objects.first()
+
+    assert action.verb == "a classé la recommandation comme «en cours»"
 
 
 @pytest.mark.django_db

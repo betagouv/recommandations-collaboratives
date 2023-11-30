@@ -131,12 +131,9 @@ main {
 }
 
 .crm-header {
-    position: sticky;
-    top: 66px;
+    padding-top: 66px;
     background-color: white;
     border-bottom: 1px solid #e1e1e1;
-
-    z-index: 100;
     margin-bottom: 0 !important;
 }
 

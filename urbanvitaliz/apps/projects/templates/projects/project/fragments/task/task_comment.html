@@ -1,13 +1,14 @@
 {% load static %}
 <div x-data="TaskComment()">
     <template x-if="task.content !== '' && !isEditing">
-        <div data-test-id="task-initial-comment" class="position-relative p-3 bg-grey-light rounded-3 p-3">
+        <div data-test-id="task-initial-comment"
+             class="position-relative p-3 bg-grey-light rounded-3 p-3">
             <div x-html="truncate(renderMarkdown(task.content),100)"
                  class="text-info-custom font-small text-dark mb-3"></div>
             {% include 'projects/project/fragments/task/task_user_card.html' %}
             {% if "manage_tasks" in user_project_perms and not disable_edit %}
                 <button class="position-absolute bottom-0 mb-3 me-3 right-0 end-0 border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey"
-                        @click.stop="isEditing = true">
+                        @click.stop="isEditing = true; setIsSubmitted(false);">
                     <svg class="bi" width="12px" height="12px" fill="#929292">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
                     </svg>
@@ -20,7 +21,7 @@
             <div class="d-flex flex-column align-items-center justify-content-center w-100 py-4">
                 <span class="text-info-custom text-orange name fw-normal mb-2">Pas de commentaire initial</span>
                 <button class="button filled blue small inherit"
-                        @click.stop="isEditing = true">Ajouter un commentaire</button>
+                        @click.stop="isEditing = true; setIsSubmitted(false);">Ajouter un commentaire</button>
             </div>
         </div>
     </template>

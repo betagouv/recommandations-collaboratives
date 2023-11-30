@@ -96,9 +96,10 @@ def invite_accept(request, invite_id):
 
 
 def invite_details(request, invite_id):
-    invite = get_object_or_404(
-        models.Invite, site=request.site, pk=invite_id, accepted_on=None
-    )
+    invite = get_object_or_404(models.Invite, site=request.site, pk=invite_id)
+
+    if invite.accepted_on:
+        return redirect(reverse("account_login"))
 
     # Check if this email already exists as an account
     existing_account = None

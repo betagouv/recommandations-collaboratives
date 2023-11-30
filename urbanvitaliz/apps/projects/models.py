@@ -8,7 +8,6 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import os
-import uuid
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -24,15 +23,8 @@ from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
-from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
-from tagging.fields import TagField
-from tagging.models import TaggedItem
-from tagging.registry import register as tagging_register
 from taggit.managers import TaggableManager
-from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
-from urbanvitaliz.apps.reminders import models as reminders_models
-from urbanvitaliz.apps.resources import models as resources
 
 from urbanvitaliz.utils import CastedGenericRelation, check_if_advisor, has_perm
 
@@ -131,7 +123,7 @@ class ProjectManager(models.Manager):
         site = Site.objects.get_current()
 
         if has_perm(user, "sites.list_projects", site):
-            projects = self.filter(sites=site, deleted=None)
+            projects = self.filter(sites=site, deleted=None).exclude(status="DRAFT")
         else:
             projects = self.none()
 
@@ -139,6 +131,9 @@ class ProjectManager(models.Manager):
         if check_if_advisor(user):
             actor_departments = user.profile.departments.values_list("code", flat=True)
             projects = self._filter_by_departments(projects, actor_departments)
+            projects = projects.exclude(
+                status="DRAFT"
+            )  # don't list unmoderated projects
 
         # Extend scope of projects to those where you're member or invited advisor
         my_projects = get_objects_for_user(
@@ -653,7 +648,9 @@ class Document(models.Model):
         verbose_name_plural = "documents"
 
     def get_absolute_url(self):
-        return reverse("projects-project-detail-documents", kwargs={"project_id": self.project.pk})
+        return reverse(
+            "projects-project-detail-documents", kwargs={"project_id": self.project.pk}
+        )
 
     def __str__(self):  # pragma: nocover
         return f"Document {self.id}"

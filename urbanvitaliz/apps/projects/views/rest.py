@@ -13,15 +13,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count, F, Q
 from django.http import Http404
 from notifications import models as notifications_models
-from rest_framework import mixins, permissions, status, viewsets
-from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from urbanvitaliz import verbs
-from urbanvitaliz.apps.tasks import models as task_models
-from urbanvitaliz.apps.tasks import signals as task_signals
 from urbanvitaliz.utils import TrigramSimilaritySearchFilter, get_group_for_site
 
 from .. import models, signals
@@ -417,7 +413,24 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Return a list of all organizations."""
-        return models.Topic.objects.all()
+        current_site = self.request.site
+
+        restrict_to = self.request.query_params.get("restrict_to", None)
+
+        topics = models.Topic.objects.filter(site=current_site)
+
+        if restrict_to:
+            try:
+                count = {
+                    "projects": Count("projects"),
+                    "recommendations": Count("tasks"),
+                }[restrict_to]
+
+                topics = topics.annotate(ntag=count).exclude(ntag=0)
+            except KeyError:
+                pass
+
+        return topics
 
 
 # eof
