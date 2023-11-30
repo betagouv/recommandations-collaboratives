@@ -25,18 +25,14 @@ function ProjectLocationEdit(projectOptions) {
 					longitude: projectOptions.commune.longitude,
 				}
 			}
-			const { latitude, longitude, name, postal } = this.project.commune;
+			const { latitude, longitude, insee, name, postal } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
 			const geoData = {}
 			try {
 				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
+				geoData.location = await geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name ?? ''} ${postal ?? ''}`);
 			} catch(e) {
 				console.log(e)
-				try {
-					geoData.location = await geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name ?? ''} ${postal ?? ''}`);
-				} catch(e) {
-					console.log(e)
-				}
 			}
 			this.initInteractiveMap(this.project, geoData, this.markers);
 		},
