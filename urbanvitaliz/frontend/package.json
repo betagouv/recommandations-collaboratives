@@ -16,7 +16,7 @@
     "@tiptap/pm": "^2.0.0-beta.218",
     "@tiptap/starter-kit": "^2.0.0-beta.218",
     "alpinejs": "^3.10.2",
-    "axios": "^0.27.2",
+    "axios": "^1.6.0",
     "d3": "^7.8.4",
     "d3-cloud": "^1.2.5",
     "intro.js": "^7.0.1",

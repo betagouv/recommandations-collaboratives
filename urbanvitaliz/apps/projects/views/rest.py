@@ -413,7 +413,24 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         """Return a list of all organizations."""
-        return models.Topic.objects.all()
+        current_site = self.request.site
+
+        restrict_to = self.request.query_params.get("restrict_to", None)
+
+        topics = models.Topic.objects.filter(site=current_site)
+
+        if restrict_to:
+            try:
+                count = {
+                    "projects": Count("projects"),
+                    "recommendations": Count("tasks"),
+                }[restrict_to]
+
+                topics = topics.annotate(ntag=count).exclude(ntag=0)
+            except KeyError:
+                pass
+
+        return topics
 
 
 # eof

@@ -46,11 +46,11 @@ export function searchOrganizationsUrl(search) {
 }
 
 // Organization
-export function searchTopicsUrl(search) {
-    return `/api/topics/?search=${search}`
+export function searchTopicsUrl(search, restrict_to) {
+    return `/api/topics/?search=${search}&restrict_to=${restrict_to}`
 }
 
-// Tasks : 
+// Tasks :
 export function taskUrl(projectId, taskId) {
     return `/api/projects/${projectId}/tasks/${taskId}/`
 }

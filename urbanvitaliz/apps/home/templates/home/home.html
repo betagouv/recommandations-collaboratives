@@ -19,7 +19,7 @@
             <div class="fr-grid-row">
                 <div class="fr-col-offset-md-1"></div>
                 <div class="fr-col-12 fr-col-md-10 fr-background-default--grey fr-pt-4w fr-p-0w fr-p-md-4w custom-background-home">
-                    <h1 class="fr-h1">{{ site.name }}</h1>
+                    <h1 class="fr-h1">{{ request.site.name }}</h1>
                     <p class="fr-text--lg fr-my-3w">
                         Porteurs de projets, recevez des conseils personnalisés des conseillers compétents.
                     </p>
@@ -27,7 +27,7 @@
                         <li>
                             <a href="{% url 'projects-onboarding' %}"
                                class="fr-btn fr-text--xl custom-button"
-                               data-test-id="intro-link-contact-uv">Solliciter {{ site.name }}</a>
+                               data-test-id="intro-link-contact-uv">Solliciter {{ request.site.name }}</a>
                         </li>
                     </ul>
                     <div></div>
@@ -47,7 +47,7 @@
                 </div>
                 <div class="fr-col-12 fr-col-sm-9 fr-text--lg">
                     <h3>Conseillers</h3>
-                    <p class="fr-my-2w">Suivez les projets de votre territoire et orientez-les via {{ site.name }}.</p>
+                    <p class="fr-my-2w">Suivez les projets de votre territoire et orientez-les via {{ request.site.name }}.</p>
                     <a href="{% url 'regional-actors' %}" class="fr-btn fr-btn--secondary">En savoir plus</a>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                 font-family: 'Marianne', arial, sans-serif">
         <div class="fr-container fr-pt-2w fr-pb-6w">
             <div class="fr-m-auto">
-                <h3 class="fr-text-inverted--grey text-center fr-pb-6w">Comment fonctionne {{ site.name }} ?</h3>
+                <h3 class="fr-text-inverted--grey text-center fr-pb-6w">Comment fonctionne {{ request.site.name }} ?</h3>
             </div>
             <div class="fr-grid-row fr-grid-row--gutters">
                 <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
@@ -156,7 +156,7 @@
                         <h6 class="fr-mb-13v fr-text-inverted--grey">Faites-vous accompagner</h6>
                         <a href="{% url 'projects-onboarding' %}"
                            class="fr-btn fr-btn--tertiary fr-text-inverted--grey fr-btn-custom-hover"
-                           data-test-id="action-link-contact-uv">Solliciter {{ site.name }}</a>
+                           data-test-id="action-link-contact-uv">Solliciter {{ request.site.name }}</a>
                     </div>
                 </div>
             </div>
