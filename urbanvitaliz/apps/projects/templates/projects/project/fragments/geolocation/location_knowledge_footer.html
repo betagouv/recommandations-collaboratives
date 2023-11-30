@@ -39,7 +39,7 @@
           <p class="mb-0">
             lat: {{ project.commune.latitude|floatformat:2 }} ; lng: {{ project.commune.longitude|floatformat:2 }}
           </p>
-          <a href="https://www.google.com/maps/search/?api=1&query={{ project.commune.longitude|unlocalize }}%2C{{ project.commune.latitude|unlocalize }}">Voir sur Google Maps</a>
+          <a href="https://www.google.com/maps/search/?api=1&query={{ project.commune.latitude|unlocalize }}%2C{{ project.commune.longitude|unlocalize }}">Voir sur Google Maps</a>
         {% endif %}
       </div>
     </div>
