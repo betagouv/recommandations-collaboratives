@@ -32,11 +32,14 @@
                 <div class="flex-fill mt-1 ms-2"
                      @click="handleOpenPreviewModal()"
                      style="cursor: pointer;
-                            font-size: 0.9em">
+                            font-size: 0.9em"
+                     data-test-id="task-kanban-topic">
                     <template x-if="task.topic && task.topic.name">
                         <div class="d-flex align-items-center mb-1 mt-1">
                             <span class="topic-indicator bg-green me-2"></span>
-                            <h5 data-test-id="task-kanban-topic" x-text="task.topic.name" class="fw-medium tiny text-gray-800 mb-0"></h5>
+                            <h5 data-test-id="task-kanban-topic"
+                                x-text="task.topic.name"
+                                class="fw-medium tiny text-gray-800 mb-0"></h5>
                         </div>
                     </template>
                     <h6 class="mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"

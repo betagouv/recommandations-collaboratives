@@ -6,6 +6,8 @@ const domElements = {
 	// Project dashboard tabs
 	ADMIN_PATH:'/administration',
 	ADMIN_TAB:'[data-test-id="navigation-administration-tab"]',
+	ACTIONS_PATH:'/actions',
+	ACTIONS_TAB:'[data-test-id="navigation-actions-tab"]',
 
 	// Pause / Reactivate project
 	ADMIN_BANNER_DEACTIVATE_PROJECT:'[data-test-id="admin-banner-deactivate-project"]',
@@ -29,6 +31,11 @@ const domElements = {
 	REMINDER_EMAIL_DATE:'[data-test-id="email-date"]',
 	MESSAGE_NO_REMINDER:'[data-test-id="no-reminders"]',
 	REMINDER_ACCESS: '[data-test-id="reminder-settings-access"]',
+	ACTIONS_PATH:'/actions',
+	ACTIONS_TAB:'[data-test-id="navigation-actions-tab"]',
+
+	// Actions Tab - Tasks List
+	TASK_CARD:'[data-test-id="task-kanban-topic"]',
 
 	// Positioning Banner
 	HEADER_BANNER_ADVISING_POSITION:'[data-test-id="header-banner-advising-position"]',
@@ -44,6 +51,7 @@ class Project {
 	}
 
 	// Navigation
+	
 	navigateToTab(tabName, path) {
 		cy.get(tabName).click({force:true})
 		cy.url().should('include', path)
@@ -53,7 +61,12 @@ class Project {
 		this.navigateToTab(this.dom.ADMIN_TAB, this.dom.ADMIN_PATH)
 	}
 
+	navigateToActionsTab() {
+		this.navigateToTab(this.dom.ACTIONS_TAB, this.dom.ACTIONS_PATH)
+	}
+
 	// Actions
+
 	joinAsAdvisor() {
 		cy.get(this.dom.BUTTON_JOIN_AS_ADVISOR).click({force:true}).then(() => {
 			cy.get(this.dom.HEADER_BANNER_ADVISING_POSITION).should('not.exist')
@@ -179,8 +192,13 @@ class Project {
 		cy.get(this.dom.REMINDER_ACCESS).get('a').click({force:true})
     cy.url().should('include', this.dom.ADMIN_PATH)
 	}
+
+
+	openTask() {
+		cy.get(this.dom.TASK_CARD).click({force:true})
+	}
 }
 
-const projectPreferences = new Project(domElements)
+const projectView = new Project(domElements)
 
-export default projectPreferences
+export default projectView
