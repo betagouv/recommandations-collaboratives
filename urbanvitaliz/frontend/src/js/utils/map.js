@@ -1,5 +1,4 @@
 
-import { statusToColorClass } from '../utils/statusToText'
 import GeocoderBAN from './geocoderBAN'
 import geolocUtils from './geolocation/'
 
