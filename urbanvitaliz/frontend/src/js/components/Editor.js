@@ -30,6 +30,7 @@ Alpine.data('editor', (content) => {
         onUpdate({ editor }) {
           _this.updatedAt = Date.now()
           _this.renderMarkdown();
+          _this.$store.editor.setIsSubmitted(false)
 
           _this.$store.editor.isEditing = editor.getMarkdown() != ''
           _this.$store.editor.currentMessage = editor.getMarkdown()
