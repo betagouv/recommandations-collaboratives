@@ -327,6 +327,7 @@ def project_create_or_update_topics(request, project_id=None):
                     continue  # no data in form,just skip it
 
                 topic, _ = models.Topic.objects.get_or_create(
+                    site=request.site,
                     name__iexact=name.lower(),
                     defaults={"name": name.capitalize(), "site": request.site},
                 )
