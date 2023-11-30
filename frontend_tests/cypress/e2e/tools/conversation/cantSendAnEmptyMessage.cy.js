@@ -1,4 +1,5 @@
 import projects from '../../../fixtures/projects/projects.json'
+import editor from '../../../support/tools/editor'
 
 const currentProject = projects[1];
 
@@ -29,7 +30,7 @@ describe("I can't send an empty message", () => {
 
         cy.url().should('include', '/conversations')
 
-        cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(`new message`, { force: true })
+        editor.writeMessage(`new message`)
 
         cy.get('[data-test-id="send-message-conversation"]').should('not.have.attr', 'disabled')
     })
@@ -44,11 +45,11 @@ describe("I can't send an empty message", () => {
 
         cy.url().should('include', '/conversations')
 
-        cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(`new message`, { force: true })
+        editor.writeMessage(`new message`)
 
         cy.get('[data-test-id="send-message-conversation"]').should('not.have.attr', 'disabled')
 
-        cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').clear()
+        editor.clear()
 
         cy.get('[data-test-id="send-message-conversation"]').should('have.attr', 'disabled')
     })
