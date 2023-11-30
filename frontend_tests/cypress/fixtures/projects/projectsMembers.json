@@ -81,6 +81,24 @@
         }
     },
     {
+        "model": "projects.projectmember",
+        "pk": 10,
+        "fields": {
+            "member": 5,
+            "project": 17,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 11,
+        "fields": {
+            "member": 5,
+            "project": 18,
+            "is_owner": true
+        }
+    },
+    {
         "model": "projects.projectswitchtender",
         "pk": 1,
         "fields": {
@@ -158,6 +176,24 @@
         "fields": {
             "switchtender": 3,
             "project": 16,
+            "site": 1
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 15,
+        "fields": {
+            "switchtender": 3,
+            "project": 17,
+            "site": 1
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 16,
+        "fields": {
+            "switchtender": 3,
+            "project": 18,
             "site": 1
         }
     }
