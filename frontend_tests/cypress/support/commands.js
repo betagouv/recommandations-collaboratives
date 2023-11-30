@@ -35,7 +35,6 @@ Cypress.Commands.add("login", (role) => {
         default:
             break;
     }
-
     cy.request({ url: "/accounts/login/" }).then(response => {
         const setCookieValue = response.headers["set-cookie"][0]
 
@@ -56,14 +55,12 @@ Cypress.Commands.add("login", (role) => {
             cy.visit('/')
             cy.getCookie("sessionid").should("exist");
             cy.getCookie("csrftoken").should("exist");
-            cy.acceptCookies()
         })
     })
 })
 
 Cypress.Commands.add('loginWithUi', (role) => {
-    const { username } = currentUser
-
+    const { username } = currentUser    
     cy.visit('/accounts/login/')
 
     cy.url().should('include', '/accounts/login/')

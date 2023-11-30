@@ -69,6 +69,7 @@ def project_list_export_csv(request):
             "tel",
             "conseillers",
             "statut_conseil",
+            "premiere_reco_le",
             "nb_reco",
             "nb_reco_nonstaff",
             "nb_reco_actives",
@@ -116,6 +117,7 @@ def project_list_export_csv(request):
         conversations = project.notes.filter(public=True)
 
         published_tasks = project.tasks.filter(site=request.site).exclude(public=False)
+        first_reco = published_tasks.order_by("created_on").first()
 
         writer.writerow(
             [
@@ -130,6 +132,7 @@ def project_list_export_csv(request):
                 project.phone,
                 switchtenders_txt,
                 project.status,
+                first_reco.created_on.date() if first_reco else "",  # First reco date
                 published_tasks.exclude(status=task_models.Task.NOT_INTERESTED).count(),
                 published_tasks.exclude(status=task_models.Task.NOT_INTERESTED)
                 .exclude(created_by__is_staff=True)
