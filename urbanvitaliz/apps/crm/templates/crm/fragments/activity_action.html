@@ -1,3 +1,4 @@
+{# Activity notification template used in the global CRM activity stream (staff only) #}
 {% load activity_tags %}
 {% load humanize %}
 {% load gravatar %}
@@ -12,8 +13,7 @@
             <div class="d-flex align-items-start">
                 <div class="font-small">
                     <span class="fw-normal">
-                        <a class=""
-                           href="{% url 'crm-user-details' action.actor.pk %}">
+                        <a class="" href="{% url 'crm-user-details' action.actor.pk %}">
                             {{ action.actor.first_name|default:action.actor }}
                             {{ action.actor.last_name|default:"" }}
                         </a>
@@ -24,39 +24,71 @@
                                     {% if action.action_object.role %}
                                         <span>a invité
                                             <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
-                                            <strong class="text-dark">
-                                                {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
-                                                    conseiller·e
+                                            {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
+                                                <strong class="text-dark">conseiller·e</strong>
+                                            {% else %}
+                                                <strong class="text-dark">collectivité</strong>
+                                            {% endif %}
+                                            sur le project
+                                            {% if action.target.commune %}
+                                                {% if action.target.get_absolute_url %}
+                                                    <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                                                 {% else %}
-                                                    collectivité
+                                                    <strong class="fw-normal">{{ action.target }}</strong>
                                                 {% endif %}
-                                            </strong>
+                                            {% endif %}
                                         </span>
                                     {% endif %}
                                 {% else %}
-                                    {% if action.action_object.feed_label %}
+                                    {% if action.verb == verbs.Document.ADDED %}
+                                        a ajouté
+                                        {% if action.action_object.the_link %}un lien{% endif %}
+                                        {% if action.action_object.the_file %}un document{% endif %}
                                         <a class="d-inline hover-underline"
                                            href="{{ action.action_object.get_absolute_url }}">
-                                            {{ action.verb }}
+                                            {% if action.action_object %}"{{ action.action_object }}"{% endif %}
+                                        </a>
+                                        sur le projet
+                                        <a class="d-inline hover-underline"
+                                           href="{{ action.action_object.get_absolute_url }}">
                                             {{ action.action_object.feed_label }}
                                         </a>
                                     {% else %}
-                                        <span>{{ action.verb }}</span>
-                                        <a class="d-inline hover-underline"
-                                           href="{{ action.action_object.get_absolute_url }}">
-                                            "{{ action.action_object }}"
-                                        </a>
-                                    {% endif %}
-                                    {% if action.target and action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY %}
-                                        <div class="d-inline-block ms-1">
-                                            <span>à propos de</span>
-                                            {% if action.target.get_absolute_url %}
-                                                <a class="hover-underline"
-                                                   href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-                                            {% else %}
-                                                <strong class="fw-normal">{{ action.target }}</strong>
+                                        {% if action.action_object.feed_label %}
+                                            {% if action.verb != verbs.Document.ADDED %}{{ action.verb }}{% endif %}
+                                            <a class="d-inline hover-underline"
+                                               href="{{ action.action_object.get_absolute_url }}">
+                                                {{ action.action_object.feed_label }}
+                                            </a>
+                                        {% else %}
+                                            <span>{{ action.verb }}</span>
+                                            {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED %}
+                                                <a class="d-inline hover-underline"
+                                                   href="{{ action.action_object.get_absolute_url }}">
+                                                    {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
+                                                        ici
+                                                    {% else %}
+                                                        {% if action.action_object %}"{{ action.action_object }}"{% endif %}
+                                                    {% endif %}
+                                                </a>
                                             {% endif %}
-                                        </div>
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if action.target %}
+                                        {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.JOINED and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
+                                            <div class="d-inline-block ms-1">
+                                                {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
+                                                    <span>à propos de</span>
+                                                {% else %}
+                                                    <span>sur le projet</span>
+                                                {% endif %}
+                                                {% if action.target.get_absolute_url %}
+                                                    <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
+                                                {% else %}
+                                                    <strong class="fw-normal">{{ action.target }}</strong>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
                             </span>

@@ -1,48 +1,45 @@
 {% extends "projects/project/detail.html" %}
-
 {% load humanize %}
 {% load static %}
 {% load gravatar %}
 {% load activity_tags %}
-
 {% block project_detail %}
-
-{% activity_stream "target" project %}
-
-<div class="w-100 h-100">
-    <div class="d-flex" style="">
-        <a href="{% url 'projects-project-detail' project.id %}" class="button grey filled my-2 mb-4" style="cursor: pointer; color: #222;">
-            <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-return-left" />
-            </svg>
-            <span>revenir au projet</span>
-        </a>
+    {% activity_stream "target" project %}
+    <div class="w-100 h-100">
+        <div class="d-flex">
+            <a href="{% url 'projects-project-detail' project.id %}"
+               class="button grey filled my-2 mb-4"
+               style="cursor: pointer;
+                      color: #222">
+                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-return-left" />
+                </svg>
+                <span>revenir au projet</span>
+            </a>
+        </div>
+        <div class="d-flex align-items-center justify-content-between"
+             style="margin-bottom: 6px">
+            <h6 style="font-size: 14px;" class="text-uppercase fw-bold m-0 p-0">Activité du projet</h6>
+        </div>
+        <div class="project-card-details h-100 p-3 d-flex flex-column justify-content-between"
+             data-test-id="project-activity-tracking-staff">
+            <article class="overflow-hidden">
+                {% regroup stream by timestamp.date as stream_by_day %}
+                <ul class="list-group m-0 p-0 activity-stream-container">
+                    {% for date, actions in stream_by_day %}
+                        <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0 d-flex flex-column mb-3 mx-0 px-0">
+                            <span class="small text-info-custom text-grey-dark mb-2 ps-2">{{ date|naturalday|capfirst }}</span>
+                            <div class="activity-stream-actions-container d-flex flex-column">
+                                {% for action in actions %}
+                                    {% display_action action %}
+                                {% endfor %}
+                            </div>
+                        </li>
+                    {% empty %}
+                        <span class="text-custom-info text-grey-dark fw-light">Vous trouverez ici l'activité de vos projets suivis</span>
+                    {% endfor %}
+                </ul>
+            </article>
+        </div>
     </div>
-    <div class="d-flex align-items-center justify-content-between" style="margin-bottom: 6px">
-        <h6 style="font-size: 14px;" class="text-uppercase fw-bold m-0 p-0">
-            Activité du projet
-        </h6>
-    </div>
-    <div class="project-card-details h-100 p-3 d-flex flex-column justify-content-between">
-        <article class="overflow-hidden">
-            {% regroup stream by timestamp.date as stream_by_day %}
-
-            <ul class="list-group m-0 p-0 activity-stream-container">
-                {% for date, actions in stream_by_day %}
-                    <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0 d-flex flex-column mb-3 mx-0 px-0">
-                        <span class="small text-info-custom text-grey-dark mb-2 ps-2">{{ date|naturalday|capfirst }}</span>
-                        <div class="activity-stream-actions-container d-flex flex-column">
-                            {% for action in actions %}
-                                {% display_action action %}
-                            {% endfor %}
-                        </div>
-                    </li>
-                {% empty %}
-                    <span class="text-custom-info text-grey-dark fw-light">Vous trouverez ici l'activité de vos projets suivis</span>
-                {% endfor %}
-            </ul>
-        </article>
-    </div>
-</div>
-
 {% endblock %}
