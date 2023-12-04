@@ -160,11 +160,11 @@ progress::-moz-progress-bar {
     padding-top: 80px;
 }
 
-.project-header-sidebar > *  {
+.project-header-sidebar > .btn  {
 	margin-block: 0;
 }
 
-.project-header-sidebar > * + * {
+.project-header-sidebar > .btn  + .btn {
 	margin-block-start: 6.5px;
 }
 
