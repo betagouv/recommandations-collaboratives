@@ -30,7 +30,8 @@
     {% vite_asset 'js/apps/projectLocation.js' %}
 {% endblock %}
 {% block content %}
-    <div x-data='ProjectLocation(projectOptions, false)'>
+    <div x-data='ProjectLocation(projectOptions, false)'
+         data-test-id="project-knogwledge-map">
         <div class="p-0 project-map-container" :class="{'is-small':mapIsSmall}">
             <div x-cloak
                  x-ref="map-static"

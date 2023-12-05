@@ -15,7 +15,6 @@ L.GeocoderBAN = L.Control.extend({
 		minIntervalBetweenRequests: 250,
 		defaultMarkgeocode: true,
 		autofocus: true,
-		className:'',
 		onUpdate: null,
 		markerIcon:null,
 		markerPopupTemplate: null
@@ -175,7 +174,6 @@ L.GeocoderBAN = L.Control.extend({
 		var clickHandler = function (e) {
 			this.minimizeControl()
 			this.geocodeResult(feature)
-			const coordinates = feature.geometry.coordinates
 			this.options.onUpdate({
 				lng: feature.geometry.coordinates[0],
 				lat: feature.geometry.coordinates[1]
@@ -203,8 +201,8 @@ L.GeocoderBAN = L.Control.extend({
 	markGeocode: function (feature) {
 		var latlng = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
 		this._map.setView(latlng, 14)
-		this.geocodeMarker = new L.Marker(latlng, {icon: createMarkerIcon(this.options.className)})
-			.bindPopup(markerPopupTemplate(feature.properties))
+		this.geocodeMarker = new L.Marker(latlng, {icon: this.options.markerIcon})
+			.bindPopup(this.options.markerPopupTemplate(feature.properties))
 			.addTo(this._map)
 			.openPopup()
 	}

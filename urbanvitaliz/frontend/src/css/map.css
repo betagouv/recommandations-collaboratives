@@ -32,7 +32,7 @@
     z-index: 10;
 }
 
-.project-location-marker.map-marker:after {
+.project-coordinates-marker.map-marker:after {
     background-color: #0063CB;;
     border: solid 2px white;
     transform: scale(1.6);

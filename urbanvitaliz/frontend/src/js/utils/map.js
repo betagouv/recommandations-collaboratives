@@ -65,7 +65,7 @@ function initMapControllerBAN(map, project, geoData, onUpdate) {
 		geoData,
 		onUpdate,
 		markerIcon: createMarkerIcon(project),
-		markerPopupTemplate: markerPopupTemplate(project) 
+		markerPopupTemplate
 	}
 	GeocoderBAN(geocoderOptions).addTo(map)
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
@@ -81,7 +81,7 @@ function addLayerMarkerProjectCoordinates(map, project) {
 		throw Error(`Coordonnées de localisation du projet indisponibles pour "${project.name}"`)
 	}
 	const coordinates = [project.location_y, project.location_x]
-	const marker = L.marker(coordinates, { icon: createMarkerIcon('project-location-marker') }).addTo(map);
+	const marker = L.marker(coordinates, { icon: createMarkerIcon('project-coordinates-marker') }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
 	L.layerGroup([marker]).addTo(map);
 	map.panTo(new L.LatLng(...coordinates));
@@ -124,11 +124,12 @@ function createMarkerIcon(className) {
 function markerPopupTemplate(project) {
 	const lat = project?.location_x ? `<p data-test-id="project-coord-x-latitude" class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(project?.location_x).toFixed(2)}</p>` : ''
 	const lng = project?.location_x ? `<p data-test-id="project-coord-y-longitude" class="m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(project?.location_y).toFixed(2)}</p>` : ''
+	const address = project?.location?.commune  ?`<p class="m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>` : ''
 	return `
 		<div class="marker-popup">
 			<header><h6>${project.name}</a></h6></header>
 			<main class="d-flex flex-column">
-				<p class="m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>
+				${address}
 				${lat}
 				${lng}
 			</main>
