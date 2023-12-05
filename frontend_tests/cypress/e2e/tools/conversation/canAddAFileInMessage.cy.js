@@ -1,5 +1,6 @@
 import file from '../../../fixtures/documents/file.json'
 import projects from '../../../fixtures/projects/projects.json'
+import editor from '../../../support/tools/editor'
 
 const currentProject = projects[1];
 
@@ -23,7 +24,7 @@ describe('I can add a file with my message in public notes', () => {
             .type(`test avec fichier : ${now}`, { force: true })
             .should('have.value', `test avec fichier : ${now}`)
 
-        cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(`test avec fichier : ${now}`, { force: true })
+        editor.writeMessage(`test avec fichier : ${now}`)
 
         cy.get('[name="the_file"]').selectFile(file.path, { force: true });
 

@@ -40,7 +40,7 @@
                         {{ topic_formset.management_form }}
                         <ul class="flex-wrap d-flex topic-form p-0 list-unstyled">
                             {% for topic_form in topic_formset %}
-                                <li x-data='TopicSearch("{{topic_form.name.value|default:""}}")' class="w-50">
+                                <li x-data='TopicSearch("{{topic_form.name.value|default:""}}", "projects")' class="w-50">
                                     <div class="rounded d-flex flex-column my-2 p-3 me-3 align-items-start border border-secondary">
                                         <div class="flex-1 w-100 topic-label">
                                             <label class="text-info-custom text-grey-dark mb-2">Thématiques abordées {{ forloop.counter }}</label>
@@ -49,7 +49,7 @@
                                                    id="{{ topic_form.name.id_for_label }}"
                                                    name="{{ topic_form.name.html_name }}"
                                                    value="{{ topic_form.name.value|default:'' }}"
-                                                   placeholder="" 
+                                                   placeholder=""
                                                    x-model="topic"
                                                    x-on:input.change.debounce="handleTopicChange"
                                                    />
