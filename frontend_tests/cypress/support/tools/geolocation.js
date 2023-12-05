@@ -85,6 +85,7 @@ class ProjectLocation {
 	}
 
 	editProjectLocationUsingInteractiveMap() {
+		// TODO: fix this test
 		cy.get(this.dom.PROJECT_MAP_EDIT).click({force:true})
 	}
 

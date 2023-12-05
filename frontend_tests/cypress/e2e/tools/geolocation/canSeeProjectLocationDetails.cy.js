@@ -19,8 +19,7 @@ describe('I can see the location of a project on the project overview', () => {
     })
 
     it.skip(`displays a marker of the project location if project coordinates are not set and geolocation data is found for project location`, () => {
-
-        // FAILING
+		// TODO: fix this test: to set a marker we must select an item returned from the API Addresses and set the marker to that location
         currentProject = projects[14];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`).then(() => {
