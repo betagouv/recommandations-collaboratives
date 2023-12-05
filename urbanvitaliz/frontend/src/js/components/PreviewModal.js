@@ -47,6 +47,7 @@ export default function PreviewModal() {
             return this.notifications.filter(n => n.action_object.who && n.action_object.id === followupId).length > 0;
         },
         async onSubmitComment(content) {
+            this.$store.editor.setIsSubmitted(true);
             if (!this.currentlyEditing) {
                 await this.$store.tasksData.issueFollowup(this.task, undefined, content);
                 await this.$store.previewModal.loadFollowups();

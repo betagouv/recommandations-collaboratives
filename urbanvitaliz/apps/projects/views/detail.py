@@ -318,19 +318,21 @@ def project_create_or_update_topics(request, project_id=None):
 
             # Handle topics
             # Add new ones to project or removed deleted ones.
+            project.topics.clear()
+
             for tform in topic_formset:
                 name = tform.cleaned_data.get("name")
-                if not name:
+                to_remove = tform.cleaned_data.get("DELETE", False)
+
+                if not name or to_remove:
                     continue  # no data in form,just skip it
+
                 topic, _ = models.Topic.objects.get_or_create(
+                    site=request.site,
                     name__iexact=name.lower(),
                     defaults={"name": name.capitalize(), "site": request.site},
                 )
-                to_remove = tform.cleaned_data["DELETE"]
-                if to_remove:
-                    project.topics.remove(topic)
-                else:
-                    project.topics.add(topic)
+                project.topics.add(topic)
 
             return redirect(
                 reverse("projects-project-detail-overview", args=[project.pk])

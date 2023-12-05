@@ -1,4 +1,5 @@
 import projects from '../../../../fixtures/projects/projects.json'
+import editor from '../../../../support/tools/editor'
 
 const currentProject = projects[1];
 
@@ -24,7 +25,7 @@ describe('I can access and use private notes', () => {
             .type(`test : ${now}`, { force: true })
             .should('have.value', `test : ${now}`)
 
-        cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(`test : ${now}`, { force: true })
+        editor.writeMessage(`test : ${now}`)
 
         cy.contains("Envoyer").click({ force: true })
 

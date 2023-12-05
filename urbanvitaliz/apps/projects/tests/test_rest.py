@@ -19,6 +19,7 @@ from pytest_django.asserts import assertContains
 from rest_framework.test import APIClient
 from urbanvitaliz import verbs
 from urbanvitaliz.utils import login
+from urbanvitaliz.apps.tasks import models as tasks_models
 
 from .. import models, utils
 
@@ -708,13 +709,79 @@ def test_anonymous_can_use_topic_api(client):
 def test_anonymous_can_search_topic_api(client, request):
     current_site = get_current_site(request)
 
-    baker.make(models.Topic, name="acme topic", site=current_site)
+    topic = baker.make(models.Topic, name="acme topic", site=current_site)
+    project = baker.make(models.Project)
+    topic.projects.add(project)
 
     url = reverse("topics-list")
     response = client.get(url, {"search": "acm topc"}, format="json")
 
     assert response.status_code == 200
     assert len(response.data) > 0
+
+
+@pytest.mark.django_db
+def test_unused_topics_are_not_suggested_via_rest_api(client, request):
+    current_site = get_current_site(request)
+
+    baker.make(models.Topic, name="acme topic", site=current_site)
+
+    url = reverse("topics-list")
+    response = client.get(
+        url, {"search": "acm topc", "restrict_to": "projects"}, format="json"
+    )
+
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_topics_are_restricted_to_projects_via_rest_api(client, request):
+    current_site = get_current_site(request)
+
+    topic = baker.make(models.Topic, name="acme topic", site=current_site)
+    task = baker.make(tasks_models.Task)
+    topic.tasks.add(task)
+
+    url = reverse("topics-list")
+    response = client.get(
+        url, {"search": "acm topc", "restrict_to": "projects"}, format="json"
+    )
+
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_topics_are_restricted_to_recommendations_via_rest_api(client, request):
+    current_site = get_current_site(request)
+
+    topic = baker.make(models.Topic, name="acme topic", site=current_site)
+    project = baker.make(models.Project)
+    topic.projects.add(project)
+
+    url = reverse("topics-list")
+    response = client.get(
+        url, {"search": "acm topc", "restrict_to": "recommendations"}, format="json"
+    )
+
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_topics_are_restricted_to_nonexistent_via_rest_api(client, request):
+    current_site = get_current_site(request)
+
+    baker.make(models.Topic, name="acme topic", site=current_site)
+
+    url = reverse("topics-list")
+    response = client.get(
+        url, {"search": "acm topc", "restrict_to": "gne"}, format="json"
+    )
+
+    assert response.status_code == 200
+    assert len(response.data) == 1
 
 
 # eof

@@ -26,7 +26,7 @@
                         {% for error in form.intent.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
-                <div x-data='TopicSearch("{{ form.topic_name.value|default:"" }}")'
+                <div x-data='TopicSearch("{{ form.topic_name.value|default:"" }}", "recommendations")'
                      class="mt-2 mb-3">
                     <label class="mb-2 text-info-custom text-grey-dark" for="topic_name">Thématique</label>
                     <div class="input-group">
