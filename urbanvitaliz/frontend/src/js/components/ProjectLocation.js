@@ -55,7 +55,7 @@ function ProjectLocation(projectOptions, modal=true) {
 			const options = mapUtils.mapOptions({interactive: true});
 			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project, geoData)
 
-			const Map  = mapUtils.initMap('map-modal', project, options, this.zoom + 3);
+			const Map  = mapUtils.initMap('map-interactive', project, options, this.zoom + 3);
 			this.interactiveMap = Map;
 			mapUtils.initMapLayers(this.interactiveMap, project, geoData);
 			this.interactiveMap.setMinZoom(this.zoom - 7);

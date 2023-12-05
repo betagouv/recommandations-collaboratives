@@ -45,7 +45,7 @@ function ProjectLocationEdit(projectOptions) {
 		initInteractiveMap(project, geoData, markers) {
 			const options = mapUtils.mapOptions({interactive: true});
 
-			const Map = mapUtils.initMap('map-location-edit', project, options, this.zoom);
+			const Map = mapUtils.initMap('map-edit', project, options, this.zoom);
 			//Center Map
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
 			Map.on('click', function(e) {

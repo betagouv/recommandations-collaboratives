@@ -49,7 +49,7 @@
         <li id="overview-step-2">
             {% with "Recommandations" as label %}
                 {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %}
-                    <a data-test-id="navigation-actions-tab"
+                    <a data-test-id="project-navigation-actions"
                        class="{% if recommandations %} active{% endif %} align-items-center"
                        href="{% url 'projects-project-detail-actions' project.pk %}">
                         {% if active_project_action_notifications_count %}
@@ -58,7 +58,7 @@
                         <span>{{ label }}</span>
                     </a>
                 {% else %}
-                    <a data-test-id="navigation-actions-tab"
+                    <a data-test-id="project-navigation-actions"
                        class="disabled align-items-center"
                        href="#">
                         <svg class="bi align-middle" width="18" height="18" fill="currentColor">

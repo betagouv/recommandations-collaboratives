@@ -21,12 +21,11 @@
             </svg>
         </a>
     </div>
-    <div data-test-id="project-map-static"
-         class="p-0 project-map-container"
-         :class="{'is-small':mapIsSmall}">
+    <div class="p-0 project-map-container" :class="{'is-small':mapIsSmall}">
         <div x-cloak
              x-ref="map-static"
              id="map-static"
+             data-test-id="map-static"
              class="project-map h-100 w-100"></div>
     </div>
 </div>
