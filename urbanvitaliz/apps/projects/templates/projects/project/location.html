@@ -51,7 +51,7 @@
               <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
             </svg>
             &nbsp;
-            <a href="{% url 'projects-project-detail' project.id %}">{{ project.name }}</a>
+            <a href="{% url 'projects-project-detail' project.id %}">{{ project.name|truncatechars:20 }}</a>
           </li>
           <li class="breadcrumb-item">Localisation</li>
         </ol>
