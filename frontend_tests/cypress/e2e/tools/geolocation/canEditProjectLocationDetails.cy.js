@@ -27,12 +27,13 @@ describe('I can edit the location details of a project on the project knowledge 
     })
 
     it.skip('can access a page to set the project coordinates by clicking on a map', () => {
+		// TODO: fix this test: fix function `editProjectLocationUsingInteractiveMap`
         currentProject = projects[11];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`)
         
         cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click().then(() => {
-            cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
+            cy.wait(600);
             projectLocation.checkMissingCoordinatesMessage('exist')
             projectView.navigateToKnowledgeTab()
             projectLocation.navigateToLocationEditPage() // test link in Knowledge tab

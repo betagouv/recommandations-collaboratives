@@ -3,7 +3,6 @@ import projectLocation from '../../../support/tools/geolocation'
 
 /**
  * To run these tests: launch the front end of the application before running the tests
- * TODO: fix baseURL once notfications PR is merged
  */
 let currentProject
 const projectOwner = "bob"
@@ -13,7 +12,7 @@ describe('I can see the location of a project on the project overview', () => {
         currentProject = projects[15];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`).then(() => {
-            cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
+            cy.wait(600);
             projectLocation.checkMapLayerProjectCoordinates()
         });
     })
@@ -23,7 +22,7 @@ describe('I can see the location of a project on the project overview', () => {
         currentProject = projects[14];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`).then(() => {
-            cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
+            cy.wait(600);
             projectLocation.checkMapLayerProjectLocation()
         });
     })
@@ -32,7 +31,7 @@ describe('I can see the location of a project on the project overview', () => {
         currentProject = projects[11];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`).then(() => {
-            cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
+            cy.wait(600);
             projectLocation.checkMapLayerAreaCommune()
         });
     })
@@ -42,7 +41,7 @@ describe('I can see the location of a project on the project overview', () => {
         currentProject = projects[12];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`).then(() => {
-            cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
+            cy.wait(600);
             projectLocation.checkMapLayerCircle()
         });
     })
@@ -52,7 +51,7 @@ describe('I can see the location of a project on the project overview', () => {
         currentProject = projects[16];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`).then(() => {
-            cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
+            cy.wait(600);
             projectLocation.checkMapLayerCircle('not.exist')
         });
     })
@@ -61,7 +60,7 @@ describe('I can see the location of a project on the project overview', () => {
        currentProject = projects[11];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`).then(() => {
-            cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
+            cy.wait(600);
             projectLocation.openMapModal()
         });
     })
