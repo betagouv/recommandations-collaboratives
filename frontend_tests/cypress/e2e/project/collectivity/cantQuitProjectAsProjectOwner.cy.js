@@ -1,7 +1,7 @@
 import projects from '../../../fixtures/projects/projects.json'
 import projectView from '../../../support/views/project'
 
-const currentProject = projects[14];
+const currentProject = projects[17];
 
 describe('As project owner, I cannot quit a project', () => {
 

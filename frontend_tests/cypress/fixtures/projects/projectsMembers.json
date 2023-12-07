@@ -67,39 +67,12 @@
         "pk": 8,
         "fields": {
             "member": 5,
-<<<<<<< HEAD
-            "project": 15,
-            "is_owner": true
-        }
-    },
-    {
-        "model": "projects.projectmember",
-        "pk": 9,
-        "fields": {
-            "member": 6,
-            "project": 15,
-            "is_owner": false
-        }
-    },
-    {
-        "model": "projects.projectmember",
-        "pk": 10,
-        "fields": {
-            "member": 5,
-=======
->>>>>>> feature/refine-geoloc
             "project": 17,
             "is_owner": true
         }
     },
     {
         "model": "projects.projectmember",
-<<<<<<< HEAD
-        "pk": 11,
-        "fields": {
-            "member": 5,
-            "project": 18,
-=======
         "pk": 9,
         "fields": {
             "member": 5,
@@ -131,8 +104,61 @@
         "fields": {
             "member": 5,
             "project": 13,
->>>>>>> feature/refine-geoloc
             "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 13,
+        "fields": {
+            "member": 5,
+            "project": 18,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 14,
+        "fields": {
+            "member": 6,
+            "project": 18,
+            "is_owner": false
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 15,
+        "fields": {
+            "member": 5,
+            "project": 20,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 16,
+        "fields": {
+            "member": 5,
+            "project": 21,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 17,
+        "fields": {
+            "member": 5,
+            "project": 22,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 18,
+        "fields": {
+            "member": 6,
+            "project": 22,
+            "is_owner": false
         }
     },
     {
@@ -211,13 +237,8 @@
         "model": "projects.projectswitchtender",
         "pk": 14,
         "fields": {
-<<<<<<< HEAD
-            "switchtender": 3,
-            "project": 16,
-=======
             "switchtender": 2,
             "project": 17,
->>>>>>> feature/refine-geoloc
             "site": 1
         }
     },
@@ -225,13 +246,8 @@
         "model": "projects.projectswitchtender",
         "pk": 15,
         "fields": {
-<<<<<<< HEAD
-            "switchtender": 3,
-            "project": 17,
-=======
             "switchtender": 2,
             "project": 16,
->>>>>>> feature/refine-geoloc
             "site": 1
         }
     },
@@ -239,10 +255,6 @@
         "model": "projects.projectswitchtender",
         "pk": 16,
         "fields": {
-<<<<<<< HEAD
-            "switchtender": 3,
-            "project": 18,
-=======
             "switchtender": 2,
             "project": 15,
             "site": 1
@@ -263,7 +275,33 @@
         "fields": {
             "switchtender": 2,
             "project": 13,
->>>>>>> feature/refine-geoloc
+            "site": 1
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 19,
+        "fields": {
+            "switchtender": 3,
+            "project": 19,
+            "site": 1
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 20,
+        "fields": {
+            "switchtender": 3,
+            "project": 20,
+            "site": 1
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 21,
+        "fields": {
+            "switchtender": 3,
+            "project": 21,
             "site": 1
         }
     }
