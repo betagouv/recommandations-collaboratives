@@ -198,3 +198,9 @@
 	padding-inline: 12px;
     margin: 0;
 }
+
+.modal-dialog .button {
+    font-size: 0.87rem;
+    padding: 10px 15px;
+    border-radius: 4px;
+}

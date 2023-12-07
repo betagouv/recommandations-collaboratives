@@ -160,12 +160,9 @@ progress::-moz-progress-bar {
     padding-top: 80px;
 }
 
-.project-header-sidebar > *  {
-	margin-block: 0;
-}
-
-.project-header-sidebar > * + * {
-	margin-block-start: 6.5px;
+.project-header-sidebar > .btn  {
+    border-radius: 2px;
+	padding: 0.29rem 1rem;
 }
 
 @media (min-width: 690px) {
