@@ -1,4 +1,4 @@
-{% if request.user != project.owner %}
+{% if request.user != project.owner and not request.user.is_staff %}
     <div data-test-id="admin-banner-quit-project"
          class="flag ps-2 medium-border-radius border-red mb-4 d-flex align-items-start justify-content-between">
         <div class="d-flex align-items-start">
@@ -29,7 +29,7 @@
                   data-test-id="form__admin-quit-project"
                   method="POST">
                 {% csrf_token %}
-                {% if position.is_advisor or position.is_observer and not is_regional_actor %}
+                {% if position.is_advisor or position.is_observer %}
                     <button data-test-id="button-quit-project"
                             formaction="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}"
                             class="button red filled flex-grow-1 text-nowrap inherit">Quitter le projet</button>
