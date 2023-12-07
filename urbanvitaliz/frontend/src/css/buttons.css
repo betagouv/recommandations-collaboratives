@@ -204,3 +204,9 @@
     padding: 10px 15px;
     border-radius: 4px;
 }
+
+.button-icon-bell {
+    padding-inline: 7px;
+    padding-block: 3px 6px;
+    border-radius: 0.25rem;
+}
