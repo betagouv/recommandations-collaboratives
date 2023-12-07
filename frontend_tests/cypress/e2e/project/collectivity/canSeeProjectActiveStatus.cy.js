@@ -1,7 +1,7 @@
 import projects from '../../../fixtures/projects/projects.json'
 import projectView from '../../../support/views/project'
 
-const currentProject = projects[14];
+const currentProject = projects[21];
 
 describe(`As non referent project member, I can see a project's active status`, () => {
 
