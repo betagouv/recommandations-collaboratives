@@ -126,7 +126,7 @@
 	}
 }
 
-.leaflet-control-geocoder-ban-alternatives > li > a {
+.leaflet-touch .leaflet-control-geocoder-ban-alternatives  a {
 	width: fit-content;
 	height: fit-content;
 	line-height: 1.5;
