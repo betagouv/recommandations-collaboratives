@@ -127,8 +127,8 @@
 }
 
 .leaflet-touch .leaflet-control-geocoder-ban-alternatives  a {
-	width: fit-content;
-	height: fit-content;
-	line-height: 1.5;
+	width: fit-content !important;
+	height: fit-content !important;
+	line-height: 1.3 !important;
 	max-width: 100%;
 }
