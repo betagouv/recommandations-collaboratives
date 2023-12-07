@@ -32,7 +32,15 @@ const domElements = {
 	MESSAGE_NO_REMINDER:'[data-test-id="no-reminders"]',
 	REMINDER_ACCESS: '[data-test-id="reminder-settings-access"]',
 	ACTIONS_PATH:'/actions',
-	ACTIONS_TAB:'[data-test-id="navigation-actions-tab"]',
+	ACTIONS_TAB:'[data-test-id="project-navigation-actions"]',
+
+	// Project dashboard tabs
+	OVERVIEW_PATH:'/presentation',
+	OVERVIEW_TAB:'[data-test-id="project-navigation-overview"]',
+
+	// Project dashboard tabs
+	KNOWLEDGE_PATH:'/connaissance',
+	KNOWLEDGE_TAB:'[data-test-id="project-navigation-knowledge"]',
 
 	// Actions Tab - Tasks List
 	TASK_CARD:'[data-test-id="task-kanban-topic"]',
@@ -63,6 +71,14 @@ class Project {
 
 	navigateToActionsTab() {
 		this.navigateToTab(this.dom.ACTIONS_TAB, this.dom.ACTIONS_PATH)
+	}
+
+	navigateToOverviewTab() {
+		this.navigateToTab(this.dom.OVERVIEW_TAB, this.dom.OVERVIEW_PATH)
+	}
+
+	navigateToKnowledgeTab() {
+		this.navigateToTab(this.dom.KNOWLEDGE_TAB, this.dom.KNOWLEDGE_PATH)
 	}
 
 	// Actions

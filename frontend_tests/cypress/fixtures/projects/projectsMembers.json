@@ -67,6 +67,7 @@
         "pk": 8,
         "fields": {
             "member": 5,
+<<<<<<< HEAD
             "project": 15,
             "is_owner": true
         }
@@ -85,7 +86,33 @@
         "pk": 10,
         "fields": {
             "member": 5,
+=======
+>>>>>>> feature/refine-geoloc
             "project": 17,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+<<<<<<< HEAD
+        "pk": 11,
+        "fields": {
+            "member": 5,
+            "project": 18,
+=======
+        "pk": 9,
+        "fields": {
+            "member": 5,
+            "project": 16,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 10,
+        "fields": {
+            "member": 5,
+            "project": 15,
             "is_owner": true
         }
     },
@@ -94,7 +121,17 @@
         "pk": 11,
         "fields": {
             "member": 5,
-            "project": 18,
+            "project": 12,
+            "is_owner": true
+        }
+    },
+    {
+        "model": "projects.projectmember",
+        "pk": 12,
+        "fields": {
+            "member": 5,
+            "project": 13,
+>>>>>>> feature/refine-geoloc
             "is_owner": true
         }
     },
@@ -174,8 +211,13 @@
         "model": "projects.projectswitchtender",
         "pk": 14,
         "fields": {
+<<<<<<< HEAD
             "switchtender": 3,
             "project": 16,
+=======
+            "switchtender": 2,
+            "project": 17,
+>>>>>>> feature/refine-geoloc
             "site": 1
         }
     },
@@ -183,8 +225,13 @@
         "model": "projects.projectswitchtender",
         "pk": 15,
         "fields": {
+<<<<<<< HEAD
             "switchtender": 3,
             "project": 17,
+=======
+            "switchtender": 2,
+            "project": 16,
+>>>>>>> feature/refine-geoloc
             "site": 1
         }
     },
@@ -192,8 +239,31 @@
         "model": "projects.projectswitchtender",
         "pk": 16,
         "fields": {
+<<<<<<< HEAD
             "switchtender": 3,
             "project": 18,
+=======
+            "switchtender": 2,
+            "project": 15,
+            "site": 1
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 17,
+        "fields": {
+            "switchtender": 2,
+            "project": 12,
+            "site": 1
+        }
+    },
+    {
+        "model": "projects.projectswitchtender",
+        "pk": 18,
+        "fields": {
+            "switchtender": 2,
+            "project": 13,
+>>>>>>> feature/refine-geoloc
             "site": 1
         }
     }

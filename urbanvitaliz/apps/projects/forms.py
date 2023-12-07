@@ -106,4 +106,12 @@ class ProjectActiveForm(forms.ModelForm):
         fields = ["inactive_reason"]
 
 
+class ProjectLocationForm(forms.ModelForm):
+    """Form for location update"""
+
+    class Meta:
+        model = models.Project
+        fields = ["location_x", "location_y"]
+
+
 # eof

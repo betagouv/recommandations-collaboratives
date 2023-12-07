@@ -31,6 +31,7 @@ from ..forms import (
     ProjectTagsForm,
     ProjectTopicsForm,
     PublicNoteForm,
+    ProjectLocationForm,
     TopicForm,
 )
 from ..utils import (
@@ -364,6 +365,31 @@ def project_update_tags(request, project_id=None):
         form = ProjectTagsForm(instance=project)
 
     return render(request, "projects/project/tags.html", locals())
+
+
+###########################################################################
+# Geolocation
+###########################################################################
+
+
+def project_update_location(request, project_id=None):
+    """Fill/update geolocation for a project"""
+    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    has_perm_or_403(request.user, "projects.change_location", project)
+
+    if request.method == "POST":
+        form = ProjectLocationForm(request.POST, instance=project)
+        if form.is_valid():
+            project = form.save()
+
+            return redirect(
+                reverse("projects-project-detail-overview", args=[project.pk])
+            )
+    else:
+        form = ProjectLocationForm(instance=project)
+
+    return render(request, "projects/project/location.html", locals())
 
 
 # eof
