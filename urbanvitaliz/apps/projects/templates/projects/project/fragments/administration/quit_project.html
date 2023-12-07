@@ -1,4 +1,4 @@
-{% if request.user in project.members and request.user != project.owner or position.is_advisor or position.is_observer %}
+{% if request.user in project.members.all and request.user != project.owner or position.is_advisor or position.is_observer %}
     <div data-test-id="admin-banner-quit-project"
          class="flag ps-2 medium-border-radius border-red mb-4 d-flex align-items-start justify-content-between">
         <div class="d-flex align-items-start">
