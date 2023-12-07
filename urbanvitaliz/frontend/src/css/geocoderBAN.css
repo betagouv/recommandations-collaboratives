@@ -125,3 +125,10 @@
 		max-width:calc(100% - var(--input-margin));
 	}
 }
+
+.leaflet-control-geocoder-ban-alternatives > li > a {
+	width: fit-content;
+	height: fit-content;
+	line-height: 1.5;
+	max-width: 100%;
+}
