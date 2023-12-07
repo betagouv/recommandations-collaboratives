@@ -7,7 +7,6 @@
     position: relative;
     height: 260px;
     width: 100%;
-    z-index: 100;
 
     border-radius: 4px;
     overflow: hidden;
@@ -25,6 +24,59 @@
 
 .map-modal .modal-body {
     height:100%;
+}
+
+.project-map-container.is-small {
+    max-height: 260px;
+}
+
+.project-map-modal,
+.location-edit {
+    .project-map-container:not(.is-small) {
+        height: 340px;
+    }
+}
+
+.location-header ,
+.location-footer {
+    flex-wrap: wrap;
+    padding-block: 1.5em;
+}
+
+.form-coordinates {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1.5em;
+}
+
+.form-coordinates > .button {
+    align-self: flex-end;
+    width: 100%;
+}
+
+.coordinates {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 1.5em;
+}
+
+.coordinates > label {
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+    gap: 1.5em;
+}
+
+@media screen and (width >= 840px) {
+    .coordinates > label {
+        width: auto;
+    }
+}
+
+@media screen and (width >= 1190px) {
+    .form-coordinates > .button {
+        width: auto;
+    }
 }
 
 .map-modal  .project-map-container {
@@ -51,4 +103,100 @@
     border: 1px solid #E5E5E5;
 
     cursor: pointer;
+}
+
+.project-map-readonly {
+    /* Allows leaflet marker to be visible without affecting leaflet transforms */
+    .leaflet-marker-icon.map-marker.leaflet-zoom-animated.leaflet-interactive {
+        transform: translateZ(1px) !important;
+    }
+}
+
+.map.card-text {
+    padding: 8px 12px 15px;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 400;
+    color: #666666;
+}
+
+.location-overview .map.card-text {
+    padding: 8px 0 0;
+}
+
+.map.card-text a {
+    color: #0063CB;
+    text-decoration: none;
+}
+
+.map.card-text svg:not(.align-middle.bi) {
+    margin: 5px 3px;
+}
+
+.map.card-text .answer {
+    display: flex;
+    position: relative;
+    margin-inline-start : 25px;
+    margin-inline-end : 15px;
+    justify-content: space-between;
+}
+
+.modal-dialog  .map.card-text {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.modal-dialog  .map.card-text > * + * {
+    margin-inline-start: 40px;
+}
+
+.location-overview .modal-footer {
+    padding: 0 5px 5px;
+}
+
+.modal-footer  .map.card-text .answer {
+    display: none;
+}
+
+.location-label {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.location-address {
+    padding: 12px;
+    margin-block-end: 20px;
+    border: 1px solid #dee2e6;
+}
+
+
+.location-edit .leaflet-popup-content,
+.location-knowledge .leaflet-popup-content,
+.location-overview .leaflet-popup-content {
+    width: auto;
+    min-width: 180px;
+}
+
+.location-edit .marker-popup header,
+.location-knowledge .marker-popup header,
+.location-overview .marker-popup header {
+    width: auto;
+    padding: 8px 14px
+}
+
+.location-edit .marker-popup h6,
+.location-knowledge .marker-popup h6,
+.location-overview .marker-popup h6  {
+    padding: 0 14px;
+    margin-bottom: 0;
+}
+
+.location-edit .marker-popup main,
+.location-knowledge .marker-popup main,
+.location-overview .marker-popup main {
+    padding: 5px 12px 8px;
 }
