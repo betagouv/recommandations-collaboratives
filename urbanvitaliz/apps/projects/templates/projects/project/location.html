@@ -68,7 +68,7 @@
             {{ project.location }}
             {% if project.commune %}, {{ project.commune.postal|default:"" }} {{ project.commune.name|default:"" }}{% endif %}
           </p>
-          <p class="location-label">Si la friche n’a pas d’adresse précise, vous pouvez entrer du texte du libre</p>
+          <p class="location-label">Si la projet n’a pas d’adresse précise, vous pouvez entrer du texte libre.</p>
           <div data-test-id="map-edit" class="project-map-container">
             <div x-ref="map-edit" id="map-edit" class="h-100 w-100"></div>
           </div>
