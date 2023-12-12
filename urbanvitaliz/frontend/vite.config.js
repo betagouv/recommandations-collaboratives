@@ -50,6 +50,8 @@ module.exports = {
                 contactList: resolve('./src/js/apps/contactList.js'),
                 projectDetailsCss: resolve('./src/css/projectDetails.css'),
                 projectLocation: resolve('./src/js/apps/projectLocation.js'),
+                projectEmailReminder: resolve('./src/js/apps/projectEmailReminder.js'),
+                projectLocationEdit: resolve('./src/js/apps/projectLocationEdit.js')
             },
             output: {
                 chunkFileNames: undefined,

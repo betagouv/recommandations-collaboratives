@@ -28,6 +28,7 @@ class EmailTemplate(models.Model):
             "Alerte conseillers d'un nouveau projet sur le territoire",
         ),
         ("sharing invitation", "Invitation à rejoindre un projet"),
+        ("project_reminders_whats_up_digest", "Où en êtes-vous ? (mail projet C)"),
     )
 
     objects = models.Manager()

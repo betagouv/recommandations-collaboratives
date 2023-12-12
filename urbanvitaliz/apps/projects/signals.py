@@ -17,11 +17,10 @@ from urbanvitaliz.utils import is_staff_for_site
 from . import models
 
 from .utils import (
-    get_collaborators_for_project,
     get_notification_recipients_for_project,
     get_project_moderators,
     get_regional_actors_for_project,
-    get_switchtenders_for_project,
+    get_advisors_for_project,
 )
 
 ########################################################################
@@ -46,7 +45,12 @@ document_uploaded = django.dispatch.Signal()
 
 @receiver(project_submitted)
 def log_project_submitted(sender, site, submitter, project, **kwargs):
-    action.send(sender=submitter, verb=verbs.Project.SUBMITTED_BY, action_object=project, target=project) 
+    action.send(
+        sender=submitter,
+        verb=verbs.Project.SUBMITTED_BY,
+        action_object=project,
+        target=project,
+    )
 
 
 @receiver(project_submitted)
@@ -65,7 +69,12 @@ def notify_moderators_project_submitted(sender, site, submitter, project, **kwar
 
 @receiver(project_validated)
 def log_project_validated(sender, site, moderator, project, **kwargs):
-    action.send(sender=moderator, verb=verbs.Project.VALIDATED_BY, action_object=project, target=project)
+    action.send(
+        sender=moderator,
+        verb=verbs.Project.VALIDATED_BY,
+        action_object=project,
+        target=project,
+    )
 
     if project.status == "DRAFT" or project.muted:
         return
@@ -111,7 +120,12 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    recipients = get_notification_recipients_for_project(project).exclude(id=sender.id)
+    if project.inactive_since:
+        recipients = get_advisors_for_project(project)
+    else:
+        recipients = get_notification_recipients_for_project(project)
+
+    recipients = recipients.exclude(id=sender.id)
 
     notify.send(
         sender=sender,
@@ -137,7 +151,12 @@ def notify_project_observer_joined(sender, project, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    recipients = get_collaborators_for_project(project).exclude(id=sender.id)
+    if project.inactive_since:
+        recipients = get_advisors_for_project(project)
+    else:
+        recipients = get_notification_recipients_for_project(project)
+
+    recipients = recipients.exclude(id=sender.id)
 
     notify.send(
         sender=sender,
@@ -189,7 +208,12 @@ def notify_project_member_joined(sender, project, **kwargs):
     if project.status == "DRAFT" or project.muted:
         return
 
-    recipients = get_collaborators_for_project(project).exclude(id=sender.id)
+    if project.inactive_since:
+        recipients = get_advisors_for_project(project)
+    else:
+        recipients = get_notification_recipients_for_project(project)
+
+    recipients = recipients.exclude(id=sender.id)
 
     notify.send(
         sender=sender,
@@ -241,7 +265,7 @@ def delete_activity_on_note_delete(sender, instance, **kwargs):
 @receiver(note_created)
 def notify_note_created(sender, note, project, user, **kwargs):
     if note.public is False:
-        recipients = get_switchtenders_for_project(project).exclude(id=user.id)
+        recipients = get_advisors_for_project(project).exclude(id=user.id)
 
         verb = verbs.Conversation.PRIVATE_MESSAGE
         action.send(
@@ -251,9 +275,12 @@ def notify_note_created(sender, note, project, user, **kwargs):
             target=project,
         )
     else:
-        recipients = get_notification_recipients_for_project(project).exclude(
-            id=user.id
-        )
+        if project.inactive_since:
+            recipients = get_advisors_for_project(project)
+        else:
+            recipients = get_notification_recipients_for_project(project)
+
+        recipients = recipients.exclude(id=user.id)
 
         verb = verbs.Conversation.PUBLIC_MESSAGE
         action.send(
@@ -319,10 +346,13 @@ def project_document_uploaded(sender, instance, **kwargs):
         target=project,
     )
 
-    # Notify other project's people and switchtenders
-    recipients = get_notification_recipients_for_project(project).exclude(
-        id=instance.uploaded_by.id
-    )
+    # Notify other project's people and advisors
+    if project.inactive_since:
+        recipients = get_advisors_for_project(project)
+    else:
+        recipients = get_notification_recipients_for_project(project)
+
+    recipients = recipients.exclude(id=instance.uploaded_by.id)
 
     notify.send(
         sender=instance.uploaded_by,
@@ -360,7 +390,7 @@ def log_survey_session_updated(sender, session, request, **kwargs):
         target=session.project,
     )
 
-    recipients = get_switchtenders_for_project(project).exclude(id=user.id)
+    recipients = get_advisors_for_project(project).exclude(id=user.id)
     notify.send(
         sender=user,
         recipient=recipients,
@@ -368,4 +398,6 @@ def log_survey_session_updated(sender, session, request, **kwargs):
         action_object=session,
         target=project,
     )
+
+
 # eof

@@ -1,0 +1,134 @@
+/**
+* srchttps://github.com/entrepreneur-interet-general/leaflet-geocoder-ban/blob/master/src/leaflet-geocoder-ban.css
+*/
+
+.leaflet-control-geocoder-ban {
+	--input-margin: 1em;
+	--input-padding: 1em;
+	--bg-color-selected: #E8EDFF;
+	border-radius: 4px;
+	background: white;
+	min-width: 26px;
+	min-height: 26px;
+}
+
+.leaflet-touch .leaflet-control-geocoder-ban {
+	min-width: 30px;
+	min-height: 30px;
+}
+
+.leaflet-control-geocoder-ban-icon {
+	border-radius: 4px;
+	width: 26px;
+	height: 26px;
+	border: none;
+	background-color: white;
+	background-repeat: no-repeat;
+	background-position: center;
+	margin-inline: var(--input-margin) 0
+}
+
+.leaflet-touch .leaflet-control-geocoder-ban-icon {
+	width: 30px;
+	height: 30px;
+}
+
+.leaflet-control-geocoder-ban-form {
+	display: none;
+	vertical-align: middle;
+	width: calc(100% - 26px);
+  aspect-ratio: unset;
+
+}
+
+.leaflet-touch .leaflet-control-geocoder-ban-form {
+	width: calc(100% - 30px);
+}
+
+
+.leaflet-control-geocoder-ban-expanded {
+	margin-right: 10px;
+}
+
+.leaflet-control-geocoder-ban-expanded .leaflet-control-geocoder-ban-form {
+	display: inline-block;
+}
+
+.leaflet-control-geocoder-ban-form input {
+	border: 0;
+	background-color: transparent;
+	width:100%;
+	line-height: 1.42;
+	padding-block:  var(--input-padding);
+	padding-inline: var(--input-padding);
+}
+
+.leaflet-control-geocoder-ban-form input:focus {
+	outline: None;
+}
+
+.leaflet-control-geocoder-ban-alternatives {
+	display: block;
+	width: inherit;
+	max-height: 300px;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	overflow: auto;
+}
+
+@media screen and (max-width: 480px) {
+	.leaflet-control-geocoder-ban-alternatives {
+			max-height: 150px;
+	}
+}
+
+.leaflet-control-geocoder-ban-alternatives-minimized {
+	display: none;
+	height: 0;
+}
+
+.leaflet-control-geocoder-ban .leaflet-control-geocoder-ban-alternatives a {
+	width: inherit;
+	height: inherit;
+	line-height: inherit;
+	background-color: transparent;
+	text-align: left;
+	padding: 3px 6px 3px 6px;
+}
+
+.leaflet-control-geocoder-ban .leaflet-control-geocoder-ban-alternatives li {
+	width: inherit;
+	cursor: pointer;
+	border-top: 1px solid #d0d0d0;
+	padding : var(--input-padding);
+}
+
+.leaflet-control-geocoder-ban-selected {
+	background-color: var(--bg-color-selected);
+}
+
+.hidden {
+	display: none;
+}
+
+.searchBar {
+	z-index: 1000;
+	position: relative;
+	max-width:45%;
+	margin-block: var(--input-margin) 0;
+	margin-inline: var(--input-margin);
+}
+
+@media screen and (min-with: 950px) {
+	.searchBar {
+		max-width:calc(100% - var(--input-margin));
+	}
+}
+
+.leaflet-touch .leaflet-control-geocoder-ban-alternatives  a {
+	width: fit-content !important;
+	height: fit-content !important;
+	line-height: 1.3 !important;
+	max-width: 100%;
+}

@@ -40,6 +40,7 @@ COLLABORATOR_DRAFT_PERMISSIONS = (
     "projects.view_tasks",
     "projects.use_surveys",
     "projects.view_surveys",
+    "projects.change_location",
 )
 
 COLLABORATOR_PERMISSIONS = (
@@ -65,6 +66,7 @@ ADVISOR_PERMISSIONS = [
     "projects.manage_documents",
     "projects.use_surveys",
     "projects.view_surveys",
+    "projects.change_location",
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
@@ -255,6 +257,33 @@ class Project(models.Model):
         return False
 
     exclude_stats = models.BooleanField(default=False, blank=True)
+
+    inactive_since = models.DateTimeField(
+        null=True, blank=True, verbose_name="Quand le projet a été déclaré inactif"
+    )
+    inactive_reason = models.CharField(
+        max_length=256,
+        blank=True,
+        null=True,
+        default="",
+        verbose_name="Raison de l'inactivité du projet",
+    )
+
+    def reactivate(self):
+        """Switch back project to active state"""
+        if not self.inactive_since:
+            return
+
+        self.inactive_since = None
+        self.inactive_reason = None
+        self.save()
+
+    last_members_activity_at = models.DateTimeField(
+        default=timezone.now,
+        editable=False,
+        verbose_name="Dernière activité de la collectivité",
+    )
+
     muted = models.BooleanField(
         default=False, blank=True, verbose_name="Ne pas envoyer de notifications"
     )
@@ -301,6 +330,12 @@ class Project(models.Model):
     )
 
     location = models.CharField(max_length=256, verbose_name="Localisation")
+    location_x = models.FloatField(
+        null=True, blank=True, verbose_name="Coordonnées géographiques (X)"
+    )
+    location_y = models.FloatField(
+        null=True, blank=True, verbose_name="Coordonnées géographiques (Y)"
+    )
     commune = models.ForeignKey(
         geomatics_models.Commune,
         null=True,
@@ -321,6 +356,15 @@ class Project(models.Model):
         through="ProjectSwitchtender",
         verbose_name="Aiguilleu·r·se·s",
     )
+
+    @property
+    def next_reminder(self):
+        current_site = Site.objects.get_current()
+        return (
+            self.reminders.filter(site=current_site, sent_on=None)
+            .order_by("deadline")
+            .first()
+        )
 
     @property
     def resources(self):
@@ -360,6 +404,8 @@ class Project(models.Model):
             ("invite_advisors", "Can invite advisors"),
             ("manage_collaborators", "Can manage collaborators"),
             ("manage_advisors", "Can manage advisors"),
+            # Geolocation
+            ("change_location", "Can change the geolocation"),
         )
 
     def __str__(self):  # pragma: nocover

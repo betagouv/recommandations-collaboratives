@@ -1,0 +1,28 @@
+[
+	{
+		"model": "reminders.reminder",
+		"pk": 1,
+		"fields": {
+			"site": 1,
+			"deadline": "2023-12-06",
+			"project": 21,
+			"state": 0,
+			"origin": 0,
+			"kind": 0,
+			"sent_on": null
+		}
+	},
+	{
+		"model": "reminders.reminder",
+		"pk": 2,
+		"fields": {
+			"site": 1,
+			"deadline": "2023-12-06",
+			"project": 18,
+			"state": 0,
+			"origin": 0,
+			"kind": 0,
+			"sent_on": null
+		}
+	}
+]

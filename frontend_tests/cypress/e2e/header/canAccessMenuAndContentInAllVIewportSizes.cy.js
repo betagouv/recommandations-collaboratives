@@ -4,7 +4,7 @@ describe('As a visitor, I can access the menu and content on different devices',
 
 	before(() => {
 		cy.visit(`/`);
-		cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-decline-all"]').click()
+    cy.acceptCookies()
 	});
 
 	testLayouts.forEach((testItem) => {
