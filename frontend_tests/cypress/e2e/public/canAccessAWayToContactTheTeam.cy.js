@@ -2,6 +2,7 @@ describe('As a visitor to a recoco site, I can find a way to contact the site te
 
 	beforeEach(() => {
 		cy.visit(`/`)
+		cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-decline-all"]').click()
 	})
 
 	it('Displays a contact form or a contact email', () => {

@@ -28,7 +28,6 @@ from urbanvitaliz.apps.projects.utils import (
     assign_advisor,
     assign_collaborator,
     generate_ro_key,
-    refresh_user_projects_in_session,
 )
 from urbanvitaliz.utils import (
     build_absolute_url,
@@ -100,8 +99,6 @@ def onboarding(request):
 
         notify_new_project(request.site, project, user)
         email_owner_of_project(request.site, project, user)
-
-        refresh_user_projects_in_session(request, user)
 
         # cleanup now useless onboarding existing data if present
         if "onboarding_existing_data" in request.session:

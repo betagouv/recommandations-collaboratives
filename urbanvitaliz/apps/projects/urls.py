@@ -57,11 +57,6 @@ urlpatterns = [
         name="projects-project-topics",
     ),
     path(
-        r"project/<int:project_id>/location",
-        detail.project_update_location,
-        name="projects-project-location",
-    ),
-    path(
         r"project/<int:project_id>/presentation",
         detail.project_overview,
         name="projects-project-detail-overview",
@@ -202,24 +197,14 @@ urlpatterns = [
         name="projects-project-access-revoke-invite",
     ),
     path(
-        r"project/<int:project_id>/administration/access/collectivity/<str:username>/delete",
+        r"project/<int:project_id>/administration/access/collectivity/<str:email>/delete",
         administration.access_collaborator_delete,
         name="projects-project-access-collectivity-delete",
     ),
     path(
-        r"project/<int:project_id>/administration/access/advisor/<str:username>/delete",
+        r"project/<int:project_id>/administration/access/advisor/<str:email>/delete",
         administration.access_advisor_delete,
         name="projects-project-access-advisor-delete",
-    ),
-    path(
-        r"project/<int:project_id>/administration/set-inactive",
-        administration.set_project_inactive,
-        name="projects-project-set-inactive",
-    ),
-    path(
-        r"project/<int:project_id>/administration/set-active",
-        administration.set_project_active,
-        name="projects-project-set-active",
     ),
 ]
 

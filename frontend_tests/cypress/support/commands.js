@@ -35,6 +35,7 @@ Cypress.Commands.add("login", (role) => {
         default:
             break;
     }
+
     cy.request({ url: "/accounts/login/" }).then(response => {
         const setCookieValue = response.headers["set-cookie"][0]
 
@@ -52,7 +53,6 @@ Cypress.Commands.add("login", (role) => {
                 csrfmiddlewaretoken: token
             }
         }).then(response => {
-            cy.visit('/')
             cy.getCookie("sessionid").should("exist");
             cy.getCookie("csrftoken").should("exist");
         })
@@ -60,7 +60,8 @@ Cypress.Commands.add("login", (role) => {
 })
 
 Cypress.Commands.add('loginWithUi', (role) => {
-    const { username } = currentUser    
+    const { username } = currentUser
+
     cy.visit('/accounts/login/')
 
     cy.url().should('include', '/accounts/login/')
@@ -70,7 +71,6 @@ Cypress.Commands.add('loginWithUi', (role) => {
     cy.get('#id_password').type("derpderp", { force: true }).should('have.value', "derpderp")
 
     cy.get("[type=submit]").click({ force: true });
-    cy.visit('/')
 
     cy.contains(`Connexion avec ${username} réussie.`)
 
@@ -79,8 +79,6 @@ Cypress.Commands.add('loginWithUi', (role) => {
 
     // // our auth cookie should be present
     cy.getCookie('sessionid').should('exist')
-
-    cy.acceptCookies()
 })
 
 Cypress.Commands.add('logout', () => {
@@ -88,24 +86,10 @@ Cypress.Commands.add('logout', () => {
     cy.contains('Déconnexion').click({ force: true })
 })
 
-/**
- * Consent to cookies banner
- */
-Cypress.Commands.add('acceptCookies', () => {
-    cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click({ force: true })
-    cy.visit('/')
-})
-
-/**
- * Decline cookies banner
- */
-Cypress.Commands.add('declineCookies', () => {
-    cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-decline-all"]').click({ force: true })
-    cy.visit('/')
-})
-
 Cypress.Commands.add("createProject", (label) => {
     cy.visit('/')
+
+    cy.get('[data-test-id="intro-uv"]').find('[data-test-id="intro-link-contact-uv"]').click({ force: true })
 
     cy.url().should('include', '/onboarding/')
 
@@ -145,7 +129,6 @@ Cypress.Commands.add("createProject", (label) => {
 })
 
 Cypress.Commands.add('becomeAdvisor', () => {
-    cy.visit('/')
     cy.get("body").then(body => {
         if (body.find('#positioning-form').length > 0) {
             cy.contains('Conseiller le projet').click({ force: true })
@@ -157,7 +140,7 @@ Cypress.Commands.add('becomeAdvisor', () => {
 })
 
 Cypress.Commands.add('createTask', (label, topic = "", withResource = false) => {
-    cy.visit('/')
+
     cy.get("body").then(body => {
         if (body.find('[data-test-id="submit-task-button"]').length > 0) {
             cy.contains("Émettre une recommandation").click({ force: true })

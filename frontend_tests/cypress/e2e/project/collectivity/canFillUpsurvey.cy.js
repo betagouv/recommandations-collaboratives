@@ -7,6 +7,7 @@ describe('I can fill a project survey', () => {
     beforeEach(() => {
         cy.login("bob");
         cy.visit(`/project/${currentProject.pk}`)
+        cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-decline-all"]').click()
 
         const challengeCode = 'survey'
         cy.intercept(`/api/challenges/definitions/${challengeCode}`, {fixture: 'settings/challengeDefinition'})

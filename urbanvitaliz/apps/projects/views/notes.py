@@ -19,7 +19,7 @@ from urbanvitaliz.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm, NoteForm, PublicNoteForm, StaffNoteForm
-from ..utils import can_administrate_project, get_collaborators_for_project
+from ..utils import can_administrate_project
 
 
 @login_required
@@ -51,15 +51,6 @@ def create_public_note(request, project_id=None):
                     document.project = instance.project
 
                     document.save()
-
-            # Reactivate project if was set inactive
-            if request.user in get_collaborators_for_project(project):
-                project.last_members_activity_at = timezone.now()
-
-                if project.inactive_since:
-                    project.reactivate()
-
-                project.save()
 
             signals.note_created.send(
                 sender=create_public_note,

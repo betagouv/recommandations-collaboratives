@@ -13,16 +13,12 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 updated: 2022-02-03 16:19:24 CET
 """
 
-import logging
-
 from django.conf import settings
 from django.core.mail import mail_admins
 from django.core.mail import send_mail as django_send_mail
 
-from .brevo import Brevo
 from .models import EmailTemplate
-
-logger = logging.getLogger("main")
+from .brevo import Brevo
 
 
 def brevo_email(template_name, recipients, params=None, test=False):
@@ -55,7 +51,7 @@ def send_debug_email(template_name, recipients, params=None, test=False):
         else:
             simple_recipients.append(recipient)
 
-    logger.debug(f"Sending email to {simple_recipients}")
+    print(f"Sending to {simple_recipients}")
 
     django_send_mail(
         "Brevo Mail",

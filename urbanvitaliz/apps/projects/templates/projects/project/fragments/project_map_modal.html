@@ -14,16 +14,17 @@
                 aria-label="Close"></button>
       </div>
       <div class="modal-body p-0">
-        <div class="p-0 project-map-container">
+        <div data-test-id="project-map-interactive"
+             class="p-0 project-map-container"
+             :class="{'is-small':mapIsSmall}">
           <div x-cloak
-               x-ref="map-interactive"
-               id="map-interactive"
-               data-test-id="map-interactive"
+               x-ref="map-modal"
+               id="map-modal"
                class="project-map h-100 w-100"></div>
         </div>
       </div>
       <div class="modal-footer justify-content-start">
-        {% include 'projects/project/fragments/geolocation/location_knowledge_footer.html' %}
+        {% include 'projects/project/fragments/project_location_details.html' %}
       </div>
     </div>
   </div>

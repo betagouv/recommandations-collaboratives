@@ -78,8 +78,8 @@
                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des tags du crm" icon="activity" %}
               </li>
               <li class="me-2 col-2 ">
-                {% url 'crm-list-topics' as url %}
-                {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des thématiques" icon="boxes" %}
+                  {% url 'crm-list-topics' as url %}
+                  {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des thématiques" icon="boxes" %}
               </li>
               <li class="me-2 col-2 ">
                 {% url 'crm-reco-without-resources' as url %}
@@ -111,6 +111,21 @@
               </ul>
             </div>
           {% endif %}
+        </div>
+        <div class="px-4 pt-4 bg-light ">
+          <h3 class="mt-3">
+            <svg class="bi align-middle" width="24" height="24">
+              <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#activity" />
+            </svg>
+            <span class="align-middle">Activité du CRM</span>
+          </h3>
+          <ul class="bg-white pt-3 px-4 border rounded crm-activity">
+            {% for action in crm_notif_stream|slice:":30" %}
+              {% include "crm/fragments/activity_action.html" %}
+            {% empty %}
+              -- Pas encore d'activité de la part du staff --
+            {% endfor %}
+          </ul>
         </div>
         <div class="px-4 pt-1 bg-light crm-timeline-min-height">
           <h3 class="mt-3">

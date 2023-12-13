@@ -131,7 +131,7 @@
     border: solid 1px #EEEEEE;
 }
 
-.button:not(.btn-outline-primary):hover{
+.button:hover{
     background-color: #e2effc;
 }
 
@@ -192,21 +192,3 @@
 /* .hint-button:hover {
     background-color: #FBD335;
 } */
-
-.btn-sm--header  {
-	padding-block: 6.25px;
-	padding-inline: 12px;
-    margin: 0;
-}
-
-.modal-dialog .button {
-    font-size: 0.87rem;
-    padding: 10px 15px;
-    border-radius: 4px;
-}
-
-.button-icon-bell {
-    padding-inline: 7px;
-    padding-block: 3px 6px;
-    border-radius: 0.25rem;
-}

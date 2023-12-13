@@ -35,7 +35,6 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "status",
-            "inactive_since",
             "created_on",
             "updated_on",
             "org_name",
@@ -139,7 +138,6 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "name": data.name,
             "org_name": data.org_name,
             "status": data.status,
-            "inactive_since": data.inactive_since,
             "created_on": data.created_on,
             "updated_on": data.updated_on,
             "switchtenders": format_switchtenders(data),
@@ -179,7 +177,6 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
                 "created_on": data.project.created_on,
                 "updated_on": data.project.updated_on,
                 "switchtenders": format_switchtenders(data.project),
-                "inactive_since": data.project.inactive_since,
                 "is_switchtender": data.is_switchtender,
                 "is_observer": data.is_observer,
                 "commune": commune_data,
@@ -231,6 +228,5 @@ class TopicSerializer(serializers.HyperlinkedModelSerializer):
         model = Topic
 
         fields = ["name"]
-
 
 # eof

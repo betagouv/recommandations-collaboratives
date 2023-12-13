@@ -2,6 +2,7 @@
 <div class="p-0 project-map-container"
      :class="{'is-small':mapIsSmall}"
      data-test-id="project-location">
+    <div x-cloak x-ref="map" id="map" class="h-100 w-100 project-map"></div>
     <div class="map-overlay">
         <a style="cursor: pointer"
            @click="openProjectMapModal"
@@ -20,11 +21,5 @@
             </svg>
         </a>
     </div>
-    <div class="p-0 project-map-container" :class="{'is-small':mapIsSmall}">
-        <div x-cloak
-             x-ref="map-static"
-             id="map-static"
-             data-test-id="map-static"
-             class="project-map h-100 w-100"></div>
-    </div>
 </div>
+{% include "projects/project/fragments/project_map_modal.html" %}

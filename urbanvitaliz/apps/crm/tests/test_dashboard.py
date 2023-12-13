@@ -44,6 +44,31 @@ def test_site_dashboard__shows_project_actions_to_staff(request, client):
 
 
 @pytest.mark.django_db
+def test_site_dashboard_shows_site_project_notifications(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    project = baker.make(project_models.Project, sites=[site])
+    # a notification for this project
+    verb = verbs.CRM.NOTE_CREATED
+    notify.send(
+        sender=user,
+        recipient=user,
+        verb=verb,
+        action_object=project,
+        target=project,
+        public=False,  # only appear on crm stream
+    )
+
+    url = reverse("crm-site-dashboard")
+    with login(client, user=user, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    assertContains(response, verb)
+
+
+@pytest.mark.django_db
 def test_site_dashboard_hides_other_site_project_notifications(request, client):
     user = baker.make(auth_models.User)
 

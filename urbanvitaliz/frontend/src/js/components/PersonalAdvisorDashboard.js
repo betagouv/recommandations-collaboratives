@@ -47,6 +47,7 @@ function PersonalAdvisorDashboard() {
             this.data = this.createProjectListWithNewActivities(projects);
 
             this.displayedData = this.data.sort(this.sortProjectDate)
+
             const { map, markersLayer } = initMap(projects)
 
             this.map = map
@@ -105,16 +106,9 @@ function PersonalAdvisorDashboard() {
         get isBusy() {
             return this.$store.app.isLoading
         },
-        getProjectStatusClass(item) {
-            if (item.project.inactive_since !== null) {
-                return 'inactive'
-            }
-        },
         getProjectStatusColor(item) {
             if (item.status === "NEW") {
                 return 'text-new-project'
-            } else if (item.project.inactive_since) {
-                return 'text-inactive'
             } else if (item.project.is_switchtender && !item.project.is_observer) {
                 return 'text-green'
             } else if (item.project.is_observer && item.project.is_switchtender) {

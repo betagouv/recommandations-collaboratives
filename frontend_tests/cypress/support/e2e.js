@@ -12,10 +12,6 @@
 // You can read more here:
 // https://on.cypress.io/configuration
 // ***********************************************************
-const url = require('url')
-
-// reset baseUrl
-Cypress.config("baseUrl", 'http://example.localhost:8000/')
 
 // Import commands.js using ES2015 syntax:
 import './commands'

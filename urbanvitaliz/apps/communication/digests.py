@@ -8,136 +8,119 @@ updated: 2022-02-03 16:16:37 CET
 """
 
 from dataclasses import asdict, dataclass
+from datetime import timedelta
 from itertools import groupby
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.urls import reverse
+from django.utils import timezone
 
 from urbanvitaliz import utils, verbs
-from urbanvitaliz.apps.tasks import models as tasks_models
 from urbanvitaliz.apps.projects import models as projects_models
-from urbanvitaliz.apps.reminders.api import (
-    make_or_update_new_recommendations_reminder,
-    make_or_update_whatsup_reminder,
-    get_due_new_recommendations_reminder_for_project,
-    get_due_whatsup_reminder_for_project,
-)
+from urbanvitaliz.apps.tasks import models as tasks_models
+from urbanvitaliz.apps.reminders import models as reminders_models
 
 from .api import send_email
-
-import logging
-
-logger = logging.getLogger("main")
 
 ########################################################################
 # Reminders
 ########################################################################
 
 
-def send_reminder_digests_by_project(project, dry_run=False):
+def send_digests_for_task_reminders_by_user(user, dry_run=False):
     """
-    Send a digest emails per project for each expired reminders
+    Send a digest email per project with expired reminders
     """
+    task_ct = ContentType.objects.get_for_model(tasks_models.Task)
+
+    now = timezone.now()
+
+    # Filter out reminders attached to non current site tasks
     current_site = Site.objects.get_current()
 
-    if not project.owner:
-        logger.warning(
-            f"No owner for project <{project.name}>(id={project.id}), "
-            "skipping project reminders"
-        )
-        return False
+    # Fetch all Task Reminders
+    reminders = reminders_models.Reminder.to_send.filter(
+        recipient=user.email, deadline__lte=now
+    ).filter(content_type=task_ct, tasks__site=current_site)
 
-    if project.inactive_since or project.muted:
-        logger.info(
-            f"Skipping inactive/muted project <{project.name}>(id={project.id})"
-        )
-        return False
+    if reminders.count() == 0:
+        return 0
 
-    send_new_recommendations_reminders_digest_by_project(
-        site=current_site, project=project, dry_run=dry_run
-    )
-
-    send_whatsup_reminders_digest_by_project(
-        site=current_site, project=project, dry_run=dry_run
-    )
-
-    # Reschedule next reminders
-    make_or_update_new_recommendations_reminder(current_site, project)
-    make_or_update_whatsup_reminder(current_site, project)
-
-
-def send_new_recommendations_reminders_digest_by_project(site, project, dry_run):
-    """Send 'New Recommendation' reminder for the given project"""
-    # Refresh reminders first
-    make_or_update_new_recommendations_reminder(site, project)
-
-    # Actually, send reminders
-    due_reminder = get_due_new_recommendations_reminder_for_project(site, project)
-
-    if not due_reminder:
-        logger.debug("No NEW_RECO due reminder for project <{project.name}>, skipping")
-        return False
+    skipped_reminders = send_reminder_digest_by_project_task(user, reminders, dry_run)
 
     if not dry_run:
-        tasks = (
-            project.tasks.filter(status__in=tasks_models.Task.OPEN_STATUSES)
-            .filter(site=site)
-            .exclude(public=False)
-            .order_by("-created_on")
-        )
-
-        digest = make_digest_of_project_recommendations(project, tasks, project.owner)
-        send_email(
-            "project_reminders_new_reco_digest",
-            {"name": normalize_user_name(project.owner), "email": project.owner.email},
-            params=digest,
-        )
-        logger.info(f"Sent NEW_RECO reminder <{due_reminder}>")
+        # Rearm for the next alarm, in 6 weeks
+        for reminder in reminders.exclude(object_id__in=skipped_reminders):
+            reminders_models.Reminder.objects.create(
+                recipient=reminder.recipient,
+                deadline=now + timedelta(weeks=6),
+                origin=reminders_models.Reminder.SYSTEM,
+                content_type=reminder.content_type,
+                object_id=reminder.object_id,
+            )
 
         # Mark as dispatched
-        due_reminder.mark_as_sent()
-    else:
-        logger.info(f"[DRY RUN] Would have sent NEW_RECO reminder <{due_reminder}>")
+        reminders.exclude(object_id__in=skipped_reminders).update(sent_on=now)
 
-    return True
+        # Delete the bogus ones
+        reminders.filter(object_id__in=skipped_reminders).delete()
+
+    return reminders.exclude(object_id__in=skipped_reminders).count()
 
 
-def send_whatsup_reminders_digest_by_project(site, project, dry_run):
-    """Send 'What's up? reminder for the given project"""
-    # Refresh reminders first
-    make_or_update_whatsup_reminder(site, project)
+def send_reminder_digest_by_project_task(user, reminders, dry_run):
+    """Send an email per project/user containing its reminders."""
 
-    # Actually, send reminders
-    due_reminder = get_due_whatsup_reminder_for_project(site, project)
+    skipped_reminders = []
+    for project_id, project_reminders in groupby(
+        reminders, key=lambda x: x.related.project_id
+    ):
+        try:
+            project = projects_models.Project.objects.get(pk=project_id)
+        except projects_models.Project.DoesNotExist:
+            for reminder in project_reminders:
+                print(f"[W] Skipping reminder {reminder}")
+                skipped_reminders.append(reminder.pk)
+            continue
 
-    if not due_reminder:
-        logger.debug("No WHATSUP due reminder for <{project.name}>, skipping")
-        return False
+        digest = make_digest_of_reminders(project, reminders, user)
+        if digest:
+            if dry_run:
+                print(f"[ID] Would have sent {len(digest)} digests to {user}.")
+            else:
+                send_email(
+                    "project_reminders_digest",
+                    {"name": normalize_user_name(user), "email": user.email},
+                    params=digest,
+                )
 
-    if not dry_run:
-        tasks = (
-            project.tasks.filter(status__in=tasks_models.Task.OPEN_STATUSES)
-            .filter(site=site)
-            .exclude(public=False)
-            .order_by("-created_on")
-        )
+    return skipped_reminders
 
-        digest = make_digest_of_project_recommendations(project, tasks, project.owner)
-        send_email(
-            "project_reminders_whats_up_digest",
-            {"name": normalize_user_name(project.owner), "email": project.owner.email},
-            params=digest,
-        )
 
-        logger.info(f"Sent WHATS_UP reminder <{due_reminder}>")
+def make_digest_of_reminders(project, reminders, user):
+    """Return digest for reminders of a project to be sent to user"""
+    task_digest = make_reminders_task_digest(reminders, user)
+    if len(task_digest) == 0:
+        return None
 
-        # Mark as dispatched
-        due_reminder.mark_as_sent()
-    else:
-        logger.info(f"[DRY RUN] Would have sent WHATS_UP reminder <{due_reminder}>")
+    project_digest = make_project_digest(project, user, url_name="actions")
+    return {
+        "notification_count": len(reminders),  # XXX buggy?
+        "project": project_digest,
+        "recos": task_digest,
+    }
 
-    return True
+
+def make_reminders_task_digest(reminders, user):
+    """Return a digest of all reminders tasks"""
+    tasks = []
+
+    for reminder in reminders:
+        recommendation = make_action_digest(reminder.related, user)
+        tasks.append(recommendation)
+
+    return tasks
 
 
 ########################################################################
@@ -185,7 +168,7 @@ def send_recommendation_digest_by_project(user, notifications, dry_run):
             # Probably a deleted project?
             continue
 
-        digest = make_digest_of_project_recommendations_from_notifications(
+        digest = make_digest_of_project_recommendations(
             project, project_notifications, user
         )
 
@@ -196,28 +179,14 @@ def send_recommendation_digest_by_project(user, notifications, dry_run):
                 params=digest,
             )
         else:
-            logger.info(
-                f"[DRY RUN] Would have sent {len(digest)} notifications for <{user}>."
-            )
+            print(f"[DI] Would have sent {len(digest)} notifications for {user}.")
 
     return skipped_projects
 
 
-def make_digest_of_project_recommendations_from_notifications(
-    project, project_notifications, user
-):
+def make_digest_of_project_recommendations(project, project_notifications, user):
     """Return digest for project recommendations to be sent to user"""
-    actions = [notification.action_object for notification in project_notifications]
-
-    # Display not visited first
-    actions.sort(key=lambda action: action.visited, reverse=True)
-
-    return make_digest_of_project_recommendations(project, actions, user)
-
-
-def make_digest_of_project_recommendations(project, tasks, user):
-    """Return digest for project recommendations to be sent to user"""
-    recommendations = make_recommendations_digest(tasks, user)
+    recommendations = make_recommendations_digest(project_notifications, user)
     project_digest = make_project_digest(project, user, url_name="actions")
     return {
         "notification_count": len(recommendations),
@@ -226,46 +195,31 @@ def make_digest_of_project_recommendations(project, tasks, user):
     }
 
 
-def make_recommendations_digest(recommendations, user):
+def make_recommendations_digest(project_notifications, user):
     """Return a digest of all project recommendations"""
-    recommendation_digest = []
+    recommendations = []
 
-    for recommendation in recommendations:
-        action_digest = make_action_digest(recommendation, user)
-        recommendation_digest.append(action_digest)
+    for notification in project_notifications:
+        action = notification.action_object
+        recommendation = make_action_digest(action, user)
+        recommendations.append(recommendation)
 
-    return recommendation_digest
+    return recommendations
 
 
 def make_project_digest(project, user=None, url_name="overview"):
     """Return base information digest for project"""
-    project_url = utils.build_absolute_url(
+    project_link = utils.build_absolute_url(
         reverse(f"projects-project-detail-{url_name}", args=[project.id]),
         auto_login_user=user,
     )
-
-    public_conversation_url = utils.build_absolute_url(
-        reverse("projects-project-detail-conversations", args=[project.id]),
-        auto_login_user=user,
-    )
-
-    pause_project_url = (
-        utils.build_absolute_url(
-            reverse("projects-project-administration", args=[project.id]),
-            auto_login_user=user,
-        )
-        + "#project-status-settings"
-    )
-
     return {
         "name": project.name,
-        "url": project_url,
+        "url": project_link,
         "commune": {
             "postal": project.commune and project.commune.postal or "",
             "name": project.commune and project.commune.name or "",
         },
-        "public_conversation_url": public_conversation_url,
-        "pause_project_url": pause_project_url,
     }
 
 
@@ -294,7 +248,6 @@ def make_action_digest(action, user):
         },
         "intent": action.intent,
         "content": action.content[:50],
-        "visited": action.visited,
         "resource": {
             "title": action.resource and action.resource.title or "",
         },
@@ -336,9 +289,7 @@ def send_new_site_digest_by_user(user, notifications, dry_run):
         digest = make_digest_for_new_site(notification, user)
         if digest:
             if dry_run:
-                logger.info(
-                    f"[DRY RUN] Would have sent {len(digest)} notifications for {user}."
-                )
+                print(f"[DI] Would have sent {len(digest)} notifications for {user}.")
             else:
                 send_email(
                     "new_site_for_switchtender",
@@ -472,9 +423,7 @@ def send_digest_by_user(
                 params=digest,
             )
         else:
-            logger.info(
-                f"[DRY RUN] Would have sent {len(digest)} notifications to <{user}>."
-            )
+            print(f"[ID] Would have sent {len(digest)} notifications to {user}.")
 
     if not dry_run:
         # Mark them as dispatched

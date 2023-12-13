@@ -146,11 +146,9 @@ def build_absolute_url(path, auto_login_user=None):
     return url
 
 
-def assign_site_staff(site, user):
-    """Make someone staff on this site"""
-    staff_group = get_group_for_site("staff", site, create=True)
-    user.profile.sites.add(site)
-    staff_group.user_set.add(user)
+# TODO move me to home/utils.py
+def get_site_administrators(site):
+    return auth.User.objects.filter(is_staff=True, is_active=True)
 
 
 ########################################################################

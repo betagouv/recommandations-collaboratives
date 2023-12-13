@@ -98,20 +98,4 @@ class ProjectTopicsForm(forms.ModelForm):
         fields = ["advisors_note"]
 
 
-class ProjectActiveForm(forms.ModelForm):
-    """Form to set/unset a project inactive"""
-
-    class Meta:
-        model = models.Project
-        fields = ["inactive_reason"]
-
-
-class ProjectLocationForm(forms.ModelForm):
-    """Form for location update"""
-
-    class Meta:
-        model = models.Project
-        fields = ["location_x", "location_y"]
-
-
 # eof

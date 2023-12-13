@@ -6,6 +6,7 @@
 {% block js %}
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock %}
+</script>
 {% block content %}
     <div x-data="Tutorial('survey', {{ active_project_survey_session.completion }} === 0)"
          class="col-11 py-5 mx-auto">
@@ -83,14 +84,14 @@
                                            name="answer"
                                            value="{{ choice.0 }}"
                                            id="form_answer-{{ forloop.counter }}"
-                                           {% if choice.0 in form.fields.answer.initial %}checked{% endif %} />
+                                           {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
                                 {% else %}
                                     <input class="form-check-input"
                                            type="radio"
                                            name="answer"
                                            value="{{ choice.0 }}"
                                            id="form_answer-{{ forloop.counter }}"
-                                           {% ifequal form.fields.answer.initial choice.0 %}checked{% endifequal %} />
+                                           {% ifequal form.fields.answer.initial choice.0 %}checked{% endifequal %}>
                                     {{ form.fields.answer.selected }}
                                 {% endif %}
                                 <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
@@ -117,7 +118,7 @@
                                    id="attachment"
                                    type="file"
                                    name="attachment"
-                                   value="kdl" />
+                                   value="kdl">
                             {% if form.attachment.value %}
                                 Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
                             {% endif %}

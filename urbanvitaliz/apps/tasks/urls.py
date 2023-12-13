@@ -77,6 +77,16 @@ urlpatterns = [
         name="projects-delete-task",
     ),
     path(
+        r"task/<int:task_id>/remind/",
+        tasks.remind_task,
+        name="projects-remind-task",
+    ),
+    path(
+        r"task/<int:task_id>/remind-delete/",
+        tasks.remind_task_delete,
+        name="projects-remind-task-delete",
+    ),
+    path(
         r"task/<int:task_id>/followup/",
         tasks.followup_task,
         name="projects-followup-task",

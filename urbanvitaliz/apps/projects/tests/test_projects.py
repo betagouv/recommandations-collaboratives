@@ -11,18 +11,17 @@ import csv
 import io
 
 import pytest
+from django.test import override_settings
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import override_settings
 from django.urls import reverse
-from django.utils import timezone
 from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
@@ -1180,76 +1179,6 @@ def test_staff_updates_tags(request, client):
 
 
 #################################################################
-# Geolocation
-#################################################################
-@pytest.mark.django_db
-def test_unprivileged_user_cannot_update_location(request, client):
-    current_site = get_current_site(request)
-
-    project = Recipe(models.Project, sites=[current_site]).make()
-
-    data = {"x": 32.3, "y": -5.0}
-
-    with login(client):
-        response = client.post(
-            reverse("projects-project-location", args=[project.id]), data=data
-        )
-
-    assert response.status_code == 403
-
-    project.refresh_from_db()
-
-    assert project.location_x is None
-    assert project.location_y is None
-
-
-@pytest.mark.django_db
-def test_advisor_can_update_location(request, client):
-    current_site = get_current_site(request)
-
-    project = Recipe(models.Project, sites=[current_site]).make()
-
-    data = {"location_x": 32.3, "location_y": -5.0}
-
-    with login(client, groups=["example_com_advisor"]) as user:
-        utils.assign_advisor(user, project, current_site)
-
-        response = client.post(
-            reverse("projects-project-location", args=[project.id]), data=data
-        )
-
-    assert response.status_code == 302
-
-    project.refresh_from_db()
-
-    assert project.location_x == data["location_x"]
-    assert project.location_y == data["location_y"]
-
-
-@pytest.mark.django_db
-def test_collaborator_can_update_location(request, client):
-    current_site = get_current_site(request)
-
-    project = Recipe(models.Project, sites=[current_site]).make()
-
-    data = {"location_x": 32.3, "location_y": -5.0}
-
-    with login(client) as user:
-        utils.assign_collaborator(user, project)
-
-        response = client.post(
-            reverse("projects-project-location", args=[project.id]), data=data
-        )
-
-    assert response.status_code == 302
-
-    project.refresh_from_db()
-
-    assert project.location_x == data["location_x"]
-    assert project.location_y == data["location_y"]
-
-
-#################################################################
 # Topics
 #################################################################
 
@@ -1585,132 +1514,6 @@ def test_project_list_excludes_non_site_projects_for_user():
     result = list(models.Project.on_site.for_user(user))
 
     assert result == [project]
-
-
-#################################################################
-# Activity flags
-#################################################################
-@pytest.mark.django_db
-def test_last_members_activity_is_updated_by_public_comment_from_member(
-    client, request
-):
-    site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-    )
-
-    url = reverse(
-        "projects-conversation-create-message", kwargs={"project_id": project.pk}
-    )
-
-    before_update = timezone.now()
-
-    with login(client) as owner:
-        utils.assign_collaborator(owner, project, is_owner=True)
-        response = client.post(url, data={"content": "this is some content"})
-
-    assert response.status_code == 302
-
-    project.refresh_from_db()
-
-    assert project.last_members_activity_at > before_update
-
-
-@pytest.mark.django_db
-def test_last_members_activity_not_updated_by_public_comment_from_advisor(
-    client, request
-):
-    site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-    )
-
-    url = reverse(
-        "projects-conversation-create-message", kwargs={"project_id": project.pk}
-    )
-
-    before_update = timezone.now()
-
-    with login(client) as user:
-        utils.assign_advisor(user, project)
-        response = client.post(url, data={"content": "this is some content"})
-
-    assert response.status_code == 302
-
-    project.refresh_from_db()
-
-    assert project.last_members_activity_at < before_update
-
-
-@pytest.mark.django_db
-def test_last_members_activity_is_updated_by_document_upload_from_member(
-    client, request
-):
-    site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-    )
-
-    url = reverse(
-        "projects-documents-upload-document", kwargs={"project_id": project.pk}
-    )
-
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-
-    before_update = timezone.now()
-    with login(client) as owner:
-        utils.assign_collaborator(owner, project, is_owner=True)
-        response = client.post(
-            url, data={"description": "this is some content", "the_file": png}
-        )
-
-    assert response.status_code == 302
-
-    project.refresh_from_db()
-
-    assert project.last_members_activity_at > before_update
-
-
-@pytest.mark.django_db
-def test_last_members_activity_not_updated_by_document_upload_from_advisor(
-    client, request
-):
-    site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-    )
-
-    url = reverse(
-        "projects-documents-upload-document", kwargs={"project_id": project.pk}
-    )
-
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-
-    before_update = timezone.now()
-
-    with login(client) as user:
-        utils.assign_advisor(user, project)
-        response = client.post(
-            url, data={"description": "this is some content", "the_file": png}
-        )
-
-    assert response.status_code == 302
-
-    project.refresh_from_db()
-
-    assert project.last_members_activity_at < before_update
 
 
 # eof

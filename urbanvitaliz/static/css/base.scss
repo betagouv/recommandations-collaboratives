@@ -95,7 +95,7 @@ main {
 a {
     color: $blue;
 }
-a:not(.btn-outline-primary):hover {
+a:hover {
     color: $dark-blue !important;
 }
 
@@ -158,11 +158,6 @@ progress::-moz-progress-bar {
 
 .main-content.public-content {
     padding-top: 80px;
-}
-
-.project-header-sidebar > .btn  {
-    border-radius: 2px;
-	padding: 0.29rem 1rem;
 }
 
 @media (min-width: 690px) {

@@ -255,11 +255,6 @@ def is_regional_actor_for_project_or_403(site, project, user, allow_national=Fal
 
 
 def get_switchtenders_for_project(project):
-    """XXX Compatibility"""
-    return get_advisors_for_project(project)
-
-
-def get_advisors_for_project(project):
     """Return all the switchtenders for a given project"""
     return auth_models.User.objects.filter(
         projects_switchtended_on_site__project=project,
@@ -360,7 +355,6 @@ def refresh_user_projects_in_session(request, user):
             "name": p.name,
             "id": p.id,
             "location": p.location,
-            "inactive": bool(p.inactive_since),
             "actions_open": p.tasks.open().count(),
         }
         for p in projects

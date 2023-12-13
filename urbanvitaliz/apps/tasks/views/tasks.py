@@ -7,12 +7,15 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from urbanvitaliz.apps.projects.utils import get_active_project_id
+from urbanvitaliz.apps.reminders import api
+from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.projects import models as project_models
 from urbanvitaliz.apps.resources import models as resources
 from urbanvitaliz.apps.survey import models as survey_models
@@ -25,19 +28,20 @@ from urbanvitaliz.utils import (
 from .. import models, signals
 
 from urbanvitaliz.apps.projects.forms import DocumentUploadForm
-from urbanvitaliz.apps.projects.utils import get_collaborators_for_project
 
 from ..forms import (
     CreateActionsFromResourcesForm,
     CreateActionWithoutResourceForm,
     CreateActionWithResourceForm,
     PushTypeActionForm,
+    RemindTaskForm,
     RsvpTaskFollowupForm,
     TaskFollowupForm,
     TaskRecommendationForm,
     UpdateTaskFollowupForm,
     UpdateTaskForm,
 )
+from ..utils import create_reminder, remove_reminder
 
 ########################################################################
 # create task/push resource to project
@@ -180,6 +184,8 @@ def toggle_done_task(request, task_id):
         if task.open:
             task.status = models.Task.DONE
 
+            # NOTE should we remove all the reminders?
+            api.remove_reminder_email(task)
             signals.action_done.send(
                 sender=toggle_done_task,
                 task=task,
@@ -210,6 +216,7 @@ def refuse_task(request, task_id):
     if request.method == "POST":
         task.status = models.Task.NOT_INTERESTED
         task.save()
+        api.remove_reminder_email(task)
         signals.action_not_interested.send(
             sender=refuse_task, task=task, project=task.project, user=request.user
         )
@@ -227,6 +234,7 @@ def already_done_task(request, task_id):
     if request.method == "POST":
         task.status = models.Task.ALREADY_DONE
         task.save()
+        api.remove_reminder_email(task)
         signals.action_already_done.send(
             sender=already_done_task, task=task, project=task.project, user=request.user
         )
@@ -281,6 +289,9 @@ def update_task(request, task_id=None):
             instance.save()
             instance.project.updated_on = instance.updated_on
             instance.project.save()
+            api.remove_reminder_email(
+                task, recipient=request.user.email, origin=api.models.Reminder.STAFF
+            )
 
             document_form = DocumentUploadForm(request.POST, request.FILES)
             if document_form.is_valid():
@@ -440,6 +451,52 @@ def delete_task(request, task_id=None):
 
 
 @login_required
+def remind_task(request, task_id=None):
+    """Set a reminder for a task"""
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
+    has_perm_or_403(request.user, "use_tasks", task.project)
+
+    owner = task.project.owner
+    if not owner:
+        raise Http404
+
+    if request.method == "POST":
+        form = RemindTaskForm(request.POST)
+        if form.is_valid():
+            days = form.cleaned_data.get("days")
+            days = days or 6 * 7  # 6 weeks is default
+
+            if create_reminder(days, task, owner, origin=api.models.Reminder.SELF):
+                messages.success(
+                    request,
+                    "Une alarme a bien été programmée dans {0} jours.".format(days),
+                )
+            else:
+                messages.error(
+                    request,
+                    "Impossible de programmer l'alarme : cet utilisateur n'existe pas.",
+                )
+        else:
+            messages.error(
+                request, "Impossible de programmer l'alarme : données invalides."
+            )
+
+    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
+
+
+@login_required
+def remind_task_delete(request, task_id=None):
+    """Delete a reminder for a task"""
+    task = get_object_or_404(models.Task, site=request.site, pk=task_id)
+    has_perm_or_403(request.user, "projects.use_tasks", task.project)
+
+    if request.method == "POST":
+        api.remove_reminder_email(task)
+
+    return redirect(reverse("projects-project-detail-actions", args=[task.project_id]))
+
+
+@login_required
 def followup_task(request, task_id=None):
     """Create a new followup for task"""
     task = get_object_or_404(models.Task, site=request.site, pk=task_id)
@@ -455,14 +512,19 @@ def followup_task(request, task_id=None):
 
             followup.save()
 
-            # update activity flags and states
-            if request.user in get_collaborators_for_project(task.project):
-                task.project.last_members_activity_at = timezone.now()
-
-                if task.project.inactive_since:
-                    task.project.reactivate()
-
-                task.project.save()
+            if followup.status in (
+                models.Task.ALREADY_DONE,
+                models.Task.NOT_INTERESTED,
+            ):
+                remove_reminder(task, task.project.owner)
+            else:
+                # Create or reset 6 weeks reminder
+                create_reminder(
+                    7 * 6,
+                    task,
+                    task.project.owner,
+                    origin=reminders_models.Reminder.SYSTEM,
+                )
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
 
@@ -525,6 +587,16 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
             followup.save()
 
             rsvp.delete()  # we are done with this use only once object
+
+            # Reminder update
+            # FIXME user is anonymous thus the reminder won't be created
+            if task.status in [models.Task.INPROGRESS, models.Task.BLOCKED]:
+                create_reminder(
+                    7 * 6, task, request.user, origin=reminders_models.Reminder.SYSTEM
+                )
+            else:
+                # FIXME pourquoi ne pas utiliser le task utils remove_reminder ?
+                api.remove_reminder_email(task)
 
             return render(request, "tasks/task/rsvp_followup_thanks.html", locals())
     else:
