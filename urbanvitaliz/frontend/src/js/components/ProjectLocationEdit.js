@@ -54,7 +54,7 @@ function ProjectLocationEdit(projectOptions) {
 					markers[0].clearLayers()
 				}
 				onClick(e.latlng)
-				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon('location-edit-marker') }).addTo(Map);
+				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon('marker-onclick') }).addTo(Map);
 				marker.bindPopup(mapUtils.markerPopupTemplate(project))
 				let markerLayer = L.layerGroup([marker]).addTo(Map);
 				markers[0] = markerLayer
@@ -62,7 +62,7 @@ function ProjectLocationEdit(projectOptions) {
 			});
 			this.map = Map;
 			
-			mapUtils.initMapLayers(this.map, project, geoData);
+			mapUtils.initEditLayers(this.map, project, geoData);
 			mapUtils.initMapControllerBAN(this.map, project, geoData, onClick);
 			this.map.setMinZoom(this.zoom - 7);
 			this.map.setMaxZoom(this.zoom + 6);
