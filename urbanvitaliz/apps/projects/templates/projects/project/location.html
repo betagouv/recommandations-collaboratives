@@ -67,6 +67,9 @@
           <p class="location-address text-muted">
             {{ project.location }}
             {% if project.commune %}, {{ project.commune.postal|default:"" }} {{ project.commune.name|default:"" }}{% endif %}
+            <svg class="bi me-1" width="15" height="15" fill="currentColor">
+              <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
+            </svg>
           </p>
           <p class="location-label">Si la projet n’a pas d’adresse précise, vous pouvez entrer du texte libre.</p>
           <div data-test-id="map-edit" class="project-map-container">
