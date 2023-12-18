@@ -9,9 +9,77 @@
 .survey-card .card-title {
     font-weight: 500;
     font-size: 22px;
-    line-height: 28px;
+    line-height: 21em;
 }
 
 .survey-card .card-completion {
     font-weight: 500;
+}
+
+/**
+ * Topics
+ */
+
+.topic-list {
+    --current-gap: var(--gap, 8px);
+    list-style: none;
+    padding-left: 0;
+    counter-reset: items 0;
+}
+
+.topic-list li {
+    --current-border-color:  var(--gray-light, #E5E5E5);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--current-border-color);
+}
+
+.topic-list li p {
+    display: flex;
+    align-items: center;
+    max-width: fit-content;
+    margin-block: 0.5em;
+    margin-inline: 0.75em;
+}
+
+.topic-list.readonly li.project-card-details {
+    padding: var(--current-gap);
+}
+
+.topic-list.readonly li p {
+    margin: 0;
+}
+
+.topic-list:not(.readonly) li p:before {
+    --current-bg-color: var(--color-items-default, #0063CB);
+    content: " ";
+    display: inline-block;
+    margin-inline-end: 0.75em;
+    width: 1em;
+    height: 1em;
+    background-color: var(--current-bg-color);
+    border-radius: 0.25em;
+}
+
+.topic-list:not(.readonly) li.item-1 p:before {
+    --current-bg-color: var(--color-items-1,#fbaff5);
+}
+
+.topic-list:not(.readonly) li.item-2 p:before {
+    --current-bg-color: var(--color-items-2,#fcb0a2);
+}
+
+.topic-list:not(.readonly) li.item-3 p:before {
+    --current-bg-color: var(--color-items-3,#79e7d5);
+}
+
+.topic-list li > p:after {
+    content: counter(items);
+    counter-increment: items;
+    margin-inline: 0.75em;
+}
+
+.topic-list li > svg {
+    margin-inline: 0.75em;
 }
