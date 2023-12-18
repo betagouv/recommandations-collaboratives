@@ -21,6 +21,9 @@ import '../css/text-colors.css'
 import '../css/border.css'
 import '../css/role.css'
 
+//Layouts CSS
+import '../css/stack.css'
+
 //Global reused component CSS
 import '../css/flags.css'
 import '../css/user.css'
