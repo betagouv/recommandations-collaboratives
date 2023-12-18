@@ -33,14 +33,20 @@
     align-items: center;
     justify-content: space-between;
     border: 1px solid var(--current-border-color);
+    padding-block: 0.5em;
+    padding-inline: 0.75em;
 }
+
+.topic-list li.empty {
+    display: none;
+}
+
 
 .topic-list li p {
     display: flex;
     align-items: center;
     max-width: fit-content;
-    margin-block: 0.5em;
-    margin-inline: 0.75em;
+    margin-block: 0;
 }
 
 .topic-list.readonly li.project-card-details {
@@ -62,15 +68,16 @@
     border-radius: 0.25em;
 }
 
-.topic-list:not(.readonly) li.item-1 p:before {
+.topic-list:not(.readonly) li:nth-child(1n) p:before,
+.topic-list:not(.readonly) li:nth-child(3n) + li p:before  {
     --current-bg-color: var(--color-items-1,#fbaff5);
 }
 
-.topic-list:not(.readonly) li.item-2 p:before {
+.topic-list:not(.readonly)  li:nth-child(2n) p:before {
     --current-bg-color: var(--color-items-2,#fcb0a2);
 }
 
-.topic-list:not(.readonly) li.item-3 p:before {
+.topic-list:not(.readonly) li:nth-child(2n) + li p:before {
     --current-bg-color: var(--color-items-3,#79e7d5);
 }
 

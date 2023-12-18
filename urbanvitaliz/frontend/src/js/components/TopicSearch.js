@@ -6,9 +6,15 @@ function TopicSearch(currentTopic, restrict_to=null) {
         topic: '',
         results: [],
         restrict_to: null,
-        init() {
+        async init() {
             this.topic = currentTopic
             this.restrict_to = restrict_to
+            if(currentTopic) {
+                const results = await api.get(searchTopicsUrl(currentTopic, this.restrict_to))
+                if (results && results.data) {
+                    return this.results = results.data
+                }
+            }
         },
         async handleTopicChange(e) {
             e.preventDefault();
