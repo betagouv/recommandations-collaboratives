@@ -49,7 +49,7 @@
         {% endif %}
       </div>
     </div>
-    {% if 'change_location' in user_project_perms %}
+    {% if request.user in project.members.all or 'change_location' in user_project_perms %}
       <div class="answer">
         <a href="{% url 'projects-project-location' project.pk %}"
            class="link-project-location-edit link-edit stretched-link text-decoration-none"

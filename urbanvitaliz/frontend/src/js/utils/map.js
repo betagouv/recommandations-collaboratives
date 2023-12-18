@@ -28,7 +28,7 @@ function getDefaultLatLngForMap(project) {
 // Map base layer
 function initMap(idMap, project, options, zoom) {
 	const [latitude, longitude] = getDefaultLatLngForMap(project)
-	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+	L.tileLayer(`https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png`, {
 		maxZoom: 20,
 		attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	});
