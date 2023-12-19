@@ -30,7 +30,7 @@
               method="post"
               class="row">
             {% csrf_token %}
-            <section class="project-details-section l-stack col-7">
+            <section class="project-details-section l-stack col-6">
                 <header>
                     <h2 class="font-small">Modifier les Thématiques du Projet</h2>
                 </header>
@@ -43,9 +43,6 @@
                         {% if topic_form.name.value %}
                             <li x-data='TopicSearch("{{ topic_form.name.value|default:"" }}", "projects")'>
                                 <p class="tiny fw-bold">{{ topic_form.name.value|default:'Thématique' }}</p>
-                                {% if topic_form.name.errors %}
-                                    {% for error in topic_form.name.errors %}{{ error|escape }}{% endfor %}
-                                {% endif %}
                                 <div class="topic-delete d-flex">
                                     <svg width="10"
                                          height="10"
@@ -85,6 +82,9 @@
                                        placeholder=""
                                        x-model="topic"
                                        x-on:input.change.debounce="handleTopicChange" />
+                                {% if topic_form.name.errors %}
+                                    {% for error in topic_form.name.errors %}{{ error|escape }}{% endfor %}
+                                {% endif %}
                             </li>
                         {% endif %}
                     {% endfor %}
@@ -94,7 +94,7 @@
                 </ul>
                 <button id="submit" type="submit" class="button filled mb-4 w-auto">Enregistrer</button>
             </section>
-            <section class="project-details-section l-stack col-5">
+            <section class="project-details-section l-stack col-6">
                 <header>
                     <svg class="bi " width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-square" />
