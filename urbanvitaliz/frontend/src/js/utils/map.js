@@ -28,7 +28,7 @@ function getDefaultLatLngForMap(project) {
 // Map base layer
 function initMap(idMap, project, options, zoom) {
 	const [latitude, longitude] = getDefaultLatLngForMap(project)
-	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+	L.tileLayer(`https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png`, {
 		maxZoom: 20,
 		attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	});
@@ -57,14 +57,28 @@ function initMapLayers(map, project, geoData) {
 	}
 }
 
-function initMapControllerBAN(map, project, geoData, onUpdate) {
+// Create layers composed with markers
+function initEditLayers(map, project, geoData) {
+	try {
+		addLayerMarkerProjectCoordinates(map, project);
+	} catch (e) {
+		try {
+			addLayerMarkerProjectLocation(map, project, geoData);
+		} catch(e) {
+			console.log(e)
+		}
+	}
+}
+
+function initMapControllerBAN(map, geoData, onUpdate) {
+	const className = 'marker-geocoder-ban'
 	const geocoderOptions = {
 		collapsed: false,
 		style: 'searchBar',
-		className: 'location-edit-marker',
+		className,
 		geoData,
 		onUpdate,
-		markerIcon: createMarkerIcon(project),
+		markerIcon: createMarkerIcon(className),
 		markerPopupTemplate
 	}
 	GeocoderBAN(geocoderOptions).addTo(map)
@@ -117,8 +131,8 @@ function addLayerAreaCircle(map, project) {
 	}).addTo(map);
 }
 
-function createMarkerIcon(className) {
-	return L.divIcon({ className: `map-marker ${className}` });
+function createMarkerIcon(className, title) {
+	return L.divIcon({ className: `map-marker ${className}`,title });
 }
 
 function markerPopupTemplate(project) {
@@ -152,6 +166,7 @@ function mapOptions({interactive, zoom}) {
 export default {
 	initMap,
 	initMapLayers,
+	initEditLayers,
 	initMapControllerBAN,
 	addLayerAreaCommune,
 	addLayerAreaCircle,

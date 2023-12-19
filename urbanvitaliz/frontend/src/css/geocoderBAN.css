@@ -115,7 +115,7 @@
 .searchBar {
 	z-index: 1000;
 	position: relative;
-	max-width:45%;
+	max-width:72%;
 	margin-block: var(--input-margin) 0;
 	margin-inline: var(--input-margin);
 }
