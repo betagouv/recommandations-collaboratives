@@ -1,3 +1,31 @@
+
+
+
+/**
+ * Project Details sections
+ */
+
+.project-details-section header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+
+.project-details-section header > * {
+    display: flex;
+    align-items: center;
+}
+
+.project-details-section header h6 {
+    justify-content: space-between;
+    width: 100%;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
 .survey-card {
     padding: 20px;
 
@@ -24,7 +52,6 @@
     --current-gap: var(--gap, 8px);
     list-style: none;
     padding-left: 0;
-    counter-reset: items 0;
 }
 
 .topic-list li {
@@ -41,7 +68,6 @@
     display: none;
 }
 
-
 .topic-list li p {
     display: flex;
     align-items: center;
@@ -49,16 +75,8 @@
     margin-block: 0;
 }
 
-.topic-list.readonly li.project-card-details {
-    padding: var(--current-gap);
-}
-
-.topic-list.readonly li p {
-    margin: 0;
-}
-
-.topic-list:not(.readonly) li p:before {
-    --current-bg-color: var(--color-items-default, #0063CB);
+.topic-list:not(.readonly) p:before {
+    --current-bg-color: var(--color-items-default);
     content: " ";
     display: inline-block;
     margin-inline-end: 0.75em;
@@ -68,25 +86,23 @@
     border-radius: 0.25em;
 }
 
-.topic-list:not(.readonly) li:nth-child(1n) p:before,
-.topic-list:not(.readonly) li:nth-child(3n) + li p:before  {
-    --current-bg-color: var(--color-items-1,#fbaff5);
+
+.topic-list:not(.readonly) li:nth-child(1n) p:before   {
+    --current-bg-color: var(--color-topic-1);
 }
 
 .topic-list:not(.readonly)  li:nth-child(2n) p:before {
-    --current-bg-color: var(--color-items-2,#fcb0a2);
+    --current-bg-color: var(--color-topic-2);
 }
 
-.topic-list:not(.readonly) li:nth-child(2n) + li p:before {
-    --current-bg-color: var(--color-items-3,#79e7d5);
+.topic-list:not(.readonly) li:nth-child(3n) p:before  {
+    --current-bg-color: var(--color-topic-3);
 }
 
-.topic-list li > p:after {
-    content: counter(items);
-    counter-increment: items;
-    margin-inline: 0.75em;
+.topic-list:not(.readonly) li:nth-child(4n) p:before  {
+    --current-bg-color: var(--color-topic-4);
 }
 
-.topic-list li > svg {
-    margin-inline: 0.75em;
+.topic-list:not(.readonly) li:nth-child(5n) p:before  {
+    --current-bg-color: var(--color-topic-5);
 }

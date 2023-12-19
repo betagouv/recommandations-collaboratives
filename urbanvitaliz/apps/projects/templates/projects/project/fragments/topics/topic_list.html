@@ -7,16 +7,12 @@
 {% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-<section class="w-100 mb-3 h-100 responsive-wrapper">
-    <header class="d-flex align-items-center justify-content-between w-100"
-            style="margin-bottom: 7px">
-        <h6 class="d-flex align-items-center justify-content-center text-uppercase fw-bold font-small mb-0">
-            <span>Thématiques du projet</span>
-        </h6>
+<section class="project-details-section l-stack h-100">
+    <header>
+        <h6 class="font-small">Thématiques du projet</h6>
         {% if "change_topics" in user_project_perms and project.all_topics.count != 0 %}
-            <a class="d-flex align-items-center"
-               href='{% url "projects-project-topics" project.id %}'>
-                <span class="tiny">Éditer</span>
+            <a href='{% url "projects-project-topics" project.id %}'>
+                <span class="tiny">Modifier</span>
                 <svg class="bi ms-2 " width="10" height="10" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
                 </svg>
@@ -24,16 +20,18 @@
         {% endif %}
     </header>
     {% if project.all_topics.count == 0 %}
-        <article class="project-card-details empty">
-            <span class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">Il n ‘y a aucune thématique associée pour le moment</span>
+        <article class="project-card-details l-stack empty">
+            <p class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">
+                Il n'y a aucune thématique associée pour le moment
+            </p>
             {% if "change_topics" in user_project_perms %}
-                <a class="button btn-blue filled mt-3"
+                <a class="button btn-blue filled mt-3 text-center w-auto"
                    href='{% url "projects-project-topics" project.id %}'>Ajouter des thématiques</a>
             {% endif %}
         </article>
     {% else %}
         <article class="l-stack">
-            <p class="project-card-details">
+            <p class="project-card-details font-small">
                 Ces thématiques sont modifiables <a href='{% url "projects-project-topics" project.id %}'>ici</a>.
             </p>
             <ul class="topic-list l-stack">
@@ -41,18 +39,20 @@
                     <li x-data='TopicSearch("{{ topic.name|default:"" }}", "projects")'
                         :class="results.length === 0 ? 'empty' : ''">
                         <template x-if="results[0]">
-                            <p>{{ topic.name }}</p>
+                            <p class="tiny fw-bold">{{ topic.name }}</p>
                         </template>
                     </li>
                 {% endfor %}
             </ul>
-            <p class="project-card-details">Ces thématiques ont été associées aux recommandations de nos conseillers.</p>
-            <ul class="topic-list readonly l-stack">
+            <p class="project-card-details font-small">
+                Ces thématiques ont été associées aux recommandations de nos conseillers.
+            </p>
+            <ul class="topic-list l-stack readonly">
                 {% for topic in project.all_topics %}
                     <li x-data='TopicSearch("{{ topic.name|default:"" }}", "recommendations")'
                         :class="results.length === 0 ? 'empty' : 'project-card-details'">
                         <template x-if="results[0]">
-                            <p>{{ topic.name }}</p>
+                            <p class="tiny fw-bold">{{ topic.name }}</p>
                         </template>
                         <svg width="12"
                              height="12"
