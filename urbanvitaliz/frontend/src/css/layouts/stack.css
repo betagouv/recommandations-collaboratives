@@ -11,6 +11,11 @@
 	justify-content: flex-start;
 }
 
+
+.l-stack\:lg {
+	--current-gap-size: 12px;
+}
+
 .l-stack.auto > * {
 	inline-size: auto;
 }

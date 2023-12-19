@@ -22,7 +22,7 @@ import '../css/border.css'
 import '../css/role.css'
 
 //Layouts CSS
-import '../css/stack.css'
+import '../css/layouts/stack.css'
 
 //Global reused component CSS
 import '../css/flags.css'

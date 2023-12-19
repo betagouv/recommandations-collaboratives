@@ -1,0 +1,70 @@
+/**
+ * Topics
+ */
+
+ .topic-list {
+	--current-gap: var(--gap, 8px);
+	list-style: none;
+	padding-left: 0;
+}
+
+.topic-list li {
+	--current-border-color:  var(--gray-light, #E5E5E5);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border: 1px solid var(--current-border-color);
+	padding-block: 0.5em;
+	padding-inline: 0.75em;
+}
+
+.topic-list li.empty {
+	display: none;
+}
+
+.topic-list li p {
+	display: flex;
+	align-items: center;
+	max-width: fit-content;
+	margin-block: 0;
+}
+
+.topic-list:not(.readonly) p:before {
+	--current-bg-color: var(--color-items-default);
+	content: " ";
+	display: inline-block;
+	margin-inline-end: 0.75em;
+	width: 1em;
+	height: 1em;
+	background-color: var(--current-bg-color);
+	border-radius: 0.25em;
+}
+
+
+.topic-list:not(.readonly) li:nth-child(1n) p:not(.readonly):before   {
+	--current-bg-color: var(--color-topic-1);
+}
+
+.topic-list:not(.readonly)  li:nth-child(2n) p:not(.readonly):before {
+	--current-bg-color: var(--color-topic-2);
+}
+
+.topic-list:not(.readonly) li:nth-child(3n) p:not(.readonly):before  {
+	--current-bg-color: var(--color-topic-3);
+}
+
+.topic-list:not(.readonly) li:nth-child(4n) p:not(.readonly):before  {
+	--current-bg-color: var(--color-topic-4);
+}
+
+.topic-list:not(.readonly) li:nth-child(5n) p:not(.readonly):before  {
+	--current-bg-color: var(--color-topic-5);
+}
+
+.topic-delete {
+	align-items: center;
+}
+
+.topic-delete svg {
+	margin-inline-end: 0.5em;
+}
