@@ -28,8 +28,10 @@
         </nav>
         <form action='{% url "projects-project-topics" project.pk %}'
               method="post"
+              autocomplete="off"
               class="row">
             {% csrf_token %}
+            <input autocomplete="false" name="hidden" type="text" style="display:none;">
             <section class="project-details-section l-stack col-6">
                 <header>
                     <h2 class="font-small">Modifier les Thématiques du Projet</h2>
@@ -40,59 +42,66 @@
                 {{ topic_formset.management_form }}
                 <ul class="topic-list l-stack">
                     {% for topic_form in topic_formset %}
-                        {% if topic_form.name.value %}
-                            <li x-data='TopicSearch("{{ topic_form.name.value|default:"" }}", "projects")'>
-                                <p class="tiny fw-bold">{{ topic_form.name.value|default:'Thématique' }}</p>
-                                <div class="topic-delete d-flex">
-                                    <svg width="10"
-                                         height="10"
-                                         viewBox="0 0 10 10"
-                                         fill="none"
-                                         xmlns="http://www.w3.org/2000/svg"
-                                         role="presentation">
-                                        <path d="M2.91671 1.66665V0.833313H7.08337V1.66665H9.16671V2.49998H8.33337V8.74998C8.33337 8.9801 8.14683 9.16665 7.91671 9.16665H2.08337C1.85326 9.16665 1.66671 8.9801 1.66671 8.74998V2.49998H0.833374V1.66665H2.91671ZM2.50004 2.49998V8.33331H7.50004V2.49998H2.50004ZM3.75004 3.74998H4.58337V7.08331H3.75004V3.74998ZM5.41671 3.74998H6.25004V7.08331H5.41671V3.74998Z" fill="#CE0500" />
-                                    </svg>
-                                    {{ topic_form.DELETE }}
-                                    {% if topic_form.DELETE.errors %}
-                                        {% for error in topic_form.DELETE.errors %}{{ error|escape }}{% endfor %}
-                                    {% endif %}
+                        <li class="d-flex justify-content-between align-items-end topic-item "
+                            x-data='TopicSearch("{{ topic_form.name.value|default:"" }}", "projects")'>
+                            {% if topic_form.name.value %}
+                                <div class="topic-item disabled">
+                                    <input type="text"
+                                           class="form-control tiny fw-bold"
+                                           id="{{ topic_form.name.id_for_label }}"
+                                           name="{{ topic_form.name.html_name }}"
+                                           value="{{ topic_form.name.value|default:'Thématique' }}"
+                                           placeholder=""
+                                           disabled />
                                 </div>
-                            </li>
-                        {% else %}
-                            <li x-data='TopicSearch("{{ topic_form.name.value|default:"" }}", "projects")'
-                                class="l-stack">
-                                <div class="d-flex justify-content-between align-items-end">
-                                    <label for="{{ topic_form.name.id_for_label }}" class="tiny fw-bold w-auto">Nouvelle Thématique</label>
+                            {% else %}
+                                <div class="l-stack w-100 justify-content-between align-items-center ">
+                                    <label for="{{ topic_form.name.id_for_label }}" class="tiny fw-bold w-100">Nouvelle Thématique</label>
+                                    <input type="text"
+                                           class="form-control tiny w-100"
+                                           id="{{ topic_form.name.id_for_label }}"
+                                           name="{{ topic_form.name.html_name }}"
+                                           value="{{ topic_form.name.value|default:'' }}"
+                                           placeholder=""
+                                           x-model="topic"
+                                           x-on:input.change.debounce="handleTopicChange" />
                                     <template x-if="results.length > 0">
-                                        <div class="d-flex flex-column align-items-start justify-content-start">
-                                            <p class="tiny w-40 readonly">Suggestions</p>
+                                        <div class="topic-choice-list l-stack ">
                                             <template x-for="result in results">
                                                 <button @click.prevent="handleResultClick(result.name)"
-                                                        class="button secondary blue tiny mx-1 mt-1"
+                                                        class="btn-select btn secondary tiny mx-1 mt-1 w-100"
                                                         x-text="result.name"></button>
                                             </template>
                                         </div>
                                     </template>
+                                    {% if topic_form.name.errors %}
+                                        {% for error in topic_form.name.errors %}{{ error|escape }}{% endfor %}
+                                    {% endif %}
                                 </div>
-                                <input type="text"
-                                       class="py-1 form-control tiny"
-                                       id="{{ topic_form.name.id_for_label }}"
-                                       name="{{ topic_form.name.html_name }}"
-                                       x-value='currentTopic'
-                                       placeholder=""
-                                       x-model="topic"
-                                       x-on:input.change.debounce="handleTopicChange" />
-                                {% if topic_form.name.errors %}
-                                    {% for error in topic_form.name.errors %}{{ error|escape }}{% endfor %}
+                            {% endif %}
+                            <div class="topic-delete d-flex my-2">
+                                <svg width="10"
+                                     height="10"
+                                     viewBox="0 0 10 10"
+                                     fill="none"
+                                     xmlns="http://www.w3.org/2000/svg"
+                                     role="presentation">
+                                    <path d="M2.91671 1.66665V0.833313H7.08337V1.66665H9.16671V2.49998H8.33337V8.74998C8.33337 8.9801 8.14683 9.16665 7.91671 9.16665H2.08337C1.85326 9.16665 1.66671 8.9801 1.66671 8.74998V2.49998H0.833374V1.66665H2.91671ZM2.50004 2.49998V8.33331H7.50004V2.49998H2.50004ZM3.75004 3.74998H4.58337V7.08331H3.75004V3.74998ZM5.41671 3.74998H6.25004V7.08331H5.41671V3.74998Z" fill="#CE0500" />
+                                </svg>
+                                {{ topic_form.DELETE }}
+                                {% if topic_form.DELETE.errors %}
+                                    {% for error in topic_form.DELETE.errors %}{{ error|escape }}{% endfor %}
                                 {% endif %}
-                            </li>
-                        {% endif %}
+                            </div>
+                        </li>
                     {% endfor %}
                     {% if topic_formset.non_form_errors %}
                         {% for error in topic_formset.non_form_errors %}{{ error|escape }}{% endfor %}
                     {% endif %}
                 </ul>
-                <button id="submit" type="submit" class="button filled mb-4 w-auto">Enregistrer</button>
+                <footer class="d-flex justify-content-end align-items-center">
+                    <button id="submit" type="submit" class="button small filled sm mb-4 w-auto">Terminé</button>
+                </footer>
             </section>
             <section class="project-details-section l-stack col-6">
                 <header>
@@ -102,11 +111,13 @@
                     <h2 class="font-small">&nbsp;Note interne</h2>
                 </header>
                 <p class="project-card-details font-small">
-                    <span class="title-info text-red">PRIVÉ</span>
+                    <span class="title-info text-red">PRIVÉ&nbsp;</span>
                     Cette note ne sera que visible par les conseillers du projet.
                 </p>
                 {% include 'tools/editor.html' with input_name=form.advisors_note.name input_value=form.advisors_note.value|default:'' escapejs=True wide=True %}
-                <button type="advisor-note" class="button filled w-auto">Enregistrer</button>
+                <footer class="d-flex justify-content-end align-items-center">
+                    <button type="advisor-note" class="button small filled w-auto">Enregistrer</button>
+                </footer>
             </section>
         </form>
         {{ form.media }}
