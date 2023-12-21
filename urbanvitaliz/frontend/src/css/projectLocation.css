@@ -200,3 +200,12 @@
 .location-overview .marker-popup main {
     padding: 5px 12px 8px;
 }
+
+.location-address {
+    color:#929292;
+    background-color:#F5F5F5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: not-allowed;
+}

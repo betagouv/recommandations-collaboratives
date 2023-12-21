@@ -36,12 +36,27 @@
     background-color: #0063CB;;
     border: solid 2px white;
     transform: scale(1.6);
+    font-size: 0.5em;
+    text-align: center;
 }
 
-.location-edit-marker.map-marker:after {
+.map-marker.marker-geocoder-ban:after {
+    content: '';
+    transform: scale(1.6);
+    font-size: 0.5em;
+    text-align: center;
+    background-color: #FDCD6D;
+    border: solid 2px #222;
+}
+
+.marker-onclick:after {
+    content:'';
+    color:  #222;;
     background-color: white;
     border: solid 2px #222;
     transform: scale(1.6);
+    font-size: 0.5em;
+    text-align: center;
 }
 
 .leaflet-popup-content-wrapper, .leaflet-popup-content-wrapper {
