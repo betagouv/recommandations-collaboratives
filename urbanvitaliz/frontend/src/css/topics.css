@@ -106,8 +106,10 @@
 .topic-choice-list  {
 	display: flex;
 	align-items: flex-start;
-	margin-block: 0.5em;
-	border: 1px solid  var(--gray-light, #E5E5E5);
+	margin-block-start: 0;
+	border-left: 1px solid  var(--gray-light, #E5E5E5);
+	border-right: 1px solid  var(--gray-light, #E5E5E5);
+	border-bottom: 1px solid  var(--gray-light, #E5E5E5);
 }
 
 .topic-choice-list .btn.btn-select {
@@ -118,10 +120,8 @@
 	border-radius: 0.2em;
 }
 
-
 .topic-choice-list .btn.btn-select:hover {
-	background-color: var(--gray-light, #E5E5E5);
-	border: none;
+	color: #929292;
 }
 
 .topic-list .btn-select + .btn-select {
