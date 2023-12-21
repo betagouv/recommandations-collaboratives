@@ -1,9 +1,5 @@
 import Alpine from 'alpinejs'
 
-import * as L from 'leaflet';
-import 'leaflet-control-geocoder';
-import 'leaflet-providers'
-
 import geolocUtils from '../utils/geolocation/'
 import mapUtils from '../utils/map/'
 

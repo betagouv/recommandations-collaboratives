@@ -1,3 +1,6 @@
+import * as L from 'leaflet';
+import 'leaflet-control-geocoder';
+import 'leaflet-providers'
 
 import GeocoderBAN from './geocoderBAN'
 import geolocUtils from './geolocation/'
