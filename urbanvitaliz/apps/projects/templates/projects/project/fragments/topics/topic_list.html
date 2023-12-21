@@ -35,7 +35,7 @@
                 Ces thématiques sont modifiables <a href='{% url "projects-project-topics" project.id %}'>ici</a>.
             </p>
             <ul class="topic-list l-stack">
-                {% for topic in project.all_topics %}
+                {% for topic in project.topics.all %}
                     <li x-data='TopicSearch("{{ topic.name|default:"" }}", "projects")'
                         :class="results.length === 0 ? 'empty' : ''">
                         <template x-if="results[0]">
