@@ -2,7 +2,6 @@ import Alpine from 'alpinejs'
 import axios from 'axios'
 
 import geolocUtils from '../utils/geolocation/'
-import mapUtils from '../utils/map/'
 
 const API_IGN_DOWNLOAD = 'https://data.geopf.fr/telechargement/capabilities'
 function ResourceIGN(projectOptions) {
