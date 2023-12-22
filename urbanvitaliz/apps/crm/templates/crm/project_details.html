@@ -53,59 +53,21 @@
                             </div>
                             <hr/>
                             <div class="d-flex align-items-center small">
-                                <form class="me-2"
-                                      action="{% url 'crm-project-toggle-annotation' project.pk %}"
-                                      method="post">
-                                    {% csrf_token %}
-                                    <div>
-                                        <input class="button" hidden name="tag" value="diag" id="id_tag">
-                                    </div>
-                                    {% if 'diag' in project.crm_annotations.tags.names %}
-                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-blue" type="submit">diagnostic</button>
-                                    {% else %}
-                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-grey text-grey-dark" type="submit">diagnostic</button>
-                                    {% endif %}
-                                </form>
-                                <form class="me-2"
-                                      action="{% url 'crm-project-toggle-annotation' project.pk %}"
-                                      method="post">
-                                    {% csrf_token %}
-                                    <div>
-                                        <input class="button" hidden name="tag" value="edl" id="id_tag">
-                                    </div>
-
-                                    {% if 'edl' in project.crm_annotations.tags.names %}
-                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-blue" type="submit">État des lieux</button>
-                                    {% else %}
-                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-grey text-grey-dark" type="submit">État des lieux</button>
-                                    {% endif %}
-                                </form>
-                                <form class="me-2"
-                                      action="{% url 'crm-project-toggle-annotation' project.pk %}"
-                                      method="post">
-                                    {% csrf_token %}
-                                    <div>
-                                        <input class="button" hidden name="tag" value="contact" id="id_tag">
-                                    </div>
-                                    {% if 'contact' in project.crm_annotations.tags.names %}
-                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-blue" type="submit">Mise en relation</button>
-                                    {% else %}
-                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-grey text-grey-dark" type="submit">Mise en relation</button>
-                                    {% endif %}
-                                </form>
-                                <form class="me-2"
-                                      action="{% url 'crm-project-toggle-annotation' project.pk %}"
-                                      method="post">
-                                    {% csrf_token %}
-                                    <div>
-                                        <input class="button" hidden name="tag" value="general" id="id_tag">
-                                    </div>
-                                    {% if 'general' in project.crm_annotations.tags.names %}
-                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-blue" type="submit">Général positif</button>
-                                    {% else %}
-                                        <button class="mx-1 my-1 border-0 badge rounded-pill bg-grey text-grey-dark " type="submit">Général positif</button>
-                                    {% endif %}
-                                </form>
+                                {% for crm_tag in site_config.crm_available_tags.all %}
+                                    <form class="me-2"
+                                          action="{% url 'crm-project-toggle-annotation' project.pk %}"
+                                          method="post">
+                                        {% csrf_token %}
+                                        <div>
+                                            <input class="button" hidden name="tag" value="{{ crm_tag.name }}" id="id_tag">
+                                        </div>
+                                        {% if crm_tag.name in project.crm_annotations.tags.names %}
+                                            <button class="mx-1 my-1 border-0 badge rounded-pill bg-dark" type="submit">{{ crm_tag.name }}</button>
+                                        {% else %}
+                                            <button class="mx-1 my-1 border-0 badge rounded-pill bg-grey text-grey-dark" type="submit">{{ crm_tag.name }}</button>
+                                        {% endif %}
+                                    </form>
+                                {% endfor %}
                             </div>
                         </div>
                         <div>

@@ -30,3 +30,4 @@ venv
 /static/
 .npmrc
 screenshots
+.idea

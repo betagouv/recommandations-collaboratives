@@ -39,12 +39,11 @@ def make_new_site(name: str, domain: str, sender_email: str, sender_name: str) -
     try:
         models.SiteConfiguration.objects.get(site=site)
     except models.SiteConfiguration.DoesNotExist:
-        onboarding = onboarding_models.Onboarding.objects.create(
-            form="[{'type': 'header', 'subtype': 'h1', 'label': 'Header'}, {'type':"
-            "'text', 'required': False, 'label': '<br>',"
-            "'className': 'form-control', 'name':"
-            "'text-1660055681026-0', 'subtype': 'text'}]"
+        json_form = (
+            '[{"type":"header","subtype":"h1","label":"Header"},{"type":"text","required":false,"label":"<br>",'
+            '"className":"form-control","name":"text-1660055681026-0","subtype":"text"}]'
         )
+        onboarding = onboarding_models.Onboarding.objects.create(json_form)
 
         survey, created = survey_models.Survey.objects.get_or_create(
             site=site,
