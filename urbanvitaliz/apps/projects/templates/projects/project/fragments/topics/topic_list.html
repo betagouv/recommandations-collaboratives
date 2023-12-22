@@ -31,19 +31,31 @@
         </article>
     {% else %}
         <article class="l-stack">
-            <p class="project-card-details font-small">
-                Ces thématiques sont modifiables <a href='{% url "projects-project-topics" project.id %}'>ici</a>.
-            </p>
-            <ul class="topic-list l-stack">
-                {% for topic in project.topics.all %}
-                    <li x-data='TopicSearch("{{ topic.name|default:"" }}", "projects")'
-                        :class="results.length === 0 ? 'empty' : ''">
-                        <template x-if="results[0]">
-                            <p class="tiny fw-bold">{{ topic.name }}</p>
-                        </template>
-                    </li>
-                {% endfor %}
-            </ul>
+            {% if project..topics.all.count == 0 %}
+                <article class="project-card-details l-stack empty">
+                    <p class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">
+                        Il n'y a aucune thématique associée au projet pour le moment
+                    </p>
+                    {% if "change_topics" in user_project_perms %}
+                        <a class="button btn-blue filled mt-3 text-center w-auto"
+                           href='{% url "projects-project-topics" project.id %}'>Ajouter des thématiques</a>
+                    {% endif %}
+                </article>
+            {% else %}
+                <p class="project-card-details font-small">
+                    Ces thématiques sont modifiables <a href='{% url "projects-project-topics" project.id %}'>ici</a>.
+                </p>
+                <ul class="topic-list l-stack">
+                    {% for topic in project.topics.all %}
+                        <li x-data='TopicSearch("{{ topic.name|default:"" }}", "projects")'
+                            :class="results.length === 0 ? 'empty' : ''">
+                            <template x-if="results[0]">
+                                <p class="tiny fw-bold">{{ topic.name }}</p>
+                            </template>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
             <p class="project-card-details font-small">
                 Ces thématiques ont été associées aux recommandations de nos conseillers.
             </p>

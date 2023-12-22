@@ -123,3 +123,47 @@
 	color: currentColor;
 	border-top: 1px solid var(--gray-light, #E5E5E5);
 }
+
+.topic-delete {
+	width: 16px;
+	height: 16px;
+	position: relative;
+	padding: 1em 10px;
+	margin-inline-start: 8px
+}
+
+.input-submit {
+    width: 24px;
+    height: 24px;
+    padding: 12px;
+    border:none;
+    box-shadow: none;
+    font-size: 0;
+		position: absolute;
+		top: 0;
+		left:0;
+		z-index: 1;
+		background-color: transparent;
+		border: 1px solid white;
+}
+
+
+.input-submit:hover {
+	border-color: red;
+}
+
+.input-submit:hover svg {
+	stroke: white
+}
+
+.topic-delete svg {
+    content: '';
+    width: 16px;
+    height: 16px;
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		z-index: 0;
+		margin: 0;
+    background-image: url('data:image/svg+xml;utf8,');
+}
