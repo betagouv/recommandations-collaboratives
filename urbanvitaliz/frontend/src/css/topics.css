@@ -26,11 +26,23 @@
 }
 
 .topic-list li p,
-.topic-list .topic-item p {
+.topic-list .topic-item .topic-link {
 	display: flex;
 	align-items: center;
-	max-width: fit-content;
+	width: 100%;
 	margin-block: 0;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.topic-link {
+	display: block;
+	min-width: 100%;
+	text-decoration: none;
+	font-weight: bold;
+}
+.topic-link:hover {
+	text-decoration: underline;
 }
 
 .topic-list .topic-item.disabled,
@@ -48,8 +60,9 @@
 
 .topic-list li.disabled:before,
 .topic-list .topic-item.disabled:before,
-.topic-list:not(.readonly) p:before {
-	--current-bg-color: var(--color-items-default);
+.topic-list .topic-link:before ,
+.topic-list p:before {
+	--current-bg-color: var(--color-items-default, #929292);
 	content: " ";
 	display: inline-block;
 	margin-inline-end: 0.75em;
@@ -59,34 +72,33 @@
 	border-radius: 0.25em;
 }
 
-
 .topic-list .topic-item:nth-child(1n) .disabled:before {
 	align-self: flex-start;
 	margin-block-start: 0.05em;
 }
 
 .topic-list .topic-item:nth-child(1n) .disabled:before,
-.topic-list:not(.readonly) li:nth-child(1n) p:not(.readonly):before  {
+.topic-list:not(.readonly) li:nth-child(1n) .topic-link:before  {
 	--current-bg-color: var(--color-topic-1);
 }
 
 .topic-list .topic-item:nth-child(2n) .disabled:before,
-.topic-list:not(.readonly) li:nth-child(2n) p:not(.readonly):before{
+.topic-list:not(.readonly) li:nth-child(2n) .topic-link:before{
 	--current-bg-color: var(--color-topic-2);
 }
 
 .topic-list .topic-item:nth-child(3n) .disabled:before,
-.topic-list:not(.readonly) li:nth-child(3n) p:not(.readonly):before {
+.topic-list:not(.readonly) li:nth-child(3n) .topic-link:before {
 	--current-bg-color: var(--color-topic-3);
 }
 
 .topic-list .topic-item:nth-child(4n) .disabled:before,
-.topic-list:not(.readonly) li:nth-child(4n) p:not(.readonly):before {
+.topic-list:not(.readonly) li:nth-child(4n) .topic-link:before {
 	--current-bg-color: var(--color-topic-4);
 }
 
 .topic-list .topic-item:nth-child(5n) .disabled:before,
-.topic-list:not(.readonly) li:nth-child(5n) p:not(.readonly):before {
+.topic-list:not(.readonly) li:nth-child(5n) .topic-link:before {
 	--current-bg-color: var(--color-topic-5);
 }
 
@@ -122,4 +134,48 @@
 .topic-list .btn-select + .btn-select {
 	color: currentColor;
 	border-top: 1px solid var(--gray-light, #E5E5E5);
+}
+
+.topic-delete {
+	width: 16px;
+	height: 16px;
+	position: relative;
+	padding: 1em 10px;
+	margin-inline-start: 8px
+}
+
+.input-submit {
+    width: 24px;
+    height: 24px;
+    padding: 12px;
+    border:none;
+    box-shadow: none;
+    font-size: 0;
+		position: absolute;
+		top: 0;
+		left:0;
+		z-index: 1;
+		background-color: transparent;
+		border: 1px solid white;
+}
+
+
+.input-submit:hover {
+	border-color: red;
+}
+
+.input-submit:hover svg {
+	stroke: white
+}
+
+.topic-delete svg {
+    content: '';
+    width: 16px;
+    height: 16px;
+		position: absolute;
+		top: 8px;
+		left: 8px;
+		z-index: 0;
+		margin: 0;
+    background-image: url('data:image/svg+xml;utf8,');
 }
