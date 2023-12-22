@@ -42,23 +42,25 @@
                     {% endif %}
                 </article>
             {% else %}
-                <p class="project-card-details font-small">
+                <!-- <p class="project-card-details font-small">
                     Ces thématiques sont modifiables <a href='{% url "projects-project-topics" project.id %}'>ici</a>.
-                </p>
+                </p> -->
                 <ul class="topic-list l-stack">
                     {% for topic in project.topics.all %}
                         <li x-data='TopicSearch("{{ topic.name|default:"" }}", "projects")'
                             :class="results.length === 0 ? 'empty' : ''">
                             <template x-if="results[0]">
-                                <p class="tiny fw-bold">{{ topic.name }}</p>
+                                <a class="tiny bold topic-link"
+                                   title="Modifier"
+                                   href='{% url "projects-project-topics" project.id %}'>{{ topic.name }}</a>
                             </template>
                         </li>
                     {% endfor %}
                 </ul>
             {% endif %}
-            <p class="project-card-details font-small">
+            <!-- <p class="project-card-details font-small">
                 Ces thématiques ont été associées aux recommandations de nos conseillers.
-            </p>
+            </p> -->
             <ul class="topic-list l-stack readonly">
                 {% for topic in project.all_topics %}
                     <li x-data='TopicSearch("{{ topic.name|default:"" }}", "recommendations")'

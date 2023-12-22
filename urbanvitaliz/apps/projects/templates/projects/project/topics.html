@@ -53,9 +53,7 @@
                                                id="{{ topic_form.name.id_for_label }}"
                                                name="{{ topic_form.name.html_name }}"
                                                value="{{ topic_form.name.value|default:'Thématique' }}"
-                                               placeholder=""
-                                               x-model="topic"
-                                               x-on:input.change.debounce="handleTopicChange" />
+                                               placeholder="" />
                                     </div>
                                 {% else %}
                                     <div class="l-stack w-100 justify-content-between align-items-center ">

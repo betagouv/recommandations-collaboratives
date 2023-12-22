@@ -1,3 +1,5 @@
+{% load static %}
 <li>
-    <p class="text-info-custom fw-medium ms-2">{{ topic.name }}</p>
+    <a class="text-info-custom fw-medium ms-2"
+       href='{% url "projects-project-topics" project.id %}'>{{ topic.name }}</a>
 </li>
