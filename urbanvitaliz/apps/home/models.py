@@ -27,6 +27,7 @@ from guardian.models import (
     UserObjectPermissionBase,
 )
 from phonenumber_field.modelfields import PhoneNumberField
+from taggit.managers import TaggableManager
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 
@@ -117,7 +118,15 @@ class SiteConfiguration(models.Model):
     onboarding = models.ForeignKey("onboarding.Onboarding", on_delete=models.CASCADE)
     sender_email = models.EmailField()
     sender_name = models.CharField(max_length=30)
-
+    crm_available_tags = TaggableManager(
+        blank=True,
+        verbose_name="Étiquettes projets disponibles dans le CRM",
+        help_text=(
+            "Liste de tags séparés par une virgule. "
+            "Attention, veillez à ne pas retirer un tag utilisé dans un projet, "
+            "celui-ci ne pourra plus est retiré depuis le CRM"
+        ),
+    )
     reminder_interval = models.IntegerField(
         default=6 * 7, verbose_name="Interval des rappels", help_text="en jours"
     )

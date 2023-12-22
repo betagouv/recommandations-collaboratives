@@ -38,6 +38,7 @@ from urbanvitaliz.apps.projects.models import Project, UserProjectStatus, Topic
 from urbanvitaliz.apps.tasks.models import Task
 from urbanvitaliz.utils import (
     get_group_for_site,
+    get_site_config_or_503,
     has_perm,
     has_perm_or_403,
     make_group_name_for_site,
@@ -553,6 +554,8 @@ def project_details(request, project_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     project = get_object_or_404(Project.all_on_site, pk=project_id)
+
+    site_config = get_site_config_or_503(request.site)
 
     actions = target_stream(project)
 
