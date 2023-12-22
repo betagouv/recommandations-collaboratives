@@ -64,6 +64,7 @@
             <ul class="topic-list l-stack readonly">
                 {% for topic in project.all_topics %}
                     <li x-data='TopicSearch("{{ topic.name|default:"" }}", "recommendations")'
+                        title="Cette thématique peut être modifiée dans les Recommandations"
                         :class="results.length === 0 ? 'empty' : 'project-card-details'">
                         <template x-if="results[0]">
                             <p class="tiny fw-bold">{{ topic.name }}</p>
