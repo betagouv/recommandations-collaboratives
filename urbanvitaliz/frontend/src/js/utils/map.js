@@ -70,8 +70,9 @@ function initEditLayers(map, project, geoData) {
 	}
 }
 
-function initMapControllerBAN(map, geoData, onUpdate) {
+function initMapControllerBAN(map,  geoData, onUpdate, project) {
 	const className = 'marker-geocoder-ban'
+	const popupOptions = {...project, title: "Recherche par adresse"}
 	const geocoderOptions = {
 		collapsed: false,
 		style: 'searchBar',
@@ -79,7 +80,9 @@ function initMapControllerBAN(map, geoData, onUpdate) {
 		geoData,
 		onUpdate,
 		markerIcon: createMarkerIcon(className),
-		markerPopupTemplate
+		markerPopupTemplate,
+		commune: geoData.location,
+		popupOptions
 	}
 	GeocoderBAN(geocoderOptions).addTo(map)
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
@@ -96,18 +99,24 @@ function addLayerMarkerProjectCoordinates(map, project) {
 	}
 	const coordinates = [project.location_y, project.location_x]
 	const marker = L.marker(coordinates, { icon: createMarkerIcon('project-coordinates-marker') }).addTo(map);
-	marker.bindPopup(markerPopupTemplate(project))
+	const popupOptions = {...project, title: "Coordonées du projet"}
+	marker.bindPopup(markerPopupTemplate(popupOptions))
 	L.layerGroup([marker]).addTo(map);
 	map.panTo(new L.LatLng(...coordinates));
 }
 
 function addLayerMarkerProjectLocation(map, project, geoData) {
-	if(geoData.code && geoData.code === 400 || geoData.features.length !== 1) {
+	if(geoData.code && geoData.code === 400 ) {
 		throw Error(`Données API Adresse indisponibles pour "${project.name}"`)
 	}
-	const coordinates = geoData.features[0].coordinates
+	const locationData =  geoData.location?.features ?  geoData.location : geoData
+	if(locationData.features?.length !== 1) {
+		throw Error(`Données API Adresse indisponibles pour "${project.name}"`)
+	}
+	const popupOptions = {...project, title: "Addresse du Projet"}
+	const coordinates = geoData.location.features[0].geometry.coordinates.reverse()
 	const marker = L.marker(coordinates, { icon: createMarkerIcon('project-location-marker') }).addTo(map);
-	marker.bindPopup(markerPopupTemplate(project))
+	marker.bindPopup(markerPopupTemplate(popupOptions))
 	map.panTo(new L.LatLng(...coordinates));
 }
 
@@ -135,15 +144,28 @@ function createMarkerIcon(className, title) {
 	return L.divIcon({ className: `map-marker ${className}`,title });
 }
 
-function markerPopupTemplate(project) {
-	const lat = project?.location_x ? `<p data-test-id="project-coord-x-latitude" class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(project?.location_x).toFixed(2)}</p>` : ''
-	const lng = project?.location_x ? `<p data-test-id="project-coord-y-longitude" class="m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(project?.location_y).toFixed(2)}</p>` : ''
-	const address = project?.location?.commune  ?`<p class="m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>` : ''
+function markerPopupTemplate({location_x, location_y, name, location, commune, address, title}) {
+	const lat = location_x ? `<p data-test-id="project-coord-x-latitude" class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(location_x).toFixed(2)}</p>` : ''
+	const lng = location_y ? `<p data-test-id="project-coord-y-longitude" class="m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(location_y).toFixed(2)}</p>` : ''
+
+	let popupAddress = ''
+	if(address){
+		popupAddress = `<p class="m-0 fs-7">${address}</p>`
+	}
+	else if(location){
+		popupAddress = `<p class="m-0 fs-7">${location}</p>`
+	}
+
+	if (commune){
+		popupAddress =`${popupAddress}<p class="m-0 fs-7 text-capitalize">${commune.name} (${commune.postal})</p>`
+	}
+
+	const popupTitle = title ? title : name
 	return `
 		<div class="marker-popup">
-			<header><h6>${project.name}</a></h6></header>
+			<header><h6>${popupTitle}</a></h6></header>
 			<main class="d-flex flex-column">
-				${address}
+				${popupAddress}
 				${lat}
 				${lng}
 			</main>

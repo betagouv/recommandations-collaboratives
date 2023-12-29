@@ -32,6 +32,18 @@
     z-index: 10;
 }
 
+
+.marker-onclick:after {
+    content:'';
+    color:  #222;;
+    background-color: white;
+    border: solid 2px #222;
+    transform: scale(1.6);
+    font-size: 0.5em;
+    text-align: center;
+}
+
+.project-location-marker.map-marker:after,
 .project-coordinates-marker.map-marker:after {
     background-color: #0063CB;;
     border: solid 2px white;
@@ -49,14 +61,13 @@
     border: solid 2px #222;
 }
 
-.marker-onclick:after {
-    content:'';
-    color:  #222;;
-    background-color: white;
-    border: solid 2px #222;
+.map-marker.marker-onclick:after {
+    content: '';
     transform: scale(1.6);
     font-size: 0.5em;
     text-align: center;
+    background-color: white;
+    border: solid 2px #222;
 }
 
 .leaflet-popup-content-wrapper, .leaflet-popup-content-wrapper {

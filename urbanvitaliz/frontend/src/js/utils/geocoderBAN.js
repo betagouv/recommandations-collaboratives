@@ -1,10 +1,10 @@
 import * as L from 'leaflet';
-
 /**
  * Source: https://github.com/entrepreneur-interet-general/leaflet-geocoder-ban/blob/master/src/leaflet-geocoder-ban.js
  */
 
-L.GeocoderBAN = L.Control.extend({
+const LExtendedBAN = L
+LExtendedBAN.GeocoderBAN = L.Control.extend({
 	options: {
 		position: 'topleft',
 		style: 'control',
@@ -17,7 +17,9 @@ L.GeocoderBAN = L.Control.extend({
 		autofocus: true,
 		onUpdate: null,
 		markerIcon:null,
-		markerPopupTemplate: null
+		markerPopupTemplate: null,
+		commune: null,
+		popupOptions: null
 	},
 	includes: L.Evented.prototype || L.Mixin.Events,
 	initialize: function (options) {
@@ -132,8 +134,13 @@ L.GeocoderBAN = L.Control.extend({
 				L.DomEvent.preventDefault(e)
 				break
 			default:
-				if (this.input.value) {
+				if (this.input.value && this.input.value.length > 3) {
 					var params = {q: this.input.value, limit: this.options.resultsNumber}
+					if(this.options.commune?.filters)  {
+						const {citycode, postcode} = this.options.commune.filters
+						params['citycode'] = citycode ?? undefined
+						params['postcode'] = postcode ?? undefined
+					}
 					var t = this
 					if (this.setTimeout) {
 						clearTimeout(this.setTimeout)
@@ -202,7 +209,7 @@ L.GeocoderBAN = L.Control.extend({
 		var latlng = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
 		this._map.setView(latlng, 14)
 		this.geocodeMarker = new L.Marker(latlng, {icon: this.options.markerIcon})
-			.bindPopup(this.options.markerPopupTemplate(feature.properties))
+			.bindPopup(this.options.markerPopupTemplate({...this.options.popupOptions, address: this.input.value }))
 			.addTo(this._map)
 			.openPopup()
 	}
@@ -225,7 +232,7 @@ const getJSON = function (url, params, callback) {
 	xmlHttp.send(null)
 }
 
-L.geocoderBAN = function (options) {
-	return new L.GeocoderBAN(options)
+LExtendedBAN.geocoderBAN = function (options) {
+	return new LExtendedBAN.GeocoderBAN(options)
 }
-export default L.geocoderBAN
+export default LExtendedBAN.geocoderBAN
