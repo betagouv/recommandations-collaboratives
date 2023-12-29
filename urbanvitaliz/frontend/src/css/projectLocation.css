@@ -30,23 +30,34 @@
     max-height: 260px;
 }
 
-.project-map-modal,
-.location-edit {
+.project-map-modal  {
     .project-map-container:not(.is-small) {
         height: 340px;
+    }
+}
+
+
+.location-edit {
+    .project-map-container:not(.is-small) {
+        height: 480px;
     }
 }
 
 .location-header ,
 .location-footer {
     flex-wrap: wrap;
-    padding-block: 1.5em;
+    padding-block: 1em;
+}
+
+.location-footer {
+    flex-wrap: wrap;
+    padding-block: 0.5em 1em;
 }
 
 .form-coordinates {
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 1.5em;
+    gap: 0.5em;
 }
 
 .form-coordinates > .button {
