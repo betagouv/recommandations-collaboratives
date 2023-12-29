@@ -42,9 +42,6 @@
                     {% endif %}
                 </article>
             {% else %}
-                <!-- <p class="project-card-details font-small">
-                    Ces thématiques sont modifiables <a href='{% url "projects-project-topics" project.id %}'>ici</a>.
-                </p> -->
                 <ul class="topic-list l-stack">
                     {% for topic in project.topics.all %}
                         <li x-data='TopicSearch("{{ topic.name|default:"" }}", "projects")'
@@ -58,9 +55,6 @@
                     {% endfor %}
                 </ul>
             {% endif %}
-            <!-- <p class="project-card-details font-small">
-                Ces thématiques ont été associées aux recommandations de nos conseillers.
-            </p> -->
             <ul class="topic-list l-stack readonly">
                 {% for topic in project.all_topics %}
                     <li x-data='TopicSearch("{{ topic.name|default:"" }}", "recommendations")'
