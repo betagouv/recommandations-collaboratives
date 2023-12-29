@@ -12,7 +12,7 @@ function ProjectLocationEdit(projectOptions) {
 		mapIsSmall: true,
 		project: null,
 		map: null,
-		zoom: 5,
+		zoom: 8,
 		markers: [],
 
 		async init() {
