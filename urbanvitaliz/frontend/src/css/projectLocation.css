@@ -209,3 +209,5 @@
     justify-content: space-between;
     cursor: not-allowed;
 }
+
+.leaflet-grab {cursor: default;}
