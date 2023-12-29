@@ -70,7 +70,7 @@ function initEditLayers(map, project, geoData) {
 	}
 }
 
-function initMapControllerBAN(map, geoData, onUpdate) {
+function initMapControllerBAN(map,  geoData, onUpdate) {
 	const className = 'marker-geocoder-ban'
 	const geocoderOptions = {
 		collapsed: false,
@@ -79,7 +79,8 @@ function initMapControllerBAN(map, geoData, onUpdate) {
 		geoData,
 		onUpdate,
 		markerIcon: createMarkerIcon(className),
-		markerPopupTemplate
+		markerPopupTemplate,
+		commune: geoData.location
 	}
 	GeocoderBAN(geocoderOptions).addTo(map)
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');

@@ -63,7 +63,7 @@ function ProjectLocationEdit(projectOptions) {
 			this.map = Map;
 			
 			mapUtils.initEditLayers(this.map, project, geoData);
-			mapUtils.initMapControllerBAN(this.map, project, geoData, onClick);
+			mapUtils.initMapControllerBAN(this.map, geoData, onClick);
 			this.map.setMinZoom(this.zoom - 7);
 			this.map.setMaxZoom(this.zoom + 6);
 			L.control.zoom({

@@ -1,5 +1,4 @@
 import * as L from 'leaflet';
-
 /**
  * Source: https://github.com/entrepreneur-interet-general/leaflet-geocoder-ban/blob/master/src/leaflet-geocoder-ban.js
  */
@@ -18,7 +17,8 @@ LExtendedBAN.GeocoderBAN = L.Control.extend({
 		autofocus: true,
 		onUpdate: null,
 		markerIcon:null,
-		markerPopupTemplate: null
+		markerPopupTemplate: null,
+		commune: null
 	},
 	includes: L.Evented.prototype || L.Mixin.Events,
 	initialize: function (options) {
@@ -133,8 +133,13 @@ LExtendedBAN.GeocoderBAN = L.Control.extend({
 				L.DomEvent.preventDefault(e)
 				break
 			default:
-				if (this.input.value) {
+				if (this.input.value && this.input.value.length > 3) {
 					var params = {q: this.input.value, limit: this.options.resultsNumber}
+					if(this.options.commune?.filters)  {
+						const {citycode, postcode} = this.options.commune.filters
+						params['citycode'] = citycode ?? undefined
+						params['postcode'] = postcode ?? undefined
+					}
 					var t = this
 					if (this.setTimeout) {
 						clearTimeout(this.setTimeout)
