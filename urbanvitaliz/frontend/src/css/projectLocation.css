@@ -221,4 +221,4 @@
     cursor: not-allowed;
 }
 
-.leaflet-grab {cursor: default;}
+.leaflet-grab {cursor: crosshair;}
