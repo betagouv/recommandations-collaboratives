@@ -57,7 +57,7 @@ function ProjectLocationEdit(projectOptions) {
 				}
 				onClick(e.latlng)
 				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon('marker-onclick') }).addTo(Map);
-				marker.bindPopup(mapUtils.markerPopupTemplate(popupOptions))
+				marker.bindPopup(mapUtils.markerPopupTemplate({...popupOptions,location_x: e.latlng.lng, location_y: e.latlng.lat }))
 				let markerLayer = L.layerGroup([marker]).addTo(Map);
 				markers[0] = markerLayer
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
