@@ -39,7 +39,7 @@ def set_default_tags(apps, schema_editor):
     Tag = apps.get_model('taggit', 'Tag')
     TaggedItem = apps.get_model('taggit', 'TaggedItem')
     ContentType = apps.get_model('contenttypes', 'ContentType')
-    content_type = ContentType.objects.get(app_label="home", model="siteconfiguration")
+    content_type, _created = ContentType.objects.get_or_create(app_label="home", model="siteconfiguration")
 
     SiteConfiguration = apps.get_model("home", "SiteConfiguration")
     for site_conf in SiteConfiguration.objects.all():
@@ -53,7 +53,6 @@ def set_default_tags(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('taggit', '0005_auto_20220424_2025'),
         ('home', '0019_alter_siteconfiguration_reminder_interval'),
     ]
 

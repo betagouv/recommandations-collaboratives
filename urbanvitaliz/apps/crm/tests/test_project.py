@@ -7,6 +7,8 @@ from django.utils import timezone
 from model_bakery import baker
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from urbanvitaliz.apps.home import models as home_models
+from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
@@ -137,6 +139,12 @@ def test_crm_project_list_filters_by_commune_name(request, client):
 @pytest.mark.django_db
 def test_crm_project_details_available_for_staff(request, client):
     site = get_current_site(request)
+    onboarding = onboarding_models.Onboarding.objects.first()
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding=onboarding,
+    )
     project = baker.make(projects_models.Project, sites=[site])
 
     url = reverse("crm-project-details", args=[project.pk])
@@ -393,7 +401,12 @@ def test_crm_search_by_user_name_on_current_site(request, client):
 @pytest.mark.django_db
 def test_toggle_missing_project_annotation(request, client):
     site = get_current_site(request)
-
+    onboarding = onboarding_models.Onboarding.objects.first()
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding=onboarding,
+    )
     project = baker.make(models.projects_models.Project, sites=[site])
 
     url = reverse("crm-project-toggle-annotation", args=[project.id])
@@ -412,6 +425,12 @@ def test_toggle_missing_project_annotation(request, client):
 @pytest.mark.django_db
 def test_toggle_on_project_annotation(request, client):
     site = get_current_site(request)
+    onboarding = onboarding_models.Onboarding.objects.first()
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding=onboarding,
+    )
 
     project = baker.make(models.projects_models.Project, sites=[site])
     annotation = baker.make(models.ProjectAnnotations, site=site, project=project)
@@ -432,6 +451,12 @@ def test_toggle_on_project_annotation(request, client):
 @pytest.mark.django_db
 def test_toggle_off_project_annotation(request, client):
     site = get_current_site(request)
+    onboarding = onboarding_models.Onboarding.objects.first()
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding=onboarding,
+    )
 
     project = baker.make(models.projects_models.Project, sites=[site])
     annotation = baker.make(models.ProjectAnnotations, site=site, project=project)
