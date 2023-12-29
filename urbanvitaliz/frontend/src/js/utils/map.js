@@ -102,10 +102,14 @@ function addLayerMarkerProjectCoordinates(map, project) {
 }
 
 function addLayerMarkerProjectLocation(map, project, geoData) {
-	if(geoData.code && geoData.code === 400 || geoData.features.length !== 1) {
+	if(geoData.code && geoData.code === 400 ) {
 		throw Error(`Données API Adresse indisponibles pour "${project.name}"`)
 	}
-	const coordinates = geoData.features[0].coordinates
+	const locationData =  geoData.location?.features ?  geoData.location : geoData
+	if(locationData.features?.length !== 1) {
+		throw Error(`Données API Adresse indisponibles pour "${project.name}"`)
+	}
+	const coordinates = geoData.location.features[0].geometry.coordinates.reverse()
 	const marker = L.marker(coordinates, { icon: createMarkerIcon('project-location-marker') }).addTo(map);
 	marker.bindPopup(markerPopupTemplate(project))
 	map.panTo(new L.LatLng(...coordinates));

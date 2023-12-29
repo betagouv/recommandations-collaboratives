@@ -29,7 +29,7 @@ function ProjectLocationEdit(projectOptions) {
 			const geoData = {}
 			try {
 				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
-				geoData.location = await geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name ?? ''} ${postal ?? ''}`);
+				geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location, {name, insee, postal});
 			} catch(e) {
 				console.log(e)
 			}
