@@ -113,9 +113,13 @@
                     integrity="sha384-l+UQ7KbPIcq6l4DoWCwMvaOJ0pdJ+oTVGD6GyROFzSriOH1F1f6dl90fOgcigkMX"
                     crossorigin="anonymous"></script>
             <script type="text/javascript">
-         Sentry.init({
-             dsn: "https://94ca61f214804521ab3f4b80600dc837@o1107121.ingest.sentry.io/6133993",
-         });
+                try {
+                    Sentry.init({
+                        dsn: "https://94ca61f214804521ab3f4b80600dc837@o1107121.ingest.sentry.io/6133993",
+                    });
+                } catch (e) {
+                  // Sentry is not defined
+                }
             </script>
         {% endif %}
         <!-- Polyfill for older browsers -->
