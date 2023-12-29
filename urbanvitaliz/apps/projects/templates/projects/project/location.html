@@ -76,10 +76,7 @@
             <div x-ref="map-edit" id="map-edit" class="h-100 w-100"></div>
           </div>
           <div class="location-footer bg-white">
-            <form method="POST"
-                  action="{% url 'projects-project-location' project.pk %}"
-                  name="ProjectLocationForm"
-                  class="d-flex form-coordinates text-muted flex-row-reverse">
+            <form method="POST" action="" name="ProjectLocationForm" class="d-flex form-coordinates text-muted flex-row-reverse">
               {% csrf_token %}
               <!-- {{ form.as_p }} -->
               <fieldset class="d-flex w-100">
