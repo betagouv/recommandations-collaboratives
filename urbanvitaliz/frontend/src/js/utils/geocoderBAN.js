@@ -18,7 +18,8 @@ LExtendedBAN.GeocoderBAN = L.Control.extend({
 		onUpdate: null,
 		markerIcon:null,
 		markerPopupTemplate: null,
-		commune: null
+		commune: null,
+		popupOptions: null
 	},
 	includes: L.Evented.prototype || L.Mixin.Events,
 	initialize: function (options) {
@@ -208,7 +209,7 @@ LExtendedBAN.GeocoderBAN = L.Control.extend({
 		var latlng = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
 		this._map.setView(latlng, 14)
 		this.geocodeMarker = new L.Marker(latlng, {icon: this.options.markerIcon})
-			.bindPopup(this.options.markerPopupTemplate(feature.properties))
+			.bindPopup(this.options.markerPopupTemplate({...this.options.popupOptions, address: this.input.value }))
 			.addTo(this._map)
 			.openPopup()
 	}

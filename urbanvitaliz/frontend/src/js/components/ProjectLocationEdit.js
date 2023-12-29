@@ -47,6 +47,8 @@ function ProjectLocationEdit(projectOptions) {
 				return
 			}
 			const Map = mapUtils.initMap('map-edit', project, options, this.zoom);
+
+			const popupOptions = {...project, title: "Point ajouté sur la carte"}
 			//Center Map
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
 			Map.on('click', function(e) {
@@ -55,7 +57,7 @@ function ProjectLocationEdit(projectOptions) {
 				}
 				onClick(e.latlng)
 				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon('marker-onclick') }).addTo(Map);
-				marker.bindPopup(mapUtils.markerPopupTemplate(project))
+				marker.bindPopup(mapUtils.markerPopupTemplate(popupOptions))
 				let markerLayer = L.layerGroup([marker]).addTo(Map);
 				markers[0] = markerLayer
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
