@@ -32,7 +32,8 @@
     font-size: 18px;
 }
 
-.font-small {
+.font-small ,
+h6.font-small {
     font-size: 14px;
 }
 
