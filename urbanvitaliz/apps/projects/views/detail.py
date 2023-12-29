@@ -383,6 +383,10 @@ def project_update_location(request, project_id=None):
         if form.is_valid():
             project = form.save()
 
+            next_url = request.GET.get("next", None)
+            if next_url:
+                return redirect(next_url)
+
             return redirect(
                 reverse("projects-project-detail-overview", args=[project.pk])
             )

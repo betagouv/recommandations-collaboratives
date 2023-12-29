@@ -108,17 +108,16 @@ def onboarding(request):
             del request.session["onboarding_existing_data"]
 
         if is_new_user:
-            # new user first have to setup her password and then complete the survey
+            # new user first have to setup her password and then complete the project location before the survey
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            next_url = (
-                reverse("survey-project-session", args=(project.id,)) + "?first_time=1"
-            )
+            next_args_for_project_location = urlencode({"next": reverse("survey-project-session", args=(project.pk,))})
+            next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
             next_args = urlencode({"next": next_url})
             return redirect(f"{reverse('home-user-setup-password')}?{next_args}")
         else:
-            response = redirect("survey-project-session", project_id=project.id)
-            response["Location"] += "?first_time=1"
-            return response
+            # go to project location form before starting survey
+            next_args = urlencode({"next": reverse("survey-project-session", args=(project.pk,))})
+            return redirect(f"{reverse('projects-project-location', args=(project.pk,))}?{next_args}")
 
     return render(request, "onboarding/onboarding.html", locals())
 
