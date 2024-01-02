@@ -4,7 +4,7 @@ import * as L from 'leaflet';
  * Source: https://github.com/entrepreneur-interet-general/leaflet-geocoder-ban/blob/master/src/leaflet-geocoder-ban.js
  */
 
-L.GeocoderBAN = L.Control.extend({
+L.Control.GeocoderBAN = L.Control.extend({
 	options: {
 		position: 'topleft',
 		style: 'control',
@@ -225,7 +225,7 @@ const getJSON = function (url, params, callback) {
 	xmlHttp.send(null)
 }
 
-L.geocoderBAN = function (options) {
-	return new L.GeocoderBAN(options)
+L.control.geocoderBAN = function (options) {
+	return new L.Control.GeocoderBAN(options)
 }
-export default L.geocoderBAN
+export default L.control.geocoderBAN
