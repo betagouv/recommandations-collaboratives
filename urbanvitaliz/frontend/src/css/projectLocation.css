@@ -19,7 +19,7 @@
 }
 
 .map-modal .modal-header h6 {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 .map-modal .modal-body {
@@ -30,23 +30,34 @@
     max-height: 260px;
 }
 
-.project-map-modal,
-.location-edit {
+.project-map-modal  {
     .project-map-container:not(.is-small) {
         height: 340px;
+    }
+}
+
+
+.location-edit {
+    .project-map-container:not(.is-small) {
+        height: 480px;
     }
 }
 
 .location-header ,
 .location-footer {
     flex-wrap: wrap;
-    padding-block: 1.5em;
+    padding-block: 1em;
+}
+
+.location-footer {
+    flex-wrap: wrap;
+    padding-block: 0.5em 1em;
 }
 
 .form-coordinates {
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 1.5em;
+    gap: 0.5em;
 }
 
 .form-coordinates > .button {
@@ -178,7 +189,7 @@
 .location-knowledge .leaflet-popup-content,
 .location-overview .leaflet-popup-content {
     width: auto;
-    min-width: 180px;
+    min-width: 200px;
 }
 
 .location-edit .marker-popup header,
@@ -191,7 +202,8 @@
 .location-edit .marker-popup h6,
 .location-knowledge .marker-popup h6,
 .location-overview .marker-popup h6  {
-    padding: 0 14px;
+    padding: 0;
+    padding-inline-end:14px;
     margin-bottom: 0;
 }
 
@@ -209,3 +221,5 @@
     justify-content: space-between;
     cursor: not-allowed;
 }
+
+.leaflet-grab {cursor: crosshair;}
