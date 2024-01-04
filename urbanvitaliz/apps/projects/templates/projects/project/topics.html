@@ -90,7 +90,7 @@
                                            class="visually-hidden"
                                            autocomplete="off"
                                            @click="handleDeleteClick()"
-                                           {% if topic_form.name.value is None %}disabled=true{% endif %}>
+                                           :disabled="{  !topic  }">
                                     <label for="id_form-{{ forloop.counter0 }}-DELETE">
                                         <span class="visually-hidden checked-text">À supprimer: sélectionné</span>
                                         <span class="visually-hidden unckecked-text">Cocher pour supprimer</span>
