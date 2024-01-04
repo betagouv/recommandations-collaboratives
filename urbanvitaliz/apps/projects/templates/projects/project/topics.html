@@ -80,18 +80,24 @@
                                         {% endif %}
                                     </div>
                                 {% endif %}
-                                <div class="topic-delete d-flex align-self-end">
-                                    <input type="submit"
-                                           aria-label="Supprimer"
-                                           title="Supprimer"
-                                           text="Supprimer"
-                                           value="checked"
-                                           name="form-{{ forloop.counter0 }}-DELETE"
+                                <div x-data="topic.delete"
+                                     class="input-checkbox-btn input-delete d-flex align-self-end"
+                                     :class="{ 'disabled' : !topic || topic.delete }">
+                                    <input name="form-{{ forloop.counter0 }}-DELETE"
                                            id="id_form-{{ forloop.counter0 }}-DELETE"
-                                           class="input-submit" />
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-                                        <path fill="#CE0500" d="M2.917 1.667V.833h4.166v.834h2.084V2.5h-.834v6.25c0 .23-.186.417-.416.417H2.083a.417.417 0 0 1-.416-.417V2.5H.833v-.833h2.084ZM2.5 2.5v5.833h5V2.5h-5Zm1.25 1.25h.833v3.333H3.75V3.75Zm1.667 0h.833v3.333h-.833V3.75Z" />
-                                    </svg>
+                                           type="checkbox"
+                                           role="button"
+                                           class="visually-hidden"
+                                           autocomplete="off"
+                                           @click="handleDeleteClick()"
+                                           {% if topic_form.name.value is None %}disabled=true{% endif %}>
+                                    <label for="id_form-{{ forloop.counter0 }}-DELETE">
+                                        <span class="visually-hidden checked-text">À supprimer: sélectionné</span>
+                                        <span class="visually-hidden unckecked-text">Cocher pour supprimer</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                            <path fill="#CE0500" d="M2.917 1.667V.833h4.166v.834h2.084V2.5h-.834v6.25c0 .23-.186.417-.416.417H2.083a.417.417 0 0 1-.416-.417V2.5H.833v-.833h2.084ZM2.5 2.5v5.833h5V2.5h-5Zm1.25 1.25h.833v3.333H3.75V3.75Zm1.667 0h.833v3.333h-.833V3.75Z" />
+                                        </svg>
+                                    </label>
                                     {% if topic_form.DELETE.errors %}
                                         {% for error in topic_form.DELETE.errors %}{{ error|escape }}{% endfor %}
                                     {% endif %}

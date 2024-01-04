@@ -102,14 +102,6 @@
 	--current-bg-color: var(--color-topic-5);
 }
 
-.topic-delete {
-	align-items: center;
-}
-
-.topic-delete svg {
-	margin-inline: 0.5em;
-}
-
 .topic-choice-list  {
 	display: flex;
 	align-items: flex-start;
@@ -136,46 +128,77 @@
 	border-top: 1px solid var(--gray-light, #E5E5E5);
 }
 
-.topic-delete {
+.input-checkbox-btn {
+	width: 32px;
+	height: 32px;
+	position: relative;
+	align-items: center;
+	margin-inline-start: 8px;
+	border: 1px solid white;
+}
+
+.input-checkbox-btn :checked + label .checked-text {
+  display: inline;
+}
+
+.input-checkbox-btn :checked + label .unchecked-text {
+  display: none;
+}
+
+.input-checkbox-btn [type="checkbox"]:not(:checked) + label .checked-text {
+  display: none;
+}
+
+.input-checkbox-btn [type="checkbox"]:not(:checked) + label .unchecked-text {
+  display: inline;
+}
+
+.input-checkbox-btn label {
+	position: absolute;
+  left: 0;
+	right: 0;
+  top: 0;
+	bottom: 0;
+  z-index: 2;
+	background-color: white;
+	border: 1px solid white;
+}
+
+.input-checkbox-btn label:hover {
+	background-color:#ffe7e7;
+}
+
+.input-checkbox-btn label svg {
+	content: '';
 	width: 16px;
 	height: 16px;
-	position: relative;
-	padding: 1em 10px;
-	margin-inline-start: 8px
-}
-
-.input-submit {
-    width: 24px;
-    height: 24px;
-    padding: 12px;
-    border:none;
-    box-shadow: none;
-    font-size: 0;
-		position: absolute;
-		top: 0;
-		left:0;
-		z-index: 1;
-		background-color: transparent;
-		border: 1px solid white;
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	z-index: 0;
+	margin: 0;
+	background-image: url('data:image/svg+xml;utf8,');
 }
 
 
-.input-submit:hover {
-	border-color: red;
+.input-checkbox-btn [type="checkbox"]:checked + label {
+	border-color: #CE0500;
 }
 
-.input-submit:hover svg {
-	stroke: white
+.input-checkbox-btn.disabled label {
+	background-color: #EEEEEE;
+	cursor: not-allowed;
+	user-select: none;
+	pointer-events: none;
+
+	color: #929292;
+	border: 1px solid white;
 }
 
-.topic-delete svg {
-    content: '';
-    width: 16px;
-    height: 16px;
-		position: absolute;
-		top: 8px;
-		left: 8px;
-		z-index: 0;
-		margin: 0;
-    background-image: url('data:image/svg+xml;utf8,');
+.input-checkbox-btn.disabled label svg {
+	filter: grayscale(80%)
+}
+
+.input-checkbox-btn [type="checkbox"]:active + label {
+	border-color: #ffe7e7;
 }
