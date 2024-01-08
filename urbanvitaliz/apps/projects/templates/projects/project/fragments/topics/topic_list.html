@@ -31,7 +31,7 @@
         </article>
     {% else %}
         <article class="l-stack">
-            {% if project..topics.all.count == 0 %}
+            {% if project.topics.all.count == 0 %}
                 <article class="project-card-details l-stack empty">
                     <p class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">
                         Il n'y a aucune thématique associée au projet pour le moment
@@ -44,13 +44,10 @@
             {% else %}
                 <ul class="topic-list l-stack">
                     {% for topic in project.topics.all %}
-                        <li x-data='TopicSearch("{{ topic.name|default:"" }}", "projects")'
-                            :class="results.length === 0 ? 'empty' : ''">
-                            <template x-if="results[0]">
-                                <a class="tiny bold topic-link"
-                                   title="Modifier"
-                                   href='{% url "projects-project-topics" project.id %}'>{{ topic.name }}</a>
-                            </template>
+                        <li>
+                            <a class="tiny bold topic-link"
+                               title="Modifier"
+                               href='{% url "projects-project-topics" project.id %}'>{{ topic.name }}</a>
                         </li>
                     {% endfor %}
                 </ul>
