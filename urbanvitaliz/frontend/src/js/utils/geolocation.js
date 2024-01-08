@@ -46,12 +46,18 @@ async function fetchCommuneIgn(insee) {
 	return communeGeo;
 }
 
-async function fetchGeolocationByAddress(address) {
+async function fetchGeolocationByAddress(address, commune) {
 	if (address.length < 3) {
 		return
 	}
 	const apiEndpoint = `${API_ADRESSE}/search?`;
 	const searchParams = { q: address, limit: 10 } // TODO
+	if(commune)  {
+		const {name, insee, postal} = commune
+		searchParams['city'] = name ?? undefined
+		searchParams['citycode'] = insee ?? undefined
+		searchParams['postcode'] = postal ?? undefined
+	}
 	const geoJSON = await fetch(apiEndpoint + new URLSearchParams(searchParams)).then(response => response.json());
 	return geoJSON;
 }

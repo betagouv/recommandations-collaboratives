@@ -10,7 +10,7 @@ function ProjectLocation(projectOptions, modal=true) {
 		mapModal: null,
 		staticMap: null,
 		interactiveMap: null,
-		zoom: 6,
+		zoom: 8,
 		markers: [],
 
 		async init() {

@@ -128,9 +128,9 @@ def test_performing_onboarding_create_a_new_user_and_logs_in(request, client):
     assert project.owner == user
     assert project.submitted_by == user
 
-    next_url = urlencode(
-        {"next": reverse("survey-project-session", args=[project.id]) + "?first_time=1"}
-    )
+    next_args_for_project_location = urlencode({"next": reverse("survey-project-session", args=(project.pk,))})
+    next_url = urlencode({"next": f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"})
+    
     url = reverse("home-user-setup-password")
     assert response.url == (f"{url}?{next_url}")
 
@@ -176,7 +176,7 @@ def test_onboarding_fills_existing_user_and_profile_missing_info(request, client
 
     assert response.status_code == 302
     assert response["Location"].startswith(
-        reverse("survey-project-session", args=[project.id])
+        reverse("projects-project-location", args=[project.id])
     )
 
     user.refresh_from_db()
@@ -219,7 +219,7 @@ def test_onbording_do_not_replace_existing_user_email_when_logged_in(request, cl
 
     assert response.status_code == 302
     assert response["Location"].startswith(
-        reverse("survey-project-session", args=[project.id])
+        reverse("projects-project-location", args=[project.id])
     )
 
     user.refresh_from_db()  # fonctionne dans ce contexte

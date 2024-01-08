@@ -9,9 +9,39 @@
 .survey-card .card-title {
     font-weight: 500;
     font-size: 22px;
-    line-height: 28px;
 }
 
 .survey-card .card-completion {
     font-weight: 500;
+}
+
+/**
+ * Project Details sections
+ */
+
+.project-details-section header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+
+.project-details-section header > * {
+    display: flex;
+    align-items: center;
+}
+
+.project-details-section header svg {
+    margin-inline-end: 0.5em;
+}
+
+.project-details-section header h2,
+.project-details-section header h6,
+.project-details-section header h4  {
+    justify-content: space-between;
+    width: 100%;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 0;
 }

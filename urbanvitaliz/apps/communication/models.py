@@ -19,7 +19,7 @@ class EmailTemplate(models.Model):
     NAME_CHOICES = (
         ("project_received", "Projet bien reçu"),
         ("project_accepted", "Projet accepté par l'équipe de modération"),
-        ("project_reminders_digest", "Résumé des rappels"),
+        # ("project_reminders_digest", "Résumé des rappels"),
         ("digest_for_non_switchtender", "Résumé quotidien général de notifications"),
         ("digest_for_switchtender", "Résumé quotidien des conseillers"),
         ("new_recommendations_digest", "Résumé des nouvelles recommandations"),
@@ -27,7 +27,8 @@ class EmailTemplate(models.Model):
             "new_site_for_switchtender",
             "Alerte conseillers d'un nouveau projet sur le territoire",
         ),
-        ("sharing invitation", "Invitation à rejoindre un projet"),
+        ("sharing_invitation", "Invitation à rejoindre un projet"),
+        ("project_reminders_new_reco_digest","Rappel des nouvelles recommandations (mail projet B)"),
         ("project_reminders_whats_up_digest", "Où en êtes-vous ? (mail projet C)"),
     )
 
