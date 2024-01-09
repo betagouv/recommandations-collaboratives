@@ -75,14 +75,14 @@ function ResourceIGN(projectOptions) {
 					crs : L.geoportalCRS.EPSG2154
 			}).setView([location_x, location_y], 5);
 
-			L.tileLayer(
-				API_IGN_TUILES,
-				{
-						minZoom : 0,
-						maxZoom : 18,
-						tileSize : 256,
-						attribution : "IGN-F/Géoportail"
-				}).addTo(map)
+			// L.tileLayer(
+			// 	API_IGN_TUILES,
+			// 	{
+			// 			minZoom : 0,
+			// 			maxZoom : 18,
+			// 			tileSize : 256,
+			// 			attribution : "IGN-F/Géoportail"
+			// 	}).addTo(map)
 
 			// Création de la couche
 			const layerTuiles = L.geoportalLayer.WMTS({
