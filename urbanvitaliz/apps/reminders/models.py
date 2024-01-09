@@ -10,8 +10,10 @@ created : 2021-09-28 12:40:54 CEST
 
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils import timezone
+from urbanvitaliz.apps.communication import models as comm_models
 from urbanvitaliz.apps.projects import models as projects_models
 
 
@@ -92,6 +94,13 @@ class Reminder(models.Model):
     kind = models.IntegerField(choices=KIND_CHOICES, editable=False)
 
     sent_on = models.DateTimeField(null=True, blank=True)
+
+    transactions = GenericRelation(
+        comm_models.TransactionRecord,
+        related_query_name="reminders",
+        content_type_field="related_ct",
+        object_id_field="related_id",
+    )
 
     class Meta:
         verbose_name = "rappel"

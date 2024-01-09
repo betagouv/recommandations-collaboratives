@@ -15,17 +15,41 @@ updated: 2022-02-03 16:19:24 CET
 
 import logging
 
+from django.utils import timezone
 from django.conf import settings
 from django.core.mail import mail_admins
 from django.core.mail import send_mail as django_send_mail
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 
 from .brevo import Brevo
-from .models import EmailTemplate
+from .models import EmailTemplate, TransactionRecord
 
 logger = logging.getLogger("main")
 
 
-def brevo_email(template_name, recipients, params=None, test=False):
+def create_transaction(transaction_id, recipients, label, related, faked=False):
+    current_site = Site.objects.get_current()
+
+    if type(recipients) is not list:
+        recipients = [recipients]
+
+    if type(recipients[0]) is dict:
+        recipients = [recipient.get("email") for recipient in recipients]
+
+    for user in User.objects.filter(profile__sites=current_site, email__in=recipients):
+        TransactionRecord.objects.create(
+            site=current_site,
+            sent_on=timezone.now(),
+            transaction_id=transaction_id,
+            label=label,
+            faked=faked,
+            user=user,
+            related=related,
+        )
+
+
+def brevo_email(template_name, recipients, params=None, test=False, related=None):
     """Uses Brevo service to send an email using the given template and params"""
     brevo = Brevo()
     try:
@@ -36,10 +60,21 @@ def brevo_email(template_name, recipients, params=None, test=False):
         )
         return False
 
-    return brevo.send_email(template.sib_id, recipients, params, test=test)
+    response = brevo.send_email(template.sib_id, recipients, params, test=test)
+
+    if response:
+        create_transaction(
+            transaction_id=response.messageId,
+            recipients=recipients,
+            label=template_name,
+            related=related,
+            faked=test,
+        )
+
+    return response
 
 
-def send_debug_email(template_name, recipients, params=None, test=False):
+def send_debug_email(template_name, recipients, params=None, test=False, related=None):
     """
     As an alternative, use the default django send_mail, mostly used for debugging
     and displaying email on the terminal.
@@ -65,6 +100,15 @@ def send_debug_email(template_name, recipients, params=None, test=False):
         simple_recipients,
         fail_silently=False,
     )
+
+    create_transaction(
+        transaction_id=f"FAKE-ID-{timezone.now()}",
+        recipients=recipients,
+        label=template_name,
+        related=related,
+        faked=True,
+    )
+
     return True
 
 

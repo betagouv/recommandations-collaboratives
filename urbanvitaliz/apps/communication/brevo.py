@@ -38,6 +38,7 @@ class Brevo:
             send_smtp_email = brevo_sdk.SendSmtpEmail(
                 template_id=template_id, to=send_to, params=params
             )
+
             response = self.api_instance.send_transac_email(send_smtp_email)
 
         return response
