@@ -12,6 +12,9 @@
 {{ project.commune.longitude|json_script:"longitude" }}
 {% block css %}
     <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" />
+    <link rel="stylesheet"
           href="https://ignf.github.io/geoportal-extensions/leaflet-latest/dist/GpPluginLeaflet.css" />
 {% endblock %}
 {% block content %}
@@ -46,32 +49,6 @@
                 latitude: JSON.parse(document.getElementById('latitude').textContent),
             }
         }
-
-
-        // Documentation : https://geoservices.ign.fr/documentation/services/utilisation-web/extension-pour-leaflet
-
-        // TODO: INtégration IGN mise en pause pour migrtation d'API Geoplateforme : https://geoservices.ign.fr/bascule-vers-la-geoplateforme
-        // Next: test APIS https://geoservices.sogefi-sig.com
-        // Création de la carte
-        const map  = L.map('map-static', {
-            dragging: true,
-            touchZoom: true,
-            doubleClickZoom: true,
-            scrollWheelZoom: true,
-            boxZoom: true,
-            keyboard: true,
-            zoomControl: true,
-            crs : L.geoportalCRS.EPSG2154
-        })
-
-        // Création de la couche
-        const layerTuiles = L.geoportalLayer.WMTS({
-            layer  : `ORTHOIMAGERY.ORTHOPHOTOS`
-        }) ;
-
-        layerTuiles.addTo(map); // ou map.addLayer(lyr);
-
-        map.setView(new L.LatLng(1.20,46.5), 12);
 
     </script>
     {% vite_asset 'js/apps/mapIGN.js' %}
