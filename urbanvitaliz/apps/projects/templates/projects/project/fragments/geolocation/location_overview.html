@@ -12,7 +12,7 @@
 {{ project.commune.longitude|json_script:"longitude" }}
 {% block css %}
     <link rel="stylesheet"
-          href="http://ignf.github.io/geoportal-extensions/leaflet-latest/dist/GpPluginLeaflet.css" />
+          href="https://ignf.github.io/geoportal-extensions/leaflet-latest/dist/GpPluginLeaflet.css" />
 {% endblock %}
 {% block content %}
     <div x-data='ResourceIGN(projectOptions)'
@@ -30,7 +30,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
-    <script src="http://ignf.github.io/geoportal-extensions/leaflet-latest/dist/GpPluginLeaflet.js"></script>
+    <script src="https://ignf.github.io/geoportal-extensions/leaflet-latest/dist/GpPluginLeaflet.js"></script>
     <script>
         const projectOptions = {
             name: JSON.parse(document.getElementById('nameProject').textContent),
@@ -49,6 +49,9 @@
 
 
         // Documentation : https://geoservices.ign.fr/documentation/services/utilisation-web/extension-pour-leaflet
+
+        // TODO: INtégration IGN mise en pause pour migrtation d'API Geoplateforme : https://geoservices.ign.fr/bascule-vers-la-geoplateforme
+        // Next: test APIS https://geoservices.sogefi-sig.com
         // Création de la carte
         const map  = L.map('map-static', {
             dragging: true,
@@ -59,7 +62,7 @@
             keyboard: true,
             zoomControl: true,
             crs : L.geoportalCRS.EPSG2154
-        });
+        })
 
         // Création de la couche
         const layerTuiles = L.geoportalLayer.WMTS({

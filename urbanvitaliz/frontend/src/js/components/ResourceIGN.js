@@ -4,6 +4,7 @@ import axios from 'axios'
 import geolocUtils from '../utils/geolocation/'
 
 const API_IGN_DOWNLOAD = 'https://data.geopf.fr/telechargement/capabilities'
+
 function ResourceIGN(projectOptions) {
 	return {
 		mapIsSmall: true,
