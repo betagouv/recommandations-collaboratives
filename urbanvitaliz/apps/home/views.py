@@ -129,6 +129,10 @@ class StatisticsView(TemplateView):
             )
         )
 
+        # SOSPonts specific
+        context["question_from_beginning"] = context["collectivity_supported"]
+        context["reco_sent"]= sum(numbers)
+
         return context
 
 
