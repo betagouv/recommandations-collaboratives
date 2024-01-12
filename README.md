@@ -37,39 +37,6 @@ TODO
 
 Les fichiers docker se trouvent à la racine dans le dossier `docker`.
 
-#### Création du conteneur
-
-En ligne de commandes, aller dans ce dossier et taper :
-
-```sh
-docker-compose up
-```
-
-Après quelques minutes d'installation, vous devriez avoir un
-environnement prêt à configurer.
-
-#### Installation des dépendances
-
-Entrez dans le container `app` en tapant :
-
-```sh
-docker-compose exec app /bin/bash
-```
-
-Rendez-vous dans le dossier `/workspace` et installez les dépendances à l'aide de :
-
-```sh
-pip3 install -r requirements.txt
-pip3 install -r requirements-dev.txt
-```
-
-Puis, installez les dépendances javascript :
-
-```sh
-cd urbanvitaliz/frontend
-yarn install
-```
-
 #### Configuration de l'applicatif
 
 Copiez le fichier de configuration d'exemple :
@@ -93,9 +60,27 @@ DATABASES = {
 }
 ```
 
+
+#### Création des conteneurs
+
+En ligne de commandes, aller dans ce dossier `Docker` et taper :
+
+```sh
+docker-compose up -d
+```
+
+Après quelques minutes d'installation, vous devriez avoir un environnement prêt.
+
+
 #### Création de la base de donnnées
 
-Synchronisez la base de données en tapant depuis `workspace` :
+Entrez dans le container `app` en tapant :
+
+```sh
+docker-compose exec app /bin/bash
+```
+
+Initialisez ou synchronisez la base de données en tapant :
 
 ```sh
 ./manage.py migrate
@@ -103,7 +88,10 @@ Synchronisez la base de données en tapant depuis `workspace` :
 
 ## Lancement de l'applicatif
 
+*Les commandes suivantes ne sont pas nécessaire si vous êtes avec Docker.*
+
 Pour lancer l'applicatif en mode `développement`, générez les statiques à l'aide de :
+
 
 ```sh
 cd urbanvitaliz/frontend && yarn dev
@@ -118,6 +106,24 @@ Puis, exécutez le backend :
 ```
 
 Vous devriez pouvoir vous connecter sur http://localhost:8000 !
+
+
+## Chargement des données de démo
+
+```bash
+./manage.py loaddata data/geomatics.json 
+```
+
+Création du premier site
+```bash
+./manage.py shell
+```
+
+```python
+from urbanvitaliz.apps.home import utils
+site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender")
+site.aliases.create(domain="localhost", redirect_to_canonical=False)
+```
 
 ## En cas de difficultés
 
