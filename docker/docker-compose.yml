@@ -14,7 +14,7 @@ services:
         NODE_VERSION: "lts/*"
     volumes:
       - ..:/workspace:cached
-    command: sleep infinity
+    command: python manage.py runserver 0.0.0.0:8000
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
@@ -22,7 +22,19 @@ services:
       SECRET_KEY: SECRET_KEY
     ports:
       - 8000:8000
-
+  front:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        VARIANT: 3-bullseye
+        NODE_VERSION: "lts/*"
+    volumes:
+      - ..:/workspace:cached
+    working_dir: /workspace/urbanvitaliz/frontend 
+    command: bash -c "yarn install && yarn dev"
+    ports:
+      - 3000:3000
   db:
     image: postgres:13.5
     restart: unless-stopped
