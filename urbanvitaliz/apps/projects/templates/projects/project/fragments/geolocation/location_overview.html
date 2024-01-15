@@ -10,30 +10,8 @@
 {{ project.commune.insee|json_script:"insee" }}
 {{ project.commune.latitude|json_script:"latitude" }}
 {{ project.commune.longitude|json_script:"longitude" }}
-{% block css %}
-    <link rel="stylesheet"
-          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" />
-    <link rel="stylesheet"
-          href="https://ignf.github.io/geoportal-extensions/leaflet-latest/dist/GpPluginLeaflet.css" />
-{% endblock %}
-{% block content %}
-    <div x-data='ResourceIGN(projectOptions)'
-         data-test-id="project-overview-map"
-         class="location-overview">
-        <div x-cloak
-             x-ref="map-static"
-             id="map-static"
-             data-test-id="map-static"
-             class="project-map h-100 w-100"></div>
-        {% include 'projects/project/fragments/geolocation/location_overview_footer.html' %}
-    </div>
-{% endblock %}
 {% block js %}
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
-    <script src="https://ignf.github.io/geoportal-extensions/leaflet-latest/dist/GpPluginLeaflet.js"></script>
+    {% vite_asset 'js/apps/projectLocation.js' %}
     <script>
         const projectOptions = {
             name: JSON.parse(document.getElementById('nameProject').textContent),
@@ -49,7 +27,14 @@
                 latitude: JSON.parse(document.getElementById('latitude').textContent),
             }
         }
-
     </script>
-    {% vite_asset 'js/apps/mapIGN.js' %}
+{% endblock %}
+{% block content %}
+    <div x-data='ProjectLocation(projectOptions)'
+         data-test-id="project-overview-map"
+         class="location-overview">
+        {% include 'projects/project/fragments/geolocation/project_map.html' %}
+        {% include 'projects/project/fragments/geolocation/location_overview_footer.html' %}
+    </div>
+    {% include "projects/project/fragments/geolocation/project_map_modal.html" %}
 {% endblock %}

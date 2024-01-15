@@ -10,7 +10,7 @@ function ProjectLocation(projectOptions, modal=true) {
 		mapModal: null,
 		staticMap: null,
 		interactiveMap: null,
-		zoom: 8,
+		zoom: 9,
 		markers: [],
 
 		async init() {
@@ -26,6 +26,7 @@ function ProjectLocation(projectOptions, modal=true) {
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = {}
 			try {
+				geoData.parcels = await geolocUtils.fetchParcelsIgn(insee);
 				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
 				geoData.location = await geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`);
 			} catch(e) {
@@ -37,26 +38,32 @@ function ProjectLocation(projectOptions, modal=true) {
 			}
 		},
 
-		initStaticMap(project, geoData) {
+		async initStaticMap(project, geoData) {
 			const options = mapUtils.mapOptions({interactive: false});
 
-			const Map = mapUtils.initMap('map-static', project, options, this.zoom);
+			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
 			this.staticMap = Map;
+			this.markers = mapUtils.initMarkerLayer(this.staticMap, project, geoData);
 			mapUtils.initMapLayers(this.staticMap, project, geoData);
 		},
 
-		initInteractiveMap(project, geoData) {
+		async initInteractiveMap(project, geoData) {
 			// Init Interactive Map
 			const options = mapUtils.mapOptions({interactive: true});
 			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project, geoData)
 
-			const Map  = mapUtils.initMap('map-interactive', project, options, this.zoom + 3);
+			const Map  =  mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom + 3);
 			this.interactiveMap = Map;
+			this.markers = mapUtils.initMarkerLayer(this.interactiveMap, project, geoData);
+			if(geoData.parcels) {
+				await  mapUtils.addLayerParcels(Map, geoData.parcels);
+			}
 			mapUtils.initMapLayers(this.interactiveMap, project, geoData);
 			this.interactiveMap.setMinZoom(this.zoom - 7);
 			this.interactiveMap.setMaxZoom(this.zoom + 6);
 			L.control.zoom({
-				position: 'topright'
+				position: 'topright',
+				color: '#335B7E',
 			}).addTo(this.interactiveMap);
 			this.interactiveMap.panTo(new L.LatLng(latitude, longitude));
 

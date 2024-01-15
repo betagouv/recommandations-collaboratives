@@ -23,6 +23,7 @@ function ProjectLocationEdit(projectOptions) {
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
 			const geoData = {}
 			try {
+				geoData.parcels = await geolocUtils.fetchParcelsIgn(insee);
 				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
 				geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location, {name, insee, postal});
 			} catch(e) {
@@ -36,16 +37,18 @@ function ProjectLocationEdit(projectOptions) {
 			this.project.location_y = coordinates.lat
 		},
 
-		initInteractiveMap(project, geoData, markers) {
+		async initInteractiveMap(project, geoData, markers) {
 			const options = mapUtils.mapOptions({interactive: true});
 			if(this.map) {
 				return
 			}
-			const Map = mapUtils.initMap('map-edit', project, options, this.zoom);
 
+			const Map =  mapUtils.initSatelliteMap('map-edit', project, options, this.zoom);
+			this.map = Map;
 			const popupOptions = {...project, title: "Point ajouté sur la carte"}
 			//Center Map
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
+			mapUtils.initMarkerLayer(this.map, project, geoData);
 			Map.on('click', function(e) {
 				if(markers[0]) {
 					markers[0].clearLayers()
@@ -57,10 +60,11 @@ function ProjectLocationEdit(projectOptions) {
 				markers[0] = markerLayer
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
 			});
-			this.map = Map;
 			
-			mapUtils.initEditLayers(this.map, project, geoData);
-			mapUtils.initMapControllerBAN(this.map, geoData, onClick);
+			mapUtils.initMapControllerBAN(this.map, geoData, onClick, this.markers);
+			if(geoData.parcels) {
+				await  mapUtils.addLayerParcels(Map, geoData.parcels);
+			}
 			this.map.setMinZoom(this.zoom - 7);
 			this.map.setMaxZoom(this.zoom + 6);
 			L.control.zoom({
