@@ -87,7 +87,7 @@ Alpine.data('editor', (content) => {
       editor.commands.setContent(event.detail);
     },
     renderMarkdown() {
-      this.markdownContent = editor.getMarkdown()
+      this.markdownContent = editor.getMarkdown().replaceAll("\\", "");
     }
   };
 });
