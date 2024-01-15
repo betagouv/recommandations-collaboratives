@@ -46,22 +46,35 @@ function ProjectLocationEdit(projectOptions) {
 		},
 
 		async initInteractiveMap(project, geoData) {
-			const options = mapUtils.mapOptions({interactive: true});
 			if(this.map) {
 				return
 			}
-
+			// Init map with base layer
+			const options = mapUtils.mapOptions({interactive: true});
 			const Map =  mapUtils.initSatelliteMap('map-edit', project, options, this.zoom);
 			this.map = Map;
-			const popupOptions = {...project, title: project.name}
 
-			//Center Map
+			// Add onclick behaviour for address input field (geocoderBAN)
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
 
-
+			// Add overlay layers (vector maps, controls and markers)
 			this.markers  =	mapUtils.initMarkerLayer(this.map, project, geoData);
-			let markers = this.markers
+			mapUtils.initMapControllerBAN(this.map, geoData, onClick, project, this.markers);
+			if(geoData.parcels) {
+				await  mapUtils.addLayerParcels(Map, geoData.parcels);
+			}
 
+			// Add zoom controls
+			this.map.setMinZoom(this.zoom - 7);
+			this.map.setMaxZoom(this.zoom + 6);
+
+			L.control.zoom({
+				position: 'topright'
+			}).addTo(this.map);
+
+			// Add onclick behaviour for map
+			const popupOptions = {...project, title: project.name}
+			let markers = this.markers
 			Map.on('click', function(e) {
 				if(markers[0]) {
 					markers[0].clearLayers()
@@ -74,18 +87,7 @@ function ProjectLocationEdit(projectOptions) {
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
 			});
 
-			mapUtils.initMapControllerBAN(this.map, geoData, onClick, project, this.markers);
-
-			if(geoData.parcels) {
-				await  mapUtils.addLayerParcels(Map, geoData.parcels);
-			}
-
-			this.map.setMinZoom(this.zoom - 7);
-			this.map.setMaxZoom(this.zoom + 6);
-			L.control.zoom({
-				position: 'topright'
-			}).addTo(this.map);
-
+			// Force a map redraw
 			setTimeout(function(){Map.invalidateSize()}, 0);
 		},
 	}
