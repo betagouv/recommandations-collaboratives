@@ -18,6 +18,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import urlencode
 from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -1248,6 +1249,30 @@ def test_collaborator_can_update_location(request, client):
     assert project.location_x == data["location_x"]
     assert project.location_y == data["location_y"]
 
+
+@pytest.mark.django_db
+def test_next_url_redirect_after_update_location(request, client):
+    current_site = get_current_site(request)
+
+    project = Recipe(models.Project, sites=[current_site]).make()
+
+    data = {"location_x": 32.3, "location_y": -5.0}
+
+    next_url = reverse("survey-project-session", args=[project.id])
+    with login(client) as user:
+        utils.assign_collaborator(user, project)
+
+        response = client.post(
+            f"{reverse('projects-project-location', args=[project.id])}?{urlencode({'next': next_url})}", data=data
+        )
+
+    assert response.status_code == 302
+    assert response["Location"] == next_url
+
+    project.refresh_from_db()
+
+    assert project.location_x == data["location_x"]
+    assert project.location_y == data["location_y"]
 
 #################################################################
 # Topics

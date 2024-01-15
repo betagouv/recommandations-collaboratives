@@ -6,9 +6,16 @@ function TopicSearch(currentTopic, restrict_to=null) {
         topic: '',
         results: [],
         restrict_to: null,
-        init() {
+        delete: false,
+        async init() {
             this.topic = currentTopic
             this.restrict_to = restrict_to
+            if(currentTopic) {
+                const results = await api.get(searchTopicsUrl(currentTopic, this.restrict_to))
+                if (results && results.data) {
+                    return this.results = results.data
+                }
+            }
         },
         async handleTopicChange(e) {
             e.preventDefault();
@@ -30,6 +37,10 @@ function TopicSearch(currentTopic, restrict_to=null) {
         },
         handleResultClick(result) {
             this.topic = result
+        },
+
+        handleDeleteClick() {
+            this.delete = ! this.delete
         }
     }
 }

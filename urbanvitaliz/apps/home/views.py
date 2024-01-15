@@ -113,7 +113,8 @@ class StatisticsView(TemplateView):
             p.number_tasks
             for p in the_projects.all().annotate(number_tasks=Count("tasks"))
         ]
-        context["collectivity_avg_reco"] = sum(numbers) / len(numbers) if numbers else 0
+        context["total_recommendation"] = sum(numbers);
+        context["collectivity_avg_reco"] = context["total_recommendation"] / len(numbers) if numbers else 0
 
         context["new_col_per_month"] = [
             (f"{p['month']}/{p['year']}", p["total"])
@@ -128,6 +129,7 @@ class StatisticsView(TemplateView):
                 latitude=F("commune__latitude"), longitude=F("commune__longitude")
             )
         )
+
 
         return context
 
