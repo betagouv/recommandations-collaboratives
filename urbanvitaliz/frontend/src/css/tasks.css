@@ -1,11 +1,7 @@
 body.modal-open {
-    max-height: 100vh !important;
-    overflow: auto !important;
+    height: 100%;
+    overflow: auto;
 }
-
-/* .modal-xl {
-    width: 90vw !important;
-} */
 
 .status-color-indicator {
     width: 12px;
@@ -38,7 +34,6 @@ body.modal-open {
 }
 
 .task-item .task-toolbar {
-    /* transform: translate3d(-25px,0,0); */
     margin-left: -24px;
 }
 
