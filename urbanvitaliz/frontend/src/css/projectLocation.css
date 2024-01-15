@@ -193,29 +193,26 @@
     border-radius: 4px;
 }
 
-.leaflet-popup-content-wrapper {
+.leaflet-popup-content-wrapper,
+.leaflet-popup-content {
     border-radius: 4px;
 }
 
-.location-edit .marker-popup header,
-.location-knowledge .marker-popup header,
-.location-overview .marker-popup header {
+.marker-popup header  {
     width: auto;
     padding: 8px 14px;
+    border-radius: 4px;
 }
 
-.location-edit .marker-popup h6,
-.location-knowledge .marker-popup h6,
-.location-overview .marker-popup h6  {
+.marker-popup h6  {
     padding: 0;
     padding-inline-end:14px;
     margin-bottom: 0;
     font-size: 14px;
+    border-radius: 4px;
 }
 
-.location-edit .marker-popup main,
-.location-knowledge .marker-popup main,
-.location-overview .marker-popup main {
+.marker-popup main {
     padding: 5px 12px 8px;
     font-size: 12px;
 }
@@ -246,4 +243,15 @@
 .leaflet-popup {
     position: absolute;
     text-align: center;
+}
+
+.spinner  {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 340px;
+}
+
+.spinner.is-small  {
+    height: 260px;
 }

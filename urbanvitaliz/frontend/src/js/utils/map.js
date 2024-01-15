@@ -196,7 +196,7 @@ function addLayerAreaCircle(map, project) {
 
 // Create layers composed with markers
 function addLayerParcels(map,  geoData) {
-	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
+	if(geoData.code && geoData.code === 400 || geoData.features?.length === 0) {
 		throw Error(`Données parcelaires indisponibles pour la commune "${geoData.commune.name}"`)
 	}
 	const parcelLayer = L.geoJSON(geoData, mapLayerStyles('area-parcels'));

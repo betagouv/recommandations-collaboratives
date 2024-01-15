@@ -10,10 +10,16 @@ function ProjectLocation(projectOptions, modal=true) {
 		mapModal: null,
 		staticMap: null,
 		interactiveMap: null,
-		zoom: 9,
+		zoom: 8,
 		markers: [],
+		isLoading: false,
+
+		get isBusy() {
+				return this.isLoading
+		},
 
 		async init() {
+			this.isLoading = true;
 			this.project = {
 				...projectOptions,
 				commune: {
@@ -32,10 +38,12 @@ function ProjectLocation(projectOptions, modal=true) {
 			} catch(e) {
 				console.log(e)
 			}
-			this.initStaticMap(this.project, geoData);
+			await this.initStaticMap(this.project, geoData);
 			if(modal) {
-				this.initInteractiveMap(this.project, geoData);
+				await this.initInteractiveMap(this.project, geoData);
 			}
+
+			this.isLoading = false;
 		},
 
 		async initStaticMap(project, geoData) {
@@ -43,8 +51,9 @@ function ProjectLocation(projectOptions, modal=true) {
 
 			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
 			this.staticMap = Map;
-			this.markers = mapUtils.initMarkerLayer(this.staticMap, project, geoData);
+			mapUtils.initMarkerLayer(this.staticMap, project, geoData);
 			mapUtils.initMapLayers(this.staticMap, project, geoData);
+			setTimeout(function(){Map.invalidateSize()}, 0);
 		},
 
 		async initInteractiveMap(project, geoData) {
@@ -55,10 +64,12 @@ function ProjectLocation(projectOptions, modal=true) {
 			const Map  =  mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom + 3);
 			this.interactiveMap = Map;
 			this.markers = mapUtils.initMarkerLayer(this.interactiveMap, project, geoData);
+			if(this.markers.length === 0) 	{
+				mapUtils.initMapLayers(this.interactiveMap, project, geoData);
+			}
 			if(geoData.parcels) {
 				await  mapUtils.addLayerParcels(Map, geoData.parcels);
 			}
-			mapUtils.initMapLayers(this.interactiveMap, project, geoData);
 			this.interactiveMap.setMinZoom(this.zoom - 7);
 			this.interactiveMap.setMaxZoom(this.zoom + 6);
 			L.control.zoom({

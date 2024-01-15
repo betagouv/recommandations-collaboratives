@@ -9,8 +9,14 @@ function ProjectLocationEdit(projectOptions) {
 		map: null,
 		zoom: 8,
 		markers: [],
+		isLoading: false,
+
+		get isBusy() {
+				return this.isLoading
+		},
 
 		async init() {
+			this.isLoading = true;
 			this.project = {
 				...projectOptions,
 				commune: {
@@ -29,7 +35,9 @@ function ProjectLocationEdit(projectOptions) {
 			} catch(e) {
 				console.log(e)
 			}
-			this.initInteractiveMap(this.project, geoData, this.markers);
+			await this.initInteractiveMap(this.project, geoData, this.markers);
+
+			this.isLoading = false;
 		},
 
 		updateProjectLocation(coordinates)  {
