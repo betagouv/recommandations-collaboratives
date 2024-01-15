@@ -113,7 +113,8 @@ class StatisticsView(TemplateView):
             p.number_tasks
             for p in the_projects.all().annotate(number_tasks=Count("tasks"))
         ]
-        context["collectivity_avg_reco"] = sum(numbers) / len(numbers) if numbers else 0
+        context["total_recommendation"] = sum(numbers);
+        context["collectivity_avg_reco"] = context["total_recommendation"] / len(numbers) if numbers else 0
 
         context["new_col_per_month"] = [
             (f"{p['month']}/{p['year']}", p["total"])
@@ -129,9 +130,6 @@ class StatisticsView(TemplateView):
             )
         )
 
-        # SOSPonts specific
-        context["question_from_beginning"] = context["collectivity_supported"]
-        context["reco_sent"]= sum(numbers)
 
         return context
 
