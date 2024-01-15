@@ -2,6 +2,7 @@ import Alpine from 'alpinejs'
 import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
+import HardBreak from '@tiptap/extension-hard-break'
 import { createMarkdownEditor } from 'tiptap-markdown';
 import '../../css/tiptap.css'
 
@@ -21,7 +22,23 @@ Alpine.data('editor', (content) => {
         element: this.$refs.element,
         extensions: [
           StarterKit,
-          Link
+          Link,
+          HardBreak.extend({
+            addKeyboardShortcuts() {
+              const handleEnter = () => this.editor.commands.first(({ commands }) => [
+                () => commands.newlineInCode(),
+                () => commands.createParagraphNear(),
+                () => commands.liftEmptyBlock(),
+                () => commands.splitBlock(),
+              ]);
+
+              return {
+                "Shift-Enter": handleEnter,
+                "Control-Enter": handleEnter,
+                "Cmd-Enter": handleEnter,
+              }
+            }
+          })
         ],
         content: content,
         onCreate({ editor }) {
