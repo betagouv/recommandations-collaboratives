@@ -9,6 +9,7 @@ document.addEventListener('alpine:init', () => {
 
         isPaginated: false,
         index: null,
+        scrollY: null,
 
         get projectId() {
             return Alpine.store('djangoData').projectId
@@ -20,12 +21,22 @@ document.addEventListener('alpine:init', () => {
 
         async init() {
             const element = document.getElementById("task-modal");
+            const body = document.querySelector("body");
             this.handle = new bootstrap.Modal(element);
 
             const cleanup = async () => {
                 location.hash = '';
-                await this.setTaskIsVisited()
+                await this.setTaskIsVisited();
+
+                // Restore scroll position
+                window.scrollTo(0, this.scrollY);
             }
+            element.addEventListener('show.bs.modal',  () => {
+                // Save scroll position
+                if(body) {
+                    this.scrollY = window.scrollY;
+                }
+            });
 
             element.addEventListener("hidePrevented.bs.modal", cleanup);
             element.addEventListener('hidden.bs.modal', cleanup);
