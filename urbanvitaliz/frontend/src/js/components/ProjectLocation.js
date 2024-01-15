@@ -11,7 +11,7 @@ function ProjectLocation(projectOptions, modal=true) {
 		staticMap: null,
 		interactiveMap: null,
 		zoom: 8,
-		markers: [],
+		markers: null,
 		isLoading: false,
 
 		get isBusy() {
@@ -42,7 +42,8 @@ function ProjectLocation(projectOptions, modal=true) {
 			if(modal) {
 				await this.initInteractiveMap(this.project, geoData);
 			}
-
+			let map = this.staticMap
+			setTimeout(function(){map.invalidateSize()}, 0);
 			this.isLoading = false;
 		},
 
@@ -51,9 +52,10 @@ function ProjectLocation(projectOptions, modal=true) {
 
 			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
 			this.staticMap = Map;
-			mapUtils.initMarkerLayer(this.staticMap, project, geoData);
-			mapUtils.initMapLayers(this.staticMap, project, geoData);
-			setTimeout(function(){Map.invalidateSize()}, 0);
+			this.markers = mapUtils.initMarkerLayer(this.staticMap, project, geoData);
+			if(!this.markers) {
+				mapUtils.initMapLayers(this.staticMap, project, geoData);
+			}
 		},
 
 		async initInteractiveMap(project, geoData) {
@@ -61,7 +63,7 @@ function ProjectLocation(projectOptions, modal=true) {
 			const options = mapUtils.mapOptions({interactive: true});
 			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project, geoData)
 
-			const Map  =  mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom + 3);
+			const Map = mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom + 3);
 			this.interactiveMap = Map;
 			this.markers = mapUtils.initMarkerLayer(this.interactiveMap, project, geoData);
 			if(this.markers.length === 0) 	{

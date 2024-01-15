@@ -8,7 +8,7 @@ function ProjectLocationEdit(projectOptions) {
 		project: null,
 		map: null,
 		zoom: 8,
-		markers: [],
+		markers: null,
 		isLoading: false,
 
 		get isBusy() {
@@ -35,7 +35,7 @@ function ProjectLocationEdit(projectOptions) {
 			} catch(e) {
 				console.log(e)
 			}
-			await this.initInteractiveMap(this.project, geoData, this.markers);
+			await this.initInteractiveMap(this.project, geoData);
 
 			this.isLoading = false;
 		},
@@ -45,7 +45,7 @@ function ProjectLocationEdit(projectOptions) {
 			this.project.location_y = coordinates.lat
 		},
 
-		async initInteractiveMap(project, geoData, markers) {
+		async initInteractiveMap(project, geoData) {
 			const options = mapUtils.mapOptions({interactive: true});
 			if(this.map) {
 				return
@@ -53,10 +53,15 @@ function ProjectLocationEdit(projectOptions) {
 
 			const Map =  mapUtils.initSatelliteMap('map-edit', project, options, this.zoom);
 			this.map = Map;
-			const popupOptions = {...project, title: "Point ajouté sur la carte"}
+			const popupOptions = {...project, title: project.name}
+
 			//Center Map
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
-			mapUtils.initMarkerLayer(this.map, project, geoData);
+
+
+			this.markers  =	mapUtils.initMarkerLayer(this.map, project, geoData);
+			let markers = this.markers
+
 			Map.on('click', function(e) {
 				if(markers[0]) {
 					markers[0].clearLayers()
@@ -68,11 +73,13 @@ function ProjectLocationEdit(projectOptions) {
 				markers[0] = markerLayer
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
 			});
-			
-			mapUtils.initMapControllerBAN(this.map, geoData, onClick, this.markers);
+
+			mapUtils.initMapControllerBAN(this.map, geoData, onClick, project, this.markers);
+
 			if(geoData.parcels) {
 				await  mapUtils.addLayerParcels(Map, geoData.parcels);
 			}
+
 			this.map.setMinZoom(this.zoom - 7);
 			this.map.setMaxZoom(this.zoom + 6);
 			L.control.zoom({

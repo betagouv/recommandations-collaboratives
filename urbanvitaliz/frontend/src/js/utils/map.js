@@ -96,7 +96,8 @@ function initMarkerLayer(map, project, geoData) {
 		// Precise location unknown: don't add a marker
 		}
 	} finally {
-		return markers
+		let markerLayer = L.layerGroup(markers).addTo(map);
+		return [markerLayer]
 	}
 }
 
@@ -111,22 +112,9 @@ function initMapLayers(map, project, geoData) {
 	}
 }
 
-// Create layers composed with markers
-function initEditLayers(map, project, geoData) {
-	try {
-		addLayerMarkerProjectCoordinates(map, project);
-	} catch (e) {
-		try {
-			addLayerMarkerProjectLocation(map, project, geoData);
-		} catch(e) {
-			console.log(e)
-		}
-	}
-}
-
-function initMapControllerBAN(map,  geoData, onUpdate, project) {
-	const className = 'marker-geocoder-ban'
-	const popupOptions = {...project, title: "Recherche par adresse"}
+function initMapControllerBAN(map,  geoData, onUpdate, project, markers) {
+	const className = 'marker-onclick'
+	const popupOptions = {...project, title: project.title}
 	const geocoderOptions = {
 		collapsed: false,
 		style: 'searchBar',
@@ -136,7 +124,8 @@ function initMapControllerBAN(map,  geoData, onUpdate, project) {
 		markerIcon: createMarkerIcon(className),
 		markerPopupTemplate,
 		commune: geoData.location,
-		popupOptions
+		popupOptions,
+		markers
 	}
 	GeocoderBAN(geocoderOptions).addTo(map)
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
@@ -256,7 +245,6 @@ export default {
 	initSatelliteMap,
 	initMarkerLayer,
 	initMapLayers,
-	initEditLayers,
 	initMapControllerBAN,
 	addLayerParcels,
 	addLayerAreaCommune,
