@@ -64,7 +64,7 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
 
     if response:
         create_transaction(
-            transaction_id=response.messageId,
+            transaction_id=response.message_id,
             recipients=recipients,
             label=template_name,
             related=related,

@@ -10,6 +10,7 @@ created : 2021-09-28 12:40:54 CEST
 
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
+from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils import timezone
@@ -94,6 +95,14 @@ class Reminder(models.Model):
     kind = models.IntegerField(choices=KIND_CHOICES, editable=False)
 
     sent_on = models.DateTimeField(null=True, blank=True)
+    sent_to = models.ForeignKey(
+        auth_models.User,
+        related_name="sent_reminders",
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+    )
 
     transactions = GenericRelation(
         comm_models.TransactionRecord,
@@ -109,8 +118,9 @@ class Reminder(models.Model):
     def __str__(self):  # pragma: nocover
         return f"{self.project.name} - {self.kind} - {self.deadline}"
 
-    def mark_as_sent(self):
+    def mark_as_sent(self, sent_to):
         self.sent_on = timezone.now()
+        self.sent_to = sent_to
         self.save()
 
 

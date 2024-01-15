@@ -91,7 +91,7 @@ def test_send_debug_email_creates_transaction_with_related(request):
 @pytest.mark.django_db
 def test_send_brevo_email_creates_transaction(mocker, request):
     class TransacResponse:
-        messageId = 2
+        message_id = "this-is-an-id"
 
     mocker.patch(
         "sib_api_v3_sdk.TransactionalEmailsApi.send_transac_email",
@@ -112,4 +112,4 @@ def test_send_brevo_email_creates_transaction(mocker, request):
 
     transaction = models.TransactionRecord.objects.first()
     assert transaction.faked is False
-    assert transaction.transaction_id == "2"
+    assert transaction.transaction_id == TransacResponse.message_id

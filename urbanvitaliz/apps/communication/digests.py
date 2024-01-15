@@ -92,11 +92,12 @@ def send_new_recommendations_reminders_digest_by_project(site, project, dry_run)
             "project_reminders_new_reco_digest",
             {"name": normalize_user_name(project.owner), "email": project.owner.email},
             params=digest,
+            related=due_reminder,
         )
         logger.info(f"Sent NEW_RECO reminder <{due_reminder}>")
 
         # Mark as dispatched
-        due_reminder.mark_as_sent()
+        due_reminder.mark_as_sent(sent_to=project.owner)
     else:
         logger.info(f"[DRY RUN] Would have sent NEW_RECO reminder <{due_reminder}>")
 
@@ -128,12 +129,13 @@ def send_whatsup_reminders_digest_by_project(site, project, dry_run):
             "project_reminders_whats_up_digest",
             {"name": normalize_user_name(project.owner), "email": project.owner.email},
             params=digest,
+            related=due_reminder,
         )
 
         logger.info(f"Sent WHATS_UP reminder <{due_reminder}>")
 
         # Mark as dispatched
-        due_reminder.mark_as_sent()
+        due_reminder.mark_as_sent(sent_to=project.owner)
     else:
         logger.info(f"[DRY RUN] Would have sent WHATS_UP reminder <{due_reminder}>")
 
@@ -194,6 +196,7 @@ def send_recommendation_digest_by_project(user, notifications, dry_run):
                 "new_recommendations_digest",
                 {"name": normalize_user_name(user), "email": user.email},
                 params=digest,
+                related=project,
             )
         else:
             logger.info(
