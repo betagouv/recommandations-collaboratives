@@ -176,7 +176,16 @@
     font-weight: 400;
     font-size: 16px;
     line-height: 24px;
+    margin-bottom: 8px;
 }
+
+.location-hint  {
+    background-color: #f6f6f6;
+    padding: 1em;
+    font-size: 0.875em;
+    margin-bottom: 0;
+}
+
 
 .location-address {
     padding: 12px;
