@@ -30,11 +30,6 @@
 
 {% block css %}
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
-<style>
- [x-cloak] { display: none !important;
-     visibility: hidden;
-     overflow: hidden}
-</style>
 {% endblock %}
 
 {% block content %}
@@ -78,13 +73,19 @@
                     </svg>&nbsp;
                     Rappels de projets
                 </h4>
+                <small class="text-muted">&larr; retour à <a href="{% url 'crm-user-reminders' crm_user.pk  %}">{{ crm_user.get_full_name }}</a></small>
 
-                Envoyé à {{ email.email }}
-                Envoyé le {{ transaction.sent_on }}
+                <br class="mb-2" />
 
-                Sujet : {{ email.subject }}
 
-                Trajet :
+                <strong>Envoyé à</strong> {{ email.email }} ({{ crm_user.get_full_name }})
+                <br>
+                <strong>Envoyé le</strong> {{ transaction.sent_on|date:"l j F Y" }}
+                <br>
+                <strong>Sujet</strong> : "{{ email.subject }}"
+                <br>
+
+                <strong>Trajet</strong> :
                 <ul>
                     {% for event in email.events %}
                     <li>
@@ -93,9 +94,7 @@
                     {% endfor %}
                 </ul>
 
-                Template utilisé :
-
-                <iframe class="w-100 h-100" srcdoc="{{ email.body }}"></iframe>
+                <iframe class="border w-100" height="800px" srcdoc="{{ email.body }}"></iframe>
             </div>
         </div>
     </div>
