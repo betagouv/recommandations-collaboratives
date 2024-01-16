@@ -8,6 +8,7 @@ from model_bakery import baker
 from pytest_django.asserts import assertContains, assertNotContains
 
 from urbanvitaliz.apps.addressbook import models as addressbook_models
+from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import get_group_for_site, login
@@ -654,6 +655,57 @@ def test_crm_user_reminder_accessible_w_perm(request, client):
     # )
 
     url = reverse("crm-user-reminders", args=[o.id])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    # assertContains(response, on_site.verb[:16])
+    # assertNotContains(response, other_site.verb[:16])
+    # assertNotContains(response, other_user.verb[:16])
+
+
+@pytest.mark.django_db
+def test_crm_user_reminder_details_not_accessible_wo_perm(request, client):
+    site = get_current_site(request)
+
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(site)
+
+    url = reverse("crm-user-reminder-details", args=[o.id, 1])
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_user_reminder_details_not_accessible_other_site(request, client):
+    site = get_current_site(request)
+    other = baker.make(site_models.Site)
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(other)
+
+    url = reverse("crm-user-reminder-details", args=[o.id, 1])
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_crm_user_reminder_details_accessible_w_perm(request, client):
+    site = get_current_site(request)
+
+    o = baker.make(auth_models.User)
+    o.profile.sites.add(site)
+
+    reminder = baker.make(reminders_models.Reminder, site=site, sent_to=o)
+
+    url = reverse("crm-user-reminder-details", args=[o.id, reminder.pk])
+
     with login(client) as user:
         assign_perm("use_crm", user, site)
         response = client.get(url)

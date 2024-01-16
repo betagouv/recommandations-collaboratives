@@ -73,26 +73,23 @@
                     </svg>&nbsp;
                     Rappels de projets
                 </h4>
-                <small class="text-muted">&larr; retour à <a href="{% url 'crm-user-reminders' crm_user.pk  %}">{{ crm_user.get_full_name }}</a></small>
+                <small class="text-muted">&larr; retour aux <a href="{% url 'crm-user-reminders' crm_user.pk  %}">rappels de {{ crm_user.get_full_name }}</a></small>
 
                 <br class="mb-2" />
 
 
-                <strong>Envoyé à</strong> {{ email.email }} ({{ crm_user.get_full_name }})
+                <strong>Envoyé à</strong> {{ email.email }} (<a href="{% url 'crm-user-details' crm_user.pk %}">{{ crm_user.get_full_name }}</a>)
                 <br>
                 <strong>Envoyé le</strong> {{ transaction.sent_on|date:"l j F Y" }}
                 <br>
                 <strong>Sujet</strong> : "{{ email.subject }}"
                 <br>
 
-                <strong>Trajet</strong> :
-                <ul>
-                    {% for event in email.events %}
-                    <li>
-                        {{ event.time }}: {{ event.name }}
-                    </li>
-                    {% endfor %}
-                </ul>
+                <div class="my-2">
+                {% for event in email.events %}
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ event.time }}"  class="badge pill bg-primary">{{ event.name }}</span>&nbsp;
+                {% endfor %}
+                </div>
 
                 <iframe class="border w-100" height="800px" srcdoc="{{ email.body }}"></iframe>
             </div>

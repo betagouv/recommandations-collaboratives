@@ -120,6 +120,8 @@ def fetch_transaction_content(transaction_id):
     for email in emails.transactional_emails:
         return brevo.get_content_from_uuid(email.uuid)
 
+    return None
+
 
 if settings.DEBUG and getattr(settings, "BREVO_FORCE_DEBUG", False):
     send_email = send_debug_email

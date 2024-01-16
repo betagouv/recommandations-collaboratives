@@ -30,6 +30,7 @@ from notifications import notify
 from urbanvitaliz import verbs
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.addressbook.models import Organization
+from urbanvitaliz.apps.communication import api
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
 from urbanvitaliz.apps.projects.models import Project, Topic, UserProjectStatus
@@ -566,11 +567,11 @@ def user_reminder_details(request, user_id, reminder_pk):
         reminders_models.Reminder, pk=reminder_pk, site=request.site, sent_to=crm_user
     )
 
+    email = None
     if reminder.transactions.count():
         transaction = reminder.transactions.first()
-        from urbanvitaliz.apps.communication import api
-
-        email = api.fetch_transaction_content(transaction.transaction_id)
+        if transaction:
+            email = api.fetch_transaction_content(transaction.transaction_id)
 
     search_form = forms.CRMSearchForm()
 
