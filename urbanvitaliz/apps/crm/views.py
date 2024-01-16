@@ -546,10 +546,35 @@ def user_reminders(request, user_id):
     future_reminders = reminders_models.Reminder.on_site.filter(
         project__in=Project.on_site.filter(
             projectmember__member=crm_user, projectmember__is_owner=True
-        )
+        ),
+        sent_on=None,
     ).order_by("-deadline")
 
     return render(request, "crm/user_reminders.html", locals())
+
+
+@login_required
+def user_reminder_details(request, user_id, reminder_pk):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    crm_user = get_object_or_404(User, pk=user_id)
+    if request.site not in crm_user.profile.sites.all():
+        # only for user of current site
+        raise Http404
+
+    reminder = get_object_or_404(
+        reminders_models.Reminder, pk=reminder_pk, site=request.site, sent_to=crm_user
+    )
+
+    if reminder.transactions.count():
+        transaction = reminder.transactions.first()
+        from urbanvitaliz.apps.communication import api
+
+        email = api.fetch_transaction_content(transaction.transaction_id)
+
+    search_form = forms.CRMSearchForm()
+
+    return render(request, "crm/user_reminder_details.html", locals())
 
 
 ########################################################################

@@ -76,54 +76,26 @@
                     <svg class="bi " width="24" height="24" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
                     </svg>&nbsp;
-                    Rappels de projets</h4>
-                <small>Sauter à <a href="#history"> l'historique</a></small>
+                    Rappels de projets
+                </h4>
 
-                <h5 class="mt-4" id="future"><svg class="bi " width="24" height="24" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#send" />
-                </svg>&nbsp;
-                Futurs rappels</h5>
+                Envoyé à {{ email.email }}
+                Envoyé le {{ transaction.sent_on }}
 
-                {% for reminder in future_reminders.all %}
+                Sujet : {{ email.subject }}
+
+                Trajet :
                 <ul>
-                    {% load humanize %}
-                    <li>{{ reminder.project }} -- <i>{{ reminder.get_kind_display }}</i>, le {{ reminder.deadline }} ({{ reminder.deadline|naturalday }})</li>
-                </ul>
-                {% empty %}
-                <span class="p-4"> -- Aucun rappel prévu --</span>
-                {% endfor %}
-
-                <hr class="m-5" />
-
-                <section id="history" x-data="messagepopup">
-                    <h5 class="mt-3"><svg class="bi " width="24" height="24" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-history" />
-                    </svg>&nbsp;
-                    Historique des rappels</h5>
-
-                    {% for reminder in sent_reminders.all %}
-                    {% with reminder.transactions.all.0 as transaction %}
-                    <div class="list-group">
-                        <a href="{% url 'crm-user-reminder-details' crm_user.pk reminder.pk %}" @click="showMessage('{{ transaction.transaction_id }}')" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5>{{ reminder.project }}</h5>
-                                {% if transaction.faked %}
-                                <span class="badge bg-secondary">Test</span>&nbsp;
-                                {% endif %}
-
-                                <small>{{ transaction.sent_on|naturalday }}</small>
-                            </div>
-
-                            <p class="mb-1">
-                                <i>{{ reminder.get_kind_display }}</i>
-                                <br class="mb-1" />
-                            </p>
-                            <small class="text-muted" >initialement programmé pour le {{ reminder.deadline }}</small>
-                        </a>
-                    </div>
-                    {% endwith %}
+                    {% for event in email.events %}
+                    <li>
+                        {{ event.time }}: {{ event.name }}
+                    </li>
                     {% endfor %}
-                </section>
+                </ul>
+
+                Template utilisé :
+
+                <iframe class="w-100 h-100" srcdoc="{{ email.body }}"></iframe>
             </div>
         </div>
     </div>

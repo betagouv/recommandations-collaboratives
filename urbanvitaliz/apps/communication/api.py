@@ -112,6 +112,15 @@ def send_debug_email(template_name, recipients, params=None, test=False, related
     return True
 
 
+def fetch_transaction_content(transaction_id):
+    brevo = Brevo()
+
+    emails = brevo.get_emails_from_transactionid(transaction_id)
+
+    for email in emails.transactional_emails:
+        return brevo.get_content_from_uuid(email.uuid)
+
+
 if settings.DEBUG and getattr(settings, "BREVO_FORCE_DEBUG", False):
     send_email = send_debug_email
 else:

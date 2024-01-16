@@ -22,7 +22,10 @@ class Brevo:
             recipients = [recipients]
 
         if test:
-            send_test_email = brevo_sdk.SendTestEmail(email_to=[recipients[0]["email"]])
+            send_test_email = (
+                brevo_sdk.SendTestEmail()
+            )  # XXX disabled to default to test list;
+            # email_to=[recipients[0]["email"]])
             response = self.api_instance.send_test_template(
                 template_id, send_test_email
             )
@@ -42,3 +45,9 @@ class Brevo:
             response = self.api_instance.send_transac_email(send_smtp_email)
 
         return response
+
+    def get_emails_from_transactionid(self, transaction_id):
+        return self.api_instance.get_transac_emails_list(message_id=transaction_id)
+
+    def get_content_from_uuid(self, uuid):
+        return self.api_instance.get_transac_email_content(uuid=uuid)
