@@ -1,5 +1,4 @@
 from django.contrib import admin, messages
-from django.utils import timezone
 from urbanvitaliz.apps.communication import digests
 
 from . import models
@@ -26,7 +25,7 @@ class ReminderAdmin(admin.ModelAdmin):
             if digests.send_new_recommendations_reminders_digest_by_project(
                 site=reminder.site, project=reminder.project, dry_run=False
             ):
-                reminder.sent_on = timezone.now()
+                reminder.mark_as_sent(reminder.project.owner)
                 reminder.save()
                 self.message_user(
                     request,
@@ -39,7 +38,7 @@ class ReminderAdmin(admin.ModelAdmin):
             if digests.send_whatsup_reminders_digest_by_project(
                 site=reminder.site, project=reminder.project, dry_run=False
             ):
-                reminder.sent_on = timezone.now()
+                reminder.mark_as_sent(reminder.project.owner)
                 reminder.save()
                 self.message_user(
                     request,

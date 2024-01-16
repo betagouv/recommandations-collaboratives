@@ -28,4 +28,10 @@ class EmailTemplateAdmin(admin.ModelAdmin):
     list_display = ["name", "site"]
 
 
+@admin.register(models.TransactionRecord)
+class TransactionRecord(admin.ModelAdmin):
+    list_filter = ["site"]
+    list_display = ["user", "sent_on"]
+
+
 # eof
