@@ -36,6 +36,10 @@
   "devDependencies": {
     "eslint": "^8.56.0",
     "eslint-config-prettier": "9.1.0",
-    "prettier": "3.2.2"
+    "postcss": "8.4.33",
+    "prettier": "3.2.2",
+    "stylelint": "16.1.0",
+    "stylelint-config-standard": "36.0.0",
+    "stylelint-config-standard-scss": "13.0.0"
   }
 }
