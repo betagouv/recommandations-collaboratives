@@ -164,6 +164,10 @@
     margin-inline-start: 40px;
 }
 
+.modal-dialog  .map-marker  {
+    transform: translateZ(1px) !important;
+}
+
 .location-overview .modal-footer {
     padding: 0 5px 5px;
 }

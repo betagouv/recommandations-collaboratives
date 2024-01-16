@@ -11,7 +11,6 @@ function ProjectLocation(projectOptions, modal=true) {
 		staticMap: null,
 		interactiveMap: null,
 		zoom: 8,
-		markers: null,
 		isLoading: false,
 
 		get isBusy() {
@@ -52,8 +51,8 @@ function ProjectLocation(projectOptions, modal=true) {
 
 			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
 			this.staticMap = Map;
-			this.markers = mapUtils.initMarkerLayer(this.staticMap, project, geoData);
-			if(!this.markers) {
+			let markers = mapUtils.initMarkerLayer(this.staticMap, project, geoData);
+			if(!markers) {
 				mapUtils.initMapLayers(this.staticMap, project, geoData);
 			}
 		},
@@ -65,8 +64,8 @@ function ProjectLocation(projectOptions, modal=true) {
 
 			const Map = mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom + 3);
 			this.interactiveMap = Map;
-			this.markers = mapUtils.initMarkerLayer(this.interactiveMap, project, geoData);
-			if(this.markers.length === 0) 	{
+			let markers = mapUtils.initMarkerLayer(this.interactiveMap, project, geoData);
+			if(markers.length === 0) 	{
 				mapUtils.initMapLayers(this.interactiveMap, project, geoData);
 			}
 			if(geoData.parcels) {
