@@ -164,7 +164,7 @@
     margin-inline-start: 40px;
 }
 
-.modal-dialog  .map-marker  {
+.modal-dialog  {
     transform: translateZ(1px) !important;
 }
 
