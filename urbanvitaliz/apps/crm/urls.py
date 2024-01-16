@@ -90,6 +90,16 @@ urlpatterns = [
         views.user_notifications,
         name="crm-user-notifications",
     ),
+    path(
+        r"crm/user/<int:user_id>/reminders",
+        views.user_reminders,
+        name="crm-user-reminders",
+    ),
+    path(
+        r"crm/user/<int:user_id>/reminders/<int:reminder_pk>",
+        views.user_reminder_details,
+        name="crm-user-reminder-details",
+    ),
     #
     # projects
     path(
