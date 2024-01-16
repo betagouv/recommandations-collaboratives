@@ -51,7 +51,7 @@ function ProjectLocationEdit(projectOptions) {
 			}
 			// Init map with base layer
 			const options = mapUtils.mapOptions({interactive: true});
-			const Map =  mapUtils.initSatelliteMap('map-edit', project, options, this.zoom);
+			const Map =  await mapUtils.initSatelliteMap('map-edit', project, options, this.zoom);
 			this.map = Map;
 
 			// Add onclick behaviour for address input field (geocoderBAN)
