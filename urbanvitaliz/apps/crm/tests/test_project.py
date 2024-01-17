@@ -472,11 +472,11 @@ def test_toggle_on_project_annotation(request, client):
         # unselected tag
         assertContains(
             response,
-            f'bg-secondary text-grey-dark" type="submit">{test_tag}',
+            f'bg-secondary" type="submit">{test_tag}',
         )
         assertContains(
             response,
-            f'bg-secondary text-grey-dark" type="submit">{other_tag}',
+            f'bg-secondary" type="submit">{other_tag}',
         )
 
         url = reverse("crm-project-toggle-annotation", args=[annotation.project.id])
@@ -495,7 +495,7 @@ def test_toggle_on_project_annotation(request, client):
         # unselected tag
         assertContains(
             response,
-            f'bg-secondary text-grey-dark" type="submit">{other_tag}',
+            f'bg-secondary" type="submit">{other_tag}',
         )
 
 
@@ -528,7 +528,7 @@ def test_toggle_off_project_annotation(request, client):
         # unselected tag
         assertContains(
             response,
-            f'bg-secondary text-grey-dark" type="submit">{test_tag}',
+            f'bg-secondary" type="submit">{test_tag}',
         )
         # selected tag
         assertContains(
