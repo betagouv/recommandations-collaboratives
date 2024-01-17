@@ -692,16 +692,20 @@ def project_toggle_annotation(request, project_id=None):
 
     project = get_object_or_404(Project.on_site, pk=project_id)
 
+    site_config = get_site_config_or_503(request.site)
+
     form = forms.ProjectAnnotationForm(request.POST)
     if form.is_valid():
         tag = form.cleaned_data.get("tag")
-        annotation, _ = models.ProjectAnnotations.objects.get_or_create(
-            project=project, site=request.site
-        )
-        if tag in annotation.tags.names():
-            annotation.tags.remove(tag)
-        else:
-            annotation.tags.add(tag)
+        # check if the tag is authorized by the site configuration
+        if tag in site_config.crm_available_tags.values_list("name", flat=True):
+            annotation, _ = models.ProjectAnnotations.objects.get_or_create(
+                project=project, site=request.site
+            )
+            if tag in annotation.tags.names():
+                annotation.tags.remove(tag)
+            else:
+                annotation.tags.add(tag)
 
     url = reverse("crm-project-details", args=[project.id])
     return redirect(url)

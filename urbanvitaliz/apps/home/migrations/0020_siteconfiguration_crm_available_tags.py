@@ -3,19 +3,21 @@
 from django.db import migrations
 import taggit.managers
 
+
 def reverse_historical_tags(apps, schema_editor):
     Tag = apps.get_model("taggit", "Tag")
     for slug in ["diag", "edl", "contact", "general"]:
         try:
             tag = Tag.objects.get(slug=slug)
-            tag.name=slug
+            tag.name = slug
             tag.save()
         except Tag.DoesNotExist:
             pass
 
+
 def update_historical_tags(apps, schema_editor):
     Tag = apps.get_model("taggit", "Tag")
-    
+
     default_tags_to_add = []
     default_tags = [
         ("diag", "Diagnostic"),
@@ -28,48 +30,55 @@ def update_historical_tags(apps, schema_editor):
     for slug, name in default_tags:
         try:
             tag = Tag.objects.get(slug=slug)
-            tag.name=name
+            tag.name = name
             tag.save()
             default_tags_to_add.append(tag)
         except Tag.DoesNotExist:
             pass
 
+
 def set_default_tags(apps, schema_editor):
-    tags_to_add = ["Diagnostic","État des lieux","Mise en relation", "Général positif"]
-    Tag = apps.get_model('taggit', 'Tag')
-    TaggedItem = apps.get_model('taggit', 'TaggedItem')
-    ContentType = apps.get_model('contenttypes', 'ContentType')
-    content_type, _created = ContentType.objects.get_or_create(app_label="home", model="siteconfiguration")
+    tags_to_add = [
+        "Diagnostic",
+        "État des lieux",
+        "Mise en relation",
+        "Général positif",
+    ]
+    Tag = apps.get_model("taggit", "Tag")
+    TaggedItem = apps.get_model("taggit", "TaggedItem")
+    ContentType = apps.get_model("contenttypes", "ContentType")
+    content_type, _created = ContentType.objects.get_or_create(
+        app_label="home", model="siteconfiguration"
+    )
 
     SiteConfiguration = apps.get_model("home", "SiteConfiguration")
     for site_conf in SiteConfiguration.objects.all():
         for tag_to_add in tags_to_add:
             tag, created = Tag.objects.get_or_create(name=tag_to_add)
             tagged_items, created = TaggedItem.objects.get_or_create(
-                    content_type_id=content_type.id,
-                    object_id=site_conf.id,
-                    tag=tag
+                content_type_id=content_type.id, object_id=site_conf.id, tag=tag
             )
+
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('home', '0019_alter_siteconfiguration_reminder_interval'),
+        ("home", "0019_alter_siteconfiguration_reminder_interval"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='siteconfiguration',
-            name='crm_available_tags',
+            model_name="siteconfiguration",
+            name="crm_available_tags",
             field=taggit.managers.TaggableManager(
                 blank=True,
                 help_text=(
-                    'Liste de tags séparés par une virgule. '
-                    'Attention, veillez à ne pas retirer un tag utilisé dans un projet, '
-                    'celui-ci ne pourra plus est retiré depuis le CRM'
+                    "Liste de tags séparés par une virgule. "
+                    "Attention, veillez à ne pas retirer un tag utilisé dans un projet, "
+                    "celui-ci ne pourra plus être retiré depuis le CRM"
                 ),
-                through='taggit.TaggedItem',
-                to='taggit.Tag',
-                verbose_name='Étiquettes projets disponibles dans le CRM'
+                through="taggit.TaggedItem",
+                to="taggit.Tag",
+                verbose_name="Étiquettes projets disponibles dans le CRM",
             ),
         ),
         migrations.RunPython(update_historical_tags, reverse_historical_tags),

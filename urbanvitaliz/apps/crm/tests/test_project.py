@@ -399,7 +399,7 @@ def test_crm_search_by_user_name_on_current_site(request, client):
 
 
 @pytest.mark.django_db
-def test_toggle_missing_project_annotation(request, client):
+def test_toggle_unauthorized_project_annotation(request, client):
     site = get_current_site(request)
     onboarding = onboarding_models.Onboarding.objects.first()
     baker.make(
@@ -416,7 +416,33 @@ def test_toggle_missing_project_annotation(request, client):
         response = client.post(url, data=data)
 
     annotation = models.ProjectAnnotations.objects.first()
-    assert data["tag"] in annotation.tags.names()
+    assert annotation is None
+
+    url = reverse("crm-project-details", args=[project.id])
+    assertRedirects(response, url)
+
+
+@pytest.mark.django_db
+def test_toggle_missing_project_annotation(request, client):
+    test_tag = "a nice tag"
+    site = get_current_site(request)
+    onboarding = onboarding_models.Onboarding.objects.first()
+    site_config = baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding=onboarding,
+    )
+    site_config.crm_available_tags.add(test_tag)
+    project = baker.make(models.projects_models.Project, sites=[site])
+
+    url = reverse("crm-project-toggle-annotation", args=[project.id])
+    data = {"tag": test_tag}
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data=data)
+
+    annotation = models.ProjectAnnotations.objects.first()
+    assert test_tag in annotation.tags.names()
 
     url = reverse("crm-project-details", args=[annotation.project.id])
     assertRedirects(response, url)

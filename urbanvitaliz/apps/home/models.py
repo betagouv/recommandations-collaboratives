@@ -124,7 +124,7 @@ class SiteConfiguration(models.Model):
         help_text=(
             "Liste de tags séparés par une virgule. "
             "Attention, veillez à ne pas retirer un tag utilisé dans un projet, "
-            "celui-ci ne pourra plus est retiré depuis le CRM"
+            "celui-ci ne pourra plus être retiré depuis le CRM"
         ),
     )
     reminder_interval = models.IntegerField(
@@ -211,6 +211,7 @@ class GroupObjectPermissionOnSite(
 ### Monkey patch guardian behaviour so it returns current site permission
 ### and honours current site admins
 
+
 # Users
 def get_user_filters_with_sites(self, obj):
     """Monkey patched method to force filtering by current site.
@@ -271,6 +272,7 @@ def get_user_perms(self, obj):
 
 ObjectPermissionChecker.original_get_user_perms = ObjectPermissionChecker.get_user_perms
 ObjectPermissionChecker.get_user_perms = get_user_perms
+
 
 # Override cache key identity using site
 def get_local_cache_key_with_site(self, obj):
