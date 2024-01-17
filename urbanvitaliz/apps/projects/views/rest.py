@@ -416,6 +416,8 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
         restrict_to = self.request.query_params.get("restrict_to", None)
         topics = models.Topic.objects.all()
         if restrict_to:
+            # Warning : make sure the models mapping here have a "deleted" field or change the code below ;)
+            # If not, a django.core.exceptions.FieldError will be throw.
             models_mapping = {
                 "projects": "projects",
                 "recommendations": "tasks",
