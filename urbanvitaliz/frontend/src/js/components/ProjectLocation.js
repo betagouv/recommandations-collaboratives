@@ -30,10 +30,14 @@ function ProjectLocation(projectOptions, modal=true) {
 			const { latitude, longitude, insee, name } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = {}
+
+
 			try {
-				geoData.parcels = await geolocUtils.fetchParcelsIgn(insee);
-				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
-				geoData.location = await geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`);
+				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
+					geolocUtils.fetchParcelsIgn(insee),
+					geolocUtils.fetchCommuneIgn(insee),
+					geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`)
+				]);
 			} catch(e) {
 				console.log(e)
 			}
