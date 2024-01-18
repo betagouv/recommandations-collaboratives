@@ -202,6 +202,9 @@ L.Control.GeocoderBAN = L.Control.extend({
 		L.DomEvent.on(li, 'mouseout', mouseOutHandler, this)
 		return li
 	},
+	setValue(value) {
+		this.input.value = value
+	},
 	geocodeResult: function (feature) {
 		this.minimizeControl()
 		this.markGeocode(feature)

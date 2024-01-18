@@ -59,7 +59,7 @@ function ProjectLocationEdit(projectOptions) {
 
 			// Add overlay layers (vector maps, controls and markers)
 			this.markers  =	mapUtils.initMarkerLayer(this.map, project, geoData);
-			mapUtils.initMapControllerBAN(this.map, geoData, onClick, project, this.markers);
+		 const geocoderBAN =	mapUtils.initMapControllerBAN(this.map, geoData, onClick, project, this.markers);
 			if(geoData.parcels) {
 				await  mapUtils.addLayerParcels(Map, geoData.parcels);
 			}
@@ -79,6 +79,7 @@ function ProjectLocationEdit(projectOptions) {
 				if(markers[0]) {
 					markers[0].clearLayers()
 				}
+				geocoderBAN.setValue('');
 				onClick(e.latlng)
 				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon('marker-onclick') }).addTo(Map);
 				marker.bindPopup(mapUtils.markerPopupTemplate({...popupOptions,location_x: e.latlng.lng, location_y: e.latlng.lat }))

@@ -127,13 +127,15 @@ function initMapControllerBAN(map,  geoData, onUpdate, project, markers) {
 		popupOptions,
 		markers
 	}
-	GeocoderBAN(geocoderOptions).addTo(map)
+	const geocodeBAN = GeocoderBAN(geocoderOptions).addTo(map)
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
 	controller[0].classList.add('leaflet-control-geocoder-expanded');
 	const inputController = controller[0].querySelector('input')
 	inputController.addEventListener('blur', async (e) => {
 			controller[0].classList.add('leaflet-control-geocoder-expanded');
 	})
+
+	return geocodeBAN
 }
 
 
