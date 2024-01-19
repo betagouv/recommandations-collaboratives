@@ -17,11 +17,11 @@ const config = {
 		extensions: ['.js', '.json'],
 	},
 	build: {
-		outDir:  resolve('./dist'),
+		outDir: resolve('./dist'),
 		assetsDir: '',
 		manifest: true,
 		emptyOutDir: true,
-		target: 'es2017',
+		target: 'es2020',
 		rollupOptions: {
 			input: {
 				main: resolve('./src/js/main.js'),
