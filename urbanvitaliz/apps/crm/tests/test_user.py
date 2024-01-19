@@ -1,4 +1,6 @@
 import pytest
+import allauth.account.utils
+from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
@@ -225,11 +227,12 @@ def test_crm_user_update_profile_information(request, client):
 
     organization = baker.make(addressbook_models.Organization)
 
-    end_user = baker.make(auth_models.User)
+    end_user = baker.make(auth_models.User, username="johndoe@example.org")
     profile = end_user.profile
 
     url = reverse("crm-user-update", args=[end_user.id])
     data = {
+        "username": end_user.username,
         "first_name": "John",
         "last_name": "DOE",
         "phone_no": "01 23 45 67 89",
@@ -246,8 +249,54 @@ def test_crm_user_update_profile_information(request, client):
     # user data is updated
     end_user.refresh_from_db()
 
+    assert end_user.username == end_user.username
     assert end_user.first_name == data["first_name"]
     assert end_user.last_name == data["last_name"]
+
+    # profile is updated
+    profile.refresh_from_db()
+
+    assert profile.phone_no == data["phone_no"]
+    assert profile.organization == organization
+    assert profile.organization_position == data["organization_position"]
+
+
+@pytest.mark.django_db
+def test_crm_user_update_profile_information_and_email_address(request, client):
+    site = get_current_site(request)
+
+    organization = baker.make(addressbook_models.Organization)
+
+    end_user = baker.make(auth_models.User)
+    profile = end_user.profile
+
+    url = reverse("crm-user-update", args=[end_user.id])
+    data = {
+        "username": "johndoe@example.org",
+        "first_name": "John",
+        "last_name": "DOE",
+        "phone_no": "01 23 45 67 89",
+        "organization": organization.id,
+        "organization_position": "staff",
+    }
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    # user data is updated
+    end_user.refresh_from_db()
+
+    assert end_user.username == data["username"]
+    assert end_user.email == data["username"]
+    assert end_user.first_name == data["first_name"]
+    assert end_user.last_name == data["last_name"]
+
+    email_address = EmailAddress.objects.get(user=end_user)
+    assert email_address.email == data["username"]
+    assert email_address.verified is False
 
     # profile is updated
     profile.refresh_from_db()
