@@ -53,6 +53,7 @@
                             </div>
                             <hr/>
                             <div class="d-flex align-items-center small">
+                                {% with project.crm_annotations.tags.names as active_tags %}
                                 {% for crm_tag in site_config.crm_available_tags.all %}
                                     <form class="me-2"
                                           action="{% url 'crm-project-toggle-annotation' project.pk %}"
@@ -61,13 +62,14 @@
                                         <div>
                                             <input class="button" hidden name="tag" value="{{ crm_tag.name }}" id="id_tag">
                                         </div>
-                                        {% if crm_tag.name in project.crm_annotations.tags.names %}
+                                        {% if crm_tag.name in active_tags %}
                                             <button class="mx-1 my-1 border-0 badge rounded-pill bg-dark" type="submit">{{ crm_tag.name }}</button>
                                         {% else %}
                                             <button class="mx-1 my-1 border-0 badge rounded-pill bg-secondary" type="submit">{{ crm_tag.name }}</button>
                                         {% endif %}
                                     </form>
                                 {% endfor %}
+                                {% endwith %}
                             </div>
                         </div>
                         <div>
