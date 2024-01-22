@@ -362,28 +362,30 @@ def user_update(request, user_id=None):
     if request.method == "POST":
         form = forms.CRMProfileForm(request.POST, instance=profile)
         if form.is_valid():
-            username = form.cleaned_data.get("username")
-            email_changed = username != crm_user.username
-            if email_changed:
-                users = filter_users_by_email(username)
-                if len(users) > 0:
-                    # a user with the new mail already exist
-                    user_link = reverse("crm-user-details", args=[users[0].pk])
-                    error_msg = mark_safe(
-                        f'L\'utilisateur <a href="{user_link}">{users[0].first_name} {users[0].last_name}</a>'
-                        " utilise déjà cette adresse email."
-                    )
-                    form.add_error("username", django_forms.ValidationError(error_msg))
-                else:
-                    # delete old email address
-                    EmailAddress.objects.filter(user=crm_user).delete()
+            with transaction.atomic():
+                username = form.cleaned_data.get("username")
+                email_changed = username != crm_user.username
+                if email_changed:
+                    users = filter_users_by_email(username)
+                    if len(users) > 0:
+                        # a user with the new mail already exist
+                        user_link = reverse("crm-user-details", args=[users[0].pk])
+                        error_msg = mark_safe(
+                            f'L\'utilisateur <a href="{user_link}">{users[0].first_name} {users[0].last_name}</a>'
+                            " utilise déjà cette adresse email."
+                        )
+                        form.add_error(
+                            "username", django_forms.ValidationError(error_msg)
+                        )
+                    else:
+                        # delete old email address
+                        EmailAddress.objects.filter(user=crm_user).delete()
 
-                    # setup new email address
-                    crm_user.username = username
-                    crm_user.email = username
+                        # setup new email address
+                        crm_user.username = username
+                        crm_user.email = username
 
-            if form.is_valid():  # maybe email update threw an error in the meantime
-                with transaction.atomic():
+                if form.is_valid():  # maybe email update threw an error in the meantime
                     # update profile object
                     form.save()
 
@@ -398,7 +400,7 @@ def user_update(request, user_id=None):
                         send_email_confirmation(request, crm_user, signup=False)
 
                     messages.success(request, success_message)
-                return redirect(reverse("crm-user-details", args=[crm_user.id]))
+                    return redirect(reverse("crm-user-details", args=[crm_user.id]))
     else:
         form = forms.CRMProfileForm(
             instance=profile,
