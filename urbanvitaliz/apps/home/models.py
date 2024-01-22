@@ -27,6 +27,7 @@ from guardian.models import (
     UserObjectPermissionBase,
 )
 from phonenumber_field.modelfields import PhoneNumberField
+from taggit.managers import TaggableManager
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics
 
@@ -117,7 +118,15 @@ class SiteConfiguration(models.Model):
     onboarding = models.ForeignKey("onboarding.Onboarding", on_delete=models.CASCADE)
     sender_email = models.EmailField()
     sender_name = models.CharField(max_length=30)
-
+    crm_available_tags = TaggableManager(
+        blank=True,
+        verbose_name="Étiquettes projets disponibles dans le CRM",
+        help_text=(
+            "Liste de tags séparés par une virgule. "
+            "Attention, veillez à ne pas retirer un tag utilisé dans un projet, "
+            "celui-ci ne pourra plus être retiré depuis le CRM"
+        ),
+    )
     reminder_interval = models.IntegerField(
         default=6 * 7, verbose_name="Interval des rappels", help_text="en jours"
     )
@@ -202,6 +211,7 @@ class GroupObjectPermissionOnSite(
 ### Monkey patch guardian behaviour so it returns current site permission
 ### and honours current site admins
 
+
 # Users
 def get_user_filters_with_sites(self, obj):
     """Monkey patched method to force filtering by current site.
@@ -262,6 +272,7 @@ def get_user_perms(self, obj):
 
 ObjectPermissionChecker.original_get_user_perms = ObjectPermissionChecker.get_user_perms
 ObjectPermissionChecker.get_user_perms = get_user_perms
+
 
 # Override cache key identity using site
 def get_local_cache_key_with_site(self, obj):

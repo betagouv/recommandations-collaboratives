@@ -38,6 +38,7 @@ from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.tasks.models import Task
 from urbanvitaliz.utils import (
     get_group_for_site,
+    get_site_config_or_503,
     has_perm,
     has_perm_or_403,
     make_group_name_for_site,
@@ -605,6 +606,8 @@ def project_details(request, project_id):
 
     project = get_object_or_404(Project.all_on_site, pk=project_id)
 
+    site_config = get_site_config_or_503(request.site)
+
     actions = target_stream(project)
 
     user_ct = ContentType.objects.get_for_model(User)
@@ -689,16 +692,20 @@ def project_toggle_annotation(request, project_id=None):
 
     project = get_object_or_404(Project.on_site, pk=project_id)
 
+    site_config = get_site_config_or_503(request.site)
+
     form = forms.ProjectAnnotationForm(request.POST)
     if form.is_valid():
         tag = form.cleaned_data.get("tag")
-        annotation, _ = models.ProjectAnnotations.objects.get_or_create(
-            project=project, site=request.site
-        )
-        if tag in annotation.tags.names():
-            annotation.tags.remove(tag)
-        else:
-            annotation.tags.add(tag)
+        # check if the tag is authorized by the site configuration
+        if tag in site_config.crm_available_tags.values_list("name", flat=True):
+            annotation, _ = models.ProjectAnnotations.objects.get_or_create(
+                project=project, site=request.site
+            )
+            if tag in annotation.tags.names():
+                annotation.tags.remove(tag)
+            else:
+                annotation.tags.add(tag)
 
     url = reverse("crm-project-details", args=[project.id])
     return redirect(url)
