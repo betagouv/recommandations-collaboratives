@@ -1,5 +1,6 @@
 import pytest
 import allauth.account.utils
+import django.core.mail
 from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
@@ -260,6 +261,9 @@ def test_crm_user_update_profile_information(request, client):
     assert profile.organization == organization
     assert profile.organization_position == data["organization_position"]
 
+    # no email address update
+    assert len(django.core.mail.outbox) == 0
+
 
 @pytest.mark.django_db
 def test_crm_user_update_profile_information_and_email_address(request, client):
@@ -304,6 +308,59 @@ def test_crm_user_update_profile_information_and_email_address(request, client):
     assert profile.phone_no == data["phone_no"]
     assert profile.organization == organization
     assert profile.organization_position == data["organization_position"]
+
+    # the confirmation email has been sent
+    assert len(django.core.mail.outbox) == 1
+    assert "Confirmez votre adresse email" in django.core.mail.outbox[0].subject
+
+
+@pytest.mark.django_db
+def test_crm_user_update_profile_information_with_email_address_exists(request, client):
+    site = get_current_site(request)
+
+    # an other user already used the new email address
+    other_user = baker.make(auth_models.User, email="johndoe@example.org")
+
+    organization = baker.make(addressbook_models.Organization)
+    end_user = baker.make(auth_models.User)
+    profile = end_user.profile
+
+    url = reverse("crm-user-update", args=[end_user.id])
+    data = {
+        "username": "johndoe@example.org",
+        "first_name": "John",
+        "last_name": "DOE",
+        "phone_no": "01 23 45 67 89",
+        "organization": organization.id,
+        "organization_position": "staff",
+    }
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url, data=data)
+
+    assert response.status_code == 200
+    assertContains(response, "utilise déjà cette adresse email")
+    expected = reverse("crm-user-details", args=[other_user.id])
+    assertContains(response, expected)
+
+    # user data is not updated
+    end_user.refresh_from_db()
+
+    assert end_user.username != data["username"]
+    assert end_user.email != data["username"]
+    assert end_user.first_name != data["first_name"]
+    assert end_user.last_name != data["last_name"]
+
+    # profile is not updated
+    profile.refresh_from_db()
+
+    assert profile.phone_no != data["phone_no"]
+    assert profile.organization != organization
+    assert profile.organization_position != data["organization_position"]
+
+    # no email address update
+    assert len(django.core.mail.outbox) == 0
 
 
 ########################################################################
