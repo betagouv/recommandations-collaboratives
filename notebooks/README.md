@@ -44,13 +44,13 @@ python manage.py shell_plus --notebook
 python manage.py runserver
 ```
 
-1. 🎨 Terminal 3: Démarrer  le serveur de dev de la lib `dsrc-ui` dans `[racine-django]/dsrc-ui` [optional, selon la tache]
+1. 🎨 Terminal 3: Démarrer  le serveur de dev de la lib `dsrc-ui` dans `[racine-django]/dsrc-ui` [optionnel, selon la tâche]
 
 ```sh
 pnpm dev
 ```
 
-1. ✨ Terminal 4: Démarrer   le serveur de dev du `frontend` dans `[racine-django]/frontend` [optional, selon la tache]
+1. ✨ Terminal 4: Démarrer   le serveur de dev du `frontend` dans `[racine-django]/frontend` [optionnel, selon la tâche]
 
 ```sh
 pnpm dev
