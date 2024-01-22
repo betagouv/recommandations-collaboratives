@@ -50,7 +50,7 @@ def test_invite_email_for_existing_user_uses_autologin(request, client):
 
 
 @pytest.mark.django_db
-def test_email_cannot_be_added_twice(request, client):
+def test_email_cannot_be_added_twice(request, client, mailoutbox):
     project = baker.make(
         models.Project,
         sites=[get_current_site(request)],
@@ -71,6 +71,10 @@ def test_email_cannot_be_added_twice(request, client):
     assert invites_models.Invite.objects.count() == 1
     invite = invites_models.Invite.objects.first()
     assert invite.email == data["email"]
+
+    assert len(mailoutbox) == 2
+    assert mailoutbox[0].to[0] == data["email"]
+    assert mailoutbox[1].to[0] == data["email"]
 
 
 ##############################################################
