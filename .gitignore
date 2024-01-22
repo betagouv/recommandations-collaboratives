@@ -31,3 +31,4 @@ venv
 **/.npmrc
 .npmrc
 screenshots
+.idea

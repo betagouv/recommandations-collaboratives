@@ -104,12 +104,13 @@
                     {% for reminder in sent_reminders.all %}
                     {% with reminder.transactions.all.0 as transaction %}
                     <div class="list-group">
-                        <a href="{% url 'crm-user-reminder-details' crm_user.pk reminder.pk %}" @click="showMessage('{{ transaction.transaction_id }}')" class="list-group-item list-group-item-action flex-column align-items-start mb-2">
+                        <a {% if transation %}href="{% url 'crm-user-reminder-details' crm_user.pk reminder.pk %}" @click="showMessage('{{ transaction.transaction_id }}')" {% endif %} class="list-group-item list-group-item-action flex-column align-items-start mb-2">
                             <div class="d-flex w-100 justify-content-between">
-                                <h5>{{ reminder.project }}</h5>
-                                {% if transaction.faked %}
-                                <span class="badge bg-secondary">Test</span>&nbsp;
-                                {% endif %}
+                                <h5>
+                                    {% if transaction.faked %}
+                                    <span class="badge bg-secondary">Envoi test</span>&nbsp;
+                                    {% endif %}
+                                    {{ reminder.project }}</h5>
 
                                 <small>{{ transaction.sent_on|naturalday }}</small>
                             </div>
@@ -122,6 +123,9 @@
                         </a>
                     </div>
                     {% endwith %}
+                    {% empty %}
+                    <span class="p-4"> -- Aucun rappel envoyé --</span>
+
                     {% endfor %}
                 </section>
             </div>

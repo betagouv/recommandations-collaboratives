@@ -18,7 +18,8 @@ L.Control.GeocoderBAN = L.Control.extend({
 		markerIcon:null,
 		markerPopupTemplate: null,
 		commune: null,
-		popupOptions: null
+		popupOptions: null,
+		markers: null
 	},
 	includes: L.Evented.prototype || L.Mixin.Events,
 	initialize: function (options) {
@@ -178,6 +179,7 @@ L.Control.GeocoderBAN = L.Control.extend({
 		a.innerHTML = '<strong>' + feature.properties.label + '</strong>, ' + feature.properties.context
 		li.geocodedFeatures = feature
 		var clickHandler = function (e) {
+			this.input.value = e.explicitOriginalTarget.outerText
 			this.minimizeControl()
 			this.geocodeResult(feature)
 			this.options.onUpdate({
@@ -200,17 +202,24 @@ L.Control.GeocoderBAN = L.Control.extend({
 		L.DomEvent.on(li, 'mouseout', mouseOutHandler, this)
 		return li
 	},
+	setValue(value) {
+		this.input.value = value
+	},
 	geocodeResult: function (feature) {
 		this.minimizeControl()
 		this.markGeocode(feature)
 	},
 	markGeocode: function (feature) {
+		if(this.options.markers[0]) {
+			this.options.markers[0].clearLayers()
+		}
 		var latlng = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]]
 		this._map.setView(latlng, 14)
 		this.geocodeMarker = new L.Marker(latlng, {icon: this.options.markerIcon})
 			.bindPopup(this.options.markerPopupTemplate({...this.options.popupOptions, address: this.input.value }))
-			.addTo(this._map)
 			.openPopup()
+		let markerLayer = L.layerGroup([this.geocodeMarker]).addTo(this._map);
+		this.options.markers[0] = markerLayer
 	}
 })
 

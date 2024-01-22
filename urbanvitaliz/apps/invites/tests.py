@@ -65,7 +65,7 @@ def test_invite_collaborator_api(request, client):
 
 
 @pytest.mark.django_db
-def test_invite_collaborator_twice_api(request, client):
+def test_invite_collaborator_twice_api(request, client, mailoutbox):
     current_site = get_current_site(request)
 
     invited_email = "new@invited.org"
@@ -81,12 +81,45 @@ def test_invite_collaborator_twice_api(request, client):
             current_site, project, "COLLABORATOR", invited_email, "hi", user
         )
 
-        invite2 = api.invite_collaborator_on_project(
-            current_site, project, "COLLABORATOR", invited_email, "hi", user
-        )
+        assert invite1
+        assert len(mailoutbox) == 1
 
-    assert invite1
-    assert invite2 is False
+        with pytest.raises(api.InviteAlreadyInvitedException):
+            api.invite_collaborator_on_project(
+                current_site, project, "COLLABORATOR", invited_email, "hi", user
+            )
+
+
+@pytest.mark.django_db
+def test_invite_collaborator_but_already_member(request, client):
+    current_site = get_current_site(request)
+
+    email = "invited@people.org"
+
+    project = baker.make(
+        projects_models.Project,
+        sites=[current_site],
+        status="READY",
+    )
+
+    membership = baker.make(
+        projects_models.ProjectMember,
+        project=project,
+        member__is_staff=False,
+        member__username=email,
+        member__email=email,
+    )
+
+    with login(client) as user:
+        with pytest.raises(api.InviteAlreadyMemberException):
+            api.invite_collaborator_on_project(
+                current_site,
+                project,
+                "COLLABORATOR",
+                membership.member.email,
+                "hi",
+                user,
+            )
 
 
 @pytest.mark.django_db
