@@ -48,10 +48,15 @@ def send_reminder_digests_by_project(project, dry_run=False):
         )
         return False
 
-    if project.inactive_since or project.muted:
+    if project.inactive_since:
         logger.info(
-            f"Skipping inactive/muted project <{project.name}>(id={project.id})"
+            f"Skipping inactive project <{project.name}>(id={project.id}) "
+            f': {project.inactive_since} ("{project.inactive_reason}")'
         )
+        return False
+
+    if project.muted:
+        logger.info(f"Skipping muted project <{project.name}>(id={project.id})")
         return False
 
     send_new_recommendations_reminders_digest_by_project(
