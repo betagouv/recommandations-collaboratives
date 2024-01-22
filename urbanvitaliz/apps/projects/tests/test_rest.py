@@ -13,6 +13,7 @@ from actstream.models import user_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.utils import timezone
 from model_bakery import baker
 from notifications.signals import notify
 from pytest_django.asserts import assertContains
@@ -728,6 +729,40 @@ def test_unused_topics_are_not_suggested_via_rest_api(client, request):
     current_site = get_current_site(request)
 
     baker.make(models.Topic, name="acme topic", site=current_site)
+
+    url = reverse("topics-list")
+    response = client.get(
+        url, {"search": "acm topc", "restrict_to": "projects"}, format="json"
+    )
+
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_topics_on_deleted_task_are_not_suggested_via_rest_api(client, request):
+    current_site = get_current_site(request)
+
+    topic = baker.make(models.Topic, name="acme topic", site=current_site)
+    task = baker.make(tasks_models.Task, deleted=timezone.now())
+    topic.tasks.add(task)
+
+    url = reverse("topics-list")
+    response = client.get(
+        url, {"search": "acm topc", "restrict_to": "recommendations"}, format="json"
+    )
+
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_topics_on_deleted_project_are_not_suggested_via_rest_api(client, request):
+    current_site = get_current_site(request)
+
+    topic = baker.make(models.Topic, name="acme topic", site=current_site)
+    project = baker.make(models.Project, deleted=timezone.now())
+    topic.projects.add(project)
 
     url = reverse("topics-list")
     response = client.get(
