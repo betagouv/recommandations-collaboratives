@@ -6,9 +6,7 @@ Ce module contient la documentation pour la bibliothèque de templates Django du
 
 ### Prérequis
 
-L'installation de l'outil de documentation des templates Django nécessite que les conditions suivantes soient remplies:
-
-- le projet Django qui contient ce module est installé et peut être lancé en mode developpement
+- le projet Django qui contient ce module est installé et peut être lancé en mode développement
 - pour démarrer l'installation ci-dessous, vous avez une console ouverte à la racine du projet Django
 - vous avez démarré un environnement virtuel (`virtualenv` ou équivalent)
 
@@ -47,13 +45,13 @@ python manage.py runserver
 1. 🎨 Terminal 3: Démarrer  le serveur de dev de la lib `dsrc-ui` dans `[racine-django]/dsrc-ui` (optionnel, selon la tâche)
 
 ```sh
-pnpm dev
+yarn dev
 ```
 
 1. ✨ Terminal 4: Démarrer   le serveur de dev du `frontend` dans `[racine-django]/frontend` (optionnel, selon la tâche)
 
 ```sh
-pnpm dev
+yarn dev
 ```
 
 ## CSS dans Jupyter dans Django
