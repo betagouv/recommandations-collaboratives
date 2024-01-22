@@ -203,6 +203,11 @@ class Project(models.Model):
         task_topics = Topic.objects.filter(tasks__project=self, tasks__deleted=None)
         return task_topics.union(self.topics.all())
 
+    @property
+    def task_topics(self):
+        """Return all topics associated w/ tasks"""
+        return Topic.objects.filter(tasks__project=self, tasks__deleted=None).distinct()
+
     notifications_as_target = CastedGenericRelation(
         notifications_models.Notification,
         related_query_name="target_projects",

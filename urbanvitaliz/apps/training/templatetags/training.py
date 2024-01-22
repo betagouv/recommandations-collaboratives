@@ -24,8 +24,8 @@ def challenge_for(user, codename):
 
 @register.simple_tag
 def challenge_acquire(challenge):
-    # TODO why isn't challenge object saved ?
     challenge.acquired_on = timezone.now()
+    challenge.save()
     return ""
 
 

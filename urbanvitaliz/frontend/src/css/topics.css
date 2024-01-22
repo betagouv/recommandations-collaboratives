@@ -20,11 +20,6 @@
 	width: 100%;
 }
 
-.topic-list li.empty,
-.topic-list .topic-item.empty  {
-	display: none;
-}
-
 .topic-list li p,
 .topic-list .topic-item .topic-link {
 	display: flex;
