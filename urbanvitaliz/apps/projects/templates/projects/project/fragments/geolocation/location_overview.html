@@ -33,7 +33,7 @@
     <div x-data='ProjectLocation(projectOptions)'
          data-test-id="project-overview-map"
          class="location-overview">
-        {% include 'projects/project/fragments/geolocation/project_map.html' %}
+        {% include 'projects/project/fragments/geolocation/project_map.html' with controls=True %}
         {% include 'projects/project/fragments/geolocation/location_overview_footer.html' %}
     </div>
     {% include "projects/project/fragments/geolocation/project_map_modal.html" %}
