@@ -1,13 +1,32 @@
-# DSRC - Documentation des Templates Django
+# DSRC - Documentation de Templates Django
 
 Ce module contient la documentation pour la bibliothèque de templates Django du Système de Design des portails Recoco, DSRC.
 
 ## Prise en Main
 
+Le code su système de design DSRC est composé de 4 modules:
+
+- `dsrc-doc` : contient la documentation interactive de la bibliothèque sous forme de Jupyter Notebooks (c'est ici!)
+- `dsrc-ui` : contient les fichiers source CSS et JavaScript de la librairie de composants
+- `dsrc-dj` : contient les templates Django des composants (HTML)
+- `dsrc-tests` : contient les tests unitaires et d'intégration des composants (hors parcours utilisateur, qui se trouvent dans `[root]/frontend_tests`)
+
+L'arborsecence de ces modules dans le projet est la suivante:
+
+```sh
+├── dsrc-tests
+├── notebooks
+│   └── dsrc-doc
+├── urbanvitaliz
+│   ├── dsrc-ui
+│   ├── templates
+│   │   └── dsrc-dj
+```
+
 ### Prérequis
 
 - le projet Django qui contient ce module est installé et peut être lancé en mode développement
-- pour démarrer l'installation ci-dessous, vous avez une console ouverte à la racine du projet Django
+- pour démarrer l'installation ci-dessous, vous avez une console ouverte à la racine du projet
 - vous avez démarré un environnement virtuel (`virtualenv` ou équivalent)
 
 Note: cette documentation est en cours de création,  l'intégration avec Docker n'a pas encore été traitée
@@ -30,25 +49,29 @@ pip install --upgrade notebook==6.4.12
 
 Pour lancer Jupyter dans Django et interagir avec le backend:
 
-1. 🗒️ Terminal 1: Démarrer Jupyter Notebooks à la racine du projet
+1. 🗒️ Terminal 1 : Démarrer Jupyter Notebooks à la racine du projet
 
 ```sh
 python manage.py shell_plus --notebook
 ```
 
-1. 🐍 Terminal 2: Démarrer le backend Django à la racine du projet
+1. 🐍 Terminal 2 : Démarrer le backend Django à la racine du projet
 
 ```sh
 python manage.py runserver
 ```
 
-1. 🎨 Terminal 3: Démarrer  le serveur de dev de la lib `dsrc-ui` dans `[racine-django]/dsrc-ui` (optionnel, selon la tâche)
+Pour travailler sur les composants ui du DSRC:
+
+1. 🎨 Terminal 3 : Démarrer le serveur de dev de la lib `dsrc-ui` dans `[root]/urbanvitaliz/dsrc-ui`
 
 ```sh
 yarn dev
 ```
 
-1. ✨ Terminal 4: Démarrer   le serveur de dev du `frontend` dans `[racine-django]/frontend` (optionnel, selon la tâche)
+Pour travailler sur les composants ui de l'application:
+
+1. ✨ Terminal 4 : Démarrer le serveur de dev du `frontend` dans `[root]/urbanvitaliz/frontend`
 
 ```sh
 yarn dev
@@ -58,10 +81,13 @@ yarn dev
 
 Afin d'appliquer des styles à un Template Django à l'intérieur d'une cellule Jupyter Notebooks,  on charge le CSS dans un `string` qui est injecté  dans le `Template` construit dans Jupyter via le dict `Context`. Les styles sont ensuite rendus dans un tag `<style>` à l'intérieur d'un `{% block css %}`.
 
+Le CSS de la librairie DSRC est généré à partir de sources SCSS dans le dossier `[root]/urbanvitaliz/dsrc-ui`.
+
+Les fichiers sont générés dans `[root]/static/` et chargés dans Jupyter Notebooks à partir de `[root]/static/`.
 
 Fonction permettant de charger des styles depuis le dossier `static` :
 
-- Copier le code dans une cellule du Notebook qui précède le rendu du Template
+- Copier le code dans une cellule du Notebook :
 
 ```python
 # Load CSS files as raw text using python
@@ -72,19 +98,20 @@ Pass the file path to the CSS file.
 def _set_css_style(css_file_path):
 
    styles = open(css_file_path, "r").read()
-   s = '%s' % styles     
-   return HTML(s)
+   mycss = '%s' % styles
+   return HTML('<style>{}</style>'.format(mycss))
 
 csscore = _set_css_style('static/css/dsfr.css') # changer pour le fichier de style souhaité
 ```
 
-Ensuite, définir un Template dans une cellule suivante:
+Définir un Template dans la cellule suivante:
 
 ```python
 template = Template("""
 {% load static %}
 {% load sass_tags %}
 {% load django_vite %}
+
 {% block css %}
     <style>
         {{csscore}} {# Chargement de styles ici #}
@@ -104,7 +131,7 @@ template = Template("""
         <td>{{p.location}}</td>
     </tr>
     {% endfor %}
-    <button class="fr-tag">Test CSS button</button>
+    <button class="fr-primary">Add Project</button>
 </table>
 """)
 
@@ -117,16 +144,15 @@ HTML(template.render(context)) # Affiche le template
 
 - [Source: solution pour charger du CSS dans une cellule Jupyter Notebook (SO)](https://stackoverflow.com/questions/32156248/how-do-i-set-custom-css-for-my-ipython-ihaskell-jupyter-notebook)
 
-
 ### Problèmes d'installation Jupyter
 
-En cas d'erreur:
+En cas d'erreur :
 
 ```sh
 ModuleNotFoundError: No module named 'notebook.notebookapp'
 ```
 
-Tout d'abord, il faut s'assurer qu'on a installé une version de `notebooks` compatible avec l'extension `shell_plus`:
+Tout d'abord, il faut s'assurer qu'on a installé une version de `notebooks` compatible avec l'extension `shell_plus` :
 
 ```sh
 pip install --upgrade notebook==6.4.12
