@@ -145,7 +145,7 @@ HTML(template.render(context)) # Affiche le template
 
 - [Source: solution pour charger du CSS dans une cellule Jupyter Notebook (SO)](https://stackoverflow.com/questions/32156248/how-do-i-set-custom-css-for-my-ipython-ihaskell-jupyter-notebook)
 
-### TODO: Controle de versiosn de Jupyter Notebooks
+### TODO: Controle de version de Jupyter Notebooks
 
 - [How to version control Jupyter](https://nextjournal.com/schmudde/how-to-version-control-jupyter)
 - [Version control in Jupyter Notbeooks](https://datasciencenotebook.org/jupyter-version-control)
