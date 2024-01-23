@@ -21,7 +21,7 @@ git+https://github.com/jazzband/django-cookie-consent@master#egg=django-cookie-c
 
 django_otp
 django-tagging==0.5.0
-django-taggit==3.0.0
+django-taggit==4.0.0
 django-gravatar2
 psycopg2-binary
 django-leaflet
@@ -32,13 +32,13 @@ rest-framework-generic-relations
 django-filter
 dynamic-django-forms
 django-hijack==3.4.5
-django-sesame[ua]==2.4
+django-sesame[ua]==3.2.2
 django-recaptcha==3.0.0
 django-allauth==0.51.0
 sentry-sdk
 sib-api-v3-sdk
 # STATIC FILES
-django-sass-processor
+django-sass-processor==1.4
 libsass
 django-compressor==4.4
 multimethod==1.7
