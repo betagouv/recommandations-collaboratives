@@ -8,7 +8,7 @@ def reverse_historical_tags(apps, schema_editor):
     Tag = apps.get_model("taggit", "Tag")
     for slug in ["diag", "edl", "contact", "general"]:
         try:
-            tag = Tag.objects.get(slug=slug)
+            tag = Tag.objects.get(slug=f"crm_{slug}")
             tag.name = slug
             tag.save()
         except Tag.DoesNotExist:
@@ -29,7 +29,7 @@ def update_historical_tags(apps, schema_editor):
     for slug, name in default_tags:
         try:
             tag = Tag.objects.get(slug=slug)
-            tag.name = name
+            tag.slug = f"crm_{tag.slug}"
             tag.save()
         except Tag.DoesNotExist:
             pass
@@ -82,6 +82,6 @@ class Migration(migrations.Migration):
                 verbose_name="Étiquettes projets disponibles dans le CRM",
             ),
         ),
-        migrations.RunPython(migrations.RunPython.noop, reverse_historical_tags),
+        migrations.RunPython(update_historical_tags, reverse_historical_tags),
         migrations.RunPython(set_default_tags, migrations.RunPython.noop),
     ]
