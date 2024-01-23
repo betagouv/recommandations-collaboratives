@@ -11,10 +11,6 @@ function ProjectLocationEdit(projectOptions) {
 		markers: null,
 		isLoading: false,
 
-		get isBusy() {
-				return this.isLoading
-		},
-
 		async init() {
 			this.isLoading = true;
 			this.project = {
@@ -25,7 +21,7 @@ function ProjectLocationEdit(projectOptions) {
 					longitude: projectOptions.commune.longitude,
 				}
 			}
-			const { latitude, longitude, insee, name, postal } = this.project.commune;
+			const { latitude, longitude, insee, name } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
 			const geoData = {}
 			try {
@@ -89,9 +85,6 @@ function ProjectLocationEdit(projectOptions) {
 				markers[0] = markerLayer
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
 			});
-
-			// Force a map redraw
-			setTimeout(function(){Map.invalidateSize()}, 0);
 		},
 	}
 }
