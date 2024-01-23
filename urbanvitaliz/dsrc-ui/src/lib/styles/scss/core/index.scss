@@ -1,6 +1,16 @@
 /* Global config */
-@forward '@gouvfr/dsfr/dist/dsfr.css';
+@forward './config/reset';
 
-/* App styles */
+/* DSFR config */
+@forward '@gouvfr/dsfr/dist/core/core.css';
+@forward '@gouvfr/dsfr/dist/component/button/button.css';
+@forward '@gouvfr/dsfr/dist/component/table/table.css';
+
+/* DSRC config */
+
+@forward './pages';
 @forward './pages';
 @forward './buttons';
+
+/* External libraries overrides */
+@forward './ext/jupyter';

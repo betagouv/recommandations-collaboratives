@@ -2,10 +2,10 @@
 
 Ce paquet conient:
 
-1. Une librairie de composants JavaScript
-1. Une librairie SCSS
+1. Une biliothèque de composants JavaScript
+1. Une biliothèque SCSS
 
-Les deux librairies ci-dessus sont basées sur le Système de Design de l'État (DSFR)
+Les deux biliothèques ci-dessus sont basées sur le Système de Design de l'État (DSFR)
 
 ## Dev
 
@@ -31,4 +31,6 @@ yarn build
 
 ## Resources
 
+- [DSFR - Éléments d'interface](https://www.systeme-de-design.gouv.fr/elements-d-interface)
+- [DSFR - API Javascript](https://www.systeme-de-design.gouv.fr/utilisation-et-organisation/developpeurs/api-javascript)
 - [Rollup Config options](https://rollupjs.org/configuration-options/)
