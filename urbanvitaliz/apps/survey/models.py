@@ -16,6 +16,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 
+from model_clone import CloneMixin
+
 from .utils import compute_qs_completion
 
 from . import apps
@@ -35,7 +37,7 @@ def create_site_permissions(sender, **kwargs):
     )
 
 
-class Survey(models.Model):
+class Survey(CloneMixin, models.Model):
 
     objects = models.Manager()
     on_site = CurrentSiteManager()
@@ -43,6 +45,8 @@ class Survey(models.Model):
     name = models.CharField(max_length=80)
 
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+    _clone_m2o_or_o2m_fields = ["question_sets"]
 
     def __str__(self):  # pragma: nocover
         return f"Survey: {self.name}"
@@ -55,7 +59,7 @@ class QuestionSetManager(models.Manager):
         return super().get_queryset().filter(deleted=None)
 
 
-class QuestionSet(models.Model):
+class QuestionSet(CloneMixin, models.Model):
     """A set of question (ex: same topic)"""
 
     objects = QuestionSetManager()
@@ -117,6 +121,8 @@ class QuestionSet(models.Model):
 
         return None
 
+    _clone_m2o_or_o2m_fields = ["questions"]
+
     def __str__(self):  # pragma: nocover
         return self.heading
 
@@ -128,7 +134,7 @@ class QuestionManager(models.Manager):
         return super().get_queryset().order_by("-priority").filter(deleted=None)
 
 
-class Question(models.Model):
+class Question(CloneMixin, models.Model):
     """A question with mutliple choices"""
 
     objects = QuestionManager()
@@ -235,6 +241,8 @@ class Question(models.Model):
         my_tags = set(self.precondition_tags.values_list("name", flat=True))
         return my_tags.issubset(session.signals)
 
+    _clone_m2o_or_o2m_fields = ["choices"]
+
     def __str__(self):  # pragma: nocover
         return self.text
 
@@ -253,7 +261,7 @@ class ChoiceManager(models.Manager):
         return super().get_queryset().filter(deleted=None).order_by("-priority")
 
 
-class Choice(models.Model):
+class Choice(CloneMixin, models.Model):
     """A choice for a given Question"""
 
     objects = ChoiceManager()
