@@ -137,6 +137,7 @@ class StatisticsView(TemplateView):
 def contact(request):
     """Sends an email to the team with contact info from user"""
     next_url = request.GET.get("next", "/")
+    email_contact = settings.TEAM_EMAILS[0]
     if request.method == "POST":
         form = ContactForm(request.user, request.POST)
         if form.is_valid():

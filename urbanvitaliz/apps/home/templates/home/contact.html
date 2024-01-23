@@ -12,7 +12,7 @@
             <p class="text-secondary">
                 Si vous ne souhaitez pas utiliser notre formulaire, vous pouvez
                 copier-coller notre adresse email :
-                <span class="fw-bold">{{ home.sender_email }}</span>
+                <a class="fw-bold" href="mailto:{{email_contact}}">{{ email_contact }}</a>
             </p>
         {% endif %}
         <form method="POST" data-test-id="contact-form">
