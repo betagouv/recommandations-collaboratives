@@ -28,6 +28,7 @@ multisites
 .DS_Store
 venv
 /static/
+**/.npmrc
 .npmrc
 screenshots
 .idea
