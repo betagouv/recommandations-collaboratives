@@ -1,9 +1,4 @@
 import Alpine from 'alpinejs'
-
-import * as L from 'leaflet';
-import 'leaflet-control-geocoder';
-import 'leaflet-providers'
-
 import geolocUtils from '../utils/geolocation/'
 import mapUtils from '../utils/map/'
 
@@ -13,9 +8,15 @@ function ProjectLocationEdit(projectOptions) {
 		project: null,
 		map: null,
 		zoom: 8,
-		markers: [],
+		markers: null,
+		isLoading: false,
+
+		get isBusy() {
+				return this.isLoading
+		},
 
 		async init() {
+			this.isLoading = true;
 			this.project = {
 				...projectOptions,
 				commune: {
@@ -28,12 +29,17 @@ function ProjectLocationEdit(projectOptions) {
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
 			const geoData = {}
 			try {
-				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
-				geoData.location = await geolocUtils.fetchGeolocationByAddress(this.project.location, {name, insee, postal});
+				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
+					geolocUtils.fetchParcelsIgn(insee),
+					geolocUtils.fetchCommuneIgn(insee),
+					geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`)
+				]);
 			} catch(e) {
 				console.log(e)
 			}
-			this.initInteractiveMap(this.project, geoData, this.markers);
+			await this.initInteractiveMap(this.project, geoData);
+
+			this.isLoading = false;
 		},
 
 		updateProjectLocation(coordinates)  {
@@ -41,20 +47,41 @@ function ProjectLocationEdit(projectOptions) {
 			this.project.location_y = coordinates.lat
 		},
 
-		initInteractiveMap(project, geoData, markers) {
-			const options = mapUtils.mapOptions({interactive: true});
+		async initInteractiveMap(project, geoData) {
 			if(this.map) {
 				return
 			}
-			const Map = mapUtils.initMap('map-edit', project, options, this.zoom);
+			// Init map with base layer
+			const options = mapUtils.mapOptions({interactive: true});
+			const Map =  await mapUtils.initSatelliteMap('map-edit', project, options, this.zoom);
+			this.map = Map;
 
-			const popupOptions = {...project, title: "Point ajouté sur la carte"}
-			//Center Map
+			// Add onclick behaviour for address input field (geocoderBAN)
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
+
+			// Add overlay layers (vector maps, controls and markers)
+			this.markers  =	mapUtils.initMarkerLayer(this.map, project, geoData);
+			const geocoderBAN =	mapUtils.initMapControllerBAN(this.map, geoData, onClick, project, this.markers);
+			if(geoData.parcels) {
+				await  mapUtils.addLayerParcels(Map, geoData.parcels);
+			}
+
+			// Add zoom controls
+			this.map.setMinZoom(this.zoom - 7);
+			this.map.setMaxZoom(this.zoom + 6);
+
+			L.control.zoom({
+				position: 'topright'
+			}).addTo(this.map);
+
+			// Add onclick behaviour for map
+			const popupOptions = {...project, title: project.name}
+			let markers = this.markers
 			Map.on('click', function(e) {
 				if(markers[0]) {
 					markers[0].clearLayers()
 				}
+				geocoderBAN.setValue('');
 				onClick(e.latlng)
 				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon('marker-onclick') }).addTo(Map);
 				marker.bindPopup(mapUtils.markerPopupTemplate({...popupOptions,location_x: e.latlng.lng, location_y: e.latlng.lat }))
@@ -62,16 +89,8 @@ function ProjectLocationEdit(projectOptions) {
 				markers[0] = markerLayer
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
 			});
-			this.map = Map;
-			
-			mapUtils.initEditLayers(this.map, project, geoData);
-			mapUtils.initMapControllerBAN(this.map, geoData, onClick);
-			this.map.setMinZoom(this.zoom - 7);
-			this.map.setMaxZoom(this.zoom + 6);
-			L.control.zoom({
-				position: 'topright'
-			}).addTo(this.map);
 
+			// Force a map redraw
 			setTimeout(function(){Map.invalidateSize()}, 0);
 		},
 	}

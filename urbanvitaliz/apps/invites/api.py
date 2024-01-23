@@ -6,6 +6,16 @@ from urbanvitaliz.apps.communication import digests
 from . import models
 
 
+class InviteAlreadyMemberException(Exception):
+    pass
+
+
+class InviteAlreadyInvitedException(Exception):
+    def __init__(self, message, invite):
+        super().__init__(message)
+        self.invite = invite
+
+
 def invite_collaborator_on_project(site, project, role, email, message, inviter):
     """Invite a collaborator using her email on a given project"""
     if role not in [e[0] for e in models.Invite.INVITE_ROLES]:
@@ -20,18 +30,17 @@ def invite_collaborator_on_project(site, project, role, email, message, inviter)
     except auth_models.User.DoesNotExist:
         user = None
 
-    already_invited = models.Invite.on_site.filter(
-        project=project, site=site, email=email, accepted_on=None
-    ).exists()
-
-    already_member = False
-
     if user and user in project.members.all():
-        already_member = True
+        raise InviteAlreadyMemberException()
 
-    # Already invited, skip
-    if already_member or already_invited:
-        return False
+    invite = models.Invite.on_site.filter(
+        project=project, site=site, email=email, accepted_on=None
+    )
+
+    if invite.exists():
+        raise InviteAlreadyInvitedException(
+            "Cet personne est déjà membre", invite.first()
+        )
 
     invite = models.Invite.objects.create(
         project=project,
@@ -82,6 +91,7 @@ def invite_resend(invite):
     except auth_models.User.DoesNotExist:
         user = None  # Used to generate autologging link
 
+    print("COIN")
     return invite_send(invite, invited_user=user)
 
 

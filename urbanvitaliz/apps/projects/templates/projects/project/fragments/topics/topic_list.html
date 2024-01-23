@@ -44,7 +44,7 @@
             {% else %}
                 <ul class="topic-list l-stack">
                     {% for topic in project.topics.all %}
-                        <li>
+                        <li title="Modifier">
                             <a class="tiny bold topic-link"
                                title="Modifier"
                                href='{% url "projects-project-topics" project.id %}'>{{ topic.name }}</a>
@@ -54,7 +54,8 @@
             {% endif %}
             <ul class="topic-list l-stack readonly">
                 {% for topic in project.task_topics.all %}
-                    <li class="project-card-details">
+                    <li class="project-card-details"
+                        title="Cette thématique peut être modifiée dans les Recommandations">
                         <p class="tiny fw-bold">{{ topic.name }}</p>
                         <svg width="12"
                              height="12"

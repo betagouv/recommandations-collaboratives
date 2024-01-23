@@ -27,6 +27,8 @@ from urbanvitaliz.apps.invites.api import (
     invite_collaborator_on_project,
     invite_resend,
     invite_revoke,
+    InviteAlreadyMemberException,
+    InviteAlreadyInvitedException,
 )
 from urbanvitaliz.apps.invites.forms import InviteForm
 from urbanvitaliz.utils import (
@@ -124,16 +126,16 @@ def access_invite(request, role, project):
         email = form.cleaned_data["email"]
         message = form.cleaned_data["message"]
 
-        invite = invite_collaborator_on_project(
-            request.site,
-            project,
-            role,
-            email,
-            message,
-            request.user,
-        )
+        try:
+            invite = invite_collaborator_on_project(
+                request.site,
+                project,
+                role,
+                email,
+                message,
+                request.user,
+            )
 
-        if invite:
             action.send(
                 invite.inviter,
                 verb=verbs.Project.INVITATION,
@@ -148,12 +150,22 @@ def access_invite(request, role, project):
                 ),
                 extra_tags=["email"],
             )
-        else:
+
+        except InviteAlreadyMemberException:
             messages.warning(
                 request,
                 (
-                    f"Cet usager ({email}) n'a pu être invité, aucun courriel"
-                    " n'a été envoyé. Vérifiez qu'il n'est pas déjà invité ou membre"
+                    f"Cet usager ({email}) est déjà membre du projet, il n'a"
+                    " donc pas été réinvité."
+                ),
+            )
+        except InviteAlreadyInvitedException as e:
+            invite_resend(e.invite)
+            messages.success(
+                request,
+                (
+                    f"Cet usager ({email}) a déjà une invitation en cours."
+                    "L'invitation a été renvoyée"
                 ),
             )
 

@@ -33,11 +33,7 @@
     <div x-data='ProjectLocation(projectOptions, false)'
          data-test-id="project-knogwledge-map">
         <div class="p-0 project-map-container" :class="{'is-small':mapIsSmall}">
-            <div x-cloak
-                 x-ref="map-static"
-                 id="map-static"
-                 data-test-id="map-static"
-                 class="project-map h-100 w-100"></div>
+            {% include 'projects/project/fragments/geolocation/project_map.html' with controls=False %}
         </div>
         {% include 'projects/project/fragments/geolocation/location_knowledge_footer.html' %}
     </div>

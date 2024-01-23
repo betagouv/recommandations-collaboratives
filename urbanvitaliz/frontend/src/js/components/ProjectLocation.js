@@ -1,9 +1,5 @@
 import Alpine from 'alpinejs'
 
-import * as L from 'leaflet';
-import 'leaflet-control-geocoder';
-import 'leaflet-providers'
-
 import geolocUtils from '../utils/geolocation/'
 import mapUtils from '../utils/map/'
 
@@ -15,9 +11,14 @@ function ProjectLocation(projectOptions, modal=true) {
 		staticMap: null,
 		interactiveMap: null,
 		zoom: 8,
-		markers: [],
+		isLoading: false,
+
+		get isBusy() {
+				return this.isLoading
+		},
 
 		async init() {
+			this.isLoading = true;
 			this.project = {
 				...projectOptions,
 				commune: {
@@ -29,38 +30,56 @@ function ProjectLocation(projectOptions, modal=true) {
 			const { latitude, longitude, insee, name } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = {}
+
+
 			try {
-				geoData.commune = await geolocUtils.fetchCommuneIgn(insee);
-				geoData.location = await geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`);
+				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
+					geolocUtils.fetchParcelsIgn(insee),
+					geolocUtils.fetchCommuneIgn(insee),
+					geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`)
+				]);
 			} catch(e) {
 				console.log(e)
 			}
-			this.initStaticMap(this.project, geoData);
+			await this.initStaticMap(this.project, geoData);
 			if(modal) {
-				this.initInteractiveMap(this.project, geoData);
+				await this.initInteractiveMap(this.project, geoData);
+			}
+			let map = this.staticMap
+			setTimeout(function(){map.invalidateSize()}, 0);
+			this.isLoading = false;
+		},
+
+		async initStaticMap(project, geoData) {
+			const options = mapUtils.mapOptions({interactive: false});
+
+			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
+			this.staticMap = Map;
+			let markers = mapUtils.initMarkerLayer(this.staticMap, project, geoData);
+			if(!markers) {
+				mapUtils.initMapLayers(this.staticMap, project, geoData);
 			}
 		},
 
-		initStaticMap(project, geoData) {
-			const options = mapUtils.mapOptions({interactive: false});
-
-			const Map = mapUtils.initMap('map-static', project, options, this.zoom);
-			this.staticMap = Map;
-			mapUtils.initMapLayers(this.staticMap, project, geoData);
-		},
-
-		initInteractiveMap(project, geoData) {
+		async initInteractiveMap(project, geoData) {
 			// Init Interactive Map
 			const options = mapUtils.mapOptions({interactive: true});
 			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project, geoData)
 
-			const Map  = mapUtils.initMap('map-interactive', project, options, this.zoom + 3);
+			const Map = mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom + 3);
 			this.interactiveMap = Map;
-			mapUtils.initMapLayers(this.interactiveMap, project, geoData);
+			let markers = mapUtils.initMarkerLayer(this.interactiveMap, project, geoData);
+			if(markers.length === 0) 	{
+				mapUtils.initMapLayers(this.interactiveMap, project, geoData);
+			}
+			if(geoData.parcels) {
+				await  mapUtils.addLayerParcels(Map, geoData.parcels);
+			}
 			this.interactiveMap.setMinZoom(this.zoom - 7);
 			this.interactiveMap.setMaxZoom(this.zoom + 6);
 			L.control.zoom({
-				position: 'topright'
+				position: 'topright',
+				color: '#335B7E',
 			}).addTo(this.interactiveMap);
 			this.interactiveMap.panTo(new L.LatLng(latitude, longitude));
 
