@@ -1,6 +1,6 @@
 <div class="w-100">
     <div class="d-flex align-items-center justify-content-between w-100">
-        <template x-if="$store.djangoData.isAdvisor">
+        <template x-if="$store.djangoData.canManageTasks">
             <div class="d-flex align-items-center w-100 justify-content-between">
                 <div class="d-flex flex-column">
                     {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html' %}
@@ -15,7 +15,7 @@
                 {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html' %}
             </div>
         </template>
-        <template x-if="!$store.djangoData.isAdvisor">
+        <template x-if="!$store.djangoData.canManageTasks">
             <div class="d-flex justify-content-between align-items-center w-100">
                 {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html' %}
                 {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html' %}
