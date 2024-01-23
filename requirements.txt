@@ -26,12 +26,12 @@ django-gravatar2
 psycopg2-binary
 django-leaflet
 django-admin-csvexport
-djangorestframework
+djangorestframework==3.14.0
 djangorestframework-xml
 rest-framework-generic-relations
 django-filter
 dynamic-django-forms
-django-hijack==3.2.2
+django-hijack==3.4.5
 django-sesame[ua]==2.4
 django-recaptcha==3.0.0
 django-allauth==0.51.0
