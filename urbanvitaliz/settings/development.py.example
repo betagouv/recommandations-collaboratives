@@ -77,11 +77,11 @@ BREVO_FORCE_DEBUG = True
 RECAPTCHA_REQUIRED_SCORE = 0
 
 # Vite
-DJANGO_VITE_DEV_MODE = True
+DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": 3000}}
 
 # Uncomment Gdal and Geos libraries paths on MacOS
 # GDAL_LIBRARY_PATH="/opt//homebrew/lib/libgdal.dylib"
 # GEOS_LIBRARY_PATH="/opt//homebrew/lib/libgeos_c.dylib"
 
-SILENCED_SYSTEM_CHECKS += ['captcha.recaptcha_test_key_error']
+SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 # eof
