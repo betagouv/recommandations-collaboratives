@@ -28,3 +28,7 @@ Pour créer un bundle pour l'environnement de production:
 ```bash
 yarn build
 ```
+
+## Resources
+
+- [Rollup Config options](https://rollupjs.org/configuration-options/)
