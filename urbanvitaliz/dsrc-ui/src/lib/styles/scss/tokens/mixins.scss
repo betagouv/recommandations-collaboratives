@@ -1,0 +1,48 @@
+@use 'sass:map';
+@use 'sass:color';
+
+// == CSS VARS
+
+/**
+ * src https://dev.to/felipperegazio/css-custom-properties-vars-with-sass-scss-a-practical-architecture-strategy-1m88
+ * Use this mixin to declare a set of CSS Custom Properties.
+ * You can use this mixin to output different global designs ("themes") while relying on
+ * common core CSS functionality to generate layout, typography, color, etc (using $design_tokens)
+ * 
+ *
+ * Usage:
+ * @include generate-css-vars((
+ *  base-font-size: 65.5%,
+ *  font-family: #{"HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif},
+ * 
+ *  primary-color: #33b5e5,
+ *  outline-color: #ff500a,
+ * ));
+ *
+ * Will result in
+ *
+ * :root {
+ *    --base-font-size: 65.5%,
+ *    --font-family: "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+ *    --primary-color:  #33b5e5;
+ *    --outline-color: #ff500a,
+ * }
+ *
+ */
+
+// $current_cssvars holds the CSS variables that have been generated so far. It is initially set to null
+$current_cssvars: ();
+
+@mixin generate-css-vars($design_tokens, $prefix) {
+	$current_cssvars: map.merge($current_cssvars, $design_tokens);
+
+	@each $name, $value in $design_tokens {
+		#{$prefix}-#{$name}: #{$value};
+	}
+}
+
+@mixin theme-custom($colors, $prefix) {
+	:root {
+		@include generate-css-vars($colors, $prefix);
+	}
+}

@@ -5,6 +5,12 @@
 	"main": "index.js",
 	"author": "patricia.boh@beta.gouv.fr",
 	"scripts": {
+		"dev:csstokens": "rollup --config rollup.config.csstokens.js -w",
+		"build:csstokens": "rollup --config rollup.config.csstokens.js",
+		"dev:csscore": "rollup --config rollup.config.csscore.js -w",
+		"build:csscore": "rollup --config rollup.config.csscore.js",
+		"dev": "rollup -c -w",
+		"build": "yarn build:csstokens && yarn build:csscore && rollup -c",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"license": " AGPL-3.0",
@@ -18,6 +24,7 @@
 		"css",
 		"javascript"
 	],
+	"type": "module",
 	"dependencies": {
 		"@gouvfr/dsfr": "^1.11.0"
 	},
@@ -31,6 +38,8 @@
 		"postcss-jit-props": "^1.0.14",
 		"prettier": "3.2.2",
 		"rollup": "^4.9.6",
+		"rollup-plugin-scss": "^4.0.0",
+		"sass": "^1.70.0",
 		"scss": "^0.2.4",
 		"stylelint": "16.1.0",
 		"stylelint-config-standard": "36.0.0",
