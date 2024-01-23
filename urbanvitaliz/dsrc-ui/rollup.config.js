@@ -15,6 +15,6 @@ export default {
 		resolve({
 			browser: true
 		}),
-		terser()
+		terser() // TODO: env based minification
 	]
 };
