@@ -5,13 +5,17 @@
 	"main": "index.js",
 	"author": "patricia.boh@beta.gouv.fr",
 	"scripts": {
-		"dev:csstokens": "rollup --config rollup.config.csstokens.js -w",
-		"build:csstokens": "rollup --config rollup.config.csstokens.js",
-		"dev:csscore": "rollup --config rollup.config.csscore.js -w",
-		"build:csscore": "rollup --config rollup.config.csscore.js",
 		"dev": "rollup -c -w",
+		"dev:csstokens": "rollup --config rollup.config.csstokens.js -w",
+		"dev:csscore": "rollup --config rollup.config.csscore.js -w",
 		"build": "yarn build:csstokens && yarn build:csscore && rollup -c",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"build:csstokens": "rollup --config rollup.config.csstokens.js",
+		"build:csscore": "rollup --config rollup.config.csscore.js",
+		"lint:css": "stylelint ./src/lib/styles/css/**/*.css > ./logs/stylelint-css.log",
+		"lint:scss": "stylelint ./src/lib/styles/scss/**/*.scss > ./logs/stylelint-scss.log",
+		"lint:prettier": "prettier --check --ignore-path=../../.prettierignore . && eslint \".\"",
+		"lint": "yarn lint:css; yarn lint:scss; yarn lint:prettier > ./logs/lint.log",
+		"format": "prettier --write --ignore-path=../../.prettierignore ."
 	},
 	"license": " AGPL-3.0",
 	"keywords": [
