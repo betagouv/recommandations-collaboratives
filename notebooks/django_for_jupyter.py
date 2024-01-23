@@ -13,13 +13,12 @@ or call:\n
 
 
 def init_django(project_name=None):
-    if DEBUG is True:
-        os.environ.setdefault("JUPYTER_CONFIG_PATH", f"~/.jupyter:{PWD}")
-        os.chdir(PWD)
-        project_name = project_name or os.environ.get("DJANGO_PROJECT") or None
-        if project_name is None:
-            raise ValueError(PROJ_MISSING_MSG)
-        sys.path.insert(0, os.getenv("PWD"))
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"{project_name}.settings")
-        os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
-        django.setup()
+    os.environ.setdefault("JUPYTER_CONFIG_PATH", f"~/.jupyter:{PWD}")
+    os.chdir(PWD)
+    project_name = project_name or os.environ.get("DJANGO_PROJECT") or None
+    if project_name is None:
+        raise ValueError(PROJ_MISSING_MSG)
+    sys.path.insert(0, os.getenv("PWD"))
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"{project_name}.settings")
+    os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+    django.setup()
