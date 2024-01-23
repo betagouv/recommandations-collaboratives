@@ -10,11 +10,11 @@ const config = {
 		open: false,
 		watch: {
 			usePolling: true,
-			disableGlobbing: false,
-		},
+			disableGlobbing: false
+		}
 	},
 	resolve: {
-		extensions: ['.js', '.json'],
+		extensions: ['.js', '.json']
 	},
 	build: {
 		outDir: resolve('./dist'),
@@ -26,9 +26,7 @@ const config = {
 			input: {
 				main: resolve('./src/js/main.js'),
 				onboarding: resolve('./src/js/apps/onboarding.js'),
-				advisorCreateProject: resolve(
-					'./src/js/apps/advisorCreateProject.js'
-				),
+				advisorCreateProject: resolve('./src/js/apps/advisorCreateProject.js'),
 				home: resolve('./src/js/apps/home.js'),
 				crm: resolve('./src/js/apps/crm.js'),
 				project: resolve('./src/js/apps/project.js'),
@@ -39,38 +37,30 @@ const config = {
 				auth: resolve('./src/js/apps/auth.js'),
 				projectDetails: resolve('./src/js/apps/projectDetails.js'),
 				projectShare: resolve('./src/js/apps/projectShare.js'),
-				projectAdministration: resolve(
-					'./src/js/apps/projectAdministration.js'
-				),
+				projectAdministration: resolve('./src/js/apps/projectAdministration.js'),
 				map: resolve('./src/js/apps/map.js'),
 				documents: resolve('./src/js/apps/documents.js'),
 				searchableList: resolve('./src/js/apps/searchableList.js'),
 				consent: resolve('./src/js/apps/consent.js'),
 				tagCloud: resolve('./src/js/apps/tagCloud.js'),
-				organizationSearch: resolve(
-					'./src/js/apps/organizationSearch.js'
-				),
+				organizationSearch: resolve('./src/js/apps/organizationSearch.js'),
 				topicSearch: resolve('./src/js/apps/topicSearch.js'),
 				user: resolve('./src/js/apps/user.js'),
 				tutorial: resolve('./src/js/apps/tutorial.js'),
 				contactList: resolve('./src/js/apps/contactList.js'),
 				projectDetailsCss: resolve('./src/css/projectDetails.css'),
 				projectLocation: resolve('./src/js/apps/projectLocation.js'),
-				projectEmailReminder: resolve(
-					'./src/js/apps/projectEmailReminder.js'
-				),
-				projectLocationEdit: resolve(
-					'./src/js/apps/projectLocationEdit.js'
-				),
+				projectEmailReminder: resolve('./src/js/apps/projectEmailReminder.js'),
+				projectLocationEdit: resolve('./src/js/apps/projectLocationEdit.js')
 			},
 			output: {
-				chunkFileNames: undefined,
-			},
-		},
+				chunkFileNames: undefined
+			}
+		}
 	},
 	test: {
-		globals: true,
-	},
+		globals: true
+	}
 };
 
 export default config;
