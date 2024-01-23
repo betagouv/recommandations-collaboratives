@@ -1,13 +1,12 @@
 /* Global config */
 @forward './config/reset';
 
-/* DSFR config */
+/* DS:FR config */
 @forward '@gouvfr/dsfr/dist/core/core.css';
 @forward '@gouvfr/dsfr/dist/component/button/button.css';
 @forward '@gouvfr/dsfr/dist/component/table/table.css';
 
-/* DSRC config */
-
+/* DS:RC config */
 @forward './pages';
 @forward './pages';
 @forward './buttons';
