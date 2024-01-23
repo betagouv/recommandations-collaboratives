@@ -46,7 +46,7 @@ Installer la version de `notebooks` qui sera compatible avec l'extension  `shell
 pip install --upgrade notebook==6.4.12
 ```
 
-## Usage des Notebooks
+## Usage de Jupyter Notebooks
 
 Pour lancer Jupyter dans Django et interagir avec le backend:
 
