@@ -30,7 +30,7 @@ L'arborsecence de ces modules dans le projet est la suivante:
 - pour démarrer l'installation ci-dessous, vous avez une console ouverte à la racine du projet
 - vous avez démarré un environnement virtuel (`virtualenv` ou équivalent)
 
-Note: cette documentation est en cours de création,  l'intégration avec Docker n'a pas encore été traitée
+Note: cette documentation est en cours de création, l'intégration avec Docker n'a pas encore été traitée
 
 ### Installer Jupyter Notebooks dans Django
 
@@ -40,7 +40,7 @@ Installer les paquets qui permettent le lancement de Jupyter dans le projet Djan
 pip install jupyter ipython django-extensions
 ```
 
-Installer la version de `notebooks` qui sera compatible avec l'extension  `shell_plus`:
+Installer la version de `notebooks` qui sera compatible avec l'extension `shell_plus`:
 
 ```sh
 pip install --upgrade notebook==6.4.12
@@ -80,7 +80,7 @@ yarn dev
 
 ## CSS dans Jupyter dans Django
 
-Afin d'appliquer des styles à un Template Django à l'intérieur d'une cellule Jupyter Notebooks,  on charge le CSS dans un `string` qui est injecté  dans le `Template` construit dans Jupyter via le dict `Context`. Les styles sont ensuite rendus dans un tag `<style>` à l'intérieur d'un `{% block css %}`.
+Afin d'appliquer des styles à un Template Django à l'intérieur d'une cellule Jupyter Notebooks, on charge le CSS dans un `string` qui est injecté dans le `Template` construit dans Jupyter via le dict `Context`. Les styles sont ensuite rendus dans un tag `<style>` à l'intérieur d'un `{% block css %}`.
 
 Le CSS de la librairie DSRC est généré à partir de sources SCSS dans le dossier `[root]/urbanvitaliz/dsrc-ui`.
 
@@ -144,6 +144,11 @@ HTML(template.render(context)) # Affiche le template
 ```
 
 - [Source: solution pour charger du CSS dans une cellule Jupyter Notebook (SO)](https://stackoverflow.com/questions/32156248/how-do-i-set-custom-css-for-my-ipython-ihaskell-jupyter-notebook)
+
+### TODO: Controle de versiosn de Jupyter Notebooks
+
+- [How to version control Jupyter](https://nextjournal.com/schmudde/how-to-version-control-jupyter)
+- [Version control in Jupyter Notbeooks](https://datasciencenotebook.org/jupyter-version-control)
 
 ### Problèmes d'installation Jupyter
 
