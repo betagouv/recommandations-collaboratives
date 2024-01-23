@@ -40,9 +40,10 @@ sib-api-v3-sdk
 # STATIC FILES
 django-sass-processor
 libsass
-django-compressor==3.1
+django-compressor==4.4
 multimethod==1.7
-django-vite==2.0.2
+django-vite==3.0.3
 django-phonenumber-field[phonenumbers]==6.3.0
 django-watson==1.6.3
 django-guardian==2.4.0
+django-clone==5.3.3
