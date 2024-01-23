@@ -1,4 +1,6 @@
 /* Global config */
 @forward '@gouvfr/dsfr/dist/dsfr.css';
-/* App overrides  */
+
+/* App styles */
+@forward './pages';
 @forward './buttons';

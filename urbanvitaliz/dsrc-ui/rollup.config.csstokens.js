@@ -8,6 +8,7 @@ import jitProps from 'postcss-jit-props';
  */
 export default {
 	input: 'src/lib/styles/scss/tokens/index.js',
+	// The destination for our bundled CSS (here: the Django project's root `static` folder)
 	output: { dir: '../../static/assets/css/', format: 'esm' },
 	plugins: [
 		scss({
@@ -16,7 +17,7 @@ export default {
 				postcss([
 					autoprefixer(),
 					jitProps({
-						files: ['../../static/assets/css/**/*.css']
+						files: ['../../static/assets/**/*.css']
 					})
 				]),
 			watch: 'src/lib/styles/scss/tokens/'

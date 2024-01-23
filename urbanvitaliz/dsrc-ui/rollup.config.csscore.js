@@ -16,7 +16,7 @@ export default {
 				postcss([
 					autoprefixer(),
 					jitProps({
-						files: ['../../static/assets/css/**/*.css']
+						files: ['../../static/assets/**/*.css']
 					})
 				]),
 			watch: 'src/lib/styles/scss/core/'
