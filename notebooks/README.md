@@ -14,13 +14,14 @@ Le code su système de design DSRC est composé de 4 modules:
 L'arborsecence de ces modules dans le projet est la suivante:
 
 ```sh
-├── dsrc-tests
-├── notebooks
-│   └── dsrc-doc
-├── urbanvitaliz
-│   ├── dsrc-ui
-│   ├── templates
-│   │   └── dsrc-dj
+.
+|-- dsrc-tests
+|-- notebooks
+|   `-- dsrc-doc
+`-- urbanvitaliz
+    |-- dsrc-ui
+    |-- templates
+    |   `-- dsrc-dj
 ```
 
 ### Prérequis
