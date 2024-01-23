@@ -1,4 +1,4 @@
-# DSRC - Documentation de Templates Django
+# DSRC - Documentation
 
 Ce module contient la documentation pour la bibliothèque de templates Django du Système de Design des portails Recoco, DSRC.
 
@@ -9,7 +9,7 @@ Le code su système de design DSRC est composé de 4 modules:
 - `dsrc-doc` : contient la documentation interactive de la bibliothèque sous forme de Jupyter Notebooks (c'est ici!)
 - `dsrc-ui` : contient les fichiers source CSS et JavaScript de la librairie de composants
 - `dsrc-dj` : contient les templates Django des composants (HTML)
-- `dsrc-tests` : contient les tests unitaires et d'intégration des composants (hors parcours utilisateur, qui se trouvent dans `[root]/frontend_tests`)
+- `dsrc-tests` : contient les tests unitaires et d'intégration des composants
 
 L'arborsecence de ces modules dans le projet est la suivante:
 
