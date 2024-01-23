@@ -18,7 +18,6 @@ def reverse_historical_tags(apps, schema_editor):
 def update_historical_tags(apps, schema_editor):
     Tag = apps.get_model("taggit", "Tag")
 
-    default_tags_to_add = []
     default_tags = [
         ("diag", "Diagnostic"),
         ("edl", "État des lieux"),
@@ -32,7 +31,6 @@ def update_historical_tags(apps, schema_editor):
             tag = Tag.objects.get(slug=slug)
             tag.name = name
             tag.save()
-            default_tags_to_add.append(tag)
         except Tag.DoesNotExist:
             pass
 
@@ -54,8 +52,11 @@ def set_default_tags(apps, schema_editor):
     SiteConfiguration = apps.get_model("home", "SiteConfiguration")
     for site_conf in SiteConfiguration.objects.all():
         for tag_to_add in tags_to_add:
-            tag, created = Tag.objects.get_or_create(name=tag_to_add)
-            tagged_items, created = TaggedItem.objects.get_or_create(
+            tag, _ = Tag.objects.get_or_create(
+                name__iexact=tag_to_add,
+                defaults={"name": tag_to_add.lower(), "slug": tag_to_add.lower()},
+            )
+            tagged_items, _ = TaggedItem.objects.get_or_create(
                 content_type_id=content_type.id, object_id=site_conf.id, tag=tag
             )
 
@@ -73,14 +74,14 @@ class Migration(migrations.Migration):
                 blank=True,
                 help_text=(
                     "Liste de tags séparés par une virgule. "
-                    "Attention, veillez à ne pas retirer un tag utilisé dans un projet, "
-                    "celui-ci ne pourra plus être retiré depuis le CRM"
+                    "Attention, veillez à ne pas retirer un tag utilisé dans un projet,"
+                    " celui-ci ne pourra plus être retiré depuis le CRM"
                 ),
                 through="taggit.TaggedItem",
                 to="taggit.Tag",
                 verbose_name="Étiquettes projets disponibles dans le CRM",
             ),
         ),
-        migrations.RunPython(update_historical_tags, reverse_historical_tags),
+        migrations.RunPython(migrations.RunPython.noop, reverse_historical_tags),
         migrations.RunPython(set_default_tags, migrations.RunPython.noop),
     ]
