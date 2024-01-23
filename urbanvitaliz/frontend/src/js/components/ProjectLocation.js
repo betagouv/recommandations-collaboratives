@@ -13,10 +13,6 @@ function ProjectLocation(projectOptions, modal=true) {
 		zoom: 8,
 		isLoading: false,
 
-		get isBusy() {
-				return this.isLoading
-		},
-
 		async init() {
 			this.isLoading = true;
 			this.project = {
