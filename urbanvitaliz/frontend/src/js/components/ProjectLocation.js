@@ -34,17 +34,17 @@ function ProjectLocation(projectOptions, modal=true) {
 					geolocUtils.fetchCommuneIgn(insee),
 					geolocUtils.fetchGeolocationByAddress(`${this.project.location}`)
 				]);
-				await this.initStaticMap(this.project, geoData);
-				if(modal) {
-					await this.initInteractiveMap(this.project, geoData);
-				}
-				let map = this.staticMap
-				setTimeout(function(){map.invalidateSize()}, 0);
 			} catch(e) {
-				// console.log(e)
+				console.log(e)
 			} finally {
 				this.isLoading = false;
 			}
+			await this.initStaticMap(this.project, geoData);
+			if(modal) {
+				await this.initInteractiveMap(this.project, geoData);
+			}
+			let map = this.staticMap
+			setTimeout(function(){map.invalidateSize()}, 0);
 		},
 
 		async initStaticMap(project, geoData) {
@@ -53,7 +53,7 @@ function ProjectLocation(projectOptions, modal=true) {
 			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
 			this.staticMap = Map;
 			let markers = mapUtils.initMarkerLayer(this.staticMap, project, geoData);
-			if(!markers) {
+			if(!markers || markers.length === 0) 	{
 				mapUtils.initMapLayers(this.staticMap, project, geoData);
 			}
 		},
@@ -66,7 +66,7 @@ function ProjectLocation(projectOptions, modal=true) {
 			const Map = mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom + 3);
 			this.interactiveMap = Map;
 			let markers = mapUtils.initMarkerLayer(this.interactiveMap, project, geoData);
-			if(markers.length === 0) 	{
+			if(!markers || markers.length === 0) 	{
 				mapUtils.initMapLayers(this.interactiveMap, project, geoData);
 			}
 			if(geoData.parcels) {
