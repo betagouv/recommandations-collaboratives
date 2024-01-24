@@ -6,8 +6,8 @@
 # Initialize Notebook
 
 from notebooks.django_for_jupyter import init_django
-init_django("urbanvitaliz")
 
+init_django("urbanvitaliz")
 
 
 # %%
@@ -28,19 +28,21 @@ from IPython.display import Image
 # %%
 
 
-get_ipython().run_line_magic('pinfo', 'Project')
+get_ipython().run_line_magic("pinfo", "Project")
 
 
 # %%
 
 
-image = get_ipython().system('python manage.py graph_models tasks reminders -o models.png')
+image = get_ipython().system(
+    "python manage.py graph_models tasks reminders -o models.png"
+)
 
 
 # %%
 
 
-Image('models.png')
+Image("models.png")
 
 
 # %%
@@ -48,7 +50,6 @@ Image('models.png')
 
 from django.template import Context, Template
 from IPython.display import HTML
-
 
 
 # %%
@@ -60,7 +61,8 @@ projects = Project.objects.all()
 # %%
 
 
-template = Template("""
+template = Template(
+    """
 <table>
     <tr>
         <th>Projet</th>
@@ -75,11 +77,9 @@ template = Template("""
     </tr>
     {% endfor %}
 </table>
-""")
-
-context = Context(
-    {'projects': projects.order_by("-created_on")[:10]}
+"""
 )
 
-HTML(template.render(context))
+context = Context({"projects": projects.order_by("-created_on")[:10]})
 
+HTML(template.render(context))

@@ -4,6 +4,7 @@
 # Initialize Notebook
 
 from notebooks.django_for_jupyter import init_django
+
 init_django("urbanvitaliz")
 
 
@@ -38,16 +39,19 @@ Make sure you trust the code you are loading.
 Arg: the file path to the file, relative to the project's static assets folder
 Returns: IPython.core.display.HTML object: contains JS/CSS in `data` property
 """
+
+
 def _load_asset(rel_file_path):
-    assets_folder = 'static/assets/'
+    assets_folder = "static/assets/"
     assets_file_path = f"{assets_folder}{rel_file_path}"
     asset_content = open(assets_file_path, "r").read()
-    asset = '%s' % asset_content     
+    asset = "%s" % asset_content
     return HTML(asset)
 
-csscore = _load_asset('css/dsrc-csscore.css')
-csstokens = _load_asset('css/dsrc-csstokens.css')
-button_component = _load_asset('components/DsrcButton.js')
+
+csscore = _load_asset("css/dsrc-csscore.css")
+csstokens = _load_asset("css/dsrc-csstokens.css")
+button_component = _load_asset("components/DsrcButton.js")
 # print(button_component)
 # print(csscore.data)
 
@@ -55,7 +59,8 @@ button_component = _load_asset('components/DsrcButton.js')
 # %%
 
 
-template = Template("""
+template = Template(
+    """
 
 {% load static %}
 {% load sass_tags %}
@@ -91,11 +96,14 @@ template = Template("""
         <button class="fr-btn fr-btn--tertiary">Bouton Tertiaire</button>
     </li>
 </ul>
-""")
+"""
+)
 
 context = Context(
-    {'projects': projects.order_by("-created_on")[:5], 'csscore': csscore.data }
+    {"projects": projects.order_by("-created_on")[:5], "csscore": csscore.data}
 )
 
 HTML(template.render(context))
 
+
+# %%
