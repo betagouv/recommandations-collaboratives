@@ -33,3 +33,9 @@ venv
 screenshots
 .idea
 .tool-versions
+
+## Ignore Jupyter Notebooks files
+# see: https://jupytext.readthedocs.io/en/latest/
+
+.ipynb_chekpoints/
+*.ipynb
