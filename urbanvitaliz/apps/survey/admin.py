@@ -1,10 +1,11 @@
 from django.contrib import admin
+from model_clone import CloneModelAdmin
 
 from . import models
 
 
 @admin.register(models.Survey)
-class SurveyAdmin(admin.ModelAdmin):
+class SurveyAdmin(CloneModelAdmin):
     list_filter = ["site"]
     list_display = ["name", "qs_count"]
 
@@ -22,9 +23,15 @@ class SessionAdmin(admin.ModelAdmin):
         return obj.answers.count()
 
 
+class QuestionTabularInline(admin.TabularInline):
+    model = models.Question
+    extra = 1
+
+
 @admin.register(models.QuestionSet)
 class QuestionSetAdmin(admin.ModelAdmin):
-    list_display = ["heading", "q_count"]
+    list_display = ["heading", "q_count", "survey"]
+    inlines = (QuestionTabularInline,)
 
     @admin.display(description="Question count")
     def q_count(self, obj):

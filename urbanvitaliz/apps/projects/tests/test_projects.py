@@ -231,6 +231,7 @@ def test_project_overview_available_for_owner(request, client):
         home_models.SiteConfiguration,
         site=current_site,
         onboarding=onboarding,
+        project_survey__name="Test survey",
     )
 
     # project email is same as test user to be logged in
@@ -252,6 +253,7 @@ def test_project_overview_available_for_switchtender(request, client):
         home_models.SiteConfiguration,
         site=site,
         onboarding=onboarding,
+        project_survey__name="Test survey",
     )
 
     project = Recipe(models.Project, sites=[site]).make()
@@ -282,6 +284,7 @@ def test_project_knowledge_available_for_owner(request, client):
         home_models.SiteConfiguration,
         site=current_site,
         onboarding=onboarding,
+        project_survey__name="Test survey",
     )
 
     # project email is same as test user to be logged in
@@ -307,6 +310,7 @@ def test_project_knowledge_available_for_switchtender(request, client):
         home_models.SiteConfiguration,
         site=current_site,
         onboarding=onboarding,
+        project_survey__name="Test survey",
     )
 
     project = Recipe(models.Project, sites=[current_site]).make()
@@ -327,6 +331,7 @@ def test_project_knowledge_available_for_restricted_switchtender(request, client
         home_models.SiteConfiguration,
         site=current_site,
         onboarding=onboarding,
+        project_survey__name="Test survey",
     )
 
     other = Recipe(geomatics.Department, code="02").make()
@@ -592,6 +597,7 @@ def test_project_detail_contains_informations(request, client):
         home_models.SiteConfiguration,
         site=current_site,
         onboarding=onboarding,
+        project_survey__name="Test survey",
     )
 
     project = Recipe(models.Project, sites=[current_site]).make()
@@ -786,6 +792,7 @@ def test_general_notifications_are_consumed_on_project_overview(request, client)
         home_models.SiteConfiguration,
         site=get_current_site(request),
         onboarding=onboarding,
+        project_survey__name="Test survey",
     )
 
     project = Recipe(
@@ -1263,7 +1270,9 @@ def test_next_url_redirect_after_update_location(request, client):
         utils.assign_collaborator(user, project)
 
         response = client.post(
-            f"{reverse('projects-project-location', args=[project.id])}?{urlencode({'next': next_url})}", data=data
+            f"{reverse('projects-project-location', args=[project.id])}?"
+            f"{urlencode({'next': next_url})}",
+            data=data,
         )
 
     assert response.status_code == 302
@@ -1273,6 +1282,7 @@ def test_next_url_redirect_after_update_location(request, client):
 
     assert project.location_x == data["location_x"]
     assert project.location_y == data["location_y"]
+
 
 #################################################################
 # Topics

@@ -114,8 +114,12 @@ class SiteConfiguration(models.Model):
         Site, on_delete=models.CASCADE, related_name="configuration"
     )
 
-    project_survey = models.ForeignKey("survey.Survey", on_delete=models.CASCADE)
-    onboarding = models.ForeignKey("onboarding.Onboarding", on_delete=models.CASCADE)
+    project_survey = models.ForeignKey(
+        "survey.Survey", null=True, on_delete=models.SET_NULL
+    )
+    onboarding = models.ForeignKey(
+        "onboarding.Onboarding", null=True, on_delete=models.SET_NULL
+    )
     sender_email = models.EmailField()
     sender_name = models.CharField(max_length=30)
     crm_available_tags = TaggableManager(
