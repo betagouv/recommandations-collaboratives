@@ -11,6 +11,11 @@ or call:\n
 `init_django(your_project_name)`
 """
 
+"""
+Use this function inside a jupyter notebook to initialize the project
+NOTE: use insied Jupyter Notebook only
+"""
+
 
 def init_django(project_name=None):
     os.environ.setdefault("JUPYTER_CONFIG_PATH", f"~/.jupyter:{PWD}")
