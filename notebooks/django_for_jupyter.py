@@ -12,8 +12,7 @@ or call:\n
 """
 
 """
-Use this function inside a jupyter notebook to initialize the project
-NOTE: use insied Jupyter Notebook only
+Use this function only inside a use inside Jupyter Notebook to initialize the project
 """
 
 
