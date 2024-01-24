@@ -29,11 +29,9 @@ function ProjectLocation(projectOptions, modal=true) {
 
 
 			try {
-				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
-					geolocUtils.fetchParcelsIgn(insee),
-					geolocUtils.fetchCommuneIgn(insee),
-					geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`)
-				]);
+				geoData.parcels = geolocUtils.fetchParcelsIgn(insee);
+				geoData.commune = geolocUtils.fetchCommuneIgn(insee);
+				geoData.location = geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`);
 			} catch(e) {
 				console.log(e)
 			}

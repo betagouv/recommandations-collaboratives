@@ -25,11 +25,9 @@ function ProjectLocationEdit(projectOptions) {
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
 			const geoData = {}
 			try {
-				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
-					geolocUtils.fetchParcelsIgn(insee),
-					geolocUtils.fetchCommuneIgn(insee),
-					geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`)
-				]);
+				geoData.parcels = geolocUtils.fetchParcelsIgn(insee);
+				geoData.commune = geolocUtils.fetchCommuneIgn(insee);
+				geoData.location = geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`);
 			} catch(e) {
 				console.log(e)
 			}
@@ -85,6 +83,8 @@ function ProjectLocationEdit(projectOptions) {
 				markers[0] = markerLayer
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
 			});
+
+			setTimeout(function(){Map.invalidateSize()}, 0);
 		},
 	}
 }
