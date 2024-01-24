@@ -2,20 +2,28 @@
 # coding: utf-8
 # %%
 
-from django.db.models import Model
-import os
-os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
+# Initialize Notebook
+
+from notebooks.django_for_jupyter import init_django
+init_django("urbanvitaliz")
+
 
 
 # %%
 
 
+from django.db.models import Model
 from urbanvitaliz.apps.projects.models import Project
 
+
+from graphviz import Source
+from IPython.display import Image
 
 # # Les composants
 
 # Ceci est un composant :
+
 
 # %%
 
@@ -26,14 +34,12 @@ get_ipython().run_line_magic('pinfo', 'Project')
 # %%
 
 
-from graphviz import Source
-from IPython.display import Image
+image = get_ipython().system('python manage.py graph_models tasks reminders -o models.png')
 
 
 # %%
 
 
-get_ipython().system('python manage.py graph_models tasks reminders -o models.png 2>/dev/null')
 Image('models.png')
 
 
@@ -76,16 +82,4 @@ context = Context(
 )
 
 HTML(template.render(context))
-
-
-# %%
-
-
-
-
-
-# %%
-
-
-
 

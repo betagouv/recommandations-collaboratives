@@ -173,6 +173,26 @@ pip uninstall traitlets
 pip install traitlets==5.9.0
 ```
 
+En cas de problèmes de lancement de commandes `graphviz`, vérifier l'installation des librairies nécessaires selon votre OS.
+
+[Guide d'installation Graphviz](https://pygraphviz.github.io/documentation/stable/install.html)
+
+Lors de l'installation de `pygraphviz` sous MacOS ave l'erreur:
+
+```sh
+error: command '/usr/bin/clang' failed with exit code 1
+```
+
+Relancez l'installation de `pygraphviz` avec la commande suivante (voir [ce commentaire sur GitHub](https://github.com/pygraphviz/pygraphviz/issues/398#issuecomment-1531236926)):
+
+```sh
+python3 -m pip install -U --no-cache-dir  \
+    --config-settings="--global-option=build_ext" \
+    --config-settings="--global-option=-I$(brew --prefix graphviz)/include/" \
+    --config-settings="--global-option=-L$(brew --prefix graphviz)/lib/" \
+    pygraphviz
+```
+
 ## Ressources
 
 Guides d'installation:
