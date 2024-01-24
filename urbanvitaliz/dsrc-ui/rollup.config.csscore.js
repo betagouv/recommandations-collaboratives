@@ -14,10 +14,10 @@ export default {
 			fileName: 'dsrc-csscore.css',
 			processor: () =>
 				postcss([
-					autoprefixer(),
 					jitProps({
 						files: ['../../static/assets/**/*.css']
-					})
+					}),
+					autoprefixer()
 				]),
 			watch: 'src/lib/styles/scss/core/'
 		})

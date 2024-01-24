@@ -1,7 +1,4 @@
 import scss from 'rollup-plugin-scss';
-import postcss from 'postcss';
-import autoprefixer from 'autoprefixer';
-import jitProps from 'postcss-jit-props';
 
 /**
  * Preprocess scss in `src/styles/` to use plain CSS in library components
@@ -13,13 +10,6 @@ export default {
 	plugins: [
 		scss({
 			fileName: 'dsrc-csstokens.css',
-			processor: () =>
-				postcss([
-					autoprefixer(),
-					jitProps({
-						files: ['../../static/assets/**/*.css']
-					})
-				]),
 			watch: 'src/lib/styles/scss/tokens/'
 		})
 	]
