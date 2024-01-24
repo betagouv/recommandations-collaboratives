@@ -173,7 +173,7 @@ pip uninstall traitlets
 pip install traitlets==5.9.0
 ```
 
-## Resources
+## Ressources
 
 Guides d'installation:
 

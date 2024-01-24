@@ -29,7 +29,7 @@ Pour créer un bundle pour l'environnement de production:
 yarn build
 ```
 
-## Resources
+## Ressources
 
 - [DSFR - Éléments d'interface](https://www.systeme-de-design.gouv.fr/elements-d-interface)
 - [DSFR - API Javascript](https://www.systeme-de-design.gouv.fr/utilisation-et-organisation/developpeurs/api-javascript)
