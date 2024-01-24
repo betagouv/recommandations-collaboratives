@@ -21,19 +21,21 @@ function ProjectLocationEdit(projectOptions) {
 					longitude: projectOptions.commune.longitude,
 				}
 			}
-			const { latitude, longitude, insee, name } = this.project.commune;
+			const { latitude, longitude, insee } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
 			const geoData = {}
 			try {
-				geoData.parcels = geolocUtils.fetchParcelsIgn(insee);
-				geoData.commune = geolocUtils.fetchCommuneIgn(insee);
-				geoData.location = geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`);
+				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
+					geolocUtils.fetchParcelsIgn(insee),
+					geolocUtils.fetchCommuneIgn(insee),
+					geolocUtils.fetchGeolocationByAddress(`${this.project.location}`)
+				]);
+				await this.initInteractiveMap(this.project, geoData);
 			} catch(e) {
-				console.log(e)
+				// console.log(e)
+			} finally {
+				this.isLoading = false;
 			}
-			await this.initInteractiveMap(this.project, geoData);
-
-			this.isLoading = false;
 		},
 
 		updateProjectLocation(coordinates)  {

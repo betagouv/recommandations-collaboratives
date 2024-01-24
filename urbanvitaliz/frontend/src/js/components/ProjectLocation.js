@@ -23,25 +23,28 @@ function ProjectLocation(projectOptions, modal=true) {
 					longitude: projectOptions.commune.longitude
 				}
 			}
-			const { latitude, longitude, insee, name } = this.project.commune;
+			const { latitude, longitude, insee } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = {}
 
 
 			try {
-				geoData.parcels = geolocUtils.fetchParcelsIgn(insee);
-				geoData.commune = geolocUtils.fetchCommuneIgn(insee);
-				geoData.location = geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`);
+				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
+					geolocUtils.fetchParcelsIgn(insee),
+					geolocUtils.fetchCommuneIgn(insee),
+					geolocUtils.fetchGeolocationByAddress(`${this.project.location}`)
+				]);
+				await this.initStaticMap(this.project, geoData);
+				if(modal) {
+					await this.initInteractiveMap(this.project, geoData);
+				}
+				let map = this.staticMap
+				setTimeout(function(){map.invalidateSize()}, 0);
 			} catch(e) {
-				console.log(e)
+				// console.log(e)
+			} finally {
+				this.isLoading = false;
 			}
-			await this.initStaticMap(this.project, geoData);
-			if(modal) {
-				await this.initInteractiveMap(this.project, geoData);
-			}
-			let map = this.staticMap
-			setTimeout(function(){map.invalidateSize()}, 0);
-			this.isLoading = false;
 		},
 
 		async initStaticMap(project, geoData) {
