@@ -11,7 +11,6 @@
 {{ project.commune.latitude|json_script:"latitude" }}
 {{ project.commune.longitude|json_script:"longitude" }}
 {% block js %}
-    {% vite_asset 'js/apps/projectLocation.js' %}
     <script>
         const projectOptions = {
             name: JSON.parse(document.getElementById('nameProject').textContent),
@@ -28,6 +27,7 @@
             }
         }
     </script>
+    {% vite_asset 'js/apps/projectLocation.js' %}
 {% endblock %}
 {% block content %}
     <div x-data='ProjectLocation(projectOptions)'
