@@ -11,8 +11,6 @@ function mapLayerStyles(className) {
 		color: '#F6F6F6',
 		fillColor: '#929292',
 		stroke: true,
-		weight: 2,
-		stroke: true,
 		weight: 1.25,
 		fillOpacity: 0.25,
 	}
