@@ -10,7 +10,6 @@
 {{ project.commune.insee|json_script:"insee" }}
 {{ project.commune.latitude|json_script:"latitude" }}
 {{ project.commune.longitude|json_script:"longitude" }}
-{{ controls|json_script:"controls" }}
 {% block js %}
     <script>
         const projectOptions = {
@@ -27,11 +26,10 @@
                 latitude: JSON.parse(document.getElementById('latitude').textContent),
             }
         }
-		let controlsJs = JSON.parse(document.getElementById('controls').textContent)
     </script>
-    {% vite_asset 'js/apps/projectLocation.js' %}
+    {% vite_asset 'js/apps/projectLocationStatic.js' %}
 {% endblock %}
-<div x-data='ProjectLocation(projectOptions, controlsJs)'
+<div x-data='MapViewerStatic(projectOptions)'
      data-test-id="project-knogwledge-map">
     <div class="p-0 project-map-container" :class="{'is-small':mapIsSmall}">
         <div x-show="isLoading"

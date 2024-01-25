@@ -1,4 +1,8 @@
 {% load static %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/apps/projectLocation.js' %}
+{% endblock %}
 <div class="modal fade modal-xl map-modal"
      id="project-map-modal"
      tabindex="-1"
@@ -13,7 +17,9 @@
                         data-bs-dismiss="modal"
                         aria-label="Fermer"></button>
             </div>
-            <div class="modal-body p-0">
+            <div class="modal-body p-0"
+                 x-data='MapViewerInteractive(projectOptions)'
+                 data-test-id="project-knogwledge-map">
                 <div class="p-0 project-map-container">
                     <div x-cloak
                          x-ref="map-interactive"

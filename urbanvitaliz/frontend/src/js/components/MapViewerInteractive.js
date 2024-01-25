@@ -3,12 +3,10 @@ import Alpine from 'alpinejs'
 import geolocUtils from '../utils/geolocation/'
 import mapUtils from '../utils/map/'
 
-function ProjectLocation(projectOptions, modal=true) {
+function MapViewerInteractive(projectOptions) {
 	return {
-		mapIsSmall: true,
+		mapIsSmall: false,
 		project: null,
-		mapModal: null,
-		staticMap: null,
 		interactiveMap: null,
 		zoom: 8,
 		isLoading: false,
@@ -39,23 +37,7 @@ function ProjectLocation(projectOptions, modal=true) {
 			} finally {
 				this.isLoading = false;
 			}
-			await this.initStaticMap(this.project, geoData);
-			if(modal) {
-				await this.initInteractiveMap(this.project, geoData);
-			}
-			let map = this.staticMap
-			setTimeout(function(){map.invalidateSize()}, 0);
-		},
-
-		async initStaticMap(project, geoData) {
-			const options = mapUtils.mapOptions({interactive: false});
-
-			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
-			this.staticMap = Map;
-			let markers = mapUtils.initMarkerLayer(this.staticMap, project, geoData);
-			if(!markers || markers.length === 0) 	{
-				mapUtils.initMapLayers(this.staticMap, project, geoData);
-			}
+			await this.initInteractiveMap(this.project, geoData);
 		},
 
 		async initInteractiveMap(project, geoData) {
@@ -88,13 +70,8 @@ function ProjectLocation(projectOptions, modal=true) {
 				setTimeout(function(){Map.invalidateSize()}, 0);
 			})
 		},
-
-		openProjectMapModal() {
-			this.mapIsSmall = false;
-			this.mapModal.show();
-		},
 	}
 }
 
 
-Alpine.data("ProjectLocation", ProjectLocation)
+Alpine.data("MapViewerInteractive", MapViewerInteractive)

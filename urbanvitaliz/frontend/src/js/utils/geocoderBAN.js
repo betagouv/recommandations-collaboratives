@@ -138,10 +138,6 @@ L.Control.GeocoderBAN = L.Control.extend({
 					var params = {q: this.input.value, limit: this.options.resultsNumber}
 					if(this.options.commune)  {
 						const {insee, postal} = this.options.commune
-						console.log('insee, postal')
-						console.log(insee, postal)
-						console.log('insee, postal')
-						console.log(insee, postal)
 						params['citycode'] = insee ?? undefined
 						params['postcode'] = postal ?? undefined
 					}

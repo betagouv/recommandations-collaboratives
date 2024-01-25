@@ -2,7 +2,7 @@ import Alpine from 'alpinejs'
 import geolocUtils from '../utils/geolocation/'
 import mapUtils from '../utils/map/'
 
-function ProjectLocationEdit(projectOptions) {
+function MapEditor(projectOptions) {
 	return {
 		mapIsSmall: true,
 		project: null,
@@ -94,4 +94,4 @@ function ProjectLocationEdit(projectOptions) {
 }
 
 
-Alpine.data("ProjectLocationEdit", ProjectLocationEdit)
+Alpine.data("MapEditor", MapEditor)

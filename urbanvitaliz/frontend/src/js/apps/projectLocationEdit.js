@@ -1,4 +1,4 @@
-import '../components/ProjectLocationEdit'
+import '../components/MapEditor'
 import '../utils/geocoderBAN'
 import 'leaflet/dist/leaflet.css'
 import '../../css/map.css'
