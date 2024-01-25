@@ -136,10 +136,14 @@ L.Control.GeocoderBAN = L.Control.extend({
 			default:
 				if (this.input.value && this.input.value.length > 3) {
 					var params = {q: this.input.value, limit: this.options.resultsNumber}
-					if(this.options.commune?.filters)  {
-						const {citycode, postcode} = this.options.commune.filters
-						params['citycode'] = citycode ?? undefined
-						params['postcode'] = postcode ?? undefined
+					if(this.options.commune)  {
+						const {insee, postal} = this.options.commune
+						console.log('insee, postal')
+						console.log(insee, postal)
+						console.log('insee, postal')
+						console.log(insee, postal)
+						params['citycode'] = insee ?? undefined
+						params['postcode'] = postal ?? undefined
 					}
 					var t = this
 					if (this.setTimeout) {

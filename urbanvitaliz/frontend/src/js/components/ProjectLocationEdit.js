@@ -74,8 +74,10 @@ function ProjectLocationEdit(projectOptions) {
 			const popupOptions = {...project, title: project.name}
 			let markers = this.markers
 			Map.on('click', function(e) {
-				if(markers[0]) {
+				if(markers && markers[0]) {
 					markers[0].clearLayers()
+				} else {
+					markers = []
 				}
 				geocoderBAN.setValue('');
 				onClick(e.latlng)

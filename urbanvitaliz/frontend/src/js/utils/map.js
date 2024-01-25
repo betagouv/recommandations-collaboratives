@@ -125,7 +125,7 @@ function initMapControllerBAN(map,  geoData, onUpdate, project, markers) {
 		onUpdate,
 		markerIcon: createMarkerIcon(className),
 		markerPopupTemplate,
-		commune: geoData.location,
+		commune: project.commune,
 		popupOptions,
 		markers
 	}
