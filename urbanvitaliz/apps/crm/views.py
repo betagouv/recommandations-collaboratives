@@ -406,7 +406,7 @@ def user_update(request, user_id=None):
                     success_message = "Les informations de l'utilisateur ont été modifiées avec succès."
                     if email_changed:
                         setup_user_email(request, crm_user, [])
-                        send_email_confirmation(request, crm_user, signup=False)
+                        send_email_confirmation(request, crm_user, signup=True)
 
                     messages.success(request, success_message)
                     return redirect(reverse("crm-user-details", args=[crm_user.id]))
