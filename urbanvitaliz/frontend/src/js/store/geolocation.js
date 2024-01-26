@@ -24,7 +24,13 @@ document.addEventListener('alpine:init', () => {
 					geolocUtils.fetchGeolocationByAddress(`${this.project.location}`)
 				]);
 				[this.latitude, this.longitude] = mapUtils.getDefaultLatLngForMap(this.project);
-				return this.project;
+				return {
+					parcels: this.parcels,
+					commune: this.commune,
+					location: this.location,
+					latitude: this.latitude,
+					longitude: this.longitude,
+				};
 			} catch(e) {
 				console.log(e);
 			} finally {
@@ -33,15 +39,6 @@ document.addEventListener('alpine:init', () => {
 		},
 		getLatLng() {
 			return [this.latitude, this.longitude];
-		},
-		getGeoData() {
-			return {  
-				parcels: this.parcels,
-				commune: this.commune,
-				location: this.location,
-				latitude: this.latitude,
-				longitude: this.longitude,
-			};
 		},
 		updateProjectLocation(coordinates)  {
 			this.longitude = coordinates.lng;

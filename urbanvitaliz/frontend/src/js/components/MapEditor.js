@@ -22,8 +22,8 @@ function MapEditor(projectOptions) {
 			};
 			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
-			this.map = await this.initMap(this.project);
-			this.project = await this.$store.geolocation.initGeolocationData(this.project);
+			const geoData = await this.$store.geolocation.initGeolocationData(this.project);
+			this.map = await this.initMap(this.project, geoData);
 			const Map = this.map;
 			setTimeout(function(){Map.invalidateSize();}, 10);
 
@@ -33,8 +33,7 @@ function MapEditor(projectOptions) {
 			this.project.location_x = this.$store.geolocation.project.location_x;
 			this.project.location_y = this.$store.geolocation.project.location_y;
 		},
-		async initMap(project) {
-			const geoData = this.$store.geolocation.getGeoData();
+		async initMap(project, geoData) {
 			// Init map with base layer
 			const options = mapUtils.mapOptions({interactive: true});
 			const Map =  await mapUtils.initSatelliteMap('map-edit', project, options, this.zoom);
@@ -46,7 +45,7 @@ function MapEditor(projectOptions) {
 			this.markers  =	mapUtils.initMarkerLayer(Map, project, geoData);
 
 			const geocoderBAN =	mapUtils.initMapControllerBAN(Map, geoData, onClick, project, this.markers);
-			if(geoData.parcels) {
+			if(geoData?.parcels) {
 				await  mapUtils.addLayerParcels(Map, geoData.parcels);
 			}
 

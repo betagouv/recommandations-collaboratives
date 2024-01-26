@@ -22,20 +22,19 @@ function MapViewerInteractive(projectOptions) {
 			};
 			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
-			this.map = await this.initMap(this.project);
-			this.project = await this.$store.geolocation.initGeolocationData(this.project);
+			const geoData = await this.$store.geolocation.initGeolocationData(this.project);
+			this.map = await this.initMap(this.project, geoData);
 		},
-		async initMap(project) {
+		async initMap(project, geoData) {
 			// Init Interactive Map
 			const options = mapUtils.mapOptions({interactive: true});
-			// Init Interactive Map
-			const geoData = this.$store.geolocation.getGeoData();
 			const Map = mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom);
 			let markers = mapUtils.initMarkerLayer(Map, project, geoData);
+
 			if(!markers || markers.length === 0) 	{
 				mapUtils.initMapLayers(Map, project, geoData);
 			}
-			if(geoData.parcels) {
+			if(geoData?.parcels) {
 				await  mapUtils.addLayerParcels(Map, geoData.parcels);
 			}
 			Map.setMinZoom(this.zoom - 7);
