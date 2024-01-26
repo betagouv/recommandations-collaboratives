@@ -102,7 +102,12 @@ function initMarkerLayer(map, project, geoData) {
 // Create layers composed with area coordinates
 function initMapLayers(map, project, geoData) {
 	try {
-		addLayerAreaCommune(map, geoData.commune);
+		let commune = geoData.commune ? geoData.commune
+			: project.commune ?  project.commune
+				: null;
+		if(commune) {
+			addLayerAreaCommune(map, commune);
+		}
 	} catch(e) {
 		if(project.commune.latitude && project.commune.longitude) {
 			addLayerAreaCircle(map, project);
@@ -111,8 +116,8 @@ function initMapLayers(map, project, geoData) {
 }
 
 function initMapControllerBAN(map,  geoData, onUpdate, project, markers) {
-	const className = 'marker-onclick'
-	const popupOptions = {...project, title: project.title}
+	const className = 'marker-onclick';;
+	const popupOptions = {...project, title: project.title};
 	const geocoderOptions = {
 		collapsed: false,
 		style: 'searchBar',
@@ -124,30 +129,30 @@ function initMapControllerBAN(map,  geoData, onUpdate, project, markers) {
 		commune: project.commune,
 		popupOptions,
 		markers
-	}
-	const geocodeBAN = GeocoderBAN(geocoderOptions).addTo(map)
+	};
+	const geocodeBAN = GeocoderBAN(geocoderOptions).addTo(map);
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
 	controller[0].classList.add('leaflet-control-geocoder-expanded');
-	const inputController = controller[0].querySelector('input')
+	const inputController = controller[0].querySelector('input');
 	inputController.addEventListener('blur', async (e) => {
-			controller[0].classList.add('leaflet-control-geocoder-expanded');
-	})
+		controller[0].classList.add('leaflet-control-geocoder-expanded');
+	});
 
-	return geocodeBAN
+	return geocodeBAN;
 }
 
 
 function addLayerMarkerProjectCoordinates(map, project) {
 	if(!project.location_x || !project.location_x) {
-		throw Error(`Coordonnées de localisation du projet indisponibles pour "${project.name}"`)
+		throw Error(`Coordonnées de localisation du projet indisponibles pour "${project.name}"`);
 	}
-	const coordinates = [project.location_y, project.location_x]
+	const coordinates = [project.location_y, project.location_x];
 	const marker = L.marker(coordinates, { icon: createMarkerIcon('project-coordinates-marker') }).addTo(map);
-	const popupOptions = {...project, title: project.name}
-	marker.bindPopup(markerPopupTemplate(popupOptions))
+	const popupOptions = {...project, title: project.name};
+	marker.bindPopup(markerPopupTemplate(popupOptions));
 	L.layerGroup([marker]).addTo(map);
 	map.panTo(new L.LatLng(...coordinates));
-	return marker
+	return marker;
 }
 
 function addLayerMarkerProjectLocation(map, project, geoData) {
@@ -200,22 +205,22 @@ function createMarkerIcon(className, title) {
 }
 
 function markerPopupTemplate({location_x, location_y, name, location, commune, address, title}) {
-	const lat = location_x ? `<p data-test-id="project-coord-x-latitude" class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(location_x).toFixed(2)}</p>` : ''
-	const lng = location_y ? `<p data-test-id="project-coord-y-longitude" class="m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(location_y).toFixed(2)}</p>` : ''
+	const lat = location_x ? `<p data-test-id="project-coord-x-latitude" class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(location_x).toFixed(2)}</p>` : '';
+	const lng = location_y ? `<p data-test-id="project-coord-y-longitude" class="m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(location_y).toFixed(2)}</p>` : '';
 
-	let popupAddress = ''
+	let popupAddress = '';
 	if(address){
-		popupAddress = `<p class="m-0 fs-7">${address}</p>`
+		popupAddress = `<p class="m-0 fs-7">${address}</p>`;
 	}
 	else if(location){
-		popupAddress = `<p class="m-0 fs-7">${location}</p>`
+		popupAddress = `<p class="m-0 fs-7">${location}</p>`;
 	}
 
 	if (commune){
-		popupAddress =`${popupAddress}<p class="m-0 fs-7 text-capitalize">${commune.name} (${commune.postal})</p>`
+		popupAddress =`${popupAddress}<p class="m-0 fs-7 text-capitalize">${commune.name} (${commune.postal})</p>`;
 	}
 
-	const popupTitle = title ? title : name
+	const popupTitle = title ? title : name;
 	return `
 		<div class="marker-popup">
 			<header><h6>${popupTitle}</a></h6></header>
@@ -225,7 +230,7 @@ function markerPopupTemplate({location_x, location_y, name, location, commune, a
 				${lng}
 			</main>
 		</div>
-	`
+	`;
 }
 
 function mapOptions({interactive, zoom}) {
@@ -237,7 +242,7 @@ function mapOptions({interactive, zoom}) {
 		boxZoom: interactive,
 		keyboard: interactive,
 		zoomControl: zoom,
-	}
+	};
 }
 
 export default {
@@ -255,4 +260,4 @@ export default {
 	getDefaultLatLngForLayers,
 	createMarkerIcon,
 	markerPopupTemplate,
-}
+};

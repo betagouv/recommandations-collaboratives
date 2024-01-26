@@ -12,7 +12,7 @@ function MapViewerStatic(projectOptions) {
 			return this.$store.geolocation.isLoading;
 		},
 		async init() {
-			this.project = {
+			const project = {
 				...projectOptions,
 				commune: {
 					...projectOptions.commune,
@@ -20,14 +20,15 @@ function MapViewerStatic(projectOptions) {
 					longitude: projectOptions.commune.longitude,
 				}
 			};
-			await this.$store.geolocation.initGeolocationData(this.project);
+			this.project = await this.$store.geolocation.initGeolocationData(project);
 			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
-			const geoData = this.$store.geolocation.getGeoData();
-			this.map = await this.initMap(this.project, geoData);
+			this.map = await this.initMap(this.project);
+			this.mapModal = this.$store.geolocation.getModal();
 		},
-		async initMap(project, geoData) {
+		async initMap(project) {
 			const options = mapUtils.mapOptions({interactive: false});
+			const geoData = this.$store.geolocation.getGeoData();
 
 			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
 			let markers = mapUtils.initMarkerLayer(Map, project, geoData);
@@ -37,11 +38,8 @@ function MapViewerStatic(projectOptions) {
 			setTimeout(function(){Map.invalidateSize();}, 10);
 			return Map;
 		},
-		initMapModal() {
-			const element = document.getElementById('project-map-modal');
-			this.mapModal = new bootstrap.Modal(element);
-		},
 		openProjectMapModal() {
+			this.mapModal = this.$store.geolocation.getModal();
 			this.mapModal.show();
 		},
 	};

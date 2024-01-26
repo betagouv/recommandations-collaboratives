@@ -12,7 +12,7 @@ function MapEditor(projectOptions) {
 			return this.$store.geolocation.isLoading;
 		},
 		async init() {
-			this.project = {
+			const project = {
 				...projectOptions,
 				commune: {
 					...projectOptions.commune,
@@ -20,7 +20,7 @@ function MapEditor(projectOptions) {
 					longitude: projectOptions.commune.longitude,
 				}
 			};
-			await this.$store.geolocation.initGeolocationData(this.project);
+			this.project = await this.$store.geolocation.initGeolocationData(project);
 			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
 			const geoData = this.$store.geolocation.getGeoData();
