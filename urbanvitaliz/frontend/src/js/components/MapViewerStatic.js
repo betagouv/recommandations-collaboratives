@@ -21,9 +21,9 @@ function MapViewerStatic(projectOptions) {
 				}
 			};
 			this.project = await this.$store.geolocation.initGeolocationData(project);
-			const { latitude, longitude } = this.project.commune;
+			const { latitude, longitude } = project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
-			this.map = await this.initMap(this.project);
+			this.map = await this.initMap(project);
 			this.mapModal = this.$store.geolocation.getModal();
 		},
 		async initMap(project) {
