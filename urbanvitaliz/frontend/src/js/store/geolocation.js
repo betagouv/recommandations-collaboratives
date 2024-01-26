@@ -32,7 +32,7 @@ document.addEventListener('alpine:init', () => {
 					longitude: this.longitude,
 				};
 			} catch(e) {
-				console.log(e);
+				// console.log(e);
 			} finally {
 				this.isLoading = false;
 			}
