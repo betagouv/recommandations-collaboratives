@@ -24,8 +24,6 @@ function MapViewerInteractive(projectOptions) {
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = this.$store.geolocation.getGeoData();
 			this.map = await this.initMap(this.project, geoData);
-			let map = this.map;
-			setTimeout(function(){map.invalidateSize();}, 0);
 		},
 		async initMap(project, geoData) {
 			// Init Interactive Map

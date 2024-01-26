@@ -25,8 +25,6 @@ function MapViewerStatic(projectOptions) {
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = this.$store.geolocation.getGeoData();
 			this.map = await this.initMap(this.project, geoData);
-			let map = this.map;
-			setTimeout(function(){map.invalidateSize();}, 0);
 		},
 		async initMap(project, geoData) {
 			const options = mapUtils.mapOptions({interactive: false});
@@ -36,6 +34,7 @@ function MapViewerStatic(projectOptions) {
 			if(!markers || markers.length === 0) 	{
 				mapUtils.initMapLayers(Map, project, geoData);
 			}
+			setTimeout(function(){Map.invalidateSize();}, 10);
 			return Map;
 		},
 		initMapModal() {
