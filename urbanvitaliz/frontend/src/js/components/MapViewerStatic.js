@@ -24,7 +24,6 @@ function MapViewerStatic(projectOptions) {
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = await this.$store.geolocation.initGeolocationData(this.project);
 			this.map = await this.initMap(this.project, geoData);
-			this.mapModal = this.$store.geolocation.getModal();
 		},
 		async initMap(project, geoData) {
 			const options = mapUtils.mapOptions({interactive: false});
