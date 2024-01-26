@@ -1,9 +1,9 @@
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
-import 'leaflet-providers'
+import 'leaflet-providers';
 
-import GeocoderBAN from './geocoderBAN'
-import geolocUtils from './geolocation/'
+import GeocoderBAN from './geocoderBAN';
+import geolocUtils from './geolocation/';
 
 function mapLayerStyles(className) {
 	return {
@@ -13,67 +13,66 @@ function mapLayerStyles(className) {
 		stroke: true,
 		weight: 1.25,
 		fillOpacity: 0.25,
-	}
+	};
 }
 
 function ignServiceURL(
-  layer,
-  env = 'decouverte',
-  format = 'image/png'
+	layer,
+	env = 'decouverte',
+	format = 'image/png'
 ) {
-  const url = `https://wxs.ign.fr/${env}/geoportail/wmts`;
-  const query =
-    'service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&style=normal';
+	const url = `https://wxs.ign.fr/${env}/geoportail/wmts`;
+	const query =
+		'service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&style=normal';
 
-  return `${url}?${query}&layer=${layer}&format=${format}`;
+	return `${url}?${query}&layer=${layer}&format=${format}`;
 }
 
 function getDefaultLatLngForLayers(project, geoData) {
 	const longitude = project.location_x ? project.location_x
-	: geoData.location.longitude ? geoData.location.longitude
-		: undefined;
+		: geoData.location.longitude ? geoData.location.longitude
+			: undefined;
 	const latitude = project.location_y ? project.location_y
-	: geoData.location.latitude ? geoData.location.latitude
-		: undefined;
+		: geoData.location.latitude ? geoData.location.latitude
+			: undefined;
 
-	return [latitude, longitude]
+	return [latitude, longitude];
 }
 
 function getDefaultLatLngForMap(project) {
 	const longitude = project.location_x ? project.location_x
 		: project.commune.longitude ? project.commune.longitude
-		: geolocUtils.LAT_LNG_FRANCE[0];
+			: geolocUtils.LAT_LNG_FRANCE[0];
 	const latitude = project.location_y ? project.location_y
 		: project.commune.latitude ? project.commune.latitude
-		: geolocUtils.LAT_LNG_FRANCE[0];
+			: geolocUtils.LAT_LNG_FRANCE[0];
 
-	return [latitude, longitude]
+	return [latitude, longitude];
 }
 
 // Map base layer
 function initMap(idMap, project, options, zoom) {
-	const [latitude, longitude] = getDefaultLatLngForMap(project)
-	L.tileLayer(`https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png`, {
+	const [latitude, longitude] = getDefaultLatLngForMap(project);
+	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
 		maxZoom: 20,
 		attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	});
 
-	const osm = L.tileLayer.provider('OpenStreetMap.France')
+	const osm = L.tileLayer.provider('OpenStreetMap.France');
 
 	return L.map(idMap, {...options, layers:[osm]}).setView(new L.LatLng(latitude, longitude), zoom);
 }
 
 function initSatelliteMap(idMap, project, options, zoom) {
-	const [latitude, longitude] = getDefaultLatLngForMap(project)
+	const [latitude, longitude] = getDefaultLatLngForMap(project);
 
 	const ign =	L.tileLayer(
-		ignServiceURL('ORTHOIMAGERY.ORTHOPHOTOS', 'essentiels', 'image/jpeg'),
-		{
-				minZoom : 0,
-				maxZoom : 20,
-				tileSize: 256,
-				attribution : "IGN-F/Géoportail"
-		})
+		ignServiceURL('ORTHOIMAGERY.ORTHOPHOTOS', 'essentiels', 'image/jpeg'), {
+			minZoom : 0,
+			maxZoom : 20,
+			tileSize: 256,
+			attribution : 'IGN-F/Géoportail'
+		});
 
 	return L.map(idMap, {...options, layers:[ign]}).setView(new L.LatLng(latitude, longitude), zoom);
 }
@@ -81,22 +80,25 @@ function initSatelliteMap(idMap, project, options, zoom) {
 
 // Create layers composed with markers
 function initMarkerLayer(map, project, geoData) {
-	let markers = []
-	let marker
+	let markers = [];
+	let marker;
 	try {
 		marker = addLayerMarkerProjectCoordinates(map, project);
-		markers[0] = marker
+		markers[0] = marker;
+		let markerLayer = L.layerGroup(markers).addTo(map);
+		return [markerLayer];
 	} catch (e) {
+		console.log('addLayerMarkerProjectCoordinates');
+		console.log(e);
 		try {
-			marker = 	addLayerMarkerProjectLocation(map, project, geoData);
-			markers[0] = marker
-		} catch(e) {
-		// Precise location unknown: don't add a marker
-		}
-	} finally {
-		if(marker) {
+			marker = addLayerMarkerProjectLocation(map, project, geoData);
+			markers[0] = marker;
 			let markerLayer = L.layerGroup(markers).addTo(map);
-			return [markerLayer]
+			return [markerLayer];
+		} catch(e) {
+			console.log('addLayerMarkerProjectLocation');
+			console.log(e);
+			return markers;
 		}
 	}
 }

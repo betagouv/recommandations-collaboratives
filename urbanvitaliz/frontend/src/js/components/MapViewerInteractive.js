@@ -24,14 +24,16 @@ function MapViewerInteractive(projectOptions) {
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = this.$store.geolocation.getGeoData();
 			this.map = await this.initMap(this.project, geoData);
+			let map = this.map;
+			setTimeout(function(){map.invalidateSize();}, 0);
 		},
 		async initMap(project, geoData) {
 			// Init Interactive Map
 			const options = mapUtils.mapOptions({interactive: true});
 			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project, geoData);
 
-			const Map = mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom + 3);
-			let markers = mapUtils.initMarkerLayer(this.map, project, geoData);
+			const Map = mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom);
+			let markers = mapUtils.initMarkerLayer(Map, project, geoData);
 			if(!markers || markers.length === 0) 	{
 				mapUtils.initMapLayers(Map, project, geoData);
 			}

@@ -42,8 +42,6 @@ function MapEditor(projectOptions) {
 			// Add overlay layers (vector maps, controls and markers)
 			this.markers  =	mapUtils.initMarkerLayer(Map, project, geoData);
 
-			console.log('this.map');
-			console.log(this.map);
 			const geocoderBAN =	mapUtils.initMapControllerBAN(Map, geoData, onClick, project, this.markers);
 			if(geoData.parcels) {
 				await  mapUtils.addLayerParcels(Map, geoData.parcels);

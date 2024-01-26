@@ -225,7 +225,6 @@ L.Control.GeocoderBAN = L.Control.extend({
 });
 
 const getJSON = function (url, params, callback) {
-
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function () {
 		if (xmlHttp.readyState !== 4) {
