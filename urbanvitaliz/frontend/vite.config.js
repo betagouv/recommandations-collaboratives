@@ -55,7 +55,8 @@ const config = {
 				tutorial: resolve('./src/js/apps/tutorial.js'),
 				contactList: resolve('./src/js/apps/contactList.js'),
 				projectDetailsCss: resolve('./src/css/projectDetails.css'),
-				mapViewer: resolve('./src/js/apps/mapViewer.js'),
+				mapViewerStatic: resolve('./src/js/apps/mapViewerStatic.js'),
+				mapViewerInteractive: resolve('./src/js/apps/mapViewerInteractive.js'),
 				projectEmailReminder: resolve(
 					'./src/js/apps/projectEmailReminder.js'
 				),
