@@ -46,11 +46,11 @@ document.addEventListener('alpine:init', () => {
 			this.project.location_x = this.longitude;
 			this.project.location_y = this.latitude;
 		},
-		async initMapModal(project, Map) {
+		initMapModal(Map) {
 			// Init Modal
 			const element = document.getElementById('project-map-modal');
 			this.mapModal = new bootstrap.Modal(element);
-			element.addEventListener('shown.bs.modal', async function (event) {
+			element.addEventListener('shown.bs.modal', function (event) {
 				setTimeout(function(){Map.invalidateSize();}, 0);
 			});
 		},

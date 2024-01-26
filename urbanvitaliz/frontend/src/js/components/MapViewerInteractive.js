@@ -45,7 +45,7 @@ function MapViewerInteractive(projectOptions) {
 			}).addTo(Map);
 			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project, geoData);
 			Map.panTo(new L.LatLng(latitude, longitude));
-			this.$store.geolocation.initMapModal(project, Map);
+			this.$store.geolocation.initMapModal(Map);
 			return Map;
 		},
 	};
