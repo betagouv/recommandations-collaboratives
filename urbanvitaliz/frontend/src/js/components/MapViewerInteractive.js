@@ -5,6 +5,7 @@ function MapViewerInteractive(projectOptions) {
 	return {
 		mapIsSmall: false,
 		project: null,
+		mapModal: null,
 		map: null,
 		zoom: 8,
 		get isLoading() {

@@ -88,16 +88,12 @@ function initMarkerLayer(map, project, geoData) {
 		let markerLayer = L.layerGroup(markers).addTo(map);
 		return [markerLayer];
 	} catch (e) {
-		console.log('addLayerMarkerProjectCoordinates');
-		console.log(e);
 		try {
 			marker = addLayerMarkerProjectLocation(map, project, geoData);
 			markers[0] = marker;
 			let markerLayer = L.layerGroup(markers).addTo(map);
 			return [markerLayer];
 		} catch(e) {
-			console.log('addLayerMarkerProjectLocation');
-			console.log(e);
 			return markers;
 		}
 	}
@@ -109,7 +105,7 @@ function initMapLayers(map, project, geoData) {
 		addLayerAreaCommune(map, geoData.commune);
 	} catch(e) {
 		if(project.commune.latitude && project.commune.longitude) {
-			addLayerAreaCircle(map, project)
+			addLayerAreaCircle(map, project);
 		}
 	}
 }
