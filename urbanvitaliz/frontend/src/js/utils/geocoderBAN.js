@@ -208,8 +208,6 @@ L.Control.GeocoderBAN = L.Control.extend({
 		this.markGeocode(feature);
 	},
 	markGeocode: function (feature) {
-		console.log('this._map');
-		console.log(this._map);
 		if(this._map) {
 			const map = this._map;
 			if(this.options.markers[0]) {
