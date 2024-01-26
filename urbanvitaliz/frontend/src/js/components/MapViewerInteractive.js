@@ -12,7 +12,7 @@ function MapViewerInteractive(projectOptions) {
 			return this.$store.geolocation.isLoading;
 		},
 		async init() {
-			const project = {
+			this.project = {
 				...projectOptions,
 				commune: {
 					...projectOptions.commune,
@@ -20,10 +20,10 @@ function MapViewerInteractive(projectOptions) {
 					longitude: projectOptions.commune.longitude,
 				}
 			};
-			this.project = await this.$store.geolocation.initGeolocationData(project);
 			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			this.map = await this.initMap(this.project);
+			this.project = await this.$store.geolocation.initGeolocationData(this.project);
 		},
 		async initMap(project) {
 			// Init Interactive Map

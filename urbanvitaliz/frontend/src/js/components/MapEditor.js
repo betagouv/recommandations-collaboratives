@@ -12,7 +12,7 @@ function MapEditor(projectOptions) {
 			return this.$store.geolocation.isLoading;
 		},
 		async init() {
-			const project = {
+			this.project = {
 				...projectOptions,
 				commune: {
 					...projectOptions.commune,
@@ -20,18 +20,21 @@ function MapEditor(projectOptions) {
 					longitude: projectOptions.commune.longitude,
 				}
 			};
-			this.project = await this.$store.geolocation.initGeolocationData(project);
 			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
-			const geoData = this.$store.geolocation.getGeoData();
-			this.map = await this.initMap(this.project, geoData);
+			this.map = await this.initMap(this.project);
+			this.project = await this.$store.geolocation.initGeolocationData(this.project);
+			const Map = this.map;
+			setTimeout(function(){Map.invalidateSize();}, 10);
+
 		},
 		updateProjectLocation(coordinates)  {
 			this.$store.geolocation.updateProjectLocation(coordinates);
 			this.project.location_x = this.$store.geolocation.project.location_x;
 			this.project.location_y = this.$store.geolocation.project.location_y;
 		},
-		async initMap(project, geoData) {
+		async initMap(project) {
+			const geoData = this.$store.geolocation.getGeoData();
 			// Init map with base layer
 			const options = mapUtils.mapOptions({interactive: true});
 			const Map =  await mapUtils.initSatelliteMap('map-edit', project, options, this.zoom);
@@ -72,8 +75,6 @@ function MapEditor(projectOptions) {
 				markers[0] = markerLayer;
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
 			});
-			setTimeout(function(){Map.invalidateSize();}, 0);
-
 			return Map;
 		},
 	};
