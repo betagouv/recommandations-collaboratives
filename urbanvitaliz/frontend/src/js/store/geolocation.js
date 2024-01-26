@@ -13,7 +13,7 @@ document.addEventListener('alpine:init', () => {
 		longitude: null,
 		isLoading: false,
 		async initGeolocationData(project) {
-			if(this.project?.id !== project.id) {
+			if(!this.project || this.project?.id !== project.id) {
 				this.isLoading = true;
 				this.project = project;
 				const { insee } = this.project.commune;
@@ -46,6 +46,8 @@ document.addEventListener('alpine:init', () => {
 		updateProjectLocation(coordinates)  {
 			this.longitude = coordinates.lng;
 			this.latitude = coordinates.lat;
+			this.project.location_x = this.longitude;
+			this.project.location_y = this.latitude;
 		},
 	});
 });

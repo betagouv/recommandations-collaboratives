@@ -24,38 +24,38 @@ function MapEditor(projectOptions) {
 			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
 			const geoData = this.$store.geolocation.getGeoData();
-			await this.initMap(this.project, geoData);
+			this.map = await this.initMap(this.project, geoData);
 		},
 		updateProjectLocation(coordinates)  {
-			this.project.location_x = coordinates.lng;
-			this.project.location_y = coordinates.lat;
+			this.$store.geolocation.updateProjectLocation(coordinates);
+			this.project.location_x = this.$store.geolocation.project.location_x;
+			this.project.location_y = this.$store.geolocation.project.location_y;
 		},
 		async initMap(project, geoData) {
-			if(this.map) {
-				return;
-			}
 			// Init map with base layer
 			const options = mapUtils.mapOptions({interactive: true});
 			const Map =  await mapUtils.initSatelliteMap('map-edit', project, options, this.zoom);
-			this.map = Map;
 
 			// Add onclick behaviour for address input field (geocoderBAN)
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates);
 
 			// Add overlay layers (vector maps, controls and markers)
-			this.markers  =	mapUtils.initMarkerLayer(this.map, project, geoData);
-			const geocoderBAN =	mapUtils.initMapControllerBAN(this.map, geoData, onClick, project, this.markers);
+			this.markers  =	mapUtils.initMarkerLayer(Map, project, geoData);
+
+			console.log('this.map');
+			console.log(this.map);
+			const geocoderBAN =	mapUtils.initMapControllerBAN(Map, geoData, onClick, project, this.markers);
 			if(geoData.parcels) {
 				await  mapUtils.addLayerParcels(Map, geoData.parcels);
 			}
 
 			// Add zoom controls
-			this.map.setMinZoom(this.zoom - 7);
-			this.map.setMaxZoom(this.zoom + 6);
+			Map.setMinZoom(this.zoom - 7);
+			Map.setMaxZoom(this.zoom + 6);
 
 			L.control.zoom({
 				position: 'topright'
-			}).addTo(this.map);
+			}).addTo(Map);
 
 			// Add onclick behaviour for map
 			const popupOptions = {...project, title: project.name};
@@ -74,8 +74,9 @@ function MapEditor(projectOptions) {
 				markers[0] = markerLayer;
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
 			});
-
 			setTimeout(function(){Map.invalidateSize();}, 0);
+
+			return Map;
 		},
 	};
 }

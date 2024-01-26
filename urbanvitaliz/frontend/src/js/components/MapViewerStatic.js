@@ -24,7 +24,7 @@ function MapViewerStatic(projectOptions) {
 			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = this.$store.geolocation.getGeoData();
-			await this.initMap(this.project, geoData);
+			this.map = await this.initMap(this.project, geoData);
 			let map = this.map;
 			setTimeout(function(){map.invalidateSize();}, 0);
 		},
@@ -32,11 +32,11 @@ function MapViewerStatic(projectOptions) {
 			const options = mapUtils.mapOptions({interactive: false});
 
 			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
-			this.map = Map;
-			let markers = mapUtils.initMarkerLayer(this.map, project, geoData);
+			let markers = mapUtils.initMarkerLayer(Map, project, geoData);
 			if(!markers || markers.length === 0) 	{
-				mapUtils.initMapLayers(this.map, project, geoData);
+				mapUtils.initMapLayers(Map, project, geoData);
 			}
+			return Map;
 		},
 		initMapModal() {
 			const element = document.getElementById('project-map-modal');
