@@ -353,7 +353,7 @@ def user_list(request):
 def user_update(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
     profile = crm_user.profile
 
     group_name = make_group_name_for_site("advisor", request.site)
@@ -369,14 +369,23 @@ def user_update(request, user_id=None):
                     users = filter_users_by_email(username)
                     if len(users) > 0:
                         # a user with the new mail already exist
-                        user_link = reverse("crm-user-details", args=[users[0].pk])
-                        error_msg = mark_safe(
-                            f'L\'utilisateur <a href="{user_link}">{users[0].first_name} {users[0].last_name}</a>'
-                            " utilise déjà cette adresse email."
-                        )
-                        form.add_error(
-                            "username", django_forms.ValidationError(error_msg)
-                        )
+                        if request.site in users[0].profile.sites.all():  # on same site
+                            user_link = reverse("crm-user-details", args=[users[0].pk])
+                            error_msg = mark_safe(
+                                f'L\'utilisateur <a href="{user_link}">{users[0].first_name} {users[0].last_name}</a>'
+                                " utilise déjà cette adresse email."
+                            )
+                            form.add_error(
+                                "username", django_forms.ValidationError(error_msg)
+                            )
+                        else:  # on an other site
+                            form.add_error(
+                                "username",
+                                django_forms.ValidationError(
+                                    "L'adresse email est déjà utilisée."
+                                ),
+                            )
+
                     else:
                         # delete old email address
                         EmailAddress.objects.filter(user=crm_user).delete()
@@ -421,7 +430,7 @@ def user_update(request, user_id=None):
 def user_deactivate(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.method == "POST":
         crm_user.is_active = False
@@ -441,7 +450,7 @@ def user_deactivate(request, user_id=None):
 def user_reactivate(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.method == "POST":
         crm_user.is_active = True
@@ -461,7 +470,7 @@ def user_reactivate(request, user_id=None):
 def user_set_advisor(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
     profile = crm_user.profile
 
     if request.method == "POST":
@@ -484,7 +493,7 @@ def user_set_advisor(request, user_id=None):
 def user_unset_advisor(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
     profile = crm_user.profile
 
     if request.method == "POST":
@@ -503,7 +512,7 @@ def user_unset_advisor(request, user_id=None):
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
@@ -534,7 +543,7 @@ def user_details(request, user_id):
 def user_project_interest(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.site not in crm_user.profile.sites.all():
         # only for user of current site
@@ -555,7 +564,7 @@ def user_project_interest(request, user_id):
 def user_notifications(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.site not in crm_user.profile.sites.all():
         # only for user of current site
@@ -574,7 +583,7 @@ def user_notifications(request, user_id):
 def user_reminders(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.site not in crm_user.profile.sites.all():
         # only for user of current site
@@ -600,7 +609,7 @@ def user_reminders(request, user_id):
 def user_reminder_details(request, user_id, reminder_pk):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
     if request.site not in crm_user.profile.sites.all():
         # only for user of current site
         raise Http404

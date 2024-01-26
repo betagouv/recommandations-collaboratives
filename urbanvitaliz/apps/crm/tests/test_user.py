@@ -181,8 +181,23 @@ def test_crm_user_list_filters_only_selected_role(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_user_details_available_for_staff(client):
+def test_crm_user_details_not_available_for_staff_other_site(request, client):
+    other_site = baker.make(site_models.Site)
     user = baker.make(auth_models.User)
+    user.profile.sites.add(other_site)
+
+    url = reverse("crm-user-details", args=[user.pk])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_crm_user_details_available_for_staff(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    user.profile.sites.add(site)
 
     url = reverse("crm-user-details", args=[user.pk])
     with login(client, groups=["example_com_staff"]):
@@ -210,13 +225,28 @@ def test_crm_user_update_not_available_for_non_staff(request, client):
 
 
 @pytest.mark.django_db
+def test_crm_user_update_not_available_for_staff_other_site(request, client):
+    site = get_current_site(request)
+    other_site = baker.make(site_models.Site)
+    user = baker.make(auth_models.User)
+    user.profile.sites.add(other_site)
+
+    url = reverse("crm-user-update", args=[user.id])
+    with login(client) as staff_user:
+        assign_perm("use_crm", staff_user, site)
+        response = client.get(url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
 def test_crm_user_update_available_for_staff(request, client):
     site = get_current_site(request)
     user = baker.make(auth_models.User)
-
+    user.profile.sites.add(site)
     url = reverse("crm-user-update", args=[user.id])
-    with login(client) as user:
-        assign_perm("use_crm", user, site)
+    with login(client) as staff_user:
+        assign_perm("use_crm", staff_user, site)
         response = client.get(url)
 
     assert response.status_code == 200
@@ -229,6 +259,8 @@ def test_crm_user_update_profile_information(request, client):
     organization = baker.make(addressbook_models.Organization)
 
     end_user = baker.make(auth_models.User, username="johndoe@example.org")
+    end_user.profile.sites.add(site)
+
     profile = end_user.profile
 
     url = reverse("crm-user-update", args=[end_user.id])
@@ -272,6 +304,7 @@ def test_crm_user_update_profile_information_and_email_address(request, client):
     organization = baker.make(addressbook_models.Organization)
 
     end_user = baker.make(auth_models.User)
+    end_user.profile.sites.add(site)
     profile = end_user.profile
 
     url = reverse("crm-user-update", args=[end_user.id])
@@ -320,9 +353,11 @@ def test_crm_user_update_profile_information_with_email_address_exists(request, 
 
     # an other user already used the new email address
     other_user = baker.make(auth_models.User, email="johndoe@example.org")
+    other_user.profile.sites.add(site)
 
     organization = baker.make(addressbook_models.Organization)
     end_user = baker.make(auth_models.User)
+    end_user.profile.sites.add(site)
     profile = end_user.profile
 
     url = reverse("crm-user-update", args=[end_user.id])
@@ -363,6 +398,60 @@ def test_crm_user_update_profile_information_with_email_address_exists(request, 
     assert len(django.core.mail.outbox) == 0
 
 
+@pytest.mark.django_db
+def test_crm_user_update_profile_information_with_email_address_exists_other_site(
+    request, client
+):
+    site = get_current_site(request)
+    other_site = baker.make(site_models.Site)
+
+    email_test = "johndoe@example.org"
+
+    # an other user already used the new email address
+    other_user = baker.make(auth_models.User, email=email_test)
+    other_user.profile.sites.add(other_site)
+
+    organization = baker.make(addressbook_models.Organization)
+    end_user = baker.make(auth_models.User)
+    end_user.profile.sites.add(site)
+    profile = end_user.profile
+
+    url = reverse("crm-user-update", args=[end_user.id])
+    data = {
+        "username": email_test,
+        "first_name": "John",
+        "last_name": "DOE",
+        "phone_no": "01 23 45 67 89",
+        "organization": organization.id,
+        "organization_position": "staff",
+    }
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url, data=data)
+
+    assert response.status_code == 200
+    assertContains(response, "adresse email est déjà utilisée.")
+    expected = reverse("crm-user-details", args=[other_user.id])
+    assertNotContains(response, expected)
+
+    # user data is not updated
+    end_user.refresh_from_db()
+    assert end_user.username != data["username"]
+    assert end_user.email != data["username"]
+    assert end_user.first_name != data["first_name"]
+    assert end_user.last_name != data["last_name"]
+
+    # profile is not updated
+    profile.refresh_from_db()
+    assert profile.phone_no != data["phone_no"]
+    assert profile.organization != organization
+    assert profile.organization_position != data["organization_position"]
+
+    # no email address update
+    assert len(django.core.mail.outbox) == 0
+
+
 ########################################################################
 # user deactivation
 ########################################################################
@@ -370,7 +459,10 @@ def test_crm_user_update_profile_information_with_email_address_exists(request, 
 
 @pytest.mark.django_db
 def test_crm_user_deactivate_page_requires_permission(request, client):
+    site = get_current_site(request)
+
     end_user = baker.make(auth_models.User, is_active=False)
+    end_user.profile.sites.add(site)
 
     url = reverse("crm-user-deactivate", args=[end_user.id])
 
@@ -385,6 +477,7 @@ def test_crm_user_deactivate_page_with_permission(request, client):
     site = get_current_site(request)
 
     end_user = baker.make(auth_models.User, is_active=False)
+    end_user.profile.sites.add(site)
 
     url = reverse("crm-user-deactivate", args=[end_user.id])
 
@@ -400,6 +493,7 @@ def test_crm_user_deactivate_processing(request, client):
     site = get_current_site(request)
 
     end_user = baker.make(auth_models.User, is_active=True)
+    end_user.profile.sites.add(site)
 
     url = reverse("crm-user-deactivate", args=[end_user.id])
 
@@ -437,6 +531,7 @@ def test_crm_user_reactivate_page_with_permission(request, client):
     site = get_current_site(request)
 
     end_user = baker.make(auth_models.User, is_active=False)
+    end_user.profile.sites.add(site)
 
     url = reverse("crm-user-reactivate", args=[end_user.id])
 
@@ -452,6 +547,7 @@ def test_crm_user_reactivate_processing(request, client):
     site = get_current_site(request)
 
     end_user = baker.make(auth_models.User, is_active=False)
+    end_user.profile.sites.add(site)
 
     url = reverse("crm-user-reactivate", args=[end_user.id])
 
@@ -474,7 +570,9 @@ def test_crm_user_reactivate_processing(request, client):
 
 @pytest.mark.django_db
 def test_crm_user_set_advisor_page_requires_permission(request, client):
+    site = get_current_site(request)
     end_user = baker.make(auth_models.User, is_active=False)
+    end_user.profile.sites.add(site)
 
     url = reverse("crm-user-set-advisor", args=[end_user.id])
 
@@ -489,6 +587,7 @@ def test_crm_user_set_advisor_page_with_permission(request, client):
     site = get_current_site(request)
 
     end_user = baker.make(auth_models.User, is_active=False)
+    end_user.profile.sites.add(site)
 
     url = reverse("crm-user-set-advisor", args=[end_user.id])
 
@@ -506,6 +605,7 @@ def test_crm_user_set_advisor_processing(request, client):
     departments = baker.make(geomatics.Department, _quantity=4)
 
     end_user = baker.make(auth_models.User)
+    end_user.profile.sites.add(site)
 
     url = reverse("crm-user-set-advisor", args=[end_user.id])
 
@@ -535,7 +635,9 @@ def test_crm_user_set_advisor_processing(request, client):
 
 @pytest.mark.django_db
 def test_crm_user_unset_advisor_page_requires_permission(request, client):
+    site = get_current_site(request)
     end_user = baker.make(auth_models.User, is_active=False)
+    end_user.profile.sites.add(site)
 
     url = reverse("crm-user-unset-advisor", args=[end_user.id])
 
@@ -550,6 +652,7 @@ def test_crm_user_unset_advisor_page_with_permission(request, client):
     site = get_current_site(request)
 
     end_user = baker.make(auth_models.User, is_active=False)
+    end_user.profile.sites.add(site)
 
     url = reverse("crm-user-unset-advisor", args=[end_user.id])
 
@@ -567,6 +670,7 @@ def test_crm_user_unset_advisor_processing(request, client):
     departments = baker.make(geomatics.Department, _quantity=2)
 
     end_user = baker.make(auth_models.User)
+    end_user.profile.sites.add(site)
     end_user.profile.departments.set(departments)
     group = get_group_for_site("advisor", site)
     end_user.groups.add(group)
