@@ -1,6 +1,5 @@
-import Alpine from 'alpinejs'
-import geolocUtils from '../utils/geolocation/'
-import mapUtils from '../utils/map/'
+import Alpine from 'alpinejs';
+import mapUtils from '../utils/map/';
 
 function MapEditor(projectOptions) {
 	return {
@@ -9,10 +8,10 @@ function MapEditor(projectOptions) {
 		map: null,
 		zoom: 8,
 		markers: null,
-		isLoading: false,
-
+		get isLoading() {
+			return this.$store.geolocation.isLoading;
+		},
 		async init() {
-			this.isLoading = true;
 			this.project = {
 				...projectOptions,
 				commune: {
@@ -20,32 +19,20 @@ function MapEditor(projectOptions) {
 					latitude: projectOptions.commune.latitude,
 					longitude: projectOptions.commune.longitude,
 				}
-			}
-			const { latitude, longitude, insee } = this.project.commune;
+			};
+			await this.$store.geolocation.initGeolocationData(this.project);
+			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
-			const geoData = {}
-			try {
-				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
-					geolocUtils.fetchParcelsIgn(insee),
-					geolocUtils.fetchCommuneIgn(insee),
-					geolocUtils.fetchGeolocationByAddress(`${this.project.location}`)
-				]);
-				await this.initInteractiveMap(this.project, geoData);
-			} catch(e) {
-				// console.log(e)
-			} finally {
-				this.isLoading = false;
-			}
+			const geoData = this.$store.geolocation.getGeoData();
+			await this.initMap(this.project, geoData);
 		},
-
 		updateProjectLocation(coordinates)  {
-			this.project.location_x = coordinates.lng
-			this.project.location_y = coordinates.lat
+			this.project.location_x = coordinates.lng;
+			this.project.location_y = coordinates.lat;
 		},
-
-		async initInteractiveMap(project, geoData) {
+		async initMap(project, geoData) {
 			if(this.map) {
-				return
+				return;
 			}
 			// Init map with base layer
 			const options = mapUtils.mapOptions({interactive: true});
@@ -53,7 +40,7 @@ function MapEditor(projectOptions) {
 			this.map = Map;
 
 			// Add onclick behaviour for address input field (geocoderBAN)
-			const onClick = (coordinates) => this.updateProjectLocation(coordinates)
+			const onClick = (coordinates) => this.updateProjectLocation(coordinates);
 
 			// Add overlay layers (vector maps, controls and markers)
 			this.markers  =	mapUtils.initMarkerLayer(this.map, project, geoData);
@@ -71,27 +58,26 @@ function MapEditor(projectOptions) {
 			}).addTo(this.map);
 
 			// Add onclick behaviour for map
-			const popupOptions = {...project, title: project.name}
-			let markers = this.markers
+			const popupOptions = {...project, title: project.name};
+			let markers = this.markers;
 			Map.on('click', function(e) {
 				if(markers && markers[0]) {
-					markers[0].clearLayers()
+					markers[0].clearLayers();
 				} else {
-					markers = []
+					markers = [];
 				}
 				geocoderBAN.setValue('');
-				onClick(e.latlng)
+				onClick(e.latlng);
 				const marker = L.marker(e.latlng, { icon: mapUtils.createMarkerIcon('marker-onclick') }).addTo(Map);
-				marker.bindPopup(mapUtils.markerPopupTemplate({...popupOptions,location_x: e.latlng.lng, location_y: e.latlng.lat }))
+				marker.bindPopup(mapUtils.markerPopupTemplate({...popupOptions,location_x: e.latlng.lng, location_y: e.latlng.lat }));
 				let markerLayer = L.layerGroup([marker]).addTo(Map);
-				markers[0] = markerLayer
+				markers[0] = markerLayer;
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
 			});
 
-			setTimeout(function(){Map.invalidateSize()}, 0);
+			setTimeout(function(){Map.invalidateSize();}, 0);
 		},
-	}
+	};
 }
 
-
-Alpine.data("MapEditor", MapEditor)
+Alpine.data('MapEditor', MapEditor);

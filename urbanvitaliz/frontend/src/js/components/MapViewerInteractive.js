@@ -1,7 +1,5 @@
-import Alpine from 'alpinejs'
-
-import geolocUtils from '../utils/geolocation/'
-import mapUtils from '../utils/map/'
+import Alpine from 'alpinejs';
+import mapUtils from '../utils/map/';
 
 function MapViewerInteractive(projectOptions) {
 	return {
@@ -9,41 +7,30 @@ function MapViewerInteractive(projectOptions) {
 		project: null,
 		interactiveMap: null,
 		zoom: 8,
-		isLoading: false,
-
+		get isLoading() {
+			return this.$store.geolocation.isLoading;
+		},
 		async init() {
-			this.isLoading = true;
 			this.project = {
 				...projectOptions,
 				commune: {
 					...projectOptions.commune,
 					latitude: projectOptions.commune.latitude,
-					longitude: projectOptions.commune.longitude
+					longitude: projectOptions.commune.longitude,
 				}
-			}
-			const { latitude, longitude, insee } = this.project.commune;
+			};
+			await this.$store.geolocation.initGeolocationData(this.project);
+			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
-			const geoData = {}
-
-
-			try {
-				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
-					geolocUtils.fetchParcelsIgn(insee),
-					geolocUtils.fetchCommuneIgn(insee),
-					geolocUtils.fetchGeolocationByAddress(`${this.project.location}`)
-				]);
-			} catch(e) {
-				console.log(e)
-			} finally {
-				this.isLoading = false;
-			}
-			await this.initInteractiveMap(this.project, geoData);
+			const geoData = this.$store.geolocation.getGeoData();
+			await this.initMap(this.project, geoData);
+			let map = this.map;
+			setTimeout(function(){map.invalidateSize();}, 0);
 		},
-
-		async initInteractiveMap(project, geoData) {
+		async initMap(project, geoData) {
 			// Init Interactive Map
 			const options = mapUtils.mapOptions({interactive: true});
-			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project, geoData)
+			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project, geoData);
 
 			const Map = mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom + 3);
 			this.interactiveMap = Map;
@@ -63,15 +50,14 @@ function MapViewerInteractive(projectOptions) {
 			this.interactiveMap.panTo(new L.LatLng(latitude, longitude));
 
 			// Init Modal
-			const element = document.getElementById("project-map-modal");
+			const element = document.getElementById('project-map-modal');
 			this.mapModal = new bootstrap.Modal(element);
 			element.addEventListener('shown.bs.modal', function (event) {
 				 // forces map redraw to fit container
-				setTimeout(function(){Map.invalidateSize()}, 0);
-			})
+				setTimeout(function(){Map.invalidateSize();}, 0);
+			});
 		},
-	}
+	};
 }
 
-
-Alpine.data("MapViewerInteractive", MapViewerInteractive)
+Alpine.data('MapViewerInteractive', MapViewerInteractive);

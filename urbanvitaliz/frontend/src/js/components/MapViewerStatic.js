@@ -1,7 +1,5 @@
-import Alpine from 'alpinejs'
-
-import geolocUtils from '../utils/geolocation/'
-import mapUtils from '../utils/map/'
+import Alpine from 'alpinejs';
+import mapUtils from '../utils/map/';
 
 function MapViewerStatic(projectOptions) {
 	return {
@@ -10,40 +8,27 @@ function MapViewerStatic(projectOptions) {
 		mapModal: null,
 		map: null,
 		zoom: 8,
-		isLoading: false,
-
+		get isLoading() {
+			return this.$store.geolocation.isLoading;
+		},
 		async init() {
-			this.isLoading = true;
 			this.project = {
 				...projectOptions,
 				commune: {
 					...projectOptions.commune,
 					latitude: projectOptions.commune.latitude,
-					longitude: projectOptions.commune.longitude
+					longitude: projectOptions.commune.longitude,
 				}
-			}
-			const { latitude, longitude, insee } = this.project.commune;
+			};
+			await this.$store.geolocation.initGeolocationData(this.project);
+			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
-			const geoData = {}
-
-
-			try {
-				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
-					geolocUtils.fetchParcelsIgn(insee),
-					geolocUtils.fetchCommuneIgn(insee),
-					geolocUtils.fetchGeolocationByAddress(`${this.project.location}`)
-				]);
-			} catch(e) {
-				// console.log(e)
-			} finally {
-				this.isLoading = false;
-			}
-			await this.initStaticMap(this.project, geoData);
-			let map = this.map
-			setTimeout(function(){map.invalidateSize()}, 0);
+			const geoData = this.$store.geolocation.getGeoData();
+			await this.initMap(this.project, geoData);
+			let map = this.map;
+			setTimeout(function(){map.invalidateSize();}, 0);
 		},
-
-		async initStaticMap(project, geoData) {
+		async initMap(project, geoData) {
 			const options = mapUtils.mapOptions({interactive: false});
 
 			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
@@ -53,19 +38,14 @@ function MapViewerStatic(projectOptions) {
 				mapUtils.initMapLayers(this.map, project, geoData);
 			}
 		},
-
-
 		initMapModal() {
-			// Init Modal
-			const element = document.getElementById("project-map-modal");
+			const element = document.getElementById('project-map-modal');
 			this.mapModal = new bootstrap.Modal(element);
 		},
-
 		openProjectMapModal() {
 			this.mapModal.show();
 		},
-	}
+	};
 }
 
-
-Alpine.data("MapViewerStatic", MapViewerStatic)
+Alpine.data('MapViewerStatic', MapViewerStatic);
