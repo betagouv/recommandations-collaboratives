@@ -74,7 +74,7 @@
                     <p class="location-label project project-card-details">Précisez la localisation</p>
                     <p class="font-small location-hint">Recherchez une adresse, et/ou placez un point plus précis sur la carte.</p>
                     <div data-test-id="map-edit" class="project-map-container">
-                        <div x-show="isLoading"
+                        <div x-show="$store.geolocation.isLoading"
                              x-transition
                              class="project-map-container spinner"
                              :class="{'is-small':mapIsSmall}">
@@ -82,7 +82,7 @@
                                 <span class="visually-hidden">Chargement de la carte...</span>
                             </div>
                         </div>
-                        <div x-cloak  x-ref="map-edit" id="map-edit" class="h-100 w-100"></div>
+                        <div x-cloak x-ref="map-edit" id="map-edit" class="h-100 w-100"></div>
                     </div>
                     <div class="location-footer bg-white">
                         <form method="POST"

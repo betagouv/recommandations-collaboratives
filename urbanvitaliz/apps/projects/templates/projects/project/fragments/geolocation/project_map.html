@@ -32,7 +32,7 @@
 <div x-data='MapViewerStatic(projectOptions)'
      data-test-id="project-knogwledge-map">
     <div class="p-0 project-map-container" :class="{'is-small':mapIsSmall}">
-        <div x-show="isLoading"
+        <div x-show="$store.geolocation.isLoading"
              x-transition
              class="project-map-container spinner"
              :class="{'is-small':mapIsSmall}">
@@ -58,7 +58,7 @@
                 </a>
             </div>
         {% endif %}
-        <div x-show="!isLoading"
+        <div x-show="!$store.geolocation.isLoading"
              class="p-0 project-map-container"
              :class="{'is-small':mapIsSmall}"
              data-test-id="project-location">
