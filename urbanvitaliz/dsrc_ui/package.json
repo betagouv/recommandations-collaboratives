@@ -1,5 +1,5 @@
 {
-	"name": "dsrc-ui",
+	"name": "dsrc_ui",
 	"version": "0.1.0",
 	"description": "DSRC - Bibliothèque de Composants UI pour portails Recoco, basée sur DSFR",
 	"main": "index.js",

@@ -33,10 +33,12 @@ venv
 screenshots
 .idea
 .tool-versions
+.env
 
 ## Ignore Jupyter Notebooks files
 # see: https://jupytext.readthedocs.io/en/latest/
 
 notebooks/.ipynb_checkpoints/
 *.ipynb
-dsrc-doc/*.md
+dsrc_doc/*.md
+!dsrc_doc/README.md

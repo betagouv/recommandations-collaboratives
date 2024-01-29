@@ -6,22 +6,22 @@ Ce module contient la documentation pour la bibliothèque de templates Django du
 
 Le code su système de design DSRC est composé de 4 modules:
 
-- `dsrc-doc` : contient la documentation interactive de la bibliothèque sous forme de Jupyter Notebooks (c'est ici!)
-- `dsrc-ui` : contient les fichiers source CSS et JavaScript de la librairie de composants
-- `dsrc-dj` : contient les templates Django des composants (HTML)
-- `dsrc-tests` : contient les tests unitaires et d'intégration des composants
+- `dsrc_doc` : contient la documentation interactive de la bibliothèque sous forme de Jupyter Notebooks (c'est ici!)
+- `dsrc_ui` : contient les fichiers source CSS et JavaScript de la librairie de composants
+- `dsrc_dj` : contient les templates Django des composants (HTML)
+- `dsrc_tests` : contient les tests unitaires et d'intégration des composants
 
 L'arborsecence de ces modules dans le projet est la suivante:
 
 ```sh
 .
-|-- dsrc-tests
+|-- dsrc_tests
 |-- notebooks
-|   `-- dsrc-doc
+|   `-- dsrc_doc
 `-- urbanvitaliz
-    |-- dsrc-ui
+    |-- dsrc_ui
     |-- templates
-    |   `-- dsrc-dj
+    |   `-- dsrc_dj
 ```
 
 ### Prérequis
@@ -64,7 +64,7 @@ python manage.py runserver
 
 Pour travailler sur les composants ui du DSRC:
 
-1. 🎨 Terminal 3 : Démarrer le serveur de dev de la lib `dsrc-ui` dans `[root]/urbanvitaliz/dsrc-ui`
+1. 🎨 Terminal 3 : Démarrer le serveur de dev de la lib `dsrc_ui` dans `[root]/urbanvitaliz/dsrc_ui`
 
 ```sh
 yarn dev
@@ -82,7 +82,7 @@ yarn dev
 
 Afin d'appliquer des styles à un Template Django à l'intérieur d'une cellule Jupyter Notebooks, on charge le CSS dans un `string` qui est injecté dans le `Template` construit dans Jupyter via le dict `Context`. Les styles sont ensuite rendus dans un tag `<style>` à l'intérieur d'un `{% block css %}`.
 
-Le CSS de la librairie DSRC est généré à partir de sources SCSS dans le dossier `[root]/urbanvitaliz/dsrc-ui`.
+Le CSS de la librairie DSRC est généré à partir de sources SCSS dans le dossier `[root]/urbanvitaliz/dsrc_ui`.
 
 Les fichiers sont générés dans `[root]/static/` et chargés dans Jupyter Notebooks à partir de `[root]/static/`.
 
