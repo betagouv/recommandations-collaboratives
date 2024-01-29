@@ -4,37 +4,6 @@ from django.db import migrations
 import taggit.managers
 
 
-def reverse_historical_tags(apps, schema_editor):
-    Tag = apps.get_model("taggit", "Tag")
-    for slug in ["diag", "edl", "contact", "general"]:
-        try:
-            tag = Tag.objects.get(slug=f"crm_{slug}")
-            tag.name = slug
-            tag.save()
-        except Tag.DoesNotExist:
-            pass
-
-
-def update_historical_tags(apps, schema_editor):
-    Tag = apps.get_model("taggit", "Tag")
-
-    default_tags = [
-        ("diag", "Diagnostic"),
-        ("edl", "État des lieux"),
-        ("contact", "Mise en relation"),
-        ("general", "Général positif"),
-    ]
-
-    # update tags name
-    for slug, name in default_tags:
-        try:
-            tag = Tag.objects.get(slug=slug)
-            tag.slug = f"crm_{tag.slug}"
-            tag.save()
-        except Tag.DoesNotExist:
-            pass
-
-
 def set_default_tags(apps, schema_editor):
     tags_to_add = [
         "Diagnostic",
@@ -64,6 +33,7 @@ def set_default_tags(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ("home", "0019_alter_siteconfiguration_reminder_interval"),
+        ("crm", "0010_new_crm_tags"),
     ]
 
     operations = [
@@ -82,6 +52,5 @@ class Migration(migrations.Migration):
                 verbose_name="Étiquettes projets disponibles dans le CRM",
             ),
         ),
-        migrations.RunPython(update_historical_tags, reverse_historical_tags),
         migrations.RunPython(set_default_tags, migrations.RunPython.noop),
     ]
