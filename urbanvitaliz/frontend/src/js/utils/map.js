@@ -1,9 +1,9 @@
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
-import 'leaflet-providers'
+import 'leaflet-providers';
 
-import GeocoderBAN from './geocoderBAN'
-import geolocUtils from './geolocation/'
+import GeocoderBAN from './geocoderBAN';
+import geolocUtils from './geolocation/';
 
 function mapLayerStyles(className) {
 	return {
@@ -11,71 +11,68 @@ function mapLayerStyles(className) {
 		color: '#F6F6F6',
 		fillColor: '#929292',
 		stroke: true,
-		weight: 2,
-		stroke: true,
 		weight: 1.25,
 		fillOpacity: 0.25,
-	}
+	};
 }
 
 function ignServiceURL(
-  layer,
-  env = 'decouverte',
-  format = 'image/png'
+	layer,
+	env = 'decouverte',
+	format = 'image/png'
 ) {
-  const url = `https://wxs.ign.fr/${env}/geoportail/wmts`;
-  const query =
-    'service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&style=normal';
+	const url = `https://wxs.ign.fr/${env}/geoportail/wmts`;
+	const query =
+		'service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&style=normal';
 
-  return `${url}?${query}&layer=${layer}&format=${format}`;
+	return `${url}?${query}&layer=${layer}&format=${format}`;
 }
 
 function getDefaultLatLngForLayers(project, geoData) {
 	const longitude = project.location_x ? project.location_x
-	: geoData.location.longitude ? geoData.location.longitude
-		: undefined;
+		: geoData.location.longitude ? geoData.location.longitude
+			: undefined;
 	const latitude = project.location_y ? project.location_y
-	: geoData.location.latitude ? geoData.location.latitude
-		: undefined;
+		: geoData.location.latitude ? geoData.location.latitude
+			: undefined;
 
-	return [latitude, longitude]
+	return [latitude, longitude];
 }
 
 function getDefaultLatLngForMap(project) {
 	const longitude = project.location_x ? project.location_x
 		: project.commune.longitude ? project.commune.longitude
-		: geolocUtils.LAT_LNG_FRANCE[0];
+			: geolocUtils.LAT_LNG_FRANCE[0];
 	const latitude = project.location_y ? project.location_y
 		: project.commune.latitude ? project.commune.latitude
-		: geolocUtils.LAT_LNG_FRANCE[0];
+			: geolocUtils.LAT_LNG_FRANCE[0];
 
-	return [latitude, longitude]
+	return [latitude, longitude];
 }
 
 // Map base layer
 function initMap(idMap, project, options, zoom) {
-	const [latitude, longitude] = getDefaultLatLngForMap(project)
-	L.tileLayer(`https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png`, {
+	const [latitude, longitude] = getDefaultLatLngForMap(project);
+	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
 		maxZoom: 20,
 		attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	});
 
-	const osm = L.tileLayer.provider('OpenStreetMap.France')
+	const osm = L.tileLayer.provider('OpenStreetMap.France');
 
 	return L.map(idMap, {...options, layers:[osm]}).setView(new L.LatLng(latitude, longitude), zoom);
 }
 
 function initSatelliteMap(idMap, project, options, zoom) {
-	const [latitude, longitude] = getDefaultLatLngForMap(project)
+	const [latitude, longitude] = getDefaultLatLngForMap(project);
 
 	const ign =	L.tileLayer(
-		ignServiceURL('ORTHOIMAGERY.ORTHOPHOTOS', 'essentiels', 'image/jpeg'),
-		{
-				minZoom : 0,
-				maxZoom : 20,
-				tileSize: 256,
-				attribution : "IGN-F/Géoportail"
-		})
+		ignServiceURL('ORTHOIMAGERY.ORTHOPHOTOS', 'essentiels', 'image/jpeg'), {
+			minZoom : 0,
+			maxZoom : 20,
+			tileSize: 256,
+			attribution : 'IGN-F/Géoportail'
+		});
 
 	return L.map(idMap, {...options, layers:[ign]}).setView(new L.LatLng(latitude, longitude), zoom);
 }
@@ -83,22 +80,21 @@ function initSatelliteMap(idMap, project, options, zoom) {
 
 // Create layers composed with markers
 function initMarkerLayer(map, project, geoData) {
-	let markers = []
-	let marker
+	let markers = [];
+	let marker;
 	try {
 		marker = addLayerMarkerProjectCoordinates(map, project);
-		markers[0] = marker
+		markers[0] = marker;
+		let markerLayer = L.layerGroup(markers).addTo(map);
+		return [markerLayer];
 	} catch (e) {
 		try {
-			marker = 	addLayerMarkerProjectLocation(map, project, geoData);
-			markers[0] = marker
-		} catch(e) {
-		// Precise location unknown: don't add a marker
-		}
-	} finally {
-		if(marker) {
+			marker = addLayerMarkerProjectLocation(map, project, geoData);
+			markers[0] = marker;
 			let markerLayer = L.layerGroup(markers).addTo(map);
-			return [markerLayer]
+			return [markerLayer];
+		} catch(e) {
+			return markers;
 		}
 	}
 }
@@ -106,17 +102,22 @@ function initMarkerLayer(map, project, geoData) {
 // Create layers composed with area coordinates
 function initMapLayers(map, project, geoData) {
 	try {
-		addLayerAreaCommune(map, geoData.commune);
+		let commune = geoData.commune ? geoData.commune
+			: project.commune ?  project.commune
+				: null;
+		if(commune) {
+			addLayerAreaCommune(map, commune);
+		}
 	} catch(e) {
 		if(project.commune.latitude && project.commune.longitude) {
-			addLayerAreaCircle(map, project)
+			addLayerAreaCircle(map, project);
 		}
 	}
 }
 
 function initMapControllerBAN(map,  geoData, onUpdate, project, markers) {
-	const className = 'marker-onclick'
-	const popupOptions = {...project, title: project.title}
+	const className = 'marker-onclick';;
+	const popupOptions = {...project, title: project.title};
 	const geocoderOptions = {
 		collapsed: false,
 		style: 'searchBar',
@@ -125,33 +126,33 @@ function initMapControllerBAN(map,  geoData, onUpdate, project, markers) {
 		onUpdate,
 		markerIcon: createMarkerIcon(className),
 		markerPopupTemplate,
-		commune: geoData.location,
+		commune: project.commune,
 		popupOptions,
 		markers
-	}
-	const geocodeBAN = GeocoderBAN(geocoderOptions).addTo(map)
+	};
+	const geocodeBAN = GeocoderBAN(geocoderOptions).addTo(map);
 	const controller = document.getElementsByClassName('leaflet-control-geocoder-ban-form');
 	controller[0].classList.add('leaflet-control-geocoder-expanded');
-	const inputController = controller[0].querySelector('input')
+	const inputController = controller[0].querySelector('input');
 	inputController.addEventListener('blur', async (e) => {
-			controller[0].classList.add('leaflet-control-geocoder-expanded');
-	})
+		controller[0].classList.add('leaflet-control-geocoder-expanded');
+	});
 
-	return geocodeBAN
+	return geocodeBAN;
 }
 
 
 function addLayerMarkerProjectCoordinates(map, project) {
 	if(!project.location_x || !project.location_x) {
-		throw Error(`Coordonnées de localisation du projet indisponibles pour "${project.name}"`)
+		throw Error(`Coordonnées de localisation du projet indisponibles pour "${project.name}"`);
 	}
-	const coordinates = [project.location_y, project.location_x]
+	const coordinates = [project.location_y, project.location_x];
 	const marker = L.marker(coordinates, { icon: createMarkerIcon('project-coordinates-marker') }).addTo(map);
-	const popupOptions = {...project, title: project.name}
-	marker.bindPopup(markerPopupTemplate(popupOptions))
+	const popupOptions = {...project, title: project.name};
+	marker.bindPopup(markerPopupTemplate(popupOptions));
 	L.layerGroup([marker]).addTo(map);
 	map.panTo(new L.LatLng(...coordinates));
-	return marker
+	return marker;
 }
 
 function addLayerMarkerProjectLocation(map, project, geoData) {
@@ -204,22 +205,22 @@ function createMarkerIcon(className, title) {
 }
 
 function markerPopupTemplate({location_x, location_y, name, location, commune, address, title}) {
-	const lat = location_x ? `<p data-test-id="project-coord-x-latitude" class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(location_x).toFixed(2)}</p>` : ''
-	const lng = location_y ? `<p data-test-id="project-coord-y-longitude" class="m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(location_y).toFixed(2)}</p>` : ''
+	const lat = location_x ? `<p data-test-id="project-coord-x-latitude" class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(location_x).toFixed(2)}</p>` : '';
+	const lng = location_y ? `<p data-test-id="project-coord-y-longitude" class="m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(location_y).toFixed(2)}</p>` : '';
 
-	let popupAddress = ''
+	let popupAddress = '';
 	if(address){
-		popupAddress = `<p class="m-0 fs-7">${address}</p>`
+		popupAddress = `<p class="m-0 fs-7">${address}</p>`;
 	}
 	else if(location){
-		popupAddress = `<p class="m-0 fs-7">${location}</p>`
+		popupAddress = `<p class="m-0 fs-7">${location}</p>`;
 	}
 
 	if (commune){
-		popupAddress =`${popupAddress}<p class="m-0 fs-7 text-capitalize">${commune.name} (${commune.postal})</p>`
+		popupAddress =`${popupAddress}<p class="m-0 fs-7 text-capitalize">${commune.name} (${commune.postal})</p>`;
 	}
 
-	const popupTitle = title ? title : name
+	const popupTitle = title ? title : name;
 	return `
 		<div class="marker-popup">
 			<header><h6>${popupTitle}</a></h6></header>
@@ -229,7 +230,7 @@ function markerPopupTemplate({location_x, location_y, name, location, commune, a
 				${lng}
 			</main>
 		</div>
-	`
+	`;
 }
 
 function mapOptions({interactive, zoom}) {
@@ -241,7 +242,7 @@ function mapOptions({interactive, zoom}) {
 		boxZoom: interactive,
 		keyboard: interactive,
 		zoomControl: zoom,
-	}
+	};
 }
 
 export default {
@@ -259,4 +260,4 @@ export default {
 	getDefaultLatLngForLayers,
 	createMarkerIcon,
 	markerPopupTemplate,
-}
+};
