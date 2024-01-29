@@ -1,4 +1,4 @@
-{% extends "dsrc_dj/base.html" %}
+{% extends "dsrc_dj/dsrc_base.html" %}
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/onboarding.js' %}
@@ -14,9 +14,6 @@
                     <a class="small text-decoration-underline text-grey"
                        href="{% url 'home' %}">Accueil</a>
                 </li>
-                <svg class="bi mx-2" width="15" height="15">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-right" />
-                </svg>
                 <li>
                     <span class="small text-dark">Soliciter {{ request.site.name }}</span>
                 </li>
