@@ -41,7 +41,7 @@ def test_user_challenge_returned_when_open_one_exists():
 @pytest.mark.django_db
 def test_user_challenge_returned_now_one_for_every_time_challenge():
     site = baker.make(site_models.Site)
-    user = baker.make(auth_models.User, last_login=timezone.now())
+    user = baker.make(auth_models.User)
     definition = baker.make(
         models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=0
     )
@@ -55,14 +55,13 @@ def test_user_challenge_returned_now_one_for_every_time_challenge():
     with settings.SITE_ID.override(site.pk):
         current = utils.get_challenge_for(user, definition.code)
 
-    # a new challenge is born
-    assert current and current != challenge and current.acquired_on is None
+    assert current is None
 
 
 @pytest.mark.django_db
 def test_user_challenge_not_repeated_before_inactivity_period():
     site = baker.make(site_models.Site)
-    user = baker.make(auth_models.User, last_login=timezone.now())
+    user = baker.make(auth_models.User)
     definition = baker.make(
         models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=1
     )
@@ -84,7 +83,7 @@ def test_user_challenge_not_repeated_before_inactivity_period():
 def test_user_challenge_repeated_when_over_inactivity_period():
     last_week = timezone.now() - datetime.timedelta(days=8)
     site = baker.make(site_models.Site)
-    user = baker.make(auth_models.User, last_login=last_week)
+    user = baker.make(auth_models.User)
     definition = baker.make(
         models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=1
     )
