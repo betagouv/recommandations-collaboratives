@@ -29,6 +29,7 @@ def update_historical_tags(apps, schema_editor):
         try:
             tag = Tag.objects.get(slug=slug)
             tag.slug = f"crm_{tag.slug}"
+            tag.name = name
             tag.save()
         except Tag.DoesNotExist:
             pass

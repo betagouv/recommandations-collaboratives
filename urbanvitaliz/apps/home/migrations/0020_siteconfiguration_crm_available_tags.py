@@ -5,12 +5,8 @@ import taggit.managers
 
 
 def set_default_tags(apps, schema_editor):
-    tags_to_add = [
-        "Diagnostic",
-        "État des lieux",
-        "Mise en relation",
-        "Général positif",
-    ]
+    tag_slugs_to_add = ["crm_diag", "crm_edl", "crm_contact", "crm_general"]
+
     Tag = apps.get_model("taggit", "Tag")
     TaggedItem = apps.get_model("taggit", "TaggedItem")
     ContentType = apps.get_model("contenttypes", "ContentType")
@@ -20,11 +16,12 @@ def set_default_tags(apps, schema_editor):
 
     SiteConfiguration = apps.get_model("home", "SiteConfiguration")
     for site_conf in SiteConfiguration.objects.all():
-        for tag_to_add in tags_to_add:
-            tag, _ = Tag.objects.get_or_create(
-                name__iexact=tag_to_add,
-                defaults={"name": tag_to_add.lower(), "slug": tag_to_add.lower()},
-            )
+        for slug in tag_slugs_to_add:
+            try:
+                tag = Tag.objects.get(slug__iexact=slug)
+            except Tag.DoesNotExist:
+                continue
+
             tagged_items, _ = TaggedItem.objects.get_or_create(
                 content_type_id=content_type.id, object_id=site_conf.id, tag=tag
             )
