@@ -22,16 +22,26 @@ def get_challenge_for(user, codename):
 
     try:
         return models.Challenge.objects.get(
-            challenge_definition=challenge_definition, user=user
+            challenge_definition=challenge_definition, user=user, acquired_on__isnull=True
         )
     except models.Challenge.DoesNotExist:
         pass  # it's ok, let look if a new one is required
+    
+    try: 
+      acquired_challenge = models.Challenge.acquired_objects.filter(
+        challenge_definition=challenge_definition, user=user
+      )
+    except models.Challenge.DoesNotExist:
+        pass  # it's ok, let look if a new one is required
+
 
     # should we repeat ?
-    inactivity = (timezone.now() - user.last_login).days
-    repetition = challenge_definition.week_inactivity_repeat * 7
-    if inactivity < repetition:
-        return None  # do not repeat for the moment
+    if len(acquired_challenge) > 0:
+        last_acquired_on_challenge = acquired_challenge[len(acquired_challenge)-1].acquired_on
+        last_acquired_on_challenge_days = (timezone.now() - last_acquired_on_challenge).days
+        repetition = challenge_definition.week_inactivity_repeat * 7
+        if last_acquired_on_challenge_days < repetition or repetition == 0:
+            return None  # do not repeat for the moment
 
     # Start a new challenge
     return models.Challenge.objects.create(
