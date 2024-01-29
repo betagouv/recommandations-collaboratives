@@ -83,3 +83,5 @@ template = Template(
 context = Context({"projects": projects.order_by("-created_on")[:10]})
 
 HTML(template.render(context))
+
+# eof

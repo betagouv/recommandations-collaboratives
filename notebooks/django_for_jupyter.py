@@ -26,3 +26,6 @@ def init_django(project_name=None):
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"{project_name}.settings")
     os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
     django.setup()
+
+
+# eof

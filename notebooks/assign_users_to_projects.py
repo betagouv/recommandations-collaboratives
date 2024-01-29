@@ -9,7 +9,8 @@
 
 from django.db.models import Model
 import os
-os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true" # Pas besoin en dehors de Jupyter
+
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"  # Pas besoin en dehors de Jupyter
 
 
 # %%
@@ -34,16 +35,19 @@ print(site)
 # %%
 
 
-from urbanvitaliz.apps.projects.utils import assign_collaborator, assign_advisor, assign_observer
+from urbanvitaliz.apps.projects.utils import (
+    assign_collaborator,
+    assign_advisor,
+    assign_observer,
+)
 
 print(assign_advisor.__doc__)
-
 
 
 # %%
 
 
-get_ipython().run_line_magic('pinfo', 'assign_collaborator')
+get_ipython().run_line_magic("pinfo", "assign_collaborator")
 
 # Assigner un utilisateur sur un projet
 assign_collaborator(user, project, is_owner=False)
@@ -53,7 +57,7 @@ assign_collaborator(user, project, is_owner=False)
 
 
 # Assigner des conseillers et observateurs
-get_ipython().run_line_magic('pinfo', 'assign_advisor')
+get_ipython().run_line_magic("pinfo", "assign_advisor")
 
 assign_advisor(user, project, site)
 
@@ -64,5 +68,4 @@ assign_observer(user, project, site)
 # %%
 
 
-
-
+# eof
