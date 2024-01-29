@@ -21,7 +21,8 @@ L'arborsecence de ces modules dans le projet est la suivante:
 `-- urbanvitaliz
     |-- dsrc_ui
     |-- templates
-    |   `-- dsrc_dj
+    |   `-- default_template
+    |       `-- dsrc_dj
 ```
 
 ### Prérequis
