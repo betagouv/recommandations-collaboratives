@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="system">
+    {% include 'dsrc_dj/core/blocks/global/dsrc_head.html' %}
+    {% block head %}{% endblock %}
+    <body>
+        {% include 'dsrc_dj/core/blocks/global/dsrc_header.html' %}
+        {% block app_header %}{% endblock %}
+        {% block main %}{% endblock %}
+        {% include 'dsrc_dj/core/blocks/global/dsrc_scripts.html' %}
+        {% block app_scripts %}{% endblock %}
+    </body>
+</html>
