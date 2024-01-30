@@ -3,6 +3,7 @@
 
 /* == DS:FR config */
 @forward '@gouvfr/dsfr/dist/core/core.css';
+/* components */
 @forward '@gouvfr/dsfr/dist/component/logo/logo.css';
 @forward '@gouvfr/dsfr/dist/component/button/button.css';
 @forward '@gouvfr/dsfr/dist/component/breadcrumb/breadcrumb.css';
@@ -18,8 +19,7 @@
 @forward '@gouvfr/dsfr/dist/component/input/input.css';
 @forward '@gouvfr/dsfr/dist/component/password/password.css';
 @forward '@gouvfr/dsfr/dist/component/header/header.css';
-
-/* DS:FR icons */
+/* icons */
 @forward '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.css';
 
 /* == DS:RC config */
