@@ -23,6 +23,7 @@ function MapViewerInteractive(projectOptions) {
 			const { latitude, longitude } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = await this.$store.geolocation.initGeolocationData(this.project);
+
 			this.map = await this.initMap(this.project, geoData);
 		},
 		async initMap(project, geoData) {
