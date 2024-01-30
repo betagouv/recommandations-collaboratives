@@ -19,3 +19,20 @@
            name="text-input-valid">
     <p id="text-input-valid-desc-valid" class="fr-valid-text">Texte de validation</p>
 </div>
+<!-- Etat validé avec messages -->
+<div class="fr-input-group" id="input-group-9360">
+    <label class="fr-label" for="username-9351">
+        Identifiant
+        <span class="fr-hint-text">Format attendu : nom@domaine.fr</span>
+    </label>
+    <input class="fr-input"
+           autocapitalize="off"
+           autocorrect="off"
+           aria-describedby="username-9351-messages"
+           name="username"
+           id="username-9351"
+           type="text" />
+    <div class="fr-messages-group"
+         id="username-9351-messages"
+         aria-live="polite"></div>
+</div>
