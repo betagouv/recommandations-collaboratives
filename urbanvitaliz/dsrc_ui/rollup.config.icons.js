@@ -43,9 +43,9 @@ export default {
 		)
 	},
 	output: {
-		dir: '../../static/assets/',
+		dir: '../../static/',
 		format: 'esm',
-		assetFileNames: '[name]-[extname]'
+		assetFileNames: '[name][extname]'
 	},
 	plugins: [svgResolverPlugin()],
 	watch: {
