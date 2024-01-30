@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load guardian_tags %}
+{% load phone_filters %}
 
 
 {% block content %}
@@ -106,14 +107,14 @@
             </td>
             <td>
                 {% if contact.phone_no %}
-                <a href="tel:{{contact.phone_no}}">{{ contact.phone_no }}</a>
+                <a href="tel:{{contact.phone_no}}">{{ contact.phone_no|format_phone }}</a>
                 {% else %}
                 -
                 {% endif %}
             </td>
             <td>
                 {% if contact.mobile_no %}
-                <a href="tel:{{contact.mobile_no}}">{{ contact.mobile_no }}</a>
+                <a href="tel:{{contact.mobile_no}}">{{ contact.mobile_no|format_phone }}</a>
                 {% else %}
                 -
                 {% endif %}
