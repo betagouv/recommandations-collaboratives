@@ -2,6 +2,19 @@
 {% block main %}
     {% include 'dsrc_dj/core/pages/dsrc_page_header.html' %}
     <main role="main" id="content">
-        {% include 'dsrc_dj/core/layouts/dsrc_center.html' %}
+        {# include 'dsrc_dj/core/layouts/dsrc_center.html' #}
+        <div class="fr-container fr-container--fluid fr-mb-md-14v">
+            <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+                <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
+                    <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-pt-10v fr-pt-md-14v fr-pb-6v fr-pb-md-10v">
+                        <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+                            <div class="fr-col-12 fr-col-md-10 fr-col-lg-9">
+                                {% block center_content %}{% endblock %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 {% endblock %}

@@ -6,8 +6,13 @@
 {% load static %}
 {% block title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
 {% block og_title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
-{% block main %}
-    {% block center_content %}
+{% block center_content %}
+    {% include 'dsrc_dj/core/compositions/navs/dsrc_stepper.html' %}
+    <hr />
+    <div>{% include 'dsrc_dj/core/compositions/forms/dsrc_form_base.html' %}</div>
+{% endblock %}
+{# block main %}
+    {# block center_content %}
         <div class="col-11 col-lg-9 py-5 mx-auto font-marianne">
             <nav class="mb-4 pb-1">
                 <ol class="list-unstyled d-flex align-items-center">
@@ -210,5 +215,5 @@
                 <button type="submit" class="button filled mt-4">Envoyer ma demande</button>
             </form>
         </div>
-    {% endblock %}
-{% endblock %}
+    {% endblock #}
+{% endblock #}
