@@ -1,12 +1,16 @@
 {% include 'dsrc_dj/dsrc_base.html' %}
+{% load static %}
 {% block main %}
     {% include 'dsrc_dj/core/pages/dsrc_page_header.html' %}
     <main role="main" id="content">
         {# include 'dsrc_dj/core/layouts/dsrc_center.html' #}
         <div class="fr-container fr-container--fluid fr-mb-md-14v">
-            <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
-                <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
-                    {% block center_content %}{% endblock %}
+            <div class="fr-grid-row fr-grid-row--gutters">
+                <div class="fr-col-12 fr-col-md-4">
+                    {% block sidebar_side_content %}{% endblock %}
+                </div>
+                <div class="fr-col-12 fr-col-md-8 fr-py-12v">
+                    {% block sidebar_main_content %}{% endblock %}
                 </div>
             </div>
         </div>
