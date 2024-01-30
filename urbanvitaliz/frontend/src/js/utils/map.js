@@ -56,18 +56,20 @@ function makeMap(idMap, project, options, zoom) {
 
     var map = new L.map(idMap, {...options});
 
-		var baseLayer = initSatelliteLayer(latitude, longitude, zoom);
-    /* If Satellite isn't available, try OSM tiles instead */
-    if (baseLayer == null) {
-        baseLayer = initMapLayer(latitude, longitude, zoom);
-    }
 
-    if (baseLayer)
-        map.addLayer(baseLayer);
-    else
-        console.error("Unable to initialize any layer, map tiling will be empty!");
+    /* If Satellite isn't available, add OSM tiles as backup */
+    var osmLayer = initMapLayer(latitude, longitude, zoom);
+    if (osmLayer)
+        map.addLayer(osmLayer);
+
+    var satelliteLayer = initSatelliteLayer(latitude, longitude, zoom);
+    if (satelliteLayer)
+        map.addLayer(satelliteLayer);
 
     map.setView(new L.LatLng(latitude, longitude), zoom);
+
+    // geolocUtils.createPolygonFromBounds(map, geolocUtils.IGN_BBOX).addTo(map);
+
 
     return map;
 

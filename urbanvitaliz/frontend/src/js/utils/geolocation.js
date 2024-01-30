@@ -11,9 +11,25 @@ const API_ADRESSE = 'https://api-adresse.data.gouv.fr';
 
 const LAT_LNG_FRANCE = [46.5,1.20]; // latitude and longitude of centroid of France
 const IGN_BBOX = new L.LatLngBounds(
-    new L.LatLng(-63.3725,  55.9259),
-    new L.LatLng(51.3121, -21.4756));
+    new L.LatLng(-63.3725, -21.4756),
+    new L.LatLng(51.3121, 55.9259));
 
+
+function createPolygonFromBounds(map, latLngBounds) {
+    var center = latLngBounds.getCenter();
+    var latlngs = [];
+
+    latlngs.push(latLngBounds.getSouthWest());//bottom left
+    latlngs.push({ lat: latLngBounds.getSouth(), lng: center.lng });//bottom center
+    latlngs.push(latLngBounds.getSouthEast());//bottom right
+    latlngs.push({ lat: center.lat, lng: latLngBounds.getEast() });// center right
+    latlngs.push(latLngBounds.getNorthEast());//top right
+    latlngs.push({ lat: latLngBounds.getNorth(), lng: map.getCenter().lng });//top center
+    latlngs.push(latLngBounds.getNorthWest());//top left
+    latlngs.push({ lat: map.getCenter().lat, lng: latLngBounds.getWest() });//center left
+
+    return new L.polygon(latlngs);
+}
 
 function getGlobalCityCodeFromCodeInsee(codeInsee) {
 	if (COMMUNES_PARIS.includes(codeInsee)) {
@@ -95,6 +111,7 @@ export default {
 	fetchCommuneIgn,
 	fetchParcelsIgn,
 	fetchGeolocationByAddress,
+    createPolygonFromBounds,
 	LAT_LNG_FRANCE,
   IGN_BBOX
 };
