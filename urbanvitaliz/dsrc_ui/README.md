@@ -7,7 +7,7 @@ Ce paquet contient:
 1. Une biliothèque de polices de caractères
 1. Une bibliothèaque d'icônes
 
-Les deux biliothèques ci-dessus sont basées sur le [Système de Design de l'État (DSFR) Version Courante](https://www.systeme-de-design.gouv.fr/a-propos/versions/version-courante/) ( v1.11.0 ).
+Les biliothèques ci-dessus sont basées sur le [Système de Design de l'État (DSFR) Version Courante](https://www.systeme-de-design.gouv.fr/a-propos/versions/version-courante/) ( v1.11.0 ).
 
 Le paquet centralise la séléction des ressources front nécéssaires au projet et leur export dans le dossier `static/assets` du projet racine Django.
 
