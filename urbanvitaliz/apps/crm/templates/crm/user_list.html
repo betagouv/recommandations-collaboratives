@@ -93,7 +93,7 @@
                 </thead>
                 <tbody>
                     {% for user in users.qs %}
-                    <tr>
+                    <tr class="{% if not user.is_active %}text-decoration-line-through{% endif %}">
                         <td><a href="{% url 'crm-user-details' user.pk %}">{{ user.username|truncatechars:48 }}</a></td>
                         <td>{{ user.first_name }}</td>
                         <td>{{ user.last_name }}</td>
