@@ -28,13 +28,14 @@ function MapViewerStatic(projectOptions) {
 		async initMap(project, geoData) {
 			const options = mapUtils.mapOptions({interactive: false});
 
-			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
-			let markers = mapUtils.initMarkerLayer(Map, project, geoData);
+        var map = mapUtils.makeMap("map-static", project, options, this.zoom);
+
+			let markers = mapUtils.initMarkerLayer(map, project, geoData);
 			if(!markers || markers.length === 0) 	{
-				mapUtils.initMapLayers(Map, project, geoData);
+				mapUtils.initMapLayers(map, project, geoData);
 			}
-			setTimeout(function(){Map.invalidateSize();}, 10);
-			return Map;
+			setTimeout(function(){map.invalidateSize();}, 10);
+			return map;
 		},
 		openProjectMapModal() {
 			this.mapModal = this.$store.geolocation.getModal();

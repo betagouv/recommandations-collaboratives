@@ -42,7 +42,7 @@ function getDefaultLatLngForLayers(project, geoData) {
 function getDefaultLatLngForMap(project) {
 	const longitude = project.location_x ? project.location_x
 		: project.commune.longitude ? project.commune.longitude
-			: geolocUtils.LAT_LNG_FRANCE[0];
+			: geolocUtils.LAT_LNG_FRANCE[1];
 	const latitude = project.location_y ? project.location_y
 		: project.commune.latitude ? project.commune.latitude
 			: geolocUtils.LAT_LNG_FRANCE[0];
@@ -50,23 +50,48 @@ function getDefaultLatLngForMap(project) {
 	return [latitude, longitude];
 }
 
+// Map creation shortcuts
+function makeMap(idMap, project, options, zoom) {
+    const [latitude, longitude] = getDefaultLatLngForMap(project);
+
+    var map = new L.map(idMap, {...options});
+
+		var baseLayer = initSatelliteLayer(latitude, longitude, zoom);
+    /* If Satellite isn't available, try OSM tiles instead */
+    if (baseLayer == null) {
+        baseLayer = initMapLayer(latitude, longitude, zoom);
+    }
+
+    if (baseLayer)
+        map.addLayer(baseLayer);
+    else
+        console.error("Unable to initialize any layer, map tiling will be empty!");
+
+    map.setView(new L.LatLng(latitude, longitude), zoom);
+
+    return map;
+
+}
+
 // Map base layer
-function initMap(idMap, project, options, zoom) {
-	const [latitude, longitude] = getDefaultLatLngForMap(project);
-	L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+function initMapLayer(lat, lng, zoom) {
+    console.debug("initializing OSM layer...");
+	return L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
 		maxZoom: 20,
 		attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	});
 
-	const osm = L.tileLayer.provider('OpenStreetMap.France');
-
-	return L.map(idMap, {...options, layers:[osm]}).setView(new L.LatLng(latitude, longitude), zoom);
 }
 
-function initSatelliteMap(idMap, project, options, zoom) {
-	const [latitude, longitude] = getDefaultLatLngForMap(project);
+function initSatelliteLayer(lat, lng, zoom) {
 
-	const ign =	L.tileLayer(
+  if (!geolocUtils.IGN_BBOX.contains(new L.LatLng(lat, lng))) {
+    console.warn("Coordinates outside of IGN Tiles range, stopping initialization");
+    return null;
+  }
+
+    console.debug("initializing Satellite layer...");
+	return L.tileLayer(
 		ignServiceURL('ORTHOIMAGERY.ORTHOPHOTOS', 'essentiels', 'image/jpeg'), {
 			minZoom : 0,
 			maxZoom : 20,
@@ -74,7 +99,6 @@ function initSatelliteMap(idMap, project, options, zoom) {
 			attribution : 'IGN-F/Géoportail'
 		});
 
-	return L.map(idMap, {...options, layers:[ign]}).setView(new L.LatLng(latitude, longitude), zoom);
 }
 
 
@@ -193,7 +217,7 @@ function addLayerParcels(map,  geoData) {
 	if(geoData.code && geoData.code === 400 || geoData.features?.length === 0) {
 		throw Error(`Données parcelaires indisponibles pour la commune "${geoData.commune.name}"`)
 	}
-	const parcelLayer = L.geoJSON(geoData, mapLayerStyles('area-parcels'));
+	const parcelLayer = L.geoJSON(geoData.parcels, mapLayerStyles('area-parcels'));
 	const overlayMap = {
     "Parcelles": parcelLayer
 	};
@@ -246,8 +270,9 @@ function mapOptions({interactive, zoom}) {
 }
 
 export default {
-	initMap,
-	initSatelliteMap,
+  makeMap,
+	initMapLayer,
+	initSatelliteLayer,
 	initMarkerLayer,
 	initMapLayers,
 	initMapControllerBAN,

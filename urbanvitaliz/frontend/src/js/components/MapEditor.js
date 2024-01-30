@@ -36,7 +36,7 @@ function MapEditor(projectOptions) {
 		async initMap(project, geoData) {
 			// Init map with base layer
 			const options = mapUtils.mapOptions({interactive: true});
-			const Map =  await mapUtils.initSatelliteMap('map-edit', project, options, this.zoom);
+			const Map =  mapUtils.makeMap('map-edit', project, options, this.zoom);
 
 			// Add onclick behaviour for address input field (geocoderBAN)
 			const onClick = (coordinates) => this.updateProjectLocation(coordinates);
@@ -46,7 +46,7 @@ function MapEditor(projectOptions) {
 
 			const geocoderBAN =	mapUtils.initMapControllerBAN(Map, geoData, onClick, project, this.markers);
 			if(geoData?.parcels) {
-				await  mapUtils.addLayerParcels(Map, geoData.parcels);
+				await  mapUtils.addLayerParcels(Map, geoData);
 			}
 
 			// Add zoom controls

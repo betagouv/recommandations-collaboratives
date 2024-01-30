@@ -28,25 +28,31 @@ function MapViewerInteractive(projectOptions) {
 		async initMap(project, geoData) {
 			// Init Interactive Map
 			const options = mapUtils.mapOptions({interactive: true});
-			const Map = mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom);
-			let markers = mapUtils.initMarkerLayer(Map, project, geoData);
+
+
+      var map = mapUtils.makeMap("map-interactive", project, options, this.zoom);
+
+			let markers = mapUtils.initMarkerLayer(map, project, geoData);
 
 			if(!markers || markers.length === 0) 	{
-				mapUtils.initMapLayers(Map, project, geoData);
+				mapUtils.initMapLayers(map, project, geoData);
 			}
 			if(geoData?.parcels) {
-				await  mapUtils.addLayerParcels(Map, geoData.parcels);
+				  await  mapUtils.addLayerParcels(map, geoData);
 			}
-			Map.setMinZoom(this.zoom - 7);
-			Map.setMaxZoom(this.zoom + 6);
+
+			map.setMinZoom(this.zoom - 7);
+			map.setMaxZoom(this.zoom + 6);
 			L.control.zoom({
 				position: 'topright',
 				color: '#335B7E',
-			}).addTo(Map);
+			}).addTo(map);
+
 			const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(project, geoData);
-			Map.panTo(new L.LatLng(latitude, longitude));
-			this.$store.geolocation.initMapModal(Map);
-			return Map;
+			map.panTo(new L.LatLng(latitude, longitude));
+			this.$store.geolocation.initMapModal(map);
+
+			return map;
 		},
 	};
 }

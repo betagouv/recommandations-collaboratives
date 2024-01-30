@@ -1,3 +1,4 @@
+import * as L from 'leaflet';
 
 const COMMUNES_LYON = ['69381','69382','69383','69384','69385','69386','69387','69388','69389'];
 const COMMUNES_MARSEILLE = ['13201','13202','13203','13204','13205','13206','13207','13208','13209','13210','13211','13212','13213','13214','13215','13216'];
@@ -9,6 +10,10 @@ const API_CADASTRE = 'https://apicarto.ign.fr/api/cadastre';
 const API_ADRESSE = 'https://api-adresse.data.gouv.fr';
 
 const LAT_LNG_FRANCE = [46.5,1.20]; // latitude and longitude of centroid of France
+const IGN_BBOX = new L.LatLngBounds(
+    new L.LatLng(-63.3725,  -21.4756),
+    new L.LatLng(55.9259, 51.3121));
+
 
 function getGlobalCityCodeFromCodeInsee(codeInsee) {
 	if (COMMUNES_PARIS.includes(codeInsee)) {
@@ -90,5 +95,6 @@ export default {
 	fetchCommuneIgn,
 	fetchParcelsIgn,
 	fetchGeolocationByAddress,
-	LAT_LNG_FRANCE
+	LAT_LNG_FRANCE,
+  IGN_BBOX
 };
