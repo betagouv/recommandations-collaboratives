@@ -13,10 +13,6 @@ function ProjectLocation(projectOptions, modal=true) {
 		zoom: 8,
 		isLoading: false,
 
-		get isBusy() {
-				return this.isLoading
-		},
-
 		async init() {
 			this.isLoading = true;
 			this.project = {
@@ -27,7 +23,7 @@ function ProjectLocation(projectOptions, modal=true) {
 					longitude: projectOptions.commune.longitude
 				}
 			}
-			const { latitude, longitude, insee, name } = this.project.commune;
+			const { latitude, longitude, insee } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
 			const geoData = {}
 
@@ -36,10 +32,12 @@ function ProjectLocation(projectOptions, modal=true) {
 				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
 					geolocUtils.fetchParcelsIgn(insee),
 					geolocUtils.fetchCommuneIgn(insee),
-					geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`)
+					geolocUtils.fetchGeolocationByAddress(`${this.project.location}`)
 				]);
 			} catch(e) {
 				console.log(e)
+			} finally {
+				this.isLoading = false;
 			}
 			await this.initStaticMap(this.project, geoData);
 			if(modal) {
@@ -47,7 +45,6 @@ function ProjectLocation(projectOptions, modal=true) {
 			}
 			let map = this.staticMap
 			setTimeout(function(){map.invalidateSize()}, 0);
-			this.isLoading = false;
 		},
 
 		async initStaticMap(project, geoData) {
@@ -56,7 +53,7 @@ function ProjectLocation(projectOptions, modal=true) {
 			const Map = await mapUtils.initSatelliteMap('map-static', project, options, this.zoom);
 			this.staticMap = Map;
 			let markers = mapUtils.initMarkerLayer(this.staticMap, project, geoData);
-			if(!markers) {
+			if(!markers || markers.length === 0) 	{
 				mapUtils.initMapLayers(this.staticMap, project, geoData);
 			}
 		},
@@ -69,7 +66,7 @@ function ProjectLocation(projectOptions, modal=true) {
 			const Map = mapUtils.initSatelliteMap('map-interactive', project, options, this.zoom + 3);
 			this.interactiveMap = Map;
 			let markers = mapUtils.initMarkerLayer(this.interactiveMap, project, geoData);
-			if(markers.length === 0) 	{
+			if(!markers || markers.length === 0) 	{
 				mapUtils.initMapLayers(this.interactiveMap, project, geoData);
 			}
 			if(geoData.parcels) {

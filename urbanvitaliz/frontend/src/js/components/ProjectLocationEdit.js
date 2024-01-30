@@ -11,10 +11,6 @@ function ProjectLocationEdit(projectOptions) {
 		markers: null,
 		isLoading: false,
 
-		get isBusy() {
-				return this.isLoading
-		},
-
 		async init() {
 			this.isLoading = true;
 			this.project = {
@@ -25,21 +21,21 @@ function ProjectLocationEdit(projectOptions) {
 					longitude: projectOptions.commune.longitude,
 				}
 			}
-			const { latitude, longitude, insee, name, postal } = this.project.commune;
+			const { latitude, longitude, insee } = this.project.commune;
 			this.zoom = latitude && longitude ? this.zoom + 8 : this.zoom;
 			const geoData = {}
 			try {
 				[geoData.parcels, geoData.commune, geoData.location] = await Promise.all([
 					geolocUtils.fetchParcelsIgn(insee),
 					geolocUtils.fetchCommuneIgn(insee),
-					geolocUtils.fetchGeolocationByAddress(`${this.project.location} ${name} ${insee}`)
+					geolocUtils.fetchGeolocationByAddress(`${this.project.location}`)
 				]);
+				await this.initInteractiveMap(this.project, geoData);
 			} catch(e) {
-				console.log(e)
+				// console.log(e)
+			} finally {
+				this.isLoading = false;
 			}
-			await this.initInteractiveMap(this.project, geoData);
-
-			this.isLoading = false;
 		},
 
 		updateProjectLocation(coordinates)  {
@@ -90,7 +86,6 @@ function ProjectLocationEdit(projectOptions) {
 				Map.panTo(new L.LatLng(e.latlng.lat, e.latlng.lng));
 			});
 
-			// Force a map redraw
 			setTimeout(function(){Map.invalidateSize()}, 0);
 		},
 	}
