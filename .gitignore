@@ -42,3 +42,6 @@ notebooks/**/.ipynb_checkpoints/
 *.ipynb
 dsrc_doc/*.md
 !dsrc_doc/README.md
+
+## DSRC UI Library
+urbanitaliz/dsrc_ui//**/.vitepress
