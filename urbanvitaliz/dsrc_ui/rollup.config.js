@@ -1,6 +1,3 @@
-import * as glob from 'glob';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import terser from '@rollup/plugin-terser';
 import resolve from '@rollup/plugin-node-resolve';
 

@@ -464,6 +464,13 @@
     loupe "^2.3.7"
     pretty-format "^29.7.0"
 
+"@web/rollup-plugin-copy@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@web/rollup-plugin-copy/-/rollup-plugin-copy-0.5.1.tgz#9d12dbc13de7a46a933524091dbb787d9466d136"
+  integrity sha512-crDMXiT/Okn5nVQIEtXShB3NmGS9gQipD1s4kZwrTG+lu5TV665gfDzMFBzezo1e7ARTGd4d4p4EB0gy/JuNJQ==
+  dependencies:
+    glob "^10.0.0"
+
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
@@ -1161,7 +1168,7 @@ glob-parent@^6.0.2:
   dependencies:
     is-glob "^4.0.3"
 
-glob@^10.3.10, glob@^10.3.7:
+glob@^10.0.0, glob@^10.3.7:
   version "10.3.10"
   resolved "https://registry.yarnpkg.com/glob/-/glob-10.3.10.tgz#0351ebb809fd187fe421ab96af83d3a70715df4b"
   integrity sha512-fa46+tv1Ak0UPK1TOy/pZrIybNNt4HCv7SDzwyfiOZkvZLEbjsZkJBPtDHVshZjbecAoAGSC20MjLDG/qr679g==
