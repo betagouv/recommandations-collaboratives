@@ -13,7 +13,7 @@ Le paquet centralise la séléction des ressources front nécéssaires au projet
 
 Les resources prises en charge par le paquet sont:
 
-- intégration de modules externes JavaScript et CSS (sousdossiers `ext`)
+- intégration de modules externes JavaScript et CSS (sousdossiers `src/**/ext`)
 - modules JavaScript (`src/lib/components`)
 - feuilles de style (`src/lib/styles/scss/core`, compilées en CSS dans le dossier `static` en sortie)
 - surcharges de variables CSS (`src/lib/styles/scss/tokens`, compilées en CSS dans le dossier `static` en sortie)
