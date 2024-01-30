@@ -32,3 +32,9 @@ class PhoneFiltersTestCase(TestCase):
     expected_output = '0'
     result = format_phone(phone_number)
     self.assertEqual(result, expected_output)
+
+  def test_format_already_format_phone(self):
+    phone_number = '01 23 45 67 89'
+    expected_output = '01 23 45 67 89'
+    result = format_phone(phone_number)
+    self.assertEqual(result, expected_output)
