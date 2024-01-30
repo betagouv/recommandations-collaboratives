@@ -1,0 +1,5 @@
+{% load static %}
+{% block js %}
+    <script src="{% static 'assets/index.js' %}" type="module"></script> {# TODO: import nomodule too #}
+    <script src="{% static 'assets/js/components/DsrcButton.js' %}" type="module"></script>
+{% endblock %}
