@@ -1,32 +1,12 @@
-{% load static %}
-{% load django_vite %}
 <!DOCTYPE html>
 <html lang="fr" data-fr-scheme="system">
     {% include 'dsrc_dj/core/blocks/global/dsrc_head.html' %}
+    {% block head %}{% endblock %}
     <body>
-        <main role="main" id="content">
-            {% block main %}
-                <h1>DSRC Django Template Library</h1>
-                {% block page_header %}
-                    {% include 'dsrc_dj/core/pages/dsrc_page_header.html' %}
-                {% endblock %}
-                <div class="fr-container fr-container--fluid fr-mb-md-14v">
-                    <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
-                        <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
-                            <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-pt-10v fr-pt-md-14v fr-pb-6v fr-pb-md-10v">
-                                <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
-                                    <div class="fr-col-12 fr-col-md-10 fr-col-lg-9">
-                                        {% include 'dsrc_dj/core/compositions/dsrc_stepper.html' %}
-                                        <hr />
-                                        <div>{% include 'dsrc_dj/core/compositions/dsrc_form.html' %}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endblock %}
-        </main>
+        {% include 'dsrc_dj/core/blocks/global/dsrc_header.html' %}
+        {% block app_header %}{% endblock %}
+        {% block main %}{% endblock %}
         {% include 'dsrc_dj/core/blocks/global/dsrc_scripts.html' %}
+        {% block app_scripts %}{% endblock %}
     </body>
 </html>

@@ -1,4 +1,4 @@
-{% extends "dsrc_dj/dsrc_base.html" %}
+{% extends "dsrc_dj/core/pages/dsrc_page_center.html" %}
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/onboarding.js' %}
@@ -6,7 +6,7 @@
 {% load static %}
 {% block title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
 {% block og_title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
-{% block content %}
+{% block main_content %}
     <div class="col-11 col-lg-9 py-5 mx-auto font-marianne">
         <nav class="mb-4 pb-1">
             <ol class="list-unstyled d-flex align-items-center">
