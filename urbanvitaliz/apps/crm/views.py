@@ -11,6 +11,14 @@ from collections import Counter, OrderedDict, defaultdict
 
 from actstream import action
 from actstream.models import Action, actor_stream, target_stream
+from allauth.account.models import EmailAddress
+from allauth.account.utils import (
+    filter_users_by_email,
+    setup_user_email,
+    send_email_confirmation,
+)
+from django import forms as django_forms
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
@@ -22,6 +30,7 @@ from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
 from guardian.shortcuts import get_users_with_perms
@@ -345,7 +354,7 @@ def user_list(request):
 def user_update(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
     profile = crm_user.profile
 
     group_name = make_group_name_for_site("advisor", request.site)
@@ -354,17 +363,59 @@ def user_update(request, user_id=None):
     if request.method == "POST":
         form = forms.CRMProfileForm(request.POST, instance=profile)
         if form.is_valid():
-            # update profile object
-            form.save()
-            # update user object
-            crm_user.first_name = form.cleaned_data.get("first_name")
-            crm_user.last_name = form.cleaned_data.get("last_name")
-            crm_user.save()
-            return redirect(reverse("crm-user-details", args=[crm_user.id]))
+            with transaction.atomic():
+                username = form.cleaned_data.get("username")
+                email_changed = username != crm_user.username
+                if email_changed:
+                    users = filter_users_by_email(username)
+                    if len(users) > 0:
+                        # a user with the new mail already exist
+                        if request.site in users[0].profile.sites.all():  # on same site
+                            user_link = reverse("crm-user-details", args=[users[0].pk])
+                            error_msg = mark_safe(
+                                f'L\'utilisateur <a href="{user_link}">{users[0].first_name} {users[0].last_name}</a>'
+                                " utilise déjà cette adresse email."
+                            )
+                            form.add_error(
+                                "username", django_forms.ValidationError(error_msg)
+                            )
+                        else:  # on an other site
+                            form.add_error(
+                                "username",
+                                django_forms.ValidationError(
+                                    "L'adresse email est déjà utilisée."
+                                ),
+                            )
+
+                    else:
+                        # delete old email address
+                        EmailAddress.objects.filter(user=crm_user).delete()
+
+                        # setup new email address
+                        crm_user.username = username
+                        crm_user.email = username
+
+                if form.is_valid():  # maybe email update threw an error in the meantime
+                    # update profile object
+                    form.save()
+
+                    # update user object
+                    crm_user.first_name = form.cleaned_data.get("first_name")
+                    crm_user.last_name = form.cleaned_data.get("last_name")
+                    crm_user.save()
+
+                    success_message = "Les informations de l'utilisateur ont été modifiées avec succès."
+                    if email_changed:
+                        setup_user_email(request, crm_user, [])
+                        send_email_confirmation(request, crm_user, signup=True)
+
+                    messages.success(request, success_message)
+                    return redirect(reverse("crm-user-details", args=[crm_user.id]))
     else:
         form = forms.CRMProfileForm(
             instance=profile,
             initial={
+                "username": crm_user.username,
                 "first_name": crm_user.first_name,
                 "last_name": crm_user.last_name,
             },
@@ -380,7 +431,7 @@ def user_update(request, user_id=None):
 def user_deactivate(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.method == "POST":
         crm_user.is_active = False
@@ -400,7 +451,7 @@ def user_deactivate(request, user_id=None):
 def user_reactivate(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.method == "POST":
         crm_user.is_active = True
@@ -420,7 +471,7 @@ def user_reactivate(request, user_id=None):
 def user_set_advisor(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
     profile = crm_user.profile
 
     if request.method == "POST":
@@ -443,7 +494,7 @@ def user_set_advisor(request, user_id=None):
 def user_unset_advisor(request, user_id=None):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
     profile = crm_user.profile
 
     if request.method == "POST":
@@ -462,7 +513,7 @@ def user_unset_advisor(request, user_id=None):
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
@@ -493,7 +544,7 @@ def user_details(request, user_id):
 def user_project_interest(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.site not in crm_user.profile.sites.all():
         # only for user of current site
@@ -514,7 +565,7 @@ def user_project_interest(request, user_id):
 def user_notifications(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.site not in crm_user.profile.sites.all():
         # only for user of current site
@@ -533,7 +584,7 @@ def user_notifications(request, user_id):
 def user_reminders(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.site not in crm_user.profile.sites.all():
         # only for user of current site
@@ -559,7 +610,7 @@ def user_reminders(request, user_id):
 def user_reminder_details(request, user_id, reminder_pk):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id)
+    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
     if request.site not in crm_user.profile.sites.all():
         # only for user of current site
         raise Http404

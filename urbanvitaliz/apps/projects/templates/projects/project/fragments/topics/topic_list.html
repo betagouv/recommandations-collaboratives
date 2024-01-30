@@ -31,7 +31,7 @@
         </article>
     {% else %}
         <article class="l-stack">
-            {% if project.topics.all.count == 0 %}
+            {% if project.topics.all.count == 0 and project.task_topics.all.count == 0 %}
                 <article class="project-card-details l-stack empty">
                     <p class="m-0 text-info-custom text-grey fw-normal pb-3 text-center">
                         Il n'y a aucune thématique associée au projet pour le moment

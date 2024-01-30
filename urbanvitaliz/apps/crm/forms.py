@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.models import User
 from markdownx.fields import MarkdownxFormField
 
 from urbanvitaliz.apps.home import models as home_models
@@ -12,6 +13,10 @@ class CRMProfileForm(forms.ModelForm):
 
     first_name = forms.CharField(max_length=64, required=True)
     last_name = forms.CharField(max_length=64, required=True)
+    username = forms.EmailField(
+        required=True,
+        help_text="En cas de modification, un email sera envoyé pour vérifier la nouvelle adresse.",
+    )
 
     class Meta:
         model = home_models.UserProfile

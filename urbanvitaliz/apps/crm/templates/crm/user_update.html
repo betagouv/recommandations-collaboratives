@@ -95,13 +95,14 @@
             <form method="POST" action="{% url 'crm-user-update' crm_user.pk %}">
                 {% csrf_token %}
                 {{ form.non_field_errors }}
+                {% for error in form.username.errors %}<div class="text-danger mb-3">{{ error }}</div>{% endfor %}
                 <div class="input-group mb-3">
                     <label for="{{ form.username.name }}" class="col-sm-2 col-form-label">
                         Identifiant de connexion<br/>
-                        <i class="small">Pour le changer, contactez un·e administrateur·trice Reco-co.</i>
+                        <i class="small">{{ form.username.help_text }}</i>
                     </label>
                     <div class="col-sm-5">
-                        <input readonly type="text" class="form-control" id="{{ form.username.name }}" name="{{form.username.name }}" value="{{ crm_user.username }}">
+                        <input type="email" class="form-control" id="{{ form.username.name }}" name="{{form.username.name }}" value="{{ form.username.value|default:'' }}">
                     </div>
                 </div>
 

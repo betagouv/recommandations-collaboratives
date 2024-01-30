@@ -49,9 +49,10 @@ const config = {
 				tutorial: resolve('./src/js/apps/tutorial.js'),
 				contactList: resolve('./src/js/apps/contactList.js'),
 				projectDetailsCss: resolve('./src/css/projectDetails.css'),
-				projectLocation: resolve('./src/js/apps/projectLocation.js'),
+				mapViewerStatic: resolve('./src/js/apps/mapViewerStatic.js'),
+				mapViewerInteractive: resolve('./src/js/apps/mapViewerInteractive.js'),
 				projectEmailReminder: resolve('./src/js/apps/projectEmailReminder.js'),
-				projectLocationEdit: resolve('./src/js/apps/projectLocationEdit.js')
+				mapEditor: resolve('./src/js/apps/mapEditor.js')
 			},
 			output: {
 				chunkFileNames: undefined

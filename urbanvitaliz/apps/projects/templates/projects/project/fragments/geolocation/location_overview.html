@@ -1,40 +1,4 @@
-{% load static %}
-{% load django_vite %}
-{{ project.name|json_script:"nameProject" }}
-{{ project.status|json_script:"status" }}
-{{ project.location|json_script:"location" }}
-{{ project.location_x|json_script:"location_x" }}
-{{ project.location_y|json_script:"location_y" }}
-{{ project.commune.name|json_script:"nameCommune" }}
-{{ project.commune.postal|json_script:"postal" }}
-{{ project.commune.insee|json_script:"insee" }}
-{{ project.commune.latitude|json_script:"latitude" }}
-{{ project.commune.longitude|json_script:"longitude" }}
-{% block js %}
-    {% vite_asset 'js/apps/projectLocation.js' %}
-    <script>
-        const projectOptions = {
-            name: JSON.parse(document.getElementById('nameProject').textContent),
-            status: JSON.parse(document.getElementById('status').textContent),
-            location: JSON.parse(document.getElementById('location').textContent),
-            location_x: JSON.parse(document.getElementById('location_x').textContent),
-            location_y: JSON.parse(document.getElementById('location_y').textContent),
-            commune: {
-                name: JSON.parse(document.getElementById('nameCommune').textContent),
-                postal: JSON.parse(document.getElementById('postal').textContent),
-                insee: JSON.parse(document.getElementById('insee').textContent),
-                longitude: JSON.parse(document.getElementById('longitude').textContent),
-                latitude: JSON.parse(document.getElementById('latitude').textContent),
-            }
-        }
-    </script>
-{% endblock %}
 {% block content %}
-    <div x-data='ProjectLocation(projectOptions)'
-         data-test-id="project-overview-map"
-         class="location-overview">
-        {% include 'projects/project/fragments/geolocation/project_map.html' with controls=True %}
-        {% include 'projects/project/fragments/geolocation/location_overview_footer.html' %}
-    </div>
-    {% include "projects/project/fragments/geolocation/project_map_modal.html" %}
+    {% include 'projects/project/fragments/geolocation/project_map.html' with controls=True %}
+    {% include 'projects/project/fragments/geolocation/location_overview_footer.html' with project=project %}
 {% endblock %}

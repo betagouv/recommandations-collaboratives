@@ -32,26 +32,28 @@
                 </div>
                 <div :class="item.isLoading && 'project-item-is-loading'"
                      class="project-item d-flex flex-column justify-content-between align-items-start w-100">
-                    <template x-if="item.project.inactive_since !== null">
-                        <div class="project-card-top-information inactive left-0">
-                            <span>Conseil en pause</span>
-                        </div>
-                    </template>
-                    <template x-if="item.project.inactive_since == null && item.status === 'NEW'">
-                        <div class="project-card-top-information new left-0">
-                            <span>Nouveau projet</span>
-                        </div>
-                    </template>
-                    <template x-if="item.project.inactive_since == null && item.project.is_observer">
-                        <div class="project-card-top-information observer left-0">
-                            <span>Observateur</span>
-                        </div>
-                    </template>
-                    <template x-if="item.project.inactive_since == null && item.project.is_switchtender && !item.project.is_observer">
-                        <div class="project-card-top-information advisor left-0">
-                            <span>Conseiller</span>
-                        </div>
-                    </template>
+                    <div class="project-card-top-information-container">
+                      <template x-if="item.project.inactive_since !== null">
+                          <div class="project-card-top-information inactive left-0">
+                              <div>Conseil en pause</div>
+                          </div>
+                      </template>
+                      <template x-if="item.project.inactive_since == null && item.status === 'NEW'">
+                          <div class="project-card-top-information new left-0">
+                              <div>Non consulté</div>
+                          </div>
+                      </template>
+                      <template x-if="item.project.inactive_since == null && item.project.is_observer">
+                          <div class="project-card-top-information observer left-0">
+                              <div>Observateur</div>
+                          </div>
+                      </template>
+                      <template x-if="item.project.inactive_since == null && item.project.is_switchtender && !item.project.is_observer">
+                          <div class="project-card-top-information advisor left-0">
+                              <div>Conseiller</div>
+                          </div>
+                      </template>
+                    </div>
                     <header class="d-flex align-items-center justify-content-between w-100 mb-1">
                         <div class="d-flex align-items-center">
                             <a class="project-link d-flex align-items-center"
