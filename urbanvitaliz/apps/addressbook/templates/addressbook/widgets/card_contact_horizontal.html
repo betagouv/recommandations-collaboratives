@@ -1,4 +1,5 @@
 {% load static %}
+{% load phone_filters %}
 
 <!-- Horizontal Card -->
 <div class="card-resource card-resource-horizontal card h-100 w-100" style="min-height: 100px;">
@@ -42,7 +43,7 @@
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone"/>
                 </svg>
                 &nbsp;
-                <a href="tel:{{contact.phone_no}}">{{ contact.phone_no }}</a>
+                <a href="tel:{{contact.phone_no}}">{{ contact.phone_no|format_phone }}</a>
             </div>
             {% endif %}
             {% if contact.mobile_no %}
