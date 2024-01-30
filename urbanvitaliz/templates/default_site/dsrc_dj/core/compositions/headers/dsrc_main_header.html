@@ -6,14 +6,18 @@
                     <div class="fr-header__brand fr-enlarge-link">
                         <div class="fr-header__brand-top">
                             <div class="fr-header__logo">
-                                <p class="fr-logo">{{ request.site }}</p>
+                                <p class="fr-logo">
+                                    République
+                                    <br>
+                                    Française
+                                </p>
                             </div>
                         </div>
                         <div class="fr-header__service">
-                            <a href="/" title="Accueil - {{ request.site }} - {{ request.name }}">
-                                <p class="fr-header__service-title">{{ request.name }}</p>
+                            <a href="/" title="Accueil - DSRC Recommendations Collaboratives">
+                                <p class="fr-header__service-title">DSRC</p>
                             </a>
-                            <p class="fr-header__service-tagline">{{ request.description }}</p>
+                            <p class="fr-header__service-tagline">Système de design pour  Recommendations Collaboratives basé sur DSFR</p>
                         </div>
                     </div>
                 {% endblock %}
@@ -26,7 +30,7 @@
         <div class="fr-container">
             <button class="fr-btn--close fr-btn" aria-controls="modal-491" title="Fermer">Fermer</button>
             <div class="fr-header__menu-links"></div>
+            {% include 'dsrc_dj/core/compositions/navs/dsrc_main_nav.html' %}
         </div>
-        {% include 'dsrc_dj/core/compositions/navs/dsrc_main_nav.html' %}
     </div>
 </header>
