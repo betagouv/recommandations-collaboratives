@@ -50,6 +50,8 @@ document.addEventListener('alpine:init', () => {
 			// Init Modal
 			const element = document.getElementById('project-map-modal');
 			this.mapModal = new bootstrap.Modal(element);
+
+      // XXX Why?
 			element.addEventListener('shown.bs.modal', function (event) {
 				setTimeout(function(){Map.invalidateSize();}, 0);
 			});

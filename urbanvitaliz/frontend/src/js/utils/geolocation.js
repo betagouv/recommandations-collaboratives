@@ -11,8 +11,8 @@ const API_ADRESSE = 'https://api-adresse.data.gouv.fr';
 
 const LAT_LNG_FRANCE = [46.5,1.20]; // latitude and longitude of centroid of France
 const IGN_BBOX = new L.LatLngBounds(
-    new L.LatLng(-63.3725,  -21.4756),
-    new L.LatLng(55.9259, 51.3121));
+    new L.LatLng(-63.3725,  55.9259),
+    new L.LatLng(51.3121, -21.4756));
 
 
 function getGlobalCityCodeFromCodeInsee(codeInsee) {
