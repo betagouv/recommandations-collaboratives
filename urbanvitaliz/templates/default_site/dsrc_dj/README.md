@@ -1,2 +1,1 @@
-# DSRC Django Templaet Library
-
+# DSRC Django Template Library
