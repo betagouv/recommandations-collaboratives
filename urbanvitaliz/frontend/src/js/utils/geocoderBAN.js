@@ -176,7 +176,7 @@ L.Control.GeocoderBAN = L.Control.extend({
 		a.innerHTML = '<strong>' + feature.properties.label + '</strong>, ' + feature.properties.context;
 		li.geocodedFeatures = feature;
 		const clickHandler = function (e) {
-			this.input.value = e.explicitOriginalTarget.outerText;
+			this.input.value = e.currentTarget.outerText;
 			this.minimizeControl();
 			this.geocodeResult(feature);
 			this.options.onUpdate({
