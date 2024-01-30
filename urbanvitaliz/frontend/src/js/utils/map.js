@@ -96,8 +96,10 @@ function initMarkerLayer(map, project, geoData) {
 		// Precise location unknown: don't add a marker
 		}
 	} finally {
-		let markerLayer = L.layerGroup(markers).addTo(map);
-		return [markerLayer]
+		if(marker) {
+			let markerLayer = L.layerGroup(markers).addTo(map);
+			return [markerLayer]
+		}
 	}
 }
 

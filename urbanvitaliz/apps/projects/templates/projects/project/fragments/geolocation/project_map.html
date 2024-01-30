@@ -1,5 +1,5 @@
 {% load static %}
-<div x-show="isBusy"
+<div x-show="isLoading"
      x-transition
      class="project-map-container spinner"
      :class="{'is-small':mapIsSmall}">
@@ -7,7 +7,7 @@
         <span class="visually-hidden">Chargement de la carte...</span>
     </div>
 </div>
-<div x-show="!isBusy"
+<div x-show="!isLoading"
      class="p-0 project-map-container"
      :class="{'is-small':mapIsSmall}"
      data-test-id="project-location">
@@ -32,8 +32,7 @@
         </div>
     {% endif %}
     <div class="p-0 project-map-container" :class="{'is-small':mapIsSmall}">
-        <div x-cloak
-             x-ref="map-static"
+        <div x-ref="map-static"
              id="map-static"
              data-test-id="map-static"
              class="project-map h-100 w-100"></div>
