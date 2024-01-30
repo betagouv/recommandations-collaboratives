@@ -3,8 +3,9 @@
     {% include 'dsrc_dj/core/blocks/global/dsrc_head.html' %}
     {% block head %}{% endblock %}
     <body>
-        {% include 'dsrc_dj/core/compositions/headers/dsrc_main_header.html' %}
-        {% block app_header %}{% endblock %}
+        {% block main_header %}
+            {% include 'dsrc_dj/core/compositions/headers/dsrc_main_header.html' %}
+        {% endblock %}
         {% block main %}{% endblock %}
         {% include 'dsrc_dj/core/blocks/global/dsrc_scripts.html' %}
         {% block app_scripts %}{% endblock %}
