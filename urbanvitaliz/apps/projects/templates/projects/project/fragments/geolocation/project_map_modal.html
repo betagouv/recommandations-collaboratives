@@ -1,30 +1,43 @@
 {% load static %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/apps/mapViewerInteractive.js' %}
+{% endblock %}
 <div class="modal fade modal-xl map-modal"
      id="project-map-modal"
      tabindex="-1"
      aria-labelledby="project-map-modal-label"
      aria-hidden="true">
-  <div class="modal-dialog">
-    <div data-test-id="project-location-modal" class="modal-content">
-      <div class="modal-header">
-        <h6 id="project-map-modal-label" class="fw-bold d-block mb-0">Localisation</h6>
-        <button type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Fermer"></button>
-      </div>
-      <div class="modal-body p-0">
-        <div class="p-0 project-map-container">
-          <div x-cloak
-               x-ref="map-interactive"
-               id="map-interactive"
-               data-test-id="map-interactive"
-               class="project-map h-100 w-100"></div>
+    <div class="modal-dialog">
+        <div data-test-id="project-location-modal" class="modal-content">
+            <div class="modal-header">
+                <h6 id="project-map-modal-label" class="fw-bold d-block mb-0">Localisation</h6>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Fermer"></button>
+            </div>
+            <div x-show="$store.geolocation.isLoading"
+                 x-transition
+                 class="project-map-container spinner">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Chargement de la carte...</span>
+                </div>
+            </div>
+            <div x-show="!$store.geolocation.isLoading"
+                 class="modal-body p-0"
+                 x-data='MapViewerInteractive(projectOptions)'
+                 data-test-id="project-knogwledge-map">
+                <div class="p-0 project-map-container">
+                    <div x-ref="map-interactive"
+                         id="map-interactive"
+                         data-test-id="map-interactive"
+                         class="project-map h-100 w-100"></div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-start">
+                {% include 'projects/project/fragments/geolocation/location_knowledge_footer.html' %}
+            </div>
         </div>
-      </div>
-      <div class="modal-footer justify-content-start">
-        {% include 'projects/project/fragments/geolocation/location_knowledge_footer.html' %}
-      </div>
     </div>
-  </div>
 </div>

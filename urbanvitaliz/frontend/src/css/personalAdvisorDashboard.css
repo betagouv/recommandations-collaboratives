@@ -272,12 +272,14 @@ main {
     color: #222;
 }
 
-.project-card-top-information {
-    position: absolute;
-    top: -12px;
+.project-card-top-information-container {
+  display: flex;
+  position: absolute;
+  top: -12px;
+  gap: 0.8rem
 }
 
-.project-card-top-information span{
+.project-card-top-information div{
     padding: 0.25rem 0.5rem;
     color: white;
     font-size: 12px;
@@ -286,20 +288,20 @@ main {
     border-radius: 2px;
 }
 
-.project-card-top-information.advisor span{
+.project-card-top-information.advisor div{
     background-color: #0063CB;
 }
 
-.project-card-top-information.observer span{
+.project-card-top-information.observer div{
     background-color: #27A658;
 }
 
-.project-card-top-information.new span{
+.project-card-top-information.new div{
     background-color: #FDCD6D;
     color: #222;
 }
 
-.project-card-top-information.inactive span{
+.project-card-top-information.inactive div{
     background-color: #E5E5E5;
     color: #222;
 }
