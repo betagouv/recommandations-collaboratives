@@ -1,5 +1,6 @@
 {% load static %}
 <form class="fr-mb-0" id="{{ form.id }}">
+    {% csrf_token %}
     <fieldset class="fr-mb-0 fr-fieldset"
               id="{{ form.id }}-fieldset"
               aria-labelledby="{{ form.id }}-fieldset-legend {{ form.id }}-fieldset-messages">

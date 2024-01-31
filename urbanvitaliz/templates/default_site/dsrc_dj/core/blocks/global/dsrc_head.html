@@ -1,29 +1,27 @@
 {% load static %}
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="theme-color" content="#000091">
-    <!-- Défini la couleur de thème du navigateur (Safari/Android) -->
-    <link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
-    <!-- 180×180 -->
-    <link rel="icon" href="favicon/favicon.svg" type="image/svg+xml">
-    <link rel="shortcut icon" href="favicon/favicon.ico" type="image/x-icon">
-    <!-- 32×32 -->
-    <link rel="manifest"
-          href="favicon/manifest.webmanifest"
-          crossorigin="use-credentials">
-    <!-- Modifier les chemins relatifs des favicons en fonction de la structure du projet -->
-    <!-- Dans le fichier manifest.webmanifest aussi, modifier les chemins vers les images -->
-    <link href="{% static 'assets/css/dsrc-csstokens.css' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% static 'assets/css/dsrc-csscore.css' %}"
-          rel="stylesheet"
-          type="text/css">
-    {% block css %}{% endblock %}
-    <title>
-        {% block title %}DSRC Django Templates{% endblock %}
-    </title>
-</head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#000091">
+<!-- Défini la couleur de thème du navigateur (Safari/Android) -->
+<link rel="apple-touch-icon" href="favicon/apple-touch-icon.png">
+<!-- 180×180 -->
+<link rel="icon" href="favicon/favicon.svg" type="image/svg+xml">
+<link rel="shortcut icon" href="favicon/favicon.ico" type="image/x-icon">
+<!-- 32×32 -->
+<link rel="manifest"
+      href="favicon/manifest.webmanifest"
+      crossorigin="use-credentials">
+<!-- Modifier les chemins relatifs des favicons en fonction de la structure du projet -->
+<!-- Dans le fichier manifest.webmanifest aussi, modifier les chemins vers les images -->
+<link href="{% static 'assets/css/dsrc-csstokens.css' %}"
+      rel="stylesheet"
+      type="text/css">
+<link href="{% static 'assets/css/dsrc-csscore.css' %}"
+      rel="stylesheet"
+      type="text/css">
+{% block css %}{% endblock %}
+<title>
+    {% block title %}DSRC Django Templates{% endblock %}
+</title>

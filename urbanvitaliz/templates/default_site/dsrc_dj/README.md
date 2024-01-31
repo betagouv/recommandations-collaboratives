@@ -35,3 +35,5 @@ La structure de la bibliothèque est la suivante:
 ```
 
 ## Prise en main
+
+Templates
