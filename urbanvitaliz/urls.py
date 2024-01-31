@@ -62,9 +62,7 @@ router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
 router.register(
     r"organizations", addressbook_rest.OrganizationViewSet, basename="organizations"
 )
-router.register(
-    r"topics", projects_rest.TopicViewSet, basename="topics"
-)
+router.register(r"topics", projects_rest.TopicViewSet, basename="topics")
 router.register(
     r"challenges/definitions",
     training_rest.ChallengeDefinitionViewSet,
@@ -121,9 +119,26 @@ urlpatterns.extend(crm_urls)
 
 if settings.DEBUG:
     import debug_toolbar
+    from drf_spectacular.views import (
+        SpectacularAPIView,
+        SpectacularRedocView,
+        SpectacularSwaggerView,
+    )
 
-    urlpatterns += [path(r"__debug__/", include(debug_toolbar.urls))]
-#    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
-
+    urlpatterns += [
+        path(r"__debug__/", include(debug_toolbar.urls)),
+        path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+        path(
+            "api/schema/swagger-ui/",
+            SpectacularSwaggerView.as_view(url_name="schema"),
+            name="swagger-ui",
+        ),
+        path(
+            "api/schema/redoc/",
+            SpectacularRedocView.as_view(url_name="schema"),
+            name="redoc",
+        ),
+    ]
+    #    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
 
 # eof
