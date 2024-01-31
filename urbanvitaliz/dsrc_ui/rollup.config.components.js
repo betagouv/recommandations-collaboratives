@@ -18,7 +18,7 @@ export default {
 			])
 		)
 	},
-	output: { dir: '../../static/assets/', format: 'esm' },
+	output: { dir: '../../static/assets/js/', format: 'esm' },
 	plugins: [
 		resolve({
 			browser: true
