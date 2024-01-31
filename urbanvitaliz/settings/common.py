@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "magicauth",
     "sass_processor",
     "django_vite",
+    "widget_tweaks",
     "markdownx",
     "dbtemplates",
     "tagging",
