@@ -1,4 +1,6 @@
 {% load static %}
+{% load dsrc_tags %}
+{% load widget_tweaks %}
 <form class="fr-mb-0" id="{{ form.id }}">
     {% csrf_token %}
     <fieldset class="fr-mb-0 fr-fieldset"
@@ -7,17 +9,15 @@
         <legend class="fr-fieldset__legend" id="{{ form.id }}-fieldset-legend">
             <h3 class="fr-h5">{{ form.legend }}</h3>
         </legend>
-        <div class="fr-fieldset__element">
-            <p class="fr-text--sm">{{ form.description }}</p>
-        </div>
-        <div class="fr-fieldset__element">
-            <p class="fr-hint-text">{{ form.hint }}</p>
-        </div>
-        <div class="fr-fieldset__element">{% include 'dsrc_dj/core/blocks/inputs/dsrc_input_text.html' %}</div>
-        <div class="fr-fieldset__element">{% include 'dsrc_dj/core/blocks/inputs/dsrc_input_password.html' %}</div>
-        <div class="fr-fieldset__element">{% include 'dsrc_dj/core/blocks/inputs/dsrc_input_checkbox.html' %}</div>
-        <div class="fr-fieldset__element">{% include 'dsrc_dj/core/blocks/inputs/dsrc_input_checkbox.html' %}</div>
-        <div class="fr-fieldset__element">{% include 'dsrc_dj/core/compositions/forms/dsrc_form_footer.html' %}</div>
-        <div class="fr-messages-group" id="{{ form.id }}" aria-live="polite"></div>
+        {% block form_content %}{% endblock %}
+        {% for field in form.visible_fields %}
+            <div class="fr-fieldset__element">{% include "dsrc_dj/core/blocks/inputs/dsrc_field.html" with field=field %}</div>
+        {% endfor %}
+        {% if form.messages %}
+            <div class="fr-messages-group" id="{{ form.id }}" aria-live="polite">
+                {% for message in form.messages %}<p>message</p>{% endfor %}
+            </div>
+        {% endif %}
     </fieldset>
+    {% include "dsrc_dj/core/compositions/forms/dsrc_form_footer.html" %}
 </form>

@@ -1,1 +1,21 @@
-/Users/patiboh/Clients/UrbanVitaliz/code/django-dsfr/dsfr/templates/dsfr/form_field_snippets/field_snippet.html
+{% load widget_tweaks %}
+{% if field|widget_type == "checkboxinput" %}
+    {% include "dsrc_dj/core/blocks/inputs/dsrc_input_checkbox.html" %}
+{% elif field|widget_type == "checkbox_groupinput" %}
+    {% include "dsrc_dj/core/blocks/inputs/dsrc_input_checkbox_group.html" %}
+{% elif field|widget_type == "radio_groupinput" %}
+    {% include "dsrc_dj/core/blocks/inputs/dsrc_input_radio_group.html" %}
+{% elif field|widget_type == "passwordinput" %}
+    {% include "dsrc_dj/core/blocks/inputs/dsrc_input_password.html" %}
+{% elif field|widget_type == "textinput" %}
+    {% include "dsrc_dj/core/blocks/inputs/dsrc_input_text.html" %}
+{% elif field|widget_type == "selectinput" %}
+    {% include "dsrc_dj/core/blocks/inputs/dsrc_input_select.html" %}
+{% elif field|widget_type == "textareainput" %}
+    {% include "dsrc_dj/core/blocks/inputs/dsrc_input_textarea.html" %}
+{% elif field|widget_type == "richtextinput" %}
+    {% include "dsrc_dj/core/compositions/forms/dsrc_richtext.html" %}
+{% else %}
+    {# Text input fallback #}
+    {# include "dsrc_dj/core/blocks/inputs/dsrc_input_text.html" #}
+{% endif %}
