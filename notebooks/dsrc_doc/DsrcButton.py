@@ -10,13 +10,12 @@ init_django("urbanvitaliz")
 
 # %%
 
-
-from urbanvitaliz.apps.projects.models import Project
 from django.db.models import Model
+from urbanvitaliz.apps.projects.models import Project
+
 
 
 # %%
-
 
 from django.template import Context, Template
 from IPython.display import display, HTML
@@ -61,46 +60,29 @@ button_component = _load_asset("index.js")
 
 template = Template(
     """
-
 {% load static %}
-{% load sass_tags %}
-{% load django_vite %}
+{% load dsrc_tags %}
 {% block css %}
     <style>
         {{csscore}}
     </style>
 {% endblock %}
 
-<table class="fr-table">
-    <tr>
-        <th>Projet</th>
-        <th>Ville</th>
-        <th>Gigs</th>
-    </tr>
-    {% for p in projects %}
-    <tr>
-        <td>{{p.name}}</td>
-        <td>{{p.created_on}}</td>
-        <td>{{p.location}}</td>
-    </tr>
-    {% endfor %}
-</table>
-<ul class="fr-btns-group fr-btns-group--inline-sm unstyled">
-    <li>
-        <button class="fr-btn">Bouton</button>
-    </li>
-    <li>
-        <button class="fr-btn fr-btn--secondary">Bouton Secondaire</button>
-    </li>
-    <li>
-        <button class="fr-btn fr-btn--tertiary">Bouton Tertiaire</button>
-    </li>
-</ul>
+{% dsrc_button data_dict %}
 """
 )
 
+data_dict = {
+    "label": "Label of the button item",
+    "onclick": "button action",
+    "type": "(Optional) type of button (submit or button - default: submit)",
+    "name": "(Optional) name of the button",
+    "is_disabled": "(Optional) boolean that indicate if the button is activated (default: False)",
+    "extra_classes": "(Optional) string with names of extra classes."
+}
+
 context = Context(
-    {"projects": projects.order_by("-created_on")[:5], "csscore": csscore.data}
+    {"data_dict": data_dict, "csscore": csscore.data}
 )
 
 HTML(template.render(context))
@@ -108,6 +90,8 @@ HTML(template.render(context))
 
 # %%
 
-# eof
+
+
+
 
 # %%
