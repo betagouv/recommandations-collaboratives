@@ -2,4 +2,4 @@
 // import * as dsfr_scoped from '../ext/dsfr';
 import * as dsfr from '@gouvfr/dsfr/dist/dsfr.module'; // TODO: import nomodule too
 
-export { dsfr };
+export default { dsfr };
