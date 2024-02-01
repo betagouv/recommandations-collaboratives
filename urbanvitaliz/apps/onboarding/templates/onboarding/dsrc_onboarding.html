@@ -2,14 +2,12 @@
 {% load static %}
 {% block title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
 {% block og_title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
-{% block center_content %}
-    <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-pt-10v fr-pt-md-14v fr-pb-6v fr-pb-md-10v">
-        <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
-            <div class="fr-col-12 fr-col-md-10 fr-col-lg-9">
-                {% include 'dsrc_dj/core/compositions/navs/dsrc_stepper.html' %}
-                <hr />
-                <div>{% include 'dsrc_dj/core/compositions/forms/dsrc_form_base.html' %}</div>
-            </div>
-        </div>
-    </div>
+{% block page_title %}Solliciter {{ request.site }}{% endblock %}
+{% block lead %}
+    Les informations démandées ci-dessous nous permettent de traiter votre demande dans les meilleures conditions.
+{% endblock %}
+{% block form %}
+    {% include 'dsrc_dj/core/compositions/navs/dsrc_stepper.html' %}
+    <hr />
+    <div>{% include 'dsrc_dj/core/compositions/forms/dsrc_form_base.html' %}</div>
 {% endblock %}
