@@ -1,10 +1,6 @@
 <div class="fr-fieldset__element">
     {% if field.field.widget.input_type == "checkbox" %}
         {% include "dsrc_dj/core/blocks/inputs/dsrc_input_checkbox.html" %}
-    {% elif field.field.widget.input_type == "checkbox_group" %}
-        {% include "dsrc_dj/core/blocks/inputs/dsrc_input_checkbox_group.html" %}
-    {% elif field.field.widget.input_type == "radio_group" %}
-        {% include "dsrc_dj/core/blocks/inputs/dsrc_input_radio_group.html" %}
     {% elif field.field.widget.input_type == "password" %}
         {% include "dsrc_dj/core/blocks/inputs/dsrc_input_password.html" %}
     {% elif field.field.widget.input_type == "text" %}

@@ -118,6 +118,10 @@ button = widgets.Button(
     **Usage**:
 
         `{% dsrc_button data_dict %}`
+
+        For JavaScript developers, this is equivalent to writing:
+
+        `<DsrcButton props={data_dict} />` # ~= Svelte / Vue / React
 """
 
 template = Template(
