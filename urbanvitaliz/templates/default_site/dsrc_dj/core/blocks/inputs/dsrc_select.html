@@ -1,7 +1,9 @@
 {% load static %}
 <div class="fr-select-group {% if field.errors %}fr-select-group--error{% endif %} {% if field.is_valid %}fr-select-group--valid{% endif %}">
-    <label class="fr-label" for="select">Label pour liste déroulante</label>
-    <select class="fr-select" id="select" name="select">
+    <label class="fr-label" for="{{ field.id_for_label }}">{{ field.auto_id }}</label>
+    <select class="fr-select"
+            id="{{ field.id_for_label }}"
+            name="{{ field.html_name }}">
         <option value="" selected disabled hidden>Sélectionner une option</option>
         <option value="1">Option 1</option>
         <option value="2">Option 2</option>

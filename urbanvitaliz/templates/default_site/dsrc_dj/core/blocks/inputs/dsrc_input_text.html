@@ -4,13 +4,13 @@
         {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
     </label>
     <input class="fr-input {% if field.errors %}fr-input--error{% endif %}{% if field.is_valid %} fr-input--valid{% endif %}"
-           aria-describedby="{% if field.errors %}{{ field.auto_id }}-desc-error{% elif field.messages %}{{ field.auto_id }}-messages{% elif field.valid_text %}{{ field.auto_id }}-desc-valid{% endif %}"
+           aria-describedby="{% if field.errors %}{{ field.id_for_label }}-desc-error{% elif field.messages %}{{ field.id_for_label }}-messages{% elif field.valid_text %}{{ field.id_for_label }}-desc-valid{% endif %}"
            type="{{ field.field.widget.input_type }}"
-           id="{{ field.auto_id }}"
-           name="{{ field.attr.name }}">
+           id="{{ field.id_for_label }}"
+           name="{{ field.html_name }}">
     {% if field.errors %}
         <div class="fr-messages-group"
-             id="{{ field.auto_id }}-desc-error"
+             id="{{ field.id_for_label }}-desc-error"
              aria-live="polite">
             {% for error in field.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
         </div>
@@ -18,10 +18,10 @@
     {% if field.messages %}
         {% for message in field.messages %}
             <div class="fr-messages-group"
-                 id="{{ field.auto_id }}-messages"
+                 id="{{ field.id_for_label }}-messages"
                  aria-live="polite">
                 {% if field.valid_text %}
-                    <p id="{{ field.auto_id }}-desc-valid" class="fr-valid-text">{{ field.valid_text }}</p>
+                    <p id="{{ field.id_for_label }}-desc-valid" class="fr-valid-text">{{ field.valid_text }}</p>
                 {% endif %}
                 <p>{{ message }}</p>
             </div>
