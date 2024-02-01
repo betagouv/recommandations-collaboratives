@@ -1,11 +1,37 @@
-{% include 'dsrc_dj/dsrc_base.html' %}
+{% extends 'dsrc_dj/dsrc_base.html' %}
 {% block main %}
-    {% include 'dsrc_dj/core/compositions/headers/dsrc_page_header.html' %}
+    {% block page_header %}
+        <div class="fr-container fr-mt-4v fr-mt-md-14v fr-mb-1v fr-mb-md-4v">
+            <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+                <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
+                    <h1 class="fr-h2">
+                        {% block page_title %}{{ request.site }}{% endblock %}
+                    </h1>
+                    <p class="fr-text--lead">
+                        {% block lead %}Bienvenue !{% endblock %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
     <main role="main" id="content">
         <div class="fr-container fr-container--fluid fr-mb-md-14v">
             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
                 <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
                     {% block center_content %}{% endblock %}
+                    {% block center_narrow %}
+                        <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-pt-4v fr-pt-md-6v fr-pb-4v fr-pb-md-6v">
+                            <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+                                <div class="fr-col-12 fr-col-md-10 fr-col-lg-9">
+                                    {% block form %}
+                                        {% include 'dsrc_dj/core/compositions/navs/dsrc_stepper.html' %}
+                                        <hr />
+                                        <div>{% include 'dsrc_dj/core/compositions/forms/dsrc_form_base.html' %}</div>
+                                    {% endblock form %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endblock center_narrow %}
                 </div>
             </div>
         </div>
