@@ -1,5 +1,6 @@
 {% load static %}
 {% load django_vite %}
+{% load phone_filters %}
 {% block js %}
     {% vite_asset 'js/apps/user.js' %}
 {% endblock %}
@@ -132,7 +133,7 @@
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
                         </svg>
                         <a class="text-decoration-none text-blue"
-                           href="tel:{{ user.profile.phone_no }}">{{ user.profile.phone_no }}</a>
+                           href="tel:{{ user.profile.phone_no }}">{{ user.profile.phone_no|format_phone }}</a>
                     </div>
                     <button class="ms-4 px-2 py-0 btn small btn-outline-primary"
                             @click="clipboardCopy('Le numéro de téléphone', '{{ user.profile.phone_no }}')">

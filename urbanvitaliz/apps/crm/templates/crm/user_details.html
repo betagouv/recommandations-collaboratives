@@ -6,6 +6,7 @@
 {% load humanize %}
 {% load training %}
 {% load hijack %}
+{% load phone_filters %}
 
 {% block js %}
 {% vite_asset 'js/apps/crm.js' %}
@@ -45,7 +46,7 @@
                             <svg class="bi" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-fill" />
                             </svg>  
-                            <span>{{crm_user.profile.phone_no}}</span>
+                            <span>{{crm_user.profile.phone_no|format_phone}}</span>
                         {% endif %}
                         {% if crm_user.email %}
                             <span class="ms-2 me-2">|</span>
