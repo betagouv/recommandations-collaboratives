@@ -1,5 +1,5 @@
 {% load static %}
-<div class="fr-select-group">
+<div class="fr-select-group {% if field.errors %}fr-select-group--error{% endif %} {% if field.is_valid %}fr-select-group--valid{% endif %}">
     <label class="fr-label" for="select">Label pour liste déroulante</label>
     <select class="fr-select" id="select" name="select">
         <option value="" selected disabled hidden>Sélectionner une option</option>

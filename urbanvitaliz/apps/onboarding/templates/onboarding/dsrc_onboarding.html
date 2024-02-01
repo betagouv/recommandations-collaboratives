@@ -1,9 +1,5 @@
 {% extends "dsrc_dj/core/pages/dsrc_page_center.html" %}
 {% load static %}
-{% load django_vite %}
-{% block js %}
-    {% vite_asset 'js/apps/onboarding.js' %}
-{% endblock %}
 {% block title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
 {% block og_title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
 {% block center_content %}

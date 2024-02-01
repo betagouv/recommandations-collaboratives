@@ -11,7 +11,11 @@
         </legend>
         {% block form_content %}{% endblock %}
         {% for field in form.visible_fields %}
-            <div class="fr-fieldset__element">{% include "dsrc_dj/core/blocks/inputs/dsrc_field.html" with field=field %}</div>
+            {% if field.use_fieldset %}
+                {% include "dsrc_dj/core/compositions/forms/dsrc_fieldset.html" with field=field %}
+            {% else %}
+                {% include "dsrc_dj/core/blocks/inputs/dsrc_field.html" with field=field %}
+            {% endif %}
         {% endfor %}
         {% if form.messages %}
             <div class="fr-messages-group" id="{{ form.id }}" aria-live="polite">

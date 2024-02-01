@@ -1,1 +1,4 @@
-<textarea></textarea>
+<label class="fr-label" for="textarea">{{ field.label }}</label>
+<textarea class="fr-input {% if field.errors %}fr-input--error{% endif %}{% if field.is_valid %} fr-input--valid{% endif %}"
+          id="textarea"
+          name="textarea"></textarea>

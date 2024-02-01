@@ -12,6 +12,7 @@ import os
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
+from dsrc.forms import DsrcBaseForm
 
 from . import models
 
@@ -81,7 +82,17 @@ class OnboardingResponseWithCaptchaForm(OnboardingResponseForm):
         if "PYTEST_CURRENT_TEST" in os.environ:
             self.fields.pop("captcha")
 
+    first_name = forms.CharField(widget=forms.TextInput())
+    last_name = forms.CharField(widget=forms.TextInput())
+    phone = forms.CharField(widget=forms.TextInput())
+    name = forms.CharField(widget=forms.TextInput(attrs={"type":"password"}))
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
+    description = forms.CharField(widget=forms.Textarea(attrs={"type":"textarea"}))
+    email = forms.CharField(
+        help_text="Format attendu : prenom.nom@domaine.fr",
+        required=True,
+        widget=forms.EmailInput()
+    )
 
 
 class SelectCommuneForm(forms.Form):
