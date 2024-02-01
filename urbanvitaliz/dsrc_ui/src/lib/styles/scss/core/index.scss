@@ -23,6 +23,8 @@
 @forward '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.css';
 
 /* == DS:RC config */
+@forward './config/global';
+@forward './config/colors';
 @forward './buttons';
 
 /* External libraries overrides */

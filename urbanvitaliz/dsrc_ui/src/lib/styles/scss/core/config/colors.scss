@@ -1,0 +1,13 @@
+// == DSRC Colors
+
+:root {
+	--dsrc-primary: var(--background-action-high-info);
+	--dsrc-primary-hover: var(--background-action-high-info-hover);
+	--dsrc-primary-active: var(--background-action-high-info-active);
+	--dsrc-secondary: var(--background-action-low-green-tilleul-verveine);
+	--dsrc-secondary-hover: var(--background-action-low-green-tilleul-verveine-hover);
+	--dsrc-secondary-active: var(--background-action-low-green-tilleul-verveine-active);
+	--dsrc-tertiary: var(--background-action-low-yellow-tournesol);
+	--dsrc-tertiary-hover: var(--background-action-low-yellow-tournesol-hover);
+	--dsrc-tertiary-active: var(--background-action-low-yellow-tournesol-active);
+}
