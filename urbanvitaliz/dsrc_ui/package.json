@@ -11,7 +11,7 @@
 		"dev:csscore": "rollup --config rollup.config.csscore.js -w",
 		"dev:icons": "rollup --config rollup.config.icons.js -w",
 		"dev:fonts": "rollup --config rollup.config.fonts.js -w",
-		"build": "yarn build:csstokens && yarn build:csscore  && yarn build:icons && yarn build:fonts && yarn build:components && rollup -c",
+		"build": "yarn build:csstokens && yarn build:csscore && yarn build:icons && yarn build:fonts && yarn build:components && rollup -c",
 		"build:ci": "yarn build:csstokens && yarn build:csscore && yarn build:components && rollup -c",
 		"build:components": "rollup --config rollup.config.components.js",
 		"build:csstokens": "rollup --config rollup.config.csstokens.js",

@@ -25,7 +25,7 @@
 /* == DS:RC config */
 @forward './config/global';
 @forward './config/colors';
-@forward './buttons';
+@forward './blocks/buttons';
 
 /* External libraries overrides */
 @forward './ext/jupyter';
