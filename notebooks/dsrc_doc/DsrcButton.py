@@ -13,7 +13,7 @@ init_django("urbanvitaliz")
 from django.db.models import Model
 from urbanvitaliz.apps.projects.models import Project
 
-
+projects = Project.objects.all()
 
 # %%
 
@@ -22,37 +22,15 @@ from IPython.display import display, HTML
 
 
 # %%
+from notebooks.dsrc_doc.dsrc_utils import load_asset
 
-
-projects = Project.objects.all()
-
-
-# %%
-# Load CSS files as raw text using python
-"""
-Read a CSS or JS file and load it into Jupyter.
-Make sure you trust the code you are loading.
-
-Arg: the file path to the file, relative to the project's static assets folder
-Returns: IPython.core.display.HTML object: contains JS/CSS in `data` property
-"""
-
-
-def _load_asset(rel_file_path):
-    assets_folder = "static/assets/"
-    assets_file_path = f"{assets_folder}{rel_file_path}"
-    asset_content = open(assets_file_path, "r").read()
-    asset = "%s" % asset_content
-    return HTML(asset)
-
-
-csscore = _load_asset("css/dsrc-csscore.css")
-csstokens = _load_asset("css/dsrc-csstokens.css")
-jscore = _load_asset("js/index.js")
-component = _load_asset("js/components/DsrcButton.js")
+csscore = load_asset("css/dsrc-csscore.css")
+csstokens = load_asset("css/dsrc-csstokens.css")
+cssoverrides = load_asset("css/output.css")
+jscore = load_asset("js/index.js")
+component = load_asset("js/components/DsrcButton.js")
 # print(component.data)
 # print(csscore.data)
-
 
 # %%
 from ipywidgets import widgets
@@ -92,25 +70,29 @@ button = widgets.Button(
     Returns : a styled `<button>` element with an event handler
 
     ```python
+    
     data_dict = {
-        "label"         : "Label of the button",
-        "onclick"       : "Button action: a Python string that contains a JavaScript event handler",
-        "type"          : "(Optional) type of button ('submit' or 'button' - default: 'submit')",
-        "name"          : "(Optional) name of the button",
-        "is_disabled"   : "(Optional) Indicates button state: True if the button is disabled (default: False)",
-        "extra_classes" : "(Optional) Concatenated string of CSS classes"
+        "label": "Label of the button item",
+        "name": "(Optional) name of the button",
+        "type": "(Optional) type of button (submit or button - default: submit)",
+        "onclick": "button action",
+        "is_disabled": "(Optional) boolean that indicate if the button is activated"
+            (default: False)",
+        "size": "(Optional) `sm` or `lg`",
+        "variant": "(Optional) `primary` `secondary`, or  `tertiary-no-outline`",
+        "color": "(Optional) color class name",
+        "icon": "(Optional) icon class name: ex `fr-icon-info-fill`
+            (see: https://www.systeme-de-design.gouv.fr/elements-d-interface/fondamentaux-techniques/icone)",
+        "align": "(Optional) align icon `left` or `right` - icon value must be set for alignment class to take effect",
+        "title": "(Optional) if True, the icon will be displayed without a visible label,
+            and the label will be used as the icon title (default: False)",
+        "classes": "(Optional) extra classes"
     }
+    
     ```
 
     All of the keys of the dict can be passed directly as named parameters of the tag.
-
-    Relevant `extra_classes`:
-
-    - `fr-btn--secondary` : secondary button
-    - `fr-btn--icon-left` and `fr-btn--icon-right`: add an icon to the button and set alignment
-      (associated with an icon class)
-    - `fr-btn--sm` and `fr-btn--lg`: button smaller or larger than the default size
-
+    
     **Tag name**:
 
         dsrc_button
@@ -119,18 +101,17 @@ button = widgets.Button(
 
         `{% dsrc_button data_dict %}`
 
-        For JavaScript developers, this is equivalent to writing:
+        For JavaScript developers, this is roughly equivalent to writing:
 
-        `<DsrcButton props={data_dict} />` # ~= Svelte / Vue / React
+        `<DsrcButton props={data_dict} />` # ~ Svelte / Vue / React
 """
 
 template = Template(
     """
-{% load static %}
 {% load dsrc_tags %}
 {% block css %}
     <style>
-        {{csscore}}
+        {{csscore}} # necessary in Jupyter Notebooks only
     </style>
 {% endblock %}
 
@@ -144,17 +125,19 @@ data_dict = {
     "type"          : "button",
     "name"          : "dsrc_button",
     "is_disabled"   : False,
-    "extra_classes" : "fr-btn--lg dsrc-primary"
+    "size"          : "md",
+    "variant"       : "secondary",
+    "icon"          : "fr-icon--info-fill",
+    "align"         : "right",
+    "classes"       : "dsrc-action--high"
 }
 
 context = Context(
-    {"data_dict": data_dict, "csscore": csscore.data, "component": component.data, "jscore": jscore.data}
+    {"data_dict": data_dict, "csscore": csscore.data}
 )
 
 HTML(template.render(context))
 
-
-# %%
 
 # %%
 
