@@ -30,11 +30,6 @@ urlpatterns = [
         views.select_commune,
         name="projects-onboarding-select-commune",
     ),
-    path(
-        r"dsrc-onboarding/",
-        views.dsrc_onboarding,
-        name="dsrc-onboarding",
-    ),
 ]
 
 # eof
