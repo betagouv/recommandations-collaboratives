@@ -1,0 +1,21 @@
+{% load static %}
+{% block js %}
+    <script src="{% static 'assets/js/components/DsrcButton.js' %}" type="module"></script>
+{% endblock %}
+<button class="fr-btn{% if self.variant %} fr-btn--{{ self.variant }}{% endif %}{% if self.size %} fr-btn--{{ self.size }}{% endif %}{% if self.variant %} fr-btn--{{ self.variant }}{% endif %}{% if self.align %} fr-btn--icon-{{ self.align }}{% endif %}{% if self.icon %} {{ self.icon }}{% endif %} {% if self.classes %}{{ self.classes }}{% endif %}"
+        onclick="{{ self.onclick }}"
+        {% if self.is_disabled %}disabled{% endif %}
+        type="{{ self.type | default:'submit' }}"
+        {% if self.title %}title="{{ self.label }}"{% endif %}
+        {% if self.name %}name="{{ self.name }}"{% endif %}>{{ self.label }}</button>
+<div class="fr-messages-group"
+     id="password-1138-input-messages"
+     aria-live="assertive">
+    <p class="fr-message" id="password-1138-input-message">Votre mot de passe doit contenir :</p>
+    <p class="fr-message fr-message--info"
+       id="password-1138-input-message-info">12 caractères minimum</p>
+    <p class="fr-message fr-message--info"
+       id="password-1138-input-message-info-1">1 caractère spécial minimum</p>
+    <p class="fr-message fr-message--info"
+       id="password-1138-input-message-info-2">1 chiffre minimum</p>
+</div>

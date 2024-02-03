@@ -1,0 +1,13 @@
+{% extends "dsrc/core/pages/dsrc_page_center.html" %}
+{% load static %}
+{% block title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
+{% block og_title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
+{% block page_title %}Solliciter {{ request.site }}{% endblock %}
+{% block tagline %}
+    Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
+{% endblock %}
+{% block form %}
+    {% include 'dsrc/core/compositions/navs/dsrc_stepper.html' %}
+    <hr />
+    {% include 'dsrc/core/compositions/forms/dsrc_form_base.html' %}
+{% endblock %}

@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "watson",
     "phonenumber_field",
     "cookie_consent",
+    "urbanvitaliz.apps.dsrc",
     "urbanvitaliz.apps.onboarding",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
@@ -128,7 +129,7 @@ TEMPLATES = [
             ],
             "libraries": {
                 "common_tags": "urbanvitaliz.templatetags.common_extra",
-                "dsrc_tags": "urbanvitaliz.templatetags.dsrc_tags",
+                "dsrc_tags": "urbanvitaliz.apps.dsrc.templatetags.dsrc_tags",
             },
         },
     },

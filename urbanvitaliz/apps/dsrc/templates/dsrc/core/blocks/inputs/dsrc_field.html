@@ -1,0 +1,18 @@
+<div class="fr-fieldset__element">
+    {% if field.field.widget.input_type == "checkbox" %}
+        {% include "dsrc/core/blocks/inputs/dsrc_input_checkbox.html" %}
+    {% elif field.field.widget.input_type == "text" %}
+        {% include "dsrc/core/blocks/inputs/dsrc_input_text.html" %}
+    {% elif field.field.widget.input_type == "email" %}
+        {% include "dsrc/core/blocks/inputs/dsrc_input_text.html" %}
+    {% elif field.field.widget.input_type == "select" %}
+        {% include "dsrc/core/blocks/inputs/dsrc_select.html" %}
+    {% elif field.field.widget.attrs.type == "textarea" %}
+        {% include "dsrc/core/blocks/inputs/dsrc_textarea.html" %}
+    {% elif field.field.widget.input_type == "richtext" %}
+        {% include "dsrc/core/compositions/forms/dsrc_richtext.html" %}
+    {% endif %}
+</div>
+{% if field.field.widget.input_type == "password" %}
+    {% include "dsrc/core/blocks/inputs/dsrc_input_password.html" %}
+{% endif %}

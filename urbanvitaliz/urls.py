@@ -31,6 +31,7 @@ from urbanvitaliz.apps.training import rest as training_rest
 from urbanvitaliz.apps.resources import views as resources_views
 from urbanvitaliz.apps.resources.urls import urlpatterns as resources_urls
 from urbanvitaliz.apps.survey.urls import urlpatterns as survey_urls
+from urbanvitaliz.apps.dsrc.urls import urlpatterns as dsrc_urls
 
 # Rest
 router = routers.DefaultRouter()
@@ -118,6 +119,7 @@ urlpatterns.extend(addressbook_urls)
 urlpatterns.extend(survey_urls)
 urlpatterns.extend(invites_urls)
 urlpatterns.extend(crm_urls)
+urlpatterns.extend(dsrc_urls)
 
 if settings.DEBUG:
     import debug_toolbar

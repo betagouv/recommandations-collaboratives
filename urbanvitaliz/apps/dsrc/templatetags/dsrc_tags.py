@@ -121,7 +121,7 @@ def dsrc_input(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc_dj/core/blocks/buttons/dsrc_button.html")
+@register.inclusion_tag("dsrc/blocks/buttons/dsrc_button.html")
 def dsrc_button(*args, **kwargs) -> dict:
     """
     Returns a button item. Takes a dict as parameter, with the following structure:
@@ -129,24 +129,25 @@ def dsrc_button(*args, **kwargs) -> dict:
     ```python
     data_dict = {
         "label": "Label of the button item",
-        "onclick": "button action",
-        "type": "(Optional) type of button (submit or button - default: submit),
         "name": "(Optional) name of the button",
-        "is_disabled": "(Optional) boolean that indicate if the button is activated
-        (default: False)",
-        "extra_classes": "(Optional) string with names of extra classes."
+        "type": "(Optional) type of button (submit or button - default: submit)",
+        "onclick": "button action",
+        "is_disabled": "(Optional) boolean that indicate if the button is activated"
+            (default: False)",
+        "size": "(Optional) `sm` or `lg`",
+        "variant": "(Optional) `primary` `secondary`, or  `tertiary-no-outline`",
+        "color": "(Optional) color class name",
+        "icon": "(Optional) icon class name: ex `fr-icon-info-fill`
+            (see: https://www.systeme-de-design.gouv.fr/elements-d-interface/fondamentaux-techniques/icone)",
+        "align": "(Optional) align icon `left` or `right` - icon value must be set for alignment class to take effect",
+        "title": "(Optional) if True, the icon will be displayed without a visible label,
+            and the label will be used as the icon title (default: False)",
+        "classes": "(Optional) extra classes"
     }
     ```
 
     All of the keys of the dict can be passed directly as named parameters of the tag.
-
-    Relevant `extra_classes`:
-
-    - `fr-btn--secondary` : secondary button
-    - `fr-btn--icon-left` and `fr-btn--icon-right`: add an icon to the button
-      (associated with an icon class)
-    - `fr-btn--sm` and `fr-btn--lg`: button smaller or larger than the default size
-
+    
     **Tag name**:
         dsrc_button
 
@@ -159,12 +160,19 @@ def dsrc_button(*args, **kwargs) -> dict:
         "type",
         "onclick",
         "is_disabled",
-        "extra_classes",
+        "size",
+        "variant",
+        "color",
+        "icon",
+        "align",
+        "title"
     ]
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
 
     if "is_disabled" not in tag_data:
         tag_data["is_disabled"] = False
+    if "title" not in tag_data:
+        tag_data["title"] = False
     return {"self": tag_data}
 
 @register.inclusion_tag("dsrc_dj/core/blocks/inputs/dsrc_select.html")
@@ -338,7 +346,6 @@ def dsrc_stepper(*args, **kwargs) -> dict:
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
 
     return {"self": tag_data}
-
 
 @register.inclusion_tag("dsrc_dj/core/compositions/content/dsrc_card.html")
 def dsfr_card(*args, **kwargs) -> dict:

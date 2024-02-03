@@ -1,0 +1,26 @@
+{% load static %}
+{% load widget_tweaks %}
+<form class="fr-mb-0" id="{{ form.id }}">
+    {% csrf_token %}
+    <fieldset class="fr-mb-0 fr-fieldset"
+              id="{{ form.id }}-fieldset"
+              aria-labelledby="{{ form.id }}-fieldset-legend {{ form.id }}-fieldset-messages">
+        <legend class="fr-fieldset__legend" id="{{ form.id }}-fieldset-legend">
+            <h3 class="fr-h5">{{ form.legend }}</h3>
+        </legend>
+        {% block form_content %}{% endblock %}
+        {% for field in form.visible_fields %}
+            {% if field.use_fieldset %}
+                {% include "dsrc/core/compositions/forms/dsrc_fieldset.html" with field=field %}
+            {% else %}
+                {% include "dsrc/core/blocks/inputs/dsrc_field.html" with field=field %}
+            {% endif %}
+        {% endfor %}
+        {% if form.messages %}
+            <div class="fr-messages-group" id="{{ form.id }}" aria-live="polite">
+                {% for message in form.messages %}<p>message</p>{% endfor %}
+            </div>
+        {% endif %}
+    </fieldset>
+    {% include "dsrc/core/compositions/forms/dsrc_form_footer.html" %}
+</form>
