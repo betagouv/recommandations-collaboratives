@@ -9,21 +9,6 @@ from django import forms
 from . import models
 
 from django import forms
-# class DsrcDjangoTemplates(DjangoTemplates):
-#     @cached_property
-#     def engine(self):
-#         return self.backend(
-#             {
-#                 "APP_DIRS": True,
-#                 "DIRS": [
-#                     Path(__file__).resolve().parent / self.backend.app_dirname,
-#                     Path(forms.__path__[0]).resolve() / "templates",
-#                 ],
-#                 "NAME": "djangoforms",
-#                 "OPTIONS": {},
-#             }
-#         )
-
 
 class DsrcBaseForm(forms.Form):
     """
@@ -40,7 +25,7 @@ class DsrcBaseForm(forms.Form):
     # @property
     # def default_renderer(self):
     #     from django.conf import settings, global_settings
-
+   
     #     return (
     #         DsrcDjangoTemplates  # Settings wasn't modified
     #         if settings.FORM_RENDERER == global_settings.FORM_RENDERER

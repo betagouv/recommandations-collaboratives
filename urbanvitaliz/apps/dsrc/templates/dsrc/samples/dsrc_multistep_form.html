@@ -1,5 +1,6 @@
 {% extends "dsrc/core/pages/dsrc_page_center.html" %}
 {% load static %}
+{% load dsrc_tags %}
 {% block title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
 {% block og_title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
 {% block page_title %}Solliciter {{ request.site }}{% endblock %}
@@ -7,7 +8,7 @@
     Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
 {% endblock %}
 {% block form %}
-    {% include 'dsrc/core/compositions/navs/dsrc_stepper.html' %}
+    {% dsrc_stepper %}
     <hr />
-    {% include 'dsrc/core/compositions/forms/dsrc_form_base.html' %}
+    {% dsrc_form %}
 {% endblock %}

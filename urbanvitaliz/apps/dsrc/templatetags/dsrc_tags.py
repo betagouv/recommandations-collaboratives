@@ -8,7 +8,7 @@ This file is largely adapted from the work done on the project `django-dsfr`, in
 What changes from `django-dsfr`:
 
 - this library uses `dsrc` prefixes instead of `dsfr`
-- the folder structure for templates differs. For mode details on fodler structure please refer to `MULTISITE_DEFAULT_TEMPLATE_DIR/dsrc_dj`
+- the folder structure for templates differs. For mode details on fodler structure please refer to `MULTISITE_DEFAULT_TEMPLATE_DIR/dsrc`
 
 Templatetag parameters are kept as-is from `django-dsfr` definitions in order to retain compatibility with that project.
 
@@ -20,19 +20,9 @@ from django import template
 from django.template.context import Context
 
 from urbanvitaliz import verbs
+from urbanvitaliz.apps.dsrc.utils import generate_random_id
 
 register = template.Library()
-
-
-def generate_random_id(start: str = ""):
-    """
-    Generates a random alphabetic id.
-    """
-    result = "".join(random.SystemRandom().choices(string.ascii_lowercase, k=16))
-    if start:
-        result = "-".join([start, result])
-    return result
-
 
 def parse_tag_args(args, kwargs, allowed_keys: list) -> dict:
     """
@@ -49,7 +39,7 @@ def parse_tag_args(args, kwargs, allowed_keys: list) -> dict:
 
     return tag_data
 
-@register.inclusion_tag("dsrc_dj/core/compositions/forms/dsrc_form_base.html", takes_context=True)
+@register.inclusion_tag("dsrc/core/compositions/forms/dsrc_form_base.html", takes_context=True)
 def dsrc_form(context) -> dict:
     """
     Returns the HTML for a form snippet
@@ -60,9 +50,13 @@ def dsrc_form(context) -> dict:
     **Usage**:
         `{% dsrc_form %}`
     """
+    
+    if "id" not in context:
+        context["id"] = generate_random_id("dsrc-form")
+
     return context
 
-@register.inclusion_tag("dsrc_dj/core/blocks/inputs/dsrc_field.html")
+@register.inclusion_tag("dsrc/core/blocks/inputs/dsrc_field.html")
 def dsrc_form_field(field) -> dict:
     """
     Returns the HTML for a form field
@@ -76,7 +70,7 @@ def dsrc_form_field(field) -> dict:
     return {"field": field}
 
 
-@register.inclusion_tag("dsrc_dj/core/blocks/inputs/dsrc_input.html")
+@register.inclusion_tag("dsrc/core/blocks/inputs/dsrc_input.html")
 def dsrc_input(*args, **kwargs) -> dict:
     """
     Returns a input item. Takes a dict as parameter, with the following structure:
@@ -175,7 +169,7 @@ def dsrc_button(*args, **kwargs) -> dict:
         tag_data["title"] = False
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc_dj/core/blocks/inputs/dsrc_select.html")
+@register.inclusion_tag("dsrc/core/blocks/inputs/dsrc_select.html")
 def dsrc_select(*args, **kwargs) -> dict:
     """
     Returns a select item. Takes a dict as parameter, with the following structure:
@@ -223,7 +217,7 @@ def dsrc_select(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc_dj/core/compositions/navs/dsrc_breadcrumb.html", takes_context=True)
+@register.inclusion_tag("dsrc/core/compositions/navs/dsrc_breadcrumb.html", takes_context=True)
 def dsrc_breadcrumb(context: Context, tag_data: dict = {}) -> dict:
     """
     Returns a breadcrumb item. Takes a dict as parameter, with the following structure:
@@ -251,7 +245,7 @@ def dsrc_breadcrumb(context: Context, tag_data: dict = {}) -> dict:
             tag_data = {}
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc_dj/core/blocks/global/dsrc_link.html")
+@register.inclusion_tag("dsrc/core/blocks/global/dsrc_link.html")
 def dsrc_link(*args, **kwargs) -> dict:
     """
     Returns a link item. Takes a dict as parameter, with the following structure:
@@ -291,7 +285,7 @@ def dsrc_link(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc_dj/core/blocks/global/dsrc_skiplinks.html", takes_context=True)
+@register.inclusion_tag("dsrc/core/blocks/global/dsrc_skiplinks.html", takes_context=True)
 def dsrc_skiplinks(context: Context, items: list) -> dict:
     """
     Returns a skiplinks item. Takes a list as parameter, with the following structure:
@@ -315,7 +309,7 @@ def dsrc_skiplinks(context: Context, items: list) -> dict:
             items = {}
     return {"self": {"items": items}}
 
-@register.inclusion_tag("dsrc_dj/core/compositions/navs/dsrc_stepper.html")
+@register.inclusion_tag("dsrc/core/compositions/navs/dsrc_stepper.html")
 def dsrc_stepper(*args, **kwargs) -> dict:
     """
     Returns a stepper item. Takes a dict as parameter, with the following structure:
@@ -347,7 +341,7 @@ def dsrc_stepper(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc_dj/core/compositions/content/dsrc_card.html")
+@register.inclusion_tag("dsrc/core/compositions/content/dsrc_card.html")
 def dsfr_card(*args, **kwargs) -> dict:
     """
     Returns a card item. Takes a dict as parameter, with the following structure:

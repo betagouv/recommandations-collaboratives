@@ -8,7 +8,7 @@
                         {% block page_title %}{{ request.site }}{% endblock %}
                     </h1>
                     <p class="fr-text--lead">
-                        {% block lead %}Bienvenue !{% endblock %}
+                        {% block tagline %}Bienvenue !{% endblock %}
                     </p>
                 </div>
             </div>
@@ -23,11 +23,7 @@
                         <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-pt-4v fr-pt-md-6v fr-pb-4v fr-pb-md-6v">
                             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
                                 <div class="fr-col-12 fr-col-md-10 fr-col-lg-9">
-                                    {% block form %}
-                                        {% include 'dsrc/core/compositions/navs/dsrc_stepper.html' %}
-                                        <hr />
-                                        <div>{% include 'dsrc/core/compositions/forms/dsrc_form_base.html' %}</div>
-                                    {% endblock form %}
+                                    {% block form %}{% endblock form %}
                                 </div>
                             </div>
                         </div>
