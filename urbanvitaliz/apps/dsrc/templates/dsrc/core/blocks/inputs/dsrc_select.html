@@ -3,7 +3,9 @@
     <label class="fr-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
     <select class="fr-select"
             id="{{ field.id_for_label }}"
-            name="{{ field.html_name }}">
+            name="{{ field.html_name }}"
+            {% if field.field.required %}required{% endif %}
+            {% if field.field.disabled %}disabled{% endif %}>
         {% for value, label in field.field.widget.choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
     </select>
 </div>
