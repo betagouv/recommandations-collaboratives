@@ -7,17 +7,21 @@
                         <div class="fr-header__brand-top">
                             <div class="fr-header__logo">
                                 <p class="fr-logo">
-                                    République
-                                    <br>
-                                    Française
+                                    {% block logo_fr %}
+                                        République
+                                        <br>
+                                        Française
+                                    {% endblock %}
                                 </p>
                             </div>
                         </div>
                         <div class="fr-header__service">
-                            <a href="/" title="Accueil - DSRC Recommendations Collaboratives">
-                                <p class="fr-header__service-title">DSRC</p>
-                            </a>
-                            <p class="fr-header__service-tagline">Système de design pour  Recommendations Collaboratives basé sur DSFR</p>
+                            {% block header_service %}
+                                <a href="/" title="Accueil - DSRC Recommendations Collaboratives">
+                                    <p class="fr-header__service-title">DSRC</p>
+                                </a>
+                                <p class="fr-header__service-tagline">Système de design pour  Recommendations Collaboratives basé sur DSFR</p>
+                            {% endblock %}
                         </div>
                     </div>
                 {% endblock %}

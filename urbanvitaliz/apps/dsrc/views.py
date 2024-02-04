@@ -42,7 +42,7 @@ def init_payload(page_title: str, links: list = []):
 ########################################################################
 
 def dsrc(request):
-   
+
     if request.method == "POST":
         # create a form instance and populate it with data from the request:
         form = forms.DsrcExampleForm(request.POST)

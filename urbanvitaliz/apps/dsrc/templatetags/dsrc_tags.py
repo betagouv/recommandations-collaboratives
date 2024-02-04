@@ -50,9 +50,27 @@ def dsrc_form(context) -> dict:
     **Usage**:
         `{% dsrc_form %}`
     """
-    
+
     if "id" not in context:
         context["id"] = generate_random_id("dsrc-form")
+
+    return context
+
+
+@register.inclusion_tag("dsrc/core/compositions/forms/dsrc_form_multistep.html", takes_context=True)
+def dsrc_form_multistep(context) -> dict:
+    """
+    Returns the HTML for a multi step form snippet
+
+    **Tag name**:
+        dsrc_form_multistep
+
+    **Usage**:
+        `{% dsrc_form_multistep %}`
+    """
+
+    if "id" not in context:
+        context["id"] = generate_random_id("dsrc-form-multistep")
 
     return context
 
@@ -66,6 +84,19 @@ def dsrc_form_field(field) -> dict:
 
     **Usage**:
         `{% dsrc_form_field field %}`
+    """
+    return {"field": field}
+
+@register.inclusion_tag("dsrc/core/compositions/forms/dsrc_fieldset.html")
+def dsrc_fieldset(field) -> dict:
+    """
+    Returns the HTML for a form field
+
+    **Tag name**:
+        dsrc_form_field
+
+    **Usage**:
+        `{% dsrc_fieldset %}`
     """
     return {"field": field}
 
@@ -309,7 +340,7 @@ def dsrc_skiplinks(context: Context, items: list) -> dict:
             items = {}
     return {"self": {"items": items}}
 
-@register.inclusion_tag("dsrc/core/compositions/navs/dsrc_stepper.html")
+@register.inclusion_tag("dsrc/core/compositions/forms/dsrc_stepper.html")
 def dsrc_stepper(*args, **kwargs) -> dict:
     """
     Returns a stepper item. Takes a dict as parameter, with the following structure:

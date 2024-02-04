@@ -1,4 +1,5 @@
 {% load static %}
+{% load dsrc_tags %}
 <form class="fr-mb-0" id="{{ form.id }}">
     {% csrf_token %}
     <fieldset class="fr-mb-0 fr-fieldset"
@@ -10,9 +11,9 @@
         {% block form_content %}{% endblock %}
         {% for field in form.visible_fields %}
             {% if field.use_fieldset %}
-                {% include "dsrc/core/compositions/forms/dsrc_fieldset.html" with field=field %}
+                {% dsrc_fieldset field %}
             {% else %}
-                {% include "dsrc/core/blocks/inputs/dsrc_field.html" with field=field %}
+                {% dsrc_form_field field %}
             {% endif %}
         {% endfor %}
         {% if form.messages %}

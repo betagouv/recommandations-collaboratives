@@ -1,3 +1,4 @@
+{% load dsrc_tags %}
 <fieldset class="fr-fieldset fr-fieldset--error"
           id="radio-error"
           role="group"
@@ -6,5 +7,5 @@
         <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
                 id="radio-error-legend">{{ field.legend }}</legend>
     {% endif %}
-    {% include "dsrc/core/blocks/inputs/dsrc_field.html" with field=field %}
+    {% dsrc_form_field field %}
 </fieldset>
