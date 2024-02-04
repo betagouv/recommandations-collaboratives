@@ -1,5 +1,9 @@
 {% load widget_tweaks %}
-<div class="fr-checkbox-group{% if field.errors %} fr-checkbox-group--error{% endif %}{% if field.is_disabled %} fr-input-group--disabled{% endif %}">
+<div class="fr-checkbox-group{% if field.has_errors %} fr-checkbox-group--error{% endif %}{% if field.is_disabled %} fr-input-group--disabled{% endif %}">
+    <label for="{{ field.id_for_label }}" class="fr-label">
+        {{ field.label }}
+        {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
+    </label>
     {% if field.errors %}
         {% with aria_describedby="aria-describedby:"|add:field.auto_id|add:"-desc-error" %}
             {{ field|attr:"type:checkbox"|attr:aria_describedby }}
@@ -7,10 +11,6 @@
     {% else %}
         {{ field|attr:"type:checkbox" }}
     {% endif %}
-    <label for="{{ field.id_for_label }}" class="fr-label">
-        {{ field.label_tag }}
-        {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
-    </label>
     {% if field.errors %}
         <div id="{{ field.id_for_label }}-desc-error">
             {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}

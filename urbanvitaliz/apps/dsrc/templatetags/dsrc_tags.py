@@ -71,6 +71,8 @@ def dsrc_form_multistep(context) -> dict:
 
     if "id" not in context:
         context["id"] = generate_random_id("dsrc-form-multistep")
+    if "classes" not in context:
+        context["classes"] = "dsrc-form"
 
     return context
 
@@ -85,20 +87,22 @@ def dsrc_form_field(field) -> dict:
     **Usage**:
         `{% dsrc_form_field field %}`
     """
+
     return {"field": field}
 
 @register.inclusion_tag("dsrc/core/compositions/forms/dsrc_fieldset.html")
-def dsrc_fieldset(field) -> dict:
+def dsrc_fieldset(fieldset) -> dict:
     """
-    Returns the HTML for a form field
+    Returns the HTML for a form fieldset
 
     **Tag name**:
-        dsrc_form_field
+        dsrc_fieldset
 
     **Usage**:
-        `{% dsrc_fieldset %}`
+        `{% dsrc_fieldset fieldset %}`
     """
-    return {"field": field}
+
+    return {"fieldset": fieldset}
 
 
 @register.inclusion_tag("dsrc/core/blocks/inputs/dsrc_input.html")
@@ -115,12 +119,20 @@ def dsrc_input(*args, **kwargs) -> dict:
         "value": "(Optional) Value of the input item",
         "min": "(Optional) Minimum value of the input item (for type='date')",
         "max": "(Optional) Maximum value of the input item (for type='date')",
-        "extra_classes": "(Optional) string with names of extra classes"
+        "classes": "(Optional) string with names of extra classes"
     }
     ```
 
-
     All of the keys of the dict can be passed directly as named parameters of the tag.
+
+    Use `classes` to override  DSFR / DSRC with site specific styles :
+
+    - `ecoq-input`
+    - `mec-input`
+    - `sosm-input`
+    - `sosp-input`
+    - `uv-input`
+
 
     **Tag name**:
         dsrc_input
@@ -137,12 +149,14 @@ def dsrc_input(*args, **kwargs) -> dict:
         "value",
         "min",
         "max",
-        "extra_classes",
+        "classes",
     ]
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
 
     if "id" not in tag_data:
         tag_data["id"] = generate_random_id("input")
+    if "classes" not in tag_data:
+        tag_data["classes"] = "dsrc-input"
 
     return {"self": tag_data}
 
@@ -173,6 +187,15 @@ def dsrc_button(*args, **kwargs) -> dict:
 
     All of the keys of the dict can be passed directly as named parameters of the tag.
     
+
+    Use `classes` to override  DSFR / DSRC with site specific styles :
+
+    - `ecoq-btn`
+    - `mec-btn`
+    - `sosm-btn`
+    - `sosp-btn`
+    - `uv-btn`
+
     **Tag name**:
         dsrc_button
 
@@ -198,6 +221,8 @@ def dsrc_button(*args, **kwargs) -> dict:
         tag_data["is_disabled"] = False
     if "title" not in tag_data:
         tag_data["title"] = False
+    if "classes" not in tag_data:
+        tag_data["classes"] = "dsrc-btn"
     return {"self": tag_data}
 
 @register.inclusion_tag("dsrc/core/blocks/inputs/dsrc_select.html")
@@ -219,11 +244,19 @@ def dsrc_select(*args, **kwargs) -> dict:
             {"text": "Option 1", "value": 1 },
             {"text": "Option 2", "value": 2 }
         ],
-        "extra_classes": "(Optional) string with names of extra classes"
+        "classes": "(Optional) string with names of extra classes"
     }
     ```
 
     All of the keys of the dict can be passed directly as named parameters of the tag.
+
+    Use `classes` to override  DSFR / DSRC with site specific styles :
+
+    - `ecoq-select`
+    - `mec-select`
+    - `sosm-select`
+    - `sosp-select`
+    - `uv-select`
 
     **Tag name**:
         dsrc_select
@@ -245,6 +278,8 @@ def dsrc_select(*args, **kwargs) -> dict:
 
     if "id" not in tag_data:
         tag_data["id"] = generate_random_id("select")
+    if "classes" not in tag_data:
+        tag_data["classes"] = "dsrc-select"
 
     return {"self": tag_data}
 
@@ -257,7 +292,8 @@ def dsrc_breadcrumb(context: Context, tag_data: dict = {}) -> dict:
     data_dict = {
         "links": [{"url": "first-url", "title": "First title"}, {...}],
         "current": "Current page title",
-        "root_dir": "the root directory, if the site is not installed at the root of the domain"
+        "root_dir": "the root directory, if the site is not installed at the root of the domain",
+        "classes": "(Optional) string with names of classes to override default theme.",
     }
     ```
 
@@ -274,6 +310,8 @@ def dsrc_breadcrumb(context: Context, tag_data: dict = {}) -> dict:
             tag_data = context["breadcrumb_data"]
         else:
             tag_data = {}
+    if "classes" not in tag_data:
+        tag_data["classes"] = "dsrc-breadcrumb"
     return {"self": tag_data}
 
 @register.inclusion_tag("dsrc/core/blocks/global/dsrc_link.html")
@@ -286,18 +324,23 @@ def dsrc_link(*args, **kwargs) -> dict:
         "url": "URL of the link item",
         "label": "Label of the link item",
         "is_external": "(Optional) Indicate if the link is external",
-        "extra_classes": "(Optional) string with names of extra classes"
+        "size": "(Optional) `sm` or `lg`",
+        "icon": "(Optional) icon class name: ex `fr-icon-info-fill`
+            (see: https://www.systeme-de-design.gouv.fr/elements-d-interface/fondamentaux-techniques/icone)",
+        "align": "(Optional) align icon `left` or `right` - icon value must be set for alignment class to take effect",
+        "classes": "(Optional) string with names of extra classes: override with site specific prefix.",
     }
     ```
 
-    Relevant extra_classes:
-
-    - `fr-link--icon-left` or `fr-link--icon-right` with an icon class
-    - `fr-link--sm` for small links
-    - `fr-link--lg` for large links
-
-
     All of the keys of the dict can be passed directly as named parameters of the tag.
+
+    Use `classes` to override  DSFR / DSRC with site specific styles :
+
+    - `ecoq-link`
+    - `mec-link`
+    - `sosm-link`
+    - `sosp-link`
+    - `uv-link`
 
     **Tag name**:
         dsrc_link
@@ -310,9 +353,15 @@ def dsrc_link(*args, **kwargs) -> dict:
         "url",
         "label",
         "is_external",
-        "extra_classes",
+        "classes",
+        "size",
     ]
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
+
+    if "id" not in tag_data:
+        tag_data["id"] = generate_random_id("select")
+    if "classes" not in tag_data:
+        tag_data["classes"] = "dsrc-link"
 
     return {"self": tag_data}
 
@@ -351,10 +400,19 @@ def dsrc_stepper(*args, **kwargs) -> dict:
         "current_step_title": "Title of current step",
         "next_step_title": "(Optional) Title of next step",
         "total_steps": "Total number of steps",
+        "classes": "(Optional) string with names of extra classes: override with site specific prefix.",
     }
     ```
 
     All of the keys of the dict can be passed directly as named parameters of the tag.
+
+    Use `classes` to override  DSFR / DSRC with site specific styles :
+
+    - `ecoq-stepper`
+    - `mec-stepper`
+    - `sosm-stepper`
+    - `sosp-stepper`
+    - `uv-stepper`
 
     **Tag name**:
         dsrc_stepper
@@ -369,6 +427,9 @@ def dsrc_stepper(*args, **kwargs) -> dict:
         "total_steps",
     ]
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
+
+    if "classes" not in tag_data:
+        tag_data["classes"] = "dsrc-stepper"
 
     return {"self": tag_data}
 
@@ -385,25 +446,30 @@ def dsfr_card(*args, **kwargs) -> dict:
         "image_url": "(Optional) url of the image",
         "image_alt": "(Optional) alt text of the image",
         "media_badges": "(Optional) list of badges for the media area (similar to a badge_group tag)"
-        "new_tab": "(Optional) if True, forces links to open in a new tab",
+        "new_tab": "(Optional) if True, forces steppers to open in a new tab",
         "link": "(Optional) link of the tag",
         "enlarge_link": "(Optional) boolean. If true (default), the link covers the whole card",
-        "extra_classes": "(Optional) string with names of extra classes",
+        "orientation": "(Optional) if `horizontal`: enables horizontal card layout. Default = None (vertical)",
+        "ratio": "(Optional) Use `tier` for 33% ratio layout, `half` for 50% ratio layout",
         "top_detail": "(Optional) dict with a top detail content and optional tags or badges",
         "bottom_detail": "(Optional) a detail string and optional icon",
-        "call_to_action": "(Optional) a list of buttons or links at the bottom of the card,
+        "call_to_action": "(Optional) a list of buttons or links at the bottom of the card",
         "id": "(Optional) id of the tile item",
+        "icon": "(Optional) icon class name. Ex `fr-card--download` replaces the forward arrow icon with a download one",
+        "classes": "(Optional) string with names of extra classes: override with site specific prefix.",
     }
     ```
 
     All of the keys of the dict can be passed directly as named parameters of the tag.
 
-    Relevant extra classes:
 
-    - `fr-card--horizontal`: makes the card horizontal
-    - `fr-card--horizontal-tier`: allows a 33% ratio instead of the 40% default
-    - `fr-card--horizontal-half`: allows a 50% ratio instead of the 40% default
-    - `fr-card--download`: Replaces the forward arrow icon with a download one
+    Use `classes` to override  DSFR / DSRC with site specific styles :
+
+    - `ecoq-card`
+    - `mec-card`
+    - `sosm-card`
+    - `sosp-card`
+    - `uv-card`
 
     Format of the top_detail dict (every field is optional):
     top_detail = {
@@ -452,6 +518,8 @@ def dsfr_card(*args, **kwargs) -> dict:
     if "call_to_action" in tag_data:
         # Forcing the enlarge_link to false if there is a CTA
         tag_data["enlarge_link"] = False
+    if "classes" not in tag_data:
+        tag_data["classes"] = "dsrc-card"
 
     return {"self": tag_data}
 

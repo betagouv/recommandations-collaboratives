@@ -3,9 +3,11 @@
           id="radio-error"
           role="group"
           aria-labelledby="radio-error-legend radio-error-messages">
-    {% if field.legend %}
+    {% if fieldset.legend %}
         <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
-                id="radio-error-legend">{{ field.legend }}</legend>
+                id="radio-error-legend">{{ fieldset.legend }}</legend>
     {% endif %}
-    {% dsrc_form_field field %}
+    {% for field in fieldset %}
+        {% dsrc_form_field field %}
+    {% endfor %}
 </fieldset>
