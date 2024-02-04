@@ -12,51 +12,11 @@ from django import forms
 
 class DsrcBaseForm(forms.Form):
     """
-    A base form that adds the necessary class on relevant fields
+    A base form
     """
-
-    # These input widgets don't need the fr-input class
-    WIDGETS_NO_FR_INPUT = [
-        forms.widgets.CheckboxInput,
-        forms.widgets.FileInput,
-        forms.widgets.ClearableFileInput,
-    ]
-
-    # @property
-    # def default_renderer(self):
-    #     from django.conf import settings, global_settings
-   
-    #     return (
-    #         DsrcDjangoTemplates  # Settings wasn't modified
-    #         if settings.FORM_RENDERER == global_settings.FORM_RENDERER
-    #         else get_default_renderer()
-    #     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            """
-            Depending on the widget, we have to add some classes:
-            - on the outer group
-            - on the form field itsef
-
-            If a class is already set, we don't force the Dsrc-specific classes.
-            """
-            print()
-            if "class" not in visible.field.widget.attrs:
-                if type(visible.field.widget) in [
-                    forms.widgets.Select,
-                    forms.widgets.SelectMultiple,
-                ]:
-                    visible.field.widget.attrs["class"] = "fr-select"
-                    visible.field.widget.group_class = "fr-select-group"
-                elif type(visible.field.widget) == forms.widgets.RadioSelect:
-                    visible.field.widget.attrs["dsrc"] = "dsrc"
-                    visible.field.widget.group_class = "fr-radio-group"
-                elif type(visible.field.widget) == forms.widgets.CheckboxSelectMultiple:
-                    visible.field.widget.attrs["dsrc"] = "dsrc"
-                elif type(visible.field.widget) not in self.WIDGETS_NO_FR_INPUT:
-                    visible.field.widget.attrs["class"] = "fr-input"
 
     def set_autofocus_on_first_error(self):
         """
@@ -117,12 +77,14 @@ class DsrcExampleForm(DsrcBaseForm):
     # Booleans and choicefields
     sample_boolean = forms.BooleanField(label="Cochez la case", required=False)
 
+    # Basic Select
     sample_select = forms.ChoiceField(
         label="Liste déroulante",
         required=False,
         choices=[(None, "Sélectionner une option"), (1, "Option 1"), (2, "Option 2"), (3, "Option 3")],
     )
 
+    # Multiple choice Select
     sample_radio = forms.ChoiceField(
         label="Boutons radio",
         required=False,
@@ -131,6 +93,7 @@ class DsrcExampleForm(DsrcBaseForm):
         widget=forms.RadioSelect,
     )
 
+    # Checkbox group
     sample_checkbox = forms.ChoiceField(
         label="Cases à cocher",
         required=False,
@@ -143,7 +106,7 @@ class DsrcExampleForm(DsrcBaseForm):
         widget=forms.CheckboxSelectMultiple,
     )
 
-    # text blocks
+    # Simple text blocks
     description = forms.CharField(widget=forms.Textarea, required=False)
 
     def clean_sample_radio(self):
