@@ -1,13 +1,9 @@
 {% load static %}
 <div class="fr-select-group {% if field.errors %}fr-select-group--error{% endif %} {% if field.is_valid %}fr-select-group--valid{% endif %}">
-    <label class="fr-label" for="{{ field.id_for_label }}">{{ field.auto_id }}</label>
+    <label class="fr-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
     <select class="fr-select"
             id="{{ field.id_for_label }}"
             name="{{ field.html_name }}">
-        <option value="" selected disabled hidden>Sélectionner une option</option>
-        <option value="1">Option 1</option>
-        <option value="2">Option 2</option>
-        <option value="3">Option 3</option>
-        <option value="4">Option 4</option>
+        {% for value, label in field.field.widget.choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
     </select>
 </div>

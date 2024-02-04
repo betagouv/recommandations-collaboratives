@@ -64,7 +64,7 @@ def dsrc(request):
     )
     payload["form"] = form
 
-    return render(request, "dsrc/samples/dsrc_multistep_form.html", payload)
+    return render(request, "dsrc/samples/dsrc_page_multistep_form.html", payload)
 
 
 ########################################################################
