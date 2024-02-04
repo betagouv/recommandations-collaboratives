@@ -4,6 +4,7 @@
 {% load gravatar %}
 {% load guardian_tags %}
 {% load django_vite %}
+{% load phone_filters %}
 {% block js %}
     {% vite_asset 'js/apps/projectDetails.js' %}
     {% vite_asset 'js/apps/projectShare.js' %}
@@ -128,9 +129,9 @@
                                               text-decoration: none"
                                        href="tel:{{ project.owner.profile.phone_no }}">
                                         {% if project.owner.profile.phone_no %}
-                                            {{ project.owner.profile.phone_no }}
+                                            {{ project.owner.profile.phone_no|format_phone }}
                                         {% elif project.phone %}
-                                            {{ project.phone }}
+                                            {{ project.phone|format_phone }}
                                         {% endif %}
                                     </a>
                                 </span>
