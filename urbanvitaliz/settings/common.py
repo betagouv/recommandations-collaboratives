@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "captcha",
     "ordered_model",
     "dynamic_forms",
+    "crispy_forms",
     "watson",
     "phonenumber_field",
     "cookie_consent",
@@ -138,6 +139,9 @@ TEMPLATES = [
 DBTEMPLATES_USE_CODEMIRROR = True
 
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ('dsrc_crispy_forms')
+CRISPY_TEMPLATE_PACK = 'dsrc_crispy_forms'
 
 WSGI_APPLICATION = "urbanvitaliz.wsgi.application"
 

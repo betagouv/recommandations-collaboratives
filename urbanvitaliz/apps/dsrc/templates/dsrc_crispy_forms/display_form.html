@@ -1,0 +1,12 @@
+{% if form.form_html %}
+    {% spaceless %}
+        {% if form_show_errors %}
+            {% include "dsrc_crispy_forms/errors.html" %}
+        {% endif %}
+        {{ form.form_html }}
+    {% endspaceless %}
+{% else %}
+    {% spaceless %}
+        {% include "dsrc_crispy_forms/uni_form.html" %}
+    {% endspaceless %}
+{% endif %}

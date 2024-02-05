@@ -1,0 +1,14 @@
+{% if form.errors and form.non_field_errors %}{% spaceless %}
+<div class="alert callout">
+    <dl>
+        {% if form_error_title %}<dt>{{ form_error_title }}</dt>{% endif %}
+        <dd>
+            <ul>
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </dd>
+    </dl>
+</div>
+{% endspaceless %}{% endif %}
