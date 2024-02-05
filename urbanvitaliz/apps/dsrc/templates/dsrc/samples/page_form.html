@@ -1,5 +1,6 @@
 {% extends "dsrc/core/pages/page_center.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% load dsrc_tags %}
 {% block title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
 {% block og_title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
@@ -8,5 +9,5 @@
     Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
 {% endblock %}
 {% block form %}
-    {% dsrc_form %}
+    {% crispy dsrc_example_form %}
 {% endblock %}

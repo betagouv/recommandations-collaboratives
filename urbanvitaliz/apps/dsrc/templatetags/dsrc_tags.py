@@ -216,8 +216,6 @@ def dsrc_button(*args, **kwargs) -> dict:
         tag_data["is_disabled"] = False
     if "title" not in tag_data:
         tag_data["title"] = False
-    if "classes" not in tag_data:
-        tag_data["classes"] = "dsrc-btn"
     return {"self": tag_data}
 
 @register.inclusion_tag("dsrc/core/blocks/inputs/select.html")

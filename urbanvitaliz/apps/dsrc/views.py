@@ -1,17 +1,15 @@
 # encoding: utf-8
 
 """
-views for onboarding new users/projects
+Base DSRC views
 
-authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
-created: 2023-07-17 20:39:35 CEST
+authors: patricia.boh@beta.gouv.fr
+created: 2024-02-05 17:36:35 CEST
 """
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 
-from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.projects import models as projects
 from . import forms
 
 def init_payload(page_title: str, links: list = []):
@@ -64,30 +62,6 @@ def dsrc(request):
     )
     payload["form"] = form
 
-    return render(request, "dsrc/samples/page_form.html", payload)
-
-
-########################################################################
-# Advisor onboard someone else
-########################################################################
-
-@login_required
-def select_commune(request, project_id=None):
-    """Intermediate screen to select proper insee number of commune"""
-    project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
-    response = redirect("survey-project-session", project_id=project.id)
-    response["Location"] += "?first_time=1"
-    if not project.commune:
-        return response
-    communes = geomatics.Commune.objects.filter(postal=project.commune.postal)
-    if request.method == "POST":
-        form = forms.SelectCommuneForm(communes, request.POST)
-        if form.is_valid():
-            project.commune = form.cleaned_data["commune"]
-            project.save()
-            return response
-    else:
-        form = forms.SelectCommuneForm(communes)
-    return render(request, "onboarding/select-commune.html", locals())
+    return render(request, "dsrc/samples/page_form.html", {'dsrc_example_form': form})
 
 # eof

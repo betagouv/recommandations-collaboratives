@@ -1,18 +1,15 @@
-
-
-import os
-
 from django import forms
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 
-from django import forms
+"""
+Base DSRC form with built-in error handling and autofocus on first error.
+"""
 
 class DsrcBaseForm(forms.Form):
-    """
-    A base form
-    """
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
 
     def set_autofocus_on_first_error(self):
         """
@@ -24,19 +21,22 @@ class DsrcBaseForm(forms.Form):
             self.fields[field].widget.attrs.update({"autofocus": ""})
             break
 
+"""
+Example form that extends DsrcBaseForm.
+"""
 class DsrcExampleForm(DsrcBaseForm):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.helper.form_id = 'id-dsrc-example-form'
+        self.helper.form_class = 'dsrc-form'
+        self.helper.form_method = 'post'
+        self.helper.form_action = 'test_form'
 
-        # Skip captcha during tests
-        if "PYTEST_CURRENT_TEST" in os.environ:
-            self.fields.pop("captcha")
+        self.helper.add_input(Submit('submit', 'Valider'))
 
-    first_name = forms.CharField(label="Prénom du contact", initial="", required=True)
-    last_name = forms.CharField(label="Nom du contact", initial="", required=True)
-    phone = forms.CharField(max_length=16, label="Téléphone", initial="", required=True)
-    email =  forms.EmailField(
+    sample_text = forms.CharField(label="Nom d'usager", initial="", required=True)
+    sample_phone = forms.CharField(max_length=16, label="Téléphone", initial="", required=True)
+    sample_email =  forms.EmailField(
         label="Courriel",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
@@ -47,19 +47,11 @@ class DsrcExampleForm(DsrcBaseForm):
         email = self.cleaned_data["email"]
         return email.lower()
 
+    sample_postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
 
-    org_name = forms.CharField(
-        label="Nom de votre structure", initial="", required=True
-    )
+    sample_description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows":"5"}), required=False)
 
-    # basic fields
-
-    location = forms.CharField(label="Adresse", required=False)
-    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
-
-    description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows":"5"}), required=False)
-
-    password = forms.CharField(
+    sample_password = forms.CharField(
         label="Mot de passe", required=True, widget=forms.PasswordInput
     )
 
@@ -72,7 +64,7 @@ class DsrcExampleForm(DsrcBaseForm):
     )
 
     # Booleans and choicefields
-    sample_boolean = forms.BooleanField(label="Cochez la case", required=False)
+    sample_radio = forms.BooleanField(label="Cochez la case", required=False)
 
     # Basic Select
     sample_select = forms.ChoiceField(
@@ -82,7 +74,7 @@ class DsrcExampleForm(DsrcBaseForm):
     )
 
     # Multiple choice Select
-    sample_radio = forms.ChoiceField(
+    sample_radio_group = forms.ChoiceField(
         label="Boutons radio",
         required=False,
         choices=[(1, "Premier choix unique"), (2, "Second choix unique"), (3, "Troisième choix unique")],
@@ -91,7 +83,7 @@ class DsrcExampleForm(DsrcBaseForm):
     )
 
     # Checkbox group
-    sample_checkbox = forms.MultipleChoiceField(
+    sample_checkbox_group = forms.MultipleChoiceField(
         label="Cases à cocher",
         required=False,
         choices=[
@@ -103,19 +95,18 @@ class DsrcExampleForm(DsrcBaseForm):
         widget=forms.CheckboxSelectMultiple(attrs={"class": "fr-input dsrc-checkbox"}),
     )
 
-    # Simple text blocks
-    description = forms.CharField(widget=forms.Textarea, required=False)
-
+	# Example clean method
     def clean_sample_radio(self):
-        sample_radio = self.cleaned_data["sample_radio"]
+        sample_radio = self.cleaned_data["sample_radio_group"]
 
         if sample_radio == "3":
             raise forms.ValidationError("Le troisième choix est interdit")
 
         return sample_radio
 
+	# Example clean method
     def clean_sample_checkbox(self):
-        sample_checkbox = self.cleaned_data["sample_checkbox"]
+        sample_checkbox = self.cleaned_data["sample_checkbox_group"]
 
         if sample_checkbox == ["3"]:
             raise forms.ValidationError("Le troisième choix est interdit")
