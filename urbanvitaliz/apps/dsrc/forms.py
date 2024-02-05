@@ -52,19 +52,37 @@ class DsrcExampleForm(DsrcBaseForm):
         if "PYTEST_CURRENT_TEST" in os.environ:
             self.fields.pop("captcha")
 
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
-    # basic fields
-    user_name = forms.CharField(label="Nom d’utilisateur", max_length=100)
-
-    user_email = forms.EmailField(
-        label="Adresse électronique",
+    first_name = forms.CharField(label="Prénom du contact", initial="", required=True)
+    last_name = forms.CharField(label="Nom du contact", initial="", required=True)
+    phone = forms.CharField(max_length=16, label="Téléphone", initial="", required=True)
+    email =  forms.EmailField(
+        label="Courriel",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
     )
 
+    def clean_email(self):
+        """Make sure email is lowercased"""
+        email = self.cleaned_data["email"]
+        return email.lower()
+
+
+    org_name = forms.CharField(
+        label="Nom de votre structure", initial="", required=True
+    )
+
+    # basic fields
+
+    location = forms.CharField(label="Adresse", required=False)
+    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
+
+    description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows":"5"}), required=False)
+
     password = forms.CharField(
         label="Mot de passe", required=True, widget=forms.PasswordInput
     )
+
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
     sample_disabled_field = forms.CharField(
         label="Champ désactivé",
@@ -88,13 +106,13 @@ class DsrcExampleForm(DsrcBaseForm):
     sample_radio = forms.ChoiceField(
         label="Boutons radio",
         required=False,
-        choices=[(1, "Premier choix"), (2, "Second choix"), (3, "Troisième choix")],
+        choices=[(1, "Premier choix unique"), (2, "Second choix unique"), (3, "Troisième choix unique")],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
         widget=forms.RadioSelect,
     )
 
     # Checkbox group
-    sample_checkbox = forms.ChoiceField(
+    sample_checkbox = forms.MultipleChoiceField(
         label="Cases à cocher",
         required=False,
         choices=[
@@ -103,7 +121,7 @@ class DsrcExampleForm(DsrcBaseForm):
             ("3", "Troisième choix"),
         ],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "fr-checkbox dsrc-input"}),
     )
 
     # Simple text blocks
@@ -120,7 +138,7 @@ class DsrcExampleForm(DsrcBaseForm):
     def clean_sample_checkbox(self):
         sample_checkbox = self.cleaned_data["sample_checkbox"]
 
-        if sample_checkbox == ["2"]:
+        if sample_checkbox == ["3"]:
             raise forms.ValidationError("Le troisième choix est interdit")
 
         return sample_checkbox

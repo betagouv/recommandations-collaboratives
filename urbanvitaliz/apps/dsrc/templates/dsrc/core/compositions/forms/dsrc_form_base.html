@@ -10,17 +10,13 @@
         </legend>
         {% block form_content %}{% endblock %}
         {% for field in form.visible_fields %}
-            {% if field.use_fieldset %}
-                {% dsrc_fieldset field %}
-            {% else %}
-                {% dsrc_form_field field %}
-            {% endif %}
+            {% dsrc_form_field field %}
         {% endfor %}
         {% if form.messages %}
             <div class="fr-messages-group" id="{{ form.id }}" aria-live="polite">
                 {% for message in form.messages %}<p>message</p>{% endfor %}
             </div>
         {% endif %}
+        {% include "dsrc/core/compositions/forms/dsrc_form_footer.html" %}
     </fieldset>
-    {% include "dsrc/core/compositions/forms/dsrc_form_footer.html" %}
 </form>

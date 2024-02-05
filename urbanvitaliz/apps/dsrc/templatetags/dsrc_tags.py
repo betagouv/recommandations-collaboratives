@@ -8,7 +8,7 @@ This file is largely adapted from the work done on the project `django-dsfr`, in
 What changes from `django-dsfr`:
 
 - this library uses `dsrc` prefixes instead of `dsfr`
-- the folder structure for templates differs. For mode details on fodler structure please refer to `MULTISITE_DEFAULT_TEMPLATE_DIR/dsrc`
+- the folder structure for templates differs. For mode details on folder structure please refer to `urbanvitaliz/apps/dsrc/README.md`
 
 Templatetag parameters are kept as-is from `django-dsfr` definitions in order to retain compatibility with that project.
 
@@ -19,7 +19,6 @@ created: 2024-01-31 11:19:06 CEST
 from django import template
 from django.template.context import Context
 
-from urbanvitaliz import verbs
 from urbanvitaliz.apps.dsrc.utils import generate_random_id
 
 register = template.Library()
@@ -51,11 +50,7 @@ def dsrc_form(context) -> dict:
         `{% dsrc_form %}`
     """
 
-    if "id" not in context:
-        context["id"] = generate_random_id("dsrc-form")
-
     return context
-
 
 @register.inclusion_tag("dsrc/core/compositions/forms/dsrc_form_multistep.html", takes_context=True)
 def dsrc_form_multistep(context) -> dict:
@@ -104,9 +99,8 @@ def dsrc_fieldset(fieldset) -> dict:
 
     return {"fieldset": fieldset}
 
-
-@register.inclusion_tag("dsrc/core/blocks/inputs/dsrc_input.html")
-def dsrc_input(*args, **kwargs) -> dict:
+@register.inclusion_tag("dsrc/core/blocks/inputs/dsrc_input_text.html")
+def dsrc_input_text(*args, **kwargs) -> dict:
     """
     Returns a input item. Takes a dict as parameter, with the following structure:
 
@@ -213,7 +207,8 @@ def dsrc_button(*args, **kwargs) -> dict:
         "color",
         "icon",
         "align",
-        "title"
+        "title",
+        "classes"
     ]
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
 
@@ -272,7 +267,7 @@ def dsrc_select(*args, **kwargs) -> dict:
         "selected",
         "default",
         "options",
-        "extra_classes",
+        "classes",
     ]
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
 
@@ -353,8 +348,10 @@ def dsrc_link(*args, **kwargs) -> dict:
         "url",
         "label",
         "is_external",
-        "classes",
         "size",
+        "icon",
+        "align",
+        "classes",
     ]
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
 
@@ -425,6 +422,7 @@ def dsrc_stepper(*args, **kwargs) -> dict:
         "current_step_title",
         "next_step_title",
         "total_steps",
+        "classes",
     ]
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
 
@@ -509,6 +507,8 @@ def dsfr_card(*args, **kwargs) -> dict:
         "bottom_detail",
         "call_to_action",
         "id",
+        "icon",
+        "classes",
     ]
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
 

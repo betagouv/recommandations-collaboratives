@@ -1,24 +1,30 @@
 {% load widget_tweaks %}
-<fieldset class="fr-fieldset {% if field.has_errors %}fr-fieldset--error{% endif %}{% if field.is_disabled %} fr-fieldset--disabled{% endif %}"
-          id="{{ field.id_for_label }}-radio-group"
-          role="group"
-          aria-labelledby="radio-error-legend radio-error-messages">
-    <div class="fr-checkbox-group{% if field.has_errors %} fr-checkbox-group--error{% endif %}{% if field.is_disabled %} fr-input-group--disabled{% endif %}">
-        {% if field.has_errors %}
-            {% with aria_describedby="aria-describedby:"|add:field.auto_id|add:"-desc-error" %}
-                {{ field|attr:"type:radio"|attr:aria_describedby }}
-            {% endwith %}
-        {% else %}
-            {{ field|attr:"type:radio" }}
-        {% endif %}
-        <label for="{{ field.id_for_label }}" class="fr-label">
-            {{ field.label_tag }}
-            {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
-        </label>
-        {% if field.has_errors %}
-            <div id="{{ field.id_for_label }}-desc-error">
-                {% for error in field.has_errors %}<p>{{ error }}</p>{% endfor %}
+{% load dsrc_tags %}
+<fieldset class="fr-fieldset"
+          id="radio-hint"
+          aria-labelledby="radio-hint-legend radio-hint-messages">
+    <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
+            id="radio-hint-legend">
+        {{ field.label_tag }}
+        {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
+    </legend>
+    {% if field.errors %}
+        {% with aria_describedby="aria-describedby:"|add:field.auto_id|add:"-desc-error" %}
+            {{ field|attr:"type:radio"|attr:aria_describedby }}
+        {% endwith %}
+    {% else %}
+        {% for choice in field %}
+            <div class="fr-fieldset__element">
+                <div class="fr-radio-group fr-radio-group--sm {% if field.has_errors %}fr-radio-group--error{% endif %}{% if field.is_disabled %} fr-radio-group--disabled{% endif %}">
+                    {{ choice.tag }}
+                    <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                </div>
             </div>
-        {% endif %}
-    </div>
+        {% endfor %}
+    {% endif %}
+    {% if field.errors %}
+        <div id="{{ field.id_for_label }}-desc-error">
+            {% for error in field.has_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+    {% endif %}
 </fieldset>

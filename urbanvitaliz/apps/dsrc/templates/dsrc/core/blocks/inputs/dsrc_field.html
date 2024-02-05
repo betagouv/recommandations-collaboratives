@@ -1,16 +1,23 @@
+{% load widget_tweaks %}
 <div class="fr-fieldset__element">
-    {% if field.field.widget.input_type == "checkbox" %}
-        {% include "dsrc/core/blocks/inputs/dsrc_input_checkbox.html" %}
-    {% elif field.field.widget.input_type == "text" %}
-        {% include "dsrc/core/blocks/inputs/dsrc_input_text.html" %}
-    {% elif field.field.widget.input_type == "email" %}
-        {% include "dsrc/core/blocks/inputs/dsrc_input_text.html" %}
-    {% elif field.field.widget.input_type == "select" %}
-        {% include "dsrc/core/blocks/inputs/dsrc_select.html" %}
-    {% elif field.field.widget.attrs.type == "textarea" %}
-        {% include "dsrc/core/blocks/inputs/dsrc_textarea.html" %}
-    {% elif field.field.widget.input_type == "richtext" %}
-        {% include "dsrc/core/compositions/forms/dsrc_richtext.html" %}
+    {% if field|widget_type == "checkboxselectmultiple" %}
+        {% include "dsrc/core/blocks/inputs/dsrc_input_checkbox_group.html" %}
+    {% elif field|widget_type == "radioselect" %}
+        {% include "dsrc/core/blocks/inputs/dsrc_input_radio_group.html" %}
+    {% else %}
+        {% if field.field.widget.input_type == "checkbox" %}
+            {% include "dsrc/core/blocks/inputs/dsrc_input_checkbox.html" %}
+        {% elif field.field.widget.input_type == "text" %}
+            {% include "dsrc/core/blocks/inputs/dsrc_input_text.html" %}
+        {% elif field.field.widget.input_type == "email" %}
+            {% include "dsrc/core/blocks/inputs/dsrc_input_text.html" %}
+        {% elif field.field.widget.input_type == "select" %}
+            {% include "dsrc/core/blocks/inputs/dsrc_select.html" %}
+        {% elif field.field.widget.attrs.cols != None and field.field.widget.attrs.rows != None %}
+            {% include "dsrc/core/blocks/inputs/dsrc_textarea.html" %}
+        {% elif field.field.widget.input_type == "richtext" %}
+            {% include "dsrc/core/compositions/forms/dsrc_richtext.html" %}
+        {% endif %}
     {% endif %}
 </div>
 {% if field.field.widget.input_type == "password" %}
