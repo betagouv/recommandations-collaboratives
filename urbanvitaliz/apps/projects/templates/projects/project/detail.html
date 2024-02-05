@@ -7,15 +7,15 @@
 
 {% load sass_tags %}
 
+{% block title %}
+    {{ project.name }} - {{ request.site.name }} 
+{% endblock %}
+
 {% block css %}
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
-{% endblock %}
-
-{% block title %}
-{{ site.name }} | {{ project.name }}
 {% endblock %}
 
 {% block content %}
