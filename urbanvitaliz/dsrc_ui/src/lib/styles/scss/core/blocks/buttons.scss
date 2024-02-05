@@ -3,6 +3,11 @@
 	--border-action-high-blue-france: var(--dsrc-primary);
 	--hover-tint: var(--dsrc-primary-hover);
 	--active-tint: var(--dsrc-primary-active);
+	--text-action-high-blue-france: var(--dsrc-primary);
+}
+
+.dsrc-action--high:hover {
+	color: var(--text-inverted-blue-france);
 }
 
 .dsrc-action--medium {
@@ -10,7 +15,6 @@
 	--border-action-high-blue-france: var(--dsrc-secondary);
 	--hover-tint: var(--dsrc-secondary-hover);
 	--active-tint: var(--dsrc-secondary-active);
-	color: var(--grey-1000);
 }
 
 .dsrc-action--low {
@@ -18,5 +22,4 @@
 	--border-action-high-blue-france: var(--dsrc-tertiary);
 	--hover-tint: var(--dsrc-tertiary-hover);
 	--active-tint: var(--dsrc-tertiary-active);
-	color: var(--grey-1000);
 }

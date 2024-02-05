@@ -1,8 +1,0 @@
-@use 'sass:color';
-
-$color-dsrc-primary: rgba(255, 255, 255, 100%);
-
-// Generate css vars
-$colors: (
-	color-dsrc-primary: $color-dsrc-primary
-);
