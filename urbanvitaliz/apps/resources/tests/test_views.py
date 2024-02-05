@@ -21,7 +21,7 @@ from urbanvitaliz.apps.projects import models as projects
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import login
 
-from . import models
+from .. import models
 
 ########################################################################
 # resources
