@@ -27,6 +27,7 @@
 @forward './config/global';
 @forward './config/colors';
 @forward './blocks/buttons';
+@forward './blocks/inputs';
 
 /* External libraries overrides */
 @forward './ext/jupyter';

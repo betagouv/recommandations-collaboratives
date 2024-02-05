@@ -1,0 +1,11 @@
+.dsrc-input {
+	--border-bottom-color: var(--dsrc-primary);
+}
+
+input.dsrc-radio,
+input.dsrc-checkbox,
+.fr-radio-group input.dsrc-radio,
+.fr-checkbox-group input.dsrc-checkbox {
+	accent-color: var(--dsrc-primary);
+	opacity: 1;
+}

@@ -1,25 +1,25 @@
-.dsrc-action--high {
-	--background-action-high-blue-france: var(--dsrc-primary);
-	--border-action-high-blue-france: var(--dsrc-primary);
-	--hover-tint: var(--dsrc-primary-hover);
-	--active-tint: var(--dsrc-primary-active);
-	--text-action-high-blue-france: var(--dsrc-primary);
+.dsrc-color--primary {
+	--background-action-high-blue-france: var(--dsrc-color-primary);
+	--border-action-high-blue-france: var(--dsrc-color-primary);
+	--hover-tint: var(--dsrc-color-primary-hover);
+	--active-tint: var(--dsrc-color-primary-active);
+	--text-action-high-blue-france: var(--dsrc-color-primary);
 }
 
-.dsrc-action--high:hover {
+.dsrc-color--primary:hover {
 	color: var(--text-inverted-blue-france);
 }
 
-.dsrc-action--medium {
-	--background-action-high-blue-france: var(--dsrc-secondary);
-	--border-action-high-blue-france: var(--dsrc-secondary);
-	--hover-tint: var(--dsrc-secondary-hover);
-	--active-tint: var(--dsrc-secondary-active);
+.dsrc-color--secondary {
+	--background-action-high-blue-france: var(--dsrc-color-secondary);
+	--border-action-high-blue-france: var(--dsrc-color-secondary);
+	--hover-tint: var(--dsrc-color-secondary-hover);
+	--active-tint: var(--dsrc-color-secondary-active);
 }
 
-.dsrc-action--low {
-	--background-action-high-blue-france: var(--dsrc-tertiary);
-	--border-action-high-blue-france: var(--dsrc-tertiary);
-	--hover-tint: var(--dsrc-tertiary-hover);
-	--active-tint: var(--dsrc-tertiary-active);
+.dsrc-color--tertiary {
+	--background-action-high-blue-france: var(--dsrc-color-tertiary);
+	--border-action-high-blue-france: var(--dsrc-color-tertiary);
+	--hover-tint: var(--dsrc-color-tertiary-hover);
+	--active-tint: var(--dsrc-color-tertiary-active);
 }
