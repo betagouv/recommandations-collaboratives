@@ -13,6 +13,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from notifications.signals import notify
 from rest_framework.test import APIClient
@@ -303,6 +304,27 @@ def test_project_task_followup_list_closed_to_user_wo_permission(request):
 
 
 @pytest.mark.django_db
+def test_project_task_followup_list_closed_for_dissociate_task_and_project(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project1 = baker.make(project_models.Project, sites=[site])
+    _ = baker.make(models.Task, project=project1, site=site, public=True)
+    assign_perm("projects.use_tasks", user, project1)
+
+    project2 = baker.make(project_models.Project, sites=[site])
+    task2 = baker.make(models.Task, project=project2, site=site, public=True)
+    _ = baker.make(models.TaskFollowup, task=task2, status=models.Task.PROPOSED)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-followups-list", args=[project1.id, task2.id])
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
 def test_project_task_followup_list_returns_followups_to_collaborator(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
@@ -310,8 +332,7 @@ def test_project_task_followup_list_returns_followups_to_collaborator(request):
     task = baker.make(models.Task, project=project, site=site, public=True)
     followup = baker.make(models.TaskFollowup, task=task, status=models.Task.PROPOSED)
 
-    # FIXME here the point should be to state the specific permission
-    utils.assign_collaborator(user, project)
+    assign_perm("projects.use_tasks", user, project)
 
     client = APIClient()
     client.force_authenticate(user=user)
