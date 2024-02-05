@@ -703,14 +703,14 @@ def test_project_status_patch_updates_object_and_log(request):
 
 
 @pytest.mark.django_db
-def test_anonymous_can_use_topic_api(client):
+def test_anonymous_cannot_use_topic_api(client):
     url = reverse("topics-list")
     response = client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_anonymous_can_search_topic_api(client, request):
+def test_anonymous_cannot_search_topic_api(client, request):
     current_site = get_current_site(request)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
@@ -720,13 +720,15 @@ def test_anonymous_can_search_topic_api(client, request):
     url = reverse("topics-list")
     response = client.get(url, {"search": "acme"}, format="json")
 
-    assert response.status_code == 200
-    assert len(response.data) > 0
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_unused_topics_are_not_suggested_via_rest_api(client, request):
+def test_unused_topics_are_not_suggested_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     baker.make(models.Topic, name="acme topic", site=current_site)
 
@@ -740,8 +742,11 @@ def test_unused_topics_are_not_suggested_via_rest_api(client, request):
 
 
 @pytest.mark.django_db
-def test_topics_on_deleted_task_are_not_suggested_via_rest_api(client, request):
+def test_topics_on_deleted_task_are_not_suggested_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     task = baker.make(tasks_models.Task, deleted=timezone.now())
@@ -757,8 +762,11 @@ def test_topics_on_deleted_task_are_not_suggested_via_rest_api(client, request):
 
 
 @pytest.mark.django_db
-def test_topics_on_deleted_project_are_not_suggested_via_rest_api(client, request):
+def test_topics_on_deleted_project_are_not_suggested_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     project = baker.make(models.Project, deleted=timezone.now())
@@ -774,8 +782,11 @@ def test_topics_on_deleted_project_are_not_suggested_via_rest_api(client, reques
 
 
 @pytest.mark.django_db
-def test_topics_are_restricted_to_projects_via_rest_api(client, request):
+def test_topics_are_restricted_to_projects_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     task = baker.make(tasks_models.Task)
@@ -791,8 +802,11 @@ def test_topics_are_restricted_to_projects_via_rest_api(client, request):
 
 
 @pytest.mark.django_db
-def test_topics_are_restricted_to_recommendations_via_rest_api(client, request):
+def test_topics_are_restricted_to_recommendations_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     project = baker.make(models.Project)
@@ -808,8 +822,11 @@ def test_topics_are_restricted_to_recommendations_via_rest_api(client, request):
 
 
 @pytest.mark.django_db
-def test_topics_are_restricted_to_nonexistent_via_rest_api(client, request):
+def test_topics_are_restricted_to_nonexistent_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     baker.make(models.Topic, name="acme topic", site=current_site)
 
@@ -819,7 +836,7 @@ def test_topics_are_restricted_to_nonexistent_via_rest_api(client, request):
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data) == 0
 
 
 # eof
