@@ -30,6 +30,7 @@ from recoco.apps.projects.urls import urlpatterns as projects_urls
 from recoco.apps.projects.views import rest as projects_rest
 from recoco.apps.resources import views as resources_views
 from recoco.apps.resources.urls import urlpatterns as resources_urls
+from recoco.apps.resources import rest as resources_rest
 from recoco.apps.survey.urls import urlpatterns as survey_urls
 from recoco.apps.tasks.urls import urlpatterns as tasks_urls
 from recoco.apps.tasks.views import rest as tasks_rest
@@ -56,7 +57,7 @@ router.register(
     basename="project-tasks-notifications",
 )
 
-router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
+router.register(r"resources", resources_rest.ResourceViewSet, basename="resources")
 router.register(
     r"departments", geomatics_rest.DepartmentViewSet, basename="departments"
 )
