@@ -416,7 +416,7 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         """Return a list of all topics."""
         restrict_to = self.request.query_params.get("restrict_to", None)
-        topics = []
+        topics = models.Topic.objects.none()
         if restrict_to:
             # Warning : make sure the models mapping here have a "deleted" field or change the code below ;)
             # If not, a django.core.exceptions.FieldError will be throw.
@@ -426,7 +426,9 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
             }
             try:
                 topics = (
-                    topics.filter(**{f"{models_mapping[restrict_to]}__deleted": None})
+                    models.Topic.objects.filter(
+                        **{f"{models_mapping[restrict_to]}__deleted": None}
+                    )
                     .annotate(ntag=Count(models_mapping[restrict_to]))
                     .exclude(ntag=0)
                 )
