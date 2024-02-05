@@ -138,7 +138,3 @@ context = Context(
 
 HTML(template.render(context))
 
-
-# %%
-
-# %%

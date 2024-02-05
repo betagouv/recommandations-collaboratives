@@ -1,10 +1,8 @@
 import pytest
 from django.urls import reverse
-# from django.contrib.sites.shortcuts import get_current_site
+
 from model_bakery import baker
 from pytest_django.asserts import assertContains
-# from urbanvitaliz.apps.home import models as home_models
-# from urbanvitaliz.apps.dsrc import models as dsrc_models
 ########################################################################
 # Baker addons for using dynamic forms
 ########################################################################

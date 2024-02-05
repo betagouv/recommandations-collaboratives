@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr" data-fr-scheme="system">
     <head>
-        {% include 'dsrc/core/blocks/global/dsrc_head.html' %}
+        {% include 'dsrc/core/blocks/global/head.html' %}
         {% block head %}{% endblock %}
     </head>
     <body>
         {% block app_header %}
-            {% include 'dsrc/core/compositions/headers/dsrc_main_header.html' %}
+            {% include 'dsrc/core/compositions/headers/main_header.html' %}
         {% endblock %}
         {% block main %}{% endblock %}
-        {% include 'dsrc/core/blocks/global/dsrc_scripts.html' %}
+        {% include 'dsrc/core/blocks/global/scripts.html' %}
     </body>
 </html>

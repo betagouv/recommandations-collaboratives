@@ -2,11 +2,7 @@
 
 import os
 
-from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
-
-from . import models
 
 from django import forms
 
@@ -29,21 +25,6 @@ class DsrcBaseForm(forms.Form):
             break
 
 class DsrcExampleForm(DsrcBaseForm):
-    
-    class Meta:
-        fields = [
-            "first_name",
-            "last_name",
-            "phone",
-            "org_name",
-            "email",
-            "name",
-            "location",
-            "insee",
-            "description",
-            "response",
-            "captcha",
-        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -82,8 +63,6 @@ class DsrcExampleForm(DsrcBaseForm):
         label="Mot de passe", required=True, widget=forms.PasswordInput
     )
 
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
-
     sample_disabled_field = forms.CharField(
         label="Champ désactivé",
         help_text="Ce champ est désactivé",
@@ -108,7 +87,7 @@ class DsrcExampleForm(DsrcBaseForm):
         required=False,
         choices=[(1, "Premier choix unique"), (2, "Second choix unique"), (3, "Troisième choix unique")],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
-        widget=forms.RadioSelect,
+        widget=forms.RadioSelect(attrs={"class": "fr-input dsrc-radio"}),
     )
 
     # Checkbox group
@@ -121,7 +100,7 @@ class DsrcExampleForm(DsrcBaseForm):
             ("3", "Troisième choix"),
         ],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "fr-checkbox dsrc-input"}),
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "fr-input dsrc-checkbox"}),
     )
 
     # Simple text blocks
@@ -146,12 +125,5 @@ class DsrcExampleForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_autofocus_on_first_error()
-
-class SelectCommuneForm(forms.Form):
-    def __init__(self, communes, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["commune"] = forms.ModelChoiceField(
-            queryset=communes, widget=forms.RadioSelect, label="Votre commune :"
-        )
 
 # eof

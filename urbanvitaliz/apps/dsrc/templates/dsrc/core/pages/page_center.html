@@ -1,4 +1,4 @@
-{% extends 'dsrc/dsrc_base.html' %}
+{% extends 'dsrc/base.html' %}
 {% block main %}
     {% block page_header %}
         <div class="fr-container fr-mt-4v fr-mt-md-14v fr-mb-1v fr-mb-md-4v">
@@ -23,7 +23,8 @@
                         <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-pt-4v fr-pt-md-6v fr-pb-4v fr-pb-md-6v">
                             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
                                 <div class="fr-col-12 fr-col-md-10 fr-col-lg-9">
-                                    {% block form %}{% endblock form %}
+                                    {% block form %}
+                                    {% endblock form %}
                                 </div>
                             </div>
                         </div>

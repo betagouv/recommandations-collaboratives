@@ -1,7 +1,8 @@
-<div class="fr-checkbox-group">
+<div class="fr-radio-group">
     <input name="{{ field.id_for_label }}"
            id="{{ field.id_for_label }}"
-           type="checkbox"
+           type="radio"
+           class="{{ field.field.widget.classes }}"
            {% if field.errors %}aria-describedby="{{ field.id_for_label }}-desc-error"{% endif %}
            {% if field.field.required %}required{% endif %}
            {% if field.field.disabled %}disabled{% endif %} />

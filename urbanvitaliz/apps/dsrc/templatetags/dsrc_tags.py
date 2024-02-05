@@ -38,7 +38,7 @@ def parse_tag_args(args, kwargs, allowed_keys: list) -> dict:
 
     return tag_data
 
-@register.inclusion_tag("dsrc/core/compositions/forms/dsrc_form_base.html", takes_context=True)
+@register.inclusion_tag("dsrc/core/compositions/forms/form_base.html", takes_context=True)
 def dsrc_form(context) -> dict:
     """
     Returns the HTML for a form snippet
@@ -52,7 +52,7 @@ def dsrc_form(context) -> dict:
 
     return context
 
-@register.inclusion_tag("dsrc/core/compositions/forms/dsrc_form_multistep.html", takes_context=True)
+@register.inclusion_tag("dsrc/core/compositions/forms/form_multistep.html", takes_context=True)
 def dsrc_form_multistep(context) -> dict:
     """
     Returns the HTML for a multi step form snippet
@@ -71,7 +71,7 @@ def dsrc_form_multistep(context) -> dict:
 
     return context
 
-@register.inclusion_tag("dsrc/core/blocks/inputs/dsrc_field.html")
+@register.inclusion_tag("dsrc/core/blocks/inputs/field.html")
 def dsrc_form_field(field) -> dict:
     """
     Returns the HTML for a form field
@@ -85,7 +85,7 @@ def dsrc_form_field(field) -> dict:
 
     return {"field": field}
 
-@register.inclusion_tag("dsrc/core/compositions/forms/dsrc_fieldset.html")
+@register.inclusion_tag("dsrc/core/compositions/forms/fieldset.html")
 def dsrc_fieldset(fieldset) -> dict:
     """
     Returns the HTML for a form fieldset
@@ -99,7 +99,7 @@ def dsrc_fieldset(fieldset) -> dict:
 
     return {"fieldset": fieldset}
 
-@register.inclusion_tag("dsrc/core/blocks/inputs/dsrc_input_text.html")
+@register.inclusion_tag("dsrc/core/blocks/inputs/input_text.html")
 def dsrc_input_text(*args, **kwargs) -> dict:
     """
     Returns a input item. Takes a dict as parameter, with the following structure:
@@ -154,7 +154,7 @@ def dsrc_input_text(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc/blocks/buttons/dsrc_button.html")
+@register.inclusion_tag("dsrc/core/blocks/buttons/button.html")
 def dsrc_button(*args, **kwargs) -> dict:
     """
     Returns a button item. Takes a dict as parameter, with the following structure:
@@ -220,7 +220,7 @@ def dsrc_button(*args, **kwargs) -> dict:
         tag_data["classes"] = "dsrc-btn"
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc/core/blocks/inputs/dsrc_select.html")
+@register.inclusion_tag("dsrc/core/blocks/inputs/select.html")
 def dsrc_select(*args, **kwargs) -> dict:
     """
     Returns a select item. Takes a dict as parameter, with the following structure:
@@ -278,7 +278,7 @@ def dsrc_select(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc/core/compositions/navs/dsrc_breadcrumb.html", takes_context=True)
+@register.inclusion_tag("dsrc/core/compositions/navs/breadcrumb.html", takes_context=True)
 def dsrc_breadcrumb(context: Context, tag_data: dict = {}) -> dict:
     """
     Returns a breadcrumb item. Takes a dict as parameter, with the following structure:
@@ -309,7 +309,7 @@ def dsrc_breadcrumb(context: Context, tag_data: dict = {}) -> dict:
         tag_data["classes"] = "dsrc-breadcrumb"
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc/core/blocks/global/dsrc_link.html")
+@register.inclusion_tag("dsrc/core/blocks/global/link.html")
 def dsrc_link(*args, **kwargs) -> dict:
     """
     Returns a link item. Takes a dict as parameter, with the following structure:
@@ -362,7 +362,7 @@ def dsrc_link(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc/core/blocks/global/dsrc_skiplinks.html", takes_context=True)
+@register.inclusion_tag("dsrc/core/blocks/global/skiplinks.html", takes_context=True)
 def dsrc_skiplinks(context: Context, items: list) -> dict:
     """
     Returns a skiplinks item. Takes a list as parameter, with the following structure:
@@ -386,7 +386,7 @@ def dsrc_skiplinks(context: Context, items: list) -> dict:
             items = {}
     return {"self": {"items": items}}
 
-@register.inclusion_tag("dsrc/core/compositions/forms/dsrc_stepper.html")
+@register.inclusion_tag("dsrc/core/compositions/forms/stepper.html")
 def dsrc_stepper(*args, **kwargs) -> dict:
     """
     Returns a stepper item. Takes a dict as parameter, with the following structure:
@@ -431,7 +431,7 @@ def dsrc_stepper(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc/core/compositions/content/dsrc_card.html")
+@register.inclusion_tag("dsrc/core/compositions/content/card.html")
 def dsfr_card(*args, **kwargs) -> dict:
     """
     Returns a card item. Takes a dict as parameter, with the following structure:
