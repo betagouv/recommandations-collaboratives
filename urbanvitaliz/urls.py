@@ -28,7 +28,7 @@ from urbanvitaliz.apps.projects.views import rest as projects_rest
 from urbanvitaliz.apps.tasks.views import rest as tasks_rest
 from urbanvitaliz.apps.addressbook import rest as addressbook_rest
 from urbanvitaliz.apps.training import rest as training_rest
-from urbanvitaliz.apps.resources import views as resources_views
+from urbanvitaliz.apps.resources import rest as resources_rest
 from urbanvitaliz.apps.resources.urls import urlpatterns as resources_urls
 from urbanvitaliz.apps.survey.urls import urlpatterns as survey_urls
 
@@ -53,7 +53,7 @@ router.register(
     basename="project-tasks-notifications",
 )
 
-router.register(r"resources", resources_views.ResourceViewSet, basename="resources")
+router.register(r"resources", resources_rest.ResourceViewSet, basename="resources")
 router.register(
     r"departments", geomatics_rest.DepartmentViewSet, basename="departments"
 )

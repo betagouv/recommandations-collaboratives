@@ -23,7 +23,6 @@ from django.utils import timezone
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView
 from markdownx.fields import MarkdownxFormField
-from rest_framework import permissions, viewsets
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.geomatics import models as geomatics_models
 from urbanvitaliz.apps.projects import models as projects
@@ -35,7 +34,7 @@ from urbanvitaliz.utils import (
 )
 
 from . import models
-from .serializers import ResourceSerializer
+
 
 ########################################################################
 # Searching resources
@@ -458,23 +457,6 @@ def delete_bookmark(request, resource_id=None):
             pass
     next_url = reverse("resources-resource-detail", args=[resource_id])
     return redirect(next_url)
-
-
-########################################################################
-# REST API
-########################################################################
-class ResourceViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows resources to be listed or edited
-    """
-
-    def get_queryset(self):
-        return models.Resource.on_site.exclude(status=models.Resource.DRAFT).order_by(
-            "-created_on", "-updated_on"
-        )
-
-    serializer_class = ResourceSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 # eof
