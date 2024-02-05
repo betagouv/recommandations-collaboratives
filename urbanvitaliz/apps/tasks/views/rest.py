@@ -179,14 +179,17 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
         )
 
         if project_id not in user_projects:
-            project = projects_models.Project.objects.get(pk=project_id)
+            project = projects_models.Project.on_site.get(pk=project_id)
             if not (
                 self.request.method == "GET"
                 and self.request.user.has_perm("projects.use_tasks", project)
             ):
                 raise PermissionDenied()
 
-        return models.TaskFollowup.objects.filter(task_id=task_id)
+        # also filter with project_id to ensure the given task and project are consistent
+        return models.TaskFollowup.objects.filter(
+            task_id=task_id, task__project_id=project_id
+        )
 
     def create(self, request, project_id, task_id):
         data = copy(request.data)
