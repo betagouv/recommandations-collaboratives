@@ -7,9 +7,13 @@
 
 {% load sass_tags %}
 
-{% block title %} | {{ resource.title }}{% endblock %}
+{% block title %}
+    {{ resource.title }} - {{ request.site.name }} 
+{% endblock %}
 
-{% block og_title %} | {{ resource.title }}{% endblock %}
+{% block og_title %} 
+    {{ resource.title }} - {{ request.site.name }}
+{% endblock %}
 
 {% block description %}{{ resource.subtitle }}{% endblock %}
 
