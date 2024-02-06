@@ -2,6 +2,10 @@
 
 {% load static %}
 
+{% block title %}
+    Modifier {{ organization.name }} {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
 <div class="col-11 py-5 mx-auto">
