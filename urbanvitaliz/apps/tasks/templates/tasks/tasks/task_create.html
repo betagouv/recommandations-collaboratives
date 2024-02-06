@@ -5,6 +5,10 @@
 
 {% load sass_tags %}
 
+{% block title %}
+    Créer une recommandation - {{ request.site.name }}
+{% endblock %}
+
 {% block css %}
 <link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
 <link href="{% sass_src 'projects/css/push.scss' %}" rel="stylesheet" type="text/css">
