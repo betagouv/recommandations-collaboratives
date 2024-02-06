@@ -81,11 +81,6 @@ urlpatterns = [
         name="crm-user-reactivate",
     ),
     path(
-        r"crm/user/<int:user_id>/project_interest",
-        views.user_project_interest,
-        name="crm-user-project-interest",
-    ),
-    path(
         r"crm/user/<int:user_id>/notifications",
         views.user_notifications,
         name="crm-user-notifications",

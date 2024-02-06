@@ -42,7 +42,7 @@ from urbanvitaliz.apps.addressbook.models import Organization
 from urbanvitaliz.apps.communication import api
 from urbanvitaliz.apps.geomatics import models as geomatics
 from urbanvitaliz.apps.home import models as home_models
-from urbanvitaliz.apps.projects.models import Project, Topic, UserProjectStatus
+from urbanvitaliz.apps.projects.models import Project, Topic
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.tasks.models import Task
 from urbanvitaliz.utils import (
@@ -373,7 +373,8 @@ def user_update(request, user_id=None):
                         if request.site in users[0].profile.sites.all():  # on same site
                             user_link = reverse("crm-user-details", args=[users[0].pk])
                             error_msg = mark_safe(
-                                f'L\'utilisateur <a href="{user_link}">{users[0].first_name} {users[0].last_name}</a>'
+                                f'L\'utilisateur <a href="{user_link}">'
+                                f"{users[0].first_name} {users[0].last_name}</a>'"
                                 " utilise déjà cette adresse email."
                             )
                             form.add_error(
@@ -404,7 +405,10 @@ def user_update(request, user_id=None):
                     crm_user.last_name = form.cleaned_data.get("last_name")
                     crm_user.save()
 
-                    success_message = "Les informations de l'utilisateur ont été modifiées avec succès."
+                    success_message = (
+                        "Les informations de l'utilisateur ont "
+                        "été modifiées avec succès."
+                    )
                     if email_changed:
                         setup_user_email(request, crm_user, [])
                         send_email_confirmation(request, crm_user, signup=True)
@@ -538,27 +542,6 @@ def user_details(request, user_id):
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/user_details.html", locals())
-
-
-@login_required
-def user_project_interest(request, user_id):
-    has_perm_or_403(request.user, "use_crm", request.site)
-
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
-
-    if request.site not in crm_user.profile.sites.all():
-        # only for user of current site
-        raise Http404
-
-    actions = actor_stream(crm_user)
-
-    user_ct = ContentType.objects.get_for_model(User)
-
-    statuses = UserProjectStatus.objects.filter(user=crm_user).order_by("project__name")
-
-    search_form = forms.CRMSearchForm()
-
-    return render(request, "crm/user_project_interest.html", locals())
 
 
 @login_required
