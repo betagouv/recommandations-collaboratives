@@ -7,6 +7,10 @@
 {% load training %}
 {% load hijack %}
 
+{% block title %}
+    Organisations - CRM {{ crm_user.get_full_name }}
+{% endblock %}
+
 {% block js %}
 {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}
