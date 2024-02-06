@@ -66,6 +66,7 @@ class ChallengeView(generics.RetrieveUpdateAPIView):
             challenge.started_on = timezone.now()
         if "acquire" in request.data:
             challenge.acquired_on = timezone.now()
+            challenge.snoozed_on = None
         if "snooze" in request.data:
             challenge.snoozed_on = timezone.now()
 

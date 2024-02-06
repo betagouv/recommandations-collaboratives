@@ -25,7 +25,37 @@ def test_get_challenge_with_other_site_definition(request):
 
 
 @pytest.mark.django_db
-def test_user_challenge_returned_when_open_one_exists():
+def test_user_challenge_returned_when_is_snoozed_and_repeat_exceed():
+    site = baker.make(site_models.Site)
+    user = baker.make(auth_models.User, last_login=timezone.now())
+    definition = baker.make(models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=3)
+    last_month = timezone.now() - datetime.timedelta(weeks=4)
+    challenge = baker.make(models.Challenge, challenge_definition=definition, user=user, snoozed_on=last_month)
+
+    with settings.SITE_ID.override(site.pk):
+        current = utils.get_challenge_for(user, definition.code)
+
+    # challenge is proposed
+    assert current and current == challenge
+
+
+@pytest.mark.django_db
+def test_user_challenge_not_returned_when_is_snoozed_and_repeat_not_exceeded():
+    site = baker.make(site_models.Site)
+    user = baker.make(auth_models.User, last_login=timezone.now())
+    definition = baker.make(models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=3)
+    last_weeks = timezone.now() - datetime.timedelta(weeks=2)
+    challenge = baker.make(models.Challenge, challenge_definition=definition, user=user, snoozed_on=last_weeks)
+
+    with settings.SITE_ID.override(site.pk):
+        current = utils.get_challenge_for(user, definition.code)
+
+    # challenge is not proposed
+    assert current is None
+
+
+@pytest.mark.django_db
+def test_user_challenge_returned_when_is_not_acquired():
     site = baker.make(site_models.Site)
     user = baker.make(auth_models.User, last_login=timezone.now())
     definition = baker.make(models.ChallengeDefinition, site=site, code="a-code")
@@ -34,72 +64,57 @@ def test_user_challenge_returned_when_open_one_exists():
     with settings.SITE_ID.override(site.pk):
         current = utils.get_challenge_for(user, definition.code)
 
-    # nothing new under the sun
-    assert current == challenge
+    # challenge is proposed
+    assert current and current == challenge and current.acquired_on is None
 
 
 @pytest.mark.django_db
-def test_user_challenge_returned_now_one_for_every_time_challenge():
+def test_user_challenge_returned_when_inactivity_more_than_one_month():
     site = baker.make(site_models.Site)
-    user = baker.make(auth_models.User, last_login=timezone.now())
-    definition = baker.make(
-        models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=0
-    )
-    challenge = baker.make(
-        models.Challenge,
-        challenge_definition=definition,
-        user=user,
-        acquired_on=timezone.now(),
-    )
+    more_than_one_month = timezone.now() - datetime.timedelta(weeks=5)
+    user = baker.make(auth_models.User, last_login=more_than_one_month)
+    user.profile.previous_login_at = more_than_one_month
+    definition = baker.make(models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=3)
+    challenge = baker.make(models.Challenge, challenge_definition=definition, user=user, acquired_on=more_than_one_month)
 
     with settings.SITE_ID.override(site.pk):
         current = utils.get_challenge_for(user, definition.code)
 
-    # a new challenge is born
-    assert current and current != challenge and current.acquired_on is None
+    # challenge is proposed
+    assert current and current == challenge and current.acquired_on is None
 
 
 @pytest.mark.django_db
-def test_user_challenge_not_repeated_before_inactivity_period():
+def test_user_challenge_not_returned_when_inactivity_less_than_one_month():
     site = baker.make(site_models.Site)
-    user = baker.make(auth_models.User, last_login=timezone.now())
-    definition = baker.make(
-        models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=1
-    )
-    challenge = baker.make(
-        models.Challenge,
-        challenge_definition=definition,
-        user=user,
-        acquired_on=timezone.now(),
-    )
+    more_than_one_month = timezone.now() - datetime.timedelta(weeks=5)
+    less_than_one_month = timezone.now() - datetime.timedelta(weeks=3)
+    user = baker.make(auth_models.User, last_login=less_than_one_month)
+    user.profile.previous_login_at = less_than_one_month
+    definition = baker.make(models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=3)
+    challenge = baker.make(models.Challenge, challenge_definition=definition, user=user, acquired_on=more_than_one_month)
 
     with settings.SITE_ID.override(site.pk):
         current = utils.get_challenge_for(user, definition.code)
 
-    # no active challenge
+    # challenge is not proposed
     assert current is None
 
-
+    
 @pytest.mark.django_db
-def test_user_challenge_repeated_when_over_inactivity_period():
-    last_week = timezone.now() - datetime.timedelta(days=8)
+def test_user_challenge_not_returned_when_inactivity_but_acquired_less_than_one_month():
     site = baker.make(site_models.Site)
-    user = baker.make(auth_models.User, last_login=last_week)
-    definition = baker.make(
-        models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=1
-    )
-    challenge = baker.make(
-        models.Challenge,
-        challenge_definition=definition,
-        user=user,
-        acquired_on=last_week,
-    )
+    more_than_one_month = timezone.now() - datetime.timedelta(weeks=5)
+    less_than_one_month = timezone.now() - datetime.timedelta(weeks=3)
+    user = baker.make(auth_models.User, last_login=more_than_one_month)
+    user.profile.previous_login_at = more_than_one_month
+    definition = baker.make(models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=3)
+    challenge = baker.make(models.Challenge, challenge_definition=definition, user=user, acquired_on=less_than_one_month)
 
     with settings.SITE_ID.override(site.pk):
         current = utils.get_challenge_for(user, definition.code)
 
-    # a new challenge is born
-    assert current and current != challenge and current.acquired_on is None
-
+    # challenge is not proposed
+    assert current is None
 
 # eof

@@ -67,11 +67,18 @@ class OpenChallengesManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(acquired_on=None)
 
+class AllChallengesManager(models.Manager):
+    """Manager for all challenges"""
+
+    def get_queryset(self):
+        return super().get_queryset()
+
 
 class Challenge(models.Model):
     """Challenge tracks the completion of users"""
 
     objects = OpenChallengesManager()
+    all_objects = AllChallengesManager()
     acquired_objects = AcquiredChallengesManager()
 
     challenge_definition = models.ForeignKey(

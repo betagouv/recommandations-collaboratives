@@ -19,8 +19,10 @@
            padding: 0">
     <div class="position-relative d-flex align-items-center"
          id="overview-step-1">
-        {% if not position.is_advisor and not position.is_observer and is_regional_actor and overview %}
-            {% include 'tutorial/tutorial_hint.html' %}
+        {% if overview %}
+            {% if position.is_advisor or position.is_observer or is_regional_actor %}
+                {% include 'tutorial/tutorial_hint.html' %}
+            {% endif %}
         {% endif %}
         {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
             <li id="overview-hint-1">
