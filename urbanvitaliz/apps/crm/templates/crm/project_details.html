@@ -2,6 +2,11 @@
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
+
+{% block title %}
+    {{ project.name }} - CRM
+{% endblock %}
+
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}
