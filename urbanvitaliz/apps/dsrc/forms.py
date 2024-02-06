@@ -18,7 +18,12 @@ class DsrcBaseForm(forms.Form):
                     continue
                 field.widget = forms.TextInput(attrs={"classes": "dsrc-input"})
             if isinstance(field, forms.BooleanField):
-                field.widget = forms.CheckboxInput(attrs={"classes": "dsrc-checkbox"})
+                field.widget = forms.CheckboxInput(attrs={"size": "sm", "classes": "dsrc-checkbox-group"})
+            if isinstance(field, forms.ChoiceField):
+                if isinstance(field.widget, (forms.RadioSelect, forms.CheckboxSelectMultiple)):
+                    continue
+                field.widget = forms.Select(attrs={"classes": "dsrc-select"})
+
     def set_autofocus_on_first_error(self):
         """
         Sets the autofocus on the first field with an error message.
@@ -75,7 +80,7 @@ class DsrcExampleForm(DsrcBaseForm):
         return email.lower()
 
     sample_password = forms.CharField(
-        label="Mot de passe", required=True, widget=forms.PasswordInput(attrs={"classes": "dsrc-input", "size": "sm"})
+        label="Mot de passe", required=True, widget=forms.PasswordInput(attrs={"size": "sm", "classes": "dsrc-input"})
     )
 
     sample_postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
@@ -91,7 +96,7 @@ class DsrcExampleForm(DsrcBaseForm):
     )
 
     # Booleans and choicefields
-    sample_boolean = forms.BooleanField(label="Cochez la case", required=False)
+    sample_boolean = forms.BooleanField(label="Cochez la case", required=False, widget=forms.CheckboxInput(attrs={"size": "sm", "classes": "dsrc-checkbox-group"}))
 
     # Basic Select
     sample_select = forms.ChoiceField(

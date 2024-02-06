@@ -11,9 +11,9 @@
         {% elif field|is_password %}
             {% include "dsrc/core/blocks/inputs/input_password.html" %}
         {% else %}
-            <div class="{% if field.field.widget.input_type == 'password' %}fr-input-wrap{% elif field.field.widget.input_type == 'text' %}fr-input-group{% else %} fr-{{ field.field.widget.input_type }}-group{% endif %} {% if field.errors %}fr-input-group--error{% endif %} {% if field.field.is_valid %}fr-input-group--valid{% endif %}{% if field|is_checkbox or field.field.widget.input_type == 'radio' %} fr-{{ field.field.widget.input_type }}-group--sm {% endif %}">
+            <div class="{% if field.field.widget.input_type == 'text' %}fr-input-group{% else %} fr-{{ field.field.widget.input_type }}-group{% endif %} {% if field.errors %}fr-input-group--error{% endif %} {% if field.field.is_valid %}fr-input-group--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }} fr-{{ field.field.widget.input_type }}-group--{{ field.field.widget.attrs.size }} {% endif %} {{ field.field.widget.attrs.classes }}">
                 {% if field.label %}
-                    {% if field|is_checkbox %}
+                    {% if field.field.widget.input_type == "checkbox" %}
                         {% include "dsrc/core/blocks/inputs/input_checkbox.html" %}
                     {% endif %}
                     <label {% if not fake_field %}for="{{ field.id_for_label }}"{% endif %}

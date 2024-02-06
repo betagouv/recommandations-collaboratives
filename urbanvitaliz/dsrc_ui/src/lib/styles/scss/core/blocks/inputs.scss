@@ -1,4 +1,5 @@
-.dsrc-input {
+.dsrc-input,
+.dsrc-select select {
 	--border-plain-grey: var(--dsrc-primary);
 }
 
@@ -6,14 +7,12 @@
 	accent-color: var(--dsrc-primary);
 	opacity: 1;
 }
-.fr-radio-group--sm input[type="radio"]:checked + label::before  {
+.dsrc-radio-group input[type="radio"] + label::before,
+.dsrc-radio-group input[type="radio"]:checked + label::before  {
 	display: none;
 }
 
-.dsrc-checkbox-group input[type="checkbox"]:checked + label::before {
-	--border-active-blue-france: var(--dsrc-primary);
-}
-
+.dsrc-input input[type="checkbox"]:checked + label::before, // necessary to override password checkbox styles
 .dsrc-checkbox-group input[type="checkbox"]:checked + label::before {
 	--border-active-blue-france: var(--dsrc-primary);
 	background-color: var(--dsrc-primary);
