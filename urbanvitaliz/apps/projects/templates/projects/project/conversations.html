@@ -4,7 +4,7 @@
 {% load gravatar %}
 {% load training %}
 {% load guardian_tags %}
-{% block title %}{{ block.super }} > Conversations{% endblock %}
+{% block title %}Conversation - {{ block.super }} {% endblock %}
 {% block project_detail %}
   {% challenge_for request.user "project-conversation-reader" as challenge %}
   {% if challenge and not challenge.acquired %}
