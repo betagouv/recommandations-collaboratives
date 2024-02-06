@@ -1,8 +1,11 @@
+{% load static %}
+{% block js %}
+    <script src="{% static 'assets/js/components/DsrcButton.js' %}" type="module"></script>
+{% endblock %}
 <ul class="fr-btns-group">
-    <li>
-        <button class="fr-btn">Label bouton</button>
-    </li>
-    <li>
-        <button class="fr-btn fr-btn--secondary">Label bouton</button>
-    </li>
+    {% for button in buttons %}
+        <li>
+            <button class="fr-btn">Label bouton</button>
+        </li>
+    {% endfor %}
 </ul>

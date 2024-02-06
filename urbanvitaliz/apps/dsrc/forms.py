@@ -1,6 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
+from crispy_forms.layout import Layout, Fieldset, Submit
 
 """
 Base DSRC form with built-in error handling and autofocus on first error.
@@ -32,7 +32,23 @@ class DsrcExampleForm(DsrcBaseForm):
         self.helper.form_method = 'post'
         self.helper.form_action = 'test_form'
 
-        self.helper.add_input(Submit('submit', 'Valider'))
+        self.helper.layout = Layout(
+            Fieldset(
+                'Créez votre compte',
+                'sample_text',
+                'sample_phone',
+                'sample_email',
+                'sample_password',
+                'sample_postcode',
+                'sample_description',
+                'sample_boolean',
+                'sample_select',
+                'sample_disabled_field',
+                'sample_radio_group',
+                'sample_checkbox_group'
+            ),
+            Submit('submit', 'Valider'),
+        )
 
     sample_text = forms.CharField(label="Nom d'usager", initial="", required=True)
     sample_phone = forms.CharField(max_length=16, label="Téléphone", initial="", required=True)
@@ -47,13 +63,13 @@ class DsrcExampleForm(DsrcBaseForm):
         email = self.cleaned_data["email"]
         return email.lower()
 
-    sample_postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
-
-    sample_description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows":"5"}), required=False)
-
     sample_password = forms.CharField(
         label="Mot de passe", required=True, widget=forms.PasswordInput
     )
+
+    sample_postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
+
+    sample_description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows":"5"}), required=False)
 
     sample_disabled_field = forms.CharField(
         label="Champ désactivé",
@@ -64,7 +80,7 @@ class DsrcExampleForm(DsrcBaseForm):
     )
 
     # Booleans and choicefields
-    sample_radio = forms.BooleanField(label="Cochez la case", required=False)
+    sample_boolean = forms.BooleanField(label="Cochez la case", required=False)
 
     # Basic Select
     sample_select = forms.ChoiceField(
@@ -79,7 +95,7 @@ class DsrcExampleForm(DsrcBaseForm):
         required=False,
         choices=[(1, "Premier choix unique"), (2, "Second choix unique"), (3, "Troisième choix unique")],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
-        widget=forms.RadioSelect(attrs={"class": "fr-input dsrc-radio"}),
+        widget=forms.RadioSelect,
     )
 
     # Checkbox group
@@ -92,7 +108,7 @@ class DsrcExampleForm(DsrcBaseForm):
             ("3", "Troisième choix"),
         ],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "fr-input dsrc-checkbox"}),
+        widget=forms.CheckboxSelectMultiple,
     )
 
 	# Example clean method

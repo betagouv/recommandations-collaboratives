@@ -3,41 +3,50 @@
     {{ field }}
 {% else %}
     <div id="div_{{ field.auto_id }}"
-         class="holder{% if wrapper_class %} {{ wrapper_class }}{% endif %}{% if field|is_checkbox %} checkbox{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}">
-        {% spaceless %}
-            {% if field.label %}
-                {% if field|is_checkbox %}
-                    {% crispy_field field %}
+         class="fr-fieldset__element{% if wrapper_class %} {{ wrapper_class }}{% endif %}{% if field|is_checkbox %} checkbox{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}{% if field.field.widget.input_type == 'password' %} fr-password{% endif %}">
+        {% if field|is_checkboxselectmultiple %}
+            {% include "dsrc/core/blocks/inputs/input_checkbox_group.html" %}
+        {% elif field|is_radioselect %}
+            {% include "dsrc/core/blocks/inputs/input_radio_group.html" %}
+        {% else %}
+            <div class="{% if field.field.widget.input_type == 'password' %}fr-input-wrap{% elif field.field.widget.input_type == 'text' %}fr-input-group{% else %} fr-{{ field.field.widget.input_type }}-group{% endif %} {% if field.errors %}fr-input-group--error{% endif %} {% if field.field.is_valid %}fr-input-group--valid{% endif %} {{ field.field.widget.classes }}">
+                {% if field.label %}
+                    {% if field|is_checkbox %}
+                        {% include "dsrc/core/blocks/inputs/input_checkbox.html" %}
+                    {% endif %}
+                    <label {% if not fake_field %}for="{{ field.id_for_label }}"{% endif %}
+                           class="fr-label">
+                        {{ field.label|safe }}
+                        {% if field.field.help_text %}<span class="fr-hint-text">{{ field.field.help_text }}</span>{% endif %}
+                    </label>
                 {% endif %}
-                <label {% if not fake_field %}for="{{ field.id_for_label }}"{% endif %}
-                       {% if field.errors and form_show_errors or field.field.required %} class="{% if field.field.required %}required{% endif %}
-                       {% if field.errors and form_show_errors %}is-invalid-label{% endif %}
-                       "
-                       {% endif %}>
-                    {{ field.label|safe }}
-                    {% if field.field.required %}<span class="asterisk">*</span>{% endif %}
-                </label>
+                {% include "dsrc_crispy_forms/layout/baseinput.html" %}
+                {% if field.field.messages %}
+                    {% for message in field.field.messages %}
+                        <div class="fr-messages-group"
+                             id="{{ field.id_for_label }}-input-messages"
+                             aria-live="assertive">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                {% if form.show_errors %}
+                    <div class="fr-messages-group"
+                         id="{{ field.id_for_label }}-desc-error"
+                         aria-live="polite">
+                        {% for error in field.errors %}
+                            <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"
+                               class="fr-error-text">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if field.valid_text %}
+                    <p id="{{ field.id_for_label }}-desc-valid" class="fr-valid-text">{{ field.valid_text }}</p>
+                {% endif %}
+            </div>
+            {% if field.field.widget.input_type == "password" %}
+                {% include "dsrc/core/blocks/inputs/input_show_password.html" %}
             {% endif %}
-            {% if field|is_checkboxselectmultiple %}
-                {% include 'dsrc_crispy_forms/layout/checkboxselectmultiple.html' %}
-            {% endif %}
-            {% if not field|is_checkbox and not field|is_checkboxselectmultiple %}
-                {% crispy_field field %}
-            {% endif %}
-            {% if field.field.abide_msg %}
-                <span id="abide_error_{{ field.auto_id }}"
-                      class="form-error{% if form_show_errors and not field.errors|length_is:"0" %} compact{% endif %}"
-                      data-form-error-for="{{ field.id_for_label }}">{{ field.field.abide_msg }}</span>
-            {% endif %}
-            {% if form_show_errors %}
-                {% for error in field.errors %}
-                    <span id="error_{{ forloop.counter }}_{{ field.auto_id }}"
-                          class="form-error is-visible{% if not forloop.last %} compact{% endif %}">{{ error }}</span>
-                {% endfor %}
-            {% endif %}
-            {% if field.help_text %}
-                <p id="helptext_{{ field.auto_id }}" class="help-text">{{ field.help_text|safe }}</p>
-            {% endif %}
-        {% endspaceless %}
+        {% endif %}
     </div>
 {% endif %}

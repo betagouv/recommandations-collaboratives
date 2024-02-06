@@ -1,7 +1,29 @@
-{% load l10n %}
-<ul>{% for choice in field.field.choices %}<li>
-    <label for="id_{{ field.html_name}}_{{ forloop.counter }}"{% if flat_attrs %} {{ flat_attrs|safe }}{% endif %}>
-        <input type="checkbox"{% if choice.0 in field.value or choice.0|stringformat:"s" in field.value or choice.0|stringformat:"s" == field.value|stringformat:"s" %} checked="checked"{% endif %} name="{{ field.html_name }}" id="id_{{ field.html_name }}_{{ forloop.counter }}" value="{{ choice.0|unlocalize }}">
-        {{ choice.1|unlocalize }}
-    </label>
-</li>{% endfor %}</ul>
+{% load widget_tweaks %}
+{% load dsrc_tags %}
+<fieldset class="fr-fieldset"
+          id="checkboxes"
+          aria-labelledby="checkboxes-legend checkboxes-messages">
+    <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
+            id="checkboxes-legend">
+        {{ field.label_tag }}
+        {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
+    </legend>
+    {% if field.errors %}
+        {% with aria_describedby="aria-describedby:"|add:field.auto_id|add:"-desc-error" %}
+            {{ field|attr:"type:checkbox"|attr:aria_describedby }}
+        {% endwith %}
+    {% else %}
+        {% for choice in field %}
+            <div class="fr-fieldset__element">
+                <div class="fr-checkbox-group  fr-checkbox-group--sm {% if field.errors %}fr-checkbox-group--error{% endif %}{% if field.is_disabled %} fr-input-group--disabled{% endif %}">
+                    <input type="checkbox"
+                           {% if choice.0 in field.value or choice.0|stringformat:'s' in field.value or choice.0|stringformat:'s' == field.value|stringformat:'s' %} checked="checked"{% endif %}
+                           name="{{ field.html_name }}"
+                           id="{{ choice.id_for_label }}"
+                           value="{{ choice.0 }}">
+                    <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</fieldset>

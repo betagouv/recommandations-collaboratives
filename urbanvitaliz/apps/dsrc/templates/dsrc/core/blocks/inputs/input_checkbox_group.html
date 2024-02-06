@@ -8,7 +8,7 @@
         {{ field.label_tag }}
         {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
     </legend>
-    {% if field.errors %}
+    {% if form.show_errors %}
         {% with aria_describedby="aria-describedby:"|add:field.auto_id|add:"-desc-error" %}
             {{ field|attr:"type:checkbox"|attr:aria_describedby }}
         {% endwith %}
@@ -22,9 +22,26 @@
             </div>
         {% endfor %}
     {% endif %}
-    {% if field.errors %}
-        <div id="{{ field.id_for_label }}-desc-error">
-            {% for error in field.has_errors %}<p>{{ error }}</p>{% endfor %}
+    {% if field.field.messages %}
+        {% for message in field.field.messages %}
+            <div class="fr-messages-group"
+                 id="{{ field.id_for_label }}-input-messages"
+                 aria-live="assertive">
+                <p>{{ message }}</p>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if form.show_errors %}
+        <div class="fr-messages-group"
+             id="{{ field.id_for_label }}-desc-error"
+             aria-live="polite">
+            {% for error in field.errors %}
+                <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"
+                   class="fr-error-text">{{ error }}</p>
+            {% endfor %}
         </div>
+    {% endif %}
+    {% if field.valid_text %}
+        <p id="{{ field.id_for_label }}-desc-valid" class="fr-valid-text">{{ field.valid_text }}</p>
     {% endif %}
 </fieldset>

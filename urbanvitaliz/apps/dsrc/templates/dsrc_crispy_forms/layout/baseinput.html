@@ -1,1 +1,15 @@
-<input type="{{ input.input_type }}" name="{% if input.name|wordcount > 1 %}{{ input.name|slugify }}{% else %}{{ input.name }}{% endif %}" value="{{ input.value }}"{% if input.input_type != "hidden" %} class="{{ input.field_classes }}" id="{% if input.id %}{{ input.id }}{% else %}{{ input.input_type }}-id-{{ input.name|slugify }}{% endif %}"{% endif %} {{ input.flat_attrs|safe }}/>
+{% if field.field.widget.input_type == "checkbox" %}
+    {% include "dsrc/core/blocks/inputs/input_checkbox.html" %}
+{% elif field.field.widget.input_type == "text" %}
+    {% include "dsrc/core/blocks/inputs/input_text.html" %}
+{% elif field.field.widget.input_type == "password" %}
+    {% include "dsrc/core/blocks/inputs/input_text.html" %}
+{% elif field.field.widget.input_type == "email" %}
+    {% include "dsrc/core/blocks/inputs/input_text.html" %}
+{% elif field.field.widget.input_type == "select" %}
+    {% include "dsrc/core/blocks/inputs/select.html" %}
+{% elif field.field.widget.attrs.cols != None and field.field.widget.attrs.rows != None %}
+    {% include "dsrc/core/blocks/inputs/textarea.html" %}
+{% elif field.field.widget.input_type == "richtext" %}
+    {% include "dsrc/core/compositions/forms/richtext.html" %}
+{% endif %}

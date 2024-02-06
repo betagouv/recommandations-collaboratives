@@ -1,7 +1,7 @@
 {% if form_show_errors %}
     {% include "dsrc_crispy_forms/errors.html" %}
 {% endif %}
-<fieldset class="fieldset">
+<fieldset class="fr-fieldset">
     {% for field in form %}
         {% include field_template|default:"dsrc_crispy_forms/field.html" %}
     {% endfor %}
