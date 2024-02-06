@@ -13,14 +13,24 @@ class DsrcBaseForm(forms.Form):
         self.helper = FormHelper()
         for field_name, field in self.fields.items():
             if isinstance(field, forms.CharField):
-                 # If the widget is already a PasswordInput or EmailInput, skip it
-                if isinstance(field.widget, (forms.PasswordInput, forms.Textarea)):
+                if isinstance(field.widget, forms.Textarea):
+                    field.widget.attrs = field.widget.attrs | {"classes": "dsrc-input"}
+                    continue
+                if isinstance(field.widget, forms.PasswordInput):
+                    field.widget.attrs = field.widget.attrs | {"size": "sm", "classes": "dsrc-input"}
                     continue
                 field.widget = forms.TextInput(attrs={"classes": "dsrc-input"})
             if isinstance(field, forms.BooleanField):
-                field.widget = forms.CheckboxInput(attrs={"size": "sm", "classes": "dsrc-checkbox-group"})
+                if isinstance(field.widget, forms.CheckboxInput):
+                    field.widget.attrs={"size": "sm", "classes": "dsrc-checkbox-group"}
+                    continue
             if isinstance(field, forms.ChoiceField):
-                if isinstance(field.widget, (forms.RadioSelect, forms.CheckboxSelectMultiple)):
+                 # If the widget is already a RadioSelect or CheckboxSelectMultiple, skip it
+                if isinstance(field.widget, forms.RadioSelect):
+                    field.widget.attrs={"classes": "dsrc-radio-group", "size": "sm"}
+                    continue
+                if isinstance(field.widget, forms.CheckboxSelectMultiple):
+                    field.widget.attrs={"classes": "dsrc-checkbox-group", "size": "sm"}
                     continue
                 field.widget = forms.Select(attrs={"classes": "dsrc-select"})
 
@@ -80,12 +90,12 @@ class DsrcExampleForm(DsrcBaseForm):
         return email.lower()
 
     sample_password = forms.CharField(
-        label="Mot de passe", required=True, widget=forms.PasswordInput(attrs={"size": "sm", "classes": "dsrc-input"})
+        label="Mot de passe", required=True, widget=forms.PasswordInput()
     )
 
     sample_postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
 
-    sample_description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows":"5", "classes": "dsrc-input"}), required=False)
+    sample_description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows":"5"}), required=False)
 
     sample_disabled_field = forms.CharField(
         label="Champ désactivé",
@@ -96,7 +106,7 @@ class DsrcExampleForm(DsrcBaseForm):
     )
 
     # Booleans and choicefields
-    sample_boolean = forms.BooleanField(label="Cochez la case", required=False, widget=forms.CheckboxInput(attrs={"size": "sm", "classes": "dsrc-checkbox-group"}))
+    sample_boolean = forms.BooleanField(label="Cochez la case", required=False, widget=forms.CheckboxInput())
 
     # Basic Select
     sample_select = forms.ChoiceField(
@@ -119,7 +129,7 @@ class DsrcExampleForm(DsrcBaseForm):
         required=False,
         choices=[(1, "Premier choix unique"), (2, "Second choix unique"), (3, "Troisième choix unique")],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
-        widget=forms.RadioSelect(attrs={"classes": "dsrc-radio-group", "size": "sm"}),
+        widget=forms.RadioSelect(),
     )
 
     # Checkbox group
@@ -132,7 +142,7 @@ class DsrcExampleForm(DsrcBaseForm):
             ("3", "Troisième choix"),
         ],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
-        widget=forms.CheckboxSelectMultiple(attrs={"classes": "dsrc-checkbox-group", "size": "sm"}),
+        widget=forms.CheckboxSelectMultiple(),
     )
 
 	# Example clean method
