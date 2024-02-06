@@ -19,9 +19,9 @@
                     <input type="checkbox"
                            {% if choice.0 in field.value or choice.0|stringformat:'s' in field.value or choice.0|stringformat:'s' == field.value|stringformat:'s' %} checked="checked"{% endif %}
                            name="{{ field.html_name }}"
-                           id="{{ choice.id_for_label }}"
+                           id="{{ choice.css_id }}"
                            value="{{ choice.0 }}">
-                    <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                    <label class="fr-label" for="{{ choice.css_id }}">{{ choice.choice_label }}</label>
                 </div>
             </div>
         {% endfor %}

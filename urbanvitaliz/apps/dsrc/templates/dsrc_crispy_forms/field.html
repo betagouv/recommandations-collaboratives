@@ -1,4 +1,4 @@
-{% load crispy_forms_field dsrc_tags %}
+{% load crispy_forms_field %}
 {% if field.is_hidden %}
     {{ field }}
 {% else %}
@@ -8,8 +8,10 @@
             {% include "dsrc/core/blocks/inputs/input_checkbox_group.html" %}
         {% elif field|is_radioselect %}
             {% include "dsrc/core/blocks/inputs/input_radio_group.html" %}
+        {% elif field|is_password %}
+            {% include "dsrc/core/blocks/inputs/input_password.html" %}
         {% else %}
-            <div class="{% if field.field.widget.input_type == 'password' %}fr-input-wrap{% elif field.field.widget.input_type == 'text' %}fr-input-group{% else %} fr-{{ field.field.widget.input_type }}-group{% endif %} {% if field.errors %}fr-input-group--error{% endif %} {% if field.field.is_valid %}fr-input-group--valid{% endif %} {{ field.field.widget.classes }}">
+            <div class="{% if field.field.widget.input_type == 'password' %}fr-input-wrap{% elif field.field.widget.input_type == 'text' %}fr-input-group{% else %} fr-{{ field.field.widget.input_type }}-group{% endif %} {% if field.errors %}fr-input-group--error{% endif %} {% if field.field.is_valid %}fr-input-group--valid{% endif %}{% if field|is_checkbox or field.field.widget.input_type == 'radio' %} fr-{{ field.field.widget.input_type }}-group--sm {% endif %} {{ field.field.widget.classes }}">
                 {% if field.label %}
                     {% if field|is_checkbox %}
                         {% include "dsrc/core/blocks/inputs/input_checkbox.html" %}

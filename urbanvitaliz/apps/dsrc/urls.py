@@ -18,16 +18,6 @@ urlpatterns = [
         views.dsrc,
         name="dsrc",
     ),
-    # path(
-    #     r"dsrc/modeles/",
-    #     views.dsrc.samples,
-    #     name="dsrc-samples",
-    # ),
-    # path(
-    #     r"dsrc/modeles/<slug:slug>/",
-    #     views.dsrc.samples_detail,
-    #     name="dsrc-samples-detail",
-    # ),
 ]
 
 # eof

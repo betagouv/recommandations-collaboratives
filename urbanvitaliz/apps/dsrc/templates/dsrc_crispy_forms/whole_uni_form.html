@@ -4,13 +4,4 @@
     {% endif %}
     {% csrf_token %}
     {% include "dsrc_crispy_forms/display_form.html" %}
-    {% if inputs %}
-        {% spaceless %}
-            <div class="button-holder">
-                {% for input in inputs %}
-                    {% include "dsrc_crispy_forms/layout/baseinput.html" %}
-                {% endfor %}
-            </div>
-        {% endspaceless %}
-    {% endif %}
     {% if form_tag %}</form>{% endif %}

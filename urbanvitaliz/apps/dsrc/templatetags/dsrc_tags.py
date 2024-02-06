@@ -18,10 +18,17 @@ created: 2024-01-31 11:19:06 CEST
 
 from django import template
 from django.template.context import Context
+from crispy_forms.layout import HTML
 
 from urbanvitaliz.apps.dsrc.utils import generate_random_id
 
 register = template.Library()
+
+@register.filter
+def render_html(field):
+    if isinstance(field, HTML):
+        return field.render({}, False)
+    return field
 
 def parse_tag_args(args, kwargs, allowed_keys: list) -> dict:
     """

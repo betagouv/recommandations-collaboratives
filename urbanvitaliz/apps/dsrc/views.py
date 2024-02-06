@@ -60,8 +60,7 @@ def dsrc(request):
         "Formulaire basique",
         links=[{"url": reverse("dsrc"), "title": "Formulaires"}],
     )
-    payload["form"] = form
-
-    return render(request, "dsrc/samples/page_form.html", {'dsrc_example_form': form})
+    payload["dsrc_example_form"] = form
+    return render(request, "dsrc/samples/page_form.html", payload)
 
 # eof

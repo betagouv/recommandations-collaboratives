@@ -1,6 +1,6 @@
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit
+from crispy_forms.layout import Layout, Fieldset, Submit, ButtonHolder, HTML
 
 """
 Base DSRC form with built-in error handling and autofocus on first error.
@@ -9,6 +9,7 @@ Base DSRC form with built-in error handling and autofocus on first error.
 class DsrcBaseForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.set_autofocus_on_first_error()
         self.helper = FormHelper()
 
     def set_autofocus_on_first_error(self):
@@ -34,7 +35,7 @@ class DsrcExampleForm(DsrcBaseForm):
 
         self.helper.layout = Layout(
             Fieldset(
-                'Créez votre compte',
+                'Créez votre compte', # The first argument is the legend of the fieldset
                 'sample_text',
                 'sample_phone',
                 'sample_email',
@@ -47,7 +48,10 @@ class DsrcExampleForm(DsrcBaseForm):
                 'sample_radio_group',
                 'sample_checkbox_group'
             ),
-            Submit('submit', 'Valider'),
+            ButtonHolder(
+                    HTML('<span>Information Saved</span>'),
+                    Submit('submit', 'submit',label='Valider', template="dsrc/core/blocks/buttons/button.html"),
+                )
         )
 
     sample_text = forms.CharField(label="Nom d'usager", initial="", required=True)
@@ -89,6 +93,14 @@ class DsrcExampleForm(DsrcBaseForm):
         choices=[(None, "Sélectionner une option"), (1, "Option 1"), (2, "Option 2"), (3, "Option 3")],
     )
 
+    sample_disabled_field = forms.CharField(
+        label="Champ désactivé",
+        help_text="Ce champ est désactivé",
+        max_length=100,
+        disabled=True,
+        required=False,
+    )
+
     # Multiple choice Select
     sample_radio_group = forms.ChoiceField(
         label="Boutons radio",
@@ -113,24 +125,19 @@ class DsrcExampleForm(DsrcBaseForm):
 
 	# Example clean method
     def clean_sample_radio(self):
-        sample_radio = self.cleaned_data["sample_radio_group"]
+        radio_group = self.cleaned_data["sample_radio_group"]
 
-        if sample_radio == "3":
+        if radio_group == "3":
             raise forms.ValidationError("Le troisième choix est interdit")
 
-        return sample_radio
+        return radio_group
 
 	# Example clean method
     def clean_sample_checkbox(self):
-        sample_checkbox = self.cleaned_data["sample_checkbox_group"]
+        checkbox_group = self.cleaned_data["sample_checkbox_group"]
 
-        if sample_checkbox == ["3"]:
+        if checkbox_group == ["3"]:
             raise forms.ValidationError("Le troisième choix est interdit")
 
-        return sample_checkbox
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_autofocus_on_first_error()
-
+        return checkbox_group
 # eof

@@ -4,7 +4,6 @@
           {% if formset.is_multipart %}enctype="multipart/form-data"{% endif %}>
     {% endif %}
     {% csrf_token %}
-    <div>{{ formset.management_form|crispy }}</div>
     {% include "dsrc_crispy_forms/errors_formset.html" %}
     {% for form in formset.forms %}
         {% include "dsrc_crispy_forms/display_form.html" %}
