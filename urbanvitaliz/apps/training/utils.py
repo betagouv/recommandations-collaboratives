@@ -21,9 +21,9 @@ def get_challenge_for(user, codename):
         return None
 
     try:
-        challenge = models.Challenge.all_objects.get(
+        challenge = models.Challenge.all_objects.filter(
             challenge_definition=challenge_definition, user=user
-        )
+        ).last()
     except models.Challenge.DoesNotExist:
         # Create a new challenge
         return models.Challenge.all_objects.create(
