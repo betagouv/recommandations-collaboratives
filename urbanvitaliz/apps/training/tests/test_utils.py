@@ -25,6 +25,18 @@ def test_get_challenge_with_other_site_definition(request):
 
 
 @pytest.mark.django_db
+def test_user_challenge_returned_when_first_visit():
+    site = baker.make(site_models.Site)
+    user = baker.make(auth_models.User)
+    definition = baker.make(models.ChallengeDefinition, site=site, code="a-code")
+
+    with settings.SITE_ID.override(site.pk):
+        current = utils.get_challenge_for(user, definition.code)
+
+    # new challenge is proposed
+    assert current
+
+@pytest.mark.django_db
 def test_user_challenge_returned_when_is_snoozed_and_repeat_exceed():
     site = baker.make(site_models.Site)
     user = baker.make(auth_models.User, last_login=timezone.now())

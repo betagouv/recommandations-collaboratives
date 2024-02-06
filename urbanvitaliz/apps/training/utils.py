@@ -30,6 +30,11 @@ def get_challenge_for(user, codename):
           challenge_definition=challenge_definition, user=user
         )
 
+    if not challenge: 
+        # Create a new challenge
+        return models.Challenge.all_objects.create(
+          challenge_definition=challenge_definition, user=user
+        )
     if challenge.snoozed_on:
         snoozed_days = (timezone.now() - challenge.snoozed_on).days
         repetition = challenge_definition.week_inactivity_repeat * 7
