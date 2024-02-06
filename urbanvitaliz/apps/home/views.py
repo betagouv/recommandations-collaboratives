@@ -9,24 +9,25 @@ created: 2021-08-16 15:40:08 CEST
 
 
 import django.core.mail
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from urbanvitaliz.apps.projects import models as projects
-from urbanvitaliz.apps.tasks import models as tasks
 from urbanvitaliz.apps.projects.utils import (
     can_administrate_project,
     get_active_project,
 )
+from urbanvitaliz.apps.tasks import models as tasks
 from urbanvitaliz.utils import check_if_advisor
 
+from . import models
 from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 
 
@@ -94,8 +95,7 @@ class StatisticsView(TemplateView):
         context["collectivity_supported"] = the_projects.count()
         context["collectivity_with_reco"] = (
             tasks.Task.on_site.exclude(
-                Q(status=tasks.Task.NOT_INTERESTED)
-                | Q(status=tasks.Task.ALREADY_DONE)
+                Q(status=tasks.Task.NOT_INTERESTED) | Q(status=tasks.Task.ALREADY_DONE)
             )
             .exclude(
                 Q(project__members__in=staff_users)
@@ -113,8 +113,10 @@ class StatisticsView(TemplateView):
             p.number_tasks
             for p in the_projects.all().annotate(number_tasks=Count("tasks"))
         ]
-        context["total_recommendation"] = sum(numbers);
-        context["collectivity_avg_reco"] = context["total_recommendation"] / len(numbers) if numbers else 0
+        context["total_recommendation"] = sum(numbers)
+        context["collectivity_avg_reco"] = (
+            context["total_recommendation"] / len(numbers) if numbers else 0
+        )
 
         context["new_col_per_month"] = [
             (f"{p['month']}/{p['year']}", p["total"])
@@ -129,7 +131,6 @@ class StatisticsView(TemplateView):
                 latitude=F("commune__latitude"), longitude=F("commune__longitude")
             )
         )
-
 
         return context
 
@@ -159,11 +160,27 @@ def send_message_to_team(request, data):
         email = data.get("email")
         content += f"\n\nfrom: {name} {email}"
     content += "\nsource: " + request.META.get("HTTP_REFERER", "")
+
+    try:
+        site_config = request.site.configuration
+    except models.SiteConfiguration.DoesNotExist:
+        raise ImproperlyConfigured(
+            f"Please create the SiteConfiguration for this site '{request.site}'"
+        )
+
+    recipient = site_config.contact_form_recipient
+
+    # Try to get the current user email if logged in, otherwise default to current site
+    # sender
+    sender_email = site_config.sender_email
+    if not request.user.is_anonymous and request.user.email:
+        sender_email = request.user.email
+
     return django.core.mail.send_mail(
         subject=subject,
         message=content,
-        from_email=settings.EMAIL_FROM,
-        recipient_list=settings.TEAM_EMAILS,
+        from_email=sender_email,
+        recipient_list=[recipient],
         fail_silently=True,
     )
 

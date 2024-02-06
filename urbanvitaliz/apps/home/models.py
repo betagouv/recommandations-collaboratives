@@ -122,8 +122,16 @@ class SiteConfiguration(models.Model):
     onboarding = models.ForeignKey(
         "onboarding.Onboarding", null=True, on_delete=models.SET_NULL
     )
-    sender_email = models.EmailField()
-    sender_name = models.CharField(max_length=30)
+    sender_email = models.EmailField(
+        help_text="Adresse de l'expéditeur pour les emails automatiques"
+    )
+    sender_name = models.CharField(
+        help_text="Nom de l'expéditeur pour les emails automatiques", max_length=30
+    )
+    contact_form_recipient = models.EmailField(
+        help_text="Adresse d'expédition pour le formulaire de contact"
+    )
+
     crm_available_tags = TaggableManager(
         blank=True,
         verbose_name="Étiquettes projets disponibles dans le CRM",
