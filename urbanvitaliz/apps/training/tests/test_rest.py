@@ -38,7 +38,7 @@ def test_anonymous_cannot_use_challenge_defintion_get_api(request, client):
 
 
 @pytest.mark.django_db
-def test_challenge_get_api_fails_if_other_site(request, client):
+def test_challenge_definition_get_api_fails_if_other_site(request, client):
     site = baker.make(site_models.Site)
     user = baker.make(auth_models.User, email="me@example.com")
     definition = baker.make(models.ChallengeDefinition, site=site)
@@ -49,8 +49,7 @@ def test_challenge_get_api_fails_if_other_site(request, client):
     url = reverse("challenge-definitions-detail", args=[definition.code])
     response = client.get(url)
 
-    assert response.status_code == 200
-    assert dict(response.data) == {}
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
@@ -214,7 +213,7 @@ def test_challenge_patch_api_start_challenge(request, client):
     definition = baker.make(models.ChallengeDefinition, site=site)
     challenge = baker.make(models.Challenge, user=user, challenge_definition=definition)
 
-    data = {"started_on": timezone.now()}
+    data = {"start": True}
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -231,6 +230,7 @@ def test_challenge_patch_api_start_challenge(request, client):
 
     assert response.data["started_on"] is not None
     assert response.data["acquired_on"] is None
+    assert response.data["snoozed_on"] is None
     assert dict(response.data["challenge_definition"]) == {
         "name": definition.name,
         "code": definition.code,
@@ -247,7 +247,7 @@ def test_challenge_patch_api_acquire_challenge(request, client):
     definition = baker.make(models.ChallengeDefinition, site=site)
     challenge = baker.make(models.Challenge, user=user, challenge_definition=definition)
 
-    data = {"acquired_on": True}
+    data = {"acquire": True}
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -263,6 +263,40 @@ def test_challenge_patch_api_acquire_challenge(request, client):
 
     assert response.data["acquired_on"] is not None
     assert response.data["started_on"] is None
+    assert response.data["snoozed_on"] is None
+    assert dict(response.data["challenge_definition"]) == {
+        "name": definition.name,
+        "code": definition.code,
+        "description": definition.description,
+        "icon_name": None,
+        "next_challenge": None,
+    }
+
+
+@pytest.mark.django_db
+def test_challenge_patch_api_snooze_challenge(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+    definition = baker.make(models.ChallengeDefinition, site=site)
+    challenge = baker.make(models.Challenge, user=user, challenge_definition=definition)
+
+    data = {"snooze": True}
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("challenges-challenge", args=[definition.code])
+    response = client.patch(url, data=data)
+
+    assert response.status_code == 200
+
+    challenge.refresh_from_db()
+
+    assert challenge.snoozed_on is not None
+
+    assert response.data["snoozed_on"] is not None
+    assert response.data["started_on"] is None
+    assert response.data["acquired_on"] is None
     assert dict(response.data["challenge_definition"]) == {
         "name": definition.name,
         "code": definition.code,
