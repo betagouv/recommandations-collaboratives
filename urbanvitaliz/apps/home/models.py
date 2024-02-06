@@ -99,6 +99,8 @@ class UserProfile(models.Model):
 
     organization_position = models.CharField(null=True, blank=True, max_length=200)
 
+    previous_login_at = models.DateTimeField(null=True, blank=True)
+
     deleted = models.DateTimeField(null=True, blank=True)
 
     class Meta:
