@@ -1,11 +1,21 @@
 .dsrc-input {
-	--border-bottom-color: var(--dsrc-primary);
+	--border-plain-grey: var(--dsrc-primary);
 }
 
-input.dsrc-radio,
-input.dsrc-checkbox,
-.fr-radio-group input.dsrc-radio,
-.fr-checkbox-group input.dsrc-checkbox {
+.dsrc-radio-group input[type="radio"]  {
 	accent-color: var(--dsrc-primary);
 	opacity: 1;
+}
+.fr-radio-group--sm input[type="radio"]:checked + label::before  {
+	display: none;
+}
+
+.dsrc-checkbox-group input[type="checkbox"]:checked + label::before {
+	--border-active-blue-france: var(--dsrc-primary);
+}
+
+.dsrc-checkbox-group input[type="checkbox"]:checked + label::before {
+	--border-active-blue-france: var(--dsrc-primary);
+	background-color: var(--dsrc-primary);
+	background-image:radial-gradient(at 5px 4px, rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), radial-gradient(at calc(100% - 5px) 4px, rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), radial-gradient(at calc(100% - 5px) calc(100% - 4px), rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), radial-gradient(at 5px calc(100% - 4px), rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f5f5fe' d='M10 15.17l9.2-9.2 1.4 1.42L10 18l-6.36-6.36 1.4-1.42z'/></svg>")
 }

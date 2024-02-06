@@ -1,4 +1,4 @@
-<input class="fr-input {% if field.field.errors %}fr-input--error{% endif %}{% if field.field.is_valid %} fr-input--valid{% endif %} {{ field.field.classes }}"
+<input class="fr-input{% if field.field.errors %} fr-input--error{% endif %}{% if field.field.is_valid %} fr-input--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }}{% endif %} {{ field.field.widget.attrs.classes }}"
        aria-describedby="{% if field.field.errors %}{{ field.id_for_label }}-desc-error{% elif field.messages %}{{ field.id_for_label }}-messages{% elif field.valid_text %}{{ field.id_for_label }}-desc-valid{% endif %}"
        type="{{ field.field.widget.input_type }}"
        id="{{ field.id_for_label }}"

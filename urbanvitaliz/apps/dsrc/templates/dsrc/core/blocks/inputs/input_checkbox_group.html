@@ -15,7 +15,7 @@
     {% else %}
         {% for choice in field %}
             <div class="fr-fieldset__element">
-                <div class="fr-checkbox-group  fr-checkbox-group--sm {% if field.errors %}fr-checkbox-group--error{% endif %}{% if field.is_disabled %} fr-input-group--disabled{% endif %}">
+                <div class="fr-checkbox-group{% if field.errors %} fr-checkbox-group--error{% endif %}{% if field.is_disabled %} fr-input-group--disabled{% endif %}{% if field.field.widget.attrs.size %} fr-checkbox-group--{{ field.field.widget.attrs.size }}{% endif %} {{ field.field.widget.attrs.classes }}">
                     {{ choice.tag }}
                     <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
                 </div>

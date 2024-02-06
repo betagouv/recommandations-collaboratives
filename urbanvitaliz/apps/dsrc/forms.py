@@ -11,7 +11,14 @@ class DsrcBaseForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.set_autofocus_on_first_error()
         self.helper = FormHelper()
-
+        for field_name, field in self.fields.items():
+            if isinstance(field, forms.CharField):
+                 # If the widget is already a PasswordInput or EmailInput, skip it
+                if isinstance(field.widget, (forms.PasswordInput, forms.Textarea)):
+                    continue
+                field.widget = forms.TextInput(attrs={"classes": "dsrc-input"})
+            if isinstance(field, forms.BooleanField):
+                field.widget = forms.CheckboxInput(attrs={"classes": "dsrc-checkbox"})
     def set_autofocus_on_first_error(self):
         """
         Sets the autofocus on the first field with an error message.
@@ -29,7 +36,7 @@ class DsrcExampleForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper.form_id = 'id-dsrc-example-form'
-        self.helper.form_class = 'dsrc-form'
+        self.helper.form_class = 'dsrc-color-primary'
         self.helper.form_method = 'post'
         self.helper.form_action = 'test_form'
 
@@ -46,11 +53,11 @@ class DsrcExampleForm(DsrcBaseForm):
                 'sample_select',
                 'sample_disabled_field',
                 'sample_radio_group',
-                'sample_checkbox_group'
+                'sample_checkbox_group',
             ),
             ButtonHolder(
                     HTML('<span>Information Saved</span>'),
-                    Submit('submit', 'submit',label='Valider', template="dsrc/core/blocks/buttons/button.html"),
+                    Submit('submit', 'submit'),
                 )
         )
 
@@ -68,12 +75,12 @@ class DsrcExampleForm(DsrcBaseForm):
         return email.lower()
 
     sample_password = forms.CharField(
-        label="Mot de passe", required=True, widget=forms.PasswordInput
+        label="Mot de passe", required=True, widget=forms.PasswordInput(attrs={"classes": "dsrc-input", "size": "sm"})
     )
 
     sample_postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
 
-    sample_description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows":"5"}), required=False)
+    sample_description = forms.CharField(label="Description", widget=forms.Textarea(attrs={"rows":"5", "classes": "dsrc-input"}), required=False)
 
     sample_disabled_field = forms.CharField(
         label="Champ désactivé",
@@ -107,7 +114,7 @@ class DsrcExampleForm(DsrcBaseForm):
         required=False,
         choices=[(1, "Premier choix unique"), (2, "Second choix unique"), (3, "Troisième choix unique")],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
-        widget=forms.RadioSelect,
+        widget=forms.RadioSelect(attrs={"classes": "dsrc-radio-group", "size": "sm"}),
     )
 
     # Checkbox group
@@ -120,7 +127,7 @@ class DsrcExampleForm(DsrcBaseForm):
             ("3", "Troisième choix"),
         ],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.CheckboxSelectMultiple(attrs={"classes": "dsrc-checkbox-group", "size": "sm"}),
     )
 
 	# Example clean method

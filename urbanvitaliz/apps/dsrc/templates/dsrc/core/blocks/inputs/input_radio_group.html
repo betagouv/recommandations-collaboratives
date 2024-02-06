@@ -15,9 +15,15 @@
     {% else %}
         {% for choice in field %}
             <div class="fr-fieldset__element">
-                <div class="fr-radio-group fr-radio-group--sm {% if field.has_errors %}fr-radio-group--error{% endif %}{% if field.is_disabled %} fr-radio-group--disabled{% endif %}">
-                    {{ choice.tag }}
-                    {{ choice }}
+                <div class="fr-radio-group {% if field.has_errors %}fr-radio-group--error{% endif %}{% if field.is_disabled %} fr-radio-group--disabled{% endif %}{% if field.field.widget.attrs.size %} fr-radio-group--{{ field.field.widget.attrs.size }}{% endif %} {{ field.field.widget.attrs.classes }}">
+                    <input name="{{ field.id_for_label }}"
+                           id="{{ field.id_for_label }}"
+                           type="radio"
+                           class="{{ field.field.widget.attrs.classes }}"
+                           {% if field.errors %}aria-describedby="{{ field.id_for_label }}-desc-error"{% endif %}
+                           {% if field.field.required %}required{% endif %}
+                           {% if field.field.disabled %}disabled{% endif %} />
+                    <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
                 </div>
             </div>
         {% endfor %}

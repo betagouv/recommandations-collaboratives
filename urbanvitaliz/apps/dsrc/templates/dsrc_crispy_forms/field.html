@@ -11,7 +11,7 @@
         {% elif field|is_password %}
             {% include "dsrc/core/blocks/inputs/input_password.html" %}
         {% else %}
-            <div class="{% if field.field.widget.input_type == 'password' %}fr-input-wrap{% elif field.field.widget.input_type == 'text' %}fr-input-group{% else %} fr-{{ field.field.widget.input_type }}-group{% endif %} {% if field.errors %}fr-input-group--error{% endif %} {% if field.field.is_valid %}fr-input-group--valid{% endif %}{% if field|is_checkbox or field.field.widget.input_type == 'radio' %} fr-{{ field.field.widget.input_type }}-group--sm {% endif %} {{ field.field.widget.classes }}">
+            <div class="{% if field.field.widget.input_type == 'password' %}fr-input-wrap{% elif field.field.widget.input_type == 'text' %}fr-input-group{% else %} fr-{{ field.field.widget.input_type }}-group{% endif %} {% if field.errors %}fr-input-group--error{% endif %} {% if field.field.is_valid %}fr-input-group--valid{% endif %}{% if field|is_checkbox or field.field.widget.input_type == 'radio' %} fr-{{ field.field.widget.input_type }}-group--sm {% endif %}">
                 {% if field.label %}
                     {% if field|is_checkbox %}
                         {% include "dsrc/core/blocks/inputs/input_checkbox.html" %}
@@ -22,7 +22,9 @@
                         {% if field.field.help_text %}<span class="fr-hint-text">{{ field.field.help_text }}</span>{% endif %}
                     </label>
                 {% endif %}
-                {% include "dsrc_crispy_forms/layout/baseinput.html" %}
+                {% if not field|is_checkbox %}
+                    {% include "dsrc_crispy_forms/layout/baseinput.html" %}
+                {% endif %}
                 {% if field.field.messages %}
                     {% for message in field.field.messages %}
                         <div class="fr-messages-group"

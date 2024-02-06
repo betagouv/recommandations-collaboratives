@@ -1,4 +1,5 @@
-<div id="{% if buttonholder.css_id %}{{ buttonholder.css_id }}{% endif %}"
-     class="button-holder{% if buttonholder.css_class %} {{ buttonholder.css_class }}{% endif %}">
-    {{ fields_output|safe }}
-</div>
+<ul class="fr-btns-group{% if buttonholder.css_class %} {{ buttonholder.css_class }}{% endif %}">
+    {% for field in buttonholder.fields %}
+        <li>{% include "dsrc/core/blocks/buttons/button.html" with field=field %}</li>
+    {% endfor %}
+</ul>
