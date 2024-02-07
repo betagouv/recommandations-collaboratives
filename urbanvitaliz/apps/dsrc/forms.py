@@ -63,6 +63,8 @@ Example form that extends DsrcBaseForm.
 - You can see an example of this form integrated:
     - in a template here: './templates/dsrc/samples/page_form.html'
     - in a view here: './views.py'
+- Once you have started the application, you can access the form at the following URL:
+	http://subdomain.localhost:8000/dsrc
 """
 class DsrcExampleForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
