@@ -9,21 +9,21 @@ const sampleDomElements = {
 	LABEL_TEXT: `Nom d'usager`, // TODO:use a selector of type [data-test='test-id']
 	LABEL_PHONE: `Téléphone`,
 	LABEL_EMAIL: `Courriel`,
-	LABEL_PASSWORD: `Mot de passe `,
+	LABEL_PASSWORD: `Mot de passe`,
 	LABEL_PASSWORD_CHECKBOX: `Afficher`,
-	LABEL_POSTCODE: `Code Postal `,
+	LABEL_POSTCODE: `Code Postal`,
 	LABEL_TEXTAREA: `Description`,
-	LABEL_BOOLEAN: `Cochez la case `,
+	LABEL_BOOLEAN: `Cochez la case`,
 	LABEL_SELECT: ` Liste déroulante`,
 	LABEL_DISABLED_INPUT_TEXT: `Champ désactivé`,
 	LABEL_RADIO_GROUP: `Boutons radio :`,
 	LABEL_CHECKBOX_GROUP: `Cases à cocher :`,
 
 	// Sample VALID inputs
-	VALID_INPUT_TEXT: 'This is a sample text',
+	VALID_INPUT_TEXT: 'UserTestUI',
 	VALID_INPUT_PHONE: '0033122334455', // TODO: use DSFR Pattern
 	VALID_INPUT_PASSWORD: '*Do-487-NoT-$use+THIS-asIS', // "Secure" password example, don't use it outside test environment
-	VALID_INPUT_EMAIL: 'julie@example.com',
+	VALID_INPUT_EMAIL: 'user-test-ui@example.com',
 	VALID_INPUT_POSTCODE: '79700', // TODO: use DSFR Pattern
 	VALID_INPUT_TEXTAREA:
 		'This is a sample text with many more characters than the input field can handle'.repeat(10),
@@ -35,11 +35,11 @@ const sampleDomElements = {
 	// Sample INVALID inputs
 	INVALID_INPUT_TEXT: '', // Invalid if required
 	INVALID_INPUT_PHONE: 'abc55', // TODO: use DSFR Pattern
-	INVALID_INPUT_PASSWORD: 'unsafe-Passw0rd', // insecure password example
-	INVALID_INPUT_EMAIL: 'julieexample.com',
+	INVALID_INPUT_PASSWORD: 'unsafe-Passw0rd', // insecure password example : todo use DSFR(?) Pattern
+	INVALID_INPUT_EMAIL: 'user-test-uiexample.com',
 	INVALID_INPUT_POSTCODE: '79',
 	INVALID_INPUT_TEXTAREA: '', // Invalid if required
-	INVALID_INPUT_BOOLEAN: true,
+	INVALID_INPUT_BOOLEAN: false, // Invalid if required (Example: accept terms and conditions)
 	INVALID_INPUT_SELECT: 'Sélectionner une option', // Invalid if required
 	INVALID_INPUT_RADIO: 3,
 	INVALID_INPUT_CHECKBOX: 3
@@ -116,20 +116,21 @@ class DsrcForm {
 
 	// Verifications
 	checkValidity(inputElement, inputType, isValid = true) {
-		// Check if the input is valid
 		let actualValue = inputElement[0].value;
 		let expectedValue;
 		if (isValid) {
 			expectedValue = this.dom[this.generateValidInputValueKey(inputType)];
-			expect(actualValue).to.equal(expectedValue);
-			expect(actualValue).to.equal(this.dom[this.generateValidInputValueKey(inputType)]);
 		} else {
-			expect(inputType[0].value).to.equal(this.dom[this.generateInvalidInputValueKey(inputType)]);
+			expectedValue = this.dom[this.generateInvalidInputValueKey(inputType)];
 		}
+		// Check if the input has been entered correctly
+		expect(actualValue).to.equal(expectedValue);
+
+		// TODO: for Invalid inputs: the field should have an `*--error` class
 	}
 
 	enterFieldValueAndAssertState(inputType, isValid = true) {
-		const selector = this.generateFieldSelectorValue(this.dataTestPrefix, inputType);
+		let selector = this.generateFieldSelectorValue(this.dataTestPrefix, inputType);
 		switch (inputType) {
 			case 'text':
 				cy.get(selector)
@@ -166,9 +167,10 @@ class DsrcForm {
 				break;
 			case 'password':
 				// TODO: test password visibility too
+				cy.get(selector).should('be.visible').and('contain', this.dom.LABEL_PASSWORD);
+
 				cy.get(selector)
-					.should('be.visible')
-					.and('contain', this.dom.LABEL_PASSWORD)
+					.find(this.dom[this.generateInputSelectorKey(inputType)])
 					.type(isValid ? this.dom.VALID_INPUT_PASSWORD : this.dom.INVALID_INPUT_PASSWORD)
 					.then(($input) => {
 						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
