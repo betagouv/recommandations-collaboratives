@@ -1,7 +1,7 @@
 {% load static %}
-<button class="fr-btn{% if self.variant %} fr-btn--{{ self.variant }}{% endif %}{% if self.size %} fr-btn--{{ self.size }}{% endif %}{% if self.variant %} fr-btn--{{ self.variant }}{% endif %}{% if self.align %} fr-btn--icon-{{ self.align }}{% endif %}{% if self.icon %} {{ self.icon }}{% endif %} {% if self.classes %}{{ self.classes }}{% endif %}"
-        onclick="{{ self.onclick }}"
-        {% if self.is_disabled %}disabled{% endif %}
-        type="{{ self.type | default:'submit' }}"
-        {% if self.title %}title="{{ self.label }}"{% endif %}
-        {% if self.name %}name="{{ self.name }}"{% endif %}>{{ field.label }}</button>
+<button class="fr-btn{% if variant %} fr-btn--{{ variant }}{% endif %}{% if size %} fr-btn--{{ size }}{% endif %}{% if variant %} fr-btn--{{ variant }}{% endif %}{% if align %} fr-btn--icon-{{ align }}{% endif %}{% if icon %} {{ icon }}{% endif %} {% if classes %}{{ classes }}{% endif %}"
+        onclick="{{ onclick }}"
+        {% if disabled %}disabled{% endif %}
+        type="{{ type | default:'submit' }}"
+        {% if title %}title="{{ label }}"{% endif %}
+        {% if name %}name="{{ name }}"{% endif %}>{{ label }}</button>
