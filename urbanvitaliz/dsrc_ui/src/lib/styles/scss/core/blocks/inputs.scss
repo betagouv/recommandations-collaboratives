@@ -5,8 +5,9 @@
 
 .dsrc-radio-group input[type="radio"]  {
 	accent-color: var(--dsrc-primary);
-	opacity: 1;
+	opacity: 1; // override DSFR background-image for now. TODO : set DSRC background-image to align with DSRF radio design
 }
+
 .dsrc-radio-group input[type="radio"] + label::before,
 .dsrc-radio-group input[type="radio"]:checked + label::before  {
 	display: none;

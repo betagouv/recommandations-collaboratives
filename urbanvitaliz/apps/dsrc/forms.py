@@ -91,7 +91,8 @@ class DsrcExampleForm(DsrcBaseForm):
             ),
         )
 
-    def clean_email(self):
+    # Example clean method
+    def clean_sample_email(self):
         """Make sure email is lowercased"""
         email = self.cleaned_data["email"]
         return email.lower()
