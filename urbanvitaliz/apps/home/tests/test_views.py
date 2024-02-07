@@ -14,9 +14,11 @@ from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ImproperlyConfigured
 from django.db.utils import IntegrityError
 from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
+from magicauth import models as magicauth_models
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 from urbanvitaliz.apps.home import models as home_models
@@ -24,10 +26,8 @@ from urbanvitaliz.apps.onboarding import models as onboarding_models
 from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.apps.projects.utils import assign_collaborator
 from urbanvitaliz.utils import login
-from magicauth import models as magicauth_models
 
-from .. import adapters, utils, models
-
+from .. import adapters, models, utils
 
 ########################################################################
 # utility functions
@@ -147,7 +147,11 @@ def test_user_can_access_contact_form(client):
 
 
 @pytest.mark.django_db
-def test_non_logged_user_can_send_message_to_team(mocker, client):
+def test_non_logged_user_can_send_message_to_team(mocker, client, request):
+    site = get_current_site(request)
+
+    site_config = baker.make(home_models.SiteConfiguration, site=site)
+
     mocker.patch("django.core.mail.send_mail")
 
     data = {
@@ -164,8 +168,8 @@ def test_non_logged_user_can_send_message_to_team(mocker, client):
     django.core.mail.send_mail.assert_called_once_with(
         subject=data["subject"],
         message=content,
-        from_email=settings.EMAIL_FROM,
-        recipient_list=settings.TEAM_EMAILS,
+        from_email=site_config.sender_email,
+        recipient_list=[site_config.contact_form_recipient],
         fail_silently=True,
     )
 
@@ -173,7 +177,25 @@ def test_non_logged_user_can_send_message_to_team(mocker, client):
 
 
 @pytest.mark.django_db
-def test_logged_user_can_send_message_to_team(mocker, client):
+def test_sending_message_to_team_needs_site_configuration(client):
+    data = {
+        "subject": "a subject",
+        "content": "some content",
+        "name": "john",
+        "email": "jdoe@example.com",
+    }
+    url = reverse("home-contact") + "?next=/"
+
+    with pytest.raises(ImproperlyConfigured):
+        client.post(url, data=data)
+
+
+@pytest.mark.django_db
+def test_logged_user_can_send_message_to_team(mocker, client, request):
+    site = get_current_site(request)
+
+    site_config = baker.make(home_models.SiteConfiguration, site=site)
+
     mocker.patch("django.core.mail.send_mail")
 
     data = {"subject": "a subject", "content": "some content"}
@@ -186,8 +208,8 @@ def test_logged_user_can_send_message_to_team(mocker, client):
     django.core.mail.send_mail.assert_called_once_with(
         subject=data["subject"],
         message=content,
-        from_email=settings.EMAIL_FROM,
-        recipient_list=settings.TEAM_EMAILS,
+        from_email=user.email,
+        recipient_list=[site_config.contact_form_recipient],
         fail_silently=True,
     )
 

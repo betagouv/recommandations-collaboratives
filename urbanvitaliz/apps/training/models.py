@@ -14,7 +14,6 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.managers import CurrentSiteManager
 from django.db import models
-from django.utils import timezone
 
 
 ########################################################################
@@ -83,6 +82,10 @@ class Challenge(models.Model):
     )
     acquired_on = models.DateTimeField(
         verbose_name="Date d'acquisition", default=None, null=True
+    )
+
+    snoozed_on = models.DateTimeField(
+        verbose_name="Date de report", default=None, null=True
     )
 
     user = models.ForeignKey(

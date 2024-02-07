@@ -112,6 +112,8 @@ def mark_notifications_as_seen(user, project):
         verbs.Project.SUBMITTED_BY,
         verbs.Project.VALIDATED,
         verbs.Project.VALIDATED_BY,
+        verbs.Project.SET_INACTIVE,
+        verbs.Project.SET_ACTIVE,
         # verbs.Recommendation.COMMENTED,
         # verbs.Survey.UPDATED,
     ]

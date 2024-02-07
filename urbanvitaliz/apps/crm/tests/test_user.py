@@ -1,5 +1,4 @@
 import pytest
-import allauth.account.utils
 import django.core.mail
 from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth_models
@@ -13,7 +12,6 @@ from pytest_django.asserts import assertContains, assertNotContains
 from urbanvitaliz.apps.addressbook import models as addressbook_models
 from urbanvitaliz.apps.reminders import models as reminders_models
 from urbanvitaliz.apps.geomatics import models as geomatics
-from urbanvitaliz.apps.projects import models as projects_models
 from urbanvitaliz.utils import get_group_for_site, login
 
 ########################################################################
@@ -689,63 +687,6 @@ def test_crm_user_unset_advisor_processing(request, client):
     assert end_user.groups.count() == 0
 
     assert end_user.profile.departments.count() == 0
-
-
-########################################################################
-# user project interest
-########################################################################
-
-
-@pytest.mark.django_db
-def test_crm_user_project_interest_not_accessible_wo_perm(request, client):
-    site = get_current_site(request)
-    o = baker.make(auth_models.User)
-    o.profile.sites.add(site)
-
-    url = reverse("crm-user-project-interest", args=[o.id])
-    with login(client):
-        response = client.get(url)
-
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_crm_user_project_interest_not_accessible_other_site(request, client):
-    site = get_current_site(request)
-    other = baker.make(site_models.Site)
-    o = baker.make(auth_models.User)
-    o.profile.sites.add(other)
-
-    url = reverse("crm-user-project-interest", args=[o.id])
-    with login(client) as user:
-        assign_perm("use_crm", user, site)
-        response = client.get(url)
-
-    assert response.status_code == 404
-
-
-@pytest.mark.django_db
-def test_crm_user_project_interest_accessible_w_perm(request, client):
-    site = get_current_site(request)
-    other = baker.make(site_models.Site)
-
-    o = baker.make(auth_models.User)
-    o.profile.sites.add(site)
-
-    expected = baker.make(projects_models.UserProjectStatus, site=site, user=o)
-    other_site = baker.make(projects_models.UserProjectStatus, site=other, user=o)
-    unexpected = baker.make(projects_models.UserProjectStatus, site=site)
-
-    url = reverse("crm-user-project-interest", args=[o.id])
-    with login(client) as user:
-        assign_perm("use_crm", user, site)
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-    assertContains(response, expected.project.name[:10])
-    assertNotContains(response, unexpected.project.name)
-    assertNotContains(response, other_site.project.name)
 
 
 ########################################################################
