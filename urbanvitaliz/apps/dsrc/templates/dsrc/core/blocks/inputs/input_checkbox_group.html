@@ -5,7 +5,7 @@
           aria-labelledby="checkboxes-legend checkboxes-messages">
     <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
             id="checkboxes-legend">
-        {{ field.label_tag }}
+        {{ field.label }}
         {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
     </legend>
     {% if form.show_errors %}
@@ -20,7 +20,7 @@
                            id="{{ field.id_for_label }}"
                            type="checkbox"
                            class="{{ field.field.widget.attrs.classes }}"
-                           data-test="{{ field.field.widget.attrs.input_test_id }}"
+                           data-test="{{ field.field.widget.attrs.input_test_id }}-{{ forloop.counter }}"
                            {% if field.errors %}aria-describedby="{{ field.id_for_label }}-desc-error"{% endif %}
                            {% if field.field.required %}required{% endif %}
                            {% if field.field.disabled %}disabled{% endif %} />

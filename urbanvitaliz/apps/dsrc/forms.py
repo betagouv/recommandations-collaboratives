@@ -83,7 +83,7 @@ class DsrcExampleForm(DsrcBaseForm):
                 'sample_password',
                 'sample_postcode',
                 'sample_description',
-                'sample_boolean',
+                'sample_checkbox',
                 'sample_select',
                 'sample_disabled_field',
                 'sample_radio_group',
@@ -151,14 +151,15 @@ class DsrcExampleForm(DsrcBaseForm):
         required=False,
     )
 
-    # Boolean choice: checkbox
-    sample_boolean = forms.BooleanField(label="Cochez la case", required=False, widget=forms.CheckboxInput(attrs={"size": "sm"}))
+    # Boolean choice
+    sample_checkbox = forms.BooleanField(label="Cochez la case", required=False, widget=forms.CheckboxInput(attrs={"size": "sm"}))
 
     # Native html Select
     sample_select = forms.ChoiceField(
         label="Liste déroulante",
         required=False,
-        choices=[(None, "Sélectionner une option"), (1, "Option 1"), (2, "Option 2"), (3, "Option 3")],
+        initial=None,
+        choices=[('', "Sélectionner une option"), (1, "Option 1"), (2, "Option 2"), (3, "Option 3")],
     )
 
     # Text input, disabled
