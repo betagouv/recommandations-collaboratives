@@ -1,3 +1,4 @@
+from django.core import validators
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset
@@ -88,30 +89,30 @@ class DsrcExampleForm(DsrcBaseForm):
             ),
         )
 
-    # # Example clean method
-    # def clean_sample_email(self):
-    #     """Make sure email is lowercased"""
-    #     email = self.cleaned_data["email"]
-    #     return email.lower()
+    # Example clean method
+    def clean_sample_email(self):
+        """Make sure email is lowercased"""
+        sample_email = self.cleaned_data["sample_email"]
+        return sample_email.lower()
 
 
-	# # Example clean method
-    # def clean_sample_radio_group(self):
-    #     radio_group = self.cleaned_data["sample_radio_group"]
+	# Example clean method
+    def clean_sample_radio_group(self):
+        sample_radio_group = self.cleaned_data["sample_radio_group"]
 
-    #     if radio_group == "3":
-    #         raise forms.ValidationError("Le troisième choix est interdit")
+        if sample_radio_group == "3":
+            raise forms.ValidationError("Le troisième choix est interdit")
 
-    #     return radio_group
+        return sample_radio_group
 
-	# # Example clean method
-    # def clean_sample_checkbox_group(self):
-    #     checkbox_group = self.cleaned_data["sample_checkbox_group"]
+	# Example clean method
+    def clean_sample_checkbox_group(self):
+        sample_checkbox_group = self.cleaned_data["sample_checkbox_group"]
 
-    #     if checkbox_group == ["3"]:
-    #         raise forms.ValidationError("Le troisième choix est interdit")
+        if sample_checkbox_group == ["3"]:
+            raise forms.ValidationError("Le troisième choix est interdit")
 
-    #     return checkbox_group
+        return sample_checkbox_group
 
     # Basic text input
     sample_text = forms.CharField(label="Nom d'usager", initial="", required=True)
