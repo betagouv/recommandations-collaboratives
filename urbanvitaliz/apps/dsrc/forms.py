@@ -21,7 +21,7 @@ class DsrcBaseForm(forms.Form):
                 if isinstance(field.widget, forms.Textarea):
                     # If the widget is already a Textarea
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-input"}
-                if isinstance(field.widget, forms.PasswordInput):
+                elif isinstance(field.widget, forms.PasswordInput):
                     # If the widget is already a PasswordInput
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-input"}
                 # Default: set a TextInput widget with dsrc classes
@@ -35,13 +35,14 @@ class DsrcBaseForm(forms.Form):
                 if isinstance(field.widget, forms.RadioSelect):
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-radio-group"}
                 # If the widget is already a CheckboxSelectMultiple
-                if isinstance(field.widget, forms.CheckboxSelectMultiple):
+                elif isinstance(field.widget, forms.CheckboxSelectMultiple):
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-checkbox-group"}
                 # Default: set a Select widget with dsrc classes
                 else: field.widget = forms.Select(attrs={"classes": "dsrc-select"})
+            # Add selector patterns used in Cypress tests
             field.widget.attrs = field.widget.attrs | {
-                "field_test_id": f"dsrc_test_{field_name}_field", # This selector pattern is used in Cypress tests
-                "input_test_id": f"dsrc_test_{field_name}_input" # This selector pattern is used in Cypress tests
+                "field_test_id": f"dsrc_test_{field_name}_field",
+                "input_test_id": f"dsrc_test_{field_name}_input"
                 }
 
     def set_autofocus_on_first_error(self):
