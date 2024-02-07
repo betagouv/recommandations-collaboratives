@@ -24,4 +24,5 @@ class ChallengeSerializer(serializers.ModelSerializer):
             "challenge_definition",
             "acquired_on",
             "started_on",
+            "snoozed_on",
         ]

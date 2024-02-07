@@ -6,6 +6,7 @@
 {% load humanize %}
 {% load training %}
 {% load hijack %}
+{% load phone_filters %}
 
 {% block js %}
 {% vite_asset 'js/apps/crm.js' %}
@@ -16,6 +17,11 @@
 <style>
     html, body {
         scroll-padding-top: 240px;
+    }
+    .custom-badge {
+      bottom: 1.5rem;
+      right: 0rem;
+      font-size: 0.5rem;
     }
 </style>
 {% endblock %}
@@ -45,7 +51,7 @@
                             <svg class="bi" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone-fill" />
                             </svg>  
-                            <span>{{crm_user.profile.phone_no}}</span>
+                            <span>{{crm_user.profile.phone_no|format_phone}}</span>
                         {% endif %}
                         {% if crm_user.email %}
                             <span class="ms-2 me-2">|</span>
@@ -105,14 +111,11 @@
                             </svg>
                             <a class="ms-2" style="font-size: 1rem;" href="{% url 'crm-user-reminders' crm_user.pk %}">Historique des rappels</a>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <svg class="bi" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#balloon-heart" />
-                            </svg>
-                            <a class="ms-2" style="font-size: 1rem;" href="{% url 'crm-user-project-interest' crm_user.pk %}">Intérêts envers les projets</a>
-                        </div>
 
                         {% get_challenges_for crm_user acquired=None as challenges %}
+                        <div class="challenge-group">
+
+                        </div>
                         {% if challenges.count %}
 
                         <div class="d-flex justify-content-between align-items-end mt-2">
@@ -120,23 +123,19 @@
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trophy" />
                             </svg>
 
-                            {% for challenge in challenges.all %}
-                            {% with challenge.challenge_definition as definition %}
-                            {% if challenge.acquired_on %}
-                            <span data-toggle="tooltip" title="(ACQUIS) {{ definition.name }} - {{ challenge.acquired_on|naturalday }}" class="rounded-circle bg-light ">
-                                <svg class="text-success mx-2 my-2" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ definition.icon_name|default:'award' }}" />
-                                </svg>
+                          {% regroup challenges.all|dictsort:"challenge_definition.name" by challenge_definition as challenge_groups %}
+                          {% for group in challenge_groups %}
+                          {% with group.list|dictsortreversed:"acquired_on"|first as last_acquire  %}
+                          <div class="position-relative">
+                            <span data-toggle="tooltip" title="(ACQUIS) {{ group.grouper }} ({{ group.list|length }})- {{ last_acquire.acquired_on|naturalday }}" class="rounded-circle bg-light ">
+                              <svg class="text-success mx-2 my-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ last_acquire.challenge_definition.icon_name|default:'award' }}" />
+                              </svg>
                             </span>
-                            {% else %}
-                            <span data-toggle="tooltip" title="(OUVERT) {{ definition.name }}" class="rounded-circle bg-black">
-                                <svg class="mx-2 my-2 text-white" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ definition.icon_name|default:'award' }}" />
-                                </svg>
-                            </span>
-                            {% endif %}
-                            {% endwith %}
-                            {% endfor %}
+                            <span class="position-absolute badge text-bg-light custom-badge">{{ group.list|length }}</span>
+                          </div>
+                          {% endwith %}
+                          {% endfor %}
                         </div>
                         {% endif %}
                     </div>

@@ -8,10 +8,10 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
+from django.http import Http404
 
 from . import models, serializers, utils
 
@@ -62,10 +62,13 @@ class ChallengeView(generics.RetrieveUpdateAPIView):
         if not challenge:
             raise Http404()
 
-        if "started_on" in request.data:
+        if "start" in request.data:
             challenge.started_on = timezone.now()
-        if "acquired_on" in request.data:
+        if "acquire" in request.data:
             challenge.acquired_on = timezone.now()
+        if "snooze" in request.data:
+            challenge.snoozed_on = timezone.now()
+
         challenge.save()
 
         data = serializers.ChallengeSerializer(challenge).data
