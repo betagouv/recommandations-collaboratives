@@ -6,4 +6,5 @@
        {% if field.field.required %}required{% endif %}
        {% if field.field.disabled %}disabled{% endif %}
        {% if field.field.max_length %}maxlength="{{ field.field.max_length }}"{% endif %}
-       {% if field.field.min_length %}minlength="{{ field.field.min_length }}"{% endif %} />
+       {% if field.field.min_length %}minlength="{{ field.field.min_length }}"{% endif %}
+       data-test="{{ field.field.widget.attrs.input_test_id }}" />

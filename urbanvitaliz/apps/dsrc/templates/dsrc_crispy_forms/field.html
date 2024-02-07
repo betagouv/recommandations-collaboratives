@@ -2,7 +2,8 @@
 {% if field.is_hidden %}
     {{ field }}
 {% else %}
-    <div id="div_{{ field.auto_id }}"
+    <div id="field_{{ field.auto_id }}"
+         data-test="{{ field.field.widget.attrs.field_test_id }}"
          class="fr-fieldset__element{% if wrapper_class %} {{ wrapper_class }}{% endif %}{% if field|is_checkbox %} checkbox{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}{% if field.field.widget.input_type == 'password' %} fr-password{% endif %}">
         {% if field|is_checkboxselectmultiple %}
             {% include "dsrc/core/blocks/inputs/input_checkbox_group.html" %}

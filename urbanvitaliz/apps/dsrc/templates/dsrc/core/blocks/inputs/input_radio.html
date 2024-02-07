@@ -2,6 +2,7 @@
        id="{{ field.id_for_label }}"
        type="radio"
        class="{{ input.classes }}"
+       data-test="{{ field.field.widget.attrs.input_test_id }}"
        {% if field.errors %}aria-describedby="{{ field.id_for_label }}-desc-error"{% endif %}
        {% if field.field.required %}required{% endif %}
        {% if field.field.disabled %}disabled{% endif %} />

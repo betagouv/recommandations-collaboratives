@@ -44,6 +44,10 @@ class DsrcBaseForm(forms.Form):
                     continue
                 # Default: set a Select widget with dsrc classes
                 field.widget = forms.Select(attrs={"classes": "dsrc-select"})
+            field.widget.attrs = field.widget.attrs | {
+                "field_test_id": f"dsrc_test_{field_name}_field", # This selector pattern is used in Cypress tests
+                "input_test_id": f"dsrc_test_{field_name}_input" # This selector pattern is used in Cypress tests
+                }
 
     def set_autofocus_on_first_error(self):
         """

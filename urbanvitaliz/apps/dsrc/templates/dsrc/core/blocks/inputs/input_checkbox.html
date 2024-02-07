@@ -1,5 +1,6 @@
 <input name="{{ field.id_for_label }}"
        id="{{ field.id_for_label }}"
+       data-test="{{ field.field.widget.attrs.input_test_id }}"
        type="checkbox"
        class="{{ input.classes }}"
        {% if field.errors %}aria-describedby="{{ field.id_for_label }}-desc-error"{% endif %}

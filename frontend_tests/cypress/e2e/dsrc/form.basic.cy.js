@@ -1,6 +1,7 @@
-import dsrcForm from '../../support/dsrc/forms.tools.js';
+import { DsrcForm } from '../../support/dsrc/forms.tools.js';
 
 describe('DsrcForm', () => {
+	const dataTestPrefix = 'dsrc_test_sample_';
 	const fields = [
 		'text',
 		'phone',
@@ -14,6 +15,8 @@ describe('DsrcForm', () => {
 		'radio_group',
 		'checkbox_group'
 	];
+	const dsrcForm = new DsrcForm(dataTestPrefix, fields);
+
 	beforeEach(() => {
 		// Create a new instance of DsrcForm before each test
 		dsrcForm.navigateToForm();
@@ -27,7 +30,7 @@ describe('DsrcForm', () => {
 
 	it('should check field state', () => {});
 
-	it('should enter field value and display errors ir input is invalid', () => {
+	it('should enter field values and display errors if an input is invalid', () => {
 		fields.forEach((field) => {
 			dsrcForm.enterFieldValueAndAssertState(field);
 			// Add your assertions here

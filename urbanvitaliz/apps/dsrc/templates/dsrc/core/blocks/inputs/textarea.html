@@ -2,4 +2,5 @@
           id="{{ field.id_for_label }}"
           name="{{ field.html_name }}"
           {% if field.field.required %}required{% endif %}
-          {% if field.field.disabled %}disabled{% endif %}></textarea>
+          {% if field.field.disabled %}disabled{% endif %}
+          data-test="{{ field.field.widget.attrs.input_test_id }}"></textarea>

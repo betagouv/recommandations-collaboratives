@@ -2,20 +2,8 @@
  * DSRC - Form Element Tests
  */
 
-const domElements = {
+const sampleDomElements = {
 	TEST_FORM_URL: '/dsrc/',
-	// Sample fields = inputs and labels
-	FIELD_TEXT: '[name="sample_text"]', // TODO:use a selector of type [data-test='test-id']
-	FIELD_PHONE: '[name="sample_phone"]',
-	FIELD_EMAIL: '[name="sample_email"]',
-	FIELD_PASSWORD: '[name="sample_password"]',
-	FIELD_POSTCODE: '[name="sample_postcode"]',
-	FIELD_TEXTAREA: '[name="sample_description"]',
-	FIELD_BOOLEAN: '[name="sample_boolean"]',
-	FIELD_SELECT: '[name="sample_select"]',
-	FIELD_DISABLED_INPUT_TEXT: '[name="sample_disabled_field"]',
-	FIELD_RADIO_GROUP: '[name="sample_radio_group"',
-	FIELD_CHECKBOX_GROUP: '[name="sample_checkbox_group"]',
 	// Sample inputs
 	INPUT_TEXT: '[name="sample_text"]', // TODO:use a selector of type [data-test='test-id']
 	INPUT_PHONE: '[name="sample_phone"]',
@@ -70,9 +58,55 @@ const domElements = {
 
 class DsrcForm {
 	dom;
+	fields;
+	dataTestPrefix;
 
-	constructor(dom) {
-		this.dom = dom;
+	constructor(dataTestPrefix, fields) {
+		this.fields = fields;
+		this.dataTestPrefix = dataTestPrefix;
+		const fieldSelectors = this.generateFieldSelectors(dataTestPrefix, fields);
+		this.dom = { ...sampleDomElements, ...fieldSelectors };
+		console.log('fieldSelectors', fieldSelectors);
+	}
+
+	generateFieldSelectorKey(inputType) {
+		console.log('inputType', inputType);
+		return `FIELD_${inputType.toUpperCase()}`;
+	}
+
+	generateFieldSelectorValue(dataTestPrefix, inputType) {
+		return `[data-test='${dataTestPrefix}${inputType}_field']`;
+	}
+
+	generateFieldSelectors(dataTestPrefix, fields) {
+		const selectors = {};
+		Object.keys(fields).forEach((inputType) => {
+			selectors[this.generateFieldSelectorKey(inputType)] = this.generateFieldSelectorValue(
+				dataTestPrefix,
+				inputType
+			);
+		});
+		return selectors;
+	}
+
+	generateInputSelectorKey(inputType) {
+		console.log('inputType', inputType);
+		return `INPUT_${inputType.toUpperCase()}`;
+	}
+
+	generateInputSelectorValue(dataTestPrefix, inputType) {
+		return `[data-test='${dataTestPrefix}${inputType}_input']`;
+	}
+
+	generateInputSelectors(dataTestPrefix, fields) {
+		const selectors = {};
+		Object.keys(fields).forEach((inputType) => {
+			selectors[this.generateInputSelectorKey(inputType)] = this.generateInputSelectorValue(
+				dataTestPrefix,
+				inputType
+			);
+		});
+		return selectors;
 	}
 
 	// Navigation
@@ -92,9 +126,10 @@ class DsrcForm {
 	}
 
 	enterFieldValueAndAssertState(inputType, isValid = true) {
+		const selector = this.generateFieldSelectorValue(this.dataTestPrefix, inputType);
 		switch (inputType) {
 			case 'text':
-				cy.get(this.dom.FIELD_TEXT)
+				cy.get(selector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_TEXT)
 					.type(isValid ? this.dom.VALID_INPUT_TEXT : this.dom.INVALID_INPUT_TEXT)
@@ -103,7 +138,7 @@ class DsrcForm {
 					});
 				break;
 			case 'phone':
-				cy.get(this.dom.FIELD_PHONE)
+				cy.get(selector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_PHONE)
 					.type(isValid ? this.dom.VALID_INPUT_PHONE : this.dom.INVALID_INPUT_PHONE)
@@ -112,7 +147,7 @@ class DsrcForm {
 					});
 				break;
 			case 'email':
-				cy.get(this.dom.FIELD_EMAIL)
+				cy.get(selector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_EMAIL)
 					.type(isValid ? this.dom.VALID_INPUT_EMAIL : this.dom.INVALID_INPUT_EMAIL)
@@ -122,7 +157,7 @@ class DsrcForm {
 				break;
 			case 'password':
 				// TODO: test password visibility too
-				cy.get(this.dom.FIELD_PASSWORD)
+				cy.get(selector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_PASSWORD)
 					.type(isValid ? this.dom.VALID_INPUT_PASSWORD : this.dom.INVALID_INPUT_PASSWORD)
@@ -131,7 +166,7 @@ class DsrcForm {
 					});
 				break;
 			case 'postcode':
-				cy.get(this.dom.FIELD_POSTCODE)
+				cy.get(selector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_POSTCODE)
 					.type(isValid ? this.dom.VALID_INPUT_POSTCODE : this.dom.INVALID_INPUT_POSTCODE)
@@ -140,7 +175,7 @@ class DsrcForm {
 					});
 				break;
 			case 'textarea':
-				cy.get(this.dom.FIELD_TEXTAREA)
+				cy.get(selector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_TEXTAREA)
 					.type(isValid ? this.dom.VALID_INPUT_TEXTAREA : this.dom.INVALID_INPUT_TEXTAREA)
@@ -149,7 +184,7 @@ class DsrcForm {
 					});
 				break;
 			case 'boolean': // this is a checkbox
-				cy.get(this.dom.LABEL_BOOLEAN)
+				cy.get(selector)
 					.should('be.visible')
 					.and('contain', this.dom.FIELD_BOOLEAN_LABEL)
 					.click()
@@ -158,7 +193,7 @@ class DsrcForm {
 					});
 				break;
 			case 'select':
-				cy.get(this.dom.FIELD_SELECT)
+				cy.get(selector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_SELECT)
 					.select(this.dom.VALID_INPUT_SELECT)
@@ -167,7 +202,7 @@ class DsrcForm {
 					});
 				break;
 			case 'radio_group':
-				cy.get(this.dom.FIELD_RADIO_GROUP)
+				cy.get(selector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_RADIO_GROUP)
 					.check(isValid ? this.dom.VALID_INPUT_RADIO : this.dom.INVALID_INPUT_RADIO)
@@ -176,7 +211,7 @@ class DsrcForm {
 					});
 				break;
 			case 'checkbox_group':
-				cy.get(this.dom.FIELD_CHECKBOX_GROUP)
+				cy.get(selector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_CHECKBOX_GROUP)
 					.check(isValid ? this.dom.VALID_INPUT_CHECKBOX : this.dom.INVALID_INPUT_CHECKBOX)
@@ -185,9 +220,7 @@ class DsrcForm {
 					});
 				break;
 			case 'disabled_field':
-				cy.get(this.dom.FIELD_DISABLED_INPUT_TEXT)
-					.should('be.disabled')
-					.and('contain', this.dom.LABEL_DISABLED_INPUT_TEXT);
+				cy.get(selector).should('be.disabled').and('contain', this.dom.LABEL_DISABLED_INPUT_TEXT);
 				break;
 			default:
 				break;
@@ -195,6 +228,4 @@ class DsrcForm {
 	}
 }
 
-const dsrcForm = new DsrcForm(domElements);
-
-export default dsrcForm;
+export default { DsrcForm };
