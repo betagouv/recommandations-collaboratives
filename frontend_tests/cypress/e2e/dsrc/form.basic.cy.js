@@ -2,8 +2,9 @@ import { DsrcForm } from '../../support/dsrc/forms.tools.js';
 
 describe('DsrcFormTest', () => {
 	// The prefix used in data-test selectors: the selectors are generated in the `forms.py` during form initialization, and are rendered in the template files
-	const dataTestPrefix = 'dsrc_test_sample_';
-	// The fields to test: these are the names of the fields of the form, as declared in the `forms.py` file, without the `sample_` prefix
+	const fieldPrefix = 'sample_';
+	const dataTestPrefix = `dsrc_test_${fieldPrefix}`;
+	// The fields to test = the input types of the fields stripped of the `sample_` prefix used in the `forms.py` file,
 	const fields = [
 		'text',
 		'phone',
@@ -11,7 +12,7 @@ describe('DsrcFormTest', () => {
 		'password',
 		'postcode',
 		'description',
-		'boolean',
+		'checkbox',
 		'select',
 		'disabled_field',
 		'radio_group',
@@ -21,34 +22,19 @@ describe('DsrcFormTest', () => {
 	const dsrcForm = new DsrcForm(dataTestPrefix, fields);
 
 	beforeEach(() => {
-		// Create a new instance of DsrcForm before each test
 		dsrcForm.navigateToForm();
 	});
 
 	it('should navigate to the form', () => {
-		// Test the navigateToForm method
 		dsrcForm.navigateToForm();
-		// Add your assertions here
 	});
 
-	it('should enter an valid input and check field state', () => {
-		fields.forEach((field) => {
+	fields.forEach((field) => {
+		it(`should enter a valid value in "${field}" input and check field state`, () => {
 			dsrcForm.enterFieldValueAndAssertState(field);
-			// Add your assertions here
 		});
-	});
-
-	it('should enter an invalid input, check field state and display errors', () => {
-		fields.forEach((field) => {
+		it(`should enter an invalid value in "${field}" input and check field state and errors`, () => {
 			dsrcForm.enterFieldValueAndAssertState(field, false);
-			// Add your assertions here
 		});
 	});
-	// it('should save the form', () => {
-	// 	// Test the saveDsrcForm method
-	// 	dsrcForm.saveDsrcForm();
-	// 	// Add your assertions here
-	// });
-
-	// Add more test cases for other methods
 });
