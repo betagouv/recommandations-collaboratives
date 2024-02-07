@@ -21,29 +21,24 @@ class DsrcBaseForm(forms.Form):
                 if isinstance(field.widget, forms.Textarea):
                     # If the widget is already a Textarea
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-input"}
-                    continue
                 if isinstance(field.widget, forms.PasswordInput):
                     # If the widget is already a PasswordInput
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-input"}
-                    continue
                 # Default: set a TextInput widget with dsrc classes
-                field.widget = forms.TextInput(attrs={"classes": "dsrc-input"})
+                else: field.widget = forms.TextInput(attrs={"classes": "dsrc-input"})
             if isinstance(field, forms.BooleanField):
                 # If the widget is already a CheckboxInput
                 if isinstance(field.widget, forms.CheckboxInput):
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-checkbox-group"}
-                    continue
             if isinstance(field, forms.ChoiceField):
                 # If the widget is already a RadioSelect
                 if isinstance(field.widget, forms.RadioSelect):
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-radio-group"}
-                    continue
                 # If the widget is already a CheckboxSelectMultiple
                 if isinstance(field.widget, forms.CheckboxSelectMultiple):
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-checkbox-group"}
-                    continue
                 # Default: set a Select widget with dsrc classes
-                field.widget = forms.Select(attrs={"classes": "dsrc-select"})
+                else: field.widget = forms.Select(attrs={"classes": "dsrc-select"})
             field.widget.attrs = field.widget.attrs | {
                 "field_test_id": f"dsrc_test_{field_name}_field", # This selector pattern is used in Cypress tests
                 "input_test_id": f"dsrc_test_{field_name}_input" # This selector pattern is used in Cypress tests

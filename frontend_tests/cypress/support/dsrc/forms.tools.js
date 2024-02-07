@@ -4,18 +4,7 @@
 
 const sampleDomElements = {
 	TEST_FORM_URL: '/dsrc/',
-	// Sample inputs
-	INPUT_TEXT: '[name="sample_text"]', // TODO:use a selector of type [data-test='test-id']
-	INPUT_PHONE: '[name="sample_phone"]',
-	INPUT_EMAIL: '[name="sample_email"]',
-	INPUT_PASSWORD: '[name="sample_password"]',
-	INPUT_POSTCODE: '[name="sample_postcode"]',
-	INPUT_TEXTAREA: '[name="sample_description"]',
-	INPUT_BOOLEAN: '[name="sample_boolean"]',
-	INPUT_SELECT: '[name="sample_select"]',
-	INPUT_DISABLED_INPUT_TEXT: '[name="sample_disabled_field"]',
-	INPUT_RADIO_GROUP: '[name="sample_radio_group"',
-	INPUT_CHECKBOX_GROUP: '[name="sample_checkbox_group"]',
+
 	// Sample labels
 	LABEL_TEXT: `Nom d'usager`, // TODO:use a selector of type [data-test='test-id']
 	LABEL_PHONE: `Téléphone`,
@@ -44,7 +33,7 @@ const sampleDomElements = {
 	VALID_INPUT_CHECKBOX: 1,
 
 	// Sample INVALID inputs
-	INVALID_INPUT_TEXT: 'This is a sample text',
+	INVALID_INPUT_TEXT: '', // Invalid if required
 	INVALID_INPUT_PHONE: 'abc55', // TODO: use DSFR Pattern
 	INVALID_INPUT_PASSWORD: 'unsafe-Passw0rd', // insecure password example
 	INVALID_INPUT_EMAIL: 'julieexample.com',
@@ -65,12 +54,12 @@ class DsrcForm {
 		this.fields = fields;
 		this.dataTestPrefix = dataTestPrefix;
 		const fieldSelectors = this.generateFieldSelectors(dataTestPrefix, fields);
-		this.dom = { ...sampleDomElements, ...fieldSelectors };
-		console.log('fieldSelectors', fieldSelectors);
+		const inputSelectors = this.generateInputSelectors(dataTestPrefix, fields);
+		this.dom = { ...sampleDomElements, ...fieldSelectors, ...inputSelectors };
 	}
 
+	// Tool functions
 	generateFieldSelectorKey(inputType) {
-		console.log('inputType', inputType);
 		return `FIELD_${inputType.toUpperCase()}`;
 	}
 
@@ -80,7 +69,9 @@ class DsrcForm {
 
 	generateFieldSelectors(dataTestPrefix, fields) {
 		const selectors = {};
-		Object.keys(fields).forEach((inputType) => {
+		let inputType;
+		Object.keys(fields).forEach((index) => {
+			inputType = fields[index];
 			selectors[this.generateFieldSelectorKey(inputType)] = this.generateFieldSelectorValue(
 				dataTestPrefix,
 				inputType
@@ -90,7 +81,6 @@ class DsrcForm {
 	}
 
 	generateInputSelectorKey(inputType) {
-		console.log('inputType', inputType);
 		return `INPUT_${inputType.toUpperCase()}`;
 	}
 
@@ -98,9 +88,19 @@ class DsrcForm {
 		return `[data-test='${dataTestPrefix}${inputType}_input']`;
 	}
 
+	generateValidInputValueKey(inputType) {
+		return `VALID_INPUT_${inputType.toUpperCase()}`;
+	}
+
+	generateInvalidInputValueKey(inputType) {
+		return `INVALID_INPUT_${inputType.toUpperCase()}`;
+	}
+
 	generateInputSelectors(dataTestPrefix, fields) {
 		const selectors = {};
-		Object.keys(fields).forEach((inputType) => {
+		let inputType;
+		Object.keys(fields).forEach((index) => {
+			inputType = fields[index];
 			selectors[this.generateInputSelectorKey(inputType)] = this.generateInputSelectorValue(
 				dataTestPrefix,
 				inputType
@@ -115,13 +115,16 @@ class DsrcForm {
 	}
 
 	// Verifications
-
-	checkValidity(inputType, isValid = true) {
+	checkValidity(inputElement, inputType, isValid = true) {
 		// Check if the input is valid
+		let actualValue = inputElement[0].value;
+		let expectedValue;
 		if (isValid) {
-			expect(inputType[0].checkValidity()).to.equal(true);
+			expectedValue = this.dom[this.generateValidInputValueKey(inputType)];
+			expect(actualValue).to.equal(expectedValue);
+			expect(actualValue).to.equal(this.dom[this.generateValidInputValueKey(inputType)]);
 		} else {
-			expect(inputType[0].checkValidity()).to.equal(false);
+			expect(inputType[0].value).to.equal(this.dom[this.generateInvalidInputValueKey(inputType)]);
 		}
 	}
 
@@ -133,8 +136,10 @@ class DsrcForm {
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_TEXT)
 					.type(isValid ? this.dom.VALID_INPUT_TEXT : this.dom.INVALID_INPUT_TEXT)
-					.then(($input) => {
-						checkValidity($input, isValid);
+					.then(() => {
+						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+							this.checkValidity($input, inputType, isValid);
+						});
 					});
 				break;
 			case 'phone':
@@ -143,7 +148,9 @@ class DsrcForm {
 					.and('contain', this.dom.LABEL_PHONE)
 					.type(isValid ? this.dom.VALID_INPUT_PHONE : this.dom.INVALID_INPUT_PHONE)
 					.then(($input) => {
-						checkValidity($input, isValid);
+						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+							this.checkValidity($input, inputType, isValid);
+						});
 					});
 				break;
 			case 'email':
@@ -152,7 +159,9 @@ class DsrcForm {
 					.and('contain', this.dom.LABEL_EMAIL)
 					.type(isValid ? this.dom.VALID_INPUT_EMAIL : this.dom.INVALID_INPUT_EMAIL)
 					.then(($input) => {
-						checkValidity($input, isValid);
+						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+							this.checkValidity($input, inputType, isValid);
+						});
 					});
 				break;
 			case 'password':
@@ -162,7 +171,9 @@ class DsrcForm {
 					.and('contain', this.dom.LABEL_PASSWORD)
 					.type(isValid ? this.dom.VALID_INPUT_PASSWORD : this.dom.INVALID_INPUT_PASSWORD)
 					.then(($input) => {
-						checkValidity($input, isValid);
+						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+							this.checkValidity($input, inputType, isValid);
+						});
 					});
 				break;
 			case 'postcode':
@@ -171,7 +182,9 @@ class DsrcForm {
 					.and('contain', this.dom.LABEL_POSTCODE)
 					.type(isValid ? this.dom.VALID_INPUT_POSTCODE : this.dom.INVALID_INPUT_POSTCODE)
 					.then(($input) => {
-						checkValidity($input, isValid);
+						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+							this.checkValidity($input, inputType, isValid);
+						});
 					});
 				break;
 			case 'textarea':
@@ -180,7 +193,9 @@ class DsrcForm {
 					.and('contain', this.dom.LABEL_TEXTAREA)
 					.type(isValid ? this.dom.VALID_INPUT_TEXTAREA : this.dom.INVALID_INPUT_TEXTAREA)
 					.then(($input) => {
-						checkValidity($input, isValid);
+						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+							this.checkValidity($input, inputType, isValid);
+						});
 					});
 				break;
 			case 'boolean': // this is a checkbox
@@ -189,7 +204,9 @@ class DsrcForm {
 					.and('contain', this.dom.FIELD_BOOLEAN_LABEL)
 					.click()
 					.then(($input) => {
-						checkValidity($input, isValid);
+						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+							this.checkValidity($input, inputType, isValid);
+						});
 					});
 				break;
 			case 'select':
@@ -198,7 +215,9 @@ class DsrcForm {
 					.and('contain', this.dom.LABEL_SELECT)
 					.select(this.dom.VALID_INPUT_SELECT)
 					.then(($input) => {
-						checkValidity($input, isValid);
+						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+							this.checkValidity($input, inputType, isValid);
+						});
 					});
 				break;
 			case 'radio_group':
@@ -207,7 +226,9 @@ class DsrcForm {
 					.and('contain', this.dom.LABEL_RADIO_GROUP)
 					.check(isValid ? this.dom.VALID_INPUT_RADIO : this.dom.INVALID_INPUT_RADIO)
 					.then(($input) => {
-						checkValidity($input, isValid);
+						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+							this.checkValidity($input, inputType, isValid);
+						});
 					});
 				break;
 			case 'checkbox_group':
@@ -216,7 +237,9 @@ class DsrcForm {
 					.and('contain', this.dom.LABEL_CHECKBOX_GROUP)
 					.check(isValid ? this.dom.VALID_INPUT_CHECKBOX : this.dom.INVALID_INPUT_CHECKBOX)
 					.then(($input) => {
-						checkValidity($input, isValid);
+						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+							this.checkValidity($input, inputType, isValid);
+						});
 					});
 				break;
 			case 'disabled_field':

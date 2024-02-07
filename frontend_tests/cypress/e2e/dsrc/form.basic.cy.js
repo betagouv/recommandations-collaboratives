@@ -1,7 +1,9 @@
 import { DsrcForm } from '../../support/dsrc/forms.tools.js';
 
 describe('DsrcForm', () => {
+	// The prefix used in data-test selectors: the selectors are generated in the `forms.py` during form initialization, and are automatically rendered in the template files
 	const dataTestPrefix = 'dsrc_test_sample_';
+	// The fields to test: these are the names of the fields of the form, as declared in the `forms.py` file
 	const fields = [
 		'text',
 		'phone',
@@ -15,6 +17,7 @@ describe('DsrcForm', () => {
 		'radio_group',
 		'checkbox_group'
 	];
+	// Create a new instance of DsrcForm using the dataTestPrefix and fields defined in our form
 	const dsrcForm = new DsrcForm(dataTestPrefix, fields);
 
 	beforeEach(() => {
