@@ -18,11 +18,8 @@ class DsrcBaseForm(forms.Form):
         # If the widget is already set for a Field: merge the default `dsrc` attrs with the ones provided by the widget
         for field_name, field in self.fields.items():
             if isinstance(field, forms.CharField):
-                if isinstance(field.widget, forms.Textarea):
+                if isinstance(field.widget, (forms.Textarea, forms.PasswordInput, forms.EmailInput)):
                     # If the widget is already a Textarea
-                    field.widget.attrs = field.widget.attrs | {"classes": "dsrc-input"}
-                elif isinstance(field.widget, forms.PasswordInput):
-                    # If the widget is already a PasswordInput
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-input"}
                 # Default: set a TextInput widget with dsrc classes
                 else: field.widget = forms.TextInput(attrs={"classes": "dsrc-input"})
@@ -91,30 +88,30 @@ class DsrcExampleForm(DsrcBaseForm):
             ),
         )
 
-    # Example clean method
-    def clean_sample_email(self):
-        """Make sure email is lowercased"""
-        email = self.cleaned_data["email"]
-        return email.lower()
+    # # Example clean method
+    # def clean_sample_email(self):
+    #     """Make sure email is lowercased"""
+    #     email = self.cleaned_data["email"]
+    #     return email.lower()
 
 
-	# Example clean method
-    def clean_sample_radio(self):
-        radio_group = self.cleaned_data["sample_radio_group"]
+	# # Example clean method
+    # def clean_sample_radio_group(self):
+    #     radio_group = self.cleaned_data["sample_radio_group"]
 
-        if radio_group == "3":
-            raise forms.ValidationError("Le troisième choix est interdit")
+    #     if radio_group == "3":
+    #         raise forms.ValidationError("Le troisième choix est interdit")
 
-        return radio_group
+    #     return radio_group
 
-	# Example clean method
-    def clean_sample_checkbox(self):
-        checkbox_group = self.cleaned_data["sample_checkbox_group"]
+	# # Example clean method
+    # def clean_sample_checkbox_group(self):
+    #     checkbox_group = self.cleaned_data["sample_checkbox_group"]
 
-        if checkbox_group == ["3"]:
-            raise forms.ValidationError("Le troisième choix est interdit")
+    #     if checkbox_group == ["3"]:
+    #         raise forms.ValidationError("Le troisième choix est interdit")
 
-        return checkbox_group
+    #     return checkbox_group
 
     # Basic text input
     sample_text = forms.CharField(label="Nom d'usager", initial="", required=True)
