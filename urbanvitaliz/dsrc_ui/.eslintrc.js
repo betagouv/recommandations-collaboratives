@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
 	env: {
 		browser: true,
 		es2021: true
@@ -26,3 +26,5 @@ module.exports = {
 		semi: ['error', 'always']
 	}
 };
+
+export default config;
