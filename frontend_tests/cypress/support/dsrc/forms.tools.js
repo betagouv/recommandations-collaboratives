@@ -29,11 +29,11 @@ const sampleDomElements = {
 		'This is a sample text with many more characters than the input field can handle'.repeat(10),
 	VALID_INPUT_BOOLEAN: 'on',
 	VALID_INPUT_SELECT: 'Option 1',
-	VALID_INPUT_RADIO: 2,
-	VALID_INPUT_CHECKBOX: 1,
+	VALID_INPUT_RADIO_GROUP: 2,
+	VALID_INPUT_CHECKBOX_GROUP: 1,
 
 	// Sample INVALID inputs
-	INVALID_INPUT_TEXT: '', // Invalid if required
+	INVALID_INPUT_TEXT: ' ', // Invalid if required
 	INVALID_INPUT_PHONE: 'abc55', // TODO: use DSFR Pattern
 	INVALID_INPUT_PASSWORD: 'unsafe-Passw0rd', // insecure password example : todo use DSFR(?) Pattern
 	INVALID_INPUT_EMAIL: 'user-test-uiexample.com',
@@ -41,8 +41,8 @@ const sampleDomElements = {
 	INVALID_INPUT_TEXTAREA: '', // Invalid if required
 	INVALID_INPUT_BOOLEAN: 'off', // Invalid if required (Example: accept terms and conditions)
 	INVALID_INPUT_SELECT: 'Sélectionner une option', // Invalid if required
-	INVALID_INPUT_RADIO: 3,
-	INVALID_INPUT_CHECKBOX: 3
+	INVALID_INPUT_RADIO_GROUP: 3,
+	INVALID_INPUT_CHECKBOX_GROUP: 3
 };
 
 class DsrcForm {

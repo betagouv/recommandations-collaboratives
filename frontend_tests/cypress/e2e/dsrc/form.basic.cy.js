@@ -31,13 +31,19 @@ describe('DsrcFormTest', () => {
 		// Add your assertions here
 	});
 
-	it('should check field state', () => {
+	it('should enter an valid input and check field state', () => {
 		fields.forEach((field) => {
 			dsrcForm.enterFieldValueAndAssertState(field);
 			// Add your assertions here
 		});
 	});
 
+	it('should enter an invalid input, check field state and display errors', () => {
+		fields.forEach((field) => {
+			dsrcForm.enterFieldValueAndAssertState(field, false);
+			// Add your assertions here
+		});
+	});
 	// it('should save the form', () => {
 	// 	// Test the saveDsrcForm method
 	// 	dsrcForm.saveDsrcForm();
