@@ -13,9 +13,24 @@
 	display: none;
 }
 
+.dsrc-checkbox-group { // necessary to fix checkbox input accessibility
+	position: relative;
+	width: fit-content;
+}
+
+.dsrc-input input[type="checkbox"], // necessary to override password checkbox styles &  fix checkbox input accessibility
+.dsrc-checkbox-group input[type="checkbox"]{
+	position: absolute;
+	z-index: 1;
+	bottom: 0.25rem;
+	right: 0;
+	left: 0;
+}
+
 .dsrc-input input[type="checkbox"]:checked + label::before, // necessary to override password checkbox styles
 .dsrc-checkbox-group input[type="checkbox"]:checked + label::before {
 	--border-active-blue-france: var(--dsrc-primary);
 	background-color: var(--dsrc-primary);
-	background-image:radial-gradient(at 5px 4px, rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), radial-gradient(at calc(100% - 5px) 4px, rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), radial-gradient(at calc(100% - 5px) calc(100% - 4px), rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), radial-gradient(at 5px calc(100% - 4px), rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f5f5fe' d='M10 15.17l9.2-9.2 1.4 1.42L10 18l-6.36-6.36 1.4-1.42z'/></svg>")
+	background-image:radial-gradient(at 5px 4px, rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), radial-gradient(at calc(100% - 5px) 4px, rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), radial-gradient(at calc(100% - 5px) calc(100% - 4px), rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), radial-gradient(at 5px calc(100% - 4px), rgba(0, 0, 0, 0) 4px, var(--dsrc-primary) 4px, var(--dsrc-primary) 5px, rgba(0, 0, 0, 0) 6px), linear-gradient(var(--dsrc-primary), var(--dsrc-primary)), url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f5f5fe' d='M10 15.17l9.2-9.2 1.4 1.42L10 18l-6.36-6.36 1.4-1.42z'/></svg>");
+	z-index: 0;
 }
