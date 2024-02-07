@@ -115,7 +115,9 @@ template = Template(
     </style>
 {% endblock %}
 
-{% dsrc_button data_dict %}
+{% block main %}
+    {% dsrc_button data_dict %}
+{% endblock %}
 """
 )
 
@@ -127,9 +129,9 @@ data_dict = {
     "is_disabled"   : False,
     "size"          : "md",
     "variant"       : "secondary",
-    "icon"          : "fr-icon--info-fill",
+    "icon"          : "fr-icon--info-fill", # nom de l'icône, sans l'extension SVG
     "align"         : "right",
-    "classes"       : "dsrc-action--high"
+    "classes"       : "dsrc-color--primary",
 }
 
 context = Context(

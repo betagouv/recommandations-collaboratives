@@ -9,12 +9,6 @@ Le code su système de design DSRC est composé de 4 modules:
 - `dsrc_doc` : contient la documentation interactive de la bibliothèque sous forme de Jupyter Notebooks (c'est ici!)
 - `dsrc_ui` : contient les fichiers source CSS et JavaScript de la librairie de composants
 - `dsrc` : Django app qui fournit des templates Django réutilisables basés sur DSFR avec surcharges DSRC
-  - module `dsrc` bibliothèque de templates Django réutilisables
-    - Contient une page d'example  avec un formulaire de base (voir intégration dans `urls.py`, `views.py` et `forms.py`)
-    - L'exemple est visible sur `http://urbanvitaliz.localhost:8000/dsrc/`
-  - module `dsrc-crispy-forms` template pack:  bibliothèque pour la gestion des formulaires:
-    - La structure est celle attendue par `crispy-forms` : [Cripsy Forms - How to create your own template packs](https://django-crispy-forms.readthedocs.io/en/latest/template_packs.html#))
-    - Utilise également des templates dans `dsrc`
 - `dsrc_tests` : contient les tests unitaires et d'intégration des composants (TBD)
 
 L'arborescence de ces modules dans le projet est la suivante:

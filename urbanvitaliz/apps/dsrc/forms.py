@@ -57,6 +57,12 @@ class DsrcBaseForm(forms.Form):
 
 """
 Example form that extends DsrcBaseForm.
+- Uses crispy_forms for managing the layout and fields rendering
+- To use this form, you can include the tag in your template:
+    {% crispy dsrc_example_form %}
+- You can see an example of this form integrated:
+    - in a template here: './templates/dsrc/samples/page_form.html'
+    - in a view here: './views.py'
 """
 class DsrcExampleForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
