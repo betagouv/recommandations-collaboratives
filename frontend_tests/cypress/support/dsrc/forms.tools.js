@@ -27,7 +27,7 @@ const sampleDomElements = {
 	VALID_INPUT_POSTCODE: '79700', // TODO: use DSFR Pattern
 	VALID_INPUT_TEXTAREA:
 		'This is a sample text with many more characters than the input field can handle'.repeat(10),
-	VALID_INPUT_BOOLEAN: true,
+	VALID_INPUT_BOOLEAN: 'on',
 	VALID_INPUT_SELECT: 'Option 1',
 	VALID_INPUT_RADIO: 2,
 	VALID_INPUT_CHECKBOX: 1,
@@ -39,7 +39,7 @@ const sampleDomElements = {
 	INVALID_INPUT_EMAIL: 'user-test-uiexample.com',
 	INVALID_INPUT_POSTCODE: '79',
 	INVALID_INPUT_TEXTAREA: '', // Invalid if required
-	INVALID_INPUT_BOOLEAN: false, // Invalid if required (Example: accept terms and conditions)
+	INVALID_INPUT_BOOLEAN: 'off', // Invalid if required (Example: accept terms and conditions)
 	INVALID_INPUT_SELECT: 'Sélectionner une option', // Invalid if required
 	INVALID_INPUT_RADIO: 3,
 	INVALID_INPUT_CHECKBOX: 3
@@ -88,14 +88,6 @@ class DsrcForm {
 		return `[data-test='${dataTestPrefix}${inputType}_input']`;
 	}
 
-	generateValidInputValueKey(inputType) {
-		return `VALID_INPUT_${inputType.toUpperCase()}`;
-	}
-
-	generateInvalidInputValueKey(inputType) {
-		return `INVALID_INPUT_${inputType.toUpperCase()}`;
-	}
-
 	generateInputSelectors(dataTestPrefix, fields) {
 		const selectors = {};
 		let inputType;
@@ -107,6 +99,14 @@ class DsrcForm {
 			);
 		});
 		return selectors;
+	}
+
+	generateValidInputValueKey(inputType) {
+		return `VALID_INPUT_${inputType.toUpperCase()}`;
+	}
+
+	generateInvalidInputValueKey(inputType) {
+		return `INVALID_INPUT_${inputType.toUpperCase()}`;
 	}
 
 	// Navigation
@@ -130,122 +130,125 @@ class DsrcForm {
 	}
 
 	enterFieldValueAndAssertState(inputType, isValid = true) {
-		let selector = this.generateFieldSelectorValue(this.dataTestPrefix, inputType);
+		let fieldSelector = this.dom[this.generateFieldSelectorKey(inputType)];
+		let inputSelector = this.dom[this.generateInputSelectorKey(inputType)];
 		switch (inputType) {
 			case 'text':
-				cy.get(selector)
+				cy.get(fieldSelector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_TEXT)
 					.type(isValid ? this.dom.VALID_INPUT_TEXT : this.dom.INVALID_INPUT_TEXT)
 					.then(() => {
-						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+						cy.get(inputSelector).then(($input) => {
 							this.checkValidity($input, inputType, isValid);
 						});
 					});
 				break;
 			case 'phone':
-				cy.get(selector)
+				cy.get(fieldSelector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_PHONE)
 					.type(isValid ? this.dom.VALID_INPUT_PHONE : this.dom.INVALID_INPUT_PHONE)
 					.then(($input) => {
-						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+						cy.get(inputSelector).then(($input) => {
 							this.checkValidity($input, inputType, isValid);
 						});
 					});
 				break;
 			case 'email':
-				cy.get(selector)
+				cy.get(fieldSelector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_EMAIL)
 					.type(isValid ? this.dom.VALID_INPUT_EMAIL : this.dom.INVALID_INPUT_EMAIL)
 					.then(($input) => {
-						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+						cy.get(inputSelector).then(($input) => {
 							this.checkValidity($input, inputType, isValid);
 						});
 					});
 				break;
 			case 'password':
 				// TODO: test password visibility too
-				cy.get(selector).should('be.visible').and('contain', this.dom.LABEL_PASSWORD);
+				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_PASSWORD);
 
-				cy.get(selector)
-					.find(this.dom[this.generateInputSelectorKey(inputType)])
+				cy.get(fieldSelector)
+					.find(inputSelector)
 					.type(isValid ? this.dom.VALID_INPUT_PASSWORD : this.dom.INVALID_INPUT_PASSWORD)
-					.then(($input) => {
-						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+					.then(() => {
+						cy.get(inputSelector).then(($input) => {
 							this.checkValidity($input, inputType, isValid);
 						});
 					});
 				break;
 			case 'postcode':
-				cy.get(selector)
+				cy.get(fieldSelector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_POSTCODE)
 					.type(isValid ? this.dom.VALID_INPUT_POSTCODE : this.dom.INVALID_INPUT_POSTCODE)
-					.then(($input) => {
-						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+					.then(() => {
+						cy.get(inputSelector).then(($input) => {
 							this.checkValidity($input, inputType, isValid);
 						});
 					});
 				break;
 			case 'textarea':
-				cy.get(selector)
+				cy.get(fieldSelector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_TEXTAREA)
 					.type(isValid ? this.dom.VALID_INPUT_TEXTAREA : this.dom.INVALID_INPUT_TEXTAREA)
-					.then(($input) => {
-						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+					.then(() => {
+						cy.get(inputSelector).then(($input) => {
 							this.checkValidity($input, inputType, isValid);
 						});
 					});
 				break;
 			case 'boolean': // this is a checkbox
-				cy.get(selector)
+				cy.get(fieldSelector)
 					.should('be.visible')
-					.and('contain', this.dom.FIELD_BOOLEAN_LABEL)
+					.and('contain', this.dom.LABEL_BOOLEAN)
 					.click()
-					.then(($input) => {
-						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+					.then(() => {
+						cy.get(inputSelector).then(($input) => {
 							this.checkValidity($input, inputType, isValid);
 						});
 					});
 				break;
 			case 'select':
-				cy.get(selector)
+				cy.get(fieldSelector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_SELECT)
 					.select(this.dom.VALID_INPUT_SELECT)
-					.then(($input) => {
-						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+					.then(() => {
+						cy.get(inputSelector).then(($input) => {
 							this.checkValidity($input, inputType, isValid);
 						});
 					});
 				break;
 			case 'radio_group':
-				cy.get(selector)
+				cy.get(fieldSelector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_RADIO_GROUP)
 					.check(isValid ? this.dom.VALID_INPUT_RADIO : this.dom.INVALID_INPUT_RADIO)
-					.then(($input) => {
-						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+					.then(() => {
+						cy.get(inputSelector).then(($input) => {
 							this.checkValidity($input, inputType, isValid);
 						});
 					});
 				break;
 			case 'checkbox_group':
-				cy.get(selector)
+				cy.get(fieldSelector)
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_CHECKBOX_GROUP)
 					.check(isValid ? this.dom.VALID_INPUT_CHECKBOX : this.dom.INVALID_INPUT_CHECKBOX)
-					.then(($input) => {
-						cy.get(this.dom[this.generateInputSelectorKey(inputType)]).then(($input) => {
+					.then(() => {
+						cy.get(inputSelector).then(($input) => {
 							this.checkValidity($input, inputType, isValid);
 						});
 					});
 				break;
 			case 'disabled_field':
-				cy.get(selector).should('be.disabled').and('contain', this.dom.LABEL_DISABLED_INPUT_TEXT);
+				cy.get(fieldSelector)
+					.should('be.disabled')
+					.and('contain', this.dom.LABEL_DISABLED_INPUT_TEXT);
 				break;
 			default:
 				break;

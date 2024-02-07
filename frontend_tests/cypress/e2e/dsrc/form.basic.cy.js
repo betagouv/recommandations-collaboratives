@@ -1,9 +1,9 @@
 import { DsrcForm } from '../../support/dsrc/forms.tools.js';
 
-describe('DsrcForm', () => {
-	// The prefix used in data-test selectors: the selectors are generated in the `forms.py` during form initialization, and are automatically rendered in the template files
+describe('DsrcFormTest', () => {
+	// The prefix used in data-test selectors: the selectors are generated in the `forms.py` during form initialization, and are rendered in the template files
 	const dataTestPrefix = 'dsrc_test_sample_';
-	// The fields to test: these are the names of the fields of the form, as declared in the `forms.py` file
+	// The fields to test: these are the names of the fields of the form, as declared in the `forms.py` file, without the `sample_` prefix
 	const fields = [
 		'text',
 		'phone',
@@ -31,9 +31,7 @@ describe('DsrcForm', () => {
 		// Add your assertions here
 	});
 
-	it('should check field state', () => {});
-
-	it('should enter field values and display errors if an input is invalid', () => {
+	it('should check field state', () => {
 		fields.forEach((field) => {
 			dsrcForm.enterFieldValueAndAssertState(field);
 			// Add your assertions here
