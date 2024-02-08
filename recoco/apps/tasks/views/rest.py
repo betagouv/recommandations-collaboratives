@@ -16,6 +16,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from recoco.apps.projects import models as projects_models
+from recoco.utils import has_perm
 
 from .. import models, signals
 from ..serializers import (
@@ -160,31 +161,39 @@ class TaskNotificationViewSet(
 ########################################################################
 
 
+class IsTaskManager(permissions.BasePermission):
+    """
+    Custom permission to check if user can manage task on given project
+    """
+
+    def has_permission(self, request, view):
+        project_id = view.kwargs.get("project_id")
+        user_projects = list(
+            projects_models.Project.on_site.for_user(request.user).values_list(
+                flat=True
+            )
+        )
+        if project_id in user_projects:
+            return True
+
+        project = projects_models.Project.on_site.get(pk=project_id)
+        return has_perm(request.user, "projects.use_tasks", project)
+
+
 class TaskFollowupViewSet(viewsets.ModelViewSet):
     """
     API endpoint for TaskFollowups
     """
 
     serializer_class = TaskFollowupSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsTaskManager,
+    ]
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
         task_id = int(self.kwargs["task_id"])
-
-        user_projects = list(
-            projects_models.Project.on_site.for_user(self.request.user).values_list(
-                flat=True
-            )
-        )
-
-        if project_id not in user_projects:
-            project = projects_models.Project.on_site.get(pk=project_id)
-            if not (
-                self.request.method == "GET"
-                and self.request.user.has_perm("projects.use_tasks", project)
-            ):
-                raise PermissionDenied()
 
         # also filter with project_id to ensure the given task and project are consistent
         return models.TaskFollowup.objects.filter(
