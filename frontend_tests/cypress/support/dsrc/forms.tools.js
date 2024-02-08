@@ -22,7 +22,7 @@ const sampleDomElements = {
 	// Sample VALID inputs
 	VALID_INPUT_TEXT: 'UserTestUI',
 	VALID_INPUT_PHONE: '0033122334455', // TODO: use DSFR Pattern
-	VALID_INPUT_PASSWORD: '*Do-487-NoT-$use+THIS-asIS', // "Secure" password example, don't use it outside test environment
+	VALID_INPUT_PASSWORD: 'test-test-test',
 	VALID_INPUT_EMAIL: 'user-test-ui@example.com',
 	VALID_INPUT_POSTCODE: '79700', // TODO: use DSFR Pattern
 	VALID_INPUT_TEXTAREA:
@@ -35,8 +35,8 @@ const sampleDomElements = {
 	// Sample INVALID inputs
 	INVALID_INPUT_TEXT: ' ', // Invalid if required
 	INVALID_INPUT_PHONE: 'abc55', // TODO: use DSFR Pattern
-	INVALID_INPUT_PASSWORD: 'unsafe-Passw0rd', // insecure password example : todo use DSFR(?) Pattern
-	INVALID_INPUT_EMAIL: 'user-test-uiexample.com',
+	INVALID_INPUT_PASSWORD: 'test',
+	INVALID_INPUT_EMAIL: 'invalid-email',
 	INVALID_INPUT_POSTCODE: '79',
 	INVALID_INPUT_TEXTAREA: '', // Invalid if required
 	INVALID_INPUT_BOOLEAN: 'off', // Invalid if required (Example: accept terms and conditions)
