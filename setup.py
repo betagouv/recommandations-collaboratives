@@ -1,7 +1,7 @@
 # coding: utf-8
 
 """
-Setup for urbavitaliz-django deployment
+Setup for recoco deployment
 
 For sdist deployments, do not forget MANIFEST.in file to include all the data files.
 """
@@ -9,17 +9,17 @@ For sdist deployments, do not forget MANIFEST.in file to include all the data fi
 from setuptools import setup
 from setuptools import find_packages
 
-import urbanvitaliz
+import recoco
 
 setup(
-    name="urbanvitaliz-django",
-    version=urbanvitaliz.VERSION,
-    description="Urbavitaliz application -django version",
+    name="recoco",
+    version=recoco.VERSION,
+    description="Recoconseil application",
     packages=find_packages(),
     include_package_data=True,
-    author="Urbanvitaliz",
-    author_email="urbanvitaliz@beta.gouv.fr",
-    url="http://www.urbanvitaliz.fr",
+    author="Recoconseil Dev Team",
+    author_email="recoco@beta.gouv.fr",
+    url="http://www.recoconseil.fr",
 )
 
 # eof

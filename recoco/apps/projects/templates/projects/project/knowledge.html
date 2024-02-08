@@ -1,0 +1,95 @@
+{% extends "projects/project/detail.html" %}
+{% load humanize %}
+{% load static %}
+{% load training %}
+{% load guardian_tags %}
+{% load django_vite %}
+{% block css %}
+    {% vite_asset 'css/projectDetails.css' %}
+{% endblock %}
+{% block title %}{{ block.super }} > Connaissance{% endblock %}
+{% block banner %}
+    {% include 'projects/project/fragments/positioning_banner.html' %}
+{% endblock %}
+{% block project_detail %}
+    {% challenge_for request.user "project-knowledge-reader" as challenge %}
+    {% if challenge and not challenge.acquired_on %}
+        {% challenge_acquire challenge %}
+    {% endif %}
+    {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% get_obj_perms request.user for project as "user_project_perms" %}
+    <style type="text/css">
+	@media print
+    {
+        main {
+            padding-top: 0 !important;
+        }
+
+        .project-navigation {
+            display: none !important;
+        }
+
+        .knowledge-title {
+            margin-top: 0 !important;
+        }
+        .masonry-wrapper{
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100% !important;
+            max-width: 100%;
+            flex-wrap: nowrap;
+            height: auto !important;
+        }
+        .masonry-wrapper .masonry-item{
+            display: block !important;
+            position: relative !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+        }
+
+        .navbar {
+            display: none !important;
+        }
+        footer {
+            display: none !important;
+        }
+
+        #overview-step-5 {
+            display: none !important;
+        }
+	}
+    </style>
+    <div class="col-12">
+        {% include 'projects/project/navigation.html' with state_of_play=True %}
+        <div class="row">
+            <!-- TODO PERMISSIONS -->
+            {% if request.user in project.members.all %}
+                {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
+                    <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
+                        <h4 class="pt-2">
+                            {% if session.completion == 0 %}
+                                Prochaine étape : Remplissez le parcours d’état des lieux
+                            {% else %}
+                                Continuez le parcours d’état des lieux
+                            {% endif %}
+                        </h4>
+                        <p class="m-0 text-info-custom fw-normal pb-3">
+                            Pour faire le point sur votre avancement et recevoir des conseils pertinents.
+                        </p>
+                        <a class="button filled pb-2"
+                           data-test-id="link-fill-survey"
+                           href="{% url 'survey-session-start' session.id %}">Compléter l'état des lieux</a>
+                    </div>
+                {% else %}
+                    <div class="col"></div>
+                {% endif %}
+            {% else %}
+                <div class="col"></div>
+            {% endif %}
+        </div>
+        {% include 'projects/project/fragments/survey_grid.html' %}
+    </div>
+{% endblock %}

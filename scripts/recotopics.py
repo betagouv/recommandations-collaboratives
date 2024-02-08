@@ -14,7 +14,7 @@ created: 2023-09-20 07:43:45 CEST
 
 import csv
 
-from urbanvitaliz.apps.projects import models
+from recoco.apps.projects import models
 
 DEFAULT_TOPIC = "Tous sujets"
 

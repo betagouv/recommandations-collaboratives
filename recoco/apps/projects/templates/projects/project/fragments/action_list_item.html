@@ -1,0 +1,267 @@
+{% load static %}
+{% load gravatar %}
+{% load humanize %}
+
+<div id="modal-action-{{ task.id }}" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+            <div class="modal-header">
+                <h5 class="modal-title">Vous ne verrez plus cette recommandation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Pourriez-vous nous dire pourquoi vous ne souhaitez pas ajouter cette action ?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <form method="POST" action="{% url 'projects-already-done-task' task.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
+                        </svg>
+                        <span class="align-middle">Je l'ai déjà fait</span>
+                    </button>
+                </form>
+                <form method="POST" action="{% url 'projects-refuse-task' task.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        <svg class="align-middle bi" width="20px" height="20px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x"/>
+                        </svg>
+                        <span class="align-middle">Ce n'est pas pertinent</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="action-{{ task.id }}" class="accordion border border-1 rounded-3 mb-4 position-relative {% if task.id in actions_with_notifications %}bg-light-yellow{% endif %}">
+
+    {% if not task.visited and task.public  %}
+    <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary" style="margin-left: 60px" >NOUVEAU</span>
+    {% endif %}
+
+    {% if task.id in actions_with_notifications %}
+    <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-danger">
+        <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell"/>
+        </svg>
+        <span class="visually-hidden">Notification</span>
+    </span>
+    {% endif %}
+
+
+    {% if not task.public %}
+    <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-warning" style="margin-left: 60px" >BROUILLON</span>
+    {% endif %}
+
+    <div class="accordion-header d-flex justify-content-between border-bottom">
+        <div class="task-opening d-flex ps-4 pt-4 justify-content-between flew-grow-1 w-100 position-relative pb-4">
+            <div class="d-flex flex-column flex-grow-1">
+                <div class="d-flex fw-bold fs-5 task-title mb-2 {% if task.closed %}text-decoration-line-through{% endif %}">
+                    {% if task.resource %}
+                    <!-- Icon -->
+                    <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }}" style="width:30px; height: 30px;" >
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ task.resource.category.icon|default:"key" }}"/>
+                    </svg>
+                    {% elif task.contact %}
+                    <svg class="align-middle bi me-2 rounded-circle" width="30px" height="30px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
+                    </svg>
+                    {% endif %}
+                    <div class="flex-grow-1 align-middle">
+                        {% if task.resource %}
+                        {{ task.resource.title|capfirst }}
+                        {% else %}
+                        {{ task.intent|capfirst }}
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if not hide_details %}
+                <div class="task-summary">
+                    {% if task.resource %}
+                    {{ task.resource.summary }}
+                    {% elif task.contact %}
+                    <div class="d-flex mx-4">
+                        {% include "addressbook/widgets/card_contact_horizontal.html" with contact=task.contact %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% if task.resource %}
+            {% if disable_tracking %}
+            <a class="stretched-link" href="{% url 'resources-resource-detail' task.resource.id %}">
+            {% else %}
+                {% if can_administrate %}
+                <a class="stretched-link" href="{% url 'projects-visit-task' task.id %}">
+                {% else %}
+                <a class="stretched-link" href="{% url 'resources-resource-detail' task.resource.id %}">
+                {% endif %}
+            {% endif %}
+                <div class="flex-shrink-1 px-3 arrow-link text-primary align-items-center">
+                    <svg class="align-middle bi" width="26px" height="26px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-right-short"/>
+                    </svg>
+                </div>
+            </a>
+            {% endif %}
+        </div>
+        {% if can_manage and task.public %}
+        <div class="toolbar d-flex border-start flex-column justify-content-between">
+            {% if task.open %}
+            <button class="p-4 btn btn-text m-0 border-bottom flex-grow-1" data-bs-toggle="modal" data-bs-target="#modal-action-{{ task.id }}">
+                <span data-bs-toggle="tooltip" title="Rejeter cette recommandation">
+                    <svg class="bi me-1 align-middle text-danger" width="16px" height="16px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x-lg"/>
+                    </svg>
+                </span>
+            </button>
+            {% endif %}
+
+            <form method="POST" action="{% url 'projects-toggle-done-task' task.id %}" class="flex-grow-1 d-flex">
+                {% csrf_token %}
+                {% if task.closed %}
+                <button title="Remettre la recommandation en cours" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
+                    <svg class="bi align-middle" width="24" height="24" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-counterclockwise"/>
+                    </svg>
+
+                </button>
+                {% else %}
+                <button title="Marquer la recommandation comme terminée" data-bs-toggle="tooltip" type="submit" class="btn btn-text align-middle p-4">
+                    <svg class="bi align-middle text-success" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check-lg"/>
+                    </svg>
+
+                </button>
+                {% endif %}
+            </form>
+
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="action-list-item accordion-item pt-2 pb-2 border-0">
+        <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
+
+            <div class="d-flex justify-content-between w-100 px-4">
+                {% if not hide_comments  %}
+                <div class="align-middle flex-grow-1">
+                    <button class="align-middle justify-content-start m-0 px-0 d-flex text-left btn btn-text collapsed text-primary w-100" data-bs-toggle="collapse" data-bs-target="#action-{{ task.id }}-content" aria-expanded="false" aria-controls="action-{{ task.id }}-content">
+                        Lire les commentaires
+                    </button>
+                </div>
+                {% endif %}
+
+                {% if can_administrate and not disable_edit %}
+                <div class="dropdown mx-2 align-middle">
+                    <a class="btn btn-sm btn-info dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        Aiguillage
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="{% url 'projects-update-task' task.id %}">Éditer</a></li>
+                        <li><a class="dropdown-item" href="{% url 'projects-sort-task' task.id 'up' %}?action=up">Remonter</a></li>
+                        {% if task.priority > 0 %}
+                        <li><a class="dropdown-item" href="{% url 'projects-sort-task' task.id 'down' %}">Descendre</a></li>
+                        {% endif %}
+
+                        {% if task.public %}
+                        <li>
+                            <form method="POST" action="{% url 'projects-remind-task-delete' task.id %}">
+                                {% csrf_token %}
+                                <button class="dropdown-item">Supprimer le rappel</button>
+                            </form>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                {% endif %}
+
+                {% if task.public %}
+                {% if not hide_details and can_manage %}
+                <span class="align-middle p-1">
+                    <svg class="align-middle bi" width="14px" height="14px" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm"/>
+                    </svg>
+                    {% if task.reminders.to_send.count %}
+                    {% with reminder=task.reminders.to_send.0 %}
+                    {% if reminder.origin == 1 %} {# Set by user #}
+                    <span class="text-secondary align-middle small">Rappel pour <strong>{{ project.email }}</strong> le {{ task.reminders.to_send.0.deadline }}</span>
+                    {% elif user.is_staff %}
+                    <span class="text-secondary align-middle small">Rappel <strong>auto</strong> le {{ task.reminders.to_send.0.deadline }}</span>
+                    {% endif %}
+                    {% endwith %}
+                    {% endif %}
+
+                    <a href="javascript:null;" class="align-middle text-decoration-underline small btn btn-text btn-sm p-0 m-0 text-primary" data-bs-toggle="modal" data-bs-target="#reminder-modal" data-bs-task-id="{{ task.id }}">
+                        {% if not task.reminders.to_send.count %}
+                        Programmer un rappel
+                        {% else %}
+                        {% with reminder=task.reminders.to_send.0 %}
+                        {% if reminder.origin == 2 %} {# Set by staff #}
+                        Programmer un rappel
+                        {% else %}
+                        Changer
+                        {% endif %}
+                        {% endwith %}
+                        {% endif %}
+                    </a>
+                </span>
+                {% endif %}
+                {% endif %}
+
+            </div>
+        </div>
+        {% if not hide_comments %}
+        <div id="action-{{ task.id }}-content" class="accordion-collapse {% if task.visited and not show_comments %}collapse{% endif %}">
+            <div class="accordion-body">
+
+                <!-- Comments -->
+                {% include "projects/project/fragments/action_comment.html" with comment=task.content_rendered author=task.created_by date=task.created_on %}
+
+                <!-- Followups -->
+                {% for followup in task.followups.all %}
+                {% if followup.status %}
+                <div class="d-flex flex-column m-2 p-2 comment small">
+                    <span class="align-middle" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ followup.who.get_full_name|default:followup.who.email }}">
+                        <svg class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left-right"/>
+                        </svg>
+                        &nbsp;
+                        <span class="align-middle text-secondary">
+                            Recommandation indiquée comme <strong>{{ followup.status_txt }}</strong>
+                        </span>
+                        <span class="align-middle">&#8212;&nbsp;</span>
+                        <small class="align-middle text-muted">{{ followup.timestamp|naturalday }}</small>
+                    </span>
+                    {% if followup.comment %}
+                    <p class="m-0 p-0">
+                        <q>&nbsp;{{ followup.comment|safe }}&nbsp;</q>
+                    </p>
+                    {% endif %}
+                </div>
+                {% else %}
+                {% include "projects/project/fragments/action_comment.html" with followup=followup comment=followup.comment author=followup.who date=followup.timestamp %}
+                {% endif %}
+                {% endfor %}
+
+                {% if can_manage and task.public %}
+                <div class="m-2 comment mt-4">
+                    <span class="">Répondre</span>
+                    <form class="mt-2 form d-flex flex-column align-items-end" method="POST" action="{% url 'projects-followup-task' task.id %}">
+                        {% csrf_token %}
+                        <textarea name="comment" style="min-height: 100px; border-color: #ccc;" class="w-100 p-2 rounded rounded-4 my-1 border" placeholder="Votre message..."></textarea>
+                        <button type="submit" class="btn btn-primary">Envoyer</button>
+                    </form>
+                </div>
+
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>

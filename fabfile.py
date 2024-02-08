@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 """
-Fabfile to drive development and deployment of urbanvitaliz-django
+Fabfile to drive development and deployment of recoco
 
 authors : raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created : 2021-06-01 09:54:36 CEST
@@ -16,12 +16,12 @@ import json
 from fabric import task
 from invoke import run as local
 
-import urbanvitaliz
+import recoco
 
 
 load_dotenv()
 
-PACKAGE = f"urbanvitaliz-django-{urbanvitaliz.VERSION}.tar.gz"
+PACKAGE = f"recoco-{recoco.VERSION}.tar.gz"
 
 # TODO make target folder being
 # - prod if branch == main,
@@ -37,11 +37,10 @@ def upgrade(cnx, site=None):
         return
     cnx.put(
         "./requirements.txt",
-        remote=f"./urbanvitaliz-{site}/requirements.txt",
+        remote=f"./recoco-{site}/requirements.txt",
     )
     cnx.run(
-        f"cd urbanvitaliz-{site} "
-        "&& venv/bin/pip install --upgrade -r requirements.txt"
+        f"cd recoco-{site} " "&& venv/bin/pip install --upgrade -r requirements.txt"
     )
 
 
@@ -51,9 +50,7 @@ def setup(cnx, site=None):
     if site not in ["production", "development"]:
         print("Usage: fab deploy --site={production,development} --hosts=...")
         return
-    cnx.run(
-        f"mkdir -p urbanvitaliz-{site}/dist" f"&& virtualenv urbanvitaliz-{site}/venv"
-    )
+    cnx.run(f"mkdir -p recoco-{site}/dist" f"&& virtualenv recoco-{site}/venv")
 
 
 @task
@@ -63,15 +60,15 @@ def deploy(cnx, site=None):
         print("Usage: fab deploy --site={production,development} --hosts=...")
         return
 
-    local("cd urbanvitaliz/frontend && yarn build")
+    local("cd recoco/frontend && yarn build")
 
     run_setup("setup.py", script_args=["sdist"])
     cnx.put(
         f"./dist/{PACKAGE}",
-        remote=f"./urbanvitaliz-{site}/dist/{PACKAGE}",
+        remote=f"./recoco-{site}/dist/{PACKAGE}",
     )
     cnx.run(
-        f"cd urbanvitaliz-{site} "
+        f"cd recoco-{site} "
         f"&& ./venv/bin/pip install ./dist/{PACKAGE}"
         "&& ./manage.py migrate"
         "&& ./manage.py compilescss"
@@ -145,10 +142,10 @@ def load_prod_db_to_staging(cnx, site=None):
 
     cnx.run("./load_prod_dump_to_db.sh")
 
-    cnx.run(f"cd urbanvitaliz-{site}/multisites" "&& git pull")
+    cnx.run(f"cd recoco-{site}/multisites" "&& git pull")
 
     cnx.run(
-        f"cd urbanvitaliz-{site} "
+        f"cd recoco-{site} "
         "&& ./manage.py compilescss"
         "&& ./manage.py collectstatic --noinput"
     )
