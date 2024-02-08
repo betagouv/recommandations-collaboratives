@@ -20,19 +20,14 @@ def get_challenge_for(user, codename):
     except models.ChallengeDefinition.DoesNotExist:
         return None
 
-    try:
-        challenge = models.Challenge.all_objects.filter(
-            challenge_definition=challenge_definition, user=user
-        ).last()
-    except models.Challenge.DoesNotExist:
-        # Create a new challenge
-        return models.Challenge.all_objects.create(
-          challenge_definition=challenge_definition, user=user
-        )
+    
+    challenge = models.Challenge.objects.filter(
+        challenge_definition=challenge_definition, user=user
+    ).last()
 
     if not challenge: 
         # Create a new challenge
-        return models.Challenge.all_objects.create(
+        return models.Challenge.objects.create(
           challenge_definition=challenge_definition, user=user
         )
     if challenge.snoozed_on:

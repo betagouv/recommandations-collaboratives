@@ -54,32 +54,20 @@ class ChallengeDefinition(models.Model):
 ########################################################################
 
 
-class AcquiredChallengesManager(models.Manager):
-    """Manager for acquired challenges"""
+class ChallengesQuerySet(models.QuerySet):
+    """Query set for acquired challenges"""
 
-    def get_queryset(self):
-        return super().get_queryset().exclude(acquired_on=None)
-
-
-class OpenChallengesManager(models.Manager):
-    """Manager for acquired challenges"""
-
-    def get_queryset(self):
-        return super().get_queryset().filter(acquired_on=None)
-
-class AllChallengesManager(models.Manager):
-    """Manager for all challenges"""
-
-    def get_queryset(self):
-        return super().get_queryset()
+    def acquired(self):
+        return self.exclude(acquired_on=None)
+        
+    def open(self):
+        return self.filter(acquired_on=None)
 
 
 class Challenge(models.Model):
     """Challenge tracks the completion of users"""
 
-    objects = OpenChallengesManager()
-    all_objects = AllChallengesManager()
-    acquired_objects = AcquiredChallengesManager()
+    objects = ChallengesQuerySet().as_manager()
 
     challenge_definition = models.ForeignKey(
         ChallengeDefinition, on_delete=models.CASCADE
