@@ -50,6 +50,20 @@ def test_user_challenge_returned_when_is_snoozed_and_repeat_exceed():
     # challenge is proposed
     assert current and current == challenge
 
+@pytest.mark.django_db
+def test_user_challenge_not_returned_when_is_snoozed_and_repeat_set_to_zero_week():
+    site = baker.make(site_models.Site)
+    user = baker.make(auth_models.User, last_login=timezone.now())
+    definition = baker.make(models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=0)
+    last_month = timezone.now() - datetime.timedelta(weeks=4)
+    challenge = baker.make(models.Challenge, challenge_definition=definition, user=user, snoozed_on=last_month)
+
+    with settings.SITE_ID.override(site.pk):
+        current = utils.get_challenge_for(user, definition.code)
+
+    # challenge is not proposed
+    assert current is None
+
 
 @pytest.mark.django_db
 def test_user_challenge_not_returned_when_is_snoozed_and_repeat_not_exceeded():

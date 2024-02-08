@@ -38,6 +38,8 @@ def get_challenge_for(user, codename):
     if challenge.snoozed_on:
         snoozed_days = (timezone.now() - challenge.snoozed_on).days
         repetition = challenge_definition.week_inactivity_repeat * 7
+        if repetition == 0:
+            return None 
         if snoozed_days > repetition:
             return challenge
         return None
