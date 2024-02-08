@@ -12,7 +12,7 @@ from . import models
 
 class IsResourceManagerOrReadOnly(permissions.BasePermission):
     """
-    Custom permission to ...
+    Custom permission to check if user can create or update resource on current site
     """
 
     def has_permission(self, request, view):
