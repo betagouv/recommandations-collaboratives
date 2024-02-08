@@ -38,5 +38,8 @@ class ResourceViewSet(viewsets.ModelViewSet):
         IsResourceManagerOrReadOnly,
     ]
 
+    def perform_create(self, serializer: ResourceSerializer):
+        serializer.save(created_by=self.request.user)
+
 
 # eof

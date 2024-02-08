@@ -92,9 +92,7 @@ def test_simple_user_cannot_create_resource_with_api(request):
         "title": "one resource",
         "subtitle": "one resource to test",
         "status": 1,
-        "tags": ["string"],
-        "created_on": "2024-02-05T17:33:45.067Z",
-        "updated_on": "2024-02-05T17:33:45.067Z",
+        "tags": ["a tag"],
     }
     response = client.post(url, data=data)
 
@@ -118,11 +116,11 @@ def test_staff_user_can_create_resource_with_api(request):
         "title": "one resource",
         "subtitle": "one resource to test",
         "status": 1,
-        "tags": ["string"],
-        "created_on": "2024-02-05T17:33:45.067Z",
-        "updated_on": "2024-02-05T17:33:45.067Z",
+        "tags": ["a tag"],
     }
     response = client.post(url, data=data)
 
     assert response.status_code == 201
     assert response.data["title"] == data["title"]
+    assert response.data["created_by"]["first_name"] == staff.first_name
+    assert response.data["created_by"]["last_name"] == staff.last_name
