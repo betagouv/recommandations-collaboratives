@@ -1,22 +1,27 @@
 {% load static %}
 {% load dsrc_tags %}
-<form class="fr-mb-0" id="{{ form.id }}">
-    {% csrf_token %}
-    <fieldset class="fr-mb-0 fr-fieldset"
-              id="{{ form.id }}-fieldset"
-              aria-labelledby="{{ form.id }}-fieldset-legend {{ form.id }}-fieldset-messages">
-        <legend class="fr-fieldset__legend" id="{{ form.id }}-fieldset-legend">
-            <h3 class="fr-h5">{{ form.legend }}</h3>
-        </legend>
-        {% block form_content %}{% endblock %}
-        {% for field in form.visible_fields %}
-            {% dsrc_form_field field %}
-        {% endfor %}
-        {% if form.messages %}
-            <div class="fr-messages-group" id="{{ form.id }}" aria-live="polite">
-                {% for message in form.messages %}<p>message</p>{% endfor %}
-            </div>
-        {% endif %}
-        {% include "dsrc/core/compositions/forms/form_footer.html" %}
-    </fieldset>
-</form>
+{% block js %}
+    <script src="{% static 'assets/js/components/DsrcForm.js' %}" type="module"></script>
+{% endblock %}
+<div x-data="DsrcForm({{ form_id }}, formData)"  x-init="init">
+    <form class="fr-mb-0" id="{{ form.id }}">
+        {% csrf_token %}
+        <fieldset class="fr-mb-0 fr-fieldset"
+                  id="{{ form.id }}-fieldset"
+                  aria-labelledby="{{ form.id }}-fieldset-legend {{ form.id }}-fieldset-messages">
+            <legend class="fr-fieldset__legend" id="{{ form.id }}-fieldset-legend">
+                <h3 class="fr-h5">{{ form.legend }}</h3>
+            </legend>
+            {% block form_content %}{% endblock %}
+            {% for field in form.visible_fields %}
+                {% dsrc_form_field field %}
+            {% endfor %}
+            {% if form.messages %}
+                <div class="fr-messages-group" id="{{ form.id }}" aria-live="polite">
+                    {% for message in form.messages %}<p>message</p>{% endfor %}
+                </div>
+            {% endif %}
+            {% include "dsrc/core/compositions/forms/form_footer.html" %}
+        </fieldset>
+    </form>
+</div>

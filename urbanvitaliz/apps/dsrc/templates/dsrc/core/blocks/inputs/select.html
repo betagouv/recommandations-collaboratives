@@ -1,4 +1,5 @@
-<select class="fr-select {{ field.field.widget.attrs.classes }}"
+<select x-model="formData.{{ field.id_for_label }}"
+        class="fr-select {{ field.field.widget.attrs.classes }}"
         id="{{ field.id_for_label }}"
         name="{{ field.html_name }}"
         {% if field.field.required %}required{% endif %}

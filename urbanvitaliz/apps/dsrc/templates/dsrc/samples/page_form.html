@@ -1,6 +1,12 @@
 {% extends "dsrc/core/pages/page_center.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load django_vite %}
+{{ formData|json_script:"formData" }}
+{% block js %}
+    {% vite_asset  'assets/js/components/forms/DsrcForm.js' %}
+    <script>const formData = JSON.parse(document.getElementById('formData').textContent);</script>
+{% endblock %}
 {% block title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
 {% block og_title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
 {% block page_title %}Solliciter {{ request.site }}{% endblock %}
@@ -8,5 +14,5 @@
     Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
 {% endblock %}
 {% block form %}
-    {% crispy dsrc_example_form %}
+    <div x-data="DsrcForm({{ form_id }}, formData)"  x-init="init">{% crispy dsrc_example_form %}</div>
 {% endblock %}

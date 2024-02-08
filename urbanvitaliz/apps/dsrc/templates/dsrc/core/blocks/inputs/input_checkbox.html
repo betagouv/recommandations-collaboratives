@@ -1,4 +1,5 @@
-<input name="{{ field.id_for_label }}"
+<input x-model="formData.{{ field.id_for_label }}"
+       name="{{ field.id_for_label }}"
        id="{{ field.id_for_label }}"
        data-test="{{ field.field.widget.attrs.input_test_id }}"
        type="checkbox"

@@ -16,7 +16,8 @@
         {% for choice in field %}
             <div class="fr-fieldset__element">
                 <div class="fr-checkbox-group{% if field.errors %} fr-checkbox-group--error{% endif %}{% if field.is_disabled %} fr-input-group--disabled{% endif %}{% if field.field.widget.attrs.size %} fr-checkbox-group--{{ field.field.widget.attrs.size }}{% endif %} {{ field.field.widget.attrs.classes }}">
-                    <input name="{{ field.id_for_label }}"
+                    <input x-model="formData.{{ field.id_for_label }}"
+                           name="{{ field.id_for_label }}"
                            id="{{ field.id_for_label }}"
                            type="checkbox"
                            class="{{ field.field.widget.attrs.classes }}"
