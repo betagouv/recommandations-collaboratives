@@ -1,3 +1,4 @@
+from django.contrib.sites.shortcuts import get_current_site
 from rest_framework import permissions, viewsets
 from urbanvitaliz.utils import has_perm
 from .serializers import ResourceSerializer
@@ -39,7 +40,8 @@ class ResourceViewSet(viewsets.ModelViewSet):
     ]
 
     def perform_create(self, serializer: ResourceSerializer):
-        serializer.save(created_by=self.request.user)
+        site = get_current_site(self.request)
+        serializer.save(created_by=self.request.user, sites=[site])
 
 
 # eof
