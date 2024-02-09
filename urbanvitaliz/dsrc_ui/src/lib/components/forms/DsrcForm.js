@@ -5,10 +5,9 @@ function DsrcForm(formId, formData) {
 	return {
 		formData: {},
 		errors: {},
-		ajvValidate: {},
+		ajvValidate: ValidationDsrcForm,
 		init() {
 			// Initialize AJV and compile your schema here
-			this.ajvValidate = ValidationDsrcForm['#/definitions/DsrcForm'];
 			this.formData = formData ?? {
 				sample_text: '',
 				sample_email: '',
