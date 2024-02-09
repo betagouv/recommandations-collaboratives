@@ -44,6 +44,33 @@ Pour créer un bundle pour l'environnement de production:
 yarn build
 ```
 
+## Fonts
+
+// TODO
+
+## Icons
+
+// TODO
+
+## Working with Forms
+
+### Input Validation
+
+- [AJV Standalone Validation Mode](https://ajv.js.org/standalone.html)
+
+## Troubleshooting
+
+Ajv and Rollup
+
+Ajv uses `commonjs` modules in its setup. To use it in the browser, we need to convert commonjs module syntax to ES modules syntax.
+This is done using `@rollup/plugin-commonjs` and setting the `transformMixedEsModules` to `true`.
+You can see the full configuration in `rollup.config.js`.
+
+More resources here:
+
+- [@rollup/plugin-commonjs transform option](https://github.com/rollup/plugins/tree/master/packages/commonjs#transformmixedesmodules)
+- Based on [this comment on how to use AJV `commonjs` modules with ESM syntax](https://github.com/ajv-validator/ajv/issues/2209)
+
 ## Ressources
 
 - [DSFR - Éléments d'interface](https://www.systeme-de-design.gouv.fr/elements-d-interface)

@@ -1,6 +1,6 @@
 # DSRC Django Template Library
 
-Ce dossier contient une la librairie de templates Django basée sur le [Système de Design de l'État (DSFR) Version Courante](https://www.systeme-de-design.gouv.fr/a-propos/versions/version-courante/) ( v1.11.0 ).
+Ce dossier contient une bibliothèque de templates Django basée sur le [Système de Design de l'État (DSFR) Version Courante](https://www.systeme-de-design.gouv.fr/a-propos/versions/version-courante/) ( v1.11.0 ).
 
 La bibliothèque se compose de deux modules: `dsrc` et `dsrc-crispy-forms`
 
