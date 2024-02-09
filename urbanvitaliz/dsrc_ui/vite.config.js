@@ -1,6 +1,4 @@
-import * as glob from 'glob';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 const config = {
 	plugins: [],
@@ -16,7 +14,10 @@ const config = {
 		}
 	},
 	resolve: {
-		extensions: ['.js', '.json']
+		extensions: ['.js', '.json'],
+		alias: {
+			'@': path.resolve(__dirname, './src')
+		}
 	},
 	build: {
 		outDir: path.resolve('./dist'),
@@ -24,32 +25,22 @@ const config = {
 		manifest: true,
 		emptyOutDir: true,
 		target: 'es2020',
+		lib: {
+			entry: path.resolve('./src/lib/index.js'),
+			name: 'DsrcUi',
+			fileName: 'dsrc-ui'
+		},
 		rollupOptions: {
-			input: {
-				...Object.fromEntries(
-					glob.sync('src/lib/components/**/*.js').map((file) => [
-						// This removes `src/` as well as the file extension from each
-						// file, so e.g. src/nested/foo.js becomes nested/foo
-						path.relative('src/lib/', file.slice(0, file.length - path.extname(file).length)),
-						// This expands the relative paths to absolute paths, so e.g.
-						// src/nested/foo becomes /project/src/nested/foo.js
-						fileURLToPath(new URL(file, import.meta.url))
-					])
-				)
-			},
+			// external: ['alpinejs'],
 			output: {
 				dir: '../../static/assets/js/',
 				format: 'esm',
 				chunkFileNames: undefined,
-				assetFileNames: '[name][extname]'
+				globals: {
+					// alpinejs: 'Alpine'
+				}
 			}
 		}
-	},
-	optimizeDeps: {
-		include: ['ajv']
-	},
-	test: {
-		globals: true
 	}
 };
 

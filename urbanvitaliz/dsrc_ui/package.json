@@ -2,8 +2,17 @@
 	"name": "dsrc_ui",
 	"version": "0.1.0",
 	"description": "DSRC - Bibliothèque de Composants UI pour portails Recoco, basée sur DSFR",
-	"main": "index.js",
 	"author": "patricia.boh@beta.gouv.fr",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"module": "./dist/dsrc-ui.js",
+	"exports": {
+		".": {
+			"import": "./dist/dsrc-ui.js"
+		}
+	},
 	"scripts": {
 		"dev": "yarn build:ajv && vite dev",
 		"dev:components": "yarn build:ajv && vite dev",
@@ -36,7 +45,6 @@
 		"css",
 		"javascript"
 	],
-	"type": "module",
 	"dependencies": {
 		"@gouvfr/dsfr": "^1.11.0",
 		"ajv": "^8.12.0",

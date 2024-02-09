@@ -1,20 +1,15 @@
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
-import formSchemas from './forms.schema';
-
-const ajv = new Ajv();
-addFormats(ajv);
+import Alpine from 'alpinejs';
+import { ValidationDsrcForm } from '../../utils/validator';
 
 function DsrcForm(formId, formData) {
 	return {
 		formData: {},
 		errors: {},
-		schema: formSchemas.dsrcForm,
+		ajvValidate: {},
 		init() {
-			console.log('"Alpine.js component is initialized"', valid);
 			// Initialize AJV and compile your schema here
+			this.ajvValidate = ValidationDsrcForm['#/definitions/DsrcForm'];
 			this.formData = formData;
-			validate = Ajv.compile(schema);
 			this.$nextTick(() => {
 				document.getElementById(formId).addEventListener('submit', (event) => {
 					this.validate();
@@ -23,10 +18,10 @@ function DsrcForm(formId, formData) {
 					}
 				});
 			});
-			// Initialize
+			console.log('"Alpine.js component is initialized"');
 		},
 		validate() {
-			let valid = validate(this.formData);
+			let valid = ajvValidate(this.formData);
 			console.log('valid', valid);
 			if (!valid) {
 				this.errors = validate.errors;

@@ -1,9 +1,11 @@
 import Alpine from 'alpinejs';
 
 document.addEventListener('DOMContentLoaded', function () {
-	window.Alpine = Alpine;
+	if (window.Alpine === undefined) {
+		window.Alpine = Alpine;
 
-	Alpine.start();
+		Alpine.start();
+	}
 });
 
 export default Alpine;
