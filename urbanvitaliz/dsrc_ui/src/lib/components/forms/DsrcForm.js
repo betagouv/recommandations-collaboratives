@@ -9,7 +9,18 @@ function DsrcForm(formId, formData) {
 		init() {
 			// Initialize AJV and compile your schema here
 			this.ajvValidate = ValidationDsrcForm['#/definitions/DsrcForm'];
-			this.formData = formData;
+			this.formData = formData ?? {
+				sample_text: '',
+				sample_email: '',
+				sample_password: '',
+				sample_postcode: '',
+				sample_description: '',
+				sample_checkbox: 'off',
+				sample_select: '',
+				sample_disabled_field: '',
+				sample_radio_group: '',
+				sample_checkbox_group: ''
+			};
 			this.$nextTick(() => {
 				document.getElementById(formId).addEventListener('submit', (event) => {
 					this.validate();
@@ -18,10 +29,10 @@ function DsrcForm(formId, formData) {
 					}
 				});
 			});
-			console.log('"Alpine.js component is initialized"');
+			console.log('"DsrcForm.js component is initialized"');
 		},
 		validate() {
-			let valid = ajvValidate(this.formData);
+			let valid = this.ajvValidate(this.formData);
 			console.log('valid', valid);
 			if (!valid) {
 				this.errors = validate.errors;
