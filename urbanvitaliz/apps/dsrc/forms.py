@@ -42,6 +42,8 @@ class DsrcBaseForm(forms.Form):
                 "field_test_id": f"dsrc_test_{field_name}_field",
                 "input_test_id": f"dsrc_test_{field_name}_input"
                 }
+            # Set placeholders
+            field.widget.attrs =field.widget.attrs |  { 'placeholder' : field.initial if field.label is None else '' }
 
     def set_autofocus_on_first_error(self):
         """

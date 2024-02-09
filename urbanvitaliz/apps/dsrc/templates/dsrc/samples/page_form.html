@@ -7,6 +7,37 @@
 {% block tagline %}
     Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
 {% endblock %}
+{{ form.sample_text.value.value|json_script:"sample_text"|default:"" }}
+{{ form.sample_phone.value|json_script:"sample_phone"|default:"" }}
+{{ form.sample_email.value|json_script:"sample_email"|default:"" }}
+{{ form.sample_password.value|json_script:"sample_password"|default:"" }}
+{{ form.sample_postcode.value|json_script:"sample_postcode"|default:"" }}
+{{ form.sample_description.value|json_script:"sample_description"|default:"" }}
+{{ form.sample_checkbox.value|json_script:"sample_checkbox"|default:"off" }}
+{{ form.sample_select.value|json_script:"sample_select"|default:"" }}
+{{ form.sample_disabled_field.value|json_script:"sample_disabled_field"|default:"" }}
+{{ form.sample_radio_group.value|json_script:"sample_radio_group"|default:"" }}
+{{ form.sample_checkbox_group.value|json_script:"sample_checkbox_group"|default:"" }}
+{% block js %}
+    <script id="formData-{{ form_id }}">
+		let formData = {};
+		document.addEventListener("DOMContentLoaded", function() {
+			formData = {
+				sample_text: JSON.parse(document.getElementById('sample_text').textContent),
+				sample_phone: JSON.parse(document.getElementById('sample_phone').textContent),
+				sample_email: JSON.parse(document.getElementById('sample_email').textContent),
+				sample_password: null,
+				sample_postcode: JSON.parse(document.getElementById('sample_postcode').textContent),
+				sample_description: JSON.parse(document.getElementById('sample_description').textContent),
+				sample_checkbox: JSON.parse(document.getElementById('sample_checkbox').textContent),
+				sample_select: JSON.parse(document.getElementById('sample_select').textContent),
+				sample_disabled_field: JSON.parse(document.getElementById('sample_disabled_field').textContent),
+				sample_radio_group: JSON.parse(document.getElementById('sample_radio_group').textContent),
+				sample_checkbox_group: JSON.parse(document.getElementById('sample_checkbox_group').textContent),
+			}
+		});
+    </script>
+{% endblock %}
 {% block form %}
     {% crispy dsrc_example_form %}
 {% endblock %}
