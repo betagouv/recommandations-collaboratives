@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs';
-import { ValidationDsrcForm } from '../../utils/validator';
+import { ValidationDsrcForm } from '../../../ext/ajv.validations';
 
 function DsrcForm(formId, formData) {
 	return {

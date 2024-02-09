@@ -1,7 +1,7 @@
 import path from 'node:path';
+import commonjs from '@rollup/plugin-commonjs';
 
 const config = {
-	plugins: [],
 	root: path.resolve('./src'),
 	base: '/static/',
 	server: {
@@ -14,10 +14,7 @@ const config = {
 		}
 	},
 	resolve: {
-		extensions: ['.js', '.json'],
-		alias: {
-			'@': path.resolve(__dirname, './src')
-		}
+		extensions: ['.js', '.json']
 	},
 	build: {
 		outDir: path.resolve('./dist'),
@@ -32,6 +29,7 @@ const config = {
 		},
 		rollupOptions: {
 			// external: ['alpinejs'],
+			plugins: [commonjs({ transformMixedEsModules: true })],
 			output: {
 				dir: '../../static/assets/js/',
 				format: 'esm',

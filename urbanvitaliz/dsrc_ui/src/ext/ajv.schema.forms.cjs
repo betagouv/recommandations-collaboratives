@@ -1,6 +1,11 @@
+/************************************************************************************
+ * This file contains JSON schema for form validation with Ajv
+ *
+ * AJV Doc on Combining Schemas: https://ajv.js.org/guide/combining-schemas.html
+ ************************************************************************************/
+
 /**
- * This file contains the JSON schema for the form fields.
- * The schemas are used by he Ajv validator to validate the form fields.
+ * Common Schemas for form inputs.
  */
 const schemaFormInputs = {
 	text: { type: 'string', minLength: 1, maxLength: 40 },
@@ -17,13 +22,7 @@ const schemaFormInputs = {
 };
 
 /**
- * The validation schema for the form: DsrcForm
- *
- * To use the schema:
- * - compile the schema into a validation function using the `generateValidator` function defined in `src/ext/ajv.validator.js`.
- * To see how the validation is used in the form, see the `DsrcForm.js` file.
- *
- * AJV Doc: https://ajv.js.org/guide/getting-started.htmlhttps://ajv.js.org/guide/getting-started.html
+ * Validation schema for the form: DsrcForm
  */
 const schemaDsrcForm = {
 	$id: '#/definitions/DsrcForm',

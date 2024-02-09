@@ -24,4 +24,4 @@ let moduleCode = standaloneCode(ajv, {
 });
 
 // Now you can write the module code to file
-fs.writeFileSync(path.join(__dirname, '../lib/utils/validator.js'), moduleCode);
+fs.writeFileSync(path.join(__dirname, 'ajv.validations.js'), moduleCode);
