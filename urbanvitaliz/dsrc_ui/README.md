@@ -46,15 +46,19 @@ yarn build
 
 ## Fonts
 
-// TODO
+// TODO Français
 
 ## Icons
 
-// TODO
+// TODO Français
 
 ## Working with Forms
 
+// TODO Français
+
 ### Input Validation
+
+// TODO Français
 
 - [AJV Standalone Validation Mode](https://ajv.js.org/standalone.html)
 
