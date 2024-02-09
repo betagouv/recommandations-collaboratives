@@ -1,8 +1,43 @@
+{{ form.sample_text.value.value|json_script:"sample_text" }}
+{{ form.sample_phone.value|json_script:"sample_phone" }}
+{{ form.sample_email.value|json_script:"sample_email" }}
+{{ form.sample_password.value|json_script:"sample_password" }}
+{{ form.sample_postcode.value|json_script:"sample_postcode" }}
+{{ form.sample_description.value|json_script:"sample_description" }}
+{{ form.sample_checkbox.value|json_script:"sample_checkbox" }}
+{{ form.sample_select.value|json_script:"sample_select" }}
+{{ form.sample_disabled_field.value|json_script:"sample_disabled_field" }}
+{{ form.sample_radio_group.value|json_script:"sample_radio_group" }}
+{{ form.sample_checkbox_group.value|json_script:"sample_checkbox_group" }}
+{% block js %}
+    <script>
+		 const formData = {
+            sample_text: JSON.parse(document.getElementById('sample_text').textContent),
+            sample_phone: JSON.parse(document.getElementById('sample_phone').textContent),
+            sample_email: JSON.parse(document.getElementById('sample_email').textContent),
+            sample_password: null,
+            sample_postcode: JSON.parse(document.getElementById('sample_postcode').textContent),
+            sample_description: JSON.parse(document.getElementById('sample_description').textContent),
+            sample_checkbox: JSON.parse(document.getElementById('sample_checkbox').textContent),
+            sample_select: JSON.parse(document.getElementById('sample_select').textContent),
+            sample_disabled_field: JSON.parse(document.getElementById('sample_disabled_field').textContent),
+            sample_radio_group: JSON.parse(document.getElementById('sample_radio_group').textContent),
+            sample_checkbox_group: JSON.parse(document.getElementById('sample_checkbox_group').textContent),
+        }
+		console.log('formData');
+		console.log(formData);
+	
+    </script>
+{% endblock %}
 {% if form_tag %}
-    <form id="{{ form_id }}"
-          method="{{ form_method }}"
-          {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
-    {% endif %}
-    {% csrf_token %}
-    {% include "dsrc_crispy_forms/display_form.html" %}
-    {% if form_tag %}</form>{% endif %}
+    <div x-data="DsrcForm('{{ form_id }}', formData)"  x-init="init">
+        <form id="{{ form_id }}"
+              method="{{ form_method }}"
+              {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+        {% endif %}
+        {% csrf_token %}
+        {% include "dsrc_crispy_forms/display_form.html" %}
+        {% if form_tag %}
+        </form>
+    </div>
+{% endif %}

@@ -2,7 +2,9 @@
 {% load dsrc_tags %}
 <fieldset class="fr-fieldset"
           id="radio-hint"
-          aria-labelledby="radio-hint-legend radio-hint-messages">
+          aria-labelledby="radio-hint-legend radio-hint-messages"
+          {% if field.field.required %}required{% endif %}
+          {% if field.field.disabled %}disabled{% endif %}>
     <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
             id="radio-hint-legend">
         {{ field.label }}
@@ -16,13 +18,13 @@
         {% for choice in field %}
             <div class="fr-fieldset__element">
                 <div class="fr-radio-group {% if field.has_errors %}fr-radio-group--error{% endif %}{% if field.is_disabled %} fr-radio-group--disabled{% endif %}{% if field.field.widget.attrs.size %} fr-radio-group--{{ field.field.widget.attrs.size }}{% endif %} {{ field.field.widget.attrs.classes }}">
-                    <input x-model="formData.{{ field.id_for_label }}"
-                           name="{{ field.id_for_label }}"
-                           id="{{ field.id_for_label }}"
+                    <input x-model="{{ choice.id_for_label }}"
+                           name="{{ choice.id_for_label }}"
+                           id="{{ choice.id_for_label }}"
                            type="radio"
                            class="{{ field.field.widget.attrs.classes }}"
                            data-test="{{ field.field.widget.attrs.input_test_id }}-{{ forloop.counter }}"
-                           {% if field.errors %}aria-describedby="{{ field.id_for_label }}-desc-error"{% endif %}
+                           {% if choice.errors %}aria-describedby="{{ field.id_for_label }}-desc-error"{% endif %}
                            {% if field.field.required %}required{% endif %}
                            {% if field.field.disabled %}disabled{% endif %} />
                     <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
