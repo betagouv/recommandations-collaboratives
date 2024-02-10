@@ -2,9 +2,11 @@
     <li>
         <a role="button"
            class="fr-btn dsrc-color--primary fr-btn--secondary"
-           href="/ {# url 'confirm_cancel' #}">Cancel</a>
+           href="/ {# url 'confirm_cancel' #}">Annuler</a>
     </li>
     <li>
-        <button type="submit" class="fr-btn dsrc-color--primary">Valider</button>
+        <button type="submit"
+                class="fr-btn dsrc-color--primary"
+                x-on:click="validate">Valider</button>
     </li>
 </ul>

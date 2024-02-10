@@ -2,8 +2,7 @@
 {% if field.is_hidden %}
     {{ field }}
 {% else %}
-    <div x-data="{ input: '{{ field.value|default:'' }}', placeholder: '{{ field.field.widget.attrs.placeholder|default:'' }}' }"
-         id="field_{{ field.auto_id }}"
+    <div id="field_{{ field.auto_id }}"
          data-test="{% if not field|is_password %}{{ field.field.widget.attrs.field_test_id }}{% endif %}"
          class="fr-fieldset__element{% if wrapper_class %} {{ wrapper_class }}{% endif %}{% if field|is_checkbox %} checkbox{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}{% if field.field.widget.input_type == 'password' %} fr-password{% endif %}">
         {% if field|is_checkboxselectmultiple %}
@@ -37,7 +36,8 @@
                     {% endfor %}
                 {% endif %}
                 {% if form.show_errors %}
-                    <div class="fr-messages-group"
+                    <div x-show="form['{{ field.html_name }}'].touched === true && form['{{ field.html_name }}'].errors.length > 0"
+                         class="fr-messages-group"
                          id="{{ field.id_for_label }}-desc-error"
                          aria-live="polite">
                         {% for error in field.errors %}

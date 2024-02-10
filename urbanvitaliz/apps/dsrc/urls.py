@@ -18,7 +18,6 @@ urlpatterns = [
         views.dsrc_form,
         name="dsrc_form",
     ),
-	path('dsrc_form_data/', views.dsrc_form_data, name='dsrc_form_data'),
 ]
 
 # eof

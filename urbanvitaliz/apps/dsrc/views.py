@@ -28,38 +28,23 @@ def dsrc_form(request):
             # redirect to a new URL, adjust as need
             return HttpResponseRedirect("/")
         else:
+            form_data = {}
+            # form_data = {}
+            for field in form:
+                value = field.value() if field.value() is not None else ""
+                if(field.errors):
+                    form_data[field.html_name] = {"errors": field.errors}
+            context = {'form_data': form_data, 'dsrc_example_form': form, 'errors': form.errors}
             # Return the form errors
-            return render(request, "dsrc/samples/page_form.html",{'dsrc_example_form': form})
+            return render(request, "dsrc/samples/page_form.html", context)
     # if a GET (or any other method) we'll create a blank form
     else:
         form = forms.DsrcExampleForm()
-        return render(request, "dsrc/samples/page_form.html",{'dsrc_example_form': form})
-
-"""
-This function creates a JSON response with form data.
-It is used to populate initial data in the Alpine component associated with the form.
-"""
-def dsrc_form_data(request):
-    # if a POST request, we'll process the form data
-    if request.method == "POST":
-        # create a form instance and populate it with data from the request:
-        form = forms.DsrcExampleForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL, adjust as need
-            return HttpResponseRedirect("/")
-        else:
-            # Return the form errors
-            return JsonResponse({'errors': form.errors})
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = forms.DsrcExampleForm()
-        form_data = {field.html_name: str(field.value()) for field in form}
+        form_data = {}
         # form_data = {}
         for field in form:
-            value = field.value() if field.value() else ""
-            form_data[field.html_name] = value
-        return JsonResponse(form_data)
+            value = field.value() if field.value() is not None else ""
+            form_data[field.html_name] = {"value": value}
+        context = {'form_data': form_data, 'dsrc_example_form': form}
+        return render(request, "dsrc/samples/page_form.html", context)
 # eof

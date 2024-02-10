@@ -1,4 +1,4 @@
-<select x-model="input"
+<select x-model="form['{{ field.html_name }}'].value"
         class="fr-select {{ field.field.widget.attrs.classes }}"
         id="{{ field.id_for_label }}"
         name="{{ field.html_name }}"

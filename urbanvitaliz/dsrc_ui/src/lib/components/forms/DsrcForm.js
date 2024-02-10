@@ -1,34 +1,49 @@
 import Alpine from 'alpinejs';
 import { ValidationDsrcForm } from '../../../ext/ajv.validations';
 
-function DsrcForm(formId, dataUrl) {
+function DsrcForm(formId, formData) {
 	return {
 		form: {},
-		errors: {},
+		errors: null,
 		ajvValidate: ValidationDsrcForm,
 		async init() {
-			try {
-				const response = await fetch(dataUrl);
-				if (response.ok) {
-					this.form = await response.json();
-				}
-				this.$nextTick(() => {
-					document.getElementById(formId).addEventListener('submit', (event) => {
-						this.validate();
-						if (Object.keys(this.errors).length > 0) {
-							event.preventDefault();
-						}
-					});
-				});
-			} catch (error) {
-				// console.error('Error fetching form data', error);
+			if (!formData) {
+				// TODO: handle errors
 			}
+			if (formData.errors) {
+				// TODO: handle errors
+			} else {
+				// If no errors: This is a blank form
+				const fields = Object.keys(formData);
+				fields.forEach((field) => {
+					this.form[field] = { ...formData[field], error: null, touched: false };
+				});
+			}
+			this.$nextTick(() => {
+				// enable form validation for all submission types (click, keyboard, ...)
+				document.getElementById(formId).addEventListener('submit', (event) => {
+					this.validate();
+					if (Object.keys(this.errors).length > 0) {
+						event.preventDefault();
+					}
+				});
+			});
 		},
-		validate() {
-			let valid = this.ajvValidate(this.form);
+		validate(event) {
+			const fields = Object.keys(this.form);
+			const validateMap = {};
+			fields.forEach((field) => {
+				validateMap[field] = this.form[field].value;
+			});
+			let valid = this.ajvValidate(validateMap);
 			if (!valid) {
 				this.errors = this.ajvValidate.errors;
+			} else {
+				this.errors = null;
 			}
+		},
+		validateInput(event) {
+			// TODO: handle errors
 		}
 	};
 }
