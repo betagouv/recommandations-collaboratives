@@ -43,7 +43,7 @@ class DsrcBaseForm(forms.Form):
                 "input_test_id": f"dsrc_test_{field_name}_input"
                 }
             # Set placeholders
-            field.widget.attrs =field.widget.attrs |  { 'placeholder' : field.initial if field.label is None else '' }
+            field.widget.attrs = field.widget.attrs |  { "placeholder" : field.initial if field.label is None else "" }
 
     def set_autofocus_on_first_error(self):
         """
@@ -64,30 +64,30 @@ Example form that extends DsrcBaseForm.
     - in a template here: './templates/dsrc/samples/page_form.html'
     - in a view here: './views.py'
 - Once you have started the application, you can access the form at the following URL:
-	http://subdomain.localhost:8000/dsrc
+	http://subdomain.localhost:8000/dsrc_form
 """
 class DsrcExampleForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper.form_id = 'dsrc-example-form'
-        self.helper.form_class = 'dsrc-color-primary'
-        self.helper.form_method = 'post'
-        self.helper.form_action = 'test_form'
+        self.helper.form_id = "dsrc-example-form"
+        self.helper.form_class = "dsrc-color-primary"
+        self.helper.form_method = "post"
+        self.helper.form_action = "test_form"
 
         self.helper.layout = Layout(
             Fieldset(
-                'Créez votre compte', # The first argument is the legend of the fieldset
-                'sample_text',
-                'sample_phone',
-                'sample_email',
-                'sample_password',
-                'sample_postcode',
-                'sample_description',
-                'sample_checkbox',
-                'sample_select',
-                'sample_disabled_field',
-                'sample_radio_group',
-                'sample_checkbox_group',
+                "Créez votre compte", # The first argument is the legend of the fieldset
+                "sample_text",
+                "sample_phone",
+                "sample_email",
+                "sample_password",
+                "sample_postcode",
+                "sample_description",
+                "sample_checkbox",
+                "sample_select",
+                "sample_disabled_field",
+                "sample_radio_group",
+                "sample_checkbox_group",
             ),
         )
 

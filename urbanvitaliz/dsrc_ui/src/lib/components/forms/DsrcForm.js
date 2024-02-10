@@ -1,40 +1,33 @@
 import Alpine from 'alpinejs';
 import { ValidationDsrcForm } from '../../../ext/ajv.validations';
 
-function DsrcForm(formId, formData) {
+function DsrcForm(formId, dataUrl) {
 	return {
-		formData: {},
+		form: {},
 		errors: {},
 		ajvValidate: ValidationDsrcForm,
-		init() {
-			// Initialize AJV and compile your schema here
-			this.formData = formData ?? {
-				sample_text: '',
-				sample_email: '',
-				sample_password: '',
-				sample_postcode: '',
-				sample_description: '',
-				sample_checkbox: 'off',
-				sample_select: '',
-				sample_disabled_field: '',
-				sample_radio_group: '',
-				sample_checkbox_group: ''
-			};
-			this.$nextTick(() => {
-				document.getElementById(formId).addEventListener('submit', (event) => {
-					this.validate();
-					if (Object.keys(this.errors).length > 0) {
-						event.preventDefault();
-					}
+		async init() {
+			try {
+				const response = await fetch(dataUrl);
+				if (response.ok) {
+					this.form = await response.json();
+				}
+				this.$nextTick(() => {
+					document.getElementById(formId).addEventListener('submit', (event) => {
+						this.validate();
+						if (Object.keys(this.errors).length > 0) {
+							event.preventDefault();
+						}
+					});
 				});
-			});
-			console.log('"DsrcForm.js component is initialized"');
+			} catch (error) {
+				// console.error('Error fetching form data', error);
+			}
 		},
 		validate() {
-			let valid = this.ajvValidate(this.formData);
-			console.log('valid', valid);
+			let valid = this.ajvValidate(this.form);
 			if (!valid) {
-				this.errors = validate.errors;
+				this.errors = this.ajvValidate.errors;
 			}
 		}
 	};

@@ -14,10 +14,11 @@ from . import views
 
 urlpatterns = [
     path(
-        r"dsrc/",
-        views.dsrc,
-        name="dsrc",
+        r"dsrc_form/",
+        views.dsrc_form,
+        name="dsrc_form",
     ),
+	path('dsrc_form_data/', views.dsrc_form_data, name='dsrc_form_data'),
 ]
 
 # eof
