@@ -17,7 +17,7 @@ from . import forms
 #######################################################
 
 """
-This is a basic form example using the DSRC form.
+This function returns a template view of the form.
 """
 def dsrc_form(request):
     if request.method == "POST":
@@ -36,8 +36,8 @@ def dsrc_form(request):
         return render(request, "dsrc/samples/page_form.html",{'dsrc_example_form': form})
 
 """
-This function creates a JSON response with the form data.
-It can be used in a template by an Alpine.js component to obtain the form data.
+This function creates a JSON response with form data.
+It is used to populate initial data in the Alpine component associated with the form.
 """
 def dsrc_form_data(request):
     # if a POST request, we'll process the form data

@@ -1,4 +1,4 @@
-<textarea x-model="{{ field.id_for_label }}"
+<textarea x-model="input"
           class="fr-input {% if field.errors %}fr-input--error{% endif %}{% if field.is_valid %} fr-input--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input--{{ field.field.widget.attrs.size }}{% endif %} {{ field.field.widget.attrs.classes }}"
           id="{{ field.id_for_label }}"
           name="{{ field.html_name }}"
