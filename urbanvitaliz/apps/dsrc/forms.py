@@ -116,8 +116,8 @@ class DsrcExampleForm(DsrcBaseForm):
 
         return sample_checkbox_group
 
-    # Messages used to provide help to the user
-    def sample_password_message_group(errors=None):
+    # Messages used to provide help to the user: overload in your forms to change the messages
+    def password_message_group(errors=None):
         return {
 			"help_text": "Votre mot de passe doit contenir :",
 			"messages": [
@@ -143,7 +143,7 @@ class DsrcExampleForm(DsrcBaseForm):
 
     # Password input, with a password widget, show/hide control, and a help text
     sample_password = forms.CharField(
-        label="Mot de passe", required=True, widget=forms.PasswordInput(attrs={"size": "sm", "message_group": sample_password_message_group()})
+        label="Mot de passe", required=True, widget=forms.PasswordInput(attrs={"size": "sm", "message_group": password_message_group()})
     )
 
     # Postal code input: input type=text, uses max_length to limit the number of characters
@@ -184,6 +184,7 @@ class DsrcExampleForm(DsrcBaseForm):
     # Unique choice : radio group
     sample_radio_group = forms.ChoiceField(
         label="Boutons radio",
+        initial=None,
         required=False,
         choices=[(1, "Premier choix unique"), (2, "Second choix unique"), (3, "Troisième choix unique")],
         help_text="Le troisième choix renvoie une erreur s’il est sélectionné",
@@ -193,6 +194,7 @@ class DsrcExampleForm(DsrcBaseForm):
     # Multiple choice : checkbox group
     sample_checkbox_group = forms.MultipleChoiceField(
         label="Cases à cocher",
+        initial=None,
         required=False,
         choices=[
             ("1", "Premier choix"),

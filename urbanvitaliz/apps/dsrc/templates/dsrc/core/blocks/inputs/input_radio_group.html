@@ -1,8 +1,12 @@
-{% load widget_tweaks %}
-{% load dsrc_tags %}
-<fieldset class="fr-fieldset"
-          id="radio-hint"
-          aria-labelledby="radio-hint-legend radio-hint-messages"
+<fieldset x-model="form['{{ field.html_name }}'].value"
+          x-ref="{{ field.html_name }}"
+          @input="changeInput"
+          @focus="touchInput"
+          @blur="validateInput"
+          id="{{ field.id_for_label }}"
+          name="{{ field.html_name }}-fieldset"
+          class="fr-fieldset"
+          aria-labelledby="radio-hint-legend radio-hint-messages{% if field.errors %} {{ field.id_for_label }}-desc-error{% endif %}"
           {% if field.field.required %}required{% endif %}
           {% if field.field.disabled %}disabled{% endif %}>
     <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
@@ -10,28 +14,20 @@
         {{ field.label }}
         {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
     </legend>
-    {% if field.errors %}
-        {% with aria_describedby="aria-describedby:"|add:field.auto_id|add:"-desc-error" %}
-            {{ field|attr:"type:radio"|attr:aria_describedby }}
-        {% endwith %}
-    {% else %}
-        {% for choice in field %}
-            <div class="fr-fieldset__element">
-                <div class="fr-radio-group {% if field.has_errors %}fr-radio-group--error{% endif %}{% if field.is_disabled %} fr-radio-group--disabled{% endif %}{% if field.field.widget.attrs.size %} fr-radio-group--{{ field.field.widget.attrs.size }}{% endif %} {{ field.field.widget.attrs.classes }}">
-                    <input x-model="{{ choice.id_for_label }}"
-                           name="{{ choice.id_for_label }}"
-                           id="{{ choice.id_for_label }}"
-                           type="radio"
-                           class="{{ field.field.widget.attrs.classes }}"
-                           data-test="{{ field.field.widget.attrs.input_test_id }}-{{ forloop.counter }}"
-                           {% if choice.errors %}aria-describedby="{{ field.id_for_label }}-desc-error"{% endif %}
-                           {% if field.field.required %}required{% endif %}
-                           {% if field.field.disabled %}disabled{% endif %} />
-                    <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
-                </div>
+    {% for choice in field %}
+        <div class="fr-fieldset__element">
+            <div class="fr-radio-group{% if field.errors %} fr-input-group--error{% endif %}{% if field.field.is_valid %} fr-input-group--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }} fr-radio-group--{{ field.field.widget.attrs.size }} {% endif %} {{ field.field.widget.attrs.classes }}"
+                 :class="`fr-input-group--${form['{{ field.html_name }}'].valid_class}`">
+                <input x-model="{{ choice.id_for_label }}"
+                       name="{{ field.html_name }}"
+                       id="{{ choice.id_for_label }}"
+                       type="radio"
+                       class="{{ field.field.widget.attrs.classes }}"
+                       data-test="{{ field.field.widget.attrs.input_test_id }}-{{ forloop.counter }}" />
+                <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
             </div>
-        {% endfor %}
-    {% endif %}
+        </div>
+    {% endfor %}
     {% if field.field.messages %}
         {% for message in field.field.messages %}
             <div class="fr-messages-group"

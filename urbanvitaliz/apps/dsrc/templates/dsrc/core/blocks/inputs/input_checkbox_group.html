@@ -1,55 +1,54 @@
-{% load widget_tweaks %}
-{% load dsrc_tags %}
-<fieldset class="fr-fieldset"
-          id="checkboxes"
-          aria-labelledby="checkboxes-legend checkboxes-messages">
+<fieldset x-model="form['{{ field.html_name }}'].value"
+          x-ref="{{ field.html_name }}"
+          @input="changeInput"
+          @focus="touchInput"
+          @blur="validateInput"
+          id="{{ field.id_for_label }}"
+          name="{{ field.html_name }}-fieldset"
+          class="fr-fieldset"
+          aria-labelledby="checkboxes-legend checkboxes-messages{% if field.errors %} {{ field.id_for_label }}-desc-error{% endif %}"
+          {% if field.field.required %}required{% endif %}
+          {% if field.field.disabled %}disabled{% endif %}>
     <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
             id="checkboxes-legend">
         {{ field.label }}
         {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
     </legend>
-    {% if form.show_errors %}
-        {% with aria_describedby="aria-describedby:"|add:field.auto_id|add:"-desc-error" %}
-            {{ field|attr:"type:checkbox"|attr:aria_describedby }}
-        {% endwith %}
-    {% else %}
-        {% for choice in field %}
-            <div class="fr-fieldset__element">
-                <div class="fr-checkbox-group{% if field.errors %} fr-checkbox-group--error{% endif %}{% if field.is_disabled %} fr-input-group--disabled{% endif %}{% if field.field.widget.attrs.size %} fr-checkbox-group--{{ field.field.widget.attrs.size }}{% endif %} {{ field.field.widget.attrs.classes }}">
-                    <input x-model="{{ choice.id_for_label }}"
-                           name="{{ choice.id_for_label }}"
-                           id="{{ choice.id_for_label }}"
-                           type="checkbox"
-                           class="{{ field.field.widget.attrs.classes }}"
-                           data-test="{{ field.field.widget.attrs.input_test_id }}-{{ forloop.counter }}"
-                           {% if field.errors %}aria-describedby="{{ choice.id_for_label }}-desc-error"{% endif %}
-                           {% if field.field.required %}required{% endif %}
-                           {% if field.field.disabled %}disabled{% endif %} />
-                    <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
-                </div>
-            </div>
-        {% endfor %}
-    {% endif %}
-    {% if field.field.messages %}
-        {% for message in field.field.messages %}
-            <div class="fr-messages-group"
-                 id="{{ field.id_for_label }}-input-messages"
-                 aria-live="assertive">
-                <p>{{ message }}</p>
-            </div>
-        {% endfor %}
-    {% endif %}
-    {% if form.show_errors %}
-        <div class="fr-messages-group"
-             id="{{ field.id_for_label }}-desc-error"
-             aria-live="polite">
-            {% for error in field.errors %}
-                <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"
-                   class="fr-error-text">{{ error }}</p>
-            {% endfor %}
+    {% for choice in field %}
+        <div class="fr-fieldset__element">
+            <div class="fr-checkbox-group{% if field.errors %} fr-input-group--error{% endif %}{% if field.field.is_valid %} fr-input-group--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }} fr-checkbox-group--{{ field.field.widget.attrs.size }}
+            {% endif %}
+            {{ field.field.widget.attrs.classes }}" :class="`fr-input-group--${form['{{ field.html_name }}'].valid_class}`">
+            <input x-model="{{ choice.id_for_label }}"
+                   name="{{ field.html_name }}"
+                   id="{{ choice.id_for_label }}"
+                   type="checkbox"
+                   class="{{ field.field.widget.attrs.classes }}"
+                   data-test="{{ field.field.widget.attrs.input_test_id }}-{{ forloop.counter }}" />
+            <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
         </div>
-    {% endif %}
-    {% if field.valid_text %}
-        <p id="{{ field.id_for_label }}-desc-valid" class="fr-valid-text">{{ field.valid_text }}</p>
-    {% endif %}
+    </div>
+{% endfor %}
+{% if field.field.messages %}
+    {% for message in field.field.messages %}
+        <div class="fr-messages-group"
+             id="{{ field.id_for_label }}-input-messages"
+             aria-live="assertive">
+            <p>{{ message }}</p>
+        </div>
+    {% endfor %}
+{% endif %}
+{% if form.show_errors %}
+    <div class="fr-messages-group"
+         id="{{ field.id_for_label }}-desc-error"
+         aria-live="polite">
+        {% for error in field.errors %}
+            <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"
+               class="fr-error-text">{{ error }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+{% if field.valid_text %}
+    <p id="{{ field.id_for_label }}-desc-valid" class="fr-valid-text">{{ field.valid_text }}</p>
+{% endif %}
 </fieldset>

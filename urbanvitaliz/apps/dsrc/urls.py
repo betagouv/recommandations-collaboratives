@@ -14,6 +14,11 @@ from . import views
 
 urlpatterns = [
     path(
+        r"dsrc/",
+        views.dsrc_form,
+        name="dsrc_form", ## TODO: Add home page to display links to the different demos
+    ),
+    path(
         r"dsrc_form/",
         views.dsrc_form,
         name="dsrc_form",
