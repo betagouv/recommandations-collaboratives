@@ -27,14 +27,18 @@
                 {% if not field|is_checkbox %}
                     {% include "dsrc_crispy_forms/layout/baseinput.html" %}
                 {% endif %}
-                {% if field.field.messages %}
-                    {% for message in field.field.messages %}
-                        <div class="fr-messages-group"
-                             id="{{ field.id_for_label }}-input-messages"
-                             aria-live="assertive">
-                            <p>{{ message }}</p>
-                        </div>
-                    {% endfor %}
+                {% if field.field.widget.attrs.message_group %}
+                    <div class="fr-messages-group"
+                         id="{{ field.id_for_label }}-input-messages"
+                         aria-live="assertive">
+                        <p class="fr-message" id="{{ field.id_for_label }}-input-message">
+                            {{ field.field.widget.attrs.message_group.help_text }}
+                        </p>
+                        {% for message in field.field.widget.attrs.message_group.messages %}
+                            <p class="fr-message fr-message--info"
+                               id="{{ field.id_for_label }}-input-message-info-{{ forloop.counter }}">{{ message }}</p>
+                        {% endfor %}
+                    </div>
                 {% endif %}
                 {% if form.cleaned_data.js_enabled == 'false' and field.errors %}
                     <!-- Display server-side validation errors here -->

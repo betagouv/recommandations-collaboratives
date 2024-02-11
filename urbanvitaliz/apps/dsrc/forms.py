@@ -117,13 +117,13 @@ class DsrcExampleForm(DsrcBaseForm):
         return sample_checkbox_group
 
     # Messages used to provide help to the user
-    def sample_password_message_group():
+    def sample_password_message_group(errors=None):
         return {
 			"help_text": "Votre mot de passe doit contenir :",
 			"messages": [
-				'12 caractères minimum',
-				'1 caractère spécial minimum',
-				'1 chiffre minimum',
+				{"text" : "12 caractères minimum", "type" : "info"},
+				{"text" : "1 caractère spécial minimum", "type" : "info"},
+				{"text" : "1 chiffre minimum", "type" : "info"},
 			]
         }
     # Basic text input
