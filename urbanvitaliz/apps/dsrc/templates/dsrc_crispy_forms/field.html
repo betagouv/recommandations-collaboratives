@@ -40,13 +40,12 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                {% if form.cleaned_data.js_enabled == 'false' and field.errors %}
+                {% if form.cleaned_data.js_enabled == 'false' and field.error_messages %}
                     <!-- Display server-side validation errors here -->
-                    {% for error in field.errors %}
+                    {% for error in field.error_messages %}
                         <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"
                            class="fr-error-text">{{ error }}</p>
                     {% endfor %}
-                {% elif }
                 {% endif %}
                 <ul x-show="fieldHasError('{{ field.html_name }}')"
                     class="fr-messages-group"

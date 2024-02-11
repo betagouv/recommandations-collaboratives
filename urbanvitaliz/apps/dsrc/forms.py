@@ -44,6 +44,10 @@ class DsrcBaseForm(forms.Form):
                 }
             # Set placeholders
             field.widget.attrs = field.widget.attrs |  { "placeholder" : field.initial if field.label is None else "" }
+            field.error_messages = field.error_messages | {
+				"required": "Texte d’erreur obligatoire",
+				"invalid": "Texte de validation",
+			}
 
     def set_autofocus_on_first_error(self):
         """
