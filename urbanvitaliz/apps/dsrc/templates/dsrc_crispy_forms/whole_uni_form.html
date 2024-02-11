@@ -4,5 +4,9 @@
           {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
     {% endif %}
     {% csrf_token %}
+    <input type="hidden"
+           name="js_enabled"
+           id="{{ form_id }}_js_enabled"
+           value="false">
     {% include "dsrc_crispy_forms/display_form.html" %}
     {% if form_tag %}</form>{% endif %}

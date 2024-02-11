@@ -8,6 +8,6 @@
     Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
 {% endblock %}
 {% block form %}
-    <div x-data="DsrcForm('dsrc-example-form', {{ form_data|safe }})"
+    <div x-data="DsrcForm('id-dsrc-example-form', {{ form_data|safe }})"
          x-init="init">{% crispy dsrc_example_form %}</div>
 {% endblock %}
