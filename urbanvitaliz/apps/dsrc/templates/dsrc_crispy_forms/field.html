@@ -12,7 +12,7 @@
         {% elif field|is_password %}
             {% include "dsrc/core/blocks/inputs/input_password.html" %}
         {% else %}
-            <div class="{% if field.field.widget.input_type == 'text' %}fr-input-group{% else %} fr-{{ field.field.widget.input_type }}-group{% endif %} {% if field.errors %}fr-input-group--error{% endif %} {% if field.field.is_valid %}fr-input-group--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }} fr-{{ field.field.widget.input_type }}-group--{{ field.field.widget.attrs.size }} {% endif %} {{ field.field.widget.attrs.classes }}"
+            <div class="{% if field.field.widget.input_type == 'text' or field.field.widget.input_type == 'email' %}fr-input-group{% else %} fr-{{ field.field.widget.input_type }}-group{% endif %} {% if field.errors %}fr-input-group--error{% endif %} {% if field.field.is_valid %}fr-input-group--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }} fr-{{ field.field.widget.input_type }}-group--{{ field.field.widget.attrs.size }} {% endif %} {{ field.field.widget.attrs.classes }}"
                  :class="`fr-input-group--${form['{{ field.html_name }}'].valid_class}`">
                 {% if field.label %}
                     {% if field.field.widget.input_type == "checkbox" %}
