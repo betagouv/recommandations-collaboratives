@@ -14,8 +14,18 @@ const schemaForms = require('./ajv.schema.forms.cjs');
 // `export const Foo = ...;export const Bar = ...;`
 // This mapping would not have been needed if the `$ids` was just `Bar` and `Foo` instead of `#/definitions/Foo`
 // and `#/definitions/Bar` respectfully
+
+const AJV_OPTIONS = {
+	allErrors: true,
+	code: { source: true, esm: true }
+};
+
 const DsrcForm = schemaForms.schemaDsrcForm;
-const ajv = new Ajv({ schemas: [DsrcForm], code: { source: true, esm: true } });
+const FormInputs = schemaForms.schemaFormInputs;
+const ajv = new Ajv({
+	...AJV_OPTIONS,
+	schemas: [FormInputs, DsrcForm]
+});
 
 addFormats(ajv);
 

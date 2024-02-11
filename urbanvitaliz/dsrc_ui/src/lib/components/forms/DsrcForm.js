@@ -4,11 +4,12 @@ import { ValidationDsrcForm } from '../../../ext/ajv.validations';
 function DsrcForm(formId, formData) {
 	return {
 		form: {},
-		errors: null,
+		errors: [],
 		ajvValidate: ValidationDsrcForm,
 		async init() {
 			if (!formData) {
 				// TODO: handle errors
+				console.error('Error fetching form data');
 			}
 			if (formData.errors) {
 				// TODO: handle errors
@@ -16,34 +17,41 @@ function DsrcForm(formId, formData) {
 				// If no errors: This is a blank form
 				const fields = Object.keys(formData);
 				fields.forEach((field) => {
-					this.form[field] = { ...formData[field], error: null, touched: false };
+					this.form[field] = { ...formData[field], errors: [], touched: false };
 				});
 			}
 			this.$nextTick(() => {
 				// enable form validation for all submission types (click, keyboard, ...)
 				document.getElementById(formId).addEventListener('submit', (event) => {
 					this.validate();
-					if (Object.keys(this.errors).length > 0) {
+					if (Array.isArray(this.errors) && this.errors.length > 0) {
 						event.preventDefault();
 					}
 				});
 			});
 		},
 		validate(event) {
-			const fields = Object.keys(this.form);
-			const validateMap = {};
-			fields.forEach((field) => {
-				validateMap[field] = this.form[field].value;
-			});
-			let valid = this.ajvValidate(validateMap);
+			let valid = this.ajvValidate(this.form);
 			if (!valid) {
 				this.errors = this.ajvValidate.errors;
 			} else {
-				this.errors = null;
+				this.errors = [];
 			}
 		},
+		getFieldErrors(fieldName) {
+			const errors = this.errors.filter((error) => error.instancePath.substring(1) === fieldName);
+			return errors.map((error) => error.message);
+		},
 		validateInput(event) {
-			// TODO: handle errors
+			const field = event.target.name;
+			this.validate();
+			this.form[field].errors = this.getFieldErrors(field);
+		},
+		touchInput(event) {
+			this.form[event.target.name].touched = true;
+		},
+		changeInput(event) {
+			this.form[event.target.name].changed = true;
 		}
 	};
 }

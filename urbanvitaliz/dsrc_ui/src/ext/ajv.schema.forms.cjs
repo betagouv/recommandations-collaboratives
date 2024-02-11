@@ -29,6 +29,7 @@ const schemaDsrcForm = {
 	type: 'object',
 	properties: {
 		sample_text: { $ref: '#/definitions/text' },
+		sample_phone: { $ref: '#/definitions/phone' },
 		sample_email: { $ref: '#/definitions/email' },
 		sample_password: { $ref: '#/definitions/password' }, // this only validates required length, not password strength
 		sample_postcode: { $ref: '#/definitions/postcode' },
@@ -43,4 +44,4 @@ const schemaDsrcForm = {
 	definitions: schemaFormInputs
 };
 
-module.exports = { schemaDsrcForm };
+module.exports = { schemaFormInputs, schemaDsrcForm };
