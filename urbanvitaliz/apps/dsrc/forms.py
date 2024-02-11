@@ -116,6 +116,16 @@ class DsrcExampleForm(DsrcBaseForm):
 
         return sample_checkbox_group
 
+    # Messages used to provide help to the user
+    def sample_password_message_group():
+        return {
+			"help_text": "Votre mot de passe doit contenir :",
+			"messages": [
+				'12 caractères minimum',
+				'1 caractère spécial minimum',
+				'1 chiffre minimum',
+			]
+        }
     # Basic text input
     sample_text = forms.CharField(label="Nom d'usager", initial="", required=True)
 
@@ -133,7 +143,7 @@ class DsrcExampleForm(DsrcBaseForm):
 
     # Password input, with a password widget, show/hide control, and a help text
     sample_password = forms.CharField(
-        label="Mot de passe", required=True, widget=forms.PasswordInput(attrs={"size": "sm"})
+        label="Mot de passe", required=True, widget=forms.PasswordInput(attrs={"size": "sm", "message_group": sample_password_message_group()})
     )
 
     # Postal code input: input type=text, uses max_length to limit the number of characters
