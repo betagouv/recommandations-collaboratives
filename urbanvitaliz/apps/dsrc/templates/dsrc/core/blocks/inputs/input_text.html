@@ -1,5 +1,6 @@
 <input x-model="form['{{ field.html_name }}'].value"
-       @input="form['{{ field.html_name }}'].touched = true"
+       @input="changeInput"
+       @focus="touchInput"
        @blur="validateInput"
        id="{{ field.id_for_label }}"
        name="{{ field.html_name }}"
