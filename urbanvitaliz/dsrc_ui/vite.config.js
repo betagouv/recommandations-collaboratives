@@ -28,15 +28,11 @@ const config = {
 			fileName: 'dsrc-ui'
 		},
 		rollupOptions: {
-			// external: ['alpinejs'],
 			plugins: [commonjs({ transformMixedEsModules: true })],
 			output: {
 				dir: '../../static/assets/js/',
 				format: 'esm',
-				chunkFileNames: undefined,
-				globals: {
-					// alpinejs: 'Alpine'
-				}
+				chunkFileNames: undefined
 			}
 		}
 	}
