@@ -1,11 +1,11 @@
 import Alpine from 'alpinejs';
-import { ValidationDsrcForm } from '../../../ext/ajv.validations';
+import * as validations from '../../../ext/ajv.validations.default';
 
-function DsrcForm(formId, formData) {
+function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm') {
 	return {
 		form: {},
 		errors: [],
-		ajvValidate: ValidationDsrcForm,
+		ajvValidate: validations[validationFunctionName],
 		async init() {
 			if (!formData) {
 				// We shouldn't reach this state: the data should be available, or the server should have returned an error before reaching this point and the form should not have been rendered

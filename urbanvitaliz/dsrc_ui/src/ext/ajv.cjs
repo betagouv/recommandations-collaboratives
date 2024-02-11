@@ -30,8 +30,8 @@ const ajv = new Ajv({
 addFormats(ajv);
 
 let moduleCode = standaloneCode(ajv, {
-	ValidationDsrcForm: '#/definitions/DsrcForm'
+	ValidationDsrcForm: '#/definitions/DsrcForm' // Validation function for the DsrcForm schema
 });
 
 // Now you can write the module code to file
-fs.writeFileSync(path.join(__dirname, 'ajv.validations.js'), moduleCode);
+fs.writeFileSync(path.join(__dirname, 'ajv.validations.default.js'), moduleCode);
