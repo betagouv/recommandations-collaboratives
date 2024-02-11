@@ -8,6 +8,6 @@
         <button type="submit"
                 class="fr-btn dsrc-color--primary"
                 x-on:click="validate"
-                :disabled="form.errors.length > 0">Valider</button>
+                {% if disabled %}disabled=""{% endif %}>Valider</button>
     </li>
 </ul>

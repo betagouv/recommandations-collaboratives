@@ -27,6 +27,12 @@ function DsrcForm(formId, formData) {
 					this.validate();
 					if (Array.isArray(this.errors) && this.errors.length > 0) {
 						event.preventDefault();
+						// Set the focus on the first field with an error
+						const firstErrorField = this.errors[0].instancePath.substring(1);
+						this.form[firstErrorField].is_valid = false;
+						this.form[firstErrorField].errors = this.getFieldErrors(firstErrorField);
+						this.form[firstErrorField].valid_class = 'error';
+						this.$refs[firstErrorField].focus();
 					}
 				});
 			});
