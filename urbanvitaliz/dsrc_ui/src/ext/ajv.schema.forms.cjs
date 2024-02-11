@@ -11,14 +11,14 @@ const schemaFormInputs = {
 	text: { type: 'string', minLength: 1, maxLength: 40 },
 	phone: { type: 'string', minLength: 8, maxLength: 16 },
 	email: { type: 'string', format: 'email' },
-	password: { type: 'string', format: 'password', minLength: 8, maxLength: 12 },
+	password: { type: 'string', format: 'password', minLength: 12, maxLength: 40 },
 	postcode: { type: 'string', minLength: 5, maxLength: 5 },
 	textarea: { type: 'string', minLength: 1, maxLength: 200 },
-	checkbox: { type: 'string' },
-	select: { type: 'string' },
+	checkbox: { type: 'string' }, // TODO: adjust this
+	select: { type: 'string' }, // TODO: adjust this
 	disabled_field: { type: 'string' },
-	radio_group: { type: 'string' },
-	checkbox_group: { type: 'string' }
+	radio_group: { type: 'string' }, // TODO: adjust this
+	checkbox_group: { type: 'string' } // TODO: adjust this
 };
 
 /**
