@@ -15,31 +15,33 @@ function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm
 				// We shouldn't reach this state: AJV validation should have prevented form submission
 				console.error('Error validating form data with AJV');
 			} else {
+				console.log('Form initialized', JSON.parse(JSON.stringify(formData)));
 				// There are no errors: This is a blank form
 				const fields = Object.keys(formData);
 				fields.forEach((field) => {
 					this.form[field] = { ...formData[field], errors: [], touched: false };
 				});
-			}
-			this.$nextTick(() => {
-				// enable form validation for all submission types (click, keyboard, ...)
-				document.getElementById(formId).addEventListener('submit', (event) => {
-					this.validate();
-					if (Array.isArray(this.errors) && this.errors.length > 0) {
-						event.preventDefault();
-						// Set the focus on the first field with an error
-						const firstErrorField = this.errors[0].instancePath.substring(1);
-						this.form[firstErrorField].is_valid = false;
-						this.form[firstErrorField].errors = this.getFieldErrors(firstErrorField);
-						this.form[firstErrorField].valid_class = 'error';
-						this.$refs[firstErrorField].focus();
-					}
+				this.$nextTick(() => {
+					// enable form validation for all submission types (click, keyboard, ...)
+					document.getElementById(formId).addEventListener('submit', (event) => {
+						this.validate();
+						if (Array.isArray(this.errors) && this.errors.length > 0) {
+							event.preventDefault();
+							// Set the focus on the first field with an error
+							const firstErrorField = this.errors[0].instancePath.substring(1);
+							this.form[firstErrorField].is_valid = false;
+							this.form[firstErrorField].errors = this.getFieldErrors(firstErrorField);
+							this.form[firstErrorField].valid_class = 'error';
+							this.$refs[firstErrorField].focus();
+						}
+					});
 				});
-			});
-			// Disable browser validation as we are using our own
-			document.getElementById(formId).setAttribute('novalidate', '');
-			// Let the server know that JS is enabled
-			document.getElementById(`${formId}_js_enabled`).value = 'true';
+				// Disable browser validation as we are using our own
+				document.getElementById(formId).setAttribute('novalidate', '');
+				// Let the server know that JS is enabled
+				document.getElementById(`${formId}_js_enabled`).value = 'true';
+				console.log('Form initialized', JSON.parse(JSON.stringify(this.form)));
+			}
 		},
 		validate(event) {
 			// debug
