@@ -5,20 +5,60 @@
  ************************************************************************************/
 
 /**
+ * Password schema
+ * Note: This schema only validates the required length and character classes. It does not guarantee password strength.
+ */
+
+/**
  * Common Schemas for form inputs.
  */
 const schemaFormInputs = {
 	text: { type: 'string', minLength: 1, maxLength: 40 },
 	phone: { type: 'string', minLength: 8, maxLength: 16 },
 	email: { type: 'string', format: 'email' },
-	password: { type: 'string', format: 'password', minLength: 12, maxLength: 40 },
-	postcode: { type: 'string', minLength: 5, maxLength: 5 },
-	textarea: { type: 'string', minLength: 1, maxLength: 200 },
-	checkbox: { type: 'string' }, // TODO: adjust this
-	select: { type: 'string' }, // TODO: adjust this
-	disabled_field: { type: 'string' },
-	radio_group: { type: 'string' }, // TODO: adjust this
-	checkbox_group: { type: 'string' } // TODO: adjust this
+	password: {
+		// TODO : adapt for true password validation
+		allOf: [
+			{
+				type: 'string',
+				format: 'password',
+				minLength: 12,
+				errorMessage: '12 caractères minimum'
+			},
+			{
+				type: 'string',
+				pattern: '[$-+!?*&%~_@#]{1}',
+				errorMessage: '1 caractère spécial minimum'
+			},
+			{
+				type: 'string',
+				pattern: '[0-9]{1}',
+				errorMessage: '1 chiffre minimum'
+			}
+		]
+	},
+	postcode: {
+		// TODO : adapt for true postcode validation
+		type: 'string',
+		minLength: 5,
+		maxLength: 5,
+		errorMessage: {
+			minLength: '5 chiffres minimum',
+			maxLength: '5 chiffres maximum'
+		}
+	},
+	textarea: {
+		type: 'string',
+		maxLength: 200,
+		errorMessage: {
+			maxLength: '200 caractères maximum'
+		}
+	},
+	checkbox: { type: 'string' }, // adjust this as necessary
+	select: { type: 'string' }, // adjust this as necessary
+	disabled_field: { type: 'string' }, // adjust this as necessary
+	radio_group: { type: 'string' }, // adjust this as necessary
+	checkbox_group: { type: 'string' } // adjust this as necessary
 };
 
 /**
@@ -28,7 +68,7 @@ const schemaDsrcForm = {
 	$id: '#/definitions/DsrcForm',
 	type: 'object',
 	properties: {
-		sample_text: { $ref: '#/definitions/text' },
+		sample_name: { $ref: '#/definitions/text' },
 		sample_phone: { $ref: '#/definitions/phone' },
 		sample_email: { $ref: '#/definitions/email' },
 		sample_password: { $ref: '#/definitions/password' }, // this only validates required length, not password strength
@@ -40,7 +80,7 @@ const schemaDsrcForm = {
 		sample_radio_group: { $ref: '#/definitions/radio_group' },
 		sample_checkbox_group: { $ref: '#/definitions/checkbox_group' }
 	},
-	required: ['sample_text', 'sample_email', 'sample_password'],
+	required: ['sample_name', 'sample_email', 'sample_password'],
 	definitions: schemaFormInputs
 };
 

@@ -59,21 +59,43 @@ function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm
 			const errors = this.errors.filter((error) => error.instancePath.substring(1) === fieldName);
 			return errors.map((error) => error.message);
 		},
+		setFieldMessages(fieldName) {
+			const field = this.form[fieldName];
+			let filteredMessages = [];
+
+			if (!field.message_group) {
+				// If the field does't have a message_group set by the server: create a message_group and add the errors to it
+				field.message_group = {};
+				if (field.errors.length > 0) {
+					filteredMessages = (field.errors || []).map((error) => ({ text: error, type: 'error' }));
+				}
+			} else {
+				// If the field has a message_group set by the server: match messages with error messages and set the message type accordingly
+				filteredMessages = field.message_group.messages.map((message) => {
+					if (field.errors.includes(message.text)) {
+						return { text: message.text, type: 'error' };
+					}
+					return { text: message.text, type: 'valid' };
+				});
+			}
+			field.message_group.messages = filteredMessages;
+		},
 		fieldHasError(fieldName) {
 			const field = this.form[fieldName];
 			return field.touched === true && field.errors.length > 0;
 		},
 		validateInput(event) {
-			const field = event.target.name;
+			const fieldName = event.target.name;
 			this.validate();
-			this.form[field].errors = this.getFieldErrors(field);
-			if (this.form[field].is_valid === false && this.form[field].errors.length === 0) {
-				this.form[field].is_valid = true;
-				this.form[field].valid_class = 'valid';
-			} else if (this.form[field].errors.length > 0) {
-				this.form[field].is_valid = false;
-				this.form[field].valid_class = 'error';
+			this.form[fieldName].errors = this.getFieldErrors(fieldName);
+			if (this.form[fieldName].is_valid === false && this.form[fieldName].errors.length === 0) {
+				this.form[fieldName].is_valid = true;
+				this.form[fieldName].valid_class = 'valid';
+			} else if (this.form[fieldName].errors.length > 0) {
+				this.form[fieldName].is_valid = false;
+				this.form[fieldName].valid_class = 'error';
 			}
+			this.setFieldMessages(fieldName);
 		},
 		touchInput(event) {
 			const field = event.target.name;

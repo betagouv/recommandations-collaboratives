@@ -6,6 +6,7 @@ const path = require('path');
 const Ajv = require('ajv');
 const standaloneCode = require('ajv/dist/standalone').default;
 const addFormats = require('ajv-formats');
+const addErrors = require('ajv-errors');
 
 const schemaForms = require('./ajv.schema.forms.cjs');
 
@@ -20,14 +21,15 @@ const AJV_OPTIONS = {
 	code: { source: true, esm: true }
 };
 
-const DsrcForm = schemaForms.schemaDsrcForm;
 const FormInputs = schemaForms.schemaFormInputs;
+const DsrcForm = schemaForms.schemaDsrcForm;
 const ajv = new Ajv({
 	...AJV_OPTIONS,
 	schemas: [FormInputs, DsrcForm]
 });
 
 addFormats(ajv);
+addErrors(ajv);
 
 let moduleCode = standaloneCode(ajv, {
 	ValidationDsrcForm: '#/definitions/DsrcForm' // Validation function for the DsrcForm schema
