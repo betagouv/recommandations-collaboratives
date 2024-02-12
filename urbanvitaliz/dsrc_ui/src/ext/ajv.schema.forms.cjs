@@ -4,6 +4,14 @@
  * AJV Doc on Combining Schemas: https://ajv.js.org/guide/combining-schemas.html
  ************************************************************************************/
 
+function generateMaxLengthErrorMessage(maxLength) {
+	return `${maxLength} caractère${maxLength > 1 ? 's' : ''}  maximum`;
+}
+
+function generateMinLengthErrorMessage(minLength) {
+	return `${minLength} caractère${minLength > 1 ? 's' : ''} minimum`;
+}
+
 /**
  * Password schema
  * Note: This schema only validates the required length and character classes. It does not guarantee password strength.
@@ -13,9 +21,41 @@
  * Common Schemas for form inputs.
  */
 const schemaFormInputs = {
-	text: { type: 'string', minLength: 1, maxLength: 40 },
-	phone: { type: 'string', minLength: 8, maxLength: 16 },
-	email: { type: 'string', format: 'email' },
+	text: {
+		allOf: [
+			{
+				type: 'string',
+				minLength: 3,
+				errorMessage: generateMinLengthErrorMessage(3)
+			},
+			{
+				type: 'string',
+				maxLength: 100,
+				errorMessage: generateMaxLengthErrorMessage(100)
+			}
+		]
+	},
+	phone: {
+		allOf: [
+			{
+				type: 'string',
+				minLength: 16,
+				errorMessage: generateMinLengthErrorMessage(16)
+			},
+			{
+				type: 'string',
+				maxLength: 100,
+				errorMessage: generateMaxLengthErrorMessage(100)
+			}
+		]
+	},
+	email: {
+		type: 'string',
+		format: 'email',
+		errorMessage: {
+			format: 'Veuillez rentrer une adresse email valide'
+		}
+	},
 	password: {
 		// TODO : adapt for true password validation
 		allOf: [
@@ -23,7 +63,7 @@ const schemaFormInputs = {
 				type: 'string',
 				format: 'password',
 				minLength: 12,
-				errorMessage: '12 caractères minimum'
+				errorMessage: generateMinLengthErrorMessage(12)
 			},
 			{
 				type: 'string',
@@ -39,19 +79,24 @@ const schemaFormInputs = {
 	},
 	postcode: {
 		// TODO : adapt for true postcode validation
-		type: 'string',
-		minLength: 5,
-		maxLength: 5,
-		errorMessage: {
-			minLength: '5 chiffres minimum',
-			maxLength: '5 chiffres maximum'
-		}
+		allOf: [
+			{
+				type: 'string',
+				minLength: 5,
+				errorMessage: generateMinLengthErrorMessage(5)
+			},
+			{
+				type: 'string',
+				maxLength: 5,
+				errorMessage: generateMaxLengthErrorMessage(5)
+			}
+		]
 	},
 	textarea: {
 		type: 'string',
 		maxLength: 200,
 		errorMessage: {
-			maxLength: '200 caractères maximum'
+			maxLength: generateMaxLengthErrorMessage(200)
 		}
 	},
 	checkbox: { type: 'string' }, // adjust this as necessary
