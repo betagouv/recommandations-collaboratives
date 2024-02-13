@@ -55,48 +55,48 @@ class DsrcForm {
 	constructor(dataTestPrefix, fields) {
 		this.fields = fields;
 		this.dataTestPrefix = dataTestPrefix;
-		const { fieldSelectors, inputSelectors } = this.generateFormSelectors(dataTestPrefix, fields);
+		const { fieldSelectors, inputSelectors } = this.getFormSelectors(dataTestPrefix, fields);
 		this.dom = { ...sampleDomElements, ...fieldSelectors, ...inputSelectors };
 	}
 
 	// Tool functions
-	generateFieldSelectorKey(inputType) {
+	getFieldSelectorKey(inputType) {
 		return `FIELD_${inputType.toUpperCase()}`;
 	}
 
-	generateFieldSelectorValue(dataTestPrefix, inputType) {
+	getFieldSelectorValue(dataTestPrefix, inputType) {
 		return `[data-test='${dataTestPrefix}${inputType}_field']`;
 	}
 
-	generateInputSelectorKey(inputType) {
+	getInputSelectorKey(inputType) {
 		return `INPUT_${inputType.toUpperCase()}`;
 	}
 
-	generateInputSelectorValue(dataTestPrefix, inputType, index = null) {
+	getInputSelectorValue(dataTestPrefix, inputType, index = null) {
 		return index
 			? `[data-test='${dataTestPrefix}${inputType}_input-${index}']`
 			: `[data-test='${dataTestPrefix}${inputType}_input']`;
 	}
 
-	generateValidInputValueKey(inputType) {
+	getValidInputValueKey(inputType) {
 		return `VALID_INPUT_${inputType.toUpperCase()}`;
 	}
 
-	generateInvalidInputValueKey(inputType) {
+	getInvalidInputValueKey(inputType) {
 		return `INVALID_INPUT_${inputType.toUpperCase()}`;
 	}
 
-	generateFormSelectors(dataTestPrefix, fields) {
+	getFormSelectors(dataTestPrefix, fields) {
 		const fieldSelectors = {};
 		const inputSelectors = {};
 		let inputType;
 		Object.keys(fields).forEach((index) => {
 			inputType = fields[index];
-			fieldSelectors[this.generateFieldSelectorKey(inputType)] = this.generateFieldSelectorValue(
+			fieldSelectors[this.getFieldSelectorKey(inputType)] = this.getFieldSelectorValue(
 				dataTestPrefix,
 				inputType
 			);
-			inputSelectors[this.generateInputSelectorKey(inputType)] = this.generateInputSelectorValue(
+			inputSelectors[this.getInputSelectorKey(inputType)] = this.getInputSelectorValue(
 				dataTestPrefix,
 				inputType
 			);
@@ -118,14 +118,17 @@ class DsrcForm {
 				.invoke('val')
 				.then((val) => {
 					actualValue = val;
+				})
+				.catch((err) => {
+					console.error('Error:', err);
 				});
 		} else {
 			cy.get(inputSelector).then(($input) => {
 				actualValue = $input.value;
 				if (isValid) {
-					expectedValue = this.dom[this.generateValidInputValueKey(inputType)];
+					expectedValue = this.dom[this.getValidInputValueKey(inputType)];
 				} else {
-					expectedValue = this.dom[this.generateInvalidInputValueKey(inputType)];
+					expectedValue = this.dom[this.getInvalidInputValueKey(inputType)];
 				}
 			});
 		}
@@ -143,8 +146,8 @@ class DsrcForm {
 	}
 
 	enterFieldValueAndAssertState(inputType, isValid = true) {
-		let fieldSelector = this.dom[this.generateFieldSelectorKey(inputType)];
-		let inputSelector = this.dom[this.generateInputSelectorKey(inputType)];
+		let fieldSelector = this.dom[this.getFieldSelectorKey(inputType)];
+		let inputSelector = this.dom[this.getInputSelectorKey(inputType)];
 		switch (inputType) {
 			case 'text':
 				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_TEXT);
@@ -219,13 +222,13 @@ class DsrcForm {
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_RADIO_GROUP);
 				if (isValid) {
-					inputSelector = this.generateInputSelectorValue(
+					inputSelector = this.getInputSelectorValue(
 						this.dataTestPrefix,
 						inputType,
 						this.dom.VALID_INPUT_RADIO_GROUP
 					);
 				} else {
-					inputSelector = this.generateInputSelectorValue(
+					inputSelector = this.getInputSelectorValue(
 						this.dataTestPrefix,
 						inputType,
 						this.dom.INVALID_INPUT_RADIO_GROUP
@@ -240,13 +243,13 @@ class DsrcForm {
 					.and('contain', this.dom.LABEL_CHECKBOX_GROUP);
 
 				if (isValid) {
-					inputSelector = this.generateInputSelectorValue(
+					inputSelector = this.getInputSelectorValue(
 						this.dataTestPrefix,
 						inputType,
 						this.dom.VALID_INPUT_CHECKBOX_GROUP
 					);
 				} else {
-					inputSelector = this.generateInputSelectorValue(
+					inputSelector = this.getInputSelectorValue(
 						this.dataTestPrefix,
 						inputType,
 						this.dom.INVALID_INPUT_CHECKBOX_GROUP
