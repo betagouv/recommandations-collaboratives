@@ -36,18 +36,11 @@ const schemaFormInputs = {
 		]
 	},
 	phone: {
-		allOf: [
-			{
-				type: 'string',
-				minLength: 16,
-				errorMessage: generateMinLengthErrorMessage(16)
-			},
-			{
-				type: 'string',
-				maxLength: 100,
-				errorMessage: generateMaxLengthErrorMessage(100)
-			}
-		]
+		type: 'string',
+		pattern: '[\\+0-9]{10,14}',
+		errorMessage: {
+			errorMessage: 'Veuillez rentrer un téléphone valide'
+		}
 	},
 	email: {
 		type: 'string',
