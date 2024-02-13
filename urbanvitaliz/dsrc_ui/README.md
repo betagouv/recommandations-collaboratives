@@ -102,7 +102,7 @@ Un formulaire rendu en Django peut être agrémenté de la validation côté cli
 Pour définir la fonction de validation du formulaire:
 
 - définir le JSON schema dans `src/ext/ajv.schemas.forms.js`
-- ajouter le schéma dans le fichier `src/ext/ajv.schemas.forms.js`
+- ajouter le schéma dans le fichier `src/ext/ajv.cjs`
 - lancer le script `build:ajv` qui généréra la fonction de validation
 
 Lors du build de la bibliohèque `dsrc_ui`; les fonctions de validation définies par les schémas seront prêtes à être utilisées par `DsrcForm` dans le tempate Django.
