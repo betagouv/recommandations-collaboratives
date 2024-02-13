@@ -4,11 +4,11 @@
  * AJV Doc on Combining Schemas: https://ajv.js.org/guide/combining-schemas.html
  ************************************************************************************/
 
-function generateMaxLengthErrorMessage(maxLength) {
+function maxLengthErrorMessage(maxLength) {
 	return `${maxLength} caractère${maxLength > 1 ? 's' : ''}  maximum`;
 }
 
-function generateMinLengthErrorMessage(minLength) {
+function minLengthErrorMessage(minLength) {
 	return `${minLength} caractère${minLength > 1 ? 's' : ''} minimum`;
 }
 
@@ -19,6 +19,7 @@ function generateMinLengthErrorMessage(minLength) {
 
 /**
  * Common Schemas for form inputs.
+ * Adjust as necessary for your form.
  */
 const schemaFormInputs = {
 	text: {
@@ -26,12 +27,12 @@ const schemaFormInputs = {
 			{
 				type: 'string',
 				minLength: 3,
-				errorMessage: generateMinLengthErrorMessage(3)
+				errorMessage: minLengthErrorMessage(3)
 			},
 			{
 				type: 'string',
 				maxLength: 100,
-				errorMessage: generateMaxLengthErrorMessage(100)
+				errorMessage: maxLengthErrorMessage(100)
 			}
 		]
 	},
@@ -50,17 +51,18 @@ const schemaFormInputs = {
 		}
 	},
 	password: {
-		// TODO : adapt for true password validation
+		// TODO:Adapt for better password strength validation
+		// See: https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
 		allOf: [
 			{
 				type: 'string',
 				format: 'password',
 				minLength: 12,
-				errorMessage: generateMinLengthErrorMessage(12)
+				errorMessage: minLengthErrorMessage(12)
 			},
 			{
 				type: 'string',
-				pattern: '[$-+!?*&%~_@#]{1}',
+				pattern: '[$\\-+!?*&%~_@#]{1}',
 				errorMessage: '1 caractère spécial minimum'
 			},
 			{
@@ -71,17 +73,17 @@ const schemaFormInputs = {
 		]
 	},
 	postcode: {
-		// TODO : adapt for true postcode validation
+		// TODO : adapt for French postcode validation
 		allOf: [
 			{
 				type: 'string',
 				minLength: 5,
-				errorMessage: generateMinLengthErrorMessage(5)
+				errorMessage: minLengthErrorMessage(5)
 			},
 			{
 				type: 'string',
 				maxLength: 5,
-				errorMessage: generateMaxLengthErrorMessage(5)
+				errorMessage: maxLengthErrorMessage(5)
 			}
 		]
 	},
@@ -89,14 +91,32 @@ const schemaFormInputs = {
 		type: 'string',
 		maxLength: 200,
 		errorMessage: {
-			maxLength: generateMaxLengthErrorMessage(200)
+			maxLength: maxLengthErrorMessage(200)
 		}
 	},
-	checkbox: { type: 'string' }, // adjust this as necessary
-	select: { type: 'string' }, // adjust this as necessary
-	disabled_field: { type: 'string' }, // adjust this as necessary
-	radio_group: { type: 'string' }, // adjust this as necessary
-	checkbox_group: { type: 'string' } // adjust this as necessary
+	checkbox: {
+		type: 'string',
+		pattern: 'on|true',
+		errorMessage: {
+			maxLength: maxLengthErrorMessage(200)
+		}
+	},
+	select: { type: 'string' },
+	disabled_field: { type: 'string' },
+	radio_group: {
+		type: 'string',
+		pattern: 'on|true',
+		errorMessage: {
+			pattern: 'Erreur de validation: Choix unique'
+		}
+	},
+	checkbox_group: {
+		type: 'string',
+		pattern: 'on|true',
+		errorMessage: {
+			pattern: 'Erreur de validation: Cases à cocher'
+		}
+	}
 };
 
 /**
