@@ -203,6 +203,8 @@ class DsrcForm {
 				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_BOOLEAN);
 				cy.get(inputSelector).click().blur();
 				cy.get(inputSelector).should('be.checked');
+
+				// TODO: check field and input state on error/valid, test required
 				break;
 			case 'select':
 				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_SELECT);
@@ -215,6 +217,8 @@ class DsrcForm {
 				} else {
 					cy.get(inputSelector).should('have.value', '');
 				}
+				// TODO: check field and input state on error/valid, test required
+
 				break;
 
 			case 'radio_group':
@@ -236,6 +240,8 @@ class DsrcForm {
 				}
 				cy.get(inputSelector).click();
 				cy.get(inputSelector).should('be.checked');
+
+				// TODO: check field and input state on error/valid, test required
 				break;
 			case 'checkbox_group':
 				cy.get(`${fieldSelector} fieldset`)
@@ -257,6 +263,8 @@ class DsrcForm {
 				}
 				cy.get(inputSelector).click();
 				cy.get(inputSelector).should('be.checked');
+
+				// TODO: check field and input state on error/valid, test required
 				break;
 			case 'disabled_field':
 				cy.get(fieldSelector).should('contain', this.dom.LABEL_DISABLED_INPUT_TEXT);
