@@ -118,6 +118,9 @@ function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm
 		changeInput(event) {
 			const field = event.target.name;
 			this.form[field].changed = true;
+			// validate the field when it changes: remove this if you want to validate the form only on `blur` or `submit` events
+			// Use a debounce mechanism for slow/complex/async validations (e.g. API calls)
+			this.validateInput(event);
 		}
 	};
 }

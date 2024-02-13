@@ -40,7 +40,7 @@ const schemaFormInputs = {
 		type: 'string',
 		pattern: '[\\+0-9]{10,14}',
 		errorMessage: {
-			errorMessage: 'Veuillez rentrer un téléphone valide'
+			pattern: 'Veuillez rentrer un téléphone valide'
 		}
 	},
 	email: {
