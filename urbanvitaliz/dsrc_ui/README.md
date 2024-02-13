@@ -105,25 +105,23 @@ Pour définir la fonction de validation du formulaire:
 - ajouter le schéma dans le fichier `src/ext/ajv.cjs`
 - lancer le script `build:ajv` qui généréra la fonction de validation
 
-Lors du build de la bibliohèque `dsrc_ui`; les fonctions de validation définies par les schémas seront prêtes à être utilisées par `DsrcForm` dans le tempate Django.
+Lors du build de la bibliohèque `dsrc_ui`, les fonctions de validation définies par les schémas seront prêtes à être utilisées par `DsrcForm` dans le tempate Django.
 
 Plus d'informations sur AJV:
 
 - [AJV Standalone Validation Mode](https://ajv.js.org/standalone.html)
 - [AJV - Doc for JSON Schema](https://ajv.js.org/json-schema.html)
 
-## Troubleshooting
-
-Ajv and Rollup
+### Ajv et Rollup
 
 Ajv utilise des modules `commonjs`. Pourque cela marche dans le browser, on doit convertir le module js en syntaxe ESM.
 On fait ceci grâce au plugin `@rollup/plugin-commonjs`  avec le setting `transformMixedEsModules` à `true`.
 La configuration des ces options se trouve dans `vite.config.js`.
 
-More resources here:
+Plus de resources ici:
 
 - [@rollup/plugin-commonjs transform option](https://github.com/rollup/plugins/tree/master/packages/commonjs#transformmixedesmodules)
-- Based on [this comment on how to use AJV `commonjs` modules with ESM syntax](https://github.com/ajv-validator/ajv/issues/2209)
+- Basé sur [ce commentaire sur comment utiliser les modules `commonjs` avec la syntaxe ESM](https://github.com/ajv-validator/ajv/issues/2209)
 
 ## Ressources
 
