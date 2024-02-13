@@ -6,7 +6,7 @@ describe('DsrcFormTest', () => {
 	const dataTestPrefix = `dsrc_test_${fieldPrefix}`;
 	// The fields to test = the input types of the fields stripped of the `sample_` prefix used in the `forms.py` file,
 	const fields = [
-		'text',
+		'name',
 		'phone',
 		'email',
 		'password',
