@@ -23,7 +23,7 @@ const sampleDomElements = {
 	// Sample VALID inputs
 	VALID_INPUT_TEXT: 'UserTestUI',
 	VALID_INPUT_PHONE: '0033122334455', // TODO: use DSFR Pattern
-	// file deepcode ignore NoHardcodedPasswords/test: this is a fake password to test form validation
+	// this is a fake password to test form validation
 	VALID_INPUT_PASSWORD: 'test-test-2est',
 	VALID_INPUT_EMAIL: 'user-test-ui@example.com',
 	VALID_INPUT_POSTCODE: '79700', // TODO: use DSFR Pattern
@@ -111,25 +111,35 @@ class DsrcForm {
 
 	// Verifications
 	checkValidity(inputType, isValid = true, fieldSelector, inputSelector) {
-		cy.get(inputSelector).then(($input) => {
-			let actualValue = $input.value;
-			let expectedValue;
-			if (isValid) {
-				expectedValue = this.dom[this.generateValidInputValueKey(inputType)];
-			} else {
-				expectedValue = this.dom[this.generateInvalidInputValueKey(inputType)];
-			}
-			// Check if the input has been entered correctly
-			expect(actualValue).to.equal(expectedValue);
+		let actualValue;
+		let expectedValue;
+		if (inputType === 'password') {
+			cy.get(inputSelector)
+				.invoke('val')
+				.then((val) => {
+					actualValue = val;
+				});
+		} else {
+			cy.get(inputSelector).then(($input) => {
+				actualValue = $input.value;
+				if (isValid) {
+					expectedValue = this.dom[this.generateValidInputValueKey(inputType)];
+				} else {
+					expectedValue = this.dom[this.generateInvalidInputValueKey(inputType)];
+				}
+			});
+		}
 
-			if (isValid) {
-				cy.get(fieldSelector).find('[class*="error"]').should('not.exist');
-				cy.get(inputSelector).find('[class*="error"]').should('not.exist');
-			} else {
-				cy.get(fieldSelector).find('[class*="error"]').should('exist');
-				cy.get(inputSelector).find('[class*="error"]').should('exist');
-			}
-		});
+		// Check if the input has been entered correctly
+		expect(actualValue).to.equal(expectedValue);
+
+		if (isValid) {
+			cy.get(`${fieldSelector} [class*="error"]`).should('not.exist');
+			cy.get(`${inputSelector}[class*="error"]`).should('not.exist');
+		} else {
+			cy.get(`${fieldSelector} [class*="error"]`).should('exist');
+			cy.get(`${inputSelector}[class*="error"]`).should('exist');
+		}
 	}
 
 	enterFieldValueAndAssertState(inputType, isValid = true) {
@@ -164,12 +174,11 @@ class DsrcForm {
 				// TODO: test password visibility too
 				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_PASSWORD);
 
-				cy.get(fieldSelector).find(inputSelector);
 				cy.get(inputSelector)
 					.type(isValid ? this.dom.VALID_INPUT_PASSWORD : this.dom.INVALID_INPUT_PASSWORD)
 					.blur();
-
 				this.checkValidity(inputType, isValid, fieldSelector, inputSelector);
+
 				break;
 			case 'postcode':
 				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_POSTCODE);
