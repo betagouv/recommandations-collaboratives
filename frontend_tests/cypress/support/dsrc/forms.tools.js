@@ -4,6 +4,7 @@
 
 const sampleDomElements = {
 	TEST_FORM_URL: '/dsrc/',
+	FIELD_PREFIX: 'sample_',
 
 	// Sample labels
 	LABEL_TEXT: `Nom d'usager`, // TODO:use a selector of type [data-test='test-id']
@@ -22,7 +23,8 @@ const sampleDomElements = {
 	// Sample VALID inputs
 	VALID_INPUT_TEXT: 'UserTestUI',
 	VALID_INPUT_PHONE: '0033122334455', // TODO: use DSFR Pattern
-	VALID_INPUT_PASSWORD: 'test-test-test',
+	// this is a fake password to test form validation
+	VALID_INPUT_PASSWORD: 'test-test-2est',
 	VALID_INPUT_EMAIL: 'user-test-ui@example.com',
 	VALID_INPUT_POSTCODE: '79700', // TODO: use DSFR Pattern
 	VALID_INPUT_TEXTAREA:
@@ -53,48 +55,48 @@ class DsrcForm {
 	constructor(dataTestPrefix, fields) {
 		this.fields = fields;
 		this.dataTestPrefix = dataTestPrefix;
-		const { fieldSelectors, inputSelectors } = this.generateFormSelectors(dataTestPrefix, fields);
+		const { fieldSelectors, inputSelectors } = this.getFormSelectors(dataTestPrefix, fields);
 		this.dom = { ...sampleDomElements, ...fieldSelectors, ...inputSelectors };
 	}
 
 	// Tool functions
-	generateFieldSelectorKey(inputType) {
+	getFieldSelectorKey(inputType) {
 		return `FIELD_${inputType.toUpperCase()}`;
 	}
 
-	generateFieldSelectorValue(dataTestPrefix, inputType) {
+	getFieldSelectorValue(dataTestPrefix, inputType) {
 		return `[data-test='${dataTestPrefix}${inputType}_field']`;
 	}
 
-	generateInputSelectorKey(inputType) {
+	getInputSelectorKey(inputType) {
 		return `INPUT_${inputType.toUpperCase()}`;
 	}
 
-	generateInputSelectorValue(dataTestPrefix, inputType, index = null) {
+	getInputSelectorValue(dataTestPrefix, inputType, index = null) {
 		return index
 			? `[data-test='${dataTestPrefix}${inputType}_input-${index}']`
 			: `[data-test='${dataTestPrefix}${inputType}_input']`;
 	}
 
-	generateValidInputValueKey(inputType) {
+	getValidInputValueKey(inputType) {
 		return `VALID_INPUT_${inputType.toUpperCase()}`;
 	}
 
-	generateInvalidInputValueKey(inputType) {
+	getInvalidInputValueKey(inputType) {
 		return `INVALID_INPUT_${inputType.toUpperCase()}`;
 	}
 
-	generateFormSelectors(dataTestPrefix, fields) {
+	getFormSelectors(dataTestPrefix, fields) {
 		const fieldSelectors = {};
 		const inputSelectors = {};
 		let inputType;
 		Object.keys(fields).forEach((index) => {
 			inputType = fields[index];
-			fieldSelectors[this.generateFieldSelectorKey(inputType)] = this.generateFieldSelectorValue(
+			fieldSelectors[this.getFieldSelectorKey(inputType)] = this.getFieldSelectorValue(
 				dataTestPrefix,
 				inputType
 			);
-			inputSelectors[this.generateInputSelectorKey(inputType)] = this.generateInputSelectorValue(
+			inputSelectors[this.getInputSelectorKey(inputType)] = this.getInputSelectorValue(
 				dataTestPrefix,
 				inputType
 			);
@@ -108,115 +110,115 @@ class DsrcForm {
 	}
 
 	// Verifications
-	checkValidity(inputElement, inputType, isValid = true) {
-		let actualValue = inputElement[0].value;
+	checkValidity(inputType, isValid = true, fieldSelector, inputSelector) {
+		let actualValue;
 		let expectedValue;
-		if (isValid) {
-			expectedValue = this.dom[this.generateValidInputValueKey(inputType)];
+		if (inputType === 'password') {
+			cy.get(inputSelector)
+				.invoke('val')
+				.then((val) => {
+					actualValue = val;
+				})
+				.catch((err) => {
+					console.error('Error:', err);
+				});
 		} else {
-			expectedValue = this.dom[this.generateInvalidInputValueKey(inputType)];
+			cy.get(inputSelector).then(($input) => {
+				actualValue = $input.value;
+				if (isValid) {
+					expectedValue = this.dom[this.getValidInputValueKey(inputType)];
+				} else {
+					expectedValue = this.dom[this.getInvalidInputValueKey(inputType)];
+				}
+			});
 		}
+
 		// Check if the input has been entered correctly
 		expect(actualValue).to.equal(expectedValue);
 
-		if (!isValid) {
-			// TODO: for Invalid inputs: the field should have an `*--error` class
+		if (isValid) {
+			cy.get(`${fieldSelector} [class*="error"]`).should('not.exist');
+			cy.get(`${inputSelector}[class*="error"]`).should('not.exist');
+		} else {
+			cy.get(`${fieldSelector} [class*="error"]`).should('exist');
+			cy.get(`${inputSelector}[class*="error"]`).should('exist');
 		}
 	}
 
 	enterFieldValueAndAssertState(inputType, isValid = true) {
-		let fieldSelector = this.dom[this.generateFieldSelectorKey(inputType)];
-		let inputSelector = this.dom[this.generateInputSelectorKey(inputType)];
+		let fieldSelector = this.dom[this.getFieldSelectorKey(inputType)];
+		let inputSelector = this.dom[this.getInputSelectorKey(inputType)];
 		switch (inputType) {
 			case 'text':
-				cy.get(fieldSelector)
-					.should('be.visible')
-					.and('contain', this.dom.LABEL_TEXT)
+				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_TEXT);
+				cy.get(inputSelector)
 					.type(isValid ? this.dom.VALID_INPUT_TEXT : this.dom.INVALID_INPUT_TEXT)
-					.then(() => {
-						cy.get(inputSelector).then(($input) => {
-							this.checkValidity($input, inputType, isValid);
-						});
-					});
+					.blur();
+
+				this.checkValidity(inputType, isValid, fieldSelector, inputSelector);
 				break;
 			case 'phone':
-				cy.get(fieldSelector)
-					.should('be.visible')
-					.and('contain', this.dom.LABEL_PHONE)
+				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_PHONE);
+				cy.get(inputSelector)
 					.type(isValid ? this.dom.VALID_INPUT_PHONE : this.dom.INVALID_INPUT_PHONE)
-					.then(() => {
-						cy.get(inputSelector).then(($input) => {
-							this.checkValidity($input, inputType, isValid);
-						});
-					});
+					.blur();
+
+				this.checkValidity(inputType, isValid, fieldSelector, inputSelector);
 				break;
 			case 'email':
-				cy.get(fieldSelector)
-					.should('be.visible')
-					.and('contain', this.dom.LABEL_EMAIL)
+				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_EMAIL);
+				cy.get(inputSelector)
 					.type(isValid ? this.dom.VALID_INPUT_EMAIL : this.dom.INVALID_INPUT_EMAIL)
-					.then(() => {
-						cy.get(inputSelector).then(($input) => {
-							this.checkValidity($input, inputType, isValid);
-						});
-					});
+					.blur();
+
+				this.checkValidity(inputType, isValid, fieldSelector, inputSelector);
 				break;
 			case 'password':
 				// TODO: test password visibility too
 				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_PASSWORD);
 
-				cy.get(fieldSelector)
-					.find(inputSelector)
+				cy.get(inputSelector)
 					.type(isValid ? this.dom.VALID_INPUT_PASSWORD : this.dom.INVALID_INPUT_PASSWORD)
-					.then(() => {
-						cy.get(inputSelector).then(($input) => {
-							this.checkValidity($input, inputType, isValid);
-						});
-					});
+					.blur();
+				this.checkValidity(inputType, isValid, fieldSelector, inputSelector);
+
 				break;
 			case 'postcode':
-				cy.get(fieldSelector)
-					.should('be.visible')
-					.and('contain', this.dom.LABEL_POSTCODE)
+				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_POSTCODE);
+				cy.get(inputSelector)
 					.type(isValid ? this.dom.VALID_INPUT_POSTCODE : this.dom.INVALID_INPUT_POSTCODE)
-					.then(() => {
-						cy.get(inputSelector).then(($input) => {
-							this.checkValidity($input, inputType, isValid);
-						});
-					});
+					.blur();
+
+				this.checkValidity(inputType, isValid, fieldSelector, inputSelector);
 				break;
 			case 'textarea':
-				cy.get(fieldSelector)
-					.should('be.visible')
-					.and('contain', this.dom.LABEL_TEXTAREA)
+				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_TEXTAREA);
+				cy.get(inputSelector)
 					.type(isValid ? this.dom.VALID_INPUT_TEXTAREA : this.dom.INVALID_INPUT_TEXTAREA)
-					.then(() => {
-						cy.get(inputSelector).then(($input) => {
-							this.checkValidity($input, inputType, isValid);
-						});
-					});
+					.blur();
+
+				this.checkValidity(inputType, isValid, fieldSelector, inputSelector);
 				break;
 			case 'boolean': // this is a checkbox
-				cy.get(fieldSelector)
-					.should('be.visible')
-					.and('contain', this.dom.LABEL_BOOLEAN)
-					.click()
-					.then(() => {
-						cy.get(inputSelector).should('be.checked');
-					});
+				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_BOOLEAN);
+				cy.get(inputSelector).click().blur();
+				cy.get(inputSelector).should('be.checked');
+
+				// TODO: check field and input state on error/valid, test required
 				break;
 			case 'select':
 				cy.get(fieldSelector).should('be.visible').and('contain', this.dom.LABEL_SELECT);
 
-				cy.get(inputSelector)
-					.select(isValid ? this.dom.VALID_INPUT_SELECT : this.dom.INVALID_INPUT_SELECT)
-					.then(() => {
-						if (isValid) {
-							cy.get(inputSelector).should('have.value', 1);
-						} else {
-							cy.get(inputSelector).should('have.value', '');
-						}
-					});
+				cy.get(inputSelector).select(
+					isValid ? this.dom.VALID_INPUT_SELECT : this.dom.INVALID_INPUT_SELECT
+				);
+				if (isValid) {
+					cy.get(inputSelector).should('have.value', 1);
+				} else {
+					cy.get(inputSelector).should('have.value', '');
+				}
+				// TODO: check field and input state on error/valid, test required
+
 				break;
 
 			case 'radio_group':
@@ -224,27 +226,22 @@ class DsrcForm {
 					.should('be.visible')
 					.and('contain', this.dom.LABEL_RADIO_GROUP);
 				if (isValid) {
-					inputSelector = this.generateInputSelectorValue(
+					inputSelector = this.getInputSelectorValue(
 						this.dataTestPrefix,
 						inputType,
 						this.dom.VALID_INPUT_RADIO_GROUP
 					);
 				} else {
-					inputSelector = this.generateInputSelectorValue(
+					inputSelector = this.getInputSelectorValue(
 						this.dataTestPrefix,
 						inputType,
 						this.dom.INVALID_INPUT_RADIO_GROUP
 					);
 				}
-				cy.get(inputSelector)
-					.check()
-					.then(() => {
-						if (inputSelector) {
-							cy.get(inputSelector).should('have.value', 'on');
-						} else {
-							cy.get(inputSelector).should('have.value', 'on');
-						}
-					});
+				cy.get(inputSelector).click();
+				cy.get(inputSelector).should('be.checked');
+
+				// TODO: check field and input state on error/valid, test required
 				break;
 			case 'checkbox_group':
 				cy.get(`${fieldSelector} fieldset`)
@@ -252,27 +249,22 @@ class DsrcForm {
 					.and('contain', this.dom.LABEL_CHECKBOX_GROUP);
 
 				if (isValid) {
-					inputSelector = this.generateInputSelectorValue(
+					inputSelector = this.getInputSelectorValue(
 						this.dataTestPrefix,
 						inputType,
 						this.dom.VALID_INPUT_CHECKBOX_GROUP
 					);
 				} else {
-					inputSelector = this.generateInputSelectorValue(
+					inputSelector = this.getInputSelectorValue(
 						this.dataTestPrefix,
 						inputType,
 						this.dom.INVALID_INPUT_CHECKBOX_GROUP
 					);
 				}
-				cy.get(inputSelector)
-					.check()
-					.then(() => {
-						if (isValid) {
-							cy.get(inputSelector).should('have.value', 'on');
-						} else {
-							cy.get(inputSelector).should('have.value', 'on');
-						}
-					});
+				cy.get(inputSelector).click();
+				cy.get(inputSelector).should('be.checked');
+
+				// TODO: check field and input state on error/valid, test required
 				break;
 			case 'disabled_field':
 				cy.get(fieldSelector).should('contain', this.dom.LABEL_DISABLED_INPUT_TEXT);

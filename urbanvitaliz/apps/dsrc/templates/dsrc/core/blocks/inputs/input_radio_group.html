@@ -18,7 +18,7 @@
         <div class="fr-fieldset__element">
             <div class="fr-radio-group{% if field.errors %} fr-input-group--error{% endif %}{% if field.field.is_valid %} fr-input-group--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }} fr-radio-group--{{ field.field.widget.attrs.size }} {% endif %} {{ field.field.widget.attrs.classes }}"
                  :class="`fr-input-group--${form['{{ field.html_name }}'].valid_class}`">
-                <input x-model="{{ choice.id_for_label }}"
+                <input x-model="{{ choice.id_for_label }}.value"
                        name="{{ field.html_name }}"
                        id="{{ choice.id_for_label }}"
                        type="radio"

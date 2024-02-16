@@ -1,12 +1,18 @@
 import Alpine from 'alpinejs';
 import * as validations from '../../../ext/ajv.validations.default';
 
+/**
+ * Use this Alpine component to provide frontend validation capabilities to a form rendered by the server.
+ * @param {string} formId The id of the <form> element
+ * @param {Object} formData The serialized form data from the server, defined in `forms.py` and serialized in `views.py`
+ * @param {string} validationFunctionName The name of the AJV validation function to use. It should be generated into `ajv.validations.default.js` by the script `build:ajv` (`ValidationDsrcForm` is the default validation function for DsrcExampleForm). To Change the default validation function, add the schema for your form to `ajv.schema.forms.cjs` and run `npm run build:ajv`
+ * @returns an Alpine component object containing the form data and methods to validate and handle form submission
+ */
 function DsrcForm(
 	formId,
 	formData,
 	validationFunctionName = 'ValidationDsrcForm'
 ) {
-	console.log('DsrcForm loaded');
 	return {
 		form: {},
 		errors: [],
@@ -24,9 +30,12 @@ function DsrcForm(
 				const fields = Object.keys(formData);
 				fields.forEach((field) => {
 					this.form[field] = {
-						...formData[field],
+						message_group: {
+							messages: [],
+						},
 						errors: [],
 						touched: false,
+						...formData[field],
 					};
 				});
 			}
@@ -77,24 +86,61 @@ function DsrcForm(
 			);
 			return errors.map((error) => error.message);
 		},
+		setFieldMessages(fieldName) {
+			const field = this.form[fieldName];
+			let filteredMessages = [];
+			if (
+				field.message_group.messages.length === 0 &&
+				field.errors.length > 0
+			) {
+				filteredMessages = (field.errors || []).map((error) => ({
+					text: error,
+					type: 'error',
+				}));
+			} else {
+				// If the field has a message_group set by the server: match local messages with error messages and set the message type accordingly
+				filteredMessages = field.message_group.messages.reduce(
+					(updatedMessages, message) => {
+						console.log(
+							'field.message_group',
+							JSON.parse(JSON.stringify(field.message_group))
+						);
+
+						console.log(
+							'field.errors',
+							JSON.parse(JSON.stringify(field.errors))
+						);
+						if (field.errors.includes(message.text)) {
+							message.type = 'error';
+						} else {
+							message.type = 'valid';
+						}
+						return [...updatedMessages, message];
+					},
+					[]
+				);
+			}
+			field.message_group.messages = filteredMessages;
+		},
 		fieldHasError(fieldName) {
 			const field = this.form[fieldName];
 			return field.touched === true && field.errors.length > 0;
 		},
 		validateInput(event) {
-			const field = event.target.name;
+			const fieldName = event.target.name;
 			this.validate();
-			this.form[field].errors = this.getFieldErrors(field);
+			this.form[fieldName].errors = this.getFieldErrors(fieldName);
 			if (
-				this.form[field].is_valid === false &&
-				this.form[field].errors.length === 0
+				this.form[fieldName].is_valid === false &&
+				this.form[fieldName].errors.length === 0
 			) {
-				this.form[field].is_valid = true;
-				this.form[field].valid_class = 'valid';
-			} else if (this.form[field].errors.length > 0) {
-				this.form[field].is_valid = false;
-				this.form[field].valid_class = 'error';
+				this.form[fieldName].is_valid = true;
+				this.form[fieldName].valid_class = 'valid';
+			} else if (this.form[fieldName].errors.length > 0) {
+				this.form[fieldName].is_valid = false;
+				this.form[fieldName].valid_class = 'error';
 			}
+			this.setFieldMessages(fieldName);
 		},
 		touchInput(event) {
 			const field = event.target.name;
@@ -103,6 +149,9 @@ function DsrcForm(
 		changeInput(event) {
 			const field = event.target.name;
 			this.form[field].changed = true;
+			// validate the field when it changes: remove this if you want to validate the form only on `blur` or `submit` events
+			// Use a debounce mechanism for slow/complex/async validations (e.g. API calls)
+			this.validateInput(event);
 		},
 	};
 }

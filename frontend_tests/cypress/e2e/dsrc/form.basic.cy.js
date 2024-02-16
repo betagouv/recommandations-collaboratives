@@ -6,7 +6,7 @@ describe('DsrcFormTest', () => {
 	const dataTestPrefix = `dsrc_test_${fieldPrefix}`;
 	// The fields to test = the input types of the fields stripped of the `sample_` prefix used in the `forms.py` file,
 	const fields = [
-		'text',
+		'name',
 		'phone',
 		'email',
 		'password',
@@ -31,7 +31,7 @@ describe('DsrcFormTest', () => {
 
 	fields.forEach((field) => {
 		it(`should enter a valid value in "${field}" input and check field state`, () => {
-			dsrcForm.enterFieldValueAndAssertState(field);
+			dsrcForm.enterFieldValueAndAssertState(field); // The default value is valid
 		});
 		it(`should enter an invalid value in "${field}" input and check field state and errors`, () => {
 			dsrcForm.enterFieldValueAndAssertState(field, false);
