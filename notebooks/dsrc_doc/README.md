@@ -86,68 +86,14 @@ Le CSS de la librairie DSRC est généré à partir de sources SCSS dans le doss
 
 Les fichiers sont générés dans `[root]/static/` et chargés dans Jupyter Notebooks à partir de `[root]/static/`.
 
-Fonction permettant de charger des styles depuis le dossier `static` :
+Le fichier `ComponentTemplate.py` contient un exemple de chargement CSS dan une cellule Juypyter Notebooks.
 
-- Copier le code dans une cellule du Notebook :
-
-```python
-# Load CSS files as raw text using python
-"""
-Read a CSS file and load it into Jupyter.
-Pass the file path to the CSS file.
-"""
-def _set_css_style(css_file_path):
-
-   styles = open(css_file_path, "r").read()
-   mycss = '%s' % styles
-   return HTML('<style>{}</style>'.format(mycss))
-
-csscore = _set_css_style('static/css/dsfr.css') # changer pour le fichier de style souhaité
-```
-
-Définir un Template dans la cellule suivante:
-
-```python
-template = Template("""
-{% load static %}
-{% load sass_tags %}
-{% load django_vite %}
-
-{% block css %}
-    <style>
-        {{csscore}} {# Chargement de styles ici #}
-    </style>
-{% endblock %}
-
-<table class="fr-table">
-    <tr>
-        <th>Projet</th>
-        <th>Ville</th>
-        <th>Gigs</th>
-    </tr>
-    {% for p in projects %}
-    <tr>
-        <td>{{p.name}}</td>
-        <td>{{p.created_on}}</td>
-        <td>{{p.location}}</td>
-    </tr>
-    {% endfor %}
-    <button class="fr-primary">Add Project</button>
-</table>
-""")
-
-context = Context(
-    {'projects': projects.order_by("-created_on")[:10], 'csscore': csscore.data } # On passe les styles, contenus dans `data`
-)
-
-HTML(template.render(context)) # Affiche le template
-```
 
 - [Source: solution pour charger du CSS dans une cellule Jupyter Notebook (SO)](https://stackoverflow.com/questions/32156248/how-do-i-set-custom-css-for-my-ipython-ihaskell-jupyter-notebook)
 
 ### Controle de version de Jupyter Notebooks
 
-Afin de ne pas surcharger le dépôt avec des données générées par la doc, ce module privilégie une gestion de versions de Jupyter Notebooks sous format de fichiers `.py` avec le paquet `jupoytext`, ce qui rend l'usage notebooks facilement compatible avec git.
+Afin de ne pas surcharger le dépôt avec des données générées par la doc, ce module privilégie une gestion de versions de Jupyter Notebooks sous format de fichiers `.py` avec le paquet `jupiytext`, ce qui rend l'usage notebooks facilement compatible avec git.
 
 - [jupytext](https://jupytext.readthedocs.io/en/latest/)
 
