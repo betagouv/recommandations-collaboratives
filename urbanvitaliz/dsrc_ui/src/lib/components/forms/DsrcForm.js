@@ -1,7 +1,12 @@
 import Alpine from 'alpinejs';
 import * as validations from '../../../ext/ajv.validations.default';
 
-function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm') {
+function DsrcForm(
+	formId,
+	formData,
+	validationFunctionName = 'ValidationDsrcForm'
+) {
+	console.log('DsrcForm loaded');
 	return {
 		form: {},
 		errors: [],
@@ -18,23 +23,34 @@ function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm
 				// There are no errors: This is a blank form
 				const fields = Object.keys(formData);
 				fields.forEach((field) => {
-					this.form[field] = { ...formData[field], errors: [], touched: false };
+					this.form[field] = {
+						...formData[field],
+						errors: [],
+						touched: false,
+					};
 				});
 			}
 			this.$nextTick(() => {
 				// enable form validation for all submission types (click, keyboard, ...)
-				document.getElementById(formId).addEventListener('submit', (event) => {
-					this.validate();
-					if (Array.isArray(this.errors) && this.errors.length > 0) {
-						event.preventDefault();
-						// Set the focus on the first field with an error
-						const firstErrorField = this.errors[0].instancePath.substring(1);
-						this.form[firstErrorField].is_valid = false;
-						this.form[firstErrorField].errors = this.getFieldErrors(firstErrorField);
-						this.form[firstErrorField].valid_class = 'error';
-						this.$refs[firstErrorField].focus();
-					}
-				});
+				document
+					.getElementById(formId)
+					.addEventListener('submit', (event) => {
+						this.validate();
+						if (
+							Array.isArray(this.errors) &&
+							this.errors.length > 0
+						) {
+							event.preventDefault();
+							// Set the focus on the first field with an error
+							const firstErrorField =
+								this.errors[0].instancePath.substring(1);
+							this.form[firstErrorField].is_valid = false;
+							this.form[firstErrorField].errors =
+								this.getFieldErrors(firstErrorField);
+							this.form[firstErrorField].valid_class = 'error';
+							this.$refs[firstErrorField].focus();
+						}
+					});
 			});
 			// Disable browser validation as we are using our own
 			document.getElementById(formId).setAttribute('novalidate', '');
@@ -56,7 +72,9 @@ function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm
 			}
 		},
 		getFieldErrors(fieldName) {
-			const errors = this.errors.filter((error) => error.instancePath.substring(1) === fieldName);
+			const errors = this.errors.filter(
+				(error) => error.instancePath.substring(1) === fieldName
+			);
 			return errors.map((error) => error.message);
 		},
 		fieldHasError(fieldName) {
@@ -67,7 +85,10 @@ function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm
 			const field = event.target.name;
 			this.validate();
 			this.form[field].errors = this.getFieldErrors(field);
-			if (this.form[field].is_valid === false && this.form[field].errors.length === 0) {
+			if (
+				this.form[field].is_valid === false &&
+				this.form[field].errors.length === 0
+			) {
 				this.form[field].is_valid = true;
 				this.form[field].valid_class = 'valid';
 			} else if (this.form[field].errors.length > 0) {
@@ -82,7 +103,7 @@ function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm
 		changeInput(event) {
 			const field = event.target.name;
 			this.form[field].changed = true;
-		}
+		},
 	};
 }
 
