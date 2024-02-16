@@ -114,7 +114,7 @@ class ExperimentFormUsingDsrc(DsrcBaseForm):
         self.helper.layout = Layout(
             Fieldset(
                 "Créez votre compte", # The first argument is the legend of the fieldset
-                "sample_text",
+                "sample_name",
                 # "sample_phone",
                 # "sample_email",
                 # "sample_password",
@@ -163,7 +163,7 @@ class ExperimentFormUsingDsrc(DsrcBaseForm):
 			]
         }
     # Basic text input
-    sample_text = forms.CharField(label="Nom d'usager", initial="", required=True)
+    sample_name = forms.CharField(label="Nom d'usager", initial="", required=True)
 
     # Phone input: input type=text, uses max_length to limit the number of characters
     # TODO: add a phone number validation, pattern / mask

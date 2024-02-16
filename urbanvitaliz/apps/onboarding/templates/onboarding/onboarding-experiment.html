@@ -4,9 +4,10 @@
 {% load crispy_forms_tags %}
 {% block js %}
     {% vite_asset 'js/apps/onboarding.js' %}
-    {% vite_asset 'lib/components/forms/DsrcForm.js' %}
 {% endblock %}
-{% include 'dsrc/core/blocks/global/scripts.html' %}
+    
+
+
 
 {% block title %} | Solliciter l'équipe {{ request.site.name }}{% endblock %}
 
