@@ -12,6 +12,7 @@ Base DSRC form:
 """
 
 class DsrcBaseForm(forms.Form):
+    print("coucou")
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -83,15 +84,15 @@ class DsrcExampleForm(DsrcBaseForm):
                 "Créez votre compte", # The first argument is the legend of the fieldset
                 "sample_text",
                 "sample_phone",
-                "sample_email",
-                "sample_password",
-                "sample_postcode",
-                "sample_description",
-                "sample_checkbox",
-                "sample_select",
-                "sample_disabled_field",
-                "sample_radio_group",
-                "sample_checkbox_group",
+                # "sample_email",
+                # "sample_password",
+                # "sample_postcode",
+                # "sample_description",
+                # "sample_checkbox",
+                # "sample_select",
+                # "sample_disabled_field",
+                # "sample_radio_group",
+                # "sample_checkbox_group",
             ),
         )
 
