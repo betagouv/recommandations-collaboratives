@@ -8,7 +8,7 @@ created: 2024-02-05 17:36:35 CEST
 """
 
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 
 from . import forms
 
