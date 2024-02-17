@@ -4,4 +4,5 @@
 // Generate Tokens
 $theme-prefix: '-'; // creates CSS variables with specific app prefix. Use '--' for no prefix
 
+// Generate CSS Vars
 @include mixins.theme-custom(colors.$colors, $theme-prefix);
