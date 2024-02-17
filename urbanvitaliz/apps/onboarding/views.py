@@ -7,8 +7,6 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-17 20:39:35 CEST
 """
 
-from urbanvitaliz.apps.dsrc import forms as dsrc_forms
-from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
