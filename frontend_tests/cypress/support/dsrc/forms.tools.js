@@ -47,7 +47,7 @@ const sampleDomElements = {
 	INVALID_INPUT_CHECKBOX_GROUP: 3
 };
 
-class DsrcForm {
+class DsrcFormValidator {
 	dom;
 	fields;
 	dataTestPrefix;
@@ -118,9 +118,6 @@ class DsrcForm {
 				.invoke('val')
 				.then((val) => {
 					actualValue = val;
-				})
-				.catch((err) => {
-					console.error('Error:', err);
 				});
 		} else {
 			cy.get(inputSelector).then(($input) => {
@@ -276,4 +273,4 @@ class DsrcForm {
 	}
 }
 
-export default { DsrcForm };
+export default { DsrcFormValidator };

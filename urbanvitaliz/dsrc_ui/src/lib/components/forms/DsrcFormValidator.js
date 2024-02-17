@@ -5,10 +5,14 @@ import * as validations from '../../../ext/ajv.validations.default';
  * Use this Alpine component to provide frontend validation capabilities to a form rendered by the server.
  * @param {string} formId The id of the <form> element
  * @param {Object} formData The serialized form data from the server, defined in `forms.py` and serialized in `views.py`
- * @param {string} validationFunctionName The name of the AJV validation function to use. It should be generated into `ajv.validations.default.js` by the script `build:ajv` (`ValidationDsrcForm` is the default validation function for DsrcExampleForm). To Change the default validation function, add the schema for your form to `ajv.schema.forms.cjs` and run `npm run build:ajv`
+ * @param {string} validationFunctionName The name of the AJV validation function to use. It should be generated into `ajv.validations.default.js` by the script `build:ajv` (`DsrcFormValidationFunction` is the default validation function for DsrcExampleForm). To Change the default validation function, add the schema for your form to `ajv.schema.forms.cjs` and run `npm run build:ajv`
  * @returns an Alpine component object containing the form data and methods to validate and handle form submission
  */
-function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm') {
+function DsrcFormValidator(
+	formId,
+	formData,
+	validationFunctionName = 'DsrcFormValidationFunction'
+) {
 	return {
 		form: {},
 		errors: [],
@@ -31,6 +35,7 @@ function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm
 						},
 						errors: [],
 						touched: false,
+						changed: false,
 						...formData[field]
 					};
 				});
@@ -75,15 +80,15 @@ function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm
 		},
 		setFieldMessages(fieldName) {
 			const field = this.form[fieldName];
+			if (!field.message_group || !field.message_group.messages) {
+				field.message_group = { help_text: '', messages: [] };
+			}
 			let filteredMessages = [];
 			if (field.message_group.messages.length === 0 && field.errors.length > 0) {
 				filteredMessages = (field.errors || []).map((error) => ({ text: error, type: 'error' }));
 			} else {
 				// If the field has a message_group set by the server: match local messages with error messages and set the message type accordingly
 				filteredMessages = field.message_group.messages.reduce((updatedMessages, message) => {
-					console.log('field.message_group', JSON.parse(JSON.stringify(field.message_group)));
-
-					console.log('field.errors', JSON.parse(JSON.stringify(field.errors)));
 					if (field.errors.includes(message.text)) {
 						message.type = 'error';
 					} else {
@@ -125,4 +130,4 @@ function DsrcForm(formId, formData, validationFunctionName = 'ValidationDsrcForm
 	};
 }
 
-Alpine.data('DsrcForm', DsrcForm);
+Alpine.data('DsrcFormValidator', DsrcFormValidator);

@@ -10,6 +10,6 @@ import './utils/globals';
 // import './lib/store/forms';
 
 // Global reused components
-import './components/forms/DsrcForm'; // provides form validation for `dsrc_crispy_forms` that have an associated JSON schema
+import './components/forms/DsrcFormValidator'; // provides form validation for `dsrc_crispy_forms` that have an associated JSON schema
 
 console.log('js main added');

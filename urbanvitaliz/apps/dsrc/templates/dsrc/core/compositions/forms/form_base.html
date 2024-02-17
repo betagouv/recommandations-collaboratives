@@ -1,9 +1,10 @@
 {% load static %}
 {% load dsrc_tags %}
 {% block js %}
-    <script src="{% static 'assets/js/components/DsrcForm.js' %}" type="module"></script>
+    <script src="{% static 'assets/js/components/DsrcFormValidator.js' %}"
+            type="module"></script>
 {% endblock %}
-<div x-data="DsrcForm({{ form_id }}, formData)"  x-init="init">
+<div x-data="DsrcFormValidator({{ form_id }}, formData)"  x-init="init">
     <form class="fr-mb-0" id="{{ form.id }}">
         {% csrf_token %}
         <fieldset class="fr-mb-0 fr-fieldset"

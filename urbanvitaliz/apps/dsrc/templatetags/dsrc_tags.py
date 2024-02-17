@@ -8,9 +8,14 @@ This file is largely adapted from the work done on the project `django-dsfr`, in
 What changes from `django-dsfr`:
 
 - this library uses `dsrc` prefixes instead of `dsfr`
-- the folder structure for templates differs. For mode details on folder structure please refer to `urbanvitaliz/apps/dsrc/README.md`
+- the folder structure for templates differs. For more details on folder structure please refer to `urbanvitaliz/apps/dsrc/README.md`
+- templatetag parameters change as follows:
+    - `classes` instead of `extra_classes` are used to override DSFR / DSRC with site specific styles
+    - the following parameters are used to generate the corresponding DSFR class in templates, where appropriate:
+        - "size", "variant", "color", "icon", "align", "title", "orientation" and "ratio"
+        - see templatetag definitions for more details
 
-Templatetag parameters are kept as-is from `django-dsfr` definitions in order to retain compatibility with that project.
+Other templatetag parameters are kept as-is from `django-dsfr` definitions.
 
 authors: patricia.boh@beta.gouv.fr
 created: 2024-01-31 11:19:06 CEST
