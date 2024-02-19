@@ -6,7 +6,7 @@ import scss from 'rollup-plugin-scss';
 export default {
 	input: 'src/lib/styles/scss/tokens/index.js',
 	// The destination for our bundled CSS (here: the Django project's root `static` folder)
-	output: { dir: '../../static/assets/css/', format: 'esm' },
+	output: { dir: './dist/css/', format: 'esm' },
 	plugins: [
 		scss({
 			fileName: 'dsrc-csstokens.css',

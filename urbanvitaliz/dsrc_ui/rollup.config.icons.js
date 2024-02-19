@@ -43,7 +43,7 @@ export default {
 		)
 	},
 	output: {
-		dir: '../../static/',
+		dir: './dist/',
 		format: 'esm',
 		assetFileNames: '[name][extname]'
 	},

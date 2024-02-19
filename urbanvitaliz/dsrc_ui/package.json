@@ -7,10 +7,11 @@
 	"files": [
 		"dist"
 	],
-	"module": "./dist/dsrc-ui.js",
+	  "module": "./dist/js/dsrc-ui.js",
+    "main" : "./dist/js/dsrc-ui.js",
 	"exports": {
 		".": {
-			"import": "./dist/dsrc-ui.js"
+			"import": "./dist/js/dsrc-ui.js"
 		}
 	},
 	"scripts": {
@@ -45,7 +46,7 @@
 	],
 	"dependencies": {
 		"@gouvfr/dsfr": "^1.11.0",
-		"alpinejs": "^3.13.5"
+		"alpinejs": "^3.10.1"
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "^25.0.7",

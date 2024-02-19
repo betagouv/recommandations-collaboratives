@@ -8,14 +8,14 @@ import jitProps from 'postcss-jit-props';
  */
 export default {
 	input: 'src/lib/styles/scss/core/index.js',
-	output: { dir: '../../static/assets/css/', format: 'esm' },
+	output: { dir: './dist/css/', format: 'esm' },
 	plugins: [
 		scss({
 			fileName: 'dsrc-csscore.css',
 			processor: () =>
 				postcss([
 					jitProps({
-						files: ['../../static/assets/**/*.css']
+						files: ['./dist/**/*.css']
 					}),
 					autoprefixer()
 				]),

@@ -21,6 +21,11 @@ urlpatterns = [
         name="projects-onboarding",
     ),
     path(
+        r"onboarding-experiment/",
+        views.onboarding_experiment,
+        name="projects-onboarding",
+    ),
+    path(
         r"onboarding/prefill/",
         views.create_project_prefilled,
         name="projects-project-prefill",

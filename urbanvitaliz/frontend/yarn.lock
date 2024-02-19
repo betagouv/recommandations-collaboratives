@@ -191,6 +191,11 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.56.0.tgz#ef20350fec605a7f7035a01764731b2de0f3782b"
   integrity sha512-gMsVel9D7f2HLkBma9VbtzZRehRogVRfbr++f06nL2vnCGCNlzOD+/MUov/F4p8myyAHspEhVobgjpX64q5m6A==
 
+"@gouvfr/dsfr@^1.11.0":
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/@gouvfr/dsfr/-/dsfr-1.11.1.tgz#6fb86026e7d53fedcec2f1d481bf6c4c24d3e787"
+  integrity sha512-t6rxZ0DDQpuex9Izpnm1wnPIgJGukZKQenPlU+PKElKGN9HvFfI3qbV5VH1uqE2+50+JORNJKJZSdYUru9stig==
+
 "@humanwhocodes/config-array@^0.11.13":
   version "0.11.14"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.14.tgz#d78e481a039f7566ecc9660b4ea7fe6b1fec442b"
@@ -515,7 +520,7 @@ ajv@^8.0.1:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-alpinejs@^3.10.2:
+alpinejs@^3.10.1, alpinejs@^3.10.2:
   version "3.13.5"
   resolved "https://registry.yarnpkg.com/alpinejs/-/alpinejs-3.13.5.tgz#c06f067e847a295085b4c6f76c42a6a35499d953"
   integrity sha512-1d2XeNGN+Zn7j4mUAKXtAgdc4/rLeadyTMWeJGXF5DzwawPBxwTiBhFFm6w/Ei8eJxUZeyNWWSD9zknfdz1kEw==
@@ -1040,6 +1045,12 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
+
+"dsrc_ui@file:../dsrc_ui":
+  version "0.1.0"
+  dependencies:
+    "@gouvfr/dsfr" "^1.11.0"
+    alpinejs "^3.10.1"
 
 eastasianwidth@^0.2.0:
   version "0.2.0"

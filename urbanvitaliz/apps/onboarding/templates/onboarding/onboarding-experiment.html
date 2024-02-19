@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block js %}
+    {% vite_asset 'js/apps/onboarding.js' %}
+{% endblock %}
+
+
+
+
+{% block title %} | Solliciter l'équipe {{ request.site.name }}{% endblock %}
+
+{% block og_title %} | Solliciter l'équipe {{ request.site.name }}{% endblock %}
+
+{% block page_title %}Solliciter {{ request.site }}{% endblock %}
+
+{% block tagline %}
+    Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
+{% endblock %}
+
+{% block content %}
+    <div x-data="DsrcFormValidator('id-experiment-dsrc-form', {{ form_data|safe }}, 'ValidationDsrcForm')"
+         x-init="init">{% crispy experiment_form %}</div>
+{% endblock %}

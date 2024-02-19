@@ -29,8 +29,12 @@ const config = {
 		},
 		rollupOptions: {
 			plugins: [commonjs({ transformMixedEsModules: true })],
+			external: [
+				"alpinejs",
+			        "@gouvfr/dsfr/dist/dsfr.module"
+			],
 			output: {
-				dir: '../../static/assets/js/',
+				dir: path.resolve('./dist/js/'),
 				format: 'esm',
 				chunkFileNames: undefined
 			}

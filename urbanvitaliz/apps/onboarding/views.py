@@ -110,16 +110,114 @@ def onboarding(request):
         if is_new_user:
             # new user first have to setup her password and then complete the project location before the survey
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            next_args_for_project_location = urlencode({"next": reverse("survey-project-session", args=(project.pk,))})
+            next_args_for_project_location = urlencode(
+                {"next": reverse("survey-project-session", args=(project.pk,))}
+            )
             next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
             next_args = urlencode({"next": next_url})
             return redirect(f"{reverse('home-user-setup-password')}?{next_args}")
         else:
             # go to project location form before starting survey
-            next_args = urlencode({"next": reverse("survey-project-session", args=(project.pk,))})
-            return redirect(f"{reverse('projects-project-location', args=(project.pk,))}?{next_args}")
+            next_args = urlencode(
+                {"next": reverse("survey-project-session", args=(project.pk,))}
+            )
+            return redirect(
+                f"{reverse('projects-project-location', args=(project.pk,))}?{next_args}"
+            )
 
     return render(request, "onboarding/onboarding.html", locals())
+
+
+########################################################################
+# User driven onboarding for a new project
+########################################################################
+
+
+def onboarding_experiment(request):
+    """Return the onboarding page and process onboarding submission"""
+
+    # if we're back from login page restore data already entered
+    existing_data = request.session.get("onboarding_existing_data")
+
+    # Fetch the onboarding form associated with the current site
+    form = forms.ExperimentFormUsingDsrc(request.POST or None, initial=existing_data)
+
+    form_data = {}
+    for field in form:
+        value = field.value() if field.value() is not None else ""
+        form_data[field.html_name] = {"value": value}
+
+    # onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
+
+    # Add fields in JSON to dynamic form rendering field.
+    # form.fields["response"].add_fields(onboarding_instance.form)
+
+    if request.method == "POST" and form.is_valid():
+        # NOTE we may check for known user not logged before valid form
+        email = (
+            request.user.username
+            if request.user.is_authenticated
+            else form.cleaned_data.get("email").lower()
+        )
+
+        user, is_new_user = auth.User.objects.get_or_create(
+            username=email, defaults={"email": email}
+        )
+
+        if not is_new_user and not request.user.is_authenticated:
+            # user exists but is not currently logged in,
+            # save data, log in, and come back to complete
+            request.session["onboarding_existing_data"] = form.cleaned_data
+            login_url = reverse("account_login")
+            next_args = urlencode({"next": reverse("projects-onboarding")})
+            return redirect(f"{login_url}?{next_args}")
+
+        user = update_user(request.site, user, form.cleaned_data)
+
+        project = create_project_for_user(
+            user=user, data=form.cleaned_data, status="DRAFT"
+        )
+
+        project.sites.add(request.site)
+
+        onboarding_response = form.save(commit=False)
+        # onboarding_response.onboarding = onboarding_instance
+        onboarding_response.project = project
+        onboarding_response.save()
+
+        assign_collaborator(user, project, is_owner=True)
+
+        create_initial_note(request.site, onboarding_response)
+
+        notify_new_project(request.site, project, user)
+        email_owner_of_project(request.site, project, user)
+
+        refresh_user_projects_in_session(request, user)
+
+        # cleanup now useless onboarding existing data if present
+        if "onboarding_existing_data" in request.session:
+            del request.session["onboarding_existing_data"]
+
+        if is_new_user:
+            # new user first have to setup her password and then complete the project location before the survey
+            log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
+            next_args_for_project_location = urlencode(
+                {"next": reverse("survey-project-session", args=(project.pk,))}
+            )
+            next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
+            next_args = urlencode({"next": next_url})
+            return redirect(f"{reverse('home-user-setup-password')}?{next_args}")
+        else:
+            # go to project location form before starting survey
+            next_args = urlencode(
+                {"next": reverse("survey-project-session", args=(project.pk,))}
+            )
+            return redirect(
+                f"{reverse('projects-project-location', args=(project.pk,))}?{next_args}"
+            )
+
+    context = {"form_data": form_data, "experiment_form": form}
+    return render(request, "onboarding/onboarding-experiment.html", context)
 
 
 ########################################################################
@@ -356,5 +454,6 @@ def invite_user_to_project(
         ),
         extra_tags=["email"],
     )
+
 
 # eof
