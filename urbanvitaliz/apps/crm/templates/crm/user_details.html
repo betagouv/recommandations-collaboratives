@@ -8,6 +8,10 @@
 {% load hijack %}
 {% load phone_filters %}
 
+{% block title %}
+    {{ crm_user.get_full_name }} - CRM
+{% endblock %}
+
 {% block js %}
 {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}

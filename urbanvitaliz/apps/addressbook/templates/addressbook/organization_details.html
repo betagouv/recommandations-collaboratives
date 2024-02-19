@@ -4,6 +4,9 @@
 {% load guardian_tags %}
 {% load phone_filters %}
 
+{% block title %}
+    {{ organization.name }} {{ block.super }}
+{% endblock %}
 
 {% block content %}
 
