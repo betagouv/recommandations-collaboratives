@@ -11,7 +11,7 @@
 {% block js %}
   {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}
-{% block title %}| Tableau de bord{% endblock %}
+{% block title %} CRM {% endblock %}
 {% block content %}
   {% get_obj_perms request.user for request.site as "user_site_perms" %}
   {% is_staff_for_current_site request.user as is_staff %}
