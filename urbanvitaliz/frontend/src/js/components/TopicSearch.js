@@ -6,7 +6,7 @@ function TopicSearch(currentTopic, restrict_to=null) {
         topic: '',
         results: [],
         restrict_to: null,
-        delete: false,
+        deleted: false,
         async init() {
             this.topic = currentTopic
             this.restrict_to = restrict_to
@@ -40,7 +40,7 @@ function TopicSearch(currentTopic, restrict_to=null) {
         },
 
         handleDeleteClick() {
-            this.delete = ! this.delete
+            this.deleted = !this.deleted
         }
     }
 }
