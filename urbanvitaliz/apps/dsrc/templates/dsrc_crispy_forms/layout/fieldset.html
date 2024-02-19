@@ -1,0 +1,9 @@
+<fieldset {% if fieldset.css_id %}id="{{ fieldset.css_id }}"{% endif %}
+          {% if fieldset.errors %}aria-labelledby="{{ fieldset.css_id }}-error-legend"{% endif %}
+          class="fr-fieldset{% if fieldset.css_class %} {{ fieldset.css_class }}{% endif %}{% if fieldset.errors %} fr-fieldset--error{% endif %}">
+    <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
+            {% if fieldset.errors %}id="{{ fieldset.css_id }}-error-legend"{% endif %}>
+        <h6>{{ legend|safe }}</h6>
+    </legend>
+    {{ fields|safe }}
+</fieldset>

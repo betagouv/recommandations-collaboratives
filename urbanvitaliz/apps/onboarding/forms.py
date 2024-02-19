@@ -15,7 +15,6 @@ from django import forms
 
 from . import models
 
-
 ##################################################
 # Notes
 ##################################################
@@ -76,7 +75,6 @@ class OnboardingResponseWithCaptchaForm(OnboardingResponseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         # Skip captcha during tests
         if "PYTEST_CURRENT_TEST" in os.environ:
             self.fields.pop("captcha")
@@ -90,6 +88,5 @@ class SelectCommuneForm(forms.Form):
         self.fields["commune"] = forms.ModelChoiceField(
             queryset=communes, widget=forms.RadioSelect, label="Votre commune :"
         )
-
 
 # eof

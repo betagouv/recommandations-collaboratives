@@ -1,0 +1,9 @@
+<select x-model="form['{{ field.html_name }}'].value"
+        class="fr-select {{ field.field.widget.attrs.classes }}"
+        id="{{ field.id_for_label }}"
+        name="{{ field.html_name }}"
+        {% if field.field.required %}required{% endif %}
+        {% if field.field.disabled %}disabled{% endif %}
+        data-test="{{ field.field.widget.attrs.input_test_id }}">
+    {% for value, label in field.field.choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+</select>

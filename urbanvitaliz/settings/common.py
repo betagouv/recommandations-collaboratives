@@ -63,9 +63,11 @@ INSTALLED_APPS = [
     "captcha",
     "ordered_model",
     "dynamic_forms",
+    "crispy_forms",
     "watson",
     "phonenumber_field",
     "cookie_consent",
+    "urbanvitaliz.apps.dsrc",
     "urbanvitaliz.apps.onboarding",
     "urbanvitaliz.apps.home",
     "urbanvitaliz.apps.projects",
@@ -127,6 +129,7 @@ TEMPLATES = [
             ],
             "libraries": {
                 "common_tags": "urbanvitaliz.templatetags.common_extra",
+                "dsrc_tags": "urbanvitaliz.apps.dsrc.templatetags.dsrc_tags",
             },
         },
     },
@@ -135,6 +138,9 @@ TEMPLATES = [
 DBTEMPLATES_USE_CODEMIRROR = True
 
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ('dsrc_crispy_forms')
+CRISPY_TEMPLATE_PACK = 'dsrc_crispy_forms'
 
 WSGI_APPLICATION = "urbanvitaliz.wsgi.application"
 
@@ -296,6 +302,7 @@ ACCOUNT_FORMS = {
 
 # Django vite
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
+# DJANGO_VITE_ASSETS_PATH = BASE_DIR / "dsrc_ui/dist" # necessary for dsrc library development
 STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 
 

@@ -357,5 +357,4 @@ def invite_user_to_project(
         extra_tags=["email"],
     )
 
-
 # eof

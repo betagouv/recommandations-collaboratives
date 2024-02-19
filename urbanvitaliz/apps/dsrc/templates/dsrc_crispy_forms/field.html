@@ -1,0 +1,71 @@
+{% load crispy_forms_field %}
+{% if field.is_hidden %}
+    {{ field }}
+{% else %}
+    <div id="field_{{ field.auto_id }}"
+         data-test="{% if not field|is_password %}{{ field.field.widget.attrs.field_test_id }}{% endif %}"
+         class="fr-fieldset__element{% if wrapper_class %} {{ wrapper_class }}{% endif %}{% if field|is_checkbox %} checkbox{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}{% if field.field.widget.input_type == 'password' %} fr-password{% endif %}">
+        {% if field|is_checkboxselectmultiple %}
+            {% include "dsrc/core/blocks/inputs/input_checkbox_group.html" %}
+        {% elif field|is_radioselect %}
+            {% include "dsrc/core/blocks/inputs/input_radio_group.html" %}
+        {% elif field|is_password %}
+            {% include "dsrc/core/blocks/inputs/input_password.html" %}
+        {% else %}
+            <div class="{% if field.field.widget.input_type == 'text' or field.field.widget.input_type == 'email' %}fr-input-group{% else %} fr-{{ field.field.widget.input_type }}-group{% endif %}{% if field.errors %} fr-input-group--error{% endif %}{% if field.field.is_valid %} fr-input-group--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }} fr-{{ field.field.widget.input_type }}-group--{{ field.field.widget.attrs.size }} {% endif %} {{ field.field.widget.attrs.classes }}"
+                 :class="`fr-input-group--${form['{{ field.html_name }}'].valid_class}`">
+                {% if field.label %}
+                    {% if field.field.widget.input_type == "checkbox" %}
+                        {% include "dsrc/core/blocks/inputs/input_checkbox.html" %}
+                    {% endif %}
+                    <label {% if not fake_field %}for="{{ field.id_for_label }}"{% endif %}
+                           class="fr-label">
+                        {{ field.label|safe }}
+                        {% if field.field.help_text %}<span class="fr-hint-text">{{ field.field.help_text }}</span>{% endif %}
+                    </label>
+                {% endif %}
+                {% if not field|is_checkbox %}
+                    {% include "dsrc_crispy_forms/layout/baseinput.html" %}
+                {% endif %}
+                {% if field.field.widget.attrs.message_group %}
+                    <div class="fr-messages-group"
+                         id="{{ field.id_for_label }}-input-messages"
+                         aria-live="assertive">
+                        <p class="fr-message" id="{{ field.id_for_label }}-input-message">
+                            {{ field.field.widget.attrs.message_group.help_text }}
+                        </p>
+                        {% for message in field.field.widget.attrs.message_group.messages %}
+                            <p class="fr-message fr-message--info"
+                               id="{{ field.id_for_label }}-input-message-info-{{ forloop.counter }}">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if form.cleaned_data.js_enabled == 'false' and field.error_messages %}
+                    <!-- Display server-side validation errors here -->
+                    {% for error in field.error_messages %}
+                        <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"
+                           class="fr-error-text">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+                <ul x-show="fieldHasError('{{ field.html_name }}')"
+                    class="fr-messages-group"
+                    id="{{ field.id_for_label }}-desc-error"
+                    aria-live="polite">
+                    <template x-for="(error, index) in form['{{ field.html_name }}'].errors"
+                              :key="index">
+                        <!-- Display client-side validation errors here -->
+                        <li id="`error_${index}_{{ field.auto_id }}`"
+                            x-text="error"
+                            class="fr-error-text">{{ error }}</li>
+                    </template>
+                </ul>
+                {% if field.valid_text %}
+                    <p id="{{ field.id_for_label }}-desc-valid" class="fr-valid-text">{{ field.valid_text }}</p>
+                {% endif %}
+            </div>
+            {% if field.field.widget.input_type == "password" %}
+                {% include "dsrc/core/blocks/inputs/input_show_password.html" %}
+            {% endif %}
+        {% endif %}
+    </div>
+{% endif %}

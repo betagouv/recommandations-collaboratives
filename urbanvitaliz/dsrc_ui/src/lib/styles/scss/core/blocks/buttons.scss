@@ -1,0 +1,26 @@
+.dsrc-color--primary {
+	--background-action-high-blue-france: var(--dsrc-color-primary);
+	--border-action-high-blue-france: var(--dsrc-color-primary);
+	--hover-tint: var(--dsrc-color-primary-hover);
+	--active-tint: var(--dsrc-color-primary-active);
+	--text-action-high-blue-france: var(--dsrc-color-primary);
+	box-shadow: inset 0 0 0 1px var(--border-action-high-blue-france);
+}
+
+.dsrc-color--primary:hover {
+	color: var(--text-inverted-blue-france);
+}
+
+.dsrc-color--secondary {
+	--background-action-high-blue-france: var(--dsrc-color-secondary);
+	--border-action-high-blue-france: var(--dsrc-color-secondary);
+	--hover-tint: var(--dsrc-color-secondary-hover);
+	--active-tint: var(--dsrc-color-secondary-active);
+}
+
+.dsrc-color--tertiary {
+	--background-action-high-blue-france: var(--dsrc-color-tertiary);
+	--border-action-high-blue-france: var(--dsrc-color-tertiary);
+	--hover-tint: var(--dsrc-color-tertiary-hover);
+	--active-tint: var(--dsrc-color-tertiary-active);
+}

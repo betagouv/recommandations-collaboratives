@@ -5,7 +5,12 @@
 		"target": "ES2020",
 		"lib": [
 			"esnext",
-		]
+		],
+		"paths": {
+			"dsrc-ui": [
+				"./dist/dsrc-ui.js",
+			]
+		},
 	},
 	"include": [
 		"./src/**/*",

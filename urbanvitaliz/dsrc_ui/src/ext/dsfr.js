@@ -1,5 +1,3 @@
-import * as button from '@gouvfr/dsfr/dist/component/button/button.module';
+import * as dsfr from '@gouvfr/dsfr/dist/dsfr.module';
 
-export default {
-	button
-};
+export default dsfr;

@@ -51,7 +51,7 @@ def _load_asset(rel_file_path):
 
 csscore = _load_asset("css/dsrc-csscore.css")
 csstokens = _load_asset("css/dsrc-csstokens.css")
-button_component = _load_asset("components/DsrcButton.js")
+button_component = _load_asset("index.js")
 # print(button_component)
 # print(csscore.data)
 
