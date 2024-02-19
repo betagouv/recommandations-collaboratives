@@ -15,10 +15,12 @@ Les resources prises en charge par le paquet sont:
 
 - intégration de modules externes JavaScript et CSS (sousdossiers `src/**/ext`)
 - modules JavaScript (`src/lib/components`)
-- feuilles de style (`src/lib/styles/scss/core`, compilées en CSS dans le dossier `static` en sortie)
-- surcharges de variables CSS (`src/lib/styles/scss/tokens`, compilées en CSS dans le dossier `static` en sortie)
+- feuilles de style (`src/lib/styles/scss/core`, )
+- surcharges de variables CSS (`src/lib/styles/scss/tokens`)
 - jeux de polices (`src/lib/fonts`)
 - icônes (`src/lib/icons`)
+
+Toutes ces bibliothèques sont copiées ou transpilées dans le dossier dans le dossier `static` en sortie
 
 ## Prise en main
 
@@ -89,6 +91,26 @@ Les scripts doivent être préfixés de `npm run` (ou `yarn` ou `pnpm`)
 - **config :** `rollup.config.icons.js`
 - **scripts :** `build:icons`
 
+#### Ajout d'icônes
+
+Les icones utilisés par la librairie DSFR et DSRC sont rendus grace à des règles CSS.
+Les fichiers SVG source doivent être placés dans le sous dossier `icons` afin d'être détectés par Rollup pour le build.
+
+Si les icônes sont issus du DSFR:
+
+- copier le fichier `svg` de l'icône depuis `node_modules/@gouvfr/dsrf/dist/icons/*/`
+- il faut garder la structure de répertoires de `dsfr`. Ainsi, si l'icone se trouve dans le sous-dossier `logo`, alors il faut créer le sous-dossier `icons/logo` si celui-ci n'existe pas. Ceci permet au CSS issu de DSFR d'avoir accès aux icônes dans les chemins attendus.
+
+Si les icônes sont spécifiques à `dsrc`:
+
+- ajouter le fichier `svg` de l'icône dans le sous dossier `icons/dsrc`
+- ajouter la règle CSS correspondante dans le fichier `src/lib/styles/scss/core/blocks/icons`
+
+Si les icônes appartiennent à une bibliothèque externe, par exemple `remix-icon`
+
+- ajouter le fichier `svg` de l'icône dans le sous dossier `icons/ext`
+- ajouter la règle CSS correspondante dans le fichier `src/lib/styles/scss/core/ext/remix-icon.scss`
+
 ## CI
 
 Un script `build:ci` permet de produire des assets sans utiliser les scripts `build:fonts` et `build:icons`. Ceci permet d'éviter de copier inutilement des assets qui ne changeront pas pendant des longues périodes.
@@ -97,7 +119,7 @@ TODO: utiliser le hash du bundle pour switcher vers le script `build` complet lo
 
 ## Validation des Formulaires
 
-Un formulaire rendu en Django peut être agrémenté de la validation côté client en utilisant le composant `DsrcForm` qui prend en paramètre l'`id` du form, l'objet `form_data` fourni par le contexte du Template Django, et le nom de la fonction de validation à utiliser.
+Un formulaire rendu en Django peut être agrémenté de la validation côté client en utilisant le composant `DsrcFormValidator` qui prend en paramètre l'`id` du form, l'objet `form_data` fourni par le contexte du Template Django, et le nom de la fonction de validation à utiliser.
 
 Pour définir la fonction de validation du formulaire:
 
@@ -105,7 +127,7 @@ Pour définir la fonction de validation du formulaire:
 - ajouter le schéma dans le fichier `src/ext/ajv.cjs`
 - lancer le script `build:ajv` qui généréra la fonction de validation
 
-Lors du build de la bibliohèque `dsrc_ui`, les fonctions de validation définies par les schémas seront prêtes à être utilisées par `DsrcForm` dans le tempate Django.
+Lors du build de la bibliohèque `dsrc_ui`, les fonctions de validation définies par les schémas seront prêtes à être utilisées par `DsrcFormValidator` dans le tempate Django.
 
 Plus d'informations sur AJV:
 

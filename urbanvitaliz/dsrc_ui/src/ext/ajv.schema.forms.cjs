@@ -120,16 +120,16 @@ const schemaFormInputs = {
 };
 
 /**
- * Validation schema for the form: DsrcForm
+ * Validation schema for the form: DsrcFormValidator
  */
-const schemaDsrcForm = {
-	$id: '#/definitions/DsrcForm',
+const schemaDsrcFormValidator = {
+	$id: '#/definitions/DsrcFormValidator',
 	type: 'object',
 	properties: {
 		sample_name: { $ref: '#/definitions/text' },
 		sample_phone: { $ref: '#/definitions/phone' },
 		sample_email: { $ref: '#/definitions/email' },
-		sample_password: { $ref: '#/definitions/password' }, // this only validates required length, not password strength
+		sample_password: { $ref: '#/definitions/password' },
 		sample_postcode: { $ref: '#/definitions/postcode' },
 		sample_description: { $ref: '#/definitions/textarea' },
 		sample_checkbox: { $ref: '#/definitions/checkbox' },
@@ -142,4 +142,4 @@ const schemaDsrcForm = {
 	definitions: schemaFormInputs
 };
 
-module.exports = { schemaFormInputs, schemaDsrcForm };
+module.exports = { schemaFormInputs, schemaDsrcFormValidator };

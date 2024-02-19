@@ -17,17 +17,6 @@ from urbanvitaliz.apps.dsrc.forms import DsrcBaseForm
 
 from . import models
 
-
-def set_autofocus_on_first_error(self):
-	"""
-	Sets the autofocus on the first field with an error message.
-	Not included in the __init__ by default because it can cause some side effects on
-	non-standard fields/forms.
-	"""
-	for field in self.errors.keys():
-		self.fields[field].widget.attrs.update({"autofocus": ""})
-		break
-
 ##################################################
 # Notes
 ##################################################
@@ -91,7 +80,7 @@ class OnboardingResponseWithCaptchaForm(OnboardingResponseForm):
         # Skip captcha during tests
         if "PYTEST_CURRENT_TEST" in os.environ:
             self.fields.pop("captcha")
-            
+
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
 

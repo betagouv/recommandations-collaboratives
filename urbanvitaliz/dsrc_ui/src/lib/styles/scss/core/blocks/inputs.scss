@@ -3,9 +3,10 @@
 	--border-plain-grey: var(--dsrc-color-primary);
 }
 
+// override DSFR background-image for now. TODO : set DSRC background-image to align with DSRF radio design
 .dsrc-radio-group input[type="radio"]  {
 	accent-color: var(--dsrc-color-primary);
-	opacity: 1; // override DSFR background-image for now. TODO : set DSRC background-image to align with DSRF radio design
+	opacity: 1;
 }
 
 .dsrc-radio-group input[type="radio"] + label::before,
@@ -13,12 +14,14 @@
 	display: none;
 }
 
-.dsrc-checkbox-group { // necessary to fix checkbox input accessibility
+// necessary to fix checkbox input accessibility
+.dsrc-checkbox-group {
 	position: relative;
 	width: fit-content;
 }
 
-.dsrc-input input[type="checkbox"], // necessary to override password checkbox styles &  fix checkbox input accessibility
+// necessary to override password checkbox styles &  fix checkbox input accessibility
+.dsrc-input input[type="checkbox"],
 .dsrc-checkbox-group input[type="checkbox"]{
 	position: absolute;
 	z-index: 1;
@@ -27,7 +30,8 @@
 	left: 0;
 }
 
-.dsrc-input input[type="checkbox"]:checked + label::before, // necessary to override password checkbox styles
+// necessary to override password checkbox styles (color)
+.dsrc-input input[type="checkbox"]:checked + label::before,
 .dsrc-checkbox-group input[type="checkbox"]:checked + label::before {
 	--border-active-blue-france: var(--dsrc-color-primary);
 	background-color: var(--dsrc-color-primary);

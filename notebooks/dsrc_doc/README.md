@@ -9,13 +9,13 @@ Le code su système de design DSRC est composé de 4 modules:
 - `dsrc_doc` : contient la documentation interactive de la bibliothèque sous forme de Jupyter Notebooks (c'est ici!)
 - `dsrc_ui` : contient les fichiers source CSS et JavaScript de la librairie de composants
 - `dsrc` : Django app qui fournit des templates Django réutilisables basés sur DSFR avec surcharges DSRC
-- `dsrc_tests` : contient les tests unitaires et d'intégration des composants (TBD)
+- `dsrc_tests` : contient les tests unitaires et d'intégration des composants (TODO: pour le moment les tests sont dans `frontend_tests`)
 
 L'arborescence de ces modules dans le projet est la suivante:
 
 ```sh
 .
-|-- dsrc_tests
+|-- dsrc_tests // TODO
 |-- notebooks
 |   `-- dsrc_doc
 `-- urbanvitaliz
@@ -150,7 +150,7 @@ HTML(template.render(context)) # Affiche le template
 
 ### Controle de version de Jupyter Notebooks
 
-Afin de ne pas surcharger le dépôt avec des données générées par la doc, ce module privilégie une gestion de versions de Jupyter Notebooks sous format de fichiers `.py` avec le paquet `jupoytext`, ce qui rend l'usage notebooks facilement compatible avec git.
+Afin de ne pas surcharger le dépôt avec des données générées par la doc, ce module privilégie une gestion de versions de Jupyter Notebooks sous format de fichiers `.py` avec le paquet `jupitext`, ce qui rend l'usage notebooks facilement compatible avec git.
 
 - [jupytext](https://jupytext.readthedocs.io/en/latest/)
 

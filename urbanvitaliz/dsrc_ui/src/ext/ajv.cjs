@@ -21,18 +21,19 @@ const AJV_OPTIONS = {
 	code: { source: true, esm: true }
 };
 
+// Add your Schemas here
 const FormInputs = schemaForms.schemaFormInputs;
-const DsrcForm = schemaForms.schemaDsrcForm;
+const DsrcFormValidator = schemaForms.schemaDsrcFormValidator;
 const ajv = new Ajv({
 	...AJV_OPTIONS,
-	schemas: [FormInputs, DsrcForm]
+	schemas: [FormInputs, DsrcFormValidator]
 });
 
 addFormats(ajv);
 addErrors(ajv);
 
 let moduleCode = standaloneCode(ajv, {
-	ValidationDsrcForm: '#/definitions/DsrcForm' // Validation function for the DsrcForm schema
+	DsrcFormValidationFunction: '#/definitions/DsrcFormValidator' // Validation function for the DsrcFormValidator schema
 });
 
 // Now you can write the module code to file
