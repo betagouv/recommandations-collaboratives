@@ -87,6 +87,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "comments_count",
             "topic",
         ]
+        read_only_fields = ["created_on", "updated_on", "created_by"]
 
     created_by = UserSerializer(read_only=True, many=False)
 
