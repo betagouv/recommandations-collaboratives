@@ -18,7 +18,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
-from recoco.utils import TrigramSimilaritySearchFilter, get_group_for_site
+from recoco.utils import (
+    TrigramSimilaritySearchFilter,
+    get_group_for_site,
+    has_perm,
+    has_perm_or_403,
+)
 
 from .. import models, signals
 from ..serializers import (
@@ -47,12 +52,18 @@ class ProjectDetail(APIView):
 
     def get(self, request, pk, format=None):
         p = self.get_object(pk)
+        has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
+            request.user, "view_project", p
+        )
         context = {"request": request}
         serializer = ProjectSerializer(p, context=context)
         return Response(serializer.data)
 
     def patch(self, request, pk, format=None):
         p = self.get_object(pk)
+        has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
+            request.user, "projects.change_location", p
+        )  # need at least one write perm
         context = {"request": request, "view": self, "format": format}
         serializer = ProjectSerializer(
             p, context=context, data=request.data, partial=True
