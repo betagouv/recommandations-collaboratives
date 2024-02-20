@@ -31,7 +31,7 @@ services:
         NODE_VERSION: "lts/*"
     volumes:
       - ..:/workspace:cached
-    working_dir: /workspace/urbanvitaliz/frontend 
+    working_dir: /workspace/recoco/frontend 
     command: bash -c "yarn install && yarn dev"
     ports:
       - 3000:3000
