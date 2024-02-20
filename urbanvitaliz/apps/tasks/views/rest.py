@@ -172,7 +172,7 @@ class TaskNotificationViewSet(
 ########################################################################
 
 
-class IsTaskManager(permissions.BasePermission):
+class IsTaskUser(permissions.BasePermission):
     """
     Custom permission to check if user can manage task on given project
     """
