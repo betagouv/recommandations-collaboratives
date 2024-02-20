@@ -305,7 +305,8 @@ ACCOUNT_FORMS = {
 # Django vite
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
 # DJANGO_VITE_ASSETS_PATH = BASE_DIR / "dsrc_ui/dist" # necessary for dsrc library development
-STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
+DSRC_CSS_PATH = BASE_DIR / "frontend/node_modules/dsrc_ui/dist/css"
+STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH, ("dsrc_ui_css", DSRC_CSS_PATH)]
 
 
 # Phonenumbers
