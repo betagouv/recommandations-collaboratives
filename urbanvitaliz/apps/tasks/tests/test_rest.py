@@ -497,7 +497,7 @@ def test_project_task_followup_create_closed_to_anonymous_user(request):
 
 
 @pytest.mark.django_db
-def test_project_task_followup_create_is_closed_for_simple_auth_user(request):
+def test_project_task_followup_create_not_allowed_for_simple_auth_user(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     project = baker.make(project_models.Project, sites=[site])

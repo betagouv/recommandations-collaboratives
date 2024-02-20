@@ -174,7 +174,7 @@ class TaskNotificationViewSet(
 
 class IsTaskUser(permissions.BasePermission):
     """
-    Custom permission to check if user can manage task on given project
+    Custom permission to check if user can use task on given project
     """
 
     def has_permission(self, request, view):
