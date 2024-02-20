@@ -1,21 +1,18 @@
-# Recoco
+# Recoco (Recommendations Collaboratives)
 
 ## Mission
 
-Recoco est un commun numérique permettant d'outiller une méthodologie de
-recommandation collective se focalisant sur les problématiques complexes
-et nécessitant de multiples expertises sur des temps longs.
+Le logiciel Recoco est un commun numérique permettant d'outiller une méthodologie de Recommandations Collaboratives se focalisant sur les problématiques complexes et nécessitant de multiples expertises sur des temps longs.
 
 
-Historiquement, Recoco est issu de la mission UrbanVitaliz (équipe-projet portée
+Historiquement, le logiciel Recoco est issu de la mission UrbanVitaliz (équipe-projet portée
 par le Cerema), en partenariat avec Beta.gouv.fr et sponsorisé par le Ministère
 de la Transition Ecologique et l'Etablissement Public Foncier du
 Nord-Pas-de-Calais.
 
 ## Logiciel
 
-Il est réalisé en python/django côté moteur et alpinejs/bootstrap/dsfr côté
-interface.
+Il est réalisé en python/django côté moteur et alpinejs/bootstrap/dsfr côté interface.
 
 Il est par nature multi-portails, permettant ainsi d'héberger plusieurs
 thématiques disposant de leur propre espace tout en proposant une porosité entre
@@ -29,17 +26,23 @@ En savoir plus sur http://recoconseil.fr
 
 Deux choix :
 
-1.  Via virtualenv et pip3
+1.  Via virtualenv et uv
 2.  Via Docker
 
 ### Virtualenv
 
-TODO
+Commencez par installer `uv` sur votre machine avec pip ou votre gestionnaire de paquets. Si vous n'avez pas de moyen connu, référez vous à la page de `uv` ( https://github.com/astral-sh/uv ).
 
-### Docker
+Créez et sourcez l'environnement:
+```sh
+uv venv
+source .venv/bin/activate
+```
 
-Les fichiers docker se trouvent à la racine dans le dossier `docker`.
-
+```sh
+uv pip install -r requirements.txt
+uv pip install -r requirements-dev.txt
+```
 #### Configuration de l'applicatif
 
 Copiez le fichier de configuration d'exemple :
@@ -63,6 +66,17 @@ DATABASES = {
 }
 ```
 
+Vous pouvez aussi renseigner les valeurs dans le fichier si vous préférez ne pas utiliser des variables d'environnement.
+
+
+
+### Docker
+
+Les fichiers docker se trouvent à la racine dans le dossier `docker`.
+
+#### Configuration de l'applicatif
+
+Référez vous à la section de Virtualenv, mais limitez vous aux variables d'environnement.
 
 #### Création des conteneurs
 
