@@ -3,6 +3,11 @@
 {% load projects_extra %}
 {% load django_vite %}
 {% load guardian_tags %}
+
+{% block title %}
+    Modifier la localisation du projet - {{ request.site.name }}
+{% endblock %}
+
 {% current_project request.session as project %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% if 'change_location' in user_project_perms %}

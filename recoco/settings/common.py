@@ -132,8 +132,10 @@ TEMPLATES = [
     },
 ]
 
+# DB Templates
 DBTEMPLATES_USE_CODEMIRROR = True
 
+# MULTISITE
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
 
 WSGI_APPLICATION = "recoco.wsgi.application"

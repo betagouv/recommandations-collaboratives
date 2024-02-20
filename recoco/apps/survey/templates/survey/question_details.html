@@ -3,6 +3,11 @@
 {% load sass_tags %}
 {% load humanize %}
 {% load django_vite %}
+
+{% block title %}
+    {{ question.text }} - {{ request.site.name }}
+{% endblock %}
+
 {% block js %}
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock %}
