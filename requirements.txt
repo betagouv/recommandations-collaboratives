@@ -1,29 +1,32 @@
-django==3.2.24
+django>4,<5.0
 ipython
 django-markdownx==4.0.7
 markdown-link-attr-modifier==0.2.1
 
 # django-magicauth fork: Multiple Auth backend support
-git+http://github.com/glibersat/django-magicauth@55eab0b91c95012944933b342748540b2c1b31bf#egg=django-magicauth
+django-magicauth @ git+http://github.com/glibersat/django-magicauth@55eab0b91c95012944933b342748540b2c1b31bf
 
 # Notifications Fork: Sites framework support
-git+https://github.com/glibersat/django-notifications.git@feature/sites-framework#egg=django-notifications-hq
+django-notifications-hq @ git+https://github.com/glibersat/django-notifications.git@feature/sites-framework
 
 # Actstream fork: sites framework support
-git+https://github.com/glibersat/django-activity-stream.git@main#egg=django-activity-stream
+django-activity-stream @ git+https://github.com/glibersat/django-activity-stream.git@django4
 
-git+https://github.com/protoroto/django-multisite.git#egg=django-multisite
-django-ordered-model==3.6
+django-multisite @ git+https://github.com/protoroto/django-multisite.git@feature/add-django4-support
 
-git+https://github.com/jazzband/django-dbtemplates.git@master#egg=django-dbtemplates
+django-dbtemplates @ git+https://github.com/jazzband/django-dbtemplates.git@master
 
-git+https://github.com/jazzband/django-cookie-consent@master#egg=django-cookie-consent
+django-cookie-consent @ git+https://github.com/jazzband/django-cookie-consent@master
 
+# Django 4 patches
+django-tagging@git+https://github.com/nextories/django-tagging.git@bug/usage_for_model_with_filters_none
+
+django-ordered-model==3.7.4
 django_otp==1.3.0
-django-tagging==0.5.0
+
 django-taggit==4.0.0 # move to 5.0
 django-gravatar2
-psycopg2-binary # move to 3.x (dj4+)
+psycopg[binary]>3
 django-leaflet
 django-admin-csvexport==2.2
 djangorestframework==3.14.0

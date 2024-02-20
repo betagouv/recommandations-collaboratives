@@ -5,11 +5,11 @@ indent = "\t" # change indentation level
 exclude = ".venv,venv,.eggs" # override the default set of excluded paths
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "urbanvitaliz.settings.development"
+DJANGO_SETTINGS_MODULE = "recoco.settings.development"
 addopts = "--reuse-db --tb=short -p no:warnings -n auto --maxprocesses 4"
-# addopts = "--cov=urbanvitaliz --cov=test --cov-report=xml --reuse-db --tb=short -p no:warnings -n auto --maxprocesses 4"
+# addopts = "--cov=recoco --cov=test --cov-report=xml --reuse-db --tb=short -p no:warnings -n auto --maxprocesses 4"
 testpaths = [
-    "urbanvitaliz"
+    "recoco"
 ]
 python_files = "tests.py test_*.py *_test.py *_tests.py"
 
@@ -33,4 +33,8 @@ disable = [
 [tool.pylint.design]
 min-public-methods = 1
 
+[tool.bandit]
+exclude_dirs = ['node_modules']
 
+[tool.bandit.assert_used]
+skips = ['*_test.py', '**/test_*.py', '**/tests.py']

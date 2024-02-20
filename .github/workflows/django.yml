@@ -55,7 +55,7 @@ jobs:
           sudo apt-get install python3-gdal
 
       - name: Compile JS
-        working-directory: ./urbanvitaliz/frontend
+        working-directory: ./recoco/frontend
         run: |
           yarn install
           yarn build
@@ -69,7 +69,7 @@ jobs:
 
       - name: Configure
         run: |
-          cp urbanvitaliz/settings/development.py.example urbanvitaliz/settings/development.py
+          cp recoco/settings/development.py.example recoco/settings/development.py
 
       - name: Run Tests
         env:
