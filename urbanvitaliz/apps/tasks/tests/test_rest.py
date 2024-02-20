@@ -451,11 +451,11 @@ def test_project_task_followup_list_closed_for_dissociate_task_and_project(reque
 def test_project_task_followup_list_returns_followups_to_collaborator(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(project_models.Project, sites=[site])
+    project = baker.make(project_models.Project, status="TO_PROCESS", sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
     followup = baker.make(models.TaskFollowup, task=task, status=models.Task.PROPOSED)
 
-    assign_perm("projects.use_tasks", user, project)
+    utils.assign_collaborator(user, project)
 
     client = APIClient()
     client.force_authenticate(user=user)
