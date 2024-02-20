@@ -182,6 +182,21 @@ def test_anonymous_cannot_use_project_detail_api(request, client):
 
 
 @pytest.mark.django_db
+def test_simple_user_cannot_use_project_detail_api(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+    project = create_project_with_notifications(site, user)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-detail", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
 def test_project_detail_contains_project_info(request, client):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
@@ -326,6 +341,27 @@ def test_bad_project_is_reported_by_project_patch_api(client):
 #     response = client.patch(url, data={"unknown": "UNKNOWN"})
 #
 #     assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_project_simple_user_cannot_update_by_project_patch_api(request, client):
+    old_status = "DRAFT"
+    new_status = "READY"
+
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+    project = baker.make(models.Project, sites=[site], status=old_status)
+
+    client = APIClient()
+    client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project.id])
+    response = client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 403
+
+    project.refresh_from_db()
+    assert project.status == old_status
 
 
 @pytest.mark.django_db
