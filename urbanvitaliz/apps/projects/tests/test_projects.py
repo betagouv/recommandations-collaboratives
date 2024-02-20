@@ -1037,13 +1037,13 @@ def test_advisor_joins_trigger_notification_to_all(request, client):
     collaborator = baker.make(auth.User)
     advisor = baker.make(auth.User)
 
-    Recipe(
+    baker.make(
         task_models.TaskRecommendation,
         condition="",
         departments=[
             dept,
         ],
-    ).make()
+    )
 
     project = Recipe(
         models.Project,

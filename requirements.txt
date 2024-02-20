@@ -13,15 +13,15 @@ django-notifications-hq @ git+https://github.com/glibersat/django-notifications.
 django-activity-stream @ git+https://github.com/glibersat/django-activity-stream.git@django4
 
 django-multisite @ git+https://github.com/protoroto/django-multisite.git@feature/add-django4-support
-django-ordered-model==3.7.4
 
 django-dbtemplates @ git+https://github.com/jazzband/django-dbtemplates.git@master
 
 django-cookie-consent @ git+https://github.com/jazzband/django-cookie-consent@master
 
 # Django 4 patches
-django-tagging @ git+https://github.com/bartsanchez/django-tagging@feature/add_support_for_django4
+django-tagging@git+https://github.com/nextories/django-tagging.git@bug/usage_for_model_with_filters_none
 
+django-ordered-model==3.7.4
 django_otp==1.3.0
 
 django-taggit==4.0.0 # move to 5.0
