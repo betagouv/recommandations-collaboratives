@@ -518,7 +518,7 @@ def test_admin_signin_should_not_be_logged(request, client):
 @pytest.mark.django_db
 def test_allauth_signin_should_be_logged(request, client):
     user = baker.make(auth_models.User, email="truc@truc.fr")
-    password = "mon mot de passe"
+    password = "mon mot de passe"  # nosec B105
     user.set_password(password)
     user.save()
 
