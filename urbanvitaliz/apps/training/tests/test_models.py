@@ -18,15 +18,15 @@ from .. import models
 @pytest.mark.django_db
 def test_challenge_is_open_by_default():
     challenge = baker.make(models.Challenge)
-    assert models.Challenge.objects.first() == challenge
-    assert models.Challenge.acquired_objects.count() == 0
+    assert models.Challenge.objects.open().first() == challenge
+    assert models.Challenge.objects.acquired().count() == 0
 
 
 @pytest.mark.django_db
 def test_acquired_challenges_are_identified_in_manager():
     challenge = baker.make(models.Challenge, acquired_on=timezone.now())
-    assert models.Challenge.acquired_objects.first() == challenge
-    assert models.Challenge.objects.count() == 0
+    assert models.Challenge.objects.acquired().first() == challenge
+    assert models.Challenge.objects.open().count() == 0
 
 
 # eof
