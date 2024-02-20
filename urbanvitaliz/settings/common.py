@@ -135,8 +135,10 @@ TEMPLATES = [
     },
 ]
 
+# DB Templates
 DBTEMPLATES_USE_CODEMIRROR = True
 
+# MULTISITE
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ('dsrc_crispy_forms')

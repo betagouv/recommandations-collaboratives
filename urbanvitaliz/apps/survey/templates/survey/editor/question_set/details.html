@@ -2,6 +2,10 @@
 
 {% load static %}
 
+{% block title %}
+    Groupe de questions {{ question_set.survey.name}}
+{% endblock %}
+
 {% block content %}
 
 <div class="col-11 py-5 mx-auto">

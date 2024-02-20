@@ -110,16 +110,23 @@ def onboarding(request):
         if is_new_user:
             # new user first have to setup her password and then complete the project location before the survey
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            next_args_for_project_location = urlencode({"next": reverse("survey-project-session", args=(project.pk,))})
+            next_args_for_project_location = urlencode(
+                {"next": reverse("survey-project-session", args=(project.pk,))}
+            )
             next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
             next_args = urlencode({"next": next_url})
             return redirect(f"{reverse('home-user-setup-password')}?{next_args}")
         else:
             # go to project location form before starting survey
-            next_args = urlencode({"next": reverse("survey-project-session", args=(project.pk,))})
-            return redirect(f"{reverse('projects-project-location', args=(project.pk,))}?{next_args}")
+            next_args = urlencode(
+                {"next": reverse("survey-project-session", args=(project.pk,))}
+            )
+            return redirect(
+                f"{reverse('projects-project-location', args=(project.pk,))}?{next_args}"
+            )
 
     return render(request, "onboarding/onboarding.html", locals())
+
 
 ########################################################################
 # User driven onboarding for a new project
@@ -129,20 +136,16 @@ def onboarding(request):
 def onboarding_experiment(request):
     """Return the onboarding page and process onboarding submission"""
 
-    site_config = get_site_config_or_503(request.site)
-
     # if we're back from login page restore data already entered
     existing_data = request.session.get("onboarding_existing_data")
 
     # Fetch the onboarding form associated with the current site
-    form = forms.ExperimentFormUsingDsrc(
-        request.POST or None, initial=existing_data
-    )
+    form = forms.ExperimentFormUsingDsrc(request.POST or None, initial=existing_data)
 
     form_data = {}
     for field in form:
-            value = field.value() if field.value() is not None else ""
-            form_data[field.html_name] = {"value": value}
+        value = field.value() if field.value() is not None else ""
+        form_data[field.html_name] = {"value": value}
 
     # onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
 
@@ -178,7 +181,7 @@ def onboarding_experiment(request):
         project.sites.add(request.site)
 
         onboarding_response = form.save(commit=False)
-        onboarding_response.onboarding = onboarding_instance
+        # onboarding_response.onboarding = onboarding_instance
         onboarding_response.project = project
         onboarding_response.save()
 
@@ -198,16 +201,22 @@ def onboarding_experiment(request):
         if is_new_user:
             # new user first have to setup her password and then complete the project location before the survey
             log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            next_args_for_project_location = urlencode({"next": reverse("survey-project-session", args=(project.pk,))})
+            next_args_for_project_location = urlencode(
+                {"next": reverse("survey-project-session", args=(project.pk,))}
+            )
             next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
             next_args = urlencode({"next": next_url})
             return redirect(f"{reverse('home-user-setup-password')}?{next_args}")
         else:
             # go to project location form before starting survey
-            next_args = urlencode({"next": reverse("survey-project-session", args=(project.pk,))})
-            return redirect(f"{reverse('projects-project-location', args=(project.pk,))}?{next_args}")
+            next_args = urlencode(
+                {"next": reverse("survey-project-session", args=(project.pk,))}
+            )
+            return redirect(
+                f"{reverse('projects-project-location', args=(project.pk,))}?{next_args}"
+            )
 
-    context = {'form_data': form_data, 'experiment_form': form}
+    context = {"form_data": form_data, "experiment_form": form}
     return render(request, "onboarding/onboarding-experiment.html", context)
 
 
@@ -445,5 +454,6 @@ def invite_user_to_project(
         ),
         extra_tags=["email"],
     )
+
 
 # eof

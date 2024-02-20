@@ -3,6 +3,11 @@
 {% load sass_tags %}
 {% load cookie_consent_tags %}
 {% load static %}
+
+{% block title %}
+    Politique de confidentialité
+{% endblock %}
+
 {% block css %}
     <link href="{% sass_src 'home/css/home/home.scss' %}"
           rel="stylesheet"

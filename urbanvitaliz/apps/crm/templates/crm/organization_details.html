@@ -4,6 +4,9 @@
 {% load static %}
 {% load django_vite %}
 
+{% block title %}
+    {{ organization.name }} - CRM
+{% endblock %}
 
 {% block js %}
 {% vite_asset 'js/apps/crm.js' %}
