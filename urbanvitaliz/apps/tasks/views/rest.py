@@ -199,7 +199,7 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
     serializer_class = TaskFollowupSerializer
     permission_classes = [
         permissions.IsAuthenticated,
-        IsTaskManager,
+        IsTaskUser,
     ]
 
     def get_queryset(self):
