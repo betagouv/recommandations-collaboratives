@@ -15,7 +15,7 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from guardian.core import ObjectPermissionChecker
 from guardian.ctypes import get_content_type
 from guardian.managers import BaseObjectPermissionManager
@@ -292,7 +292,7 @@ ObjectPermissionChecker.get_user_perms = get_user_perms
 def get_local_cache_key_with_site(self, obj):
     ctype = get_content_type(obj)
     site = Site.objects.get_current()
-    return (ctype.id, force_text(obj.pk), force_text(site.pk))
+    return (ctype.id, force_str(obj.pk), force_str(site.pk))
 
 
 ObjectPermissionChecker.original_get_local_cache_key = (

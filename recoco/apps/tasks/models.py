@@ -213,8 +213,7 @@ class Task(OrderedModel):
 
     deleted = models.DateTimeField(null=True, blank=True)
 
-    class Meta:
-        ordering = []
+    class Meta(OrderedModel.Meta):
         verbose_name = "action"
         verbose_name_plural = "actions"
 

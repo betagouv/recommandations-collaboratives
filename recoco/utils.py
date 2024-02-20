@@ -205,8 +205,8 @@ class CastedGenericRelation(GenericRelation):
     def get_joining_columns(self, reverse_join=False):
         return ()
 
-    def get_extra_restriction(self, where_class, alias, remote_alias):
-        cond = super().get_extra_restriction(where_class, alias, remote_alias)
+    def get_extra_restriction(self, alias, remote_alias):
+        cond = super().get_extra_restriction(alias, remote_alias)
         from_field = self.model._meta.pk
         to_field = self.remote_field.model._meta.get_field(self.object_id_field_name)
         lookup = from_field.get_lookup("exact")(

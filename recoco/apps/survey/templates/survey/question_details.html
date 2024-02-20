@@ -95,7 +95,7 @@
                                            name="answer"
                                            value="{{ choice.0 }}"
                                            id="form_answer-{{ forloop.counter }}"
-                                           {% ifequal form.fields.answer.initial choice.0 %}checked{% endifequal %} />
+                                           {% if form.fields.answer.initial == choice.0 %}checked{% endif %} />
                                     {{ form.fields.answer.selected }}
                                 {% endif %}
                                 <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
