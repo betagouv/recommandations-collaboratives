@@ -33,5 +33,8 @@ disable = [
 [tool.pylint.design]
 min-public-methods = 1
 
+[tool.bandit]
+exclude_dirs = ['node_modules']
+
 [tool.bandit.assert_used]
-skips = ['*_test.py', '**/test_*.py']
+skips = ['*_test.py', '**/test_*.py', '**/tests.py']
