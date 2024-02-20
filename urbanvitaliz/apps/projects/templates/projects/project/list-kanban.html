@@ -4,6 +4,11 @@
 {% load notifications_tags %}
 {% load gravatar %}
 {% load sass_tags %}
+
+{% block title %}
+    Tableau de bord administrateur {{ block.super }}
+{% endblock %}
+
 {% block project_list_content %}
     <div x-data="KanbanProjects()">
         <div class="topbar d-flex justify-content-between bg-light border-bottom p-2">

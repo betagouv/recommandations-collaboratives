@@ -3,6 +3,10 @@
 {% load django_vite %}
 {% load static %}
 
+{% block title %}
+    Usage des tags dans le CRM - CRM
+{% endblock %}
+
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     {% vite_asset 'js/apps/tagCloud.js' %}

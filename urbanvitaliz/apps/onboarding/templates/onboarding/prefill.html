@@ -3,9 +3,12 @@
 
 {% load static %}
 
-{% block title %} | Pré-remplir un projet{% endblock %}
+{% block title %}
+    Déposer un projet pour le compte de la collectivité {{ block.super }}
+{% endblock %}
 
-{% block og_title %} | Pré-remplir un projet{% endblock %}
+
+{% block og_title %}Déposer un projet pour le compte de la collectivité {{ block.super }}{% endblock %}
 
 {% block js %}
     {% vite_asset 'js/apps/advisorCreateProject.js' %}

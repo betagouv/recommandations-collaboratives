@@ -7,17 +7,16 @@
 {% load django_vite %}
 {% load guardian_tags %}
 
+{% block title %}
+    Recommandations - {{ block.super }}
+{% endblock %}
+
 {% block js %}
     {% vite_asset 'js/apps/project.js' %}
 {% endblock %}
 
-
 {% block css %}
 <link href="{% sass_src 'projects/css/board.scss' %}" rel="stylesheet" type="text/css" />
-{% endblock %}
-
-{% block title %}
-{{ block.super }} > Recommandation
 {% endblock %}
 
 {% block banner %}
