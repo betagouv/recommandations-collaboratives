@@ -6,10 +6,15 @@ import '../ext/dsfr'; // DSFR (Système de Design de l'État) - JS
 // Initialize AlpineJS
 import './utils/globals';
 
+// Ajv 
+import * as validations from '../ext/ajv.validations.default'
+
+
 //Global Store
 // import './lib/store/forms';
 
 // Global reused components
-import './components/forms/DsrcFormValidator'; // provides form validation for `dsrc_crispy_forms` that have an associated JSON schema
+import DsrcFormValidator from './components/forms/DsrcFormValidator'; // provides form validation for `dsrc_crispy_forms` that have an associated JSON schema
+export default { DsrcFormValidator, validations}
 
 console.log('js main added');

@@ -1,4 +1,4 @@
-import Alpine from 'alpinejs';
+// import Alpine from 'alpinejs';
 import * as validations from '../../../ext/ajv.validations.default';
 
 /**
@@ -8,16 +8,18 @@ import * as validations from '../../../ext/ajv.validations.default';
  * @param {string} validationFunctionName The name of the AJV validation function to use. It should be generated into `ajv.validations.default.js` by the script `build:ajv` (`DsrcFormValidationFunction` is the default validation function for DsrcExampleForm). To Change the default validation function, add the schema for your form to `ajv.schema.forms.cjs` and run `npm run build:ajv`
  * @returns an Alpine component object containing the form data and methods to validate and handle form submission
  */
-export const DsrcFormValidator = (
+function DsrcFormValidator (
 	formId,
 	formData,
 	validationFunctionName = 'DsrcFormValidationFunction'
-) => {
+) {
 	return {
 		form: {},
 		errors: [],
 		ajvValidate: validations[validationFunctionName],
 		async init() {
+      console.log("DsrcFormValidator init");
+      console.log("validations", validations);
 			if (!formData) {
 				// We shouldn't reach this state: the data should be available, or the server should have returned an error before reaching this point and the form should not have been rendered
 				console.error('Error fetching form data');
@@ -68,6 +70,7 @@ export const DsrcFormValidator = (
 			document.getElementById(formId).setAttribute('novalidate', '');
 			// Let the server know that JS is enabled
 			document.getElementById(`${formId}_js_enabled`).value = 'true';
+      console.log("this.ajvValidate", this.ajvValidate);
 		},
 		validate(event) {
 			// debug
@@ -150,6 +153,6 @@ export const DsrcFormValidator = (
 	};
 };
 
-Alpine.data('DsrcFormValidator', DsrcFormValidator);
+// Alpine.data('DsrcFormValidator', DsrcFormValidator);
 
 export default DsrcFormValidator;

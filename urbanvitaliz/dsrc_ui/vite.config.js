@@ -31,7 +31,7 @@ const config = {
 			plugins: [commonjs({ transformMixedEsModules: true })],
 			external: [
 				"alpinejs",
-			        "@gouvfr/dsfr/dist/dsfr.module"
+        "@gouvfr/dsfr/dist/dsfr.module"
 			],
 			output: {
 				dir: path.resolve('./dist/js/'),

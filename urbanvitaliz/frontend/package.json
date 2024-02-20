@@ -20,6 +20,7 @@
 		"axios": "^1.6.0",
 		"d3": "^7.8.4",
 		"d3-cloud": "^1.2.5",
+		"dsrc_ui": "file:../dsrc_ui",
 		"intro.js": "^7.0.1",
 		"js-cookie": "^3.0.1",
 		"leaflet": "^1.9.1",
@@ -30,10 +31,10 @@
 		"md5": "^2.3.0",
 		"prosemirror-model": "^1.18.1",
 		"tiptap-markdown": "^0.6.0",
-		"vite": "^4.5.2",
-		"dsrc_ui": "file:../dsrc_ui"
+		"vite": "^4.5.2"
 	},
 	"devDependencies": {
+		"alpinejs-component": "^1.2.4",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "9.1.0",
 		"postcss": "8.4.33",

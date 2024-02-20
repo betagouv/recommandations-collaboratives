@@ -11,7 +11,9 @@
     "main" : "./dist/js/dsrc-ui.js",
 	"exports": {
 		".": {
-			"import": "./dist/js/dsrc-ui.js"
+			"import": "./dist/js/dsrc-ui.js",
+      "DsrcFormValidator": "./dist/js/components/forms/DsrcFormValidator",
+      "validations": "./dist/js/ajv.validations.default"
 		}
 	},
 	"scripts": {
@@ -20,8 +22,9 @@
 		"dev:csstokens": "rollup --config rollup.config.csstokens.js -w",
 		"dev:csscore": "rollup --config rollup.config.csscore.js -w",
 		"build": "yarn build:icons && yarn build:fonts && yarn build:ci",
-		"build:ci": "yarn build:csstokens && yarn build:csscore && yarn build:ajv && vite build",
-		"build:ajv": "node ./src/ext/ajv.cjs",
+		"build:ci": "yarn build:csstokens && yarn build:csscore && yarn build:ajv && vite build && yarn build:modules",
+		"node:ajv": "node ./src/ext/ajv.cjs",
+		"build:ajv": "yarn node:ajv && rollup --config rollup.config.ajv.js",
 		"build:modules": "rollup --config rollup.config.modules.js",
 		"build:csstokens": "rollup --config rollup.config.csstokens.js",
 		"build:csscore": "rollup --config rollup.config.csscore.js",
