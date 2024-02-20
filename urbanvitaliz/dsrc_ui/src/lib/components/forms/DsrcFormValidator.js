@@ -18,8 +18,6 @@ function DsrcFormValidator (
 		errors: [],
 		ajvValidate: validations[validationFunctionName],
 		async init() {
-      console.log("DsrcFormValidator init");
-      console.log("validations", validations);
 			if (!formData) {
 				// We shouldn't reach this state: the data should be available, or the server should have returned an error before reaching this point and the form should not have been rendered
 				console.error('Error fetching form data');
@@ -68,7 +66,6 @@ function DsrcFormValidator (
 			document.getElementById(formId).setAttribute('novalidate', '');
 			// Let the server know that JS is enabled
 			document.getElementById(`${formId}_js_enabled`).value = 'true';
-      console.log("this.ajvValidate", this.ajvValidate);
 		},
 		validate(event) {
 			// debug

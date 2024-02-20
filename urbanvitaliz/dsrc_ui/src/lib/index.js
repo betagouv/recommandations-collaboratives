@@ -1,10 +1,10 @@
 import 'vite/modulepreload-polyfill'; // needed by django_vite : https://github.com/MrBin99/django-vite/tree/multi-config?tab=readme-ov-file#assets
 
 //  External dependencies
-import '../ext/dsfr'; // DSFR (Système de Design de l'État) - JS
+// import '../ext/dsfr'; // DSFR (Système de Design de l'État) - JS
 
 // Initialize AlpineJS
-import './utils/globals';
+// import './utils/globals';
 
 // Ajv 
 import * as validations from '../ext/ajv.validations.default'
@@ -17,4 +17,4 @@ import * as validations from '../ext/ajv.validations.default'
 import DsrcFormValidator from './components/forms/DsrcFormValidator'; // provides form validation for `dsrc_crispy_forms` that have an associated JSON schema
 export default { DsrcFormValidator, validations}
 
-console.log('js main added');
+console.log('DSRC main added');

@@ -31,4 +31,8 @@ import '../css/callout.css'
 import '../css/markdown.css'
 import '../css/miscellaneous.css'
 
+//Global DSRC library
+import 'dsrc_ui/dist/css/dsrc-csscore.css'
+import 'dsrc_ui/dist/css/dsrc-csstokens.css'
+
 console.log('js main added');
