@@ -208,7 +208,7 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
 
         # also filter with project_id to ensure the given task and project are consistent
         return models.TaskFollowup.objects.filter(
-            task_id=task_id, task__project_id=project_id
+            task_id=task_id, task__site=self.request.site, task__project_id=project_id
         )
 
     def create(self, request, project_id, task_id):
