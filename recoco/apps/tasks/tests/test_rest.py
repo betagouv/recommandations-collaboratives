@@ -13,7 +13,6 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from notifications.signals import notify
 from rest_framework.test import APIClient
@@ -432,7 +431,7 @@ def test_project_task_followup_list_closed_for_dissociate_task_and_project(reque
     site = get_current_site(request)
     project1 = baker.make(project_models.Project, sites=[site])
     _ = baker.make(models.Task, project=project1, site=site, public=True)
-    assign_perm("projects.use_tasks", user, project1)
+    utils.assign_advisor(user, project1)
 
     project2 = baker.make(project_models.Project, sites=[site])
     task2 = baker.make(models.Task, project=project2, site=site, public=True)
@@ -521,7 +520,7 @@ def test_project_task_followup_create_is_processed_for_auth_user(request):
 
     client = APIClient()
     client.force_authenticate(user=user)
-    assign_perm("projects.use_tasks", user, project)
+    utils.assign_advisor(user, project)
     data = {"comment": "a new followup for tasks"}
     url = reverse("project-tasks-followups-list", args=[project.id, task.id])
     response = client.post(url, data=data)
@@ -571,7 +570,7 @@ def test_project_task_followup_update_is_processed_for_auth_user(request):
 
     client = APIClient()
     client.force_authenticate(user=user)
-    assign_perm("projects.use_tasks", user, project)
+    utils.assign_advisor(user, project)
     data = {"comment": "an updated comment for followup"}
     url = reverse(
         "project-tasks-followups-detail", args=[project.id, task.id, followup.id]
@@ -735,7 +734,7 @@ def test_last_members_activity_is_updated_by_member_followup_via_rest(request, c
 
     client = APIClient()
     client.force_authenticate(user=user)
-    assign_perm("projects.use_tasks", user, project)
+    utils.assign_advisor(user, project)
     data = {"comment": "an updated comment for followup"}
     url = reverse("project-tasks-followups-list", args=[project.id, task.id])
     before_update = timezone.now()
