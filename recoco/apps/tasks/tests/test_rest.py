@@ -334,7 +334,7 @@ def test_project_advisor_cannot_move_unknown_tasks_for_site(request):
 
 
 @pytest.mark.django_db
-def test_project_collaborator_cannot_move_project_tasks_for_site(request):
+def test_project_collaborator_can_move_project_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     project = baker.make(project_models.Project, status="READY", sites=[site])
@@ -348,7 +348,8 @@ def test_project_collaborator_cannot_move_project_tasks_for_site(request):
     url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
     response = client.post(url, data={"above": tasks[1].id})
 
-    assert response.status_code == 403
+    assert response.status_code == 200
+    assert response.data == {"status": "insert above done"}
 
 
 @pytest.mark.django_db

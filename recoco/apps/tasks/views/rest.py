@@ -17,7 +17,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from recoco.apps.projects import models as projects_models
-from recoco.utils import has_perm
+from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
 from ..serializers import (
@@ -45,7 +45,7 @@ class IsTaskViewerOrManagerToWrite(permissions.BasePermission):
                 "projects.view_tasks", project
             ) or request.user.has_perm("sites.list_projects", request.site)
 
-        return request.user.has_perm("projects.manage_tasks", project)
+        return request.user.has_perm("projects.use_tasks", project)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -67,10 +67,18 @@ class TaskViewSet(viewsets.ModelViewSet):
         site = get_current_site(self.request)
         project_id = int(self.kwargs["project_id"])
         project = projects_models.Project.on_site.get(pk=project_id)
+
+        has_perm_or_403(self.request.user, "projects.manage_tasks", project)
+
         serializer.save(created_by=self.request.user, site=site, project=project)
 
     def perform_update(self, serializer: TaskSerializer):
         original_object = self.get_object()
+
+        has_perm_or_403(
+            self.request.user, "projects.manage_tasks", original_object.project
+        )
+
         updated_object = serializer.save()
 
         if original_object.public is False and updated_object.public is True:
