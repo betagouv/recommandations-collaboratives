@@ -16,7 +16,11 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
-INSTALLED_APPS += ("debug_toolbar",)
+INSTALLED_APPS += [
+    "debug_toolbar",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
+]
 
 MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
 

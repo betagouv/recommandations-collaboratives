@@ -3,6 +3,7 @@ black
 coverage
 django-debug-toolbar
 django_coverage_plugin
+drf-spectacular[sidecar]
 fabric
 ipython
 model_bakery
