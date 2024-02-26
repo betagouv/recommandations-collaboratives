@@ -1,0 +1,209 @@
+<!-- prettier-ignore -->
+{% extends "base.html" %}
+{% load sass_tags %}
+{% load static %}
+{% block title %} Déclaration d'accessibilité {% endblock %}
+{% block css %}
+
+<link href="{% sass_src 'home/css/home/home.scss' %}" rel="stylesheet" type="text/css" />
+{% endblock %} {% block content %}
+
+<div class="col-8 py-3 g-0 mx-auto">
+    <h1>Déclaration d’accessibilité</h1>
+
+    <p><i>Établie le 2 février 2024.</i></p>
+
+    <p>
+        Le Cerema porte le service Recommandations-Collaboratives, qui permet de créer des plateformes thématiques de conseil aux collectivités, sur un même modèle d’application web. UrbanVitaliz est l’une de ces plateformes. D’un point de vue technique, l’application UrbanVitaliz est gérée par l’équipe de Recommandations-Collaboratives, notamment en ce qui concerne l’accessibilité.
+        <br />
+        Le Cerema s’engage à rendre son service accessible, conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.
+        <br />
+        À cette fin, nous mettons en œuvre la stratégie et les actions suivantes : <a href="">schéma pluri-annuel 2024-2026</a>.
+        <br />
+        Cette déclaration d’accessibilité s’applique à UrbanVitaliz (<a href="https://urbanvitaliz.fr/">https://urbanvitaliz.fr/</a>).
+    </p>
+
+    <h2>État de conformité</h2>
+
+    <p>UrbanVitaliz est non conforme avec le RGAA. Le site n’a encore pas été audité.</p>
+
+    <h2>Contenus non accessibles</h2>
+
+    <p>Les contenus listés ci-dessous ne sont pas accessibles pour les raisons suivantes.</p>
+
+    <h3>Non conformité</h3>
+    <p>Malgré nos efforts, certains contenus sont inaccessibles. Vous trouverez ci-dessous une liste des limitations connues et des solutions potentielles :</p>
+    <ol>
+        <li>
+            <span class="fw-bold">D’une manière générale, sur la plupart des pages :</span>
+            <ul>
+                <li>les contrastes sont insuffisants,</li>
+                <li>il manque le bouton Accéder au contenu,</li>
+                <li>la hiérarchie des titres n’est pas respectée.</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Questionnaire d'état des lieux après dépôt d'un projet :</span>
+            <ul>
+                <li>Navigation au clavier impossible,</li>
+                <li>cas d’erreurs mal signalés.</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Navigation au sein de l'application (menus) :</span>
+            <ul>
+                <li>Navigationau clavier impossible</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Onglet Présentation au sein d'un projet :</span>
+            <ul>
+                <li>Pas de titre,</li>
+                <li>au clavier, impossible d'inviter un utilisateur,</li>
+                <li>au clavier, impossible d'ouvrir la modale de la carte de localisation,</li>
+                <li>manque aria-label sur la carte,</li>
+                <li>en l’absence de feuille de style, certains textes et boutons se superposent.</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Onglet Etat des lieux :</span>
+            <ul>
+                <li>problème d’affichage en zoom texte</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Onglet Recommandations :</span>
+            <ul>
+                <li>textes alternatifs manquants sur les icônes d’édition (pour les conseillers et staff),</li>
+                <li>en l’absence de feuille de style, toutes les popups s’affichent en même temps,</li>
+                <li>en l’absence de feuille de style, de nombreux textes se superposent.</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Onglet Conversation :</span>
+            <ul>
+                <li>au clavier, le focus est parfois manquant,</li>
+                <li>textes alternatifs manquants sur les icônes d’édition de texte,</li>
+                <li>en l’absence de feuille de style, certains textes se superposent.</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Onglet Fichiers et Liens :</span>
+            <ul>
+                <li>au clavier, impossible de consulter les fichiers et liens présents,</li>
+                <li>au clavier le focus est parfois manquant,</li>
+                <li>textes alternatifs manquants sur certaines icônes (notamment télécharger).</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Onglet Espace Conseillers :</span>
+            <ul>
+                <li>En l'absence de feuille de style, certains textes se superposent.</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Onglet Paramètres :</span>
+            <ul>
+                <li>au clavier impossible d’inviter un membre au projet,</li>
+                <li>textes alternatifs manquants sur certaines icônes (notamment pour gérer les membres et invitations),</li>
+                <li>En l'absence de feuille de style, de nombreux textes et icônes se superposent.</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Liste des ressources :</span>
+            <ul>
+                <li>Au clavier, impossible d’accéder à la liste des ressources,</li>
+                <li>Au clavier, impossible de créer une ressource, aucun titre sur la page.</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Formulaire de contact :</span>
+            <ul>
+                <li>labels présents uniquement dans les champs,</li>
+                <li>en l’absence de feuille de style impossible de valider le captcha.</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Tableau de bord “staff” :</span>
+            <ul>
+                <li>au clavier, impossible de parcourir les projets</li>
+            </ul>
+        </li>
+        <li>
+            <span class="fw-bold">Tableau de bord “conseiller” :</span>
+            <ul>
+                <li>au clavier, impossible de parcourir les projets,</li>
+                <li>alternative à la carte manquante.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <p>Afin de corriger ces problèmes, nous travaillons en 2024 à une refonte de la plupart des pages de l’application. Nous allons également nous appuyer de plus en plus sur des composants optimisés et réutilisés à travers le site, qui prennent bien en compte les critères d’accessibilité. Enfin, nous allons déployer plus largement le Système de Design de l’Etat (DSFR). Le Schéma Pluri-Annuel 2024-2026 cité plus haut donne plus de détails à ce sujet.</p>
+    <p>Si dans l’attente de cette refonte ou après, vous rencontrez des blocages pour utiliser le site, vous pouvez nous contacter à xxx</p>
+
+    <h2>Établissement de cette déclaration d’accessibilité</h2>
+    <p>Cette déclaration a été établie le 2 février 2024.</p>
+
+    <h3>Technologies utilisées</h3>
+    <p>L’accessibilité de UrbanVitaliz s’appuie sur les technologies suivantes :</p>
+    <ul>
+        <li>HTML</li>
+        <li>CSS</li>
+        <li>JavaScript</li>
+    </ul>
+
+    <h3>Agents utilisateurs, technologies d’assistance et outils utilisés pour vérifier l’accessibilité</h3>
+
+    <p>Les tests des pages web ont été effectués avec les combinaisons de navigateurs web et lecteurs d’écran suivants :</p>
+    <ul>
+        <li>Navigateur Firefox version 122.0.1</li>
+        <li>Navigateur Chrome version 119.0.6045.159</li>
+    </ul>
+    <br />
+
+    <p>UrbanVitaliz n’est pas compatible avec :</p>
+    <ul>
+        <li>Navigateurs vieux de plus de 3 versions majeures</li>
+    </ul>
+
+    <h2>Amélioration et contact</h2>
+
+    <p>Si vous n’arrivez pas à accéder à un contenu ou à un service, vous pouvez contacter le responsable de UrbanVitaliz pour être orienté vers une alternative accessible ou obtenir le contenu sous une autre forme :</p>
+    <ul>
+        <li>E-mail : <a href="mailto:equipe@urbanvitaliz.fr">equipe@urbanvitaliz.fr</a></li>
+    </ul>
+
+    <br />
+    <p>Nous essayons de répondre dans les 2 jours ouvrés.</p>
+
+    <h2>Voie de recours</h2>
+
+    <p>Cette procédure est à utiliser dans le cas suivant : vous avez signalé au responsable du site internet un défaut d’accessibilité qui vous empêche d’accéder à un contenu ou à un des services du portail et vous n’avez pas obtenu de réponse satisfaisante.</p>
+
+    <p>Vous pouvez :</p>
+    <ul>
+        <li>
+            Écrire un message au
+            <a href="https://formulaire.defenseurdesdroits.fr/" target="_blank" rel="noopener">Défenseur des droits</a>
+        </li>
+        <li>
+            Contacter
+            <a href="https://www.defenseurdesdroits.fr/saisir/delegues" target="_blank" rel="noopener">le délégué du Défenseur des droits dans votre région</a>
+        </li>
+        <li>
+            Envoyer un courrier par la poste (gratuit, ne pas mettre de timbre) :
+            <br />
+            Défenseur des droits
+            <br />
+            Libre réponse 71120 75342 Paris CEDEX 07
+        </li>
+    </ul>
+
+    <hr />
+    <p>
+        Cette déclaration d’accessibilité a été créée le 2 février 2024 grâce au
+        <a href="https://betagouv.github.io/a11y-generateur-declaration/#create" target="_blank" rel="noopener">Générateur de Déclaration d’Accessibilité de BetaGouv</a>.
+    </p>
+</div>
+
+{% endblock %}

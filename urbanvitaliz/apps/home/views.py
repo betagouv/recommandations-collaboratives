@@ -70,6 +70,10 @@ class TermsOfUsePageView(TemplateView):
     template_name = "home/terms_of_use.html"
 
 
+class AccessibiltyPageView(TemplateView):
+    template_name = "home/accessibility.html"
+
+
 class PrivacyPageView(TemplateView):
     template_name = "home/privacy.html"
 
