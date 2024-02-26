@@ -306,7 +306,7 @@ def project_create_or_update_topics(request, project_id=None):
 
     has_perm_or_403(request.user, "projects.change_topics", project)
 
-    TopicFormset = formset_factory(TopicForm, extra=6, max_num=6, can_delete=True)
+    TopicFormset = formset_factory(TopicForm, extra=4, max_num=4, can_delete=True)
 
     if request.method == "POST":
         topic_formset = TopicFormset(request.POST)
