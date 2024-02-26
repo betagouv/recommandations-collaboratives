@@ -69,9 +69,12 @@ class LegalsPageView(TemplateView):
 class TermsOfUsePageView(TemplateView):
     template_name = "home/terms_of_use.html"
 
-
 class AccessibiltyPageView(TemplateView):
     template_name = "home/accessibility.html"
+
+
+class MutliAnnualSchemaPageView(TemplateView):
+    template_name = "home/multi_annual_schema.html"
 
 
 class PrivacyPageView(TemplateView):
