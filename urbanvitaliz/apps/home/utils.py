@@ -28,6 +28,16 @@ def get_current_site_sender():
 
     return f"{site_config.sender_name} <{site_config.sender_email}>"
 
+def get_current_site_sender_email():
+    """Returns the current site email sender"""
+    current_site = Site.objects.get_current()
+    try:
+        site_config = current_site.configuration
+    except models.SiteConfiguration.DoesNotExist:
+        return settings.DEFAULT_FROM_EMAIL
+
+    return f"{site_config.sender_email}"
+
 
 def make_new_site(name: str, domain: str, sender_email: str, sender_name: str) -> Site:
     """Return a new site with given name/domain or None if exists"""

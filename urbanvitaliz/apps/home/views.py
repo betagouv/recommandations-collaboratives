@@ -71,6 +71,18 @@ class TermsOfUsePageView(TemplateView):
 
 class AccessibiltyPageView(TemplateView):
     template_name = "home/accessibility.html"
+    
+    def get_context_data(self, **kwargs):
+      try:
+          site_config = self.request.site.configuration
+      except models.SiteConfiguration.DoesNotExist:
+          raise ImproperlyConfigured(
+              f"Please create the SiteConfiguration for this site '{self.request.site}'"
+          )
+      context = super().get_context_data(**kwargs)
+      context['sender_email'] = site_config.sender_email
+      return context
+
 
 
 class MutliAnnualSchemaPageView(TemplateView):

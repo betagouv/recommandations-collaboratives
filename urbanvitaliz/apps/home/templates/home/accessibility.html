@@ -10,24 +10,28 @@
 <!-- prettier-ignore -->
 {% block content %}
 
+<script>
+    console.log("{{ request.sender_email }}");
+</script>
+
 <div class="col-8 py-3 g-0 mx-auto">
     <h1>Déclaration d’accessibilité</h1>
 
     <p><i>Établie le 2 février 2024.</i></p>
 
     <p>
-        Le Cerema porte le service Recommandations-Collaboratives, qui permet de créer des plateformes thématiques de conseil aux collectivités, sur un même modèle d’application web. UrbanVitaliz est l’une de ces plateformes. D’un point de vue technique, l’application UrbanVitaliz est gérée par l’équipe de Recommandations-Collaboratives, notamment en ce qui concerne l’accessibilité.
+        Le Cerema porte le service Recommandations-Collaboratives, qui permet de créer des plateformes thématiques de conseil aux collectivités, sur un même modèle d’application web. {{ request.site.name }} est l’une de ces plateformes. D’un point de vue technique, l’application {{ request.site.name }} est gérée par l’équipe de Recommandations-Collaboratives, notamment en ce qui concerne l’accessibilité.
         <br />
         Le Cerema s’engage à rendre son service accessible, conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.
         <br />
         À cette fin, nous mettons en œuvre la stratégie et les actions suivantes : <a href="{% url 'multi-annual-schema' %}">schéma pluri-annuel 2024-2026</a>.
         <br />
-        Cette déclaration d’accessibilité s’applique à UrbanVitaliz (<a href="https://urbanvitaliz.fr/">https://urbanvitaliz.fr/</a>).
+        Cette déclaration d’accessibilité s’applique à {{ request.site.name }} (<a href="https://{{ request.site }}/">https://{{ request.site }}</a>).
     </p>
 
     <h2>État de conformité</h2>
 
-    <p>UrbanVitaliz est non conforme avec le RGAA. Le site n’a encore pas été audité.</p>
+    <p>{{ request.site.name }} est non conforme avec le RGAA. Le site n’a encore pas été audité.</p>
 
     <h2>Contenus non accessibles</h2>
 
@@ -147,7 +151,7 @@
     <p>Cette déclaration a été établie le 2 février 2024.</p>
 
     <h3>Technologies utilisées</h3>
-    <p>L’accessibilité de UrbanVitaliz s’appuie sur les technologies suivantes :</p>
+    <p>L’accessibilité de {{ request.site.name }} s’appuie sur les technologies suivantes :</p>
     <ul>
         <li>HTML</li>
         <li>CSS</li>
@@ -163,16 +167,16 @@
     </ul>
     <br />
 
-    <p>UrbanVitaliz n’est pas compatible avec :</p>
+    <p>{{ request.site.name }} n’est pas compatible avec :</p>
     <ul>
         <li>Navigateurs vieux de plus de 3 versions majeures</li>
     </ul>
 
     <h2>Amélioration et contact</h2>
 
-    <p>Si vous n’arrivez pas à accéder à un contenu ou à un service, vous pouvez contacter le responsable de UrbanVitaliz pour être orienté vers une alternative accessible ou obtenir le contenu sous une autre forme :</p>
+    <p>Si vous n’arrivez pas à accéder à un contenu ou à un service, vous pouvez contacter le responsable de {{ request.site.name }} pour être orienté vers une alternative accessible ou obtenir le contenu sous une autre forme :</p>
     <ul>
-        <li>E-mail : <a href="mailto:equipe@urbanvitaliz.fr">equipe@urbanvitaliz.fr</a></li>
+        <li>E-mail : <a href="mailto:{{sender_email}}">{{sender_email}}</a></li>
     </ul>
 
     <br />
