@@ -48,13 +48,23 @@
                 <ul class="topic-list l-stack">
                     {% for topic_form in topic_formset %}
                         <li class="d-flex justify-content-between align-items-end topic-item "
-                            x-data='TopicSearch("{{ topic_form.name.value|default:"" }}", "projects")'>
+                            x-data='TopicSearch("{{ topic_form.name.value|default:"" }}", "projects")'
+                            >
                             {% if topic_form.name.value %}
                                 <div class="topic-item disabled">
                                     <div class="l-stack w-100 justify-content-between align-items-end ">
-                                        <label for="{{ topic_form.name.id_for_label }}" class="tiny fw-bold w-100">Thématique</label>
+                                        <label for="{{ topic_form.name.id_for_label }}" class="tiny fw-bold w-100" :value="deleted">
+                                          <template x-if="deleted">
+                                            <span>Thématique supprimée</span>
+                                          </template>
+                                          <template x-if="!deleted">
+                                            <span>Thématique</span>
+                                          </template> 
+                                        </label>
+                                        
                                         <input type="text"
                                                class="form-control tiny w-100"
+                                               :class="{'text-decoration-line-through' : deleted}"
                                                id="{{ topic_form.name.id_for_label }}"
                                                name="{{ topic_form.name.html_name }}"
                                                value="{{ topic_form.name.value|default:'Thématique' }}"
@@ -85,9 +95,8 @@
                                         {% endif %}
                                     </div>
                                 {% endif %}
-                                <div x-data="topic.delete"
-                                     class="input-checkbox-btn input-delete d-flex align-self-end"
-                                     :class="{ 'disabled' : !topic || topic.delete }">
+                                <div class="input-checkbox-btn input-delete d-flex align-self-end"
+                                     :class="{ 'disabled' : !topic }">
                                     <input name="form-{{ forloop.counter0 }}-DELETE"
                                            id="id_form-{{ forloop.counter0 }}-DELETE"
                                            type="checkbox"
