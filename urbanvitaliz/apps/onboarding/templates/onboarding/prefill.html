@@ -1,4 +1,18 @@
-{% extends "base.html" %} {% load django_vite %} {% load static %} {% block title %} Déposer un projet pour le compte de la collectivité {{ block.super }} {% endblock %} {% block og_title %}Déposer un projet pour le compte de la collectivité {{ block.super }}{% endblock %} {% block js %} {% vite_asset 'js/apps/advisorCreateProject.js' %} {% endblock %} {% block content %}
+<!--prettier-ignore-->
+{% extends "base.html" %}
+{% load django_vite %}
+{% load static %}
+{% block title %} 
+    Déposer un projet pour le compte de la collectivité {{ block.super }} 
+{% endblock %}
+{% block og_title %}
+    Déposer un projet pour le compte de la collectivité {{ block.super }}
+{% endblock %}
+{% block js %} 
+    {% vite_asset 'js/apps/advisorCreateProject.js' %}
+{% endblock %}
+
+{% block content %}
 
 <div class="col-11 col-lg-9 py-5 mx-auto">
     <h2>
