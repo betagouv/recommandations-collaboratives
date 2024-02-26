@@ -1,13 +1,13 @@
 Auteurs principaux
 ==================
-Guillaume Libersat
-Quetin Danneville
-Raphael Marvie
-Jeremy Bojko
-Rahman Kalfane
-Sébastien Reuiller
+ - Guillaume Libersat
+ - Quentin Danneville
+ - Raphael Marvie
+ - Jeremy Bojko
+ - Rahman Kalfane
+ - Sébastien Reuiller
 
 Contributeurs
 =============
-Antoine Ribeiro
-Patricia Boh
+ - Antoine Ribeiro
+ - Patricia Boh
