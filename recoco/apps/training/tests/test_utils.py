@@ -81,6 +81,31 @@ def test_user_challenge_not_returned_when_is_snoozed_and_repeat_set_to_zero_week
 
 
 @pytest.mark.django_db
+def test_get_acquired_challenge_when_user_has_no_previous_login():
+    site = baker.make(site_models.Site)
+    user = baker.make(auth_models.User, last_login=timezone.now())
+    user.profile.previous_login_at = None
+    user.profile.save()
+
+    definition = baker.make(
+        models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=4
+    )
+
+    baker.make(
+        models.Challenge,
+        user=user,
+        challenge_definition=definition,
+        acquired_on=datetime.datetime.now() - datetime.timedelta(weeks=1),
+    )
+
+    with settings.SITE_ID.override(site.pk):
+        current = utils.get_challenge_for(user, definition.code)
+
+    # challenge is not proposed
+    assert current is None
+
+
+@pytest.mark.django_db
 def test_user_challenge_not_returned_when_is_snoozed_and_repeat_not_exceeded():
     site = baker.make(site_models.Site)
     user = baker.make(auth_models.User, last_login=timezone.now())
@@ -122,6 +147,8 @@ def test_user_challenge_returned_when_inactivity_more_than_one_month():
     more_than_one_month = timezone.now() - datetime.timedelta(weeks=5)
     user = baker.make(auth_models.User, last_login=more_than_one_month)
     user.profile.previous_login_at = more_than_one_month
+    user.profile.save()
+
     definition = baker.make(
         models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=3
     )
@@ -146,6 +173,8 @@ def test_user_challenge_not_returned_when_inactivity_less_than_one_month():
     less_than_one_month = timezone.now() - datetime.timedelta(weeks=3)
     user = baker.make(auth_models.User, last_login=less_than_one_month)
     user.profile.previous_login_at = less_than_one_month
+    user.profile.save()
+
     definition = baker.make(
         models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=3
     )
@@ -170,6 +199,8 @@ def test_user_challenge_not_returned_when_inactivity_but_acquired_less_than_one_
     less_than_one_month = timezone.now() - datetime.timedelta(weeks=3)
     user = baker.make(auth_models.User, last_login=more_than_one_month)
     user.profile.previous_login_at = more_than_one_month
+    user.profile.save()
+
     definition = baker.make(
         models.ChallengeDefinition, site=site, code="a-code", week_inactivity_repeat=3
     )
