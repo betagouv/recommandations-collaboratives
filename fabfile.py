@@ -40,7 +40,8 @@ def upgrade(cnx, site=None):
         remote=f"./recoco-{site}/requirements.txt",
     )
     cnx.run(
-        f"cd recoco-{site} " "&& venv/bin/pip install --upgrade -r requirements.txt"
+        f"cd recoco-{site} "
+        "&& ./.venv/bin/uv pip install --upgrade -r requirements.txt"
     )
 
 
@@ -50,7 +51,11 @@ def setup(cnx, site=None):
     if site not in ["production", "development"]:
         print("Usage: fab deploy --site={production,development} --hosts=...")
         return
-    cnx.run(f"mkdir -p recoco-{site}/dist" f"&& virtualenv recoco-{site}/venv")
+    cnx.run(
+        f"mkdir -p recoco-{site}/dist"
+        f"&& virtualenv recoco-{site}/.venv"
+        f"&& recoco-{site}/.venv/bin/pip install uv"
+    )
 
 
 @task
@@ -69,7 +74,7 @@ def deploy(cnx, site=None):
     )
     cnx.run(
         f"cd recoco-{site} "
-        f"&& ./venv/bin/pip install ./dist/{PACKAGE}"
+        f'&& ./.venv/bin/uv pip install "recoco @ ./dist/{PACKAGE}" --reinstall-package "recoco"'
         "&& ./manage.py migrate"
         "&& ./manage.py compilescss"
         "&& ./manage.py collectstatic --noinput"
@@ -96,7 +101,7 @@ def ad_staging_create_database(db_name: str):
         "",
     )
 
-    requests.post(address, auth=credentials, data=data)
+    requests.post(address, auth=credentials, data=data, timeout=10)
 
 
 def ad_staging_drop_database(db_name: str):
@@ -109,15 +114,15 @@ def ad_staging_drop_database(db_name: str):
         "",
     )
 
-    response = requests.get(f"{api_root}/v1/database/", auth=credentials)
+    response = requests.get(f"{api_root}/v1/database/", auth=credentials, timeout=10)
     db_json = response.json()
 
     for db in db_json:
         if db["name"] == f"uvstaging_{db_name}":
             response = requests.delete(
-                f"{api_root}{db['href']}",
-                auth=credentials,
+                f"{api_root}{db['href']}", auth=credentials, timeout=10
             )
+
             print(response)
             return
 
