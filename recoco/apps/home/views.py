@@ -29,6 +29,7 @@ from recoco.utils import check_if_advisor
 
 from . import models
 from .forms import ContactForm, UserPasswordFirstTimeSetupForm
+from .utils import get_current_site_sender_email
 
 
 class HomePageView(TemplateView):
@@ -69,20 +70,14 @@ class LegalsPageView(TemplateView):
 class TermsOfUsePageView(TemplateView):
     template_name = "home/terms_of_use.html"
 
+
 class AccessibiltyPageView(TemplateView):
     template_name = "home/accessibility.html"
-    
-    def get_context_data(self, **kwargs):
-      try:
-          site_config = self.request.site.configuration
-      except models.SiteConfiguration.DoesNotExist:
-          raise ImproperlyConfigured(
-              f"Please create the SiteConfiguration for this site '{self.request.site}'"
-          )
-      context = super().get_context_data(**kwargs)
-      context['sender_email'] = site_config.sender_email
-      return context
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["sender_email"] = get_current_site_sender_email()
+        return context
 
 
 class MutliAnnualSchemaPageView(TemplateView):
