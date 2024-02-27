@@ -1,21 +1,20 @@
 /* variables */
-$blue: #335B7E;
-$dark-blue: #224A6D;
-$turquoise: #5DC2B0;
-
+$blue: #335b7e;
+$dark-blue: #224a6d;
+$turquoise: #5dc2b0;
 
 /* Gloabal settings */
 body {
     min-height: 100vh;
     min-height: -webkit-fill-available;
-
 }
 
 html {
     height: -webkit-fill-available;
 }
 
-html, body {
+html,
+body {
     overflow-x: hidden; /* Prevent scroll on narrow devices */
 }
 
@@ -30,22 +29,21 @@ main {
 
 /* Info boxes */
 .bd-callout {
-	  padding: 1.25rem;
-	  margin-top: 1.25rem;
-	  margin-bottom: 1.25rem;
-	  border: 1px solid #e9ecef;
-	  border-left-width: .25rem;
-	  border-radius: .25rem;
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid #e9ecef;
+    border-left-width: 0.25rem;
+    border-radius: 0.25rem;
 }
 
 .bd-callout-info {
-	  border-left-color: #5bc0de;
+    border-left-color: #5bc0de;
 }
 
 .bd-callout-warning {
-	  border-left-color: orange;
+    border-left-color: orange;
 }
-
 
 .bd-placeholder-img {
     font-size: 1.125rem;
@@ -86,16 +84,23 @@ main {
     -webkit-box-shadow: 4px -4px #ddd inset;
 }
 
-.arrow-up    { transform:rotate(135deg) }
-.arrow-right { transform:rotate(225deg) }
-.arrow-down  { transform:rotate(-45deg) }
-.arrow-left  { transform:rotate(45deg) }
-
+.arrow-up {
+    transform: rotate(135deg);
+}
+.arrow-right {
+    transform: rotate(225deg);
+}
+.arrow-down {
+    transform: rotate(-45deg);
+}
+.arrow-left {
+    transform: rotate(45deg);
+}
 
 a {
     color: $blue;
 }
-a:not(.btn-outline-primary):hover {
+a:not(.btn-outline-primary):not(.btn-primary):not(.btn-outline-secondary):hover {
     color: $dark-blue !important;
 }
 
@@ -104,7 +109,9 @@ a:not(.btn-outline-primary):hover {
     border-color: $dark-blue !important;
     color: white !important;
 
-    &:hover {
+    &:hover,
+    &:focus {
+        background-color: $dark-blue !important;
         color: white !important;
     }
 }
@@ -134,18 +141,19 @@ progress::-moz-progress-bar {
     background-color: black;
 }
 
-
 .active {
     color: black;
     font-weight: 700 !important;
 }
 
 .bg-light-yellow {
-    background-color: #FFFBC4;
+    background-color: #fffbc4;
 }
 
 // Alpine Cloaking
-[x-cloak] { display: none !important; }
+[x-cloak] {
+    display: none !important;
+}
 
 .modal {
     z-index: 9889089;
@@ -153,16 +161,16 @@ progress::-moz-progress-bar {
 
 // Main content layout
 .main-content {
-    padding-top: 66px
+    padding-top: 66px;
 }
 
 .main-content.public-content {
     padding-top: 80px;
 }
 
-.project-header-sidebar > .btn  {
+.project-header-sidebar > .btn {
     border-radius: 2px;
-	padding: 0.29rem 1rem;
+    padding: 0.29rem 1rem;
 }
 
 @media (min-width: 690px) {
