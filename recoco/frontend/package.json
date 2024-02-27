@@ -1,7 +1,7 @@
 {
-  "name": "urbanvitaliz",
+  "name": "recoco-fe",
   "version": "1.0.0",
-  "description": "urbanvitaliz",
+  "description": "Frontend Recoco",
   "author": "guillaume.libersat@beta.gouv.fr, quentin.danneville@beta.gouv.fr",
   "private": true,
   "scripts": {

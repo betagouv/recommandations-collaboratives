@@ -19,11 +19,13 @@ document.addEventListener('alpine:init', () => {
 			const { insee } = this.project.commune;
 			try {
 				[this.parcels, this.commune, this.location] = await Promise.all([
-					geolocUtils.fetchParcelsIgn(insee),
+					  null, // geolocUtils.fetchParcelsIgn(insee),
 					geolocUtils.fetchCommuneIgn(insee),
 					geolocUtils.fetchGeolocationByAddress(`${this.project.location}`)
 				]);
+
 				[this.latitude, this.longitude] = mapUtils.getDefaultLatLngForMap(this.project);
+
 				return {
 					parcels: this.parcels,
 					commune: this.commune,
@@ -32,7 +34,7 @@ document.addEventListener('alpine:init', () => {
 					longitude: this.longitude,
 				};
 			} catch(e) {
-				// console.log(e);
+				console.log(e);
 			} finally {
 				this.isLoading = false;
 			}

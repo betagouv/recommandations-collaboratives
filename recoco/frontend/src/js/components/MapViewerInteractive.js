@@ -21,14 +21,14 @@ function MapViewerInteractive(projectOptions) {
 				}
 			};
 			const { latitude, longitude } = this.project.commune;
-			this.zoom = latitude && longitude ? this.zoom + 5 : this.zoom;
+			this.zoom = latitude && longitude ? this.zoom + 9 : this.zoom;
 			const geoData = await this.$store.geolocation.initGeolocationData(this.project);
 
 			this.map = await this.initMap(this.project, geoData);
 		},
 		async initMap(project, geoData) {
 			// Init Interactive Map
-			const options = mapUtils.mapOptions({interactive: true});
+			const options = mapUtils.mapOptions({interactive: true, minZoom: 8, maxZoom: 20});
 
 
       var map = mapUtils.makeMap("map-interactive", project, options, this.zoom);
@@ -42,8 +42,6 @@ function MapViewerInteractive(projectOptions) {
 				  await  mapUtils.addLayerParcels(map, geoData);
 			}
 
-			map.setMinZoom(this.zoom - 7);
-			map.setMaxZoom(this.zoom + 6);
 			L.control.zoom({
 				position: 'topright',
 				color: '#335B7E',

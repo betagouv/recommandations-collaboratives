@@ -6,6 +6,7 @@ const COMMUNES_PARIS = ['75101','75102','75103','75104','75105','75106','75107',
 
 
 // Doc: https://apicarto.ign.fr/api/doc/cadastre#/Commune/get_cadastre_commune
+const API_GEO_GOUV = 'https://geo.api.gouv.fr';
 const API_CADASTRE = 'https://apicarto.ign.fr/api/cadastre';
 const API_ADRESSE = 'https://api-adresse.data.gouv.fr';
 
@@ -51,28 +52,21 @@ async function fetchCommuneIgn(insee) {
 	if (insee.length !== 5) {
 		return;
 	}
-	const apiEndpoint = `${API_CADASTRE}/commune?`;
-	const searchParams = {};
 
-	if (!getGlobalCityCodeFromCodeInsee(codeInsee)) {
-		searchParams['code_insee'] = insee;
-	} else {
-		var codeArr = getCodeArrFromCodeInsee(codeInsee);
-		var codeInsee = getGlobalCityCodeFromCodeInsee(codeInsee);
-		searchParams['code_arr'] = codeArr;
-		searchParams['code_insee'] = codeInsee;
-	}
+  const apiEndpoint = `${API_GEO_GOUV}/communes/${insee}?format=geojson&geometry=contour`;
 
-	const communeGeo = await fetch(apiEndpoint + new URLSearchParams(searchParams)).then(response => response.json());
+	  const response = await fetch(apiEndpoint);
 
-	return communeGeo;
+    const geodata = await response.json();
+
+	  return geodata;
 }
 
 async function fetchParcelsIgn(insee) {
 	if (insee.length !== 5) {
 		return;
 	}
-	const apiEndpoint = `${API_CADASTRE}/parcelle?`;
+	  const apiEndpoint = `${API_CADASTRE}/parcelle?_limit=100&`;
 	const searchParams = {};
 
 	if (!getGlobalCityCodeFromCodeInsee(codeInsee)) {

@@ -21,7 +21,7 @@ function ignServiceURL(
 	env = 'decouverte',
 	format = 'image/png'
 ) {
-	const url = `https://wxs.ign.fr/${env}/geoportail/wmts`;
+	const url = `https://data.geopf.fr/wmts`;
 	const query =
 		'service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&style=normal';
 
@@ -56,15 +56,19 @@ function makeMap(idMap, project, options, zoom) {
 
     var map = new L.map(idMap, {...options});
 
+    var satelliteLayer = initSatelliteLayer(latitude, longitude, zoom);
+    if (satelliteLayer) {
+        map.addLayer(satelliteLayer);
+    }
 
     /* If Satellite isn't available, add OSM tiles as backup */
     var osmLayer = initMapLayer(latitude, longitude, zoom);
-    if (osmLayer)
+    if (osmLayer) {
         map.addLayer(osmLayer);
-
-    var satelliteLayer = initSatelliteLayer(latitude, longitude, zoom);
-    if (satelliteLayer)
-        map.addLayer(satelliteLayer);
+        if (satelliteLayer) {
+            osmLayer.setOpacity(0.5);
+        }
+    }
 
     map.setView(new L.LatLng(latitude, longitude), zoom);
 
@@ -79,7 +83,7 @@ function makeMap(idMap, project, options, zoom) {
 function initMapLayer(lat, lng, zoom) {
     console.debug("initializing OSM layer...");
 	return L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
-		maxZoom: 20,
+		maxZoom: 21,
 		attribution: '&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	});
 
@@ -95,7 +99,7 @@ function initSatelliteLayer(lat, lng, zoom) {
     console.debug("initializing Satellite layer...");
 	return L.tileLayer(
 		ignServiceURL('ORTHOIMAGERY.ORTHOPHOTOS', 'essentiels', 'image/jpeg'), {
-			minZoom : 0,
+			minZoom : 15,
 			maxZoom : 20,
 			tileSize: 256,
 			attribution : 'IGN-F/Géoportail'
@@ -127,7 +131,7 @@ function initMarkerLayer(map, project, geoData) {
 
 // Create layers composed with area coordinates
 function initMapLayers(map, project, geoData) {
-	try {
+    	try {
 		let commune = geoData.commune ? geoData.commune
 			: project.commune ?  project.commune
 				: null;
@@ -198,11 +202,7 @@ function addLayerMarkerProjectLocation(map, project, geoData) {
 }
 
 function addLayerAreaCommune(map, geoData) {
-	if(geoData.code && geoData.code === 400 || geoData.features.length === 0) {
-		throw Error(`Données IGN indisponibles pour la commune "${geoData.commune.name}"`)
-	}
-
-	L.geoJSON(geoData.features[0].geometry, mapLayerStyles('area-commune')).addTo(map);
+	L.geoJSON(geoData, mapLayerStyles('area-commune')).addTo(map);
 }
 
 // Create layers composed with markers
