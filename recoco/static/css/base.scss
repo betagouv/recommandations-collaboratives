@@ -1,0 +1,172 @@
+/* variables */
+$blue: #335B7E;
+$dark-blue: #224A6D;
+$turquoise: #5DC2B0;
+
+
+/* Gloabal settings */
+body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+
+}
+
+html {
+    height: -webkit-fill-available;
+}
+
+html, body {
+    overflow-x: hidden; /* Prevent scroll on narrow devices */
+}
+
+main {
+    display: flex;
+    flex-wrap: nowrap;
+
+    min-height: 100vh;
+    height: -webkit-fill-available;
+    overflow-x: auto;
+}
+
+/* Info boxes */
+.bd-callout {
+	  padding: 1.25rem;
+	  margin-top: 1.25rem;
+	  margin-bottom: 1.25rem;
+	  border: 1px solid #e9ecef;
+	  border-left-width: .25rem;
+	  border-radius: .25rem;
+}
+
+.bd-callout-info {
+	  border-left-color: #5bc0de;
+}
+
+.bd-callout-warning {
+	  border-left-color: orange;
+}
+
+
+.bd-placeholder-img {
+    font-size: 1.125rem;
+    text-anchor: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+@media (min-width: 768px) {
+    .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+    }
+}
+
+/* Heading Infobox */
+.box-heading {
+    background-color: #fafafa;
+    border-radius: 10px;
+    padding: 20px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+/* Arrow */
+.arrow {
+    position: absolute;
+    padding: 0.4em; /* Arrow size */
+    box-shadow: 1px -1px 0 1px white inset;
+    -webkit-box-shadow: 2px -2px white inset;
+    border: solid transparent;
+    border-width: 0 0 2rem 2rem;
+    transition: 0.2s;
+}
+
+.arrow:hover {
+    box-shadow: 2px -2px 0 2px #ddd inset;
+    -webkit-box-shadow: 4px -4px #ddd inset;
+}
+
+.arrow-up    { transform:rotate(135deg) }
+.arrow-right { transform:rotate(225deg) }
+.arrow-down  { transform:rotate(-45deg) }
+.arrow-left  { transform:rotate(45deg) }
+
+
+a {
+    color: $blue;
+}
+a:not(.btn-outline-primary):hover {
+    color: $dark-blue !important;
+}
+
+.btn-primary {
+    background-color: $blue !important;
+    border-color: $dark-blue !important;
+    color: white !important;
+
+    &:hover {
+        color: white !important;
+    }
+}
+
+progress {
+    border: 0;
+    height: 6px;
+    border-radius: 20px;
+    background-color: black;
+}
+progress::-webkit-progress-bar {
+    border: 0;
+    height: 6px;
+    border-radius: 20px;
+    background-color: black;
+}
+progress::-webkit-progress-value {
+    border: 0;
+    height: 6px;
+    border-radius: 20px;
+    background-color: black;
+}
+progress::-moz-progress-bar {
+    border: 0;
+    height: 6px;
+    border-radius: 20px;
+    background-color: black;
+}
+
+
+.active {
+    color: black;
+    font-weight: 700 !important;
+}
+
+.bg-light-yellow {
+    background-color: #FFFBC4;
+}
+
+// Alpine Cloaking
+[x-cloak] { display: none !important; }
+
+.modal {
+    z-index: 9889089;
+}
+
+// Main content layout
+.main-content {
+    padding-top: 66px
+}
+
+.main-content.public-content {
+    padding-top: 80px;
+}
+
+.project-header-sidebar > .btn  {
+    border-radius: 2px;
+	padding: 0.29rem 1rem;
+}
+
+@media (min-width: 690px) {
+    .main-content.public-content {
+        padding-top: 150px;
+    }
+}

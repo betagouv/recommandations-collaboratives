@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+{% load static %}
+
+{% load sass_tags %}
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'projects/css/project.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+$(document).ready(function(){
+    activateTab();
+
+    window.addEventListener('hashchange', function() {
+        activateTab()
+    });
+});
+
+// Change hash for page-reload
+$('.nav-tabs button').on('shown.bs.tab', function (e) {
+
+    window.location.hash = $(e.target).data("bs-target");
+    window.scrollBy(0, 0);
+})
+
+function activateTab(){
+    var url = document.location.toString();
+    if (url.match('#')) {
+        let hash = url.split('#')[1]
+        $('#' + hash + "-tab").get(0).click();
+    }
+};
+
+</script>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+
+    <h1 class=" align-items-center">
+        <svg class="bi" width="40" height="40" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+        </svg>
+        {{ project.name|title }}
+    </h1>
+
+    {% if can_manage %}
+    <div class="row">
+        <div class="bd-callout">
+            Ceci est une prévisualisation de ce que verront les personnes disposant du lien de partage.
+            <br>
+            <strong>Lien de partage :</strong> <a target="_new" href="{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}">{{ request.scheme }}://{{ request.get_host  }}{% url 'projects-project-sharing-link' project.ro_key %}</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        {% include "projects/project/fragments/survey_grid.html" %}
+    </div>
+</div>
+<section>
+
+</section>
+
+{% endblock %}

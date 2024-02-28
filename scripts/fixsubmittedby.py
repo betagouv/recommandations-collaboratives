@@ -1,14 +1,11 @@
-
 from django.conf import settings
 from django.contrib.sites.models import Site
-from urbanvitaliz.apps.projects import models as projects_models
+from recoco.apps.projects import models as projects_models
 
 
 # pour chaque site
 for site in Site.objects.all():
-
     with settings.SITE_ID.override(site.pk):
-
         # collect projects w/o submitted_by
 
         projects = projects_models.Project.objects.filter(submitted_by=None)

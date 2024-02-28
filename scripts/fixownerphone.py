@@ -1,14 +1,11 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
-from urbanvitaliz.apps.addressbook import models as addressbook_models
-from urbanvitaliz.apps.projects import models as projects_models
+from recoco.apps.projects import models as projects_models
 
 
 # pour chaque site
 for site in Site.objects.all():
-
     with settings.SITE_ID.override(site.pk):
-
         # collect owners without phone numbers
         # and project containing phone number
 
@@ -30,6 +27,11 @@ for site in Site.objects.all():
             profile.phone_no = pm.project.phone
             profile.save()
 
-            print("Updated:", profile.user.last_name, profile.organization, profile.phone_no)
+            print(
+                "Updated:",
+                profile.user.last_name,
+                profile.organization,
+                profile.phone_no,
+            )
 
 # eof

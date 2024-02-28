@@ -1,13 +1,11 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
-from urbanvitaliz.apps.addressbook import models as addressbook_models
-from urbanvitaliz.apps.projects import models as projects_models
+from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.projects import models as projects_models
 
 # pour chaque site
 for site in Site.objects.all():
-
     with settings.SITE_ID.override(site.pk):
-
         # collect project owners with missing organization
         # and project having an org name
 

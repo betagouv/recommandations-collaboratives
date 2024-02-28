@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load humanize %}
+{% load gravatar %}
+{% load guardian_tags %}
+
+{% load sass_tags %}
+
+{% block title %}
+    {{ resource.title }}
+{% endblock %}
+
+{% block og_title %}
+    {{ resource.title }}
+{% endblock %}
+
+{% block description %}{{ resource.subtitle }}{% endblock %}
+
+{% block og_description %}{{ resource.subtitle }}{% endblock %}
+
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+<style type="text/css">
+    html, body {
+        scroll-padding-top: 80px;
+    }
+
+	@media print
+    {
+        main {
+            padding-top: 0 !important;
+        }
+        .navbar {
+            display: none !important;
+        }
+        footer {
+            display: none !important;
+        }
+
+        .flag {
+            display: none !important;
+        }
+
+        #resource-main-content {
+            display: flex !important;
+            flex-direction: column !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #resource-main, #resource-footer {
+            width: 100% !important;
+            padding: 0 10px !important;
+            margin: 0 !i;
+        }
+
+        #ask-question, #push-resource, #edit-resource, #project_used, #print {
+            display: none !important;
+        }
+
+        .container-fluid {
+            padding: 0 !important;
+        }
+
+        .breadcrumb {
+            display: none !important;
+        }
+
+        #category-list li{
+            background: none !important;
+            color: #222 !important;
+            margin: 0 3px !important;
+            padding: 0 !important;
+            font-size: 12px !important;
+        }
+
+        #resource-details {
+            margin: 0 !important;
+            padding: 0 !important;
+            margin-bottom: 25px !important;
+            font-size: 10px !important;
+            font-weight: 300 !important;
+        }
+
+        #category-list li span{
+            color: #222 !important;
+            font-size: 12px !important;
+        }
+
+        #contact-list {
+            background-color: red;
+        }
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row py-5" id="resource-main-content">
+    <div class="col-9 px-5 mx-auto font-marianne" id="resource-main">
+
+        {% include 'resources/resource/fragments/breadcrumb.html' %}
+        <div class="d-flex align-items-center mb-3" id="resource-details">
+            {% include 'resources/resource/fragments/category_list.html' %}
+            {% include 'resources/resource/fragments/author.html' %}
+        </div>
+        {% include 'resources/resource/fragments/flag.html' %}
+        {% include 'resources/resource/fragments/resource_content.html' with resource=resource contacts=contacts %}
+        {% comment %} <div class="bd-callout mt-6">
+            <svg class="bi me-2 align-middle" width="24" height="24">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle-fill"/>
+            </svg>
+            &nbsp;
+            Un problème sur cette ressource ? Un doute, des questions ? N'hésitez pas à <a href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'">nous interpeller</a>.
+        </div> {% endcomment %}
+
+    </div>
+
+    <div class="col-3 mx-auto" id="resource-footer">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <!-- User actions -->
+            <div id="ask-question" class="d-grid gap-2 mt-3">
+                <a class="button blue d-flex justify-content-center align-items-center" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource {{ resource.title|truncatewords:4 }}" role="button">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+                    </svg>
+                    &nbsp;
+                    Poser une question
+                </a>
+            </div>
+            {% if is_switchtender %}
+            <!-- Switchtender actions -->
+
+            <!-- Push Resource -->
+            <div id="push-resource" class="d-grid gap-2 mt-3">
+                {% if active_project %}
+                {% if not resource.status == 0  %}
+                <form action="{% url "projects-create-resource-action" resource.id %}" method="GET">
+                    <button type="submit" class="button w-100 btn-sm" role="submit">
+                        Pousser la ressource
+                    </button>
+                </form>
+                {% endif %}
+                {% else %}
+                <span class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="left" title="Sélectionner d'abord un projet pour pousser une ressource">
+                    <button type="submit" class="button w-100 btn-sm" role="submit" disabled>
+                        Pousser la ressource
+                    </button>
+                </span>
+                {% endif %}
+            </div>
+            {% endif %}
+            <div id="print" class="d-flex w-100 mt-2">
+                <a onclick="window.print()" class="button blue w-100 text-center">
+                    <svg class="bi align-middle me-2" width="18" height="18" fill="#0063CB">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#printer" />
+                    </svg>
+                    <span>Imprimer</span>
+                </a>
+            </div>
+
+            <!-- Edit -->
+            {% get_obj_perms request.user for request.site as "user_site_perms" %}
+
+            {% if "manage_resources" in user_site_perms %}
+            <div id="edit-resource" class="d-grid gap-2 mt-3">
+                <a class="btn btn-light btn-sm" href="{% url 'resources-resource-update' resource.id %}" role="button">
+                    <svg class="bi" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+                    </svg>
+                    &nbsp;
+                    Éditer
+                </a>
+            </div>
+            {% endif %}
+            <div class="mt-4">
+            {% if resource.departments.count %}
+                {% include 'resources/resource/fragments/departments.html' %}
+            {% endif %}
+            </div>
+            {% if request.user %}
+                {% include 'resources/resource/fragments/contact_list.html' %}
+            {% endif %}
+        </div>
+        <div id="project_used" class="mt-4">
+            {% if projects_used_by %}
+                {% include 'resources/resource/fragments/project_used.html' %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -13,7 +13,7 @@ import sqlite3
 
 from django.urls import resolvers
 
-from urbanvitaliz import urls
+from recoco import urls
 
 
 def collect_urls(urlpatterns, prefix=""):
