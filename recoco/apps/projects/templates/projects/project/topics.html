@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load sass_tags %}
+{% load django_vite %}
+
+{% block title %}
+    Thématiques du projet {{project.name}}
+{% endblock %}
+
+{% block js %}
+    {% vite_asset 'js/apps/topicSearch.js' %}
+{% endblock %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/project.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
+{% block content %}
+    <div class="col-11 py-5 mx-auto">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="pb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
+                    </svg>
+                    &nbsp;
+                    <a href="{% url 'projects-project-detail' project.id %}">{{ project.name|truncatechars:20 }}</a>
+                </li>
+                <li class="breadcrumb-item">Thématiques</li>
+            </ol>
+        </nav>
+        <form action='{% url "projects-project-topics" project.pk %}'
+              method="post"
+              autocomplete="off"
+              class="row">
+            {% csrf_token %}
+            <input autocomplete="false" name="hidden" type="text" style="display:none;">
+            <section class="project-details-section l-stack col-6">
+                <header>
+                    <h2 class="font-small">Modifier les Thématiques du Projet</h2>
+                </header>
+                <p class="project-card-details font-small">
+                    Les thématiques sont définies par les conseillers du projet, vous pouvez en ajouter ou les supprimer ici.
+                </p>
+                {{ topic_formset.management_form }}
+                <ul class="topic-list l-stack">
+                    {% for topic_form in topic_formset %}
+                        <li class="d-flex justify-content-between align-items-end topic-item "
+                            x-data='TopicSearch("{{ topic_form.name.value|default:"" }}", "projects")'
+                            >
+                            {% if topic_form.name.value %}
+                                <div class="topic-item disabled">
+                                    <div class="l-stack w-100 justify-content-between align-items-end ">
+                                        <label for="{{ topic_form.name.id_for_label }}" class="tiny fw-bold w-100" :value="deleted">
+                                          <template x-if="deleted">
+                                            <span>Thématique supprimée</span>
+                                          </template>
+                                          <template x-if="!deleted">
+                                            <span>Thématique</span>
+                                          </template> 
+                                        </label>
+                                        
+                                        <input type="text"
+                                               class="form-control tiny w-100"
+                                               :class="{'text-decoration-line-through' : deleted}"
+                                               id="{{ topic_form.name.id_for_label }}"
+                                               name="{{ topic_form.name.html_name }}"
+                                               value="{{ topic_form.name.value|default:'Thématique' }}"
+                                               placeholder="" />
+                                    </div>
+                                {% else %}
+                                    <div class="l-stack w-100 justify-content-between align-items-center ">
+                                        <label for="{{ topic_form.name.id_for_label }}" class="tiny fw-bold w-100">Nouvelle Thématique</label>
+                                        <input type="text"
+                                               class="form-control tiny w-100"
+                                               id="{{ topic_form.name.id_for_label }}"
+                                               name="{{ topic_form.name.html_name }}"
+                                               value="{{ topic_form.name.value|default:'' }}"
+                                               placeholder=""
+                                               x-model="topic"
+                                               x-on:input.change.debounce="handleTopicChange" />
+                                        <template x-if="results.length > 0">
+                                            <div class="topic-choice-list l-stack ">
+                                                <template x-for="result in results">
+                                                    <button @click.prevent="handleResultClick(result.name)"
+                                                            class="btn-select btn secondary tiny mx-1 mt-1 w-100"
+                                                            x-text="result.name"></button>
+                                                </template>
+                                            </div>
+                                        </template>
+                                        {% if topic_form.name.errors %}
+                                            {% for error in topic_form.name.errors %}{{ error|escape }}{% endfor %}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                <div class="input-checkbox-btn input-delete d-flex align-self-end"
+                                     :class="{ 'disabled' : !topic }">
+                                    <input name="form-{{ forloop.counter0 }}-DELETE"
+                                           id="id_form-{{ forloop.counter0 }}-DELETE"
+                                           type="checkbox"
+                                           role="button"
+                                           class="visually-hidden"
+                                           autocomplete="off"
+                                           @click="handleDeleteClick()"
+                                           :disabled="!topic">
+                                    <label for="id_form-{{ forloop.counter0 }}-DELETE">
+                                        <span class="visually-hidden checked-text">Supprimer</span>
+                                        <span class="visually-hidden unckecked-text">Cocher pour supprimer</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                            <path fill="#CE0500" d="M2.917 1.667V.833h4.166v.834h2.084V2.5h-.834v6.25c0 .23-.186.417-.416.417H2.083a.417.417 0 0 1-.416-.417V2.5H.833v-.833h2.084ZM2.5 2.5v5.833h5V2.5h-5Zm1.25 1.25h.833v3.333H3.75V3.75Zm1.667 0h.833v3.333h-.833V3.75Z" />
+                                        </svg>
+                                    </label>
+                                    {% if topic_form.DELETE.errors %}
+                                        {% for error in topic_form.DELETE.errors %}{{ error|escape }}{% endfor %}
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                        {% if topic_formset.non_form_errors %}
+                            {% for error in topic_formset.non_form_errors %}{{ error|escape }}{% endfor %}
+                        {% endif %}
+                    </ul>
+                    <footer class="d-flex justify-content-end align-items-center">
+                        <button id="submit" type="submit" class="button small filled sm mb-4 w-auto">Terminé</button>
+                    </footer>
+                </section>
+                <section class="project-details-section l-stack col-6">
+                    <header>
+                        <svg class="bi " width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-square" />
+                        </svg>
+                        <h2 class="font-small">&nbsp;Note interne</h2>
+                    </header>
+                    <p class="project-card-details font-small">
+                        <span class="title-info text-red">PRIVÉ&nbsp;</span>
+                        Cette note ne sera que visible par les conseillers du projet.
+                    </p>
+                    {% include 'tools/editor.html' with input_name=form.advisors_note.name input_value=form.advisors_note.value|default:'' escapejs=True wide=True %}
+                    <footer class="d-flex justify-content-end align-items-center">
+                        <button type="advisor-note" class="button small filled w-auto">Enregistrer</button>
+                    </footer>
+                </section>
+            </form>
+            {{ form.media }}
+        </div>
+    {% endblock %}

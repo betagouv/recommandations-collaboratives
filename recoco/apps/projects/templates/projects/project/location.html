@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+{% load projects_extra %}
+{% load django_vite %}
+{% load guardian_tags %}
+
+{% block title %}
+    Modifier la localisation du projet - {{ request.site.name }}
+{% endblock %}
+
+{% current_project request.session as project %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
+{% if 'change_location' in user_project_perms %}
+    {% block js %}
+        {{ project.name|json_script:"editNameProject" }}
+        {{ project.status|json_script:"editStatus" }}
+        {{ project.location|json_script:"editLocation" }}
+        {{ project.location_x|json_script:"editLocation_x" }}
+        {{ project.location_y|json_script:"editLocation_y" }}
+        {{ project.commune.name|json_script:"editNameCommune" }}
+        {{ project.commune.postal|json_script:"editPostal" }}
+        {{ project.commune.insee|json_script:"editInsee" }}
+        {{ project.commune.latitude|json_script:"editLatitude" }}
+        {{ project.commune.longitude|json_script:"editLongitude" }}
+        <script>
+        const projectOptions = {
+            name: JSON.parse(document.getElementById('editNameProject').textContent),
+            status: JSON.parse(document.getElementById('editStatus').textContent),
+            location: JSON.parse(document.getElementById('editLocation').textContent),
+            location_x: document.getElementById('editLocation_x')
+              ? JSON.parse(document.getElementById('editLocation_x').textContent)
+              : null,
+            location_y: document.getElementById('editLocation_y')
+              ? JSON.parse(document.getElementById('editLocation_y').textContent)
+              : null,
+            commune: {
+                name: JSON.parse(document.getElementById('editNameCommune').textContent),
+                postal: JSON.parse(document.getElementById('editPostal').textContent),
+                insee: JSON.parse(document.getElementById('editInsee').textContent),
+                latitude: JSON.parse(document.getElementById('editLatitude').textContent),
+                longitude: JSON.parse(document.getElementById('editLongitude').textContent),
+            }
+        }
+        </script>
+        {% vite_asset 'js/apps/mapEditor.js' %}
+    {% endblock %}
+    {% block content %}
+        <div x-data='MapEditor(projectOptions)'
+             data-test-id="location-edit"
+             class="location-edit col-11 py-4 mx-auto">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
+                        </svg>
+                        &nbsp;
+                        <a href="{% url 'projects-project-detail' project.id %}">{{ project.name|truncatechars:20 }}</a>
+                    </li>
+                    <li class="breadcrumb-item">Localisation</li>
+                </ol>
+            </nav>
+            <div class="row">
+                <header class="location-header qs-heading">
+                    <h2 id="location-edit-label" class="fw-bold d-block mb-0">Où se situe votre projet ?</h2>
+                </header>
+            </div>
+            <div class="location-body row mt-2">
+                <div class="col col-lg-9 pe-5">
+                    <p class="location-label">Adresse du projet</p>
+                    <p class="location-address text-muted">
+                        {{ project.location }}
+                        {% if project.commune %}, {{ project.commune.postal|default:"" }} {{ project.commune.name|default:"" }}{% endif %}
+                        <svg class="bi me-1" width="15" height="15" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
+                        </svg>
+                    </p>
+                    <p class="location-label project project-card-details">Précisez la localisation</p>
+                    <p class="font-small location-hint">Recherchez une adresse, et/ou placez un point plus précis sur la carte.</p>
+                    <div data-test-id="map-edit" class="project-map-container">
+                        <div x-show="$store.geolocation.isLoading"
+                             x-transition
+                             class="project-map-container spinner">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Chargement de la carte...</span>
+                            </div>
+                        </div>
+                        <div x-show="!$store.geolocation.isLoading"
+                             class="p-0 project-map-container"
+                             data-test-id="project-location-edit">
+                            <div x-ref="map-edit" id="map-edit" class="h-100 w-100"></div>
+                        </div>
+                    </div>
+                    <div class="location-footer bg-white">
+                        <form method="POST"
+                              action=""
+                              name="ProjectLocationForm"
+                              class="d-flex form-coordinates text-muted flex-row-reverse">
+                            {% csrf_token %}
+                            <!-- {{ form.as_p }} -->
+                            <fieldset class="d-flex w-100">
+                                <div class="coordinates d-flex">
+                                    <label class="sr-only sr-only-focusable">
+                                        Longitude :
+                                        <input type="hidden"
+                                               name="location_x"
+                                               :value="project.location_x"
+                                               :placeholder="project.location_x" />
+                                    </label>
+                                    <label class="sr-only sr-only-focusable">
+                                        Latitude :
+                                        <input type="hidden"
+                                               name="location_y"
+                                               :value="project.location_y"
+                                               :placeholder="project.location_y" />
+                                    </label>
+                                </div>
+                            </fieldset>
+                            <button data-test-id="button-save-project-location" class="btn btn-primary">Sauvegarder la localisation</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col col-lg-3">
+                    <div id="section-why" class="mb-5">
+                        <svg class="d-inline-block bi me-1"
+                             width="18"
+                             height="18"
+                             fill="currentColor">
+                            <use xlink:href="/static/svg/bootstrap-icons.svg#question-circle"></use>
+                        </svg>
+                        &nbsp;
+                        <h5 class="d-inline-block">Pourquoi c'est important</h5>
+                        <p class="text-secondary"></p>
+                        <div id="excerpt-why" class="d-inline-block">
+                            <p>
+                                La localisation précise du site permet de mieux comprendre  l’environnement immédiat et donc les enjeux que vous rencontrez. C’est une donnée essentielle pour que l’on puisse vous conseiller de manière affinée.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+{% endif %}

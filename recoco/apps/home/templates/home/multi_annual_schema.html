@@ -1,0 +1,97 @@
+<!-- prettier-ignore -->
+{% extends "base.html" %}
+{% load sass_tags %}
+{% load static %}
+{% block title %} Déclaration d'accessibilité {% endblock %}
+{% block css %}
+<link href="{% sass_src 'home/css/home/home.scss' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+<!-- prettier-ignore -->
+{% block content %}
+
+<div class="col-8 py-3 g-0 mx-auto">
+    <h1>Schéma pluri-annuel</h1>
+
+    <p><i>Établie le 2 février 2024.</i></p>
+
+    <p>Ce document présente la politique d’accessibilité du service Recommandations-Collaboratives et des sites en découlant, pour les années 2024 à 2026.</p>
+
+    <h2>Périmètre</h2>
+
+    <p>Ce document concerne l’ensemble des sites en activités et gérés via le service Recommandations-Collaboratives, c’est-à-dire, à date :</p>
+    <ul>
+        <li>UrbanVitaliz (<a href="http://www.urbanvitaliz.fr">www.urbanvitaliz.fr</a>)</li>
+        <li>SOSPonts (<a href="https://sosponts.recoconseil.fr">https://sosponts.recoconseil.fr</a>)</li>
+        <li>Conseils EcoQuartier (<a href="https://ecoquartiers.recoconseil.fr/">https://ecoquartiers.recoconseil.fr/</a>)</li>
+    </ul>
+
+    <h3>Hors périmètre</h3>
+
+    <p>Les sites en construction ou lancés pour permettre de tester un nouveau portail ne sont pas inclus dans ce document.</p>
+
+    <h2>Ressources humaines et techniques</h2>
+
+    <h3>Référent accessibilité numérique</h3>
+
+    <p>L’élaboration, le suivi et la mise à jour de ce schéma pluriannuel sont placés sous la responsabilité de la personne référente en accessibilité numérique. Elle peut être contactée à l’adresse xxx.</p>
+
+    <p>Sa mission est :</p>
+
+    <ul>
+        <li>de promouvoir l’accessibilité par la diffusion des normes et des bonnes pratiques,</li>
+        <li>d’accompagner les équipes internes par des actions de formation notamment,</li>
+        <li>de contrôler et de veiller à l’application de la loi du 11 février 2005 précitée en procédant, directement ou par l’intermédiaire d’intervenants spécialisés, à des audits réguliers,</li>
+        <li>enfin, d’assurer la prise en charge des demandes des utilisateurs et, de manière générale, la qualité du service rendu aux utilisateurs en situation de handicap.</li>
+    </ul>
+
+    <h3>Equipe produit</h3>
+
+    <p>L’équipe chargée de faire évoluer l’application Recommandations-Collaboratives veille dans son ensemble à la prise en compte des personnes en situation de handicap et à l’amélioration progressive de l’accessibilité. Sont particulièrement impliqués sur le sujet :</p>
+
+    <ul>
+        <li>le ou la Product Owner,</li>
+        <li>le ou la Designer,</li>
+        <li>un ou une développeuse web front-end à minima.</li>
+    </ul>
+
+    <p>En termes de recrutements sur ces postes, les compétences liées à l’accessibilité seront considérées comme des pré-requis et systématiquement interrogées pendant le processus.</p>
+
+    <p>En termes d’actions de formation, des actions de formation et de sensibilisation seront organisées tout au long de la période concernée par le présent document. Elles permettront aux personnes intervenant sur les sites de développer, éditer et mettre en ligne des contenus accessibles. Chaque personne directement concernée par la mise en place de cette stratégie sera invitée à participer à minima à une formation par an.</p>
+
+    <h3>Aides externes</h3>
+
+    <p>L’équipe peut faire appel aux ressources suivantes :</p>
+
+    <ul>
+        <li>Le pôle Numérique Inclusif de l’Incubateur de Services Numériques de la DINUM</li>
+        <li>Les marchés publics, pour faire appel à des prestataires expert·es en accessibilité (pour faire des audits, ou pour accompagner la mise en accessibilité).</li>
+    </ul>
+
+    <h2>Politique d’accessibilité</h2>
+
+    <p>L’amélioration de l’accessibilité numérique doit progressivement accompagner voire conduire tous les travaux d’enrichissement et d’amélioration de l’application Recommandations-Collaboratives.</p>
+
+    <h3>Stratégie de mise en oeuvre</h3>
+
+    <p>Recommandations-Collaboratives est un produit en phase d’accélération. Ses fonctionnalités sont amenées à être régulièrement enrichies, ses pages à être périodiquement re-designées. Dans ce contexte, les étapes suivantes sont envisagées pour rendre progressivement le service conforme à ses obligations d’accessibilité :</p>
+
+    <ul>
+        <li>1er semestre 2024 : Refonte des pages incontournables de l’application (les plus utilisées), afin d’implémenter le DSFR, de fluidifier les parcours utilisateurs, d’harmoniser les éléments utilisés. Ce sera l’occasion de régler les principaux problèmes d’accessibilité sur ces pages.</li>
+        <li>2ème semestre 2024 : pré-audit de l’application et nouvelle vague d’améliorations, avec l’aide cette fois du pôle Numérique Inclusif de l’Incubateur de Services Numériques de la DINUM ou de prestataires experts recrutés spécialement pour accompagner ce travail.</li>
+        <li>2025 : Premier audit de conformité et travaux d’amélioration en fonction de ce qui aura été pointé. Mise en place de tests automatisés.</li>
+        <li>2026 : Deuxième audit de conformité et travaux d’amélioration en fonction de ce qui aura été pointé.</li>
+    </ul>
+
+    <h3>Mise en pratique au quotidien</h3>
+
+    <p>Lors du développement de nouvelles fonctionnalités, les enjeux d’accessibilité seront pris en compte dès la phase de design, puis dans le développement. Ces travaux feront l’objet d’une liste de points à vérifier systématiquement.</p>
+
+    <p>Les travaux mineurs sur des pages existantes seront l’occasion de régler les principaux problèmes restants sur ces écrans.</p>
+
+    <p>Périodiquement, une période de travail d’une durée prédéfinie sera majoritairement dédiée à rendre l’application plus accessible.</p>
+
+    <p>Enfin, des tests en interne seront menés tout au long des travaux pour valider les critères d’accessibilité prédéfinis, vérifiés sur au moins 2 navigateurs web. Des tests utilisateurs seront réalisés du point de vue de l’accessibilité. Les demandes des usagers sur ce sujet feront l’objet d’une prise en charge prioritaire.</p>
+</div>
+
+{% endblock %}

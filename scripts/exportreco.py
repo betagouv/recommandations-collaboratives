@@ -4,7 +4,7 @@ Script to extract all tasks
 
 import csv
 
-from urbanvitaliz.apps.projects.models import Task
+from recoco.apps.projects.models import Task
 
 headers = [
     "# reco",
