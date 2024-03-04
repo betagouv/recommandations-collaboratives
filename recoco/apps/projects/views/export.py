@@ -61,7 +61,7 @@ def project_list_export_csv(request):
             "departement",
             "commune_insee",
             "commune_nom",
-            "nom_friche",
+            "nom_projet",
             "detail_adresse",
             "date_contact",
             "contact_dossier",
