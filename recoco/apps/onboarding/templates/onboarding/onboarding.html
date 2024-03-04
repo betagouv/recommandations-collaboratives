@@ -153,9 +153,9 @@
                 <label class="text-info-custom text-grey-dark" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
                 <input type="text" id="{{ form.name.id_for_label }}"
                     class="py-4 placeholder-grey form-control {% if form.name.errors %}is-invalid{% endif %}" name="{{ form.name.name }}"
-                    maxlength="35" placeholder="Mon nom de dossier" value="{{ form.name.value|default:'' }}" required>
+                    maxlength="50" placeholder="Mon nom de dossier" value="{{ form.name.value|default:'' }}" required>
                     <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
-                                <p class="text-info-custom font-small text-grey-dark my-0 ">Limité à 35 caractères</p>
+                                <p class="text-info-custom font-small text-grey-dark my-0 ">Limité à 50 caractères</p>
                     </div>
                 {% for error in form.name.errors %}
                 <div class="text-danger text-end">{{ error }}</div>
