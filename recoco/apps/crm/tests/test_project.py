@@ -13,6 +13,7 @@ from recoco.apps.projects import models as projects_models
 from recoco.utils import login
 
 from .. import models
+from django.utils.text import slugify, capfirst
 
 ########################################################################
 # list
@@ -469,14 +470,23 @@ def test_toggle_on_project_annotation(request, client):
     with login(client, groups=["example_com_staff"]):
         response = client.get(detail_url)
         assert response.status_code == 200
+
         # unselected tag
         assertContains(
             response,
-            f'bg-secondary" type="submit">{test_tag}',
+            f'id="checkbox-{slugify(test_tag)}" >',
         )
         assertContains(
             response,
-            f'bg-secondary" type="submit">{other_tag}',
+            f'<label class="form-check-label" for="checkbox-{slugify(test_tag)}">{capfirst(test_tag)}</label>',
+        )
+        assertContains(
+            response,
+            f'id="checkbox-{slugify(other_tag)}" >',
+        )
+        assertContains(
+            response,
+            f'<label class="form-check-label" for="checkbox-{slugify(other_tag)}">{capfirst(other_tag)}</label>',
         )
 
         url = reverse("crm-project-toggle-annotation", args=[annotation.project.id])
@@ -490,12 +500,12 @@ def test_toggle_on_project_annotation(request, client):
         # selected tag
         assertContains(
             response,
-            f'bg-dark" type="submit">{test_tag}',
+            f'id="checkbox-{slugify(test_tag)}" checked>',
         )
         # unselected tag
         assertContains(
             response,
-            f'bg-secondary" type="submit">{other_tag}',
+            f'id="checkbox-{slugify(other_tag)}" >',
         )
 
 
@@ -527,13 +537,21 @@ def test_toggle_off_project_annotation(request, client):
         assert response.status_code == 200
         # unselected tag
         assertContains(
-            response,
-            f'bg-secondary" type="submit">{test_tag}',
+          response,
+          f'id="checkbox-{slugify(test_tag)}" >',
+        )
+        assertContains(
+          response,
+          f'<label class="form-check-label" for="checkbox-{slugify(test_tag)}">{capfirst(test_tag)}',
         )
         # selected tag
         assertContains(
-            response,
-            f'bg-dark" type="submit">{other_tag}',
+          response,
+          f'id="checkbox-{slugify(other_tag)}" checked>',
+        )
+        assertContains(
+          response,
+          f'<label class="form-check-label" for="checkbox-{slugify(other_tag)}">{capfirst(other_tag)}',
         )
 
         response = client.post(url, data=data)
