@@ -7,7 +7,7 @@ function MapViewerInteractive(projectOptions) {
 		project: null,
 		mapModal: null,
 		map: null,
-		zoom: 8,
+		zoom: 11,
 		get isLoading() {
 			return this.$store.geolocation.isLoading;
 		},
@@ -20,8 +20,10 @@ function MapViewerInteractive(projectOptions) {
 					longitude: projectOptions.commune.longitude,
 				}
 			};
-			const { latitude, longitude } = this.project.commune;
-			this.zoom = latitude && longitude ? this.zoom + 9 : this.zoom;
+        const latitude = this.project.location_x;
+        const longitude  = this.project.location_y;
+			  this.zoom = latitude && longitude ? this.zoom + 7 : this.zoom;
+
 			const geoData = await this.$store.geolocation.initGeolocationData(this.project);
 
 			this.map = await this.initMap(this.project, geoData);
