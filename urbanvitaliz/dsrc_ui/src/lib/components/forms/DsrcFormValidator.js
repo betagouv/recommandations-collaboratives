@@ -1,6 +1,12 @@
 // import Alpine from 'alpinejs';
-import * as validations from '../../../ext/ajv.validations.default';
+// import * as validations from '../../../ext/ajv.validations.default';
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
+import addErrors from 'ajv-errors';
 
+const ajv = new Ajv({allErrors: true});
+addFormats(ajv);
+addErrors(ajv);
 /**
  * Use this Alpine component to provide frontend validation capabilities to a form rendered by the server.
  * @param {string} formId The id of the <form> element
@@ -11,12 +17,22 @@ import * as validations from '../../../ext/ajv.validations.default';
 function DsrcFormValidator (
 	formId,
 	formData,
-	validationFunctionName = 'DsrcFormValidationFunction'
+	actionButtonFormParam,
+  validationSchema,
 ) {
 	return {
 		form: {},
 		errors: [],
-		ajvValidate: validations[validationFunctionName],
+    actionButtonFormParam: {
+      submit: {
+        label: "Valider",
+      },
+      cancel: {
+        label: "Annuler",
+        href:""
+      }
+    },
+    schema: validationSchema,
 		async init() {
 			if (!formData) {
 				// We shouldn't reach this state: the data should be available, or the server should have returned an error before reaching this point and the form should not have been rendered
@@ -40,6 +56,11 @@ function DsrcFormValidator (
 					};
 				});
 			}
+      if(!actionButtonFormParam) {
+        // We have to get parameters to display action buttons in form 
+        console.error('Error missing button parameters');
+      }
+      this.actionButtonFormParam = actionButtonFormParam;
 			this.$nextTick(() => {
 				// enable form validation for all submission types (click, keyboard, ...)
 				document
@@ -74,11 +95,12 @@ function DsrcFormValidator (
 			fields.forEach((field) => {
 				validateMap[field] = this.form[field].value;
 			});
-			let valid = this.ajvValidate(validateMap);
-			if (!valid) {
-				this.errors = this.ajvValidate.errors;
-			} else {
+      const validate = ajv.compile(validationSchema)
+      const valid = validate(validateMap);
+			if (valid) {
 				this.errors = [];
+			} else {
+				this.errors = validate.errors;
 			}
 		},
 		getFieldErrors(fieldName) {
