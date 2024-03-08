@@ -15,7 +15,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
@@ -28,11 +28,57 @@ from urbanvitaliz.apps.tasks import models as tasks
 from urbanvitaliz.utils import check_if_advisor
 
 from . import models
-from .forms import ContactForm, UserPasswordFirstTimeSetupForm
+from .forms import ContactForm, UserPasswordFirstTimeSetupForm, ModalEmailOnboardingForm
 
 
-class HomePageView(TemplateView):
-    template_name = "home/home.html"
+def home_page(request):
+    form = ModalEmailOnboardingForm(request.POST or None)
+
+    form_data = {}
+
+    action_button_form_param =  {
+      "submit": {
+        "label": "Déposer votre projet",
+      }
+    }
+
+    for field in form:
+        value = field.value() if field.value() is not None else ""
+        form_data[field.html_name] = {"value": value}
+
+    if request.method == "POST" and form.is_valid():
+        email = (
+            request.user.username
+            if request.user.is_authenticated
+            else form.clean_email()
+        )
+
+        user, is_new_user = auth.User.objects.get_or_create(
+            username=email, defaults={"email": email}
+        )
+
+        print("is_new_user", is_new_user)
+        print("request.user.is_authenticated", request.user.is_authenticated)
+
+        request.session["onboarding_email"] = form.cleaned_data
+        
+        if not is_new_user: 
+            if not request.user.is_authenticated:
+                # User have already an account but is disconnected 
+                next_step = reverse("projects-onboarding-signin")
+            # User have already an account and is connected
+            next_step = reverse("projects-onboarding-project")
+            return redirect(f"{next_step}")
+            
+        next_step = reverse("projects-onboarding-signup")
+        return redirect(f"{next_step}")
+
+    context = {
+        "form_data": form_data, 
+        "form": form, 
+        "action_button_form_param": action_button_form_param
+    }
+    return render(request, "home/home.html", context)
 
 
 @method_decorator([login_required], name="dispatch")
