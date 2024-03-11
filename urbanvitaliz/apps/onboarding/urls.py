@@ -21,9 +21,24 @@ urlpatterns = [
         name="projects-onboarding",
     ),
     path(
-        r"onboarding-experiment/",
-        views.onboarding_experiment,
-        name="projects-onboarding",
+        r"onboarding/signin",
+        views.onboarding_step1_signin,
+        name="projects-onboarding-signin",
+    ),
+    path(
+        r"onboarding/signup",
+        views.onboarding_step1_signup,
+        name="projects-onboarding-signup",
+    ),
+    path(
+        r"onboarding/project",
+        views.onboarding_step2_project,
+        name="projects-onboarding-project",
+    ),
+    path(
+        r"onboarding/summary/<int:project_id>",
+        views.onboarding_summary,
+        name="projects-onboarding-summary",
     ),
     path(
         r"onboarding/prefill/",
