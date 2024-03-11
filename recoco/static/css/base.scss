@@ -156,17 +156,7 @@ progress::-moz-progress-bar {
 
 // Main content layout
 
-.main-content.public-content {
-    padding-top: 80px;
-}
-
 .project-header-sidebar > .btn {
     border-radius: 2px;
     padding: 0.29rem 1rem;
-}
-
-@media (min-width: 690px) {
-    .main-content.public-content {
-        padding-top: 150px;
-    }
 }
