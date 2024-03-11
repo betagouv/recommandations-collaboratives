@@ -7,23 +7,16 @@
 	"files": [
 		"dist"
 	],
+	"main": "./dist/js/dsrc-ui.umd.js",
 	"module": "./dist/js/dsrc-ui.js",
-  "main" : "./dist/js/dsrc-ui.js",
 	"exports": {
 		".": {
 			"import": "./dist/js/dsrc-ui.js",
-			"require": "./dist/js/dsrc-ui.js",
-      "DsrcFormValidator": "./dist/js/components/forms/DsrcFormValidator",
-      "validations": "./dist/js/ajv.validations.default"
-		},
-    "./dist/css/dsrc-csscore.css": {
-      "import": "./dist/css/dsrc-csscore.css",
-      "require": "./dist/css/dsrc-csscore.css"
-    },
-    "./dist/css/dsrc-csstokens.css": {
-      "import": "./dist/css/dsrc-csstokens.css",
-      "require": "./dist/css/dsrc-csstokens.css"
-    }
+			"require": "./dist/js/dsrc-ui.umd.js",
+			"DsrcFormValidator": "./dist/js/components/forms/DsrcFormValidator",
+			"validations": "./dist/js/ajv.validations.default",
+			"DsrcModal": "./dist/js/components/blocks/DsrcModal/DsrcModal"
+		}
 	},
 	"scripts": {
 		"dev": "yarn build:ajv && vite dev",
@@ -31,7 +24,7 @@
 		"dev:csstokens": "rollup --config rollup.config.csstokens.js -w",
 		"dev:csscore": "rollup --config rollup.config.csscore.js -w",
 		"build": "yarn build:icons && yarn build:fonts && yarn build:ci",
-		"build:ci": "yarn build:csstokens && yarn build:csscore && vite build && yarn build:modules && yarn build:ajv",
+		"build:ci": "yarn build:csstokens && yarn build:csscore && vite build && yarn build:modules",
 		"node:ajv": "node ./src/ext/ajv.cjs",
 		"build:ajv": "yarn node:ajv && rollup --config rollup.config.ajv.js",
 		"build:modules": "rollup --config rollup.config.modules.js",
@@ -42,8 +35,7 @@
 		"lint:css": "stylelint ./src/lib/styles/css/**/*.css > ./logs/stylelint-css.log",
 		"lint:scss": "stylelint ./src/lib/styles/scss/**/*.scss > ./logs/stylelint-scss.log",
 		"lint:prettier": "prettier --check --ignore-path=../../.prettierignore . && eslint \".\"",
-		"lint": "yarn lint:css; yarn lint:scss; yarn lint:prettier > ./logs/lint.log",
-		"format": "prettier --write --ignore-path=../../.prettierignore ."
+		"lint": "yarn lint:css; yarn lint:scss; yarn lint:prettier > ./logs/lint.log"
 	},
 	"license": " AGPL-3.0",
 	"keywords": [
@@ -62,6 +54,7 @@
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "^25.0.7",
+		"@rollup/plugin-json": "^6.1.0",
 		"@rollup/plugin-node-resolve": "^15.2.3",
 		"@rollup/plugin-terser": "^0.4.4",
 		"@web/rollup-plugin-copy": "^0.5.1",
