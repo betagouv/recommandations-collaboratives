@@ -13,11 +13,6 @@ html {
     height: -webkit-fill-available;
 }
 
-html,
-body {
-    overflow-x: hidden; /* Prevent scroll on narrow devices */
-}
-
 main {
     display: flex;
     flex-wrap: nowrap;
@@ -160,9 +155,6 @@ progress::-moz-progress-bar {
 }
 
 // Main content layout
-.main-content {
-    padding-top: 66px;
-}
 
 .main-content.public-content {
     padding-top: 80px;
