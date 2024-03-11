@@ -15,6 +15,7 @@ from urllib.parse import urldefrag, urljoin
 from django.conf import settings
 from django.contrib.auth import models as auth
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.search import SearchVector
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -287,11 +288,9 @@ class TrigramSimilaritySearchFilter(SearchFilter):
             return queryset.none()
 
         # make conditions
-        conditions = {}
-        for search_field in search_fields:
-            conditions[f"{search_field}__trigram_similar"] = search_terms
+        vectors = SearchVector(*search_fields, config="french")
 
-        queryset = queryset.filter(**conditions)
+        queryset = queryset.annotate(search=vectors).filter(search=search_terms)
 
         return queryset
 
