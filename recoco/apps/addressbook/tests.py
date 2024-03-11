@@ -327,7 +327,7 @@ def test_anonymous_can_search_organization_api(client, request):
     baker.make(models.Organization, name="acme corporation", sites=[current_site])
 
     url = reverse("organizations-list")
-    response = client.get(url, {"search": "acm corparotion"}, format="json")
+    response = client.get(url, {"search": "acme"}, format="json")
 
     assert response.status_code == 200
     assert len(response.data) > 0
