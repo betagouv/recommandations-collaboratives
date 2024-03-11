@@ -1,3 +1,7 @@
+//Bootstrap librairie
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 import 'vite/modulepreload-polyfill';
 import './utils/globals';
 
@@ -10,10 +14,6 @@ import './store/app';
 //Global reused component
 import './components/Notification';
 import './components/Editor';
-
-//Bootstrap librairie
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 //Global CSS
 import '@gouvfr/dsfr/dist/dsfr/dsfr.min.css';
