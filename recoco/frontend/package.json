@@ -21,7 +21,7 @@
     "axios": "^1.6.0",
     "d3": "^7.8.4",
     "d3-cloud": "^1.2.5",
-    "dsrc_ui": "file:../dsrc_ui",
+    "dsrc_ui": "file:./modules/dsrc_ui",
     "intro.js": "^7.0.1",
     "js-cookie": "^3.0.1",
     "leaflet": "^1.9.1",
