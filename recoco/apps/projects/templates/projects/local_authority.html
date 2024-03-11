@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load sass_tags %}
+{% load humanize %}
+
+{% block css %}
+<link href="{% sass_src 'resources/resources.scss' %}" rel="stylesheet" type="text/css">
+<link href="{% sass_src 'resources/resource_card.scss' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<div class="col-11 py-5 mx-auto">
+    <h1 class="align-items-center">
+        <svg class="bi" width="40" height="40" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#people"/>
+        </svg>
+        Mon Espace
+    </h1>
+
+
+    <div class="row resource-details mb-3">
+        <div class="col-sm-12 col-lg-8 col-xl-9">
+
+
+            <div class="bd-callout bd-callout-info">
+                Bienvenue sur votre tableau de bord ! Vous y trouverez un résumé de
+                vos informations ainsi que les éventuelles notifications.
+            </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
+            <p class="small text-secondary">
+                <a href="#" class="d-flex align-items-center link-dark text-decoration-none" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="align-items-center link-dark text-decoration-none">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#life-preserver"/>
+                        </svg>
+                    </span>
+                    &nbsp;
+                    <strong>Besoin d'aide ?</strong>&nbsp;
+                    Une question ?
+                </a>
+
+                <div class="d-grid gap-2 mt-3">
+                    <a class="btn btn-primary btn-sm" href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=UrbanVitaliz" role="button">
+                        <svg class="bi" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
+                        </svg>
+                        &nbsp;
+                        Écrire à l'équipe UrbanVitaliz
+                    </a>
+                </div>
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="w-100">
+        <h2 class="mt-5 mb-3 d-inline-block">
+            <svg class="bi align-baseline" width="24" height="24" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building"/>
+            </svg>
+            Mes Friches en projet
+        </h2>
+    </div>
+
+
+    <ul class="list-group">
+			  {% for project in projects %}
+        <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-action">
+            <div class="d-flex me-auto justify-content-between">
+                <h4 class="mb-1">
+                    <a class="text-reset stretched-link" href="{% url "projects-project-detail" project.id %}">{{ project.name|title|truncatechars:40 }}</a>
+                    <span class="d-block fs-6 text-secondary">{{ project.location|capfirst }}</span>
+                </h4>
+            </div>
+            <div class="d-flex me-5 ms-5 justify-content-between">
+                {% if project.tasks.open.count > 0 %}
+                <div class="text-center">
+                    <span class="badge bg-primary">
+                        <svg class="bi align-middle" width="24" height="24" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#card-checklist"/>
+                        </svg>
+                        &nbsp;
+                        {{ project.tasks.open.count }}
+                    </span>
+                    <br/>
+                    <span class="small text-secondary">Proposition{{ project.tasks.open.count|pluralize }} de recommandations à prendre</span>
+                </div>
+                {% else %}
+                <span class="text-secondary small text-center">
+                    Aucune recommandation à prendre,<br/>
+                    vous êtes à jour !
+                    <svg class="bi align-middle text-success" width="24" height="24" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check"/>
+                    </svg>
+                </span>
+                {% endif %}
+            </div>
+            <div class="d-flex me-5 ms-5 justify-content-between">
+                <div class="text-center">
+                    <svg class="bi align-middle" width="20" height="20" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
+                </svg>
+                <span class="align-middle fs-4">{{ project.resources.count }}</span>
+                <br/>
+                <span class="text-secondary small">Ressources associées</span>
+                </div>
+            </div>
+            <div class="d-flex ms-5 ">
+                <small>Modifié {{ project.updated_on|naturaltime }}</small>
+            </div>
+        </li>
+		    {% empty %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div class="w-100">
+                <div class="text-center mt-3 mb-3">
+                    <svg class="bi me-2" width="32" height="32">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#megaphone"/>
+                    </svg>
+
+                    <h4 class="mt-1">
+                        Un Projet à nous soumettre ?
+                    </h4>
+				            <a class="mt-3 mb-3  btn btn-primary" href="{% url "projects-onboarding" %}" >Prenez contact dès maintenant !</a>
+                    <br/>
+                    <span class="text-secondary small">Tous les projets déposés sont accompagnés gratuitement par l'équipe UrbanVitaliz.</span>
+                </div>
+            </div>
+        </li>
+				{% endfor %}
+    </ul>
+
+    {% if projects %}
+    <a class="btn btn-primary btn-sm mb-1 mt-3 d-inline-block float-end"  href="{% url 'projects-onboarding'  %}">
+        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
+        </svg>
+        Nouveau projet
+    </a>
+    {% endif %}
+
+    <h2 class="mb-4 mt-5">
+        <svg class="bi align-baseline" width="24" height="24" fill="currentColor">
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
+        </svg>
+        Mes Ressources sauvegardées
+    </h2>
+
+    {% if user.bookmarks.count %}
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        {% for bookmark in user.bookmarks.all %}
+        <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-12">
+            <div>
+            {% include "resources/resource/widgets/card_standard.html" with resource=bookmark.resource %}
+
+            {% if bookmark.comments %}
+            <div class="text-secondary mt-2 p-1">
+                <svg class="bi align-baseline" width="18" height="18" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pen"/>
+                </svg>
+                {{ bookmark.comments }} &#8210; <a href="{% url "resources-bookmark-create" bookmark.resource.id %}">éditer votre note</a>
+            </div>
+            {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <span class="">Les ressources <strong>documentent vos démarches</strong>. Cet espace vous permet de les collecter.</span>
+    <div class="bd-callout bd-callout-info">
+        <p>
+            <svg class="bi ms-1 me-1 align-middle" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key"/>
+            </svg>
+
+            Vous n'avez ajouté aucune ressource en favoris pour l'instant.
+            <br/>
+        </p>
+        <p>
+            Vous pouvez le faire à tout moment en <strong>cliquant sur l'icône
+            <svg class="bi ms-1 me-1 align-baseline text-warning" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
+            </svg>
+            </strong> :
+            <ul>
+                <li>Dans la <a href="{% url "resources-resource-search" %}">liste des ressources</a>, en <strong>bas de la carte</strong> ;</li>
+                <li>Sur <a href="{% url "resources-resource-detail" 1 %}">une ressource</a>, <strong>à côté du titre</strong>.</li>
+            </ul>
+        </p>
+        <p class="text-secondary">Il vous suffira de cliquer à nouveau sur l'étoile pour retirer la ressource de votre liste.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
