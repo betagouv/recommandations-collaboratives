@@ -1,7 +1,10 @@
-import dsrc_ui from 'dsrc_ui';
+import '../../css/onboarding.css';
 import '../components/CitySelect';
 
+import '../components/DsrcFormValidatorActivate';
+import {schemaOnboardingStep1FormValidator} from '../utils/ajv/schema/ajv.schema.OnboardingSigninForm';
 import Alpine from 'alpinejs';
 
-// const ajvValidations = dsrc_ui.validations['ValidationDsrcForm'];
-Alpine.data('DsrcFormValidator', dsrc_ui.DsrcFormValidator);
+Alpine.data('AjvValidationSchema', () => {
+  return { schemaOnboardingStep1FormValidator };
+});

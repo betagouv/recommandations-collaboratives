@@ -4,11 +4,11 @@
  * AJV Doc on Combining Schemas: https://ajv.js.org/guide/combining-schemas.html
  ************************************************************************************/
 
-function maxLengthErrorMessage(maxLength) {
+export function maxLengthErrorMessage(maxLength) {
   return `${maxLength} caractère${maxLength > 1 ? 's' : ''}  maximum`;
 }
 
-function minLengthErrorMessage(minLength) {
+export function minLengthErrorMessage(minLength) {
   return `${minLength} caractère${minLength > 1 ? 's' : ''} minimum`;
 }
 
