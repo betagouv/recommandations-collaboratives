@@ -25,7 +25,7 @@ from django import template
 from django.template.context import Context
 from crispy_forms.layout import HTML
 
-from urbanvitaliz.apps.dsrc.utils import generate_random_id
+from recoco.apps.dsrc.utils import generate_random_id
 
 register = template.Library()
 

@@ -79,6 +79,8 @@ INSTALLED_APPS = [
     "recoco.apps.invites",
     "recoco.apps.crm",
     "recoco.apps.training",
+    "crispy_forms",
+
 ]
 
 SITE_ID = SiteID(default=1)

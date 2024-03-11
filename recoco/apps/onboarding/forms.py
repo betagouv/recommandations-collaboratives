@@ -13,7 +13,7 @@ from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from crispy_forms.layout import Layout, Fieldset
-from urbanvitaliz.apps.dsrc.forms import DsrcBaseForm
+from recoco.apps.dsrc.forms import DsrcBaseForm
 
 from . import models
 
