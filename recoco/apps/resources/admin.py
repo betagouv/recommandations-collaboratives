@@ -9,6 +9,7 @@ created: 2021-06-16 11:10:27 CEST
 
 
 from django.contrib import admin
+from csvexport.actions import csvexport
 
 from . import models
 
@@ -22,6 +23,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(models.Resource)
 class ResourceAdmin(admin.ModelAdmin):
+    actions = [csvexport]
     search_fields = ["title", "content"]
     list_filter = ["sites", "updated_on"]
     list_display = ["title", "status", "category", "updated_on"]

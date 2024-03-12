@@ -718,7 +718,7 @@ def test_anonymous_can_search_topic_api(client, request):
     topic.projects.add(project)
 
     url = reverse("topics-list")
-    response = client.get(url, {"search": "acm topc"}, format="json")
+    response = client.get(url, {"search": "acme"}, format="json")
 
     assert response.status_code == 200
     assert len(response.data) > 0
@@ -732,7 +732,7 @@ def test_unused_topics_are_not_suggested_via_rest_api(client, request):
 
     url = reverse("topics-list")
     response = client.get(
-        url, {"search": "acm topc", "restrict_to": "projects"}, format="json"
+        url, {"search": "acme", "restrict_to": "projects"}, format="json"
     )
 
     assert response.status_code == 200
@@ -815,7 +815,7 @@ def test_topics_are_restricted_to_nonexistent_via_rest_api(client, request):
 
     url = reverse("topics-list")
     response = client.get(
-        url, {"search": "acm topc", "restrict_to": "gne"}, format="json"
+        url, {"search": "acme topic", "restrict_to": "gne"}, format="json"
     )
 
     assert response.status_code == 200
