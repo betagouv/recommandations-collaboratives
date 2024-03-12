@@ -30,7 +30,7 @@ def run():
 
             if element["type"] in ("text", "textarea"):
                 print(f"Creating TEXT question {element['label']}")
-                Question.objects.get_or_create(
+                question, _ = Question.objects.get_or_create(
                     question_set=qset,
                     text=element["label"],
                     text_short=element["label"][:28],
@@ -62,6 +62,8 @@ def run():
                 )
             else:
                 print(f"Ignoring form entry of type {element['type']}")
+
+            sc.onboarding_questions.add(question)
 
         print("============== ANSWERS ==================")
         for onb_resp in onboarding.responses.all():
