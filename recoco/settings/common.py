@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "watson",
     "phonenumber_field",
     "cookie_consent",
+    "recoco.apps.dsrc",
     "recoco.apps.onboarding",
     "recoco.apps.home",
     "recoco.apps.projects",
@@ -79,6 +80,7 @@ INSTALLED_APPS = [
     "recoco.apps.invites",
     "recoco.apps.crm",
     "recoco.apps.training",
+    "crispy_forms",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -127,6 +129,7 @@ TEMPLATES = [
             ],
             "libraries": {
                 "common_tags": "recoco.templatetags.common_extra",
+                "dsrc_tags": "recoco.apps.dsrc.templatetags.dsrc_tags",
             },
         },
     },
@@ -137,6 +140,9 @@ DBTEMPLATES_USE_CODEMIRROR = True
 
 # MULTISITE
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ('dsrc_crispy_forms')
+CRISPY_TEMPLATE_PACK = 'dsrc_crispy_forms'
 
 WSGI_APPLICATION = "recoco.wsgi.application"
 

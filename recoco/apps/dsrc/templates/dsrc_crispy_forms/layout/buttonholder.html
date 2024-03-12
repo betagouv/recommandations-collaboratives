@@ -1,0 +1,8 @@
+<ul class="fr-btns-group{% if buttonholder.css_class %} {{ buttonholder.css_class }}{% endif %}">
+    {% for field in buttonholder.fields %}
+        {{ field }}
+        {% with label=field.context.label name=field.context.name type=field.context.type onclick=field.context.onclick disabled=field.context.disabled size=field.context.size variant=field.context.variant color=field.context.color icon=field.context.icon align=field.context.align title=field.context.title classes=field.context.classes %}
+            <li>{% include "dsrc/core/blocks/buttons/button.html" %}</li>
+        {% endwith %}
+    {% endfor %}
+</ul>

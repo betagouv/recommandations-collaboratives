@@ -1,0 +1,15 @@
+{% for fieldset in form.fieldsets %}
+    {% spaceless %}
+        <fieldset class="fieldset item-{{ forloop.counter }} {{ fieldset.classes }}">
+            {% if fieldset.legend %}<legend>{{ fieldset.legend }}</legend>{% endif %}
+            {% if fieldset.description %}<p class="description">{{ fieldset.description }}</p>{% endif %}
+            {% for field in fieldset %}
+                {% if field.is_hidden %}
+                    {{ field }}
+                {% else %}
+                    {% include field_template|default:"dsrc_crispy_forms/field.html" %}
+                {% endif %}
+            {% endfor %}
+            {% if not forloop.last or not fieldset_open %}</fieldset>{% endif %}
+    {% endspaceless %}
+{% endfor %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% load static %}
+{% load sass_tags %}
+{% load crispy_forms_tags %}
+{% block js %}
+  {% vite_asset 'js/apps/onboarding.js' %}
+{% endblock js %}
+{% block css %}
+{% endblock css %}
+{% block title %}
+  | Solliciter l'équipe {{ request.site.name }}
+{% endblock title %}
+{% block og_title %}
+  | Solliciter l'équipe {{ request.site.name }}
+{% endblock og_title %}
+{% block page_title %}
+  Solliciter {{ request.site }}
+{% endblock page_title %}
+{% block tagline %}
+  Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
+{% endblock tagline %}
+{% block content %}
+  <div class="container">
+    <div class="banner mt-6 text-center">
+      <img src="{% static 'urbanvitaliz.fr/home/img/home/logo-urbanvitaliz.svg' %}"
+           width="10%"
+           height="auto"
+           alt="Logo d'UrbanVitaliz" />
+      <h1>
+        <strong>Déposer votre projet</strong> UrbanVitaliz
+      </h1>
+    </div>
+    <div class="fr-stepper mb-3">
+      <h2 class="fr-stepper__title">
+        Décrivez votre projet
+        <span class="fr-stepper__state">Étape 2 sur 2</span>
+      </h2>
+      <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
+      <p class="fr-stepper__details">
+        <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
+      </p>
+    </div>
+    <div class="container__form d-flex justify-content-center">
+      <div class="onboarding__form"
+           x-data="DsrcFormValidator('id-onboarding-form-project', {{ form_data|safe }}, {{ action_button_form_param }}, 'OnboardingStepProjectValidationFunction')"
+           x-init="init">{% crispy experiment_form %}</div>
+    </div>
+  </div>
+{% endblock content %}

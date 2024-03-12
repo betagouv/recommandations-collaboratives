@@ -1,0 +1,62 @@
+<fieldset x-model="form['{{ field.html_name }}'].value"
+          x-ref="{{ field.html_name }}"
+          @input="changeInput"
+          @focus="touchInput"
+          @blur="validateInput"
+          id="{{ field.id_for_label }}"
+          name="{{ field.html_name }}-fieldset"
+          class="fr-fieldset"
+          aria-labelledby="radio-hint-legend radio-hint-messages{% if field.errors %} {{ field.id_for_label }}-desc-error{% endif %}"
+          {% if field.field.required %}required{% endif %}
+          {% if field.field.disabled %}disabled{% endif %}>
+    <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
+            id="radio-hint-legend">
+        {{ field.label }}
+        {% if field.help_text %}<span class="fr-hint-text">{{ field.help_text }}</span>{% endif %}
+    </legend>
+    {% for choice in field %}
+        <div class="fr-fieldset__element">
+            <div class="fr-radio-group{% if field.errors %} fr-input-group--error{% endif %}{% if field.field.is_valid %} fr-input-group--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }} fr-radio-group--{{ field.field.widget.attrs.size }} {% endif %} {{ field.field.widget.attrs.classes }}"
+                 :class="`fr-input-group--${form['{{ field.html_name }}'].valid_class}`">
+                <input x-model="{{ choice.id_for_label }}.value"
+                       name="{{ field.html_name }}"
+                       id="{{ choice.id_for_label }}"
+                       type="radio"
+                       class="{{ field.field.widget.attrs.classes }}"
+                       data-test="{{ field.field.widget.attrs.input_test_id }}-{{ forloop.counter }}" />
+                <label class="fr-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+            </div>
+        </div>
+    {% endfor %}
+    {% if field.field.messages %}
+        {% for message in field.field.messages %}
+            <div class="fr-messages-group"
+                 id="{{ field.css_id }}-input-messages"
+                 aria-live="assertive">
+                <p>{{ message }}</p>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if form.cleaned_data.js_enabled == 'false' and field.errors %}
+        <!-- Display server-side validation errors here -->
+        {% for error in field.errors %}
+            <p id="error_{{ forloop.counter }}_{{ field.auto_id }}"
+               class="fr-error-text">{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+    <ul x-show="fieldHasError('{{ field.html_name }}')"
+        class="fr-messages-group"
+        id="{{ field.id_for_label }}-desc-error"
+        aria-live="polite">
+        <template x-for="(error, index) in form['{{ field.html_name }}'].errors"
+                  :key="index">
+            <!-- Display client-side validation errors here -->
+            <li id="`error_${index}_{{ field.auto_id }}`"
+                x-text="error"
+                class="fr-error-text">{{ error }}</li>
+        </template>
+    </ul>
+    {% if field.valid_text %}
+        <p id="{{ field.css_id }}-desc-valid" class="fr-valid-text">{{ field.valid_text }}</p>
+    {% endif %}
+</fieldset>

@@ -34,6 +34,7 @@ djangorestframework-xml
 rest-framework-generic-relations
 django-filter
 dynamic-django-forms
+django-crispy-forms
 django-hijack==3.4.5
 django-sesame[ua]==3.2.2
 django-recaptcha==3.0.0
