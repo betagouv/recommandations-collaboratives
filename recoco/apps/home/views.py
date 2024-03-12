@@ -28,7 +28,7 @@ from recoco.apps.tasks import models as tasks
 from recoco.utils import check_if_advisor
 
 from . import models
-from .forms import ContactForm, UserPasswordFirstTimeSetupForm, ModalEmailOnboardingForm
+from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 from .utils import get_current_site_sender_email
 
 

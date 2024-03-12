@@ -180,31 +180,3 @@ class UserPasswordFirstTimeSetupForm(forms.Form):
         if password1 and password2:
             if password1 != password2:
                 raise ValidationError("Les mots de passe ne correspondent pas.")
-
-
-class ModalEmailOnboardingForm(DsrcBaseForm): 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.form_id = "id-email-onboarding-form"  # The form id is used for validation, it must be set and unique in the page
-        self.helper.form_class = "dsrc-color-primary"  # Theme override classes
-        self.helper.form_method = "post"
-        # NOTE unused parameter ?
-        self.helper.form_action = "test_form" 
-
-        self.helper.layout = Layout(
-            Fieldset(
-                "",  # The first argument is the legend of the fieldset
-                "email",
-            ),
-        )
-
-    def clean_email(self):
-        """Make sure email is lowercased"""
-        email = self.cleaned_data["email"]
-        return email.lower()
-    
-    email = forms.EmailField(
-        label="Adresse email",
-        help_text="Format attendu : prenom.nom@domaine.fr",
-        required=True,
-    )
