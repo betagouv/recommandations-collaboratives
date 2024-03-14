@@ -140,21 +140,23 @@ def onboarding_step1_signup(request):
     existing_data_user = request.session.get("onboarding_existing_data_user")
 
     # Fetch the onboarding form associated with the current site
-    form = forms.ExperimentFormUsingDsrcPart1(request.POST or None, initial=existing_data_user)
+    form = forms.ExperimentFormUsingDsrcPart1(
+        request.POST or None, initial=existing_data_user
+    )
 
     form_data = {}
     for field in form:
         value = field.value() if field.value() is not None else ""
         form_data[field.html_name] = {"value": value}
-    
-    action_button_form_param =  {
-      "submit": {
-        "label": "Suivant",
-      },
-      # "cancel": {
-      #   "label": "False",
-      #   "href":""
-      # }
+
+    action_button_form_param = {
+        "submit": {
+            "label": "Suivant",
+        },
+        # "cancel": {
+        #   "label": "False",
+        #   "href":""
+        # }
     }
 
     if request.method == "POST" and form.is_valid():
@@ -168,12 +170,16 @@ def onboarding_step1_signup(request):
         request.session["onboarding_existing_data_user"] = form.cleaned_data
         return redirect(f"{reverse('projects-onboarding-project')}")
 
-    context = {"form_data": form_data, "experiment_form": form, "action_button_form_param": action_button_form_param}
+    context = {
+        "form_data": form_data,
+        "experiment_form": form,
+        "action_button_form_param": action_button_form_param,
+    }
     return render(request, "onboarding/onboarding-step1-signup.html", context)
+
 
 def onboarding_step1_signin(request):
     """Return the onboarding page and process onboarding submission"""
-
     # if we're back from login page restore data already entered
     existing_data = request.session.get("onboarding_existing_data")
 
@@ -184,15 +190,15 @@ def onboarding_step1_signin(request):
     for field in form:
         value = field.value() if field.value() is not None else ""
         form_data[field.html_name] = {"value": value}
-    
-    action_button_form_param =  {
-      "submit": {
-        "label": "Suivant",
-      },
-      # "cancel": {
-      #   "label": "False",
-      #   "href":""
-      # }
+
+    action_button_form_param = {
+        "submit": {
+            "label": "Suivant",
+        },
+        # "cancel": {
+        #   "label": "False",
+        #   "href":""
+        # }
     }
 
     # onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
@@ -202,7 +208,7 @@ def onboarding_step1_signin(request):
 
     if request.method == "POST":
         print(form.is_valid())
-    # and form.is_valid():
+        # and form.is_valid():
         # NOTE we may check for known user not logged before valid form
         # email = (
         #     request.user.username
@@ -217,12 +223,12 @@ def onboarding_step1_signin(request):
         return redirect(f"{reverse('projects-onboarding-project')}")
 
         # if not is_new_user and not request.user.is_authenticated:
-            # user exists but is not currently logged in,
-            # save data, log in, and come back to complete
-            # request.session["onboarding_existing_data"] = form.cleaned_data
-            # login_url = reverse("account_login")
-            # next_args = urlencode({"next": reverse("projects-onboarding")})
-            # return redirect(f"{login_url}?{next_args}")
+        # user exists but is not currently logged in,
+        # save data, log in, and come back to complete
+        # request.session["onboarding_existing_data"] = form.cleaned_data
+        # login_url = reverse("account_login")
+        # next_args = urlencode({"next": reverse("projects-onboarding")})
+        # return redirect(f"{login_url}?{next_args}")
 
         # user = update_user(request.site, user, form.cleaned_data)
 
@@ -268,35 +274,43 @@ def onboarding_step1_signin(request):
         #         f"{reverse('projects-project-location', args=(project.pk,))}?{next_args}"
         #     )
 
-    context = {"form_data": form_data, "experiment_form": form, "action_button_form_param": action_button_form_param}
+    context = {
+        "form_data": form_data,
+        "experiment_form": form,
+        "action_button_form_param": action_button_form_param,
+    }
     return render(request, "onboarding/onboarding-step1-signin.html", context)
+
 
 def onboarding_step2_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)
-    print("request.site", request.site)
-    print("site_config", site_config)
-    print("site_config.onboarding.pk", site_config.onboarding.pk)
-    
+
     # if we're back from login page restore data already entered
     existing_data_project = request.session.get("onboarding_existing_data_project")
-    print("existing_data_project", existing_data_project)
+
     # Fetch the onboarding form associated with the current site
-    form = forms.ExperimentFormUsingDsrcPart2(request.POST or None)
+    form = forms.ExperimentFormUsingDsrcPart2(
+        request.POST or None, existing_data_project
+    )
+
+    question_forms = []
+    from recoco.apps.survey.forms import AnswerForm
+
+    print(site_config.onboarding_questions.all())
+    for question in site_config.onboarding_questions.all():
+        question_forms.append(AnswerForm(question, None))
 
     form_data = {}
     for field in form:
         value = field.value() if field.value() is not None else ""
         form_data[field.html_name] = {"value": value}
-    
-    action_button_form_param =  {
-      "submit": {
-        "label": "Suivant",
-      },
-      "cancel": {
-        "label": "Précédent",
-        "href":reverse("projects-onboarding-signup")
-      }
+
+    action_button_form_param = {
+        "submit": {
+            "label": "Suivant",
+        },
+        "cancel": {"label": "Précédent", "href": reverse("projects-onboarding-signup")},
     }
 
     if request.method == "POST" and form.is_valid():
@@ -334,11 +348,14 @@ def onboarding_step2_project(request):
 
         project.sites.add(request.site)
 
-        onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
-        onboarding_response = models.OnboardingResponse.objects.create(onboarding=onboarding_instance, project=project);
+        onboarding_instance = models.Onboarding.objects.get(
+            pk=site_config.onboarding.pk
+        )
+        onboarding_response = models.OnboardingResponse.objects.create(
+            onboarding=onboarding_instance, project=project
+        )
         onboarding_response.save()
-        
-        
+
         assign_collaborator(user, project, is_owner=True)
 
         create_initial_note(request.site, onboarding_response)
@@ -372,8 +389,14 @@ def onboarding_step2_project(request):
                 f"{reverse('projects-onboarding-summary', args=(project.pk,))}?{next_args}"
             )
 
-    context = {"form_data": form_data, "experiment_form": form, "action_button_form_param": action_button_form_param}
+    context = {
+        "form_data": form_data,
+        "experiment_form": form,
+        "action_button_form_param": action_button_form_param,
+        "question_forms": question_forms,
+    }
     return render(request, "onboarding/onboarding-step2.html", context)
+
 
 @login_required
 def onboarding_summary(request, project_id=None):
@@ -382,15 +405,12 @@ def onboarding_summary(request, project_id=None):
     # if we're back from login page restore data already entered
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
 
-    action_button_form_param =  {
-      "submit": {
-        "label": "Suivant",
-      },
-      "cancel": {
-        "label": "Précédent",
-        "href":reverse("projects-onboarding-signup")
-      }
-    }
+    # action_button_form_param = {
+    #     "submit": {
+    #         "label": "Suivant",
+    #     },
+    #     "cancel": {"label": "Précédent", "href": reverse("projects-onboarding-signup")},
+    # }
 
     context = {"project": project}
     return render(request, "onboarding/onboarding-summary.html", context)
