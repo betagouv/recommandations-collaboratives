@@ -24,7 +24,7 @@ class EmailTemplate(models.Model):
     objects = models.Manager()
     on_site = CurrentSiteManager()
 
-    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=40, choices=TPL_CHOICES)
     sib_id = models.IntegerField()
 

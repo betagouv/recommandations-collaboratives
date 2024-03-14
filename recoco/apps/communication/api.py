@@ -53,12 +53,17 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
     """Uses Brevo service to send an email using the given template and params"""
     brevo = Brevo()
     try:
+        # try to use the site specific template 
         template = EmailTemplate.on_site.get(name__iexact=template_name)
     except EmailTemplate.DoesNotExist:
-        mail_admins(
-            subject="Unable to send email", message=f"{template_name} was not found !"
-        )
-        return False
+        try:
+            # use default template
+            template = EmailTemplate.objects.get(site=None, name__iexact=template_name)
+        except EmailTemplate.DoesNotExist:
+            mail_admins(
+                subject="Unable to send email", message=f"{template_name} was not found !"
+            )
+            return False
 
     response = brevo.send_email(template.sib_id, recipients, params, test=test)
 
@@ -94,7 +99,7 @@ def send_debug_email(template_name, recipients, params=None, test=False, related
 
     django_send_mail(
         "Brevo Mail",
-        f"Message utilisant le template {template_name} avec les"
+        f"Message utilisant le template {template_name} avec les "
         f"paramètres : {params} (TEST MODE: {test})",
         "no-reply@recoconseil.fr",
         simple_recipients,
