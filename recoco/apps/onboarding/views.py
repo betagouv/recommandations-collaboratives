@@ -17,7 +17,6 @@ from django.template.loader import render_to_string
 from django.utils.http import urlencode
 
 from recoco.apps.addressbook import models as addressbook
-
 from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
