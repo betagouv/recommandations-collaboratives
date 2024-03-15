@@ -73,7 +73,6 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
     params["site_domain"] = current_site.domain
 
     site_config = get_site_config_or_503(current_site)
-    # TODO: need to provide a default logo
     if site_config.email_logo:
         params["site_logo"] = build_absolute_url(site_config.email_logo.url) 
 
