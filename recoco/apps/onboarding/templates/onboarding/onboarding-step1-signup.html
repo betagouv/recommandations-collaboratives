@@ -47,9 +47,9 @@
       </p>
     </div>
     <div class="container__form d-flex justify-content-center"
-         x-data="AjvValidationSchema">
+         x-data="AjvValidationSchema('schemaOnboardingStep1FormValidator')">
       <div class="onboarding__form"
-           x-data="DsrcFormValidator('id-onboarding-form-signup', {{ form_data|safe }}, {{ action_button_form_param }}, schemaOnboardingStep1FormValidator)"
+           x-data="DsrcFormValidator('id-onboarding-form-signup', {{ form_data|safe }}, {{ action_button_form_param }}, schemaValidator)"
            x-init="init">{% crispy experiment_form %}</div>
     </div>
   </div>

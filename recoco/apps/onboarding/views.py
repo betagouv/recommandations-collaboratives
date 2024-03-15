@@ -137,8 +137,10 @@ def onboarding_step1_signup(request):
     """Return the onboarding page and process onboarding submission"""
 
     # if we're back from login page restore data already entered
-    existing_data_user = request.session.get("onboarding_existing_data_user")
 
+    existing_data_user = request.session.get("onboarding_existing_data_user")
+    existing_email_user = request.session.get("onboarding_email")
+    existing_data_user = {"email": existing_email_user["email"]}
     # Fetch the onboarding form associated with the current site
     form = forms.ExperimentFormUsingDsrcPart1(
         request.POST or None, initial=existing_data_user
@@ -152,11 +154,7 @@ def onboarding_step1_signup(request):
     action_button_form_param = {
         "submit": {
             "label": "Suivant",
-        },
-        # "cancel": {
-        #   "label": "False",
-        #   "href":""
-        # }
+        }
     }
 
     if request.method == "POST" and form.is_valid():

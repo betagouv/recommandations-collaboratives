@@ -132,7 +132,11 @@ class ExperimentFormUsingDsrcPart1(DsrcBaseForm):
 
     first_name = forms.CharField(label="Prénom", initial="", required=True)
     last_name = forms.CharField(label="Nom", initial="", required=True)
-    org_name = forms.CharField(label="Nom de votre administration ou de votre entreprise", initial="", required=True)
+    org_name = forms.CharField(
+        label="Nom de votre administration ou de votre entreprise",
+        initial="",
+        required=True,
+    )
     role = forms.CharField(label="Fonction", initial="", required=True)
 
     # TODO: add an email validation, pattern / mask
@@ -140,6 +144,7 @@ class ExperimentFormUsingDsrcPart1(DsrcBaseForm):
         label="Adresse email",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
+        initial="",
     )
 
     # Password input, with a password widget, show/hide control, and a help text
@@ -152,10 +157,9 @@ class ExperimentFormUsingDsrcPart1(DsrcBaseForm):
     )
 
     # TODO: add a phone number validation, pattern / mask
-    phone = forms.CharField(
-        max_length=16, label="Téléphone", initial="", required=True
-    )
-    
+    phone = forms.CharField(max_length=16, label="Téléphone", initial="", required=True)
+
+
 class OnboardingSigninForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -168,7 +172,7 @@ class OnboardingSigninForm(DsrcBaseForm):
             Fieldset(
                 "Vous avez déjà un compte ? Identifiez-vous !",  # The first argument is the legend of the fieldset
                 "email_adress",
-                "password"
+                "password",
             ),
         )
 
@@ -209,6 +213,7 @@ class OnboardingSigninForm(DsrcBaseForm):
         max_length=16, label="Téléphone", initial="", required=True
     )
 
+
 class ExperimentFormUsingDsrcPart2(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -232,9 +237,16 @@ class ExperimentFormUsingDsrcPart2(DsrcBaseForm):
     name = forms.CharField(label="Nom du projet", initial="", required=True)
     location = forms.CharField(label="Commune", initial="", required=True)
     insee = forms.CharField(label="INSEE", initial="", required=True)
-    description = forms.CharField(label="Contexte du projet", widget=forms.Textarea(attrs={"rows": "5"}), required=True)
-    response = forms.CharField(label="Posez vos questions", widget=forms.Textarea(attrs={"rows": "5"}), required=False)
-    
+    description = forms.CharField(
+        label="Contexte du projet",
+        widget=forms.Textarea(attrs={"rows": "5"}),
+        required=True,
+    )
+    response = forms.CharField(
+        label="Posez vos questions",
+        widget=forms.Textarea(attrs={"rows": "5"}),
+        required=False,
+    )
 
 
 # eof
