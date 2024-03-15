@@ -22,6 +22,8 @@ from django.core.mail import send_mail as django_send_mail
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
+from recoco.utils import get_site_config_or_503, build_absolute_url
+
 from .brevo import Brevo
 from .models import EmailTemplate, TransactionRecord
 
@@ -64,6 +66,16 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
                 subject="Unable to send email", message=f"{template_name} was not found !"
             )
             return False
+
+    # enriches params with site data
+    current_site = Site.objects.get_current()
+    params["site_name"] = current_site.name
+    params["site_domain"] = current_site.domain
+
+    site_config = get_site_config_or_503(current_site)
+    # TODO: need to provide a default logo
+    if site_config.email_logo:
+        params["site_logo"] = build_absolute_url(site_config.email_logo.url) 
 
     response = brevo.send_email(template.sib_id, recipients, params, test=test)
 
