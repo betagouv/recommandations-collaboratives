@@ -76,7 +76,7 @@ def invite_send(invite, invited_user=None):
             params["sender"]["organization"] = invite.inviter.profile.organization.name
 
     res = communication_api.send_email(
-        template_name="sharing invitation",
+        template_name="sharing_invitation",
         recipients=[{"email": invite.email}],
         params=params,
     )

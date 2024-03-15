@@ -341,7 +341,7 @@ def invite_user_to_project(
     )
 
     send_email(
-        template_name="sharing invitation",
+        template_name="sharing_invitation",
         recipients=[{"email": user.email}],
         params={
             "sender": {"email": request.user.email},
