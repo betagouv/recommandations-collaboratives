@@ -92,7 +92,6 @@ def invite_resend(invite):
     except auth_models.User.DoesNotExist:
         user = None  # Used to generate autologging link
 
-    print("COIN")
     return invite_send(invite, invited_user=user)
 
 
