@@ -221,6 +221,8 @@ class ExperimentFormUsingDsrcPart2(DsrcBaseForm):
         self.helper.form_class = "dsrc-color-primary"  # Theme override classes
         self.helper.form_method = "post"
         self.helper.form_action = "test_form"
+        self.helper.form_tag = False
+        self.helper.form_button = False
 
         self.helper.layout = Layout(
             Fieldset(
