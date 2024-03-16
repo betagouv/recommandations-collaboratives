@@ -114,10 +114,10 @@ class ExperimentFormUsingDsrcPart1(DsrcBaseForm):
         )
 
     # Example clean method
-    def clean_email_adress(self):
+    def clean_email(self):
         """Make sure email is lowercased"""
-        email_adress = self.cleaned_data["email_adress"]
-        return email_adress.lower()
+        email = self.cleaned_data["email"]
+        return email.lower()
 
     # Messages used to provide help to the user: overload in your forms to change the messages
     def password_message_group(errors=None):
@@ -171,7 +171,7 @@ class OnboardingSigninForm(DsrcBaseForm):
         self.helper.layout = Layout(
             Fieldset(
                 "Vous avez déjà un compte ? Identifiez-vous !",  # The first argument is the legend of the fieldset
-                "email_adress",
+                "email",
                 "password",
             ),
         )
@@ -179,8 +179,8 @@ class OnboardingSigninForm(DsrcBaseForm):
     # Example clean method
     def clean_email_adress(self):
         """Make sure email is lowercased"""
-        email_adress = self.cleaned_data["email_adress"]
-        return email_adress.lower()
+        email = self.cleaned_data["email"]
+        return email.lower()
 
     # Messages used to provide help to the user: overload in your forms to change the messages
     def password_message_group(errors=None):
@@ -193,7 +193,7 @@ class OnboardingSigninForm(DsrcBaseForm):
             ],
         }
 
-    email_adress = forms.EmailField(
+    email = forms.EmailField(
         label="Adresse email",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
@@ -206,11 +206,6 @@ class OnboardingSigninForm(DsrcBaseForm):
         widget=forms.PasswordInput(
             attrs={"size": "sm", "message_group": password_message_group()}
         ),
-    )
-
-    # TODO: add a phone number validation, pattern / mask
-    phone_number = forms.CharField(
-        max_length=16, label="Téléphone", initial="", required=True
     )
 
 

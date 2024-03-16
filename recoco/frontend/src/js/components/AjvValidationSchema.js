@@ -1,10 +1,14 @@
 import Alpine from 'alpinejs';
-import { schemaOnboardingStep1FormValidator } from '../utils/ajv/schema/ajv.schema.OnboardingSigninForm';
+import { schemaOnboardingStep1SignupFormValidator } from '../utils/ajv/schema/ajv.schema.OnboardingSignupForm';
 import { schemaOnboardingEmailFormValidator } from '../utils/ajv/schema/ajv.schema.OnboardingEmailForm';
+import { schemaOnboardingStep1SigninFormValidator } from '../utils/ajv/schema/ajv.schema.OnboardingSigninForm';
 
 Alpine.data('AjvValidationSchema', (schemaValidatorName) => {
   const schemasValidator = {
-    schemaOnboardingStep1FormValidator: schemaOnboardingStep1FormValidator,
+    schemaOnboardingStep1SignupFormValidator:
+      schemaOnboardingStep1SignupFormValidator,
+    schemaOnboardingStep1SigninFormValidator:
+      schemaOnboardingStep1SigninFormValidator,
     schemaOnboardingEmailFormValidator: schemaOnboardingEmailFormValidator,
   };
   return {
