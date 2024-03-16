@@ -3,8 +3,8 @@ import { schemaFormInputs } from './ajv.schema.forms';
 /**
  * Validation schema for the form: DsrcFormValidator
  */
-export const schemaOnboardingStepProjectFormValidator = {
-  $id: '#/definitions/OnboardingStepProjectFormValidator',
+export const schemaOnboardingStep2ProjectFormValidator = {
+  $id: '#/definitions/OnboardingStep2ProjectFormValidator',
   type: 'object',
   properties: {
     name: { $ref: '#/definitions/text' },

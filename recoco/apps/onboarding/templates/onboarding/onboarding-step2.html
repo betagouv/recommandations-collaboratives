@@ -42,9 +42,10 @@
         <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
       </p>
     </div>
-    <div class="container__form d-flex justify-content-center">
+    <div class="container__form d-flex justify-content-center"
+         x-data="AjvValidationSchema('schemaOnboardingStep2ProjectFormValidator')">
       <div class="onboarding__form"
-           x-data="DsrcFormValidator('id-onboarding-form-project', {{ form_data|safe }}, {{ action_button_form_param }}, 'OnboardingStepProjectValidationFunction')"
+           x-data="DsrcFormValidator('id-onboarding-form-project', {{ form_data|safe }}, {{ action_button_form_param }}, schemaValidator)"
            x-init="init">
         <form id="id-onboarding-form-project"
               method="post"
