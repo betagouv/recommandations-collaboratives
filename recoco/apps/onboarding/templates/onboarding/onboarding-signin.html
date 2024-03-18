@@ -7,11 +7,6 @@
   {% vite_asset 'js/apps/onboarding.js' %}
 {% endblock js %}
 {% block css %}
-  {% comment %} <link href="{% static 'dsrc_ui_css/dsrc-csstokens.css' %}" rel="stylesheet" type="text/css">
-  <link href="{% static 'dsrc_ui_css/dsrc-csscore.css' %}"
-        rel="stylesheet"
-        type="text/css"> {% endcomment %}
-  {% comment %} <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css"> {% endcomment %}
 {% endblock css %}
 {% block title %}
   | Solliciter l'équipe {{ request.site.name }}
@@ -49,8 +44,8 @@
     <div class="container__form d-flex justify-content-center"
          x-data="AjvValidationSchema('schemaOnboardingStep1SigninFormValidator')">
       <div class="onboarding__form"
-           x-data="DsrcFormValidator('id-onboarding-form-signin', {{ form_data|safe }}, {{ action_button_form_param }}, schemaValidator)"
-           x-init="init">{% crispy experiment_form %}</div>
+           x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator)"
+           x-init="init">{% crispy form %}</div>
     </div>
   </div>
 {% endblock content %}

@@ -14,6 +14,7 @@ from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from crispy_forms.layout import Layout, Fieldset
 from recoco.apps.dsrc.forms import DsrcBaseForm
+from django.shortcuts import reverse
 
 from . import models
 
@@ -92,13 +93,12 @@ class SelectCommuneForm(forms.Form):
         )
 
 
-class ExperimentFormUsingDsrcPart1(DsrcBaseForm):
+class OnboardingSignupForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper.form_id = "id-onboarding-form-signup"  # The form id is used for validation, it must be set and unique in the page
-        self.helper.form_class = "dsrc-color-primary"  # Theme override classes
+        self.helper.form_id = "id-onboarding-signup-form"  # The form id is used for validation, it must be set and unique in the page
         self.helper.form_method = "post"
-        self.helper.form_action = "test_form"
+        self.helper.action_button = {"submit": {"label": "Suivant"}}
 
         self.helper.layout = Layout(
             Fieldset(
@@ -163,10 +163,13 @@ class ExperimentFormUsingDsrcPart1(DsrcBaseForm):
 class OnboardingSigninForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper.form_id = "id-onboarding-form-signin"  # The form id is used for validation, it must be set and unique in the page
-        self.helper.form_class = "dsrc-color-primary"  # Theme override classes
+        self.helper.form_id = "id-onboarding-signin-form"  # The form id is used for validation, it must be set and unique in the page
         self.helper.form_method = "post"
-        self.helper.form_action = "test_form"
+        self.helper.action_button = {
+            "submit": {
+                "label": "Suivant",
+            }
+        }
 
         self.helper.layout = Layout(
             Fieldset(
@@ -209,15 +212,21 @@ class OnboardingSigninForm(DsrcBaseForm):
     )
 
 
-class ExperimentFormUsingDsrcPart2(DsrcBaseForm):
+class OnboardingProjectForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper.form_id = "id-onboarding-form-project"  # The form id is used for validation, it must be set and unique in the page
-        self.helper.form_class = "dsrc-color-primary"  # Theme override classes
+        self.helper.form_id = "id-onboarding-project-form"  # The form id is used for validation, it must be set and unique in the page
         self.helper.form_method = "post"
-        self.helper.form_action = "test_form"
         self.helper.form_tag = False
-        self.helper.form_button = False
+        self.helper.form_button = {
+            "submit": {
+                "label": "Suivant",
+            },
+            "cancel": {
+                "label": "Précédent",
+                "href": reverse("projects-onboarding-signup"),
+            },
+        }
 
         self.helper.layout = Layout(
             Fieldset(

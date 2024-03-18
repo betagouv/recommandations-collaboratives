@@ -22,17 +22,17 @@ urlpatterns = [
     ),
     path(
         r"onboarding/signin",
-        views.onboarding_step1_signin,
+        views.onboarding_signin,
         name="projects-onboarding-signin",
     ),
     path(
         r"onboarding/signup",
-        views.onboarding_step1_signup,
+        views.onboarding_signup,
         name="projects-onboarding-signup",
     ),
     path(
         r"onboarding/project",
-        views.onboarding_step2_project,
+        views.onboarding_project,
         name="projects-onboarding-project",
     ),
     path(
