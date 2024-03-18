@@ -52,59 +52,67 @@
               enctype="multipart/form-data">
           {% crispy experiment_form %}
           {% for form in question_forms %}
-            <div class="onboarding__form">
-              {{ form.question.text }}
-              <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <ul class="list-group mt-3 mb-3">
-                  {% for choice in form.fields.answer.choices %}
-                    <li class="list-group-item py-3">
-                      {% if question.is_multiple %}
-                        <input class="form-check-input"
-                               type="checkbox"
-                               name="answer"
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <fieldset class="fr-fieldset"
+                        id="radio-hint"
+                        aria-labelledby="radio-hint-legend radio-hint-messages">
+                <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
+                        id="radio-hint-legend">{{ form.question.text }}</legend>
+                {% for choice in form.fields.answer.choices %}
+                  <div class="fr-fieldset__element">
+                    {% if question.is_multiple %}
+                      <div class="fr-radio-group">
+                        <input type="radio"
                                value="{{ choice.0 }}"
-                               id="form_answer-{{ forloop.counter }}"
-                               {% if choice.0 in form.fields.answer.initial %}checked{% endif %} />
-                      {% else %}
-                        <input class="form-check-input"
-                               type="radio"
-                               name="answer"
+                               id="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                               name="form_question-{{ forloop.parentloop.counter }}"
+                               {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
+                        <label class="fr-label"
+                               for="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                          {{ choice.1|capfirst }}
+                        </label>
+                      </div>
+                    {% else %}
+                      <div class="fr-checkbox-group">
+                        <input type="checkbox"
                                value="{{ choice.0 }}"
-                               id="form_answer-{{ forloop.counter }}"
-                               {% if form.fields.answer.initial == choice.0 %}checked{% endif %} />
-                        {{ form.fields.answer.selected }}
-                      {% endif %}
-                      <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
-                    </li>
-                  {% endfor %}
-                </ul>
-                <!-- Comment -->
-                <div class="mt-3 mb-3">
-                  <label class="mb-1" for="input-project-comment">{{ question_comment_title|default:'Commentaire' }}</label>
-                  <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %}"
-                            style="height: 100px"
-                            id="input-project-comment"
-                            name="{{ form.comment.name }}"
-                            placeholder="{{ question.comment_title }}">{{ form.comment.value|default:'' }}</textarea>
-                  {% for error in form.comment.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                </div>
-                <!-- File upload -->
-                {% if form.attachment %}
-                  <div class="mb-3">
-                    <label for="attachment" class="form-label">{{ question.upload_title }}</label>
-                    <input class="form-control form-control-sm"
-                           id="attachment"
-                           type="file"
-                           name="attachment"
-                           value="kdl" />
-                    {% if form.attachment.value %}
-                      Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
+                               id="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                               name="form_question-{{ forloop.parentloop.counter }}"
+                               {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
+                        <label class="fr-label"
+                               for="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                          {{ choice.1|capfirst }}
+                        </label>
+                      </div>
                     {% endif %}
                   </div>
-                {% endif %}
-              </form>
-            </div>
+                {% endfor %}
+              </fieldset>
+              <!-- Comment -->
+              {% if question_comment_title %}
+                <div class="fr-input-group {% if form.comment.errors %}fr-input-group--error{% endif %}">
+                  <label class="fr-label" for="textarea">{{ question_comment_title|default:'Commentaire' }}</label>
+                  <textarea class="fr-input" rows="4" id="textarea" name="textarea"></textarea>
+                  {% for error in form.comment.errors %}
+                    <p id="text-input-error-desc-error" class="fr-error-text">{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              <!-- File upload -->
+              {% if form.attachment %}
+                <div class="fr-upload-group fr-mb-6w">
+                  <label class="fr-label" for="file-upload">
+                    {{ question.upload_title }}
+                    <span class="fr-hint-text">Taille maximale : 500 Mo. Formats supportés : jpg, png, pdf. Plusieurs fichiers possibles.</span>
+                  </label>
+                  <input class="fr-upload" type="file" id="file-upload" name="file-upload">
+                  {% if form.attachment.value %}
+                    Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </form>
           {% endfor %}
           {% include "dsrc/core/blocks/buttons/button_group.html" %}
         </form>
