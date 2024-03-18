@@ -28,7 +28,7 @@ from recoco.apps.tasks import models as tasks
 from recoco.utils import check_if_advisor
 
 from . import models
-from .forms import ContactForm, UserPasswordFirstTimeSetupForm, ModalEmailOnboardingForm
+from .forms import ContactForm, UserPasswordFirstTimeSetupForm, ModalOnboardingEmailForm
 from .utils import get_current_site_sender_email
 
 
@@ -37,19 +37,11 @@ class HomePageView(TemplateView):
 
 
 def home_page(request):
-    form = ModalEmailOnboardingForm(request.POST or None)
+    form = ModalOnboardingEmailForm(request.POST or None)
 
-    form_data = {}
-
-    action_button_form_param = {
-        "submit": {
-            "label": "Déposer votre projet",
-        }
-    }
-
-    for field in form:
-        value = field.value() if field.value() is not None else ""
-        form_data[field.html_name] = {"value": value}
+    if request.user.is_authenticated:
+        next_step = reverse("projects-onboarding-project")
+        return redirect(f"{next_step}")
 
     if request.method == "POST" and form.is_valid():
         email = (
@@ -63,24 +55,17 @@ def home_page(request):
         except auth.User.DoesNotExist:
             user = None
 
-        request.session["onboarding_email"] = form.cleaned_data
+        request.session["onboarding_email"] = form.cleaned_data["email"]
 
         if user:
-            if not request.user.is_authenticated:
-                # User have already an account but is disconnected
-                next_step = reverse("projects-onboarding-signin")
-            # User have already an account and is connected
-            next_step = reverse("projects-onboarding-project")
+            # User have already an account but is disconnected
+            next_step = reverse("projects-onboarding-signin")
         else:
             next_step = reverse("projects-onboarding-signup")
 
         return redirect(f"{next_step}")
 
-    context = {
-        "form_data": form_data,
-        "form": form,
-        "action_button_form_param": action_button_form_param,
-    }
+    context = {"form": form}
     return render(request, "home/home.html", context)
 
 
