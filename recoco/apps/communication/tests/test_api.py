@@ -99,7 +99,7 @@ def test_send_brevo_email_creates_transaction(mocker, request):
         return_value=TransacResponse(),
     )
     current_site = get_current_site(request)
-    _ = baker.make(home_models.SiteConfiguration, site=current_site)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     template = baker.make(models.EmailTemplate, name="a template", site=current_site)
 
@@ -128,7 +128,7 @@ def test_send_brevo_email_non_existent_template(mocker, request):
     template_name = "a non existent template"
 
     current_site = get_current_site(request)
-    _ = baker.make(home_models.SiteConfiguration, site=current_site)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     user1 = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     user1.profile.sites.add(current_site)
@@ -152,7 +152,7 @@ def test_send_brevo_email_use_default_template(mocker, request):
     template_name = "a template"
 
     current_site = get_current_site(request)
-    _ = baker.make(home_models.SiteConfiguration, site=current_site)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     template = baker.make(models.EmailTemplate, name=template_name, site=None)
 
@@ -182,7 +182,7 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
     template_name = "a template"
 
     current_site = get_current_site(request)
-    _ = baker.make(home_models.SiteConfiguration, site=current_site)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     template = baker.make(models.EmailTemplate, name=template_name, site=None)
     overrided_template = baker.make(models.EmailTemplate, name=template_name, site=current_site)
