@@ -39,10 +39,6 @@ class HomePageView(TemplateView):
 def home_page(request):
     form = ModalOnboardingEmailForm(request.POST or None)
 
-    if request.user.is_authenticated:
-        next_step = reverse("projects-onboarding-project")
-        return redirect(f"{next_step}")
-
     if request.method == "POST" and form.is_valid():
         email = (
             request.user.username
