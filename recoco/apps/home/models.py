@@ -136,7 +136,9 @@ class SiteConfiguration(models.Model):
         return f"images/{self.site.pk}/logo/{filename}"
     
     email_logo = models.ImageField(
-        verbose_name="Logo utilisé pour les emails automatiques", null=True, blank=True, upload_to=logo_upload_path
+        verbose_name="Logo utilisé pour les emails automatiques", 
+        help_text="Veuillez fournir une image d'une largeur maximale de 600 pixels et d'un ratio de 4:3.",
+        null=True, blank=True, upload_to=logo_upload_path
     )
 
     crm_available_tags = TaggableManager(

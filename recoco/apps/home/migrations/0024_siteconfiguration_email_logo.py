@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
             name="email_logo",
             field=models.ImageField(
                 blank=True,
+                help_text="Veuillez fournir une image d'une largeur maximale de 600 pixels et d'un ratio de 4:3.",
                 null=True,
                 upload_to=recoco.apps.home.models.SiteConfiguration.logo_upload_path,
                 verbose_name="Logo utilisé pour les emails automatiques",
