@@ -30,6 +30,8 @@ from recoco.apps.projects.utils import (
     generate_ro_key,
     refresh_user_projects_in_session,
 )
+from recoco.apps.survey.forms import AnswerForm
+
 from recoco.utils import (
     build_absolute_url,
     get_site_config_or_503,
@@ -293,11 +295,16 @@ def onboarding_step2_project(request):
     )
 
     question_forms = []
-    from recoco.apps.survey.forms import AnswerForm
-
-    print(site_config.onboarding_questions.all())
     for question in site_config.onboarding_questions.all():
-        question_forms.append(AnswerForm(question, None))
+        form_prefix = f"q{question.id}-"
+        question_forms.append(
+            AnswerForm(
+                question,
+                None,
+                request.POST or None,
+                prefix=form_prefix,
+            )
+        )
 
     form_data = {}
     for field in form:
@@ -311,81 +318,93 @@ def onboarding_step2_project(request):
         "cancel": {"label": "Précédent", "href": reverse("projects-onboarding-signup")},
     }
 
-    if request.method == "POST" and form.is_valid():
-        existing_data_user = request.session.get("onboarding_existing_data_user")
-        # NOTE we may check for known user not logged before valid form
-        email = (
-            request.user.username
-            if request.user.is_authenticated
-            else existing_data_user["email"].lower()
-        )
+    if request.method == "POST":
 
-        user, is_new_user = auth.User.objects.get_or_create(
-            username=email, defaults={"email": email}
-        )
+        all_forms_valid = form.is_valid()
 
-        print("email", email)
-        print("user", user)
-        print("is_new_user", is_new_user)
-        if not is_new_user and not request.user.is_authenticated:
-            # user exists but is not currently logged in,
-            # save data, log in, and come back to complete
-            request.session["onboarding_existing_data_project"] = form.cleaned_data
-            login_url = reverse("projects-onboarding-signup")
-            # next_args = urlencode({"next": reverse("projects-onboarding-summary")})
-            # return redirect(f"{login_url}?{next_args}")
-            return redirect(f"{login_url}")
+        for question_form in question_forms:
+            all_forms_valid = all_forms_valid and question.is_valid()
 
-        user = update_user(request.site, user, existing_data_user)
-
-        print("existing_data_user", existing_data_user)
-        onboarding_data = {**form.cleaned_data, **existing_data_user}
-        project = create_project_for_user(
-            user=user, data=onboarding_data, status="DRAFT"
-        )
-
-        project.sites.add(request.site)
-
-        onboarding_instance = models.Onboarding.objects.get(
-            pk=site_config.onboarding.pk
-        )
-        onboarding_response = models.OnboardingResponse.objects.create(
-            onboarding=onboarding_instance, project=project
-        )
-        onboarding_response.save()
-
-        assign_collaborator(user, project, is_owner=True)
-
-        create_initial_note(request.site, onboarding_response)
-
-        notify_new_project(request.site, project, user)
-        email_owner_of_project(request.site, project, user)
-
-        refresh_user_projects_in_session(request, user)
-
-        # cleanup now useless onboarding existing data if present
-        if "onboarding_existing_data_project" in request.session:
-            del request.session["onboarding_existing_data_project"]
-        if "existing_data_user" in request.session:
-            del request.session["existing_data_user"]
-
-        if is_new_user:
-            # new user first have to setup her password and then complete the project location before the survey
-            log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            next_args_for_project_location = urlencode(
-                {"next": reverse("survey-project-session", args=(project.pk,))}
+        if all_forms_valid:
+            existing_data_user = request.session.get("onboarding_existing_data_user")
+            # NOTE we may check for known user not logged before valid form
+            email = (
+                request.user.username
+                if request.user.is_authenticated
+                else existing_data_user["email"].lower()
             )
-            next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
-            next_args = urlencode({"next": next_url})
-            return redirect(f"{reverse('home-user-setup-password')}?{next_args}")
-        else:
-            # go to project location form before starting survey
-            next_args = urlencode(
-                {"next": reverse("projects-project-location", args=(project.pk,))}
+
+            user, is_new_user = auth.User.objects.get_or_create(
+                username=email, defaults={"email": email}
             )
-            return redirect(
-                f"{reverse('projects-onboarding-summary', args=(project.pk,))}?{next_args}"
+
+            print("email", email)
+            print("user", user)
+            print("is_new_user", is_new_user)
+            if not is_new_user and not request.user.is_authenticated:
+                # user exists but is not currently logged in,
+                # save data, log in, and come back to complete
+                request.session["onboarding_existing_data_project"] = form.cleaned_data
+                login_url = reverse("projects-onboarding-signup")
+                # next_args = urlencode({"next": reverse("projects-onboarding-summary")})
+                # return redirect(f"{login_url}?{next_args}")
+                return redirect(f"{login_url}")
+
+            user = update_user(request.site, user, existing_data_user)
+
+            print("existing_data_user", existing_data_user)
+            onboarding_data = {**form.cleaned_data, **existing_data_user}
+            project = create_project_for_user(
+                user=user, data=onboarding_data, status="DRAFT"
             )
+
+            project.sites.add(request.site)
+
+            onboarding_instance = models.Onboarding.objects.get(
+                pk=site_config.onboarding.pk
+            )
+            onboarding_response = models.OnboardingResponse.objects.create(
+                onboarding=onboarding_instance, project=project
+            )
+
+            # Save survey questions
+            for question_form in question_forms:
+                question.save()
+
+            assign_collaborator(user, project, is_owner=True)
+
+            create_initial_note(request.site, onboarding_response)
+
+            notify_new_project(request.site, project, user)
+            email_owner_of_project(request.site, project, user)
+
+            refresh_user_projects_in_session(request, user)
+
+            # cleanup now useless onboarding existing data if present
+            if "onboarding_existing_data_project" in request.session:
+                del request.session["onboarding_existing_data_project"]
+            if "existing_data_user" in request.session:
+                del request.session["existing_data_user"]
+
+            if is_new_user:
+                # new user first have to setup her password and then complete the project location before the survey
+                log_user(
+                    request, user, backend="django.contrib.auth.backends.ModelBackend"
+                )
+                next_args_for_project_location = urlencode(
+                    {"next": reverse("survey-project-session", args=(project.pk,))}
+                )
+                next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
+                next_args = urlencode({"next": next_url})
+                return redirect(f"{reverse('home-user-setup-password')}?{next_args}")
+            else:
+                # go to project location form before starting survey
+                next_args = urlencode(
+                    {"next": reverse("projects-project-location", args=(project.pk,))}
+                )
+                return redirect(
+                    f"{reverse('projects-onboarding-summary', args=(project.pk,))}?{next_args}"
+                )
 
     context = {
         "form_data": form_data,
