@@ -132,11 +132,11 @@ class SiteConfiguration(models.Model):
         help_text="Adresse d'expédition pour le formulaire de contact"
     )
 
-    def upload_path(self, filename):
-        return f"images/{self.site.pk}/{filename}"
+    def logo_upload_path(self, filename):
+        return f"images/{self.site.pk}/logo/{filename}"
     
     email_logo = models.ImageField(
-        verbose_name="Logo utilisé pour les emails automatiques", null=True, blank=True, upload_to=upload_path
+        verbose_name="Logo utilisé pour les emails automatiques", null=True, blank=True, upload_to=logo_upload_path
     )
 
     crm_available_tags = TaggableManager(

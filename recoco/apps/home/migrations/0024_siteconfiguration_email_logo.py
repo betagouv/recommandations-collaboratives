@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             field=models.ImageField(
                 blank=True,
                 null=True,
-                upload_to=recoco.apps.home.models.SiteConfiguration.upload_path,
+                upload_to=recoco.apps.home.models.SiteConfiguration.logo_upload_path,
                 verbose_name="Logo utilisé pour les emails automatiques",
             ),
         ),
