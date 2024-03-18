@@ -46,9 +46,10 @@
         <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
       </p>
     </div>
-    <div class="container__form d-flex justify-content-center">
+    <div class="container__form d-flex justify-content-center"
+         x-data="AjvValidationSchema('schemaOnboardingStep1SigninFormValidator')">
       <div class="onboarding__form"
-           x-data="DsrcFormValidator('id-onboarding-form-signin', {{ form_data|safe }}, {{ action_button_form_param }}, 'OnboardingStep1ValidationFunction')"
+           x-data="DsrcFormValidator('id-onboarding-form-signin', {{ form_data|safe }}, {{ action_button_form_param }}, schemaValidator)"
            x-init="init">{% crispy experiment_form %}</div>
     </div>
   </div>

@@ -1,19 +1,19 @@
 <ul class="fr-btns-group fr-btns-group--inline-sm">
   <template x-if="actionButtonFormParam.cancel">
     <li class="flex-grow-1">
-        <a role="button"
-           class="fr-btn dsrc-color--primary fr-btn--secondary w-100"
-           :href="actionButtonFormParam.cancel.href"
-           x-text="actionButtonFormParam.cancel.label">Annuler</a>
+      <a role="button"
+         class="fr-btn dsrc-color--primary fr-btn--secondary w-100"
+         :href="actionButtonFormParam.cancel.href"
+         x-text="actionButtonFormParam.cancel.label">Annuler</a>
     </li>
   </template>
-    <template x-if="actionButtonFormParam.submit">
-      <li class="flex-grow-1">
-        <button type="submit"
-        class="fr-btn dsrc-color--primary w-100"
-        x-on:click="validate"
-        {% if disabled %}disabled=""{% endif %}
-        x-text="actionButtonFormParam.submit.label">Valider</button>
-      </li>
-    </template>
+  <template x-if="actionButtonFormParam.submit">
+    <li class="flex-grow-1">
+      <button type="submit"
+              class="fr-btn dsrc-color--primary w-100"
+              x-on:click="validate"
+              {% if disabled %}disabled=""{% endif %}
+              x-text="actionButtonFormParam.submit.label">Valider</button>
+    </li>
+  </template>
 </ul>

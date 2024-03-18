@@ -2,6 +2,7 @@
 {% load django_vite %}
 {% load static %}
 {% load sass_tags %}
+{% load survey %}
 {% load crispy_forms_tags %}
 {% block js %}
   {% vite_asset 'js/apps/onboarding.js' %}
@@ -41,10 +42,73 @@
         <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
       </p>
     </div>
-    <div class="container__form d-flex justify-content-center">
+    <div class="container__form d-flex justify-content-center"
+         x-data="AjvValidationSchema('schemaOnboardingStep2ProjectFormValidator')">
       <div class="onboarding__form"
-           x-data="DsrcFormValidator('id-onboarding-form-project', {{ form_data|safe }}, {{ action_button_form_param }}, 'OnboardingStepProjectValidationFunction')"
-           x-init="init">{% crispy experiment_form %}</div>
+           x-data="DsrcFormValidator('id-onboarding-form-project', {{ form_data|safe }}, {{ action_button_form_param }}, schemaValidator)"
+           x-init="init">
+        <form id="id-onboarding-form-project"
+              method="post"
+              enctype="multipart/form-data">
+          {% crispy experiment_form %}
+          {% for form in question_forms %}
+            <div class="onboarding__form">
+              {{ form.question.text }}
+              <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <ul class="list-group mt-3 mb-3">
+                  {% for choice in form.fields.answer.choices %}
+                    <li class="list-group-item py-3">
+                      {% if question.is_multiple %}
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="answer"
+                               value="{{ choice.0 }}"
+                               id="form_answer-{{ forloop.counter }}"
+                               {% if choice.0 in form.fields.answer.initial %}checked{% endif %} />
+                      {% else %}
+                        <input class="form-check-input"
+                               type="radio"
+                               name="answer"
+                               value="{{ choice.0 }}"
+                               id="form_answer-{{ forloop.counter }}"
+                               {% if form.fields.answer.initial == choice.0 %}checked{% endif %} />
+                        {{ form.fields.answer.selected }}
+                      {% endif %}
+                      <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
+                    </li>
+                  {% endfor %}
+                </ul>
+                <!-- Comment -->
+                <div class="mt-3 mb-3">
+                  <label class="mb-1" for="input-project-comment">{{ question_comment_title|default:'Commentaire' }}</label>
+                  <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %}"
+                            style="height: 100px"
+                            id="input-project-comment"
+                            name="{{ form.comment.name }}"
+                            placeholder="{{ question.comment_title }}">{{ form.comment.value|default:'' }}</textarea>
+                  {% for error in form.comment.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                </div>
+                <!-- File upload -->
+                {% if form.attachment %}
+                  <div class="mb-3">
+                    <label for="attachment" class="form-label">{{ question.upload_title }}</label>
+                    <input class="form-control form-control-sm"
+                           id="attachment"
+                           type="file"
+                           name="attachment"
+                           value="kdl" />
+                    {% if form.attachment.value %}
+                      Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </form>
+            </div>
+          {% endfor %}
+          {% include "dsrc/core/blocks/buttons/button_group.html" %}
+        </form>
+      </div>
     </div>
   </div>
 {% endblock content %}

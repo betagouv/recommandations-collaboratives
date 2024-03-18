@@ -1,9 +1,11 @@
 {% if form.form_html %}
-    {% if form_show_errors %}
-        {% include "dsrc_crispy_forms/errors.html" %}
-    {% endif %}
-    {{ form.form_html }}
+  {% if form_show_errors %}
+    {% include "dsrc_crispy_forms/errors.html" %}
+  {% endif %}
+  {{ form.form_html }}
 {% else %}
-    {% include "dsrc_crispy_forms/uni_form.html" %}
+  {% include "dsrc_crispy_forms/uni_form.html" %}
 {% endif %}
-{% include "dsrc/core/blocks/buttons/button_group.html" %}
+{% if form.helper.form_button != False %}
+  {% include "dsrc/core/blocks/buttons/button_group.html" %}
+{% endif %}
