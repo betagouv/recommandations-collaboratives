@@ -218,7 +218,7 @@ class OnboardingProjectForm(DsrcBaseForm):
         self.helper.form_id = "id-onboarding-project-form"  # The form id is used for validation, it must be set and unique in the page
         self.helper.form_method = "post"
         self.helper.form_tag = False
-        self.helper.form_button = {
+        self.helper.action_button = {
             "submit": {
                 "label": "Suivant",
             },

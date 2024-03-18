@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% load static %}
+{% load sass_tags %}
+{% load survey %}
+{% load crispy_forms_tags %}
+{% block js %}
+  {% vite_asset 'js/apps/onboarding.js' %}
+{% endblock js %}
+{% block css %}
+{% endblock css %}
+{% block title %}
+  | Solliciter l'équipe {{ request.site.name }}
+{% endblock title %}
+{% block og_title %}
+  | Solliciter l'équipe {{ request.site.name }}
+{% endblock og_title %}
+{% block page_title %}
+  Solliciter {{ request.site }}
+{% endblock page_title %}
+{% block tagline %}
+  Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
+{% endblock tagline %}
+{% block content %}
+  <div class="container">
+    <div class="banner mt-6 text-center">
+      <img src="{% static 'urbanvitaliz.fr/home/img/home/logo-urbanvitaliz.svg' %}"
+           width="10%"
+           height="auto"
+           alt="Logo d'UrbanVitaliz" />
+      <h1>
+        <strong>Déposer votre projet</strong> UrbanVitaliz
+      </h1>
+    </div>
+    <div class="fr-stepper mb-3">
+      <h2 class="fr-stepper__title">
+        Décrivez votre projet
+        <span class="fr-stepper__state">Étape 2 sur 2</span>
+      </h2>
+      <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
+      <p class="fr-stepper__details">
+        <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
+      </p>
+    </div>
+    <div class="container__form d-flex justify-content-center"
+         x-data="AjvValidationSchema('schemaOnboardingStep2ProjectFormValidator')">
+      <div class="onboarding__form"
+           x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator)"
+           x-init="init">
+        <form id="{{ form.helper.form_id }}"
+              method="post"
+              enctype="multipart/form-data">
+          {% crispy form %}
+          {% for form in question_forms %}
+            <div class="onboarding__form">
+              {{ form.question.text }}
+              {% csrf_token %}
+              <ul class="list-group mt-3 mb-3">
+                {% for choice in form.fields.answer.choices %}
+                  <li class="list-group-item py-3">
+                    {% if question.is_multiple %}
+                      <input class="form-check-input"
+                             type="checkbox"
+                             name="{{ form.prefix }}answer"
+                             value="{{ choice.0 }}"
+                             id="form_{{ form.prefix }}answer-{{ forloop.counter }}"
+                             {% if choice.0 in form.fields.answer.initial %}checked{% endif %} />
+                    {% else %}
+                      <input class="form-check-input"
+                             type="radio"
+                             name="{{ form.prefix }}answer"
+                             value="{{ choice.0 }}"
+                             id="form_{{ form.prefix }}answer-{{ forloop.counter }}"
+                             {% if form.fields.answer.initial == choice.0 %}checked{% endif %} />
+                      {{ form.fields.answer.selected }}
+                    {% endif %}
+                    <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
+                  </li>
+                {% endfor %}
+              </ul>
+              <!-- Comment -->
+              <div class="mt-3 mb-3">
+                <label class="mb-1" for="input-project-comment">{{ question_comment_title|default:'Commentaire' }}</label>
+                <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %}"
+                          style="height: 100px"
+                          id="{{ form.prefix }}input-project-comment"
+                          name="{{ form.prefix }}{{ form.comment.name }}"
+                          placeholder="{{ question.comment_title }}">{{ form.comment.value|default:'' }}</textarea>
+                {% for error in form.comment.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+              </div>
+              <!-- File upload -->
+              {% if form.attachment %}
+                <div class="mb-3">
+                  <label for="attachment" class="form-label">{{ question.upload_title }}</label>
+                  <input class="form-control form-control-sm"
+                         id="{{ form.prefix }}attachment"
+                         type="file"
+                         name="{{ form.prefix }}attachment"
+                         value="kdl" />
+                  {% if form.attachment.value %}
+                    Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          {% include "dsrc/core/blocks/buttons/button_group.html" %}
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
