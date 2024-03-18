@@ -1,0 +1,13 @@
+{% comment %} {% extends "dsrc/core/pages/page_center.html" %} {% endcomment %}
+{% comment %} {% load static %} {% endcomment %}
+{% load crispy_forms_tags %}
+{% block title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
+{% block og_title %}| Solliciter l'équipe {{ request.site.name }}{% endblock %}
+{% block page_title %}Solliciter {{ request.site }}{% endblock %}
+{% block tagline %}
+    Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
+{% endblock %}
+{% block form %}
+    <div x-data="DsrcFormValidator('id-dsrc-example-form', {{ form_data|safe }}, 'DsrcFormValidationFunction')"
+         x-init="init">{% crispy dsrc_example_form %}</div>
+{% endblock %}

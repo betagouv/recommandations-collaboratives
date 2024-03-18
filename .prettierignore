@@ -1,0 +1,3 @@
+**/*.html
+recoco/apps/**/*.html
+recoco/templates/**/*.html

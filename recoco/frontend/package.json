@@ -10,6 +10,7 @@
     "build": "./node_modules/vite/bin/vite.js build"
   },
   "dependencies": {
+    "@gouvfr/dsfr": "^1.11.2",
     "@popperjs/core": "^2.11.5",
     "@tiptap/core": "^2.0.0-beta.218",
     "@tiptap/extension-hard-break": "^2.1.16",
@@ -18,8 +19,10 @@
     "@tiptap/starter-kit": "^2.0.0-beta.218",
     "alpinejs": "^3.10.2",
     "axios": "^1.6.0",
+    "bootstrap": "^5.3.3",
     "d3": "^7.8.4",
     "d3-cloud": "^1.2.5",
+    "dsrc_ui": "file:./modules/dsrc_ui",
     "intro.js": "^7.0.1",
     "js-cookie": "^3.0.1",
     "leaflet": "^1.9.1",

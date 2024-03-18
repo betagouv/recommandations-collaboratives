@@ -15,7 +15,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
@@ -34,7 +34,6 @@ from .utils import get_current_site_sender_email
 
 class HomePageView(TemplateView):
     template_name = "home/home.html"
-
 
 @method_decorator([login_required], name="dispatch")
 class LoginRedirectView(View):
