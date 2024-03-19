@@ -16,8 +16,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 //Global CSS
-import '@gouvfr/dsfr/dist/dsfr/dsfr.min.css';
-import '@gouvfr/dsfr/dist/utility/utility.min.css';
 import '../css/dsfr-custom.css';
 import '../css/buttons.css';
 import '../css/input.css';
@@ -27,8 +25,6 @@ import '../css/colors.css';
 import '../css/text-colors.css';
 import '../css/border.css';
 import '../css/role.css';
-
-
 
 //Layouts CSS
 import '../css/layouts/stack.css';
