@@ -7,11 +7,12 @@
   {% vite_asset 'js/apps/onboarding.js' %}
 {% endblock js %}
 {% block css %}
-  {% comment %} <link href="{% static 'dsrc_ui_css/dsrc-csstokens.css' %}" rel="stylesheet" type="text/css">
-  <link href="{% static 'dsrc_ui_css/dsrc-csscore.css' %}"
+  <link href="{% sass_src 'home/css/dsfr/build/dsfr/dsfr.min.css' %}"
         rel="stylesheet"
-        type="text/css"> {% endcomment %}
-  {% comment %} <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css"> {% endcomment %}
+        type="text/css">
+  <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+        rel="stylesheet"
+        type="text/css">
 {% endblock css %}
 {% block title %}
   | Solliciter l'équipe {{ request.site.name }}

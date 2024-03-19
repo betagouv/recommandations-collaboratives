@@ -49,6 +49,7 @@
         <form id="{{ form.helper.form_id }}" method="post">
           {% crispy form %}
           {{ captcha_form }}
+          {% include "tools/organization_search.html" with name=form.org_name.name label=form.org_name.label value=form.org_name.value id_for_label=form.org_name.id_for_label placeholder="Mon organisation" errors=form.org_name.errors %}
           {% for error in captcha_form.errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
           {% include "dsrc/core/blocks/buttons/button_group.html" %}
         </form>

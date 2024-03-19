@@ -1,106 +1,110 @@
 {% extends "base.html" %}
-
 {% load sass_tags %}
 {% load static %}
-
 {% load i18n %}
-
-{% block head_title %}{% trans "Signup" %}{% endblock %}
-
-{% block css %}
-<link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css">
-<link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}" rel="stylesheet" type="text/css">
-<link href="{% sass_src 'home/css/auth/auth.css' %}" rel="stylesheet" type="text/css">
+{% block head_title %}
+  {% trans "Signup" %}
 {% endblock %}
-
+{% block css %}
+  <link href="{% sass_src 'home/css/dsfr/build/dsfr/dsfr.min.css' %}"
+        rel="stylesheet"
+        type="text/css">
+  <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+        rel="stylesheet"
+        type="text/css">
+  <link href="{% sass_src 'home/css/auth/auth.css' %}"
+        rel="stylesheet"
+        type="text/css">
+{% endblock %}
 {% block content %}
-
-<div class="fr-container fr-py-6w max-width-800" style="font-family: 'Marianne', arial, sans-serif;">
+  <div class="fr-container fr-py-6w max-width-800"
+       style="font-family: 'Marianne', arial, sans-serif">
     <h1 class="fr-mb-6w">
-        <svg class="bi me-2" width="28" height="28">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
-        </svg>
-        Création d'un compte {{ site.name }}
+      <svg class="bi me-2" width="28" height="28">
+        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
+      </svg>
+      Création d'un compte {{ site.name }}
     </h1>
-
-    <form class="signup fr-form-group" id="signup_form" method="post" action="{% url 'account_signup' %}">
-        {% csrf_token %}
-        {% if redirect_field_value %}
-        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-        {% endif %}
-        <fieldset class="fr-fieldset">
-            <h4 class="fr-mb-2w d-block">
-                S'inscrire en remplissant les champs suivants
-            </h4>
-            <div class="fr-fieldset__content">
-                <p>
-                    {{form.first_name.label}}
-                    {{form.first_name.errors}}
-                    {{form.first_name}}
-                </p>
-                <p>
-                    {{form.last_name.label}}
-                    {{form.last_name.errors}}
-                    {{form.last_name}}
-                </p>
-                <p class="">
-                    {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True %}
-                </p>
-                <p>
-                    {{form.organization_position.label}}
-                    {{form.organization_position.errors}}
-                    {{form.organization_position}}
-                </p>
-                <p>
-                    {{form.email.label}}
-                    {{form.email.errors}}
-                    {{form.email}}
-                </p>
-                <p>
-                    {{form.phone_no.label}}
-                    {{form.phone_no.errors}}
-                    {{form.phone_no}}
-                </p>
-                <p>
-                    {{form.password1.label}}
-                    {{form.password1.errors}}
-                    {{form.password1}}
-                </p>
-                <p>
-                    {{form.password2.label}}
-                    {{form.password2.errors}}
-                    {{form.password2}}
-                </p>
-                <p>
-                    {{ form.captcha }}
-                    {% for error in form.captcha.errors %}
-                    <div class="text-danger text-start mb-2">{{ error }}</div>
-                    {% endfor %}
-                </p>
-                <div class="fr-input-group fr-mt-4v">
-                    <button class="fr-btn custom-login-button" type="submit">
-                        S'inscrire
-                    </button>
-                </div>
-            </div>
-        </fieldset>
+    <form class="signup fr-form-group"
+          id="signup_form"
+          method="post"
+          action="{% url 'account_signup' %}">
+      {% csrf_token %}
+      {% if redirect_field_value %}
+        <input type="hidden"
+               name="{{ redirect_field_name }}"
+               value="{{ redirect_field_value }}" />
+      {% endif %}
+      <fieldset class="fr-fieldset">
+        <h4 class="fr-mb-2w d-block">S'inscrire en remplissant les champs suivants</h4>
+        <div class="fr-fieldset__content">
+          <p>
+            {{ form.first_name.label }}
+            {{ form.first_name.errors }}
+            {{ form.first_name }}
+          </p>
+          <p>
+            {{ form.last_name.label }}
+            {{ form.last_name.errors }}
+            {{ form.last_name }}
+          </p>
+          <p class="">
+            {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True %}
+          </p>
+          <p>
+            {{ form.organization_position.label }}
+            {{ form.organization_position.errors }}
+            {{ form.organization_position }}
+          </p>
+          <p>
+            {{ form.email.label }}
+            {{ form.email.errors }}
+            {{ form.email }}
+          </p>
+          <p>
+            {{ form.phone_no.label }}
+            {{ form.phone_no.errors }}
+            {{ form.phone_no }}
+          </p>
+          <p>
+            {{ form.password1.label }}
+            {{ form.password1.errors }}
+            {{ form.password1 }}
+          </p>
+          <p>
+            {{ form.password2.label }}
+            {{ form.password2.errors }}
+            {{ form.password2 }}
+          </p>
+          <p>
+            {{ form.captcha }}
+            {% for error in form.captcha.errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
+          </p>
+          <div class="fr-input-group fr-mt-4v">
+            <button class="fr-btn custom-login-button" type="submit">S'inscrire</button>
+          </div>
+        </div>
+      </fieldset>
     </form>
-    <hr style="height: 1px;margin-top: 45px;background-color: grey!important; background-image: none;" />
+    <hr style="height: 1px;
+               margin-top: 45px;
+               background-color: grey!important;
+               background-image: none" />
     <div class="fr-form-group fr-mt-14v">
-        <fieldset class="fr-fieldset d-flex flex-column align-items-center justify-content-center">
-            <h4 class="fr-mb-2w d-block ">
-                Vous avez déjà un compte chez nous ?
-            </h4>
-            <div class="fr-fieldset__content">
-                <div class="fr-input-group">
-                    <a class="fr-btn fr-btn--secondary custom-login-button" href="{% url 'account_login' %}">Se
-                        connecter</a>
-                </div>
-            </div>
-        </fieldset>
+      <fieldset class="fr-fieldset d-flex flex-column align-items-center justify-content-center">
+        <h4 class="fr-mb-2w d-block ">Vous avez déjà un compte chez nous ?</h4>
+        <div class="fr-fieldset__content">
+          <div class="fr-input-group">
+            <a class="fr-btn fr-btn--secondary custom-login-button"
+               href="{% url 'account_login' %}">Se
+            connecter</a>
+          </div>
+        </div>
+      </fieldset>
     </div>
-
-</div>
-<hr style="height: 1px;margin-bottom: 20px;background-color: grey!important; background-image: none;" />
-
+  </div>
+  <hr style="height: 1px;
+             margin-bottom: 20px;
+             background-color: grey!important;
+             background-image: none" />
 {% endblock %}
