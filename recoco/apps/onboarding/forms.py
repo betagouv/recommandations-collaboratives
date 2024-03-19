@@ -93,6 +93,21 @@ class SelectCommuneForm(forms.Form):
         )
 
 
+class OnlyCaptchaForm(forms.Form):
+    class Meta:
+        fields = [
+            "captcha",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Skip captcha during tests
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            self.fields.pop("captcha")
+
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
+
+
 class OnboardingSignupForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -164,21 +179,6 @@ class OnboardingSignupForm(DsrcBaseForm):
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
 
-class OnlyCaptchaForm(forms.Form):
-    class Meta:
-        fields = [
-            "captcha",
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Skip captcha during tests
-        if "PYTEST_CURRENT_TEST" in os.environ:
-            self.fields.pop("captcha")
-
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
-
-
 class OnboardingSigninForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -192,7 +192,7 @@ class OnboardingSigninForm(DsrcBaseForm):
 
         self.helper.layout = Layout(
             Fieldset(
-                "Vous avez déjà un compte ? Identifiez-vous !",  # The first argument is the legend of the fieldset
+                "Vous avez déjà un compte : identifiez-vous",  # The first argument is the legend of the fieldset
                 "email",
                 "password",
             ),
