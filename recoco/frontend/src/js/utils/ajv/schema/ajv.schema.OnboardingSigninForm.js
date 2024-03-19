@@ -8,7 +8,7 @@ export const schemaOnboardingStep1SigninFormValidator = {
   type: 'object',
   properties: {
     email: { $ref: '#/definitions/email' },
-    password: { $ref: '#/definitions/password' },
+    password: { $ref: '#/definitions/passwordSoft' },
   },
   required: ['email', 'password'],
   definitions: schemaFormInputs,

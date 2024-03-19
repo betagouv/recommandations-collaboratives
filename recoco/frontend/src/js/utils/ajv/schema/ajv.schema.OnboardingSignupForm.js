@@ -29,7 +29,7 @@ export const schemaOnboardingStep1SignupFormValidator = {
     org_name: { $ref: '#/definitions/text' },
     role: { $ref: '#/definitions/text' },
     email: { $ref: '#/definitions/email' },
-    password: { $ref: '#/definitions/password' },
+    password: { $ref: '#/definitions/passwordSoft' },
     phone: { $ref: '#/definitions/phone' },
   },
   required: [
