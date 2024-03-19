@@ -21,6 +21,25 @@ from .. import api, brevo, models
 
 
 @pytest.mark.django_db
+def test_send_email_call_send_debug_email_in_debug_mode(mocker, settings, request):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    django_send_mail_mock = mocker.patch("recoco.apps.communication.api.django_send_mail")
+    brevo_mock = mocker.patch("recoco.apps.communication.brevo.Brevo.send_email")
+
+    template_name = "a template"
+
+    user1 = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
+    user1.profile.sites.add(current_site)
+
+    api.send_email(template_name, user1.email, params={})
+
+    brevo_mock.assert_not_called()
+    django_send_mail_mock.assert_called_once()
+    
+
+@pytest.mark.django_db
 def test_send_debug_email_creates_transaction_without_related(request):
     current_site = get_current_site(request)
 
