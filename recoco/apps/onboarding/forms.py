@@ -12,11 +12,43 @@ import os
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
+from django.urls import reverse_lazy
 from crispy_forms.layout import Layout, Fieldset
 from recoco.apps.dsrc.forms import DsrcBaseForm
 from django.shortcuts import reverse
 
 from . import models
+
+
+class ModalOnboardingEmailForm(DsrcBaseForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.form_id = "id-onboarding-email-form"  # The form id is used for validation, it must be set and unique in the page
+        self.helper.form_method = "post"
+        self.helper.form_action = reverse_lazy("projects-onboarding")
+        self.helper.action_button = {
+            "submit": {
+                "label": "Déposer votre projet",
+            }
+        }
+        self.helper.layout = Layout(
+            Fieldset(
+                "",  # The first argument is the legend of the fieldset
+                "email",
+            ),
+        )
+
+    def clean_email(self):
+        """Make sure email is lowercased"""
+        email = self.cleaned_data["email"]
+        return email.lower()
+
+    email = forms.EmailField(
+        label="Adresse email",
+        help_text="Format attendu : prenom.nom@domaine.fr",
+        required=True,
+    )
+
 
 ##################################################
 # Notes

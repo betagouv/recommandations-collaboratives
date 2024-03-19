@@ -14,7 +14,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites import models as sites
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.template.loader import render_to_string
-
 from recoco.apps.addressbook import models as addressbook
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
@@ -30,7 +29,6 @@ from recoco.apps.projects.utils import (
     refresh_user_projects_in_session,
 )
 from recoco.apps.survey.forms import AnswerForm
-
 from recoco.utils import (
     build_absolute_url,
     get_site_config_or_503,
@@ -39,39 +37,34 @@ from recoco.utils import (
 
 from . import forms, models
 
+
 ########################################################################
 # User driven onboarding for a new project
 ########################################################################
-
-
 def onboarding(request):
     """Depending on the user login, redirect to next page"""
 
+    # skip that step if we're already logged in
     if request.user.is_authenticated:
         return redirect("projects-onboarding-project")
 
-    form = forms.ModalOnboardingEmailForm(request.POST)
+    form = forms.ModalOnboardingEmailForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         email = form.cleaned_data["email"]
+        request.session["onboarding_email"] = email
 
         try:
             user = auth.User.objects.get(username=email)
         except auth.User.DoesNotExist:
             user = None
 
-        request.session["onboarding_email"] = email
-
         if user:
-            # User have already an account but is disconnected
+            # User have already an account, request login in
             return redirect(reverse("projects-onboarding-signin"))
 
+    # default safe case, ask for sigup
     return redirect(reverse("projects-onboarding-signup"))
-
-
-########################################################################
-# User driven onboarding for a new project
-########################################################################
 
 
 def onboarding_signup(request):

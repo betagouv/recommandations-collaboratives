@@ -19,16 +19,14 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
+from recoco.apps.onboarding import forms as onboarding_forms
 from recoco.apps.projects import models as projects
-from recoco.apps.projects.utils import (
-    can_administrate_project,
-    get_active_project,
-)
+from recoco.apps.projects.utils import can_administrate_project, get_active_project
 from recoco.apps.tasks import models as tasks
 from recoco.utils import check_if_advisor
 
 from . import models
-from .forms import ContactForm, UserPasswordFirstTimeSetupForm, ModalOnboardingEmailForm
+from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 from .utils import get_current_site_sender_email
 
 
@@ -38,7 +36,7 @@ class HomePageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["onboarding_modal_form"] = ModalOnboardingEmailForm(
+        context["onboarding_modal_form"] = onboarding_forms.ModalOnboardingEmailForm(
             self.request.POST or None
         )
 
