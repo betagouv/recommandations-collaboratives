@@ -171,7 +171,7 @@ def test_send_brevo_email_use_default_template(mocker, request):
     template_name = "a template"
 
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+    baker.make(home_models.SiteConfiguration, site=current_site, legal_address="here")
 
     template = baker.make(models.EmailTemplate, name=template_name, site=None)
 
@@ -185,7 +185,7 @@ def test_send_brevo_email_use_default_template(mocker, request):
     brevo.Brevo.send_email.assert_called_once_with(
         template.sib_id,
         recipients,
-        {'site_name': current_site.name, 'site_domain': current_site.domain},
+        {'site_name': current_site.name, 'site_domain': current_site.domain, "legal_address": "here"},
         test=False
     )
 
@@ -201,7 +201,7 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
     template_name = "a template"
 
     current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
+    baker.make(home_models.SiteConfiguration, site=current_site, legal_address="here")
 
     template = baker.make(models.EmailTemplate, name=template_name, site=None)
     overrided_template = baker.make(models.EmailTemplate, name=template_name, site=current_site)
@@ -216,6 +216,6 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
     brevo.Brevo.send_email.assert_called_once_with(
         overrided_template.sib_id,
         recipients,
-        {'site_name': current_site.name, 'site_domain': current_site.domain},
+        {'site_name': current_site.name, 'site_domain': current_site.domain, "legal_address": "here"},
         test=False
     )

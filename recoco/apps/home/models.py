@@ -131,6 +131,13 @@ class SiteConfiguration(models.Model):
     contact_form_recipient = models.EmailField(
         help_text="Adresse d'expédition pour le formulaire de contact"
     )
+    legal_address = models.CharField(
+        verbose_name="Adresse postale",
+        help_text="L'adresse postale est notamment affichée en bas des emails automatiques.",
+        null=True, 
+        blank=True,
+        max_length=100
+    )
 
     def logo_upload_path(self, filename):
         return f"images/{self.site.pk}/logo/{filename}"

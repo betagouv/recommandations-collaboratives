@@ -73,9 +73,10 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
     params["site_domain"] = current_site.domain
 
     site_config = get_site_config_or_503(current_site)
+    params["legal_address"] = site_config.legal_address or ""
     if site_config.email_logo:
-        params["site_logo"] = build_absolute_url(site_config.email_logo.url) 
-
+        params["site_logo"] = build_absolute_url(site_config.email_logo.url)
+    
     response = brevo.send_email(template.sib_id, recipients, params, test=test)
 
     if response:
