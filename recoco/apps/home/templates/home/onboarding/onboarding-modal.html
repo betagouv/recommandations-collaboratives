@@ -1,0 +1,25 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<dialog aria-labelledby="onboarding-modal-title"
+        id="onboarding-modal"
+        class="fr-modal"
+        role="dialog">
+  <div class="fr-container fr-container--fluid fr-container-md">
+    <div class="fr-grid-row fr-grid-row--center">
+      <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+        <div class="fr-modal__body">
+          <div class="fr-modal__header">
+            <button class="fr-btn--close fr-btn" aria-controls="onboarding-modal">Fermer</button>
+          </div>
+          <div class="fr-modal__content"
+               x-data="AjvValidationSchema('schemaOnboardingEmailFormValidator')">
+            <h1 id="onboarding-modal-title" class="fr-modal__title">Solliciter {{ request.site.name }}</h1>
+            {% include "home/onboarding/fragments/site-description.html" %}
+            <div x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator)"
+                 x-init="init">{% crispy form %}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
