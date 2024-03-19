@@ -15,7 +15,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.shortcuts import redirect, render, reverse
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
@@ -35,34 +35,14 @@ from .utils import get_current_site_sender_email
 class HomePageView(TemplateView):
     template_name = "home/home.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-def home_page(request):
-    form = ModalOnboardingEmailForm(request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        email = (
-            request.user.username
-            if request.user.is_authenticated
-            else form.clean_email()
+        context["onboarding_modal_form"] = ModalOnboardingEmailForm(
+            self.request.POST or None
         )
 
-        try:
-            user = auth.User.objects.get(username=email)
-        except auth.User.DoesNotExist:
-            user = None
-
-        request.session["onboarding_email"] = form.cleaned_data["email"]
-
-        if user:
-            # User have already an account but is disconnected
-            next_step = reverse("projects-onboarding-signin")
-        else:
-            next_step = reverse("projects-onboarding-signup")
-
-        return redirect(f"{next_step}")
-
-    context = {"form": form}
-    return render(request, "home/home.html", context)
+        return context
 
 
 @method_decorator([login_required], name="dispatch")
