@@ -42,6 +42,7 @@ def test_send_email_call_send_debug_email_in_debug_mode(mocker, settings, reques
 @pytest.mark.django_db
 def test_send_debug_email_creates_transaction_without_related(request):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     template_name = "a template"
 
@@ -64,6 +65,7 @@ def test_send_debug_email_creates_transaction_without_related(request):
 @pytest.mark.django_db
 def test_send_debug_email_creates_transaction_with_multiple_recipients(request):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     template_name = "a template"
 
@@ -87,6 +89,7 @@ def test_send_debug_email_creates_transaction_with_multiple_recipients(request):
 @pytest.mark.django_db
 def test_send_debug_email_creates_transaction_with_related(request):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     template_name = "a template"
 
