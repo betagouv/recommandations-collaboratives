@@ -144,6 +144,8 @@ def onboarding_signup(request):
         request.POST or None, initial={"email": existing_email_user}
     )
 
+    captcha_form = forms.OnlyCaptchaForm(request.POST or None)
+
     if request.method == "POST" and form.is_valid():
         email = form.cleaned_data.get("email").lower()
 
@@ -153,7 +155,7 @@ def onboarding_signup(request):
         log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
         return redirect(f"{reverse('projects-onboarding-project')}")
 
-    context = {"form": form}
+    context = {"form": form, "captcha_form": captcha_form}
     return render(request, "onboarding/onboarding-signup.html", context)
 
 

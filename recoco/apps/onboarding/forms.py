@@ -99,6 +99,8 @@ class OnboardingSignupForm(DsrcBaseForm):
         self.helper.form_id = "id-onboarding-signup-form"  # The form id is used for validation, it must be set and unique in the page
         self.helper.form_method = "post"
         self.helper.action_button = {"submit": {"label": "Suivant"}}
+        self.helper.form_tag = False
+        self.helper.form_button = False
 
         self.helper.layout = Layout(
             Fieldset(
@@ -112,6 +114,9 @@ class OnboardingSignupForm(DsrcBaseForm):
                 "password",
             ),
         )
+        # Skip captcha during tests
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            self.fields.pop("captcha")
 
     # Example clean method
     def clean_email(self):
@@ -123,11 +128,7 @@ class OnboardingSignupForm(DsrcBaseForm):
     def password_message_group(errors=None):
         return {
             "help_text": "Votre mot de passe doit contenir :",
-            "messages": [
-                {"text": "12 caractères minimum", "type": "info"},
-                {"text": "1 caractère spécial minimum", "type": "info"},
-                {"text": "1 chiffre minimum", "type": "info"},
-            ],
+            "messages": [{"text": "8 caractères minimum", "type": "info"}],
         }
 
     first_name = forms.CharField(label="Prénom", initial="", required=True)
@@ -151,6 +152,7 @@ class OnboardingSignupForm(DsrcBaseForm):
     password = forms.CharField(
         label="Mot de passe",
         required=True,
+        help_text="Votre mot de passe doit contenir 8 caractères minimum",
         widget=forms.PasswordInput(
             attrs={"size": "sm", "message_group": password_message_group()}
         ),
@@ -158,6 +160,23 @@ class OnboardingSignupForm(DsrcBaseForm):
 
     # TODO: add a phone number validation, pattern / mask
     phone = forms.CharField(max_length=16, label="Téléphone", initial="", required=True)
+
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
+
+
+class OnlyCaptchaForm(forms.Form):
+    class Meta:
+        fields = [
+            "captcha",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Skip captcha during tests
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            self.fields.pop("captcha")
+
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
 
 class OnboardingSigninForm(DsrcBaseForm):
@@ -190,9 +209,7 @@ class OnboardingSigninForm(DsrcBaseForm):
         return {
             "help_text": "Votre mot de passe doit contenir :",
             "messages": [
-                {"text": "12 caractères minimum", "type": "info"},
-                {"text": "1 caractère spécial minimum", "type": "info"},
-                {"text": "1 chiffre minimum", "type": "info"},
+                {"text": "8 caractères minimum", "type": "info"},
             ],
         }
 
@@ -206,6 +223,7 @@ class OnboardingSigninForm(DsrcBaseForm):
     password = forms.CharField(
         label="Mot de passe",
         required=True,
+        help_text="Votre mot de passe doit contenir 8 caractères minimum",
         widget=forms.PasswordInput(
             attrs={"size": "sm", "message_group": password_message_group()}
         ),
@@ -218,6 +236,7 @@ class OnboardingProjectForm(DsrcBaseForm):
         self.helper.form_id = "id-onboarding-project-form"  # The form id is used for validation, it must be set and unique in the page
         self.helper.form_method = "post"
         self.helper.form_tag = False
+        self.helper.form_button = False
         self.helper.action_button = {
             "submit": {
                 "label": "Suivant",

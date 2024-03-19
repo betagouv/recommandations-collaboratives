@@ -7,11 +7,6 @@
   {% vite_asset 'js/apps/onboarding.js' %}
 {% endblock js %}
 {% block css %}
-  {% comment %} <link href="{% static 'dsrc_ui_css/dsrc-csstokens.css' %}" rel="stylesheet" type="text/css">
-  <link href="{% static 'dsrc_ui_css/dsrc-csscore.css' %}"
-        rel="stylesheet"
-        type="text/css"> {% endcomment %}
-  {% comment %} <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}" rel="stylesheet" type="text/css"> {% endcomment %}
 {% endblock css %}
 {% block title %}
   | Solliciter l'équipe {{ request.site.name }}
@@ -50,7 +45,14 @@
          x-data="AjvValidationSchema('schemaOnboardingStep1SignupFormValidator')">
       <div class="onboarding__form"
            x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator)"
-           x-init="init">{% crispy form %}</div>
+           x-init="init">
+        <form id="{{ form.helper.form_id }}" method="post">
+          {% crispy form %}
+          {{ captcha_form }}
+          {% for error in captcha_form.errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
+          {% include "dsrc/core/blocks/buttons/button_group.html" %}
+        </form>
+      </div>
     </div>
   </div>
 {% endblock content %}
