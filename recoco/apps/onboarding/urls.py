@@ -22,7 +22,7 @@ urlpatterns = [
     ),
     path(
         r"onboarding/signin",
-        views.onboarding_signin,
+        views.OnboardingLoginView.as_view(),
         name="projects-onboarding-signin",
     ),
     path(

@@ -17,6 +17,8 @@ from crispy_forms.layout import Layout, Fieldset
 from recoco.apps.dsrc.forms import DsrcBaseForm
 from django.shortcuts import reverse
 
+import allauth.account.forms
+
 from . import models
 
 
@@ -192,7 +194,7 @@ class OnboardingSignupForm(DsrcBaseForm):
     phone = forms.CharField(max_length=16, label="Téléphone", initial="", required=True)
 
 
-class OnboardingSigninForm(DsrcBaseForm):
+class OnboardingLoginForm(allauth.account.forms.LoginForm, DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper.form_id = "id-onboarding-signin-form"  # The form id is used for validation, it must be set and unique in the page

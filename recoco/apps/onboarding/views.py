@@ -35,6 +35,8 @@ from recoco.utils import (
     is_switchtender_or_403,
 )
 
+import allauth.account.views
+
 from . import forms, models
 
 
@@ -83,39 +85,26 @@ def onboarding_signup(request):
             username=email, defaults={"email": email}
         )
         log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-        return redirect(f"{reverse('projects-onboarding-project')}")
+        return redirect(reverse("projects-onboarding-project"))
 
     context = {"form": form}
     return render(request, "onboarding/onboarding-signup.html", context)
 
 
-def onboarding_signin(request):
-    """Return the onboarding signin page and process onboarding signin submission"""
+class OnboardingLoginView(allauth.account.views.LoginView):
+    template_name = "onboarding/onboarding-signin.html"
+    success_url = "projects-onboarding-project"
+    form_class = forms.OnboardingLoginForm
 
-    existing_data = request.session.get("onboarding_existing_data")
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    form = forms.OnboardingSigninForm(request.POST or None, initial=existing_data)
+        context["existing_email_user"] = self.request.session.get("onboarding_email")
 
-    if request.method == "POST":
-        # FIXME with signin logic
-        # and form.is_valid():
-        # NOTE we may check for known user not logged before valid form
-        # email = (
-        #     request.user.username
-        #     if request.user.is_authenticated
-        #     else form.cleaned_data.get("email").lower()
-        # )
-
-        # user, is_new_user = auth.User.objects.get_or_create(
-        #     username=email, defaults={"email": email}
-        # )
-        return redirect(f"{reverse('projects-onboarding-project')}")
-
-    context = {"form": form}
-    return render(request, "onboarding/onboarding-signin.html", context)
+        return context
 
 
-@login_required
+@login_required(login_url="projects-onboarding-signin")
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)
