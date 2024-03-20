@@ -376,3 +376,28 @@ a.fr-btn {
 .fr-fieldset {
   margin-bottom: 2.4rem;
 }
+
+
+/* -------------------- *\
+  Add from 1.5.2 of DSFR
+\* -------------------- */
+
+.fr-background-default--grey {
+  background-color: var(--background-default-grey) !important;
+  --hover: var(--background-default-grey-hover) !important;
+  --active: var(--background-default-grey-active) !important;
+}
+
+.fr-background-alt--grey {
+  background-color: var(--background-alt-grey) !important;
+  --hover: var(--background-alt-grey-hover) !important;
+  --active: var(--background-alt-grey-active) !important;
+}
+
+.fr-text-inverted--grey {
+  color: var(--text-inverted-grey) !important;
+}
+
+.fr-text-label--blue-cumulus {
+  color: #3558a2 !important;
+}
