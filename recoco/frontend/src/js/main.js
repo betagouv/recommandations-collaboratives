@@ -11,10 +11,6 @@ import './store/app';
 import './components/Notification';
 import './components/Editor';
 
-//Bootstrap librairie
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
 //Global CSS
 import '../css/dsfr-custom.css';
 import '../css/buttons.css';

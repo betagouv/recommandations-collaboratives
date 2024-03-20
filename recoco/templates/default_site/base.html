@@ -34,6 +34,9 @@
       </script>
     {% endif %}
     {% include 'seo.html' %}
+    <link href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}"
+          rel="stylesheet"
+          type="text/css">
     <link href="{% sass_src 'css/base.scss' %}"
           rel="stylesheet"
           type="text/css">
@@ -94,7 +97,7 @@
       {% endif %}
       <!--             <div class="b-page-divider"></div> -->
       <div class="container-fluid bg-white">
-        <div class="row">
+        <div class="row background--grey-light">
           {% block content %}{% endblock %}
         </div>
         <div class="row justify-content-center">{% include 'footer.html' %}</div>
@@ -126,6 +129,7 @@
     {% endif %}
     <script src="{% static 'js/text.js' %}"></script>
     <script src="{% static 'js/tooltip.js' %}"></script>
+    <script src="{% static 'bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <!-- bs5 notifications  -->
     <script type="text/javascript">
          $('document').ready(function() {
