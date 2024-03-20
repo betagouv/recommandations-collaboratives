@@ -10,6 +10,9 @@
   <link href="{% static '@gouvfr/dsfr/dist/dsfr.min.css' %}"
         rel="stylesheet"
         type="text/css">
+  <link href="{% static '@gouvfr/dsfr/dist/utility/utility.min.css' %}"
+        rel="stylesheet"
+        type="text/css">
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
         rel="stylesheet"
         type="text/css">
@@ -28,7 +31,7 @@
 {% endblock tagline %}
 {% block content %}
   <div class="container onboarding__summary">
-    <div class="banner mt-6 text-center">
+    <div class="banner mt-6 mb-6 text-center">
       <img src="{% static 'urbanvitaliz.fr/home/img/home/logo-urbanvitaliz.svg' %}"
            width="10%"
            height="auto"
@@ -39,8 +42,8 @@
     </div>
     <div class="container__form">
       <p>Nous avons bien reçu votre projet</p>
-      {% comment %} TODO Cart project sum  {% endcomment %}
-      <div class="project-card fr-icon-arrow-right-line">
+      <div class="project-card">
+        <span class="icon fr-icon-arrow-right-line"></span>
         <div class="project-card__content">
           <div class="project__title">
             {% if project.commune %}
@@ -59,15 +62,12 @@
         </div>
       </div>
       <p class="text-uppercase next-steps">Prochaine étapes</p>
-      <ol>
+      <ol class="ms-4 mb-4">
         <li>Remplissez l’état des lieux de votre projet sur les pages suivantes.</li>
         <li>Nos conseillers·ères valident avec vous les derniers points sous quelques semaines.</li>
         <li>Vous recevez ensuite nos recommandations et pouvez échanger avec notre équipe.</li>
       </ol>
       <ul class="fr-btns-group">
-        <li>
-          <button class="fr-btn">Voir le projet</button>
-        </li>
         <li>
           <button class="fr-btn fr-btn--secondary">Aller à l'état des lieux</button>
         </li>
