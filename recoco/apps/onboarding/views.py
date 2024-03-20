@@ -189,10 +189,9 @@ def onboarding_signin(request):
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)
-
-    # Fetch the onboarding form associated with the current site
-    form = forms.OnboardingProjectForm(request.POST or None)
-
+    form_name_location = forms.OnboardingProjectNameLocationForm(request.POST or None)
+    form_commune = forms.OnboardingProjectCommuneForm(request.POST or None)
+    form_project_context = forms.OnboardingProjectContextForm(request.POST or None)
     question_forms = []
     for question in site_config.onboarding_questions.all():
         form_prefix = f"q{question.id}-"
@@ -207,22 +206,37 @@ def onboarding_project(request):
 
     if request.method == "POST":
 
-        all_forms_valid = form.is_valid()
+        all_forms_valid = (
+            form_name_location.is_valid()
+            and form_project_context.is_valid()
+            and form_commune.is_valid()
+        )
 
-        for question_form in question_forms:
-            all_forms_valid = all_forms_valid and question.is_valid()
+        # FIXME question_form always invalid
+        # for question_form in question_forms:
+        #     all_forms_valid = all_forms_valid and question_form.is_valid()
 
         if all_forms_valid:
-            # FIXME
+            project_dict = {
+                "name": form_name_location.cleaned_data["name"],
+                "location": form_name_location.cleaned_data["location"],
+                "insee": form_commune.cleaned_data["insee"],
+                "description": form_project_context.cleaned_data["description"],
+                "response": form_project_context.cleaned_data["response"],
+                "org_name": request.user.profile.organization,
+                "phone": request.user.profile.phone_no,
+            }
+
             project = create_project_for_user(
-                user=request.user, data=form.cleaned_data, status="DRAFT"
+                user=request.user, data=project_dict, status="DRAFT"
             )
 
             project.sites.add(request.site)
 
             # Save survey questions
-            for question_form in question_forms:
-                question.save()
+            # FIXME question_forms always invalid
+            # for question_form in question_forms:
+            #     question.save()
 
             assign_collaborator(request.user, project, is_owner=True)
 
@@ -236,7 +250,9 @@ def onboarding_project(request):
             )
 
     context = {
-        "form": form,
+        "form": form_name_location,
+        "form_commune": form_commune,
+        "form_project_context": form_project_context,
         "question_forms": question_forms,
     }
     return render(request, "onboarding/onboarding-project.html", context)
@@ -246,15 +262,8 @@ def onboarding_project(request):
 def onboarding_summary(request, project_id=None):
     """Resume project from onboarding"""
 
-    # if we're back from login page restore data already entered
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
-    # TODO redirect EDL ?
-    # action_button_form_param = {
-    #     "submit": {
-    #         "label": "Suivant",
-    #     },
-    #     "cancel": {"label": "Précédent", "href": reverse("projects-onboarding-signup")},
-    # }
+    # TODO redirect EDL
 
     context = {"project": project}
     return render(request, "onboarding/onboarding-summary.html", context)

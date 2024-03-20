@@ -14,6 +14,7 @@ from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from crispy_forms.layout import Layout, Fieldset
 from recoco.apps.dsrc.forms import DsrcBaseForm
+from recoco.apps.geomatics import models as geomatics
 from django.shortcuts import reverse
 
 from . import models
@@ -93,6 +94,9 @@ class SelectCommuneForm(forms.Form):
         )
 
 
+##################################################
+# Onboarding multi-step forms
+##################################################
 class OnlyCaptchaForm(forms.Form):
     class Meta:
         fields = [
@@ -230,7 +234,7 @@ class OnboardingSigninForm(DsrcBaseForm):
     )
 
 
-class OnboardingProjectForm(DsrcBaseForm):
+class OnboardingProjectNameLocationForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper.form_id = "id-onboarding-project-form"  # The form id is used for validation, it must be set and unique in the page
@@ -252,16 +256,45 @@ class OnboardingProjectForm(DsrcBaseForm):
                 "",  # The first argument is the legend of the fieldset
                 "name",
                 "location",
-                "insee",
+            )
+        )
+
+    name = forms.CharField(label="Nom du projet", initial="", required=True)
+    location = forms.CharField(
+        label="Adresse",
+        initial="",
+        required=True,
+        help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
+    )
+
+
+class OnboardingProjectCommuneForm(forms.Form):
+    postcode = forms.CharField(label="Code postal", initial="", required=True)
+    communes = geomatics.Commune.objects.all()
+    insee = forms.ChoiceField(
+        label="Commune",
+        initial="",
+        required=True,
+        choices=[(c.insee, c.name) for c in communes],
+    )
+
+
+class OnboardingProjectContextForm(DsrcBaseForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.form_id = "id-onboarding-project-form"  # The form id is used for validation, it must be set and unique in the page
+        self.helper.form_method = "post"
+        self.helper.form_tag = False
+        self.helper.form_button = False
+
+        self.helper.layout = Layout(
+            Fieldset(
+                "",  # The first argument is the legend of the fieldset
                 "description",
                 "response",
             ),
         )
 
-    # Basic text input
-    name = forms.CharField(label="Nom du projet", initial="", required=True)
-    location = forms.CharField(label="Commune", initial="", required=True)
-    insee = forms.CharField(label="INSEE", initial="", required=True)
     description = forms.CharField(
         label="Contexte du projet",
         widget=forms.Textarea(attrs={"rows": "5"}),
