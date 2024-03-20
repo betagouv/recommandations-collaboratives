@@ -69,7 +69,8 @@
       </ol>
       <ul class="fr-btns-group">
         <li>
-          <button class="fr-btn fr-btn--secondary">Aller à l'état des lieux</button>
+          <a class="fr-btn fr-btn--primary"
+             href="{% url 'survey-project-session' project_id=project.id %}">Remplir l'état des lieux</a>
         </li>
       </ul>
     </div>
