@@ -1,0 +1,32 @@
+/* Global config */
+@forward './config/reset';
+
+/* == DS:FR config */
+// @forward '@gouvfr/dsfr/dist/core/core.css';
+/* components */
+@forward '@gouvfr/dsfr/dist/component/logo/logo.css';
+@forward '@gouvfr/dsfr/dist/component/button/button.css';
+@forward '@gouvfr/dsfr/dist/component/breadcrumb/breadcrumb.css';
+@forward '@gouvfr/dsfr/dist/component/form/form.css';
+@forward '@gouvfr/dsfr/dist/component/stepper/stepper.css';
+@forward '@gouvfr/dsfr/dist/component/link/link.css';
+@forward '@gouvfr/dsfr/dist/component/table/table.css';
+@forward '@gouvfr/dsfr/dist/component/select/select.css';
+@forward '@gouvfr/dsfr/dist/component/modal/modal.css';
+@forward '@gouvfr/dsfr/dist/component/checkbox/checkbox.css';
+@forward '@gouvfr/dsfr/dist/component/radio/radio.css';
+@forward '@gouvfr/dsfr/dist/component/skiplink/skiplink.css';
+@forward '@gouvfr/dsfr/dist/component/navigation/navigation.css';
+@forward '@gouvfr/dsfr/dist/component/input/input.css';
+@forward '@gouvfr/dsfr/dist/component/password/password.css';
+@forward '@gouvfr/dsfr/dist/component/header/header.css';
+/* icons */
+@forward '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.css';
+
+/* == DS:RC config */
+@forward './config/global';
+@forward './blocks/buttons';
+@forward './blocks/inputs';
+
+/* External libraries overrides */
+@forward './ext/jupyter';

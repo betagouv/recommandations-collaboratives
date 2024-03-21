@@ -1,5 +1,6 @@
 recursive-include recoco/static *.*
 recursive-include recoco/frontend/dist/ *.*
+recursive-exclude recoco/frontend/modules *.*
 recursive-include recoco/apps/home/static *.*
 recursive-include recoco/apps/projects *.txt
 recursive-include recoco/apps/projects *.md

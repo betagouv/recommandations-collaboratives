@@ -2,9 +2,9 @@ name: Django Tests CI
 
 on:
   push:
-    branches: [ "main", "develop", "release/*", "feature/*" ]
+    branches: ['main', 'develop', 'release/*', 'feature/*']
   pull_request:
-    branches: [ "main", "develop", "release/*" ]
+    branches: ['main', 'develop', 'release/*']
 
 jobs:
   build:
@@ -36,16 +36,16 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - uses: borales/actions-yarn@v3.0.0
 
@@ -53,6 +53,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install python3-gdal
+
+      - name: Compile DSRC_UI
+        working-directory: ./recoco/frontend/modules/dsrc_ui
+        run: |
+          yarn install
+          yarn build
 
       - name: Compile JS
         working-directory: ./recoco/frontend
@@ -73,8 +79,8 @@ jobs:
 
       - name: Run Tests
         env:
-          SECRET_KEY: "this-is-not-a-secret-key"
-          SENDINBLUE_API_KEY: "this-is-a-fake-api-key"
+          SECRET_KEY: 'this-is-not-a-secret-key'
+          SENDINBLUE_API_KEY: 'this-is-a-fake-api-key'
           DB_HOST: localhost
           DB_USER: postgres
           DB_PASSWORD: postgres

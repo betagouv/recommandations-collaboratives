@@ -1,0 +1,19 @@
+{% load dsrc_tags %}
+{% dsrc_stepper %}
+<form class="fr-mb-0" id="{{ form.id }}">
+    {% csrf_token %}
+    {% block form_content %}{% endblock %}
+    {% for field in form.visible_fields %}
+        {% if field.use_fieldset %}
+            {% dsrc_fieldset field %}
+        {% else %}
+            {% dsrc_form_field field %}
+        {% endif %}
+    {% endfor %}
+    {% if form.messages %}
+        <div class="fr-messages-group" id="{{ form.id }}" aria-live="polite">
+            {% for message in form.messages %}<p>message</p>{% endfor %}
+        </div>
+    {% endif %}
+    {% include "dsrc/core/compositions/forms/form_footer.html" %}
+</form>

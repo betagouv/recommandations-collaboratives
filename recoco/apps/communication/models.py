@@ -14,35 +14,18 @@ from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
 
+from .constants import TPL_CHOICES
+
 
 class EmailTemplate(models.Model):
     class Meta:
         unique_together = ("site", "name")
 
-    NAME_CHOICES = (
-        ("project_received", "Projet bien reçu"),
-        ("project_accepted", "Projet accepté par l'équipe de modération"),
-        # ("project_reminders_digest", "Résumé des rappels"),
-        ("digest_for_non_switchtender", "Résumé quotidien général de notifications"),
-        ("digest_for_switchtender", "Résumé quotidien des conseillers"),
-        ("new_recommendations_digest", "Résumé des nouvelles recommandations"),
-        (
-            "new_site_for_switchtender",
-            "Alerte conseillers d'un nouveau projet sur le territoire",
-        ),
-        ("sharing_invitation", "Invitation à rejoindre un projet"),
-        (
-            "project_reminders_new_reco_digest",
-            "Rappel des nouvelles recommandations (mail projet B)",
-        ),
-        ("project_reminders_whats_up_digest", "Où en êtes-vous ? (mail projet C)"),
-    )
-
     objects = models.Manager()
     on_site = CurrentSiteManager()
 
-    site = models.ForeignKey(Site, on_delete=models.CASCADE)
-    name = models.CharField(max_length=40, choices=NAME_CHOICES)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, blank=True, null=True)
+    name = models.CharField(max_length=40, choices=TPL_CHOICES)
     sib_id = models.IntegerField()
 
     def __str__(self):

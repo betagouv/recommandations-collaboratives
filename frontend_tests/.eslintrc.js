@@ -3,7 +3,7 @@ module.exports = {
         browser: true,
         es2021: true,
     },
-    extends: 'eslint:recommended',
+    extends: ['eslint:recommended', 'plugin:prettier/recommended'],
     overrides: [
         {
             env: {
@@ -20,7 +20,7 @@ module.exports = {
         sourceType: 'module',
     },
     rules: {
-        indent: ['error', 'space'],
+        indent: ['error', 'tab'],
         'linebreak-style': ['error', 'unix'],
         quotes: ['error', 'single'],
         semi: ['error', 'always'],

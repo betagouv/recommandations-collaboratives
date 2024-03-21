@@ -12,18 +12,14 @@ from pathlib import Path
 from typing import AnyStr
 from urllib.parse import urldefrag, urljoin
 
-from django.conf import settings
 from django.contrib.auth import models as auth
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.search import SearchVector
 from django.contrib.sites.models import Site
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.core.mail import send_mail
 from django.db import migrations
 from django.db import models as db_models
 from django.db.models.functions import Cast
-from django.template import loader
 from django.utils.translation import gettext_lazy as _
 from rest_framework.filters import SearchFilter
 from rest_framework.settings import api_settings
@@ -100,31 +96,6 @@ def check_if_advisor(user, site=None):
     site = site or Site.objects.get_current()
     group_name = make_group_name_for_site("advisor", site)
     return auth.User.objects.filter(pk=user.id, groups__name=group_name).exists()
-
-
-def send_email(
-    request, user_email, email_subject, template_base_name, extra_context=None
-):
-    """Send an email raw or html, inspired by magicauth"""
-    html_template = template_base_name + ".html"
-    text_template = template_base_name + ".txt"
-    from_email = settings.EMAIL_FROM
-
-    context = {"site": get_current_site(request), "request": request}
-    if extra_context:
-        context.update(extra_context)
-
-    text_message = loader.render_to_string(text_template, context)
-    html_message = loader.render_to_string(html_template, context)
-
-    send_mail(
-        subject=email_subject,
-        message=text_message,
-        from_email=from_email,
-        html_message=html_message,
-        recipient_list=[user_email],
-        fail_silently=False,
-    )
 
 
 def build_absolute_url(path, auto_login_user=None):

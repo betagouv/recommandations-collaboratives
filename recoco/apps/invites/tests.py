@@ -17,6 +17,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects, assertNotContains, assertContains
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_collaborator, assign_advisor
 from recoco.utils import has_perm, login
@@ -43,6 +44,7 @@ def test_email_is_always_lowercased_on_invite():
 @pytest.mark.django_db
 def test_invite_collaborator_api(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     invited_email = "new@invited.org"
 
@@ -67,6 +69,7 @@ def test_invite_collaborator_api(request, client):
 @pytest.mark.django_db
 def test_invite_collaborator_twice_api(request, client, mailoutbox):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     invited_email = "new@invited.org"
 
@@ -93,6 +96,7 @@ def test_invite_collaborator_twice_api(request, client, mailoutbox):
 @pytest.mark.django_db
 def test_invite_collaborator_but_already_member(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     email = "invited@people.org"
 
@@ -125,6 +129,7 @@ def test_invite_collaborator_but_already_member(request, client):
 @pytest.mark.django_db
 def test_invite_collaborator_after_leaved_api(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     invited_email = "new@invited.org"
 
@@ -155,7 +160,9 @@ def test_invite_collaborator_after_leaved_api(request, client):
 ################################################################
 @pytest.mark.django_db
 def test_invite_available_for_everyone(request, client):
-    invite = Recipe(models.Invite, site=get_current_site(request)).make()
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    invite = Recipe(models.Invite, site=current_site).make()
     url = reverse("invites-invite-details", args=[invite.pk])
     response = client.get(url)
     assert response.status_code == 200
@@ -163,8 +170,10 @@ def test_invite_available_for_everyone(request, client):
 
 @pytest.mark.django_db
 def test_invite_redirects_to_login_if_already_accepted(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     invite = Recipe(
-        models.Invite, site=get_current_site(request), accepted_on=timezone.now()
+        models.Invite, site=current_site, accepted_on=timezone.now()
     ).make()
 
     url = reverse("invites-invite-details", args=[invite.pk])
@@ -176,7 +185,9 @@ def test_invite_redirects_to_login_if_already_accepted(request, client):
 
 @pytest.mark.django_db
 def test_invite_show_error_message_if_not_for_current_logged_in_user(request, client):
-    invite = Recipe(models.Invite, site=get_current_site(request)).make()
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    invite = Recipe(models.Invite, site=current_site).make()
     url = reverse("invites-invite-details", args=[invite.pk])
 
     with login(client):
@@ -188,12 +199,14 @@ def test_invite_show_error_message_if_not_for_current_logged_in_user(request, cl
 
 @pytest.mark.django_db
 def test_invite_does_not_match_existing_account(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     invited = Recipe(
         auth_models.User, username="invited", email="invited@example.com"
     ).make()
 
     invite = Recipe(
-        models.Invite, site=get_current_site(request), email=invited.email
+        models.Invite, site=current_site, email=invited.email
     ).make()
     url = reverse("invites-invite-details", args=[invite.pk])
 
@@ -206,9 +219,11 @@ def test_invite_does_not_match_existing_account(request, client):
 
 @pytest.mark.django_db
 def test_invite_matches_existing_account_for_logged_in_user(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     with login(client) as user:
         invite = Recipe(
-            models.Invite, site=get_current_site(request), email=user.email
+            models.Invite, site=current_site, email=user.email
         ).make()
         url = reverse("invites-invite-details", args=[invite.pk])
         response = client.get(url)
@@ -221,12 +236,14 @@ def test_invite_matches_existing_account_for_logged_in_user(request, client):
 def test_invite_matches_existing_account_redirects_anonyous_user_to_login(
     request, client
 ):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     invited = Recipe(
         auth_models.User, username="invited", email="invited@example.com"
     ).make()
 
     invite = Recipe(
-        models.Invite, site=get_current_site(request), email=invited.email
+        models.Invite, site=current_site, email=invited.email
     ).make()
 
     url = reverse("invites-invite-details", args=[invite.pk])
@@ -240,7 +257,9 @@ def test_invite_matches_existing_account_redirects_anonyous_user_to_login(
 ################################################################
 @pytest.mark.django_db
 def test_accept_invite_returns_to_details_if_get(request, client):
-    invite = Recipe(models.Invite, site=get_current_site(request)).make()
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    invite = Recipe(models.Invite, site=current_site).make()
     url = reverse("invites-invite-accept", args=[invite.pk])
     response = client.get(url)
 
@@ -250,9 +269,11 @@ def test_accept_invite_returns_to_details_if_get(request, client):
 
 @pytest.mark.django_db
 def test_accept_invite_matches_existing_account(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     with login(client) as user:
         invite = Recipe(
-            models.Invite, site=get_current_site(request), email=user.email
+            models.Invite, site=current_site, email=user.email
         ).make()
         url = reverse("invites-invite-accept", args=[invite.pk])
         response = client.post(url)
@@ -265,6 +286,7 @@ def test_accept_invite_matches_existing_account(request, client):
 @pytest.mark.django_db
 def test_accept_invite_as_switchtender_triggers_notification(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     membership = baker.make(
         projects_models.ProjectMember, member__is_staff=False, is_owner=True
@@ -295,6 +317,7 @@ def test_accept_invite_as_switchtender_triggers_notification(request, client):
 @pytest.mark.django_db
 def test_accept_invite_as_team_member_triggers_notification(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     membership = baker.make(
         projects_models.ProjectMember, member__is_staff=False, is_owner=True
@@ -327,6 +350,8 @@ def test_user_cannot_access_member_invitation_for_someone_else(
     client,
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
     with login(client, email="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
@@ -351,6 +376,8 @@ def test_logged_in_user_accepts_invite_advisor_with_matching_existing_account(
     client,
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
     with login(client, email="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
@@ -380,6 +407,8 @@ def test_logged_in_user_accepts_invite_observer_with_matching_existing_account(
     client,
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
     with login(client, email="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
@@ -409,6 +438,7 @@ def test_user_cannot_access_switchtender_invitation_for_someone_else(
     client,
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     invited = Recipe(
         auth_models.User, username="invited", email="invited@example.com"
@@ -439,6 +469,7 @@ def test_logged_in_user_accepts_invite_collaborator_with_matching_existing_accou
     client,
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     with login(client, email="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
@@ -465,6 +496,8 @@ def test_logged_in_user_accepts_invite_collaborator_with_mismatched_existing_acc
     request,
     client,
 ):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     invited = Recipe(
         auth_models.User, username="invited", email="invited@example.com"
     ).make()
@@ -472,7 +505,7 @@ def test_logged_in_user_accepts_invite_collaborator_with_mismatched_existing_acc
     invite = Recipe(
         models.Invite,
         role="COLLABORATOR",
-        site=get_current_site(request),
+        site=current_site,
         email=invited.email,
     ).make()
 
@@ -494,6 +527,8 @@ def test_anonymous_accepts_invite_with_existing_account_fails(
     client,
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
     invited = Recipe(
         auth_models.User, username="invited", email="invited@example.com"
     ).make()
@@ -521,6 +556,7 @@ def test_anonymous_accepts_invite_as_switchtender(
     client,
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     invite = Recipe(
         models.Invite,
         role="SWITCHTENDER",
@@ -560,6 +596,7 @@ def test_anonymous_accepts_invite_as_collaborator(
     client,
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     invite = Recipe(
         models.Invite,
         role="COLLABORATOR",
@@ -596,6 +633,7 @@ def test_anonymous_accepts_invite_as_collaborator(
 @pytest.mark.django_db
 def test_accepting_invitation_assigns_organization_to_current_site(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     invite = Recipe(
         models.Invite,
         role="COLLABORATOR",
@@ -622,6 +660,7 @@ def test_accepting_invitation_assigns_organization_to_current_site(request, clie
 @pytest.mark.django_db
 def test_accepting_invitation_updates_organization_with_current_site(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     invite = Recipe(
         models.Invite,
         role="COLLABORATOR",
@@ -650,6 +689,7 @@ def test_logged_in_user_accepts_invite_but_is_already_member(
     client,
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     with login(client, email="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
@@ -678,6 +718,7 @@ def test_logged_in_user_accepts_invite_but_is_already_advisor(
     client,
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     with login(client, email="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
