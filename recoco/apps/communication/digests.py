@@ -25,6 +25,7 @@ from recoco.apps.reminders.api import (
 )
 
 from .api import send_email
+from . import constants as communication_constants
 
 import logging
 
@@ -94,7 +95,7 @@ def send_new_recommendations_reminders_digest_by_project(site, project, dry_run)
 
         digest = make_digest_of_project_recommendations(project, tasks, project.owner)
         send_email(
-            "project_reminders_new_reco_digest",
+            communication_constants.TPL_PROJECT_REMINDERS_NEW_RECO_DIGEST,
             {"name": normalize_user_name(project.owner), "email": project.owner.email},
             params=digest,
             related=due_reminder,
@@ -131,7 +132,7 @@ def send_whatsup_reminders_digest_by_project(site, project, dry_run):
 
         digest = make_digest_of_project_recommendations(project, tasks, project.owner)
         send_email(
-            "project_reminders_whats_up_digest",
+            communication_constants.TPL_PROJECT_REMINDERS_WHATS_UP_DIGEST,
             {"name": normalize_user_name(project.owner), "email": project.owner.email},
             params=digest,
             related=due_reminder,
@@ -198,7 +199,7 @@ def send_recommendation_digest_by_project(user, notifications, dry_run):
 
         if not dry_run:
             send_email(
-                "new_recommendations_digest",
+                communication_constants.TPL_NEW_RECOMMENDATIONS_DIGEST,
                 {"name": normalize_user_name(user), "email": user.email},
                 params=digest,
                 related=project,
@@ -349,7 +350,7 @@ def send_new_site_digest_by_user(user, notifications, dry_run):
                 )
             else:
                 send_email(
-                    "new_site_for_switchtender",
+                    communication_constants.TPL_NEW_SITE_FOR_SWITCHTENDER,
                     {"name": normalize_user_name(user), "email": user.email},
                     params=digest,
                 )
@@ -406,7 +407,7 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
     )
 
     return send_digest_by_user(
-        user, template_name="digest_for_non_switchtender", queryset=queryset
+        user, template_name=communication_constants.TPL_DIGEST_FOR_NON_SWITCHTENDER, queryset=queryset
     )
 
 
@@ -431,7 +432,7 @@ def send_digest_for_switchtender_by_user(user, dry_run=False):
 
     return send_digest_by_user(
         user,
-        template_name="digest_for_switchtender",
+        template_name=communication_constants.TPL_DIGEST_FOR_SWITCHTENDER,
         queryset=queryset,
         extra_context=context,
         dry_run=dry_run,

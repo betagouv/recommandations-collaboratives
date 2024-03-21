@@ -19,6 +19,7 @@ from notifications.models import Notification
 from notifications.signals import notify
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
+from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects import signals as projects_signals
 from recoco.apps.tasks import signals as tasks_signals
@@ -35,6 +36,8 @@ from .. import digests
 
 @pytest.mark.django_db
 def test_send_digests_for_new_reco(client, request):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     membership = baker.make(projects_models.ProjectMember)
 
     switchtender = Recipe(
@@ -43,7 +46,7 @@ def test_send_digests_for_new_reco(client, request):
 
     project = baker.make(
         projects_models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         status="DONE",
         projectmember_set=[membership],
     )
@@ -52,7 +55,7 @@ def test_send_digests_for_new_reco(client, request):
     tasks_signals.action_created.send(
         sender=test_send_digests_for_new_reco,
         task=tasks_models.Task.objects.create(
-            project=project, site=get_current_site(request), created_by=switchtender
+            project=project, site=current_site, created_by=switchtender
         ),
         project=project,
         user=switchtender,
@@ -86,6 +89,7 @@ def test_send_digests_for_new_reco_empty(client):
 @pytest.mark.django_db
 def test_send_digests_for_new_sites_by_user(request):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     advisor_group = auth.Group.objects.get(name="example_com_advisor")
 
@@ -142,6 +146,7 @@ def test_send_digests_for_new_sites_by_user(request):
 @pytest.mark.django_db
 def test_send_digests_for_switchtender_by_user(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     advisor_group = auth.Group.objects.get(name="example_com_advisor")
 

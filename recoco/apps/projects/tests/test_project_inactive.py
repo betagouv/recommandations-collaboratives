@@ -17,6 +17,7 @@ from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
 from recoco import verbs
+from recoco.apps.home import models as home_models
 from recoco.apps.invites.api import invite_collaborator_on_project
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.apps.tasks import models as tasks_models
@@ -313,6 +314,7 @@ def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactiv
     request, client, subtests
 ):
     site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
 
     project = baker.make(
         models.Project,

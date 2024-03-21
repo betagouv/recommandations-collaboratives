@@ -17,6 +17,7 @@ from django.core.management import call_command
 from django.test import override_settings
 from django.utils import timezone
 from model_bakery import baker
+from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.apps.reminders import models as reminders_models
@@ -32,6 +33,7 @@ def test_command_send_digest_executes_all_tasks(request, mocker, caplog):
     caplog.set_level(logging.DEBUG)
 
     site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
 
     advisor = baker.make(auth_models.User, username="advisor", email="jdoe@example.org")
     advisor.profile.sites.add(site)
@@ -87,6 +89,7 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker, caplog
     caplog.set_level(logging.DEBUG)
 
     site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
 
     advisor = baker.make(
         auth_models.User, username="advisor", email="jdoe@example.org", is_active=False
@@ -142,6 +145,7 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker, caplog
 @override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_reminder_are_treated(request, mocker):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     user = baker.make(auth_models.User)
 
     project = baker.make(projects_models.Project, sites=[current_site])
@@ -158,6 +162,7 @@ def test_command_reminder_are_treated(request, mocker):
 @override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_recommendation_reminder_sent(request, mocker):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     user = baker.make(auth_models.User)
 
     project = baker.make(projects_models.Project, sites=[current_site])
@@ -181,6 +186,7 @@ def test_command_pending_recommendation_reminder_sent(request, mocker):
 @override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_reminder_sent_and_rescheduled(request, mocker):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     user = baker.make(auth_models.User)
 
     project = baker.make(
@@ -210,6 +216,7 @@ def test_command_pending_reminder_sent_and_rescheduled(request, mocker):
 @override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_recommendation_reminder_not_send_if_no_owner(request, mocker):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     baker.make(projects_models.Project, sites=[current_site])
 
@@ -230,6 +237,7 @@ def test_command_pending_recommendation_reminder_not_send_if_no_owner(request, m
 @override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_reminders_not_sent_if_project_inactive(request, mocker):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     user = baker.make(auth_models.User)
 
     project = baker.make(
@@ -254,6 +262,7 @@ def test_command_pending_reminders_not_sent_if_project_inactive(request, mocker)
 @override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_reminders_not_sent_if_project_muted(request, mocker):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     user = baker.make(auth_models.User)
 
     project = baker.make(projects_models.Project, sites=[current_site], muted=True)
