@@ -4,6 +4,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import 'vite/modulepreload-polyfill';
 import './utils/globals';
+import './utils/tooltipInitialization.js';
 
 //Global Store
 import './store/utils';
@@ -27,8 +28,6 @@ import '../css/colors.css';
 import '../css/text-colors.css';
 import '../css/border.css';
 import '../css/role.css';
-
-
 
 //Layouts CSS
 import '../css/layouts/stack.css';
