@@ -108,6 +108,17 @@ a:visited {
   color: $dark-blue;
 }
 
+.btn-group {
+
+  .btn-secondary {
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background-color: transparent;
+  }
+}
+
 footer a {
   text-decoration: none;
 }
