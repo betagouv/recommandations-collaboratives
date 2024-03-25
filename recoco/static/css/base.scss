@@ -104,6 +104,14 @@ a:not(.btn-outline-primary):not(.btn-primary):not(.btn-outline-secondary):hover 
   color: $dark-blue !important;
 }
 
+a:visited {
+  color: $dark-blue;
+}
+
+footer a {
+  text-decoration: none;
+}
+
 .btn-primary {
   background-color: $blue !important;
   border-color: $dark-blue !important;
