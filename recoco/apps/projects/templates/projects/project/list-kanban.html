@@ -91,7 +91,9 @@
                                     :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
                             </template>
                             <div class="fw-semibold">
-                              <a :href="makeProjectURL(t.id)" x-text="truncate(t.name)"></a>
+                              <a class="project-link"
+                                 :href="makeProjectURL(t.id)"
+                                 x-text="truncate(t.name)"></a>
                             </div>
                             <template x-if="t.commune">
                               <div class="fw-bold text-uppercase small">
