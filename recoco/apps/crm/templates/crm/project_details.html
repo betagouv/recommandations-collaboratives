@@ -71,7 +71,8 @@
                                  type="checkbox"
                                  name="checkbox-{{ crm_tag.name|slugify }}"
                                  onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
-                                 id="checkbox-{{ crm_tag.name|slugify }}" {% if crm_tag.name in active_tags %}checked{% endif %}>
+                                 id="checkbox-{{ crm_tag.name|slugify }}"
+                                 {% if crm_tag.name in active_tags %}checked{% endif %}>
                           <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
                         </form>
                       </div>
