@@ -56,11 +56,11 @@
         <form id="{{ form.helper.form_id }}"
               method="post"
               enctype="multipart/form-data">
+          {% csrf_token %}
           {% crispy form %}
           {% include "projects/project/fragments/city_select_dsfr.html" %}
-          {% crispy form_project_context %}
+
           {% for form in question_forms %}
-            {% csrf_token %}
             <fieldset class="fr-fieldset"
                       id="radio-hint"
                       aria-labelledby="radio-hint-legend radio-hint-messages">
@@ -73,7 +73,7 @@
                       <input type="radio"
                              value="{{ choice.0 }}"
                              id="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
-                             name="form_question-{{ forloop.parentloop.counter }}"
+                             name="{{ form.answer.html_name }}"
                              {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
                       <label class="fr-label"
                              for="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
@@ -85,7 +85,7 @@
                       <input type="checkbox"
                              value="{{ choice.0 }}"
                              id="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
-                             name="form_question-{{ forloop.parentloop.counter }}"
+                             name="{{ form.answer.html_name }}"
                              {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
                       <label class="fr-label"
                              for="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
@@ -97,10 +97,10 @@
               {% endfor %}
             </fieldset>
             <!-- Comment -->
-            {% if question_comment_title %}
+            {% if form.comment %}
               <div class="fr-input-group {% if form.comment.errors %}fr-input-group--error{% endif %}">
                 <label class="fr-label" for="textarea">{{ question_comment_title|default:'Commentaire' }}</label>
-                <textarea class="fr-input" rows="4" id="textarea" name="textarea"></textarea>
+                <textarea class="fr-input" rows="3" id="textarea" name="textarea"></textarea>
                 {% for error in form.comment.errors %}
                   <p id="text-input-error-desc-error" class="fr-error-text">{{ error }}</p>
                 {% endfor %}

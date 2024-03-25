@@ -279,32 +279,4 @@ class OnboardingProjectCommuneForm(forms.Form):
     )
 
 
-class OnboardingProjectContextForm(DsrcBaseForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.form_id = "id-onboarding-project-form"  # The form id is used for validation, it must be set and unique in the page
-        self.helper.form_method = "post"
-        self.helper.form_tag = False
-        self.helper.form_button = False
-
-        self.helper.layout = Layout(
-            Fieldset(
-                "",  # The first argument is the legend of the fieldset
-                "description",
-                "response",
-            ),
-        )
-
-    description = forms.CharField(
-        label="Contexte du projet",
-        widget=forms.Textarea(attrs={"rows": "5"}),
-        required=True,
-    )
-    response = forms.CharField(
-        label="Posez vos questions",
-        widget=forms.Textarea(attrs={"rows": "5"}),
-        required=False,
-    )
-
-
 # eof
