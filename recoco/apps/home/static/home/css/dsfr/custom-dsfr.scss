@@ -46,9 +46,12 @@ a.fr-btn {
 
 .custom-button {
   background: #00BBC3 !important;
+  color: white !important;
+  text-decoration: none;
 
   &:hover {
     background: #479195 !important;
+    color: white !important;
   }
 }
 

@@ -101,7 +101,7 @@ a {
 }
 
 a:not(.btn-outline-primary):not(.btn-primary):not(.btn-outline-secondary):hover {
-  color: $dark-blue !important;
+  color: $dark-blue;
 }
 
 a:visited {
