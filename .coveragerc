@@ -1,7 +1,7 @@
 [run]
 # plugins = django_coverage_plugin
 source =
-    ./urbanvitaliz
+    ./recoco
 
 omit =
     *test*,*migrations*,*sgi.py,*production.py
@@ -12,4 +12,4 @@ template_extensions = html
 [report]
 # ignore_errors = True
 
-include = ./urbanvitaliz/**
+include = ./recoco/**
