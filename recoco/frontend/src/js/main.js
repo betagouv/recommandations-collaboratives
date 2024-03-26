@@ -1,6 +1,5 @@
 //Bootstrap librairie
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import 'vite/modulepreload-polyfill';
 import './utils/globals';
@@ -27,8 +26,6 @@ import '../css/colors.css';
 import '../css/text-colors.css';
 import '../css/border.css';
 import '../css/role.css';
-
-
 
 //Layouts CSS
 import '../css/layouts/stack.css';
