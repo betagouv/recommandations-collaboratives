@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import 'vite/modulepreload-polyfill';
 import './utils/globals';
+import './utils/tooltipInitialization.js';
 
 //Global Store
 import './store/utils';
@@ -15,8 +16,6 @@ import './components/Notification';
 import './components/Editor';
 
 //Global CSS
-import '@gouvfr/dsfr/dist/dsfr/dsfr.min.css';
-import '@gouvfr/dsfr/dist/utility/utility.min.css';
 import '../css/dsfr-custom.css';
 import '../css/buttons.css';
 import '../css/input.css';
