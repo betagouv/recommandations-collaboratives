@@ -48,7 +48,7 @@
           <div class="row mb-3">
             <div class="col">
               <label class="mb-2 text-info-custom text-grey-dark"
-                     for="input-project-address">Adresse</label>
+                     for="input-project-address">{{ project_form.location.label }}</label>
               <input type="text"
                      class="py-3 placeholder-grey form-control {% if project_form.location.errors %}is-invalid{% endif %}"
                      id="input-project-address"
@@ -62,7 +62,7 @@
           <div class="row mb-3">
             <div class="col">
               <label class="text-info-custom text-grey-dark"
-                     for="input-project-description">Contexte du projet</label>
+                     for="input-project-description">{{ project_form.description.label }}</label>
               <textarea maxlength="500"
                         class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %}"
                         style="height: 100px"
@@ -93,7 +93,7 @@
               </div>
             </div>
             <div class="mb-3 col-auto">
-              <label class="text-info-custom text-grey-dark" for="input-project-address">Commune</label>
+              <label class="text-info-custom text-grey-dark" for="input-project-address">{{ project_form.insee.label }}</label>
               <select required
                       :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' : 'padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' "
                       style=""
