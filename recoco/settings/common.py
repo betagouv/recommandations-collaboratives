@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "dbtemplates",
     "tagging",
     "taggit",
+    "modelcluster",
     "leaflet",
     "django_gravatar",
     "actstream",
@@ -81,6 +82,18 @@ INSTALLED_APPS = [
     "recoco.apps.crm",
     "recoco.apps.training",
     "crispy_forms",
+    "wagtail.contrib.forms",
+    "wagtail.contrib.redirects",
+    "wagtail.embeds",
+    "wagtail.sites",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.search",
+    "wagtail.admin",
+    "wagtail",
+    "rcm",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -103,6 +116,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
 ROOT_URLCONF = "recoco.urls"
@@ -141,8 +155,8 @@ DBTEMPLATES_USE_CODEMIRROR = True
 # MULTISITE
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = ('dsrc_crispy_forms')
-CRISPY_TEMPLATE_PACK = 'dsrc_crispy_forms'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "dsrc_crispy_forms"
+CRISPY_TEMPLATE_PACK = "dsrc_crispy_forms"
 
 WSGI_APPLICATION = "recoco.wsgi.application"
 
@@ -321,6 +335,9 @@ REST_FRAMEWORK = {
         "rest_framework_xml.renderers.XMLRenderer",
     ]
 }
+
+# WAGTAIL
+WAGTAIL_SITE_NAME = "Recoco"
 
 
 # eof

@@ -12,10 +12,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.urls import include, path
+from django.urls import include, path, re_path
 from magicauth.urls import urlpatterns as magicauth_urls
 from rest_framework import routers
+from wagtail import urls as wagtail_urls
+from wagtail.admin import urls as wagtailadmin_urls
+from wagtail.documents import urls as wagtaildocs_urls
 
+from recoco.apps.addressbook import rest as addressbook_rest
 from recoco.apps.addressbook.urls import urlpatterns as addressbook_urls
 from recoco.apps.crm.urls import urlpatterns as crm_urls
 from recoco.apps.geomatics import rest as geomatics_rest
@@ -23,14 +27,13 @@ from recoco.apps.home.urls import urlpatterns as home_urls
 from recoco.apps.invites.urls import urlpatterns as invites_urls
 from recoco.apps.onboarding.urls import urlpatterns as onboarding_urls
 from recoco.apps.projects.urls import urlpatterns as projects_urls
-from recoco.apps.tasks.urls import urlpatterns as tasks_urls
 from recoco.apps.projects.views import rest as projects_rest
-from recoco.apps.tasks.views import rest as tasks_rest
-from recoco.apps.addressbook import rest as addressbook_rest
-from recoco.apps.training import rest as training_rest
 from recoco.apps.resources import views as resources_views
 from recoco.apps.resources.urls import urlpatterns as resources_urls
 from recoco.apps.survey.urls import urlpatterns as survey_urls
+from recoco.apps.tasks.urls import urlpatterns as tasks_urls
+from recoco.apps.tasks.views import rest as tasks_rest
+from recoco.apps.training import rest as training_rest
 
 # Rest
 router = routers.DefaultRouter()
@@ -103,6 +106,9 @@ urlpatterns = [
     path("hijack/", include("hijack.urls")),
     path("nimda/", admin.site.urls),
     path("cookies/", include("cookie_consent.urls")),
+    path("cms/", include(wagtailadmin_urls)),
+    path("documents/", include(wagtaildocs_urls)),
+    re_path(r"c/", include(wagtail_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
