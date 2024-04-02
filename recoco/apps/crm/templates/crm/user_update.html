@@ -99,14 +99,14 @@
             <form method="POST" action="{% url 'crm-user-update' crm_user.pk %}">
                 {% csrf_token %}
                 {{ form.non_field_errors }}
-                {% for error in form.username.errors %}<div class="text-danger mb-3">{{ error }}</div>{% endfor %}
                 <div class="input-group mb-3">
                     <label for="{{ form.username.name }}" class="col-sm-2 col-form-label">
                         Identifiant de connexion<br/>
                         <i class="small">{{ form.username.help_text }}</i>
                     </label>
                     <div class="col-sm-5">
-                        <input type="email" class="form-control" id="{{ form.username.name }}" name="{{form.username.name }}" value="{{ form.username.value|default:'' }}">
+                        <input type="email" class="form-control{% if form.username.errors %} is-invalid{% endif %}" id="{{ form.username.name }}" name="{{form.username.name }}" value="{{ form.username.value|default:'' }}">
+                        {% for error in form.username.errors %}<div id="{{ form.username.name }}_feedback" class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
 
@@ -114,21 +114,24 @@
                 <div class="input-group mb-3">
                     <label for="{{ form.first_name.name }}" class="col-sm-2 col-form-label">Prénom</label>
                     <div class="col-sm-5">
-                        <input type="text" class="form-control" id="{{ form.first_name.name }}" name="{{form.first_name.name }}" value="{{ form.first_name.value|default:'' }}">
+                        <input type="text" class="form-control{% if form.first_name.errors %} is-invalid{% endif %}" id="{{ form.first_name.name }}" name="{{form.first_name.name }}" value="{{ form.first_name.value|default:'' }}">
+                        {% for error in form.first_name.errors %}<div id="{{ form.first_name.name }}_feedback" class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
 
                 <div class="input-group mb-3">
                     <label for="{{ form.last_name.name }}" class="col-sm-2 col-form-label">Nom</label>
                     <div class="col-sm-5">
-                        <input type="text" class="form-control" id="{{ form.last_name.name }}" name="{{form.last_name.name }}" value="{{ form.last_name.value|default:'' }}">
+                        <input type="text" class="form-control{% if form.last_name.errors %} is-invalid{% endif %}" id="{{ form.last_name.name }}" name="{{form.last_name.name }}" value="{{ form.last_name.value|default:'' }}">
+                        {% for error in form.last_name.errors %}<div id="{{ form.last_name.name }}_feedback" class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
 
                 <div class="input-group mb-3">
                     <label for="{{ form.phone_no.name }}" class="col-sm-2 col-form-label">Numéro de téléphone</label>
                     <div class="col-sm-5">
-                        <input type="text" class="form-control" id="{{ form.phone_no.name }}" name="{{form.phone_no.name }}" value="{{ form.phone_no.value|default:'' }}">
+                        <input type="text" class="form-control{% if form.phone_no.errors %} is-invalid{% endif %}" id="{{ form.phone_no.name }}" name="{{form.phone_no.name }}" value="{{ form.phone_no.value|default:'' }}">
+                        {% for error in form.phone_no.errors %}<div id="{{ form.phone_no.name }}_feedback" class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
 
@@ -138,20 +141,22 @@
                 <div class="input-group mb-3">
                     <label for="{{ form.organization.name }}" class="col-sm-2 col-form-label">Structure de rattachement</label>
                     <div class=" col-sm-5">
-                        <select class="form-control" name="{{ form.organization.name }}" id="{{ form.organization.name }}">
+                        <select class="form-control{% if form.organization.errors %} is-invalid{% endif %}" name="{{ form.organization.name }}" id="{{ form.organization.name }}">
                             {% for choice in form.organization.field.choices %}
                             <option value="{{ choice.0 }}" {% if choice.0 == form.organization.value %}selected{%endif %}>
                                 {{ choice.1 }}
                             </option>
                             {% endfor %}
                         </select>
+                        {% for error in form.organization.errors %}<div id="{{ form.organization.name }}_feedback" class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
 
                 <div class="input-group mb-3">
                     <label for="{{ form.organization_position.name }}" class="col-sm-2 col-form-label">Rôle dans la structure</label>
                     <div class="col-sm-5">
-                        <input type="text" class="form-control" id="{{ form.organization_position.name }}" name="{{form.organization_position.name }}" value="{{ form.organization_position.value|default:'' }}">
+                        <input type="text" class="form-control{% if form.organization_position.errors %} is-invalid{% endif %}" id="{{ form.organization_position.name }}" name="{{form.organization_position.name }}" value="{{ form.organization_position.value|default:'' }}">
+                        {% for error in form.organization_position.errors %}<div id="{{ form.organization_position.name }}_feedback" class="invalid-feedback">{{ error }}</div>{% endfor %}
                     </div>
                 </div>
 
