@@ -67,7 +67,7 @@ class Project:
     SET_INACTIVE = "a mis en pause le projet"
     SET_ACTIVE = "a réactivé le projet"
 
-    EDITED = "a modifé le.s champ.s du projet"
+    EDITED = "a modifé les informations du projet"
 
 
 class Survey:

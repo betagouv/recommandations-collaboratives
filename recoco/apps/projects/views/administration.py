@@ -106,11 +106,10 @@ def project_administration(request, project_id):
                     edited_fields.append(form.fields[field_name].label.lower().replace(" du projet", ""))
 
             if edited_fields:
-                plural = "s" if len(edited_fields) > 1 else ""
                 action.send(
                     request.user,
                     verb=verbs.Project.EDITED,
-                    description=f"Le{plural} champ{plural} modifié{plural} : {' / '.join(edited_fields)}",
+                    description=" / ".join(edited_fields),
                     action_object=project,
                     target=project,
                 )
