@@ -93,8 +93,9 @@ def project_administration(request, project_id):
             # get list of edited fields to track action
             edited_fields = []
             for field_name, submitted_value in form.cleaned_data.items():
-                # get commune attr for related fields
+                # Those fields aren't in form.initial because it is a ModelForm for the Project model.
                 if field_name in ["postcode", "insee"]:
+                    # get commune attr for related fields
                     if project.commune:
                         original_value = getattr(project.commune, "postal" if field_name == "postcode" else field_name)
                     else:
