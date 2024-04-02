@@ -10,11 +10,12 @@ Soit en texte, soit en images ou les deux.
 
 ## Checklist d'acceptation de revue de code
 - [ ] Aucun texte ne fait référence à du vocabulaire spécifique d'un métier
+- [ ] Mon code est auto-documenté ou la documentation a été mise à jour/créée
 - [ ] La gestion du multi-portail a été prise en compte
 - [ ] L'accessibilité a été prise en compte
 - [ ] Pre-commit est configuré et a été lancé
-- [ ] Des tests couvrant le code ont été ajoutés/modifiés
+- [ ] Des tests couvrant le code changé ont été ajoutés/modifiés
 - [ ] L'ensemble des tests front et back sont au vert
 
 ## Demandes
-- [ ] Je souhaite un passage en préproduction
+- [ ] Je souhaite un déploiement en préproduction
