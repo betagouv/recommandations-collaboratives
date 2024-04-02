@@ -39,6 +39,6 @@ class MultiColumnsBlock(blocks.StreamBlock):
 
 class QuoteBlock(blocks.StructBlock):
     image = ImageChooserBlock(label="Illustration (à gauche)", required=False)
-    quote = blocks.CharBlock(label="Citation")
+    quote = blocks.TextBlock(label="Citation")
     author_name = blocks.CharBlock(label="Nom de l’auteur")
     author_title = blocks.CharBlock(label="Titre de l’auteur")
