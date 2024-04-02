@@ -6,7 +6,7 @@
 # created: 2021-06-22 11:49:13 CEST
 #
 
-which=urbanvitliz  # default package for linting
+which=recoco  # default package for linting
 
 SETTINGS=recoco.settings.development
 
@@ -22,9 +22,7 @@ tags:
 	@find ./recoco -name \*.py | etags --language=python -
 
 nice:
-	isort recoco
-	black recoco
-	flake8 recoco
+	pre-commit run --all-files ruff
 
 lint:
 	pylint --django-settings-module=$(SETTINGS) $(which)
@@ -52,7 +50,7 @@ migrate:
 	./manage.py migrate
 
 safe:
-	bandit -x tests,development.py -r recoco
+	pre-commit run --all-files bandit
 	semgrep --config=p/ci recoco
 
 # eof
