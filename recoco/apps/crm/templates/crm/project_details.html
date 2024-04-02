@@ -59,13 +59,7 @@
                             action="{% url 'crm-project-toggle-annotation' project.pk %}"
                             method="post">
                         {% csrf_token %}
-                        <div>
-                          <input class="button"
-                                 hidden
-                                 name="tag"
-                                 value="{{ crm_tag.name }}"
-                                 id="id_tag" />
-                        </div>
+                        <input class="button" hidden name="tag" value="{{ crm_tag.name }}" id="id_tag" />
                         <div class="crm-form-check form-check form-check-inline">
                           <input class="form-check-input"
                                  type="checkbox"
@@ -73,9 +67,9 @@
                                  onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
                                  id="checkbox-{{ crm_tag.name|slugify }}" {% if crm_tag.name in active_tags %}checked{% endif %}>
                           <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
-                        </form>
-                      </div>
-                    {% endfor %}
+                        </div>
+                      </form>
+                      {% endfor %}
                   {% endwith %}
                 </div>
               </fieldset>
