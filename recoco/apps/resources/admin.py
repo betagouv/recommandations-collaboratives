@@ -10,19 +10,21 @@ created: 2021-06-16 11:10:27 CEST
 
 from django.contrib import admin
 from csvexport.actions import csvexport
+from reversion.admin import VersionAdmin
+
 
 from . import models
 
 
 @admin.register(models.Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(VersionAdmin):
     search_fields = ["name", "icon"]
     list_filter = ["sites"]
     list_display = ["name", "icon", "color"]
 
 
 @admin.register(models.Resource)
-class ResourceAdmin(admin.ModelAdmin):
+class ResourceAdmin(VersionAdmin):
     actions = [csvexport]
     search_fields = ["title", "content"]
     list_filter = ["sites", "updated_on"]

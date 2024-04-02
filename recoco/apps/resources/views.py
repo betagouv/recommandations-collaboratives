@@ -8,6 +8,7 @@ created : 2021-06-16 10:59:08 CEST
 """
 import datetime
 
+import reversion
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -288,8 +289,12 @@ def resource_update(request, resource_id=None):
         if form.is_valid():
             resource = form.save(commit=False)
             resource.updated_on = timezone.now()
-            resource.save()
-            form.save_m2m()
+
+            with reversion.create_revision():
+                reversion.set_user(request.user)
+                resource.save()
+                form.save_m2m()
+
             return redirect(next_url)
     else:
         form = EditResourceForm(instance=resource)
@@ -306,9 +311,12 @@ def resource_create(request):
         if form.is_valid():
             resource = form.save(commit=False)
             resource.created_by = request.user
-            resource.save()
-            resource.sites.add(request.site)
-            form.save_m2m()
+            with reversion.create_revision():
+                reversion.set_user(request.user)
+                resource.save()
+                resource.sites.add(request.site)
+                form.save_m2m()
+
             next_url = reverse("resources-resource-detail", args=[resource.id])
             return redirect(next_url)
     else:
