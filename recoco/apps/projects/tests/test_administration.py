@@ -84,12 +84,12 @@ def test_project_update_when_missing_commune(request, client):
 
     actions = action_object_stream(project)
     assert actions.count() == 1
-    assert actions[0].verb.startswith(verbs.Project.EDITED[:20])
-    assert "nom" in actions[0].verb
-    assert "adresse" in actions[0].verb
-    assert "contexte" in actions[0].verb
-    assert "code postal" not in actions[0].verb
-    assert "commune" not in actions[0].verb
+    assert actions[0].verb == verbs.Project.EDITED
+    assert "nom" in actions[0].description
+    assert "adresse" in actions[0].description
+    assert "contexte" in actions[0].description
+    assert "code postal" not in actions[0].description
+    assert "commune" not in actions[0].description
 
 @pytest.mark.django_db
 def test_project_update_commune(request, client):
@@ -124,12 +124,12 @@ def test_project_update_commune(request, client):
 
     actions = action_object_stream(project)
     assert actions.count() == 1
-    assert actions[0].verb.startswith(verbs.Project.EDITED[:20])
-    assert "nom" in actions[0].verb
-    assert "adresse" in actions[0].verb
-    assert "contexte" in actions[0].verb
-    assert "code postal" in actions[0].verb
-    assert "commune" in actions[0].verb
+    assert actions[0].verb == verbs.Project.EDITED
+    assert "nom" in actions[0].description
+    assert "adresse" in actions[0].description
+    assert "contexte" in actions[0].description
+    assert "code postal" in actions[0].description
+    assert "commune" in actions[0].description
 
 
 @pytest.mark.django_db
