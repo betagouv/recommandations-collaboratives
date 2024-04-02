@@ -67,6 +67,7 @@ def test_create_existing_organization_and_redirect(request, client):
     organization = Recipe(
         models.Organization, sites=[current_site], name="my organization"
     ).make()
+    assert organization.sites.count() == 1
 
     url = reverse("addressbook-organization-create")
 
@@ -79,6 +80,35 @@ def test_create_existing_organization_and_redirect(request, client):
 
     updated = models.Organization.on_site.first()
     assert updated.name == data["name"]
+    assert organization.sites.count() == 1
+    assert current_site in list(organization.sites.all())
+
+    new_url = reverse("addressbook-organization-details", args=(organization.pk,))
+    assertRedirects(response, new_url)
+
+
+@pytest.mark.django_db
+def test_create_existing_organization_on_other_site_and_redirect(request, client):
+    current_site = get_current_site(request)
+    other_site = baker.make(sites_models.Site)
+
+    organization = Recipe(
+        models.Organization, sites=[other_site], name="my organization"
+    ).make()
+    assert organization.sites.count() == 1
+
+    url = reverse("addressbook-organization-create")
+
+    with login(client, groups=["example_com_staff"]):
+        data = {"name": "my organization"}
+        response = client.post(url, data=data)
+
+    # no new organization created
+    assert models.Organization.on_site.count() == 1
+
+    updated = models.Organization.on_site.first()
+    assert updated.name == data["name"]
+    assert organization.sites.count() == 2
     assert current_site in list(organization.sites.all())
 
     new_url = reverse("addressbook-organization-details", args=(organization.pk,))
