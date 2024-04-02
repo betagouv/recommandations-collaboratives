@@ -9,6 +9,7 @@ created: 2022-12-26 11:54:56 CEST
 
 
 import pytest
+from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
@@ -18,12 +19,15 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertRedirects
+
+from recoco import verbs
 from recoco.apps.communication import api as communication_api
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.invites import models as invites_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import login
+
 
 from .. import models
 
@@ -78,6 +82,14 @@ def test_project_update_when_missing_commune(request, client):
 
     assert response.status_code == 302
 
+    actions = action_object_stream(project)
+    assert actions.count() == 1
+    assert actions[0].verb == verbs.Project.EDITED
+    assert "nom" in actions[0].description
+    assert "adresse" in actions[0].description
+    assert "contexte" in actions[0].description
+    assert "code postal" not in actions[0].description
+    assert "commune" not in actions[0].description
 
 @pytest.mark.django_db
 def test_project_update_commune(request, client):
@@ -108,6 +120,16 @@ def test_project_update_commune(request, client):
 
     project = models.Project.objects.get(id=project.pk)
     assert project.commune == new_commune
+
+
+    actions = action_object_stream(project)
+    assert actions.count() == 1
+    assert actions[0].verb == verbs.Project.EDITED
+    assert "nom" in actions[0].description
+    assert "adresse" in actions[0].description
+    assert "contexte" in actions[0].description
+    assert "code postal" in actions[0].description
+    assert "commune" in actions[0].description
 
 
 @pytest.mark.django_db
