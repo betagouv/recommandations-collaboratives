@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "dynamic_forms",
     "watson",
     "phonenumber_field",
+    "reversion",
     "cookie_consent",
     "recoco.apps.dsrc",
     "recoco.apps.onboarding",
@@ -141,8 +142,8 @@ DBTEMPLATES_USE_CODEMIRROR = True
 # MULTISITE
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = ('dsrc_crispy_forms')
-CRISPY_TEMPLATE_PACK = 'dsrc_crispy_forms'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "dsrc_crispy_forms"
+CRISPY_TEMPLATE_PACK = "dsrc_crispy_forms"
 
 WSGI_APPLICATION = "recoco.wsgi.application"
 

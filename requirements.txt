@@ -51,3 +51,5 @@ django-phonenumber-field[phonenumbers]==6.3.0
 django-watson==1.6.3
 django-guardian==2.4.0
 django-clone==5.3.3
+
+django-reversion==5.0.2
