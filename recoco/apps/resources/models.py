@@ -139,7 +139,6 @@ class ResourceOnSiteManager(CurrentSiteManager, ResourceManagerWithQS):
         "category",
         "contacts",
         "departments",
-        "tags",
     ),
     follow=("category",),
 )

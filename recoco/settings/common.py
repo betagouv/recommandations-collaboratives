@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "watson",
     "phonenumber_field",
     "reversion",
+    "reversion_compare",
     "cookie_consent",
     "recoco.apps.dsrc",
     "recoco.apps.onboarding",

@@ -41,6 +41,11 @@ urlpatterns = [
         name="resources-resource-update",
     ),
     path(
+        "ressource/<path:pk>/revision/",
+        views.ResourceHistoryCompareView.as_view(),
+        name="resources-resource-history",
+    ),
+    path(
         r"ressource/<int:resource_id>/bookmark/create/",
         views.create_bookmark,
         name="resources-bookmark-create",
