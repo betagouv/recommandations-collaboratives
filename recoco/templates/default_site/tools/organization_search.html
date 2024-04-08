@@ -2,21 +2,18 @@
 
 {% block js %}
     {% vite_asset 'js/apps/organizationSearch.js' %}
-{% endblock %}
+{% endblock js %}
 
-<div x-data='OrganizationSearch("{{value|default:""}}")'>
-        {% if dsfr %}
-            {{label}}
-        {% else %}
-            <label class="text-info-custom text-grey-dark" for="id_for_label">{{ label }}</label>
-        {% endif %}
+<div x-data='OrganizationSearch("{{ value|default:"" }}")'>
+        <label class="{% if dsfr %}fr-label{% else %} text-info-custom text-grey-dark{% endif %}" for="{{ id_for_label }}">{{ label }}</label>
+
         <input x-on:input.change.debounce="handleOrganizationChange" x-model="organization" type="text"
         {% if dsfr %}
             class="fr-input fr-mt-2v fr-mb-4v"
         {% else %}
             class="{% if small_padding %} py-2 {% else %}py-4 {% endif %}placeholder-grey form-control {% if errors %} is-invalid {% endif %} {% if disabled %} input-disabled {% endif %}"
         {% endif %}
-            id="{{ id_for_label }}" name="{{ name }}" placeholder="{{placeholder}}"
+            id="{{ id_for_label }}" name="{{ name }}" placeholder="{{ placeholder }}"
             value="organization" {% if not disabled %} required {% endif %} />
         {% for error in errors %}
             <div class="text-danger text-end">{{ error }}</div>
