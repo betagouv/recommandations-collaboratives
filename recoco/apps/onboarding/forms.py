@@ -155,7 +155,6 @@ class OnboardingSignupForm(DsrcBaseForm):
     org_name = forms.CharField(
         label="Nom de votre administration ou de votre entreprise",
         initial="",
-        required=True,
     )
     role = forms.CharField(label="Fonction", initial="", required=True)
 
@@ -178,9 +177,13 @@ class OnboardingSignupForm(DsrcBaseForm):
     )
 
     # TODO: add a phone number validation, pattern / mask
-    phone = forms.CharField(max_length=16, label="Téléphone", initial="", required=True)
-
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
+    phone = forms.CharField(
+        max_length=16,
+        label="Téléphone",
+        initial="",
+        help_text="Format attendu: 0102030405",
+        required=True,
+    )
 
 
 class OnboardingSigninForm(DsrcBaseForm):

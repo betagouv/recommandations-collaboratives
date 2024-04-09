@@ -146,7 +146,7 @@ def onboarding_signup(request):
 
     captcha_form = forms.OnlyCaptchaForm(request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
+    if request.method == "POST" and form.is_valid() and captcha_form.is_valid():
         email = form.cleaned_data.get("email").lower()
 
         user, is_new_user = auth.User.objects.get_or_create(

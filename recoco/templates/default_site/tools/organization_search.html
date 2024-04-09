@@ -9,7 +9,7 @@
 
         <input x-on:input.change.debounce="handleOrganizationChange" x-model="organization" type="text"
         {% if dsfr %}
-            class="fr-input fr-mt-2v fr-mb-4v"
+            class="fr-input"
         {% else %}
             class="{% if small_padding %} py-2 {% else %}py-4 {% endif %}placeholder-grey form-control {% if errors %} is-invalid {% endif %} {% if disabled %} input-disabled {% endif %}"
         {% endif %}
