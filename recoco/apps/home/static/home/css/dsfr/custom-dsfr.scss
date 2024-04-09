@@ -27,6 +27,10 @@
   // --display-spacing: 0 0 2rem;
 }
 
+a {
+  text-decoration: none;
+}
+
 a.fr-btn {
   &:hover {
     &:not(.fr-btn--secondary) {
