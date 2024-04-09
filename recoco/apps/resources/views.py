@@ -11,7 +11,8 @@ import datetime
 import reversion
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
@@ -382,9 +383,16 @@ class EditResourceForm(forms.ModelForm):
 
 
 # History/Reversion
-class ResourceHistoryCompareView(HistoryCompareDetailView):
+class ResourceHistoryCompareView(
+    LoginRequiredMixin, PermissionRequiredMixin, HistoryCompareDetailView
+):
     model = models.Resource
+    permission_required = "sites.manage_resources"
     template_name = "resources/resource/history.html"
+
+    def has_permission(self):
+        site = get_current_site(self.request)
+        return self.request.user.has_perm(self.permission_required, site)
 
 
 ########################################################################
