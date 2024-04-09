@@ -150,8 +150,13 @@ def onboarding_signup(request):
         email = form.cleaned_data.get("email").lower()
 
         user, is_new_user = auth.User.objects.get_or_create(
-            username=email, defaults={"email": email}
+            username=email,
+            first_name=form.cleaned_data.get("first_name"),
+            last_name=form.cleaned_data.get("last_name"),
+            defaults={"email": email},
         )
+        user.set_password(form.cleaned_data.get("password"))
+        user.save()
         log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
         return redirect(f"{reverse('projects-onboarding-project')}")
 
