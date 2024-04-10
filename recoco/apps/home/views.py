@@ -8,6 +8,7 @@ created: 2021-08-16 15:40:08 CEST
 """
 
 
+from urllib.parse import urlencode
 import django.core.mail
 from django.contrib import messages
 from django.contrib.auth import login as log_user
@@ -15,7 +16,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
@@ -43,6 +44,18 @@ class HomePageView(TemplateView):
         )
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_context_data()["onboarding_modal_form"]
+        if form.is_valid():
+            request.session["onboarding_email"] = form.cleaned_data["email"]
+            try:
+                auth.User.objects.get(email=form.cleaned_data["email"])
+                next_args = urlencode({"next": reverse("projects-onboarding-project")})
+                return redirect(f"/accounts/login/?{next_args}")
+            except auth.User.DoesNotExist:
+                signup_url = reverse("projects-onboarding-signup")
+                return redirect(signup_url)
 
 
 @method_decorator([login_required], name="dispatch")
