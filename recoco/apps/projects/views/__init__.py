@@ -22,6 +22,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from notifications import models as notifications_models
 
 from recoco import verbs
+from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
 from recoco.apps.communication.digests import normalize_user_name
@@ -211,7 +212,7 @@ def project_accept(request, project_id=None):
                 "project": digests.make_project_digest(project, owner),
             }
             send_email(
-                template_name="project_accepted",
+                template_name=communication_constants.TPL_PROJECT_ACCEPTED,
                 recipients=[
                     {
                         "name": normalize_user_name(owner),

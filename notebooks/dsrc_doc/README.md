@@ -18,7 +18,7 @@ L'arborescence de ces modules dans le projet est la suivante:
 |-- dsrc_tests // TODO
 |-- notebooks
 |   `-- dsrc_doc
-`-- urbanvitaliz
+`-- recoco
     |-- apps
     |   |-- dsrc
     |   |   |-- templates
@@ -67,7 +67,7 @@ python manage.py runserver
 
 Pour travailler sur les composants ui du DSRC:
 
-1. 🎨 Terminal 3 : Démarrer le serveur de dev de la lib `dsrc_ui` dans `[root]/urbanvitaliz/dsrc_ui`
+1. 🎨 Terminal 3 : Démarrer le serveur de dev de la lib `dsrc_ui` dans `[root]/recoco/dsrc_ui`
 
 ```sh
 yarn dev
@@ -75,7 +75,7 @@ yarn dev
 
 Pour travailler sur les composants ui de l'application:
 
-1. ✨ Terminal 4 : Démarrer le serveur de dev du `frontend` dans `[root]/urbanvitaliz/frontend`
+1. ✨ Terminal 4 : Démarrer le serveur de dev du `frontend` dans `[root]/recoco/frontend`
 
 ```sh
 yarn dev
@@ -85,7 +85,7 @@ yarn dev
 
 Afin d'appliquer des styles à un Template Django à l'intérieur d'une cellule Jupyter Notebooks, on charge le CSS dans un `string` qui est injecté dans le `Template` construit dans Jupyter via le dict `Context`. Les styles sont ensuite rendus dans un tag `<style>` à l'intérieur d'un `{% block css %}`.
 
-Le CSS de la librairie DSRC est généré à partir de sources SCSS dans le dossier `[root]/urbanvitaliz/dsrc_ui`.
+Le CSS de la librairie DSRC est généré à partir de sources SCSS dans le dossier `[root]/recoco/dsrc_ui`.
 
 Les fichiers sont générés dans `[root]/static/` et chargés dans Jupyter Notebooks à partir de `[root]/static/`.
 

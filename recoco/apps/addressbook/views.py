@@ -30,7 +30,7 @@ def organization_create(request):
         if form.is_valid():
             name = form.cleaned_data.get("name")
             departments = form.cleaned_data.get("departments")
-            organization, _ = models.Organization.on_site.get_or_create(name=name)
+            organization = models.Organization.get_or_create(name=name)
             organization.sites.add(request.site)
             organization.departments.add(*departments)
             organization.save()

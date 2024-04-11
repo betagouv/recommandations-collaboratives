@@ -635,7 +635,9 @@ def test_project_detail_contains_actions_for_assigned_advisor(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_not_available_for_non_staff_users(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-accept", args=[project.id])
     with login(client):
         response = client.get(url)
@@ -645,6 +647,7 @@ def test_accept_project_not_available_for_non_staff_users(request, client):
 @pytest.mark.django_db
 def test_accept_project_and_redirect(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     owner = Recipe(auth.User, username="owner@owner.co").make()
     project = Recipe(models.Project, sites=[current_site]).make()
     baker.make(models.ProjectMember, project=project, member=owner, is_owner=True)
@@ -669,6 +672,7 @@ def test_accept_project_and_redirect(request, client):
 @pytest.mark.django_db
 def test_accept_project_without_owner_and_redirect(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     project = Recipe(models.Project, sites=[current_site]).make()
 
     updated_on_before = project.updated_on
@@ -688,6 +692,7 @@ def test_accept_project_without_owner_and_redirect(request, client):
 @pytest.mark.django_db
 def test_accept_project_notifies_regional_actors(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     st_group = auth.Group.objects.get(name="example_com_advisor")
 
@@ -719,6 +724,8 @@ def test_accept_project_notifies_regional_actors(request, client):
 
 @pytest.mark.django_db
 def test_accept_project_does_not_notify_non_regional_actors(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     group = auth.Group.objects.get(name="example_com_advisor")
 
     dpt_nord = Recipe(geomatics.Department, code=59, name="Nord").make()
@@ -739,7 +746,7 @@ def test_accept_project_does_not_notify_non_regional_actors(request, client):
     owner_membership = baker.make(models.ProjectMember, is_owner=True)
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         commune=commune,
         projectmember_set=[owner_membership],
     ).make()
@@ -790,7 +797,7 @@ def test_general_notifications_are_consumed_on_project_overview(request, client)
 
     baker.make(
         home_models.SiteConfiguration,
-        site=get_current_site(request),
+        site=current_site,
         onboarding=onboarding,
         project_survey__name="Test survey",
     )

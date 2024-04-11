@@ -17,6 +17,7 @@ from django.template.loader import render_to_string
 from django.utils.http import urlencode
 
 from recoco.apps.addressbook import models as addressbook
+from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
 from recoco.apps.communication.digests import normalize_user_name
@@ -439,7 +440,7 @@ def email_owner_of_project(
         ),
     }
     send_email(
-        template_name="project_received",
+        template_name=communication_constants.TPL_PROJECT_RECEIVED,
         recipients=[
             {
                 "name": normalize_user_name(project.owner),
@@ -468,7 +469,7 @@ def invite_user_to_project(
     )
 
     send_email(
-        template_name="sharing invitation",
+        template_name=communication_constants.TPL_SHARING_INVITATION,
         recipients=[{"email": user.email}],
         params={
             "sender": {"email": request.user.email},

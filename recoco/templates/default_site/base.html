@@ -128,14 +128,11 @@
               crossorigin="anonymous"></script>
     {% endif %}
     <script src="{% static 'js/text.js' %}"></script>
-    <script src="{% static 'js/tooltip.js' %}"></script>
-    <script src="{% static 'bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <!-- bs5 notifications  -->
     <script type="text/javascript">
          $('document').ready(function() {
              $('.toast').toast('show');
          });
-
     </script>
     {% block js %}
     {% endblock %}

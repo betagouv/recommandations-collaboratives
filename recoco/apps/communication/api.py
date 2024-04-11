@@ -22,6 +22,8 @@ from django.core.mail import send_mail as django_send_mail
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
+from recoco.utils import get_site_config_or_503, build_absolute_url
+
 from .brevo import Brevo
 from .models import EmailTemplate, TransactionRecord
 
@@ -48,19 +50,43 @@ def create_transaction(transaction_id, recipients, label, related, faked=False):
             related=related,
         )
 
+def get_site_params():
+    params = {}
+    current_site = Site.objects.get_current()
+    params["site_name"] = current_site.name
+    params["site_domain"] = current_site.domain
+
+    site_config = get_site_config_or_503(current_site)
+    params["legal_address"] = site_config.legal_address or ""
+    if site_config.email_logo:
+        params["site_logo"] = build_absolute_url(site_config.email_logo.url)
+
+    return params
+
 
 def brevo_email(template_name, recipients, params=None, test=False, related=None):
     """Uses Brevo service to send an email using the given template and params"""
     brevo = Brevo()
     try:
+        # try to use the site specific template 
         template = EmailTemplate.on_site.get(name__iexact=template_name)
     except EmailTemplate.DoesNotExist:
-        mail_admins(
-            subject="Unable to send email", message=f"{template_name} was not found !"
-        )
-        return False
+        try:
+            # use default template
+            template = EmailTemplate.objects.get(site=None, name__iexact=template_name)
+        except EmailTemplate.DoesNotExist:
+            current_site = Site.objects.get_current()
+            mail_admins(
+                subject="Unable to send email", message=f"{template_name} was not found on {current_site} !"
+            )
+            return False
 
-    response = brevo.send_email(template.sib_id, recipients, params, test=test)
+    # enriches params with site data
+    all_params = get_site_params()
+    if params:
+        all_params.update(params)
+    
+    response = brevo.send_email(template.sib_id, recipients, all_params, test=test)
 
     if response:
         create_transaction(
@@ -92,10 +118,14 @@ def send_debug_email(template_name, recipients, params=None, test=False, related
 
     logger.debug(f"Sending email to {simple_recipients}")
 
+    all_params = get_site_params()
+    if params:
+        all_params.update(params)
+
     django_send_mail(
         "Brevo Mail",
-        f"Message utilisant le template {template_name} avec les"
-        f"paramètres : {params} (TEST MODE: {test})",
+        f"Message utilisant le template {template_name} avec les "
+        f"paramètres : {all_params} (TEST MODE: {test})",
         "no-reply@recoconseil.fr",
         simple_recipients,
         fail_silently=False,

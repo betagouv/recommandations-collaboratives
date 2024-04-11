@@ -1,6 +1,7 @@
 from django.contrib.auth import models as auth_models
 from recoco import utils
 from recoco.apps.communication import api as communication_api
+from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 
 from . import models
@@ -76,7 +77,7 @@ def invite_send(invite, invited_user=None):
             params["sender"]["organization"] = invite.inviter.profile.organization.name
 
     res = communication_api.send_email(
-        template_name="sharing invitation",
+        template_name=communication_constants.TPL_SHARING_INVITATION,
         recipients=[{"email": invite.email}],
         params=params,
     )
@@ -91,7 +92,6 @@ def invite_resend(invite):
     except auth_models.User.DoesNotExist:
         user = None  # Used to generate autologging link
 
-    print("COIN")
     return invite_send(invite, invited_user=user)
 
 

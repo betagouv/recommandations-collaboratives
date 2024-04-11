@@ -5,13 +5,13 @@
 
 from notebooks.django_for_jupyter import init_django
 
-init_django("urbanvitaliz")
+init_django("recoco")
 
 
 # %%
 
 from django.db.models import Model
-from urbanvitaliz.apps.projects.models import Project
+from recoco.apps.projects.models import Project
 
 projects = Project.objects.all()
 

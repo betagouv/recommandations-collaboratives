@@ -20,7 +20,7 @@ Le module `dsrc/templates/core` est organisé dans les modules suivants:
 
 Le module `dsrc/templates/samples` contient des bases de code à prendre comme example pour des intégrations spécifiques.
 
-Una démo de formulaire est visible sur `http://urbanvitaliz.localhost:8000/dsrc/`
+Un démo de formulaire est visible sur `http://recoco.localhost:8000/dsrc/`
 
 - voir l'intégration dans `urls.py`, `views.py` et `forms.py`
 

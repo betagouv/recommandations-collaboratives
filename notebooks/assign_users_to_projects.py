@@ -18,7 +18,7 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"  # Pas besoin en dehors de Jupy
 
 # coding: utf-8
 from django.contrib.auth.models import User
-from urbanvitaliz.apps.projects.models import Project
+from recoco.apps.projects.models import Project
 from django.contrib.sites.models import Site
 
 
@@ -35,7 +35,7 @@ print(site)
 # %%
 
 
-from urbanvitaliz.apps.projects.utils import (
+from recoco.apps.projects.utils import (
     assign_collaborator,
     assign_advisor,
     assign_observer,

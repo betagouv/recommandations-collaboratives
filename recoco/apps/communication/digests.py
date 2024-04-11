@@ -17,6 +17,7 @@ from django.urls import reverse
 from recoco import utils, verbs
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.projects import models as projects_models
+from recoco.apps.projects import utils as projects_utils
 from recoco.apps.reminders.api import (
     make_or_update_new_recommendations_reminder,
     make_or_update_whatsup_reminder,
@@ -25,6 +26,7 @@ from recoco.apps.reminders.api import (
 )
 
 from .api import send_email
+from . import constants as communication_constants
 
 import logging
 
@@ -59,10 +61,12 @@ def send_reminder_digests_by_project(project, dry_run=False):
         logger.info(f"Skipping muted project <{project.name}>(id={project.id})")
         return False
 
+    # New reco (mail type B)
     send_new_recommendations_reminders_digest_by_project(
         site=current_site, project=project, dry_run=dry_run
     )
 
+    # What's up (mail type C)
     send_whatsup_reminders_digest_by_project(
         site=current_site, project=project, dry_run=dry_run
     )
@@ -73,7 +77,9 @@ def send_reminder_digests_by_project(project, dry_run=False):
 
 
 def send_new_recommendations_reminders_digest_by_project(site, project, dry_run):
-    """Send 'New Recommendation' reminder for the given project"""
+    """
+    Send 'New Recommendation' reminder for the given project (mail type B)
+    """
     # Refresh reminders first
     make_or_update_new_recommendations_reminder(site, project)
 
@@ -92,14 +98,17 @@ def send_new_recommendations_reminders_digest_by_project(site, project, dry_run)
             .order_by("-created_on")
         )
 
-        digest = make_digest_of_project_recommendations(project, tasks, project.owner)
-        send_email(
-            "project_reminders_new_reco_digest",
-            {"name": normalize_user_name(project.owner), "email": project.owner.email},
-            params=digest,
-            related=due_reminder,
-        )
-        logger.info(f"Sent NEW_RECO reminder <{due_reminder}>")
+        # Send to ALL project collaborators, not only project owner
+        recipients = projects_utils.get_collaborators_for_project(project)
+        for recipient in recipients:
+            digest = make_digest_of_project_recommendations(project, tasks, recipient)
+            send_email(
+                communication_constants.TPL_PROJECT_REMINDERS_NEW_RECO_DIGEST,
+                {"name": normalize_user_name(recipient), "email": recipient.email},
+                params=digest,
+                related=due_reminder,
+            )
+            logger.info(f"Sent NEW_RECO reminder <{due_reminder}>")
 
         # Mark as dispatched
         due_reminder.mark_as_sent(sent_to=project.owner)
@@ -129,13 +138,16 @@ def send_whatsup_reminders_digest_by_project(site, project, dry_run):
             .order_by("-created_on")
         )
 
-        digest = make_digest_of_project_recommendations(project, tasks, project.owner)
-        send_email(
-            "project_reminders_whats_up_digest",
-            {"name": normalize_user_name(project.owner), "email": project.owner.email},
-            params=digest,
-            related=due_reminder,
-        )
+        # Send to ALL project collaborators, not only project owner
+        recipients = projects_utils.get_collaborators_for_project(project)
+        for recipient in recipients:
+            digest = make_digest_of_project_recommendations(project, tasks, recipient)
+            send_email(
+                communication_constants.TPL_PROJECT_REMINDERS_WHATS_UP_DIGEST,
+                {"name": normalize_user_name(recipient), "email": recipient.email},
+                params=digest,
+                related=due_reminder,
+            )
 
         logger.info(f"Sent WHATS_UP reminder <{due_reminder}>")
 
@@ -198,7 +210,7 @@ def send_recommendation_digest_by_project(user, notifications, dry_run):
 
         if not dry_run:
             send_email(
-                "new_recommendations_digest",
+                communication_constants.TPL_NEW_RECOMMENDATIONS_DIGEST,
                 {"name": normalize_user_name(user), "email": user.email},
                 params=digest,
                 related=project,
@@ -349,7 +361,7 @@ def send_new_site_digest_by_user(user, notifications, dry_run):
                 )
             else:
                 send_email(
-                    "new_site_for_switchtender",
+                    communication_constants.TPL_NEW_SITE_FOR_SWITCHTENDER,
                     {"name": normalize_user_name(user), "email": user.email},
                     params=digest,
                 )
@@ -406,7 +418,9 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
     )
 
     return send_digest_by_user(
-        user, template_name="digest_for_non_switchtender", queryset=queryset
+        user,
+        template_name=communication_constants.TPL_DIGEST_FOR_NON_SWITCHTENDER,
+        queryset=queryset,
     )
 
 
@@ -431,7 +445,7 @@ def send_digest_for_switchtender_by_user(user, dry_run=False):
 
     return send_digest_by_user(
         user,
-        template_name="digest_for_switchtender",
+        template_name=communication_constants.TPL_DIGEST_FOR_SWITCHTENDER,
         queryset=queryset,
         extra_context=context,
         dry_run=dry_run,

@@ -15,6 +15,7 @@ from django.utils import timezone
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.home import models as home_models
 from recoco.apps.invites import models as invites_models
 from recoco.utils import login
 
@@ -28,9 +29,11 @@ from ..utils import assign_advisor, assign_collaborator
 
 @pytest.mark.django_db
 def test_invite_email_for_existing_user_uses_autologin(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         status="READY",
     )
 
@@ -51,9 +54,11 @@ def test_invite_email_for_existing_user_uses_autologin(request, client):
 
 @pytest.mark.django_db
 def test_email_cannot_be_added_twice(request, client, mailoutbox):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         status="READY",
     )
 
@@ -84,7 +89,9 @@ def test_email_cannot_be_added_twice(request, client, mailoutbox):
 
 @pytest.mark.django_db
 def test_lambda_user_cannot_invite_collaborator_to_project(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-access-collectivity-invite", args=[project.id])
 
     with login(client, is_staff=False):
@@ -96,6 +103,7 @@ def test_lambda_user_cannot_invite_collaborator_to_project(request, client):
 @pytest.mark.django_db
 def test_assigned_advisor_can_invite_collaborator_to_project(request, client):
     site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
     project = baker.make(models.Project, sites=[site], projectmember_set=[])
 
     url = reverse("projects-project-access-collectivity-invite", args=[project.id])
@@ -117,6 +125,7 @@ def test_regional_actor_can_invite_collaborator_to_project(request, client):
     Recipe(geomatics.Department).make()
 
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     project = baker.make(
         models.Project,
@@ -145,6 +154,7 @@ def test_staff_can_invite_collaborator_to_project(request, client):
     Recipe(geomatics.Department).make()
 
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     project = baker.make(
         models.Project,
@@ -166,6 +176,8 @@ def test_staff_can_invite_collaborator_to_project(request, client):
 
 @pytest.mark.django_db
 def test_owner_can_invite_collaborator_member_if_not_draft(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     baker.make(
         models.ProjectMember,
         is_owner=True,
@@ -175,7 +187,7 @@ def test_owner_can_invite_collaborator_member_if_not_draft(request, client):
     )
     project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         #        projectmember_set=[membership],
         status="READY",
     )
@@ -195,6 +207,8 @@ def test_owner_can_invite_collaborator_member_if_not_draft(request, client):
 
 @pytest.mark.django_db
 def test_owner_cannot_invite_email_to_project_if_draft(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     membership = baker.make(
         models.ProjectMember,
         is_owner=True,
@@ -204,7 +218,7 @@ def test_owner_cannot_invite_email_to_project_if_draft(request, client):
     )
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         projectmember_set=[membership],
         status="DRAFT",
     ).make()
@@ -225,7 +239,9 @@ def test_owner_cannot_invite_email_to_project_if_draft(request, client):
 
 @pytest.mark.django_db
 def test_user_cannot_invite_collectivity_to_project(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-access-collectivity-invite", args=[project.id])
 
     with login(client, is_staff=False):
@@ -237,6 +253,7 @@ def test_user_cannot_invite_collectivity_to_project(request, client):
 @pytest.mark.django_db
 def test_assigned_advisor_can_invite_advisor_to_project(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     project = baker.make(models.Project, sites=[current_site], projectmember_set=[])
 
@@ -261,6 +278,7 @@ def test_regional_actor_can_invite_advisor_to_project(request, client):
     Recipe(geomatics.Department).make()
 
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     project = baker.make(
         models.Project,
@@ -289,6 +307,7 @@ def test_staff_can_invite_advisor_to_project(request, client):
     Recipe(geomatics.Department).make()
 
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     project = baker.make(
         models.Project,
@@ -310,6 +329,8 @@ def test_staff_can_invite_advisor_to_project(request, client):
 
 @pytest.mark.django_db
 def test_collectivity_member_cannot_invite_an_advisor(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     membership = baker.make(
         models.ProjectMember,
         is_owner=False,
@@ -319,7 +340,7 @@ def test_collectivity_member_cannot_invite_an_advisor(request, client):
     )
     project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         projectmember_set=[membership],
         status="READY",
     )
@@ -342,9 +363,11 @@ def test_collectivity_member_cannot_invite_an_advisor(request, client):
 
 @pytest.mark.django_db
 def test_staff_cannot_revoke_accepted_invitation(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         status="READY",
     ).make()
 
@@ -352,7 +375,7 @@ def test_staff_cannot_revoke_accepted_invitation(request, client):
         invites_models.Invite,
         project=project,
         accepted_on=timezone.now(),
-        site=get_current_site(request),
+        site=current_site,
     ).make()
 
     url = reverse(
@@ -370,15 +393,17 @@ def test_staff_cannot_revoke_accepted_invitation(request, client):
 
 @pytest.mark.django_db
 def test_unprivileged_user_cannot_revoke_invitation(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     project = Recipe(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         status="READY",
     ).make()
 
     invite = Recipe(
         invites_models.Invite,
-        site=get_current_site(request),
+        site=current_site,
         project=project,
     ).make()
 
@@ -397,16 +422,18 @@ def test_unprivileged_user_cannot_revoke_invitation(request, client):
 
 @pytest.mark.django_db
 def test_collaborator_can_revoke_collaborator_invitation(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     invited_email = "invite@party.com"
     project = baker.make(
         models.Project,
-        sites=[get_current_site(request)],
+        sites=[current_site],
         status="READY",
     )
 
     invite = baker.make(
         invites_models.Invite,
-        site=get_current_site(request),
+        site=current_site,
         project=project,
         role="COLLABORATOR",
         email=invited_email,
@@ -428,6 +455,7 @@ def test_collaborator_can_revoke_collaborator_invitation(request, client):
 @pytest.mark.django_db
 def test_advisor_can_revoke_collaborator_invitation(request, client):
     site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
     invited_email = "invite@party.com"
     project = baker.make(
         models.Project,
@@ -459,6 +487,7 @@ def test_advisor_can_revoke_collaborator_invitation(request, client):
 @pytest.mark.django_db
 def test_staff_can_revoke_collaborator_invitation(request, client):
     site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
     invited_email = "invite@party.com"
     project = baker.make(
         models.Project,
@@ -494,6 +523,7 @@ def test_staff_can_revoke_collaborator_invitation(request, client):
 @pytest.mark.django_db
 def test_collaborator_cannot_revoke_advisor_invitation(request, client):
     site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
     invited_email = "invite@party.com"
     project = baker.make(
         models.Project,
@@ -524,6 +554,7 @@ def test_collaborator_cannot_revoke_advisor_invitation(request, client):
 @pytest.mark.django_db
 def test_advisor_cannot_revoke_other_advisor_invitation(request, client):
     site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
     invited_email = "invite@party.com"
     project = baker.make(
         models.Project,
@@ -554,6 +585,7 @@ def test_advisor_cannot_revoke_other_advisor_invitation(request, client):
 @pytest.mark.django_db
 def test_staff_can_revoke_advisor_invitation(request, client):
     site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
     invited_email = "invite@party.com"
     project = baker.make(
         models.Project,
