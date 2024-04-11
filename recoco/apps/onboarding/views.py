@@ -138,6 +138,7 @@ def onboarding(request):
 def onboarding_signup(request):
     """Return the onboarding signup page and process onboarding signup submission"""
 
+    # FIXME existing email is not kept in form
     existing_email_user = request.session.get("onboarding_email")
 
     form = forms.OnboardingSignupForm(
@@ -155,9 +156,17 @@ def onboarding_signup(request):
             last_name=form.cleaned_data.get("last_name"),
             defaults={"email": email},
         )
+        request.session["onboarding_signup"] = form.cleaned_data
+        # FIXME is password setting correctly done ?
         user.set_password(form.cleaned_data.get("password"))
         user.save()
+        # FIXME do this send a confirmation email ?
         log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+        # cleanup now useless onboarding existing data if present
+        if "onboarding_email" in request.session:
+            del request.session["onboarding_email"]
+
         return redirect(f"{reverse('projects-onboarding-project')}")
 
     context = {"form": form, "captcha_form": captcha_form}
@@ -194,6 +203,7 @@ def onboarding_signin(request):
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)
+    onboarding_signup_data = request.session.get("onboarding_signup")
     form_name_location = forms.OnboardingProjectNameLocationForm(request.POST or None)
     form_commune = forms.OnboardingProjectCommuneForm(request.POST or None)
     question_forms = []
@@ -220,8 +230,10 @@ def onboarding_project(request):
                 "name": form_name_location.cleaned_data["name"],
                 "location": form_name_location.cleaned_data["location"],
                 "insee": form_commune.cleaned_data["insee"],
-                "org_name": request.user.profile.organization,
-                "phone": request.user.profile.phone_no,
+                "org_name": request.user.profile.organization
+                or onboarding_signup_data.get("org_name"),
+                "phone": request.user.profile.phone_no
+                or onboarding_signup_data.get("phone"),
                 "description": "",
             }
 
@@ -241,6 +253,10 @@ def onboarding_project(request):
             email_owner_of_project(request.site, project, request.user)
 
             refresh_user_projects_in_session(request, request.user)
+
+            # cleanup now useless onboarding existing data if present
+            if "onboarding_signup" in request.session:
+                del request.session["onboarding_signup"]
 
             return redirect(
                 f"{reverse('projects-onboarding-summary', args=(project.pk,))}"
