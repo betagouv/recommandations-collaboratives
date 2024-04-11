@@ -21,11 +21,6 @@ urlpatterns = [
         name="projects-onboarding",
     ),
     path(
-        r"onboarding/signin",
-        views.onboarding_signin,
-        name="projects-onboarding-signin",
-    ),
-    path(
         r"onboarding/signup",
         views.onboarding_signup,
         name="projects-onboarding-signup",

@@ -173,32 +173,6 @@ def onboarding_signup(request):
     return render(request, "onboarding/onboarding-signup.html", context)
 
 
-def onboarding_signin(request):
-    """Return the onboarding signin page and process onboarding signin submission"""
-
-    existing_data = request.session.get("onboarding_existing_data")
-
-    form = forms.OnboardingSigninForm(request.POST or None, initial=existing_data)
-
-    if request.method == "POST":
-        # FIXME with signin logic
-        # and form.is_valid():
-        # NOTE we may check for known user not logged before valid form
-        # email = (
-        #     request.user.username
-        #     if request.user.is_authenticated
-        #     else form.cleaned_data.get("email").lower()
-        # )
-
-        # user, is_new_user = auth.User.objects.get_or_create(
-        #     username=email, defaults={"email": email}
-        # )
-        return redirect(f"{reverse('projects-onboarding-project')}")
-
-    context = {"form": form}
-    return render(request, "onboarding/onboarding-signin.html", context)
-
-
 @login_required
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
