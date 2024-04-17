@@ -5,7 +5,7 @@
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
     </svg>
     <span class="d-flex align-items-center">
-        <a href="{% url 'crm-user-details' obj.pk %}">{{ obj.get_full_name|default:obj.username }}</a>
+        <a href="{% url 'crm-user-details' obj.pk %}" class="{% if not obj.is_active %}text-decoration-line-through{% endif %}">{{ obj.get_full_name|default:obj.username }}</a>
         {% if obj.profile.organization.name %}
             <span class="ms-2 me-2">|</span>
             <svg class="bi" width="16" height="16" fill="currentColor">
