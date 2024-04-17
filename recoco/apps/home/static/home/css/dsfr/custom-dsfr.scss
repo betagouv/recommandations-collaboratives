@@ -30,12 +30,13 @@
 }
 
 a {
+  text-decoration: none !important;
 
   &.btn,
   &.button,
   &.nav-link,
   &.link-secondary {
-    text-decoration: none;
+    text-decoration: none !important;
   }
 }
 
@@ -70,6 +71,8 @@ a.fr-btn {
 
 .custom-button {
   background: #00BBC3 !important;
+  color: white !important;
+  text-decoration: none;
 
   &:hover {
     background: #479195 !important;

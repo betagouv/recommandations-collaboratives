@@ -19,6 +19,7 @@ from django.shortcuts import reverse
 
 from . import models
 
+
 ##################################################
 # Notes
 ##################################################
@@ -97,19 +98,6 @@ class SelectCommuneForm(forms.Form):
 ##################################################
 # Onboarding multi-step forms
 ##################################################
-class OnlyCaptchaForm(forms.Form):
-    class Meta:
-        fields = [
-            "captcha",
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Skip captcha during tests
-        if "PYTEST_CURRENT_TEST" in os.environ:
-            self.fields.pop("captcha")
-
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
 
 class OnboardingSignupForm(DsrcBaseForm):
@@ -131,6 +119,7 @@ class OnboardingSignupForm(DsrcBaseForm):
                 "email",
                 "phone",
                 "password",
+                "captcha",
             ),
         )
         # Skip captcha during tests
@@ -184,9 +173,10 @@ class OnboardingSignupForm(DsrcBaseForm):
         help_text="Format attendu: 0102030405",
         required=True,
     )
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
 
-class OnboardingProjectNameLocationForm(DsrcBaseForm):
+class OnboardingProject(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper.form_id = "id-onboarding-project-form"  # The form id is used for validation, it must be set and unique in the page
@@ -208,6 +198,10 @@ class OnboardingProjectNameLocationForm(DsrcBaseForm):
                 "",  # The first argument is the legend of the fieldset
                 "name",
                 "location",
+                "postcode",
+                "communes",
+                "insee",
+                "description",
             )
         )
 
@@ -218,9 +212,6 @@ class OnboardingProjectNameLocationForm(DsrcBaseForm):
         required=True,
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
     )
-
-
-class OnboardingProjectCommuneForm(forms.Form):
     postcode = forms.CharField(label="Code postal", initial="", required=True)
     communes = geomatics.Commune.objects.all()
     insee = forms.ChoiceField(
@@ -229,6 +220,7 @@ class OnboardingProjectCommuneForm(forms.Form):
         required=True,
         choices=[(c.insee, c.name) for c in communes],
     )
+    description = forms.CharField(label="Description", initial="", required=True)
 
 
 # eof

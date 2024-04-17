@@ -4,7 +4,7 @@
      x-data="CitySearch()"
      x-init="getPostcode(projectPostcode,projectInsee)">
   <div class="row">
-    <div class="col-6 fr-input-group">
+    <div class="col-6 fr-input-group mb-0">
       <label class="fr-label" for="input-project-address">Code postal</label>
       <input :disabled="isLoading"
              @change.debounce="fetchCities()"

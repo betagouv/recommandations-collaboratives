@@ -13,6 +13,14 @@
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
         rel="stylesheet"
         type="text/css">
+        <style>
+          label[for="id_captcha"] {
+            display: none;
+          }
+          .g-recaptcha {
+            margin-left: 0.5rem;
+          }
+        </style>
 {% endblock css %}
 {% block title %}
   | Solliciter l'équipe {{ request.site.name }}
@@ -71,8 +79,7 @@
             {{ form.email|as_crispy_field }}
             {{ form.phone|as_crispy_field }}
             {{ form.password|as_crispy_field }}
-            {{ captcha_form }}
-            {% for error in captcha_form.errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
+            {{ form.captcha }}
           </fieldset>
           {% include "dsrc/core/blocks/buttons/button_group.html" %}
         </form>

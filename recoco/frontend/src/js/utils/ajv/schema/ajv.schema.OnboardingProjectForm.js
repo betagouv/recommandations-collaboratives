@@ -9,9 +9,9 @@ export const schemaOnboardingStep2ProjectFormValidator = {
   properties: {
     name: { $ref: '#/definitions/text' },
     location: { $ref: '#/definitions/text' },
-    description: { $ref: '#/definitions/textarea' },
-    response: { $ref: '#/definitions/textarea' },
+    postcode: { $ref: '#/definitions/text' },
+    description: { $ref: '#/definitions/text' },
   },
-  required: ['name', 'location', 'description', 'response'],
+  required: ['name', 'location', 'postcode', 'description'],
   definitions: schemaFormInputs,
 };

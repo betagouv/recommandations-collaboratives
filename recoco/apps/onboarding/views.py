@@ -84,7 +84,14 @@ def onboarding(request):
             next_args = urlencode({"next": reverse("projects-onboarding")})
             return redirect(f"{login_url}?{next_args}")
 
-        user = update_user(request.site, user, form.cleaned_data)
+        user = update_user(
+            request.site,
+            user,
+            form.cleaned_data.get("first_name"),
+            form.cleaned_data.get("last_name"),
+            form.cleaned_data.get("org_name"),
+            form.cleaned_data.get("phone"),
+        )
 
         project = create_project_for_user(
             user=user, data=form.cleaned_data, status="DRAFT"
@@ -139,6 +146,9 @@ def onboarding(request):
 def onboarding_signup(request):
     """Return the onboarding signup page and process onboarding signup submission"""
 
+    if request.user.is_authenticated:
+        # FIXME
+        return redirect(reverse("projects-onboarding-project"))
     # FIXME existing email is not kept in form
     existing_email_user = request.session.get("onboarding_email")
 
@@ -146,9 +156,10 @@ def onboarding_signup(request):
         request.POST or None, initial={"email": existing_email_user}
     )
 
-    captcha_form = forms.OnlyCaptchaForm(request.POST or None)
+    # captcha_form = forms.OnlyCaptchaForm(request.POST or None)
 
-    if request.method == "POST" and form.is_valid() and captcha_form.is_valid():
+    if request.method == "POST" and form.is_valid():
+        # and captcha_form.is_valid():
         email = form.cleaned_data.get("email").lower()
 
         user, is_new_user = auth.User.objects.get_or_create(
@@ -157,20 +168,33 @@ def onboarding_signup(request):
             last_name=form.cleaned_data.get("last_name"),
             defaults={"email": email},
         )
-        request.session["onboarding_signup"] = form.cleaned_data
-        # FIXME is password setting correctly done ?
+
+        # FIXME
+        if not is_new_user:
+            # user exists but is not currently logged in,
+            login_url = reverse("account_login")
+            next_args = urlencode({"next": reverse("projects-onboarding-project")})
+            return redirect(f"{login_url}?{next_args}")
+
         user.set_password(form.cleaned_data.get("password"))
-        user.save()
+        user = update_user(
+            request.site,
+            user,
+            form.cleaned_data.get("first_name"),
+            form.cleaned_data.get("last_name"),
+            form.cleaned_data.get("org_name"),
+            form.cleaned_data.get("phone"),
+        )
+
         # FIXME do this send a confirmation email ?
         log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
-        # cleanup now useless onboarding existing data if present
         if "onboarding_email" in request.session:
             del request.session["onboarding_email"]
 
         return redirect(f"{reverse('projects-onboarding-project')}")
 
-    context = {"form": form, "captcha_form": captcha_form}
+    context = {"form": form}
     return render(request, "onboarding/onboarding-signup.html", context)
 
 
@@ -178,9 +202,7 @@ def onboarding_signup(request):
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)
-    onboarding_signup_data = request.session.get("onboarding_signup")
-    form_name_location = forms.OnboardingProjectNameLocationForm(request.POST or None)
-    form_commune = forms.OnboardingProjectCommuneForm(request.POST or None)
+    form = forms.OnboardingProject(request.POST or None)
     question_forms = []
     for question in site_config.onboarding_questions.all():
         form_prefix = f"q{question.id}-"
@@ -194,22 +216,20 @@ def onboarding_project(request):
         )
 
     if request.method == "POST":
-
-        all_forms_valid = form_name_location.is_valid() and form_commune.is_valid()
+        all_forms_valid = form.is_valid()
 
         for question_form in question_forms:
             all_forms_valid = all_forms_valid and question_form.is_valid()
 
+        # FIXME add description
         if all_forms_valid:
             project_dict = {
-                "name": form_name_location.cleaned_data["name"],
-                "location": form_name_location.cleaned_data["location"],
-                "insee": form_commune.cleaned_data["insee"],
-                "org_name": request.user.profile.organization
-                or onboarding_signup_data.get("org_name"),
-                "phone": request.user.profile.phone_no
-                or onboarding_signup_data.get("phone"),
-                "description": "",
+                "name": form.cleaned_data["name"],
+                "location": form.cleaned_data["location"],
+                "insee": form.cleaned_data["insee"],
+                "org_name": request.user.profile.organization,
+                "phone": request.user.profile.phone_no,
+                "description": form.cleaned_data["description"],
             }
 
             project = create_project_for_user(
@@ -238,8 +258,7 @@ def onboarding_project(request):
             )
 
     context = {
-        "form": form_name_location,
-        "form_commune": form_commune,
+        "form": form,
         "question_forms": question_forms,
     }
     return render(request, "onboarding/onboarding-project.html", context)
@@ -279,7 +298,14 @@ def create_project_prefilled(request):
         user, is_new_user = auth.User.objects.get_or_create(
             username=email, defaults={"email": email}
         )
-        user = update_user(request.site, user, form.cleaned_data)
+        user = update_user(
+            request.site,
+            user,
+            form.cleaned_data.get("first_name"),
+            form.cleaned_data.get("last_name"),
+            form.cleaned_data.get("org_name"),
+            form.cleaned_data.get("phone"),
+        )
 
         project = create_project_for_user(
             user=user,
@@ -357,20 +383,28 @@ def create_project_for_user(
     return project
 
 
-def update_user(site: sites.Site, user: auth.User, data: dict) -> auth.User:
+# FIXME
+def update_user(
+    site: sites.Site,
+    user: auth.User,
+    first_name: str,
+    last_name: str,
+    org_name: str,
+    phone: str,
+) -> auth.User:
     """Update and return given user and its profile w/ data from form"""
 
     # FIXME existing value are kept instead of new ones, why?
 
-    user.first_name = user.first_name or data.get("first_name")
-    user.last_name = user.last_name or data.get("last_name")
+    user.first_name = user.first_name or first_name
+    user.last_name = user.last_name or last_name
     user.save()
 
-    organization = get_organization(site, data.get("org_name"))
+    organization = get_organization(site, org_name)
 
     profile = user.profile
     profile.organization = profile.organization or organization
-    profile.phone_no = profile.phone_no or data.get("phone")
+    profile.phone_no = profile.phone_no or phone
     profile.save()
 
     profile.sites.add(site)
