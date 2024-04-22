@@ -54,6 +54,47 @@ def test_onboarding_page_is_reachable_without_login(request, client):
 
 
 @pytest.mark.django_db
+def test_start_onboarding_with_nonexisting_account(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    data = {
+        "email": "a@eXampLe.com",
+    }
+    response = client.post(reverse("home"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url == reverse("projects-onboarding-signup")
+
+
+@pytest.mark.django_db
+def test_start_onboarding_with_existing_account(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    data = {
+        "email": "a@exAmpLe.Com",
+    }
+
+    baker.make(auth.User, email=data["email"].lower(), username=data["email"])
+
+    response = client.post(reverse("home"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url.startswith(reverse("account_login"))
+
+
+@pytest.mark.django_db
 def test_performing_onboarding_create_a_new_project(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
 
