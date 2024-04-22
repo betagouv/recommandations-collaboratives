@@ -438,6 +438,26 @@ def test_delete_resource_and_redirect(client, request):
     assert models.Resource.on_site.count() == 0
 
 
+#
+# history
+@pytest.mark.django_db
+def test_resource_history_not_available_for_common_user(request, client):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
+    url = reverse("resources-resource-history", args=[resource.id])
+    with login(client):
+        response = client.get(url)
+        assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_resource_history_available_for_authorized_user(request, client):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
+    url = reverse("resources-resource-history", args=[resource.id])
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+        assert response.status_code == 200
+
+
 ########################################################################
 # Resource searching
 ########################################################################

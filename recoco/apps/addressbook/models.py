@@ -6,6 +6,8 @@ Views for addressbook application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-07-20 15:56:20 CEST
 """
+
+import reversion
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
@@ -78,6 +80,9 @@ class ContactOnSiteManager(CurrentSiteManager, ContactManager):
     pass
 
 
+@reversion.register(
+    fields=("first_name", "last_name", "phone_no", "mobile_no", "email", "division")
+)
 class Contact(models.Model):
     objects = ContactManager()
     on_site = ContactOnSiteManager()
