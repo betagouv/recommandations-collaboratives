@@ -1,3 +1,7 @@
+body {
+  font-family: 'Marianne', arial, sans-serif;
+}
+
 .row.background--grey-light {
   background-color: #fafafa;
 }
@@ -23,6 +27,10 @@
 
 .onboarding__form {
   padding: 0 1rem;
+}
+
+.g-recaptcha {
+  margin-left: 0.5rem;
 }
 
 /* Onboarding summary */

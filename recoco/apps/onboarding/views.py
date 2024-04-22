@@ -147,7 +147,6 @@ def onboarding_signup(request):
     """Return the onboarding signup page and process onboarding signup submission"""
 
     if request.user.is_authenticated:
-        # FIXME
         return redirect(reverse("projects-onboarding-project"))
     # FIXME existing email is not kept in form
     existing_email_user = request.session.get("onboarding_email")
@@ -169,7 +168,6 @@ def onboarding_signup(request):
             defaults={"email": email},
         )
 
-        # FIXME
         if not is_new_user:
             # user exists but is not currently logged in,
             login_url = reverse("account_login")
@@ -221,7 +219,6 @@ def onboarding_project(request):
         for question_form in question_forms:
             all_forms_valid = all_forms_valid and question_form.is_valid()
 
-        # FIXME add description
         if all_forms_valid:
             project_dict = {
                 "name": form.cleaned_data["name"],
@@ -335,6 +332,118 @@ def create_project_prefilled(request):
 
 
 @login_required
+def create_user_for_project_prefilled(request):
+    """Create a new project for someone else - step 1 create user"""
+    # site_config = get_site_config_or_503(request.site)
+
+    is_switchtender_or_403(request.user)
+
+    prefill_signup_user_data = request.session.get("prefill_signup_user")
+
+    # FIXME make this form initializable
+    form = forms.PrefillSignupForm(
+        request.POST or None, initial=prefill_signup_user_data
+    )
+
+    if request.method == "POST" and form.is_valid():
+        request.session["prefill_signup_user"] = form.cleaned_data
+
+        return redirect(f"{reverse('projects-project-prefill-project')}")
+
+    return render(request, "onboarding/prefill-user.html", locals())
+
+
+@login_required
+def create_project_for_project_prefilled(request):
+    """Create a new project for someone else - step 2 create project"""
+    site_config = get_site_config_or_503(request.site)
+
+    is_switchtender_or_403(request.user)
+
+    prefill_signup_user_data = request.session.get("prefill_signup_user")
+
+    if not prefill_signup_user_data:
+        return redirect(f"{reverse('projects-project-prefill-signup')}")
+
+    form = forms.PrefillProjectForm(request.POST or None)
+
+    question_forms = []
+    for question in site_config.onboarding_questions.all():
+        form_prefix = f"q{question.id}-"
+        question_forms.append(
+            AnswerForm(
+                question,
+                None,
+                request.POST or None,
+                prefix=form_prefix,
+            )
+        )
+
+    if request.method == "POST":
+        all_forms_valid = form.is_valid()
+
+        for question_form in question_forms:
+            all_forms_valid = all_forms_valid and question_form.is_valid()
+
+        if all_forms_valid:
+            project_dict = {
+                "name": form.cleaned_data["name"],
+                "location": form.cleaned_data["location"],
+                "insee": form.cleaned_data["insee"],
+                "org_name": request.user.profile.organization,
+                "phone": request.user.profile.phone_no,
+                "description": form.cleaned_data["description"],
+            }
+
+            # User creation
+            email = prefill_signup_user_data.get("email").lower()
+
+            user, is_new_user = auth.User.objects.get_or_create(
+                username=email, defaults={"email": email}
+            )
+
+            if is_new_user:
+                user = update_user(
+                    site=request.site,
+                    user=user,
+                    first_name=prefill_signup_user_data.get("first_name"),
+                    last_name=prefill_signup_user_data.get("last_name"),
+                    org_name=prefill_signup_user_data.get("org_name"),
+                    phone=prefill_signup_user_data.get("phone"),
+                )
+
+            # Project creation
+
+            project = create_project_for_user(
+                user=request.user, data=project_dict, status="DRAFT"
+            )
+
+            project.sites.add(request.site)
+
+            # Save survey questions
+            for question_form in question_forms:
+                question.save()
+
+            assign_collaborator(user, project, is_owner=True)
+            assign_advisor(request.user, project, request.site)
+
+            # FIXME
+            # create_initial_note(request.site, onboarding_response)
+            invite_user_to_project(request, user, project, is_new_user)
+            notify_new_project(request.site, project, user)
+
+            # cleanup now useless prefill existing data if present
+            if "prefill_signup_user" in request.session:
+                del request.session["prefill_signup_user"]
+
+            return redirect(
+                f"{reverse('projects-onboarding-summary', args=(project.pk,))}"
+            )
+
+    return render(request, "onboarding/prefill-project.html", locals())
+
+
+@login_required
 def select_commune(request, project_id=None):
     """Intermediate screen to select proper insee number of commune"""
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
@@ -383,7 +492,6 @@ def create_project_for_user(
     return project
 
 
-# FIXME
 def update_user(
     site: sites.Site,
     user: auth.User,

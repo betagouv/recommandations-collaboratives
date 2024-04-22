@@ -1,10 +1,10 @@
 import { schemaFormInputs } from './ajv.schema.forms';
 
 /**
- * Validation schema for the form: DsrcFormValidator
+ * Validation schema for the form: PrefillProjectForm
  */
-export const schemaOnboardingStep2ProjectFormValidator = {
-  $id: '#/definitions/OnboardingStep2ProjectFormValidator',
+export const schemaPrefillProjectFormValidator = {
+  $id: '#/definitions/PrefillProjectFormValidator',
   type: 'object',
   properties: {
     name: { $ref: '#/definitions/text' },

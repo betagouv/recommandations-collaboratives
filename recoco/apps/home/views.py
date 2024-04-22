@@ -14,7 +14,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
@@ -52,7 +52,8 @@ class HomePageView(TemplateView):
             try:
                 auth.User.objects.get(email=form.cleaned_data["email"])
                 next_args = urlencode({"next": reverse("projects-onboarding-project")})
-                return redirect(f"/accounts/login/?{next_args}")
+                login_url = reverse("account_login")
+                return redirect(f"{login_url}?{next_args}")
             except auth.User.DoesNotExist:
                 signup_url = reverse("projects-onboarding-signup")
                 return redirect(signup_url)

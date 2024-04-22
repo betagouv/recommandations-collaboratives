@@ -3,8 +3,14 @@
 {% load static %}
 {% load sass_tags %}
 {% load crispy_forms_tags %}
+{% block title %}
+    Déposer un projet pour le compte de la collectivité {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Déposer un projet pour le compte de la collectivité {{ block.super }}
+{% endblock og_title %}
 {% block js %}
-  {% vite_asset 'js/apps/onboarding.js' %}
+  {% vite_asset 'js/apps/advisorCreateProject.js' %}
 {% endblock js %}
 {% block css %}
   <link href="{% static '@gouvfr/dsfr/dist/dsfr.min.css' %}"
@@ -13,37 +19,20 @@
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
         rel="stylesheet"
         type="text/css">
-        <style>
-          label[for="id_captcha"] {
-            display: none;
-          }
-          .g-recaptcha {
-            margin-left: 0.5rem;
-          }
-        </style>
+  <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+        rel="stylesheet"
+        type="text/css">
 {% endblock css %}
-{% block title %}
-  | Solliciter l'équipe {{ request.site.name }}
-{% endblock title %}
-{% block og_title %}
-  | Solliciter l'équipe {{ request.site.name }}
-{% endblock og_title %}
-{% block page_title %}
-  Solliciter {{ request.site }}
-{% endblock page_title %}
-{% block tagline %}
-  Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
-{% endblock tagline %}
 {% block content %}
   <div class="container">
     <div class="banner mt-6 mb-6 text-center">
       <h1>
-        <strong>Déposer votre projet</strong> UrbanVitaliz
+        <strong>Déposer un nouveau projet</strong> {{ request.site.name }}
       </h1>
     </div>
     <div class="fr-stepper mb-3">
       <h2 class="fr-stepper__title">
-        Identifiez-vous
+        Identifiez la personne pour laquelle vous déposez ce projet
         <span class="fr-stepper__state">Étape 1 sur 2</span>
       </h2>
       <div class="fr-stepper__steps" data-fr-current-step="1" data-fr-steps="2"></div>
@@ -52,7 +41,7 @@
       </p>
     </div>
     <div class="container__form d-flex justify-content-center"
-         x-data="AjvValidationSchema('schemaOnboardingStep1SignupFormValidator')">
+         x-data="AjvValidationSchema('schemaOnboardingPrefillSignupFormValidator')">
       <div class="onboarding__form"
            x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator)"
            x-init="init">
@@ -74,8 +63,6 @@
             {{ form.role|as_crispy_field }}
             {{ form.email|as_crispy_field }}
             {{ form.phone|as_crispy_field }}
-            {{ form.password|as_crispy_field }}
-            {{ form.captcha }}
           </fieldset>
           {% include "dsrc/core/blocks/buttons/button_group.html" %}
         </form>

@@ -7,7 +7,6 @@ author  : guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created : 2022-06-06 11:54:25 CEST
 """
 
-
 from django.urls import path
 
 from . import views
@@ -36,9 +35,14 @@ urlpatterns = [
         name="projects-onboarding-summary",
     ),
     path(
-        r"onboarding/prefill/",
-        views.create_project_prefilled,
-        name="projects-project-prefill",
+        r"onboarding/prefill/signup",
+        views.create_user_for_project_prefilled,
+        name="projects-project-prefill-signup",
+    ),
+    path(
+        r"onboarding/prefill/project",
+        views.create_project_for_project_prefilled,
+        name="projects-project-prefill-project",
     ),
     path(
         r"onboarding/<int:project_id>/commune/",

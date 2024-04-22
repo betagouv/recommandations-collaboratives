@@ -27,6 +27,7 @@
   // --display-spacing: 0 0 2rem;
   --display-spacing: ;
   // --display-spacing: 0 0 2rem;
+  --background-action-high-blue-france: #0063CB;
 }
 
 a {
@@ -60,6 +61,10 @@ a.fr-btn {
       color: #000091 !important;
     }
   }
+}
+
+.fr-btn {
+  border-radius: 0.15rem;
 }
 
 .custom-login-button {

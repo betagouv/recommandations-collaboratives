@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% load static %}
+{% load sass_tags %}
+{% load crispy_forms_tags %}
+{% block title %}
+    Déposer un projet pour le compte de la collectivité {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Déposer un projet pour le compte de la collectivité {{ block.super }}
+{% endblock og_title %}
+{% block js %}
+  {% vite_asset 'js/apps/advisorCreateProject.js' %}
+{% endblock js %}
+{% block css %}
+  <link href="{% static '@gouvfr/dsfr/dist/dsfr.min.css' %}"
+        rel="stylesheet"
+        type="text/css">
+  <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+        rel="stylesheet"
+        type="text/css">
+  <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+        rel="stylesheet"
+        type="text/css">
+{% endblock css %}
+{% block content %}
+<div class="container">
+  <div class="banner mt-6 mb-6 text-center">
+    <h1>
+      <strong>Déposer votre projet</strong> UrbanVitaliz
+    </h1>
+  </div>
+  <div class="fr-stepper mb-3">
+    <h2 class="fr-stepper__title">
+      Décrivez votre projet
+      <span class="fr-stepper__state">Étape 2 sur 2</span>
+    </h2>
+    <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
+    <p class="fr-stepper__details">
+      <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
+    </p>
+  </div>
+  <div class="container__form d-flex justify-content-center"
+       x-data="AjvValidationSchema('schemaPrefillProjectFormValidator')">
+    <div class="onboarding__form"
+         x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator)"
+         x-init="init">
+      <form id="{{ form.helper.form_id }}"
+            method="post"
+            enctype="multipart/form-data">
+            <input type="hidden"
+              name="js_enabled"
+              id="{{ form.helper.form_id }}_js_enabled"
+              value="false">
+            <fieldset class="fr-fieldset">
+              {% csrf_token %}
+              {{ form.name|as_crispy_field }}
+              {{ form.location|as_crispy_field }}
+              <div class="fr-fieldset__element">
+                {% include "projects/project/fragments/city_select_dsfr.html" %}
+              </div>
+              {{ form.description|as_crispy_field }}
+            </fieldset>
+
+        {% for form in question_forms %}
+          <fieldset class="fr-fieldset"
+                    id="radio-hint"
+                    aria-labelledby="radio-hint-legend radio-hint-messages">
+            <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
+                    id="radio-hint-legend">{{ form.question.text }}</legend>
+            {% for choice in form.fields.answer.choices %}
+              <div class="fr-fieldset__element">
+                {% if not form.question.is_multiple %}
+                  <div class="fr-radio-group">
+                    <input type="radio"
+                           value="{{ choice.0 }}"
+                           id="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                           name="{{ form.answer.html_name }}"
+                           {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
+                    <label class="fr-label"
+                           for="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                      {{ choice.1|capfirst }}
+                    </label>
+                  </div>
+                {% else %}
+                  <div class="fr-checkbox-group">
+                    <input type="checkbox"
+                           value="{{ choice.0 }}"
+                           id="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                           name="{{ form.answer.html_name }}"
+                           {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
+                    <label class="fr-label"
+                           for="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                      {{ choice.1|capfirst }}
+                    </label>
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </fieldset>
+          <!-- Comment -->
+          {% if form.comment %}
+            <div class="fr-input-group {% if form.comment.errors %}fr-input-group--error{% endif %}">
+              <label class="fr-label" for="textarea">{{ question_comment_title|default:'Commentaire' }}</label>
+              <textarea class="fr-input" rows="3" id="textarea" name="textarea"></textarea>
+              {% for error in form.comment.errors %}
+                <p id="text-input-error-desc-error" class="fr-error-text">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+          <!-- File upload -->
+          {% if form.attachment %}
+            <div class="fr-upload-group fr-mb-6w">
+              <label class="fr-label" for="file-upload">
+                {{ question.upload_title }}
+                <span class="fr-hint-text">Taille maximale : 500 Mo. Formats supportés : jpg, png, pdf. Plusieurs fichiers possibles.</span>
+              </label>
+              <input class="fr-upload" type="file" id="file-upload" name="file-upload">
+              {% if form.attachment.value %}
+                Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+        {% include "dsrc/core/blocks/buttons/button_group.html" %}
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

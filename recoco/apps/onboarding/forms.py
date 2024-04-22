@@ -223,4 +223,103 @@ class OnboardingProject(DsrcBaseForm):
     description = forms.CharField(label="Description", initial="", required=True)
 
 
+class PrefillSignupForm(DsrcBaseForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.form_id = "id-prefill-signup-form"  # The form id is used for validation, it must be set and unique in the page
+        self.helper.form_method = "post"
+        self.helper.action_button = {"submit": {"label": "Suivant"}}
+        self.helper.form_tag = False
+        self.helper.form_button = False
+
+        self.helper.layout = Layout(
+            Fieldset(
+                "Pour qui remplissez-vous ce projet",  # The first argument is the legend of the fieldset
+                "first_name",
+                "last_name",
+                "org_name",
+                "role",
+                "email",
+                "phone",
+            ),
+        )
+
+    def clean_email(self):
+        """Make sure email is lowercased"""
+        email = self.cleaned_data["email"]
+        return email.lower()
+
+    first_name = forms.CharField(label="Prénom", initial="", required=True)
+    last_name = forms.CharField(label="Nom", initial="", required=True)
+    org_name = forms.CharField(
+        label="Nom de votre administration ou de votre entreprise",
+        initial="",
+    )
+    role = forms.CharField(label="Fonction", initial="", required=True)
+
+    # TODO: add an email validation, pattern / mask
+    email = forms.EmailField(
+        label="Adresse email",
+        help_text="Format attendu : prenom.nom@domaine.fr",
+        required=True,
+        initial="",
+    )
+
+    # TODO: add a phone number validation, pattern / mask
+    phone = forms.CharField(
+        max_length=16,
+        label="Téléphone",
+        initial="",
+        help_text="Format attendu: 0102030405",
+        required=True,
+    )
+
+
+class PrefillProjectForm(DsrcBaseForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.form_id = "id-prefill-project-form"  # The form id is used for validation, it must be set and unique in the page
+        self.helper.form_method = "post"
+        self.helper.form_tag = False
+        self.helper.form_button = False
+        self.helper.action_button = {
+            "submit": {
+                "label": "Suivant",
+            },
+            "cancel": {
+                "label": "Précédent",
+                "href": reverse("projects-project-prefill-signup"),
+            },
+        }
+
+        self.helper.layout = Layout(
+            Fieldset(
+                "",  # The first argument is the legend of the fieldset
+                "name",
+                "location",
+                "postcode",
+                "communes",
+                "insee",
+                "description",
+            )
+        )
+
+    name = forms.CharField(label="Nom du projet", initial="", required=True)
+    location = forms.CharField(
+        label="Adresse",
+        initial="",
+        required=True,
+        help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
+    )
+    postcode = forms.CharField(label="Code postal", initial="", required=True)
+    communes = geomatics.Commune.objects.all()
+    insee = forms.ChoiceField(
+        label="Commune",
+        initial="",
+        required=True,
+        choices=[(c.insee, c.name) for c in communes],
+    )
+    description = forms.CharField(label="Description", initial="", required=True)
+
+
 # eof

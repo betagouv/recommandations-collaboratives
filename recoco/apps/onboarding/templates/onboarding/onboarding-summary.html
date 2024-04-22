@@ -32,16 +32,12 @@
 {% block content %}
   <div class="container onboarding__summary">
     <div class="banner mt-6 mb-6 text-center">
-      <img src="{% static 'urbanvitaliz.fr/home/img/home/logo-urbanvitaliz.svg' %}"
-           width="10%"
-           height="auto"
-           alt="Logo d'UrbanVitaliz" />
       <h1>
-        <strong>Nous avons bien reçu votre projet UrbanVitaliz</strong>
+        <strong>Nous avons bien reçu votre projet {{ request.site.name }}</strong>
       </h1>
     </div>
     <div class="container__form">
-      <p>Nous avons bien reçu votre projet</p>
+      <p>Nous avons bien reçu votre projet.</p>
       <div class="project-card">
         <span class="icon fr-icon-arrow-right-line"></span>
         <div class="project-card__content">
@@ -63,9 +59,9 @@
       </div>
       <p class="text-uppercase next-steps">Prochaine étapes</p>
       <ol class="ms-4 mb-4">
-        <li>Remplissez l’état des lieux de votre projet sur les pages suivantes.</li>
-        <li>Nos conseillers·ères valident avec vous les derniers points sous quelques semaines.</li>
-        <li>Vous recevez ensuite nos recommandations et pouvez échanger avec notre équipe.</li>
+        <li>Prenez quelques minutes pour répondre aux questions suivantes.</li>
+        <li>Nos conseillers vous recontacteront pour affiner votre besoin sous quelques semaines.</li>
+        <li>Vous recevrez ensuite nos recommandations et pourrez poser d’autres questions.</li>
       </ol>
       <ul class="fr-btns-group">
         <li>

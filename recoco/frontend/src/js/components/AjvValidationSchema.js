@@ -3,6 +3,8 @@ import { schemaOnboardingStep1SignupFormValidator } from '../utils/ajv/schema/aj
 import { schemaOnboardingEmailFormValidator } from '../utils/ajv/schema/ajv.schema.OnboardingEmailForm';
 import { schemaOnboardingStep1SigninFormValidator } from '../utils/ajv/schema/ajv.schema.OnboardingSigninForm';
 import { schemaOnboardingStep2ProjectFormValidator } from '../utils/ajv/schema/ajv.schema.OnboardingProjectForm';
+import { schemaOnboardingPrefillSignupFormValidator } from '../utils/ajv/schema/ajv.schema.PrefillSignupForm';
+import { schemaPrefillProjectFormValidator } from '../utils/ajv/schema/ajv.schema.PrefillProjectForm';
 
 Alpine.data('AjvValidationSchema', (schemaValidatorName) => {
   const schemasValidator = {
@@ -10,6 +12,8 @@ Alpine.data('AjvValidationSchema', (schemaValidatorName) => {
     schemaOnboardingStep1SigninFormValidator,
     schemaOnboardingEmailFormValidator,
     schemaOnboardingStep2ProjectFormValidator,
+    schemaOnboardingPrefillSignupFormValidator,
+    schemaPrefillProjectFormValidator,
   };
   return {
     schemaValidator: schemasValidator[schemaValidatorName],
