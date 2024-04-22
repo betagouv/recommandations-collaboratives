@@ -1,212 +1,215 @@
 .button {
-    border: 1px solid #0063CB;
-    padding: 10px 45px;
-    border-radius: 2px;
+  border: 1px solid #0063cb;
+  padding: 10px 45px;
+  border-radius: 2px;
 
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    color: #0063CB;
-    text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: #0063cb;
+  text-decoration: none;
 
-    transition: all 0.25s ease;
-    background: transparent;
-    cursor: pointer !important;
+  transition: all 0.25s ease;
+  background: transparent;
+  cursor: pointer !important;
 }
 
 .button.blue:active {
-    background-color: #e2effc;
+  background-color: #e2effc;
 }
 
 .button.black {
-    border: 1px solid #222;
-    color: #222;
+  border: 1px solid #222;
+  color: #222;
 }
 
 .button.black.filled {
-    background-color: #222;
-    color: white;
-    border: 1px solid transparent;
+  background-color: #222;
+  color: white;
+  border: 1px solid transparent;
 }
 
 .button.black.filled:hover {
-    background-color: #3c3b3b;
-    color: white !important;
+  background-color: #3c3b3b;
+  color: white !important;
 }
 
 .button.blue:target {
-    background-color: #e2effc;
+  background-color: #e2effc;
 }
 
 .button.blue:focus {
-    background-color: #e2effc;
-    box-shadow: 0 0 1px 4px #e0ecf9;
+  background-color: #e2effc;
+  box-shadow: 0 0 1px 4px #e0ecf9;
 }
 
 .button.active {
-    background-color: #d2d2d2 !important;
+  background-color: #d2d2d2 !important;
 }
 
 .button.small {
-    padding: 5px 15px;
+  padding: 5px 15px;
 }
 
 .button.tiny {
-    padding: 3px 10px;
+  padding: 3px 10px;
 }
 
 .button.filled {
-    background-color: #0063CB;
-    color: white;
+  background-color: #0063cb;
+  color: white;
 }
 
 .button.filled:hover {
-    color: #0063CB !important;
+  color: #0063cb !important;
 }
 
 .button.red.filled {
-    background-color: #CE0500;
-    color: white;
+  background-color: #ce0500;
+  color: white;
 }
 
 .button.white {
-    border-color: white;
-    color: white;
+  border-color: white;
+  color: white;
 }
 
 .button.black {
-    border-color: #222;
-    color: #222;
+  border-color: #222;
+  color: #222;
 }
 
 .button.white.filled {
-    border-color: white;
-    background-color: white;
-    color: #222 !important;
+  border-color: white;
+  background-color: white;
+  color: #222 !important;
 }
 
 .button.white.filled:hover {
-    border-color: #b6b6b6;
-    background-color: #b6b6b6;
-    color: #222 !important;
+  border-color: #b6b6b6;
+  background-color: #b6b6b6;
+  color: #222 !important;
 }
 
 .button.white:hover {
-    border-color: white;
-    color: #222 !important;
+  border-color: white;
+  color: #222 !important;
 }
 
 .button.red {
-    border-color: #CE0500;
-    color: #CE0500;
+  border-color: #ce0500;
+  color: #ce0500;
 }
 
 .button.grey.filled {
-    background-color: #f6f6f6;
-    color: #222;
-    border-color: #f6f6f6;
+  background-color: #f6f6f6;
+  color: #222;
+  border-color: #f6f6f6;
 }
 
 .button.red:hover {
-    background-color: #ffe7e7;
-    color: #CE0500 !important;
+  background-color: #ffe7e7;
+  color: #ce0500 !important;
 }
 
 .button.green {
-    border-color: #18753C;
-    color: #18753C;
+  border-color: #18753c;
+  color: #18753c;
 }
 
 .button.green:hover {
-    background-color: #e0f9ea;
-    color: #18753C !important;
+  background-color: #e0f9ea;
+  color: #18753c !important;
 }
 
-.button.disabled, .button:disabled{
-    background-color: #EEEEEE;
-    cursor: not-allowed;
-    user-select: none;
-    pointer-events: none;
+.button.disabled,
+.button:disabled {
+  background-color: #eeeeee;
+  cursor: not-allowed;
+  user-select: none;
+  pointer-events: none;
 
-    color: #929292;
-    border: solid 1px #EEEEEE;
+  color: #929292;
+  border: solid 1px #eeeeee;
 }
 
-.button:not(.btn-outline-primary):hover{
-    background-color: #e2effc;
+.button:not(.btn-outline-primary):hover {
+  background-color: #e2effc;
 }
 
 .play-button {
-    transition: 0.15s ease;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  transition: 0.15s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .play-button:hover {
-    transform: scale(1.2);
+  transform: scale(1.2);
 }
 
-.border-form {
-    border: 1px solid #E5E5E5;
-    border-radius: 4px;
+.border-form  {
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
 }
 
 .button.inherit {
-    text-transform: none;
+  text-transform: none;
 }
 
 .appearance-none {
-    appearance: none;
-    -webkit-appearance:none;
-    border: none;
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
 }
 
 .hint-button {
-    position: absolute;
-    bottom: 48px;
-    left: -5px;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    font-size: 14px;
-    font-weight: 500;
-    color: white;
-    background-color: #0063CB;
-    z-index: 100;
-    box-shadow: 0px 3px 8px -16px rgba(0, 0, 0, 0.32), 0px 8px 16px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 50px;
+  left: -5px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  background-color: #0063cb;
+  z-index: 100;
+  box-shadow:
+    0px 3px 8px -16px rgba(0, 0, 0, 0.32),
+    0px 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.hint-button::after{
-    content: '';
+.hint-button::after {
+  content: '';
 
-    position: absolute;
-    bottom: -7.5px;
-    left: 10px;
+  position: absolute;
+  bottom: 83.5px;
+  left: 10px;
 
-    width: 15px;
-    height: 15px;
+  width: 15px;
+  height: 15px;
 
-    transform: rotate(45deg);
-    background-color: #0063CB;
+  transform: rotate(45deg);
+  background-color: #0063cb;
 }
 
 /* .hint-button:hover {
     background-color: #FBD335;
 } */
 
-.btn-sm--header  {
-	padding-block: 6.25px;
-	padding-inline: 12px;
-    margin: 0;
+.btn-sm--header {
+  padding-block: 6.25px;
+  padding-inline: 12px;
+  margin: 0;
 }
 
 .modal-dialog .button {
-    font-size: 0.87rem;
-    padding: 10px 15px;
-    border-radius: 4px;
+  font-size: 0.87rem;
+  padding: 10px 15px;
+  border-radius: 4px;
 }
 
 .button-icon-bell {
-    padding-inline: 7px;
-    padding-block: 3px 6px;
-    border-radius: 0.25rem;
+  padding-inline: 7px;
+  padding-block: 3px 6px;
+  border-radius: 0.25rem;
 }
