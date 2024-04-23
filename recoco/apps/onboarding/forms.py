@@ -216,7 +216,7 @@ class OnboardingProject(DsrcBaseForm):
             },
             "cancel": {
                 "label": "Précédent",
-                "href": reverse("projects-onboarding-signup"),
+                "href": reverse("onboarding-signup"),
             },
         }
 
