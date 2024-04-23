@@ -54,7 +54,7 @@ class OnboardingView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect(reverse("projects-onboarding-project"))
+            return redirect(reverse("onboarding-project"))
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -66,11 +66,11 @@ class OnboardingView(FormView):
 
         try:
             auth.User.objects.get(email=form.cleaned_data["email"])
-            next_args = urlencode({"next": reverse("projects-onboarding-project")})
+            next_args = urlencode({"next": reverse("onboarding-project")})
             login_url = reverse("account_login")
             return redirect(f"{login_url}?{next_args}")
         except auth.User.DoesNotExist:
-            signup_url = reverse("projects-onboarding-signup")
+            signup_url = reverse("onboarding-signup")
             return redirect(signup_url)
 
     def form_invalid(self, form):
@@ -81,7 +81,7 @@ def onboarding_signup(request):
     """Return the onboarding signup page and process onboarding signup submission"""
 
     if request.user.is_authenticated:
-        return redirect(reverse("projects-onboarding-project"))
+        return redirect(reverse("onboarding-project"))
     # FIXME existing email is not kept in form
     existing_email_user = request.session.get("onboarding_email")
 
@@ -102,7 +102,7 @@ def onboarding_signup(request):
         if not is_new_user:
             # user exists but is not currently logged in,
             login_url = reverse("account_login")
-            next_args = urlencode({"next": reverse("projects-onboarding-project")})
+            next_args = urlencode({"next": reverse("onboarding-project")})
             return redirect(f"{login_url}?{next_args}")
 
         user.set_password(form.cleaned_data.get("password"))
@@ -213,7 +213,7 @@ def onboarding_summary(request, project_id=None):
 
 
 # TODO to delete when prefill v2 is deploy
-def create_project_prefilled(request):
+def OLD_prefill_project_submit(request):
     """Create a new project for someone else"""
     site_config = get_site_config_or_503(request.site)
 
@@ -268,7 +268,7 @@ def create_project_prefilled(request):
 
 
 @login_required
-def create_user_for_project_prefilled(request):
+def prefill_project_set_user(request):
     """Create a new project for someone else - step 1 create user"""
     # site_config = get_site_config_or_503(request.site)
 
@@ -290,7 +290,7 @@ def create_user_for_project_prefilled(request):
 
 
 @login_required
-def create_project_for_project_prefilled(request):
+def prefill_project_submit(request):
     """Create a new project for someone else - step 2 create project"""
     site_config = get_site_config_or_503(request.site)
 
