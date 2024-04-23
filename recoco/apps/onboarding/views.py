@@ -79,6 +79,7 @@ class OnboardingView(FormView):
 
 def onboarding_signup(request):
     """Return the onboarding signup page and process onboarding signup submission"""
+    site_config = get_site_config_or_503(request.site)
 
     if request.user.is_authenticated:
         return redirect(reverse("projects-onboarding-project"))
@@ -122,7 +123,7 @@ def onboarding_signup(request):
 
         return redirect(f"{reverse('projects-onboarding-project')}")
 
-    context = {"form": form}
+    context = {"form": form, "site_config": site_config}
     return render(request, "onboarding/onboarding-signup.html", context)
 
 
@@ -130,10 +131,6 @@ def onboarding_signup(request):
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)
-
-    # TODO logo
-    # if site_config.email_logo:
-    #     site_logo = build_absolute_url(site_config.email_logo.url)
 
     form = forms.OnboardingProject(request.POST or None)
 
@@ -193,6 +190,7 @@ def onboarding_project(request):
     context = {
         "form": form,
         "question_forms": question_forms,
+        "site_config": site_config,
     }
     return render(request, "onboarding/onboarding-project.html", context)
 
@@ -200,6 +198,7 @@ def onboarding_project(request):
 @login_required
 def onboarding_summary(request, project_id=None):
     """Resume project from onboarding"""
+    site_config = get_site_config_or_503(request.site)
 
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
     next_args_for_project_location = urlencode(
@@ -207,7 +206,7 @@ def onboarding_summary(request, project_id=None):
     )
     next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
 
-    context = {"project": project, "next_url": next_url}
+    context = {"project": project, "next_url": next_url, "site_config": site_config}
     return render(request, "onboarding/onboarding-summary.html", context)
 
 
@@ -274,7 +273,7 @@ def create_project_prefilled(request):
 @login_required
 def create_user_for_project_prefilled(request):
     """Create a new project for someone else - step 1 create user"""
-    # site_config = get_site_config_or_503(request.site)
+    site_config = get_site_config_or_503(request.site)
 
     is_switchtender_or_403(request.user)
 

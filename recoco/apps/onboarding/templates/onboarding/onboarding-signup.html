@@ -37,6 +37,12 @@
 {% block content %}
   <div class="container">
     <div class="banner mt-6 mb-6 text-center">
+      {% if site_config.email_logo %}
+          <img src="{{ site_config.email_logo.url }}"
+                width="10%"
+                height="auto"
+                alt="Logo {{ request.site.name }}" />
+      {% endif %}
       <h1>
         <strong>Déposer votre projet</strong> UrbanVitaliz
       </h1>
