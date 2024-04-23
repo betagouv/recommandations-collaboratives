@@ -147,6 +147,13 @@ def test_user_can_access_contact_form(client):
 
 
 @pytest.mark.django_db
+def test_user_can_access_accesiblity_page(client):
+    url = reverse("accessibility")
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
 def test_non_logged_user_can_send_message_to_team(mocker, client, request):
     site = get_current_site(request)
 

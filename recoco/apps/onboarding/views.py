@@ -15,6 +15,7 @@ from django.contrib.sites import models as sites
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
+from django.views.generic import FormView
 
 from recoco.apps.addressbook import models as addressbook
 from recoco.apps.communication import constants as communication_constants
@@ -46,101 +47,34 @@ from . import forms, models
 ########################################################################
 
 
-def onboarding(request):
-    """Return the onboarding page and process onboarding submission"""
+class OnboardingView(FormView):
+    """Dispatch user based on auth/provided credentials"""
 
-    site_config = get_site_config_or_503(request.site)
+    form_class = forms.OnboardingEmailForm
 
-    # if we're back from login page restore data already entered
-    existing_data = request.session.get("onboarding_existing_data")
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(reverse("projects-onboarding-project"))
 
-    # Fetch the onboarding form associated with the current site
-    form = forms.OnboardingResponseWithCaptchaForm(
-        request.POST or None, initial=existing_data
-    )
+        return super().dispatch(request, *args, **kwargs)
 
-    onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
+    def get(self, request, *args, **kwargs):
+        return redirect(reverse("account_login"))
 
-    # Add fields in JSON to dynamic form rendering field.
-    form.fields["response"].add_fields(onboarding_instance.form)
+    def form_valid(self, form):
+        self.request.session["onboarding_email"] = form.cleaned_data["email"]
 
-    if request.method == "POST" and form.is_valid():
-        # NOTE we may check for known user not logged before valid form
-        email = (
-            request.user.username
-            if request.user.is_authenticated
-            else form.cleaned_data.get("email").lower()
-        )
-
-        user, is_new_user = auth.User.objects.get_or_create(
-            username=email, defaults={"email": email}
-        )
-
-        if not is_new_user and not request.user.is_authenticated:
-            # user exists but is not currently logged in,
-            # save data, log in, and come back to complete
-            request.session["onboarding_existing_data"] = form.cleaned_data
+        try:
+            auth.User.objects.get(email=form.cleaned_data["email"])
+            next_args = urlencode({"next": reverse("projects-onboarding-project")})
             login_url = reverse("account_login")
-            next_args = urlencode({"next": reverse("projects-onboarding")})
             return redirect(f"{login_url}?{next_args}")
+        except auth.User.DoesNotExist:
+            signup_url = reverse("projects-onboarding-signup")
+            return redirect(signup_url)
 
-        user = update_user(
-            request.site,
-            user,
-            form.cleaned_data.get("first_name"),
-            form.cleaned_data.get("last_name"),
-            form.cleaned_data.get("org_name"),
-            form.cleaned_data.get("phone"),
-        )
-
-        project = create_project_for_user(
-            user=user, data=form.cleaned_data, status="DRAFT"
-        )
-
-        project.sites.add(request.site)
-
-        onboarding_response = form.save(commit=False)
-        onboarding_response.onboarding = onboarding_instance
-        onboarding_response.project = project
-        onboarding_response.save()
-
-        assign_collaborator(user, project, is_owner=True)
-
-        create_initial_note(request.site, onboarding_response)
-
-        notify_new_project(request.site, project, user)
-        email_owner_of_project(request.site, project, user)
-
-        refresh_user_projects_in_session(request, user)
-
-        # cleanup now useless onboarding existing data if present
-        if "onboarding_existing_data" in request.session:
-            del request.session["onboarding_existing_data"]
-
-        if is_new_user:
-            # new user first have to setup her password and then complete the project location before the survey
-            log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            next_args_for_project_location = urlencode(
-                {"next": reverse("survey-project-session", args=(project.pk,))}
-            )
-            next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
-            next_args = urlencode({"next": next_url})
-            return redirect(f"{reverse('home-user-setup-password')}?{next_args}")
-        else:
-            # go to project location form before starting survey
-            next_args = urlencode(
-                {"next": reverse("survey-project-session", args=(project.pk,))}
-            )
-            return redirect(
-                f"{reverse('projects-project-location', args=(project.pk,))}?{next_args}"
-            )
-
-    return render(request, "onboarding/onboarding.html", locals())
-
-
-########################################################################
-# User driven onboarding for a new project
-########################################################################
+    def form_invalid(self, form):
+        return redirect(reverse("account_login"))
 
 
 def onboarding_signup(request):
@@ -200,6 +134,7 @@ def onboarding_signup(request):
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)
+
     form = forms.OnboardingProject(request.POST or None)
     question_forms = []
     for question in site_config.onboarding_questions.all():
@@ -224,8 +159,6 @@ def onboarding_project(request):
                 "name": form.cleaned_data["name"],
                 "location": form.cleaned_data["location"],
                 "insee": form.cleaned_data["insee"],
-                "org_name": request.user.profile.organization,
-                "phone": request.user.profile.phone_no,
                 "description": form.cleaned_data["description"],
             }
 
@@ -480,8 +413,6 @@ def create_project_for_user(
     project = projects.Project.objects.create(
         submitted_by=submitted_by or user,
         name=data.get("name"),
-        phone=data.get("phone"),
-        org_name=data.get("org_name"),
         description=data.get("description"),
         location=data.get("location"),
         commune=commune,

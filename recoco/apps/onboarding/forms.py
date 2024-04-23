@@ -98,6 +98,33 @@ class SelectCommuneForm(forms.Form):
 ##################################################
 # Onboarding multi-step forms
 ##################################################
+class OnboardingEmailForm(DsrcBaseForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper.form_id = "id-onboarding-email-form"  # The form id is used for validation, it must be set and unique in the page
+        self.helper.form_method = "post"
+        self.helper.action_button = {
+            "submit": {
+                "label": "Déposer votre projet",
+            }
+        }
+        self.helper.layout = Layout(
+            Fieldset(
+                "",  # The first argument is the legend of the fieldset
+                "email",
+            ),
+        )
+
+    def clean_email(self):
+        """Make sure email is lowercased"""
+        email = self.cleaned_data["email"]
+        return email.lower()
+
+    email = forms.EmailField(
+        label="Adresse email",
+        help_text="Format attendu : prenom.nom@domaine.fr",
+        required=True,
+    )
 
 
 class OnboardingSignupForm(DsrcBaseForm):
@@ -213,6 +240,7 @@ class OnboardingProject(DsrcBaseForm):
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
     )
     postcode = forms.CharField(label="Code postal", initial="", required=True)
+
     communes = geomatics.Commune.objects.all()
     insee = forms.ChoiceField(
         label="Commune",

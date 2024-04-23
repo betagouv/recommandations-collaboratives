@@ -14,7 +14,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.shortcuts import redirect, render, reverse
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
@@ -26,11 +26,12 @@ from recoco.apps.projects.utils import (
 from recoco.apps.tasks import models as tasks
 from recoco.apps.resources import models as resources_models
 from recoco.utils import check_if_advisor
-from urllib.parse import urlencode
 
 from . import models
-from .forms import ContactForm, UserPasswordFirstTimeSetupForm, ModalOnboardingEmailForm
+from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 from .utils import get_current_site_sender_email
+
+from recoco.apps.onboarding.forms import OnboardingEmailForm
 
 
 class HomePageView(TemplateView):
@@ -38,25 +39,8 @@ class HomePageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context["onboarding_modal_form"] = ModalOnboardingEmailForm(
-            self.request.POST or None
-        )
-
+        context["onboarding_modal_form"] = OnboardingEmailForm()
         return context
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_context_data()["onboarding_modal_form"]
-        if form.is_valid():
-            request.session["onboarding_email"] = form.cleaned_data["email"]
-            try:
-                auth.User.objects.get(email=form.cleaned_data["email"])
-                next_args = urlencode({"next": reverse("projects-onboarding-project")})
-                login_url = reverse("account_login")
-                return redirect(f"{login_url}?{next_args}")
-            except auth.User.DoesNotExist:
-                signup_url = reverse("projects-onboarding-signup")
-                return redirect(signup_url)
 
 
 @method_decorator([login_required], name="dispatch")
