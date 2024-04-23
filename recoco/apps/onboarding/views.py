@@ -89,10 +89,7 @@ def onboarding_signup(request):
         request.POST or None, initial={"email": existing_email_user}
     )
 
-    # captcha_form = forms.OnlyCaptchaForm(request.POST or None)
-
     if request.method == "POST" and form.is_valid():
-        # and captcha_form.is_valid():
         email = form.cleaned_data.get("email").lower()
 
         user, is_new_user = auth.User.objects.get_or_create(
@@ -118,7 +115,6 @@ def onboarding_signup(request):
             form.cleaned_data.get("phone"),
         )
 
-        # FIXME do this send a confirmation email ?
         log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
         if "onboarding_email" in request.session:
@@ -174,6 +170,8 @@ def onboarding_project(request):
 
             assign_collaborator(request.user, project, is_owner=True)
 
+            # FIXME adapt function
+            # create_initial_note(request.site, onboarding_response)
             notify_new_project(request.site, project, request.user)
             email_owner_of_project(request.site, project, request.user)
 
@@ -199,9 +197,12 @@ def onboarding_summary(request, project_id=None):
     """Resume project from onboarding"""
 
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
-    # TODO redirect EDL
+    next_args_for_project_location = urlencode(
+        {"next": reverse("survey-project-session", args=(project.pk,))}
+    )
+    next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
 
-    context = {"project": project}
+    context = {"project": project, "next_url": next_url}
     return render(request, "onboarding/onboarding-summary.html", context)
 
 
@@ -210,6 +211,7 @@ def onboarding_summary(request, project_id=None):
 ########################################################################
 
 
+# TODO to delete when prefill v2 is deploy
 def create_project_prefilled(request):
     """Create a new project for someone else"""
     site_config = get_site_config_or_503(request.site)
@@ -360,8 +362,9 @@ def create_project_for_project_prefilled(request):
             assign_collaborator(user, project, is_owner=True)
             assign_advisor(request.user, project, request.site)
 
-            # FIXME
+            # FIXME adapt function
             # create_initial_note(request.site, onboarding_response)
+
             invite_user_to_project(request, user, project, is_new_user)
             notify_new_project(request.site, project, user)
 

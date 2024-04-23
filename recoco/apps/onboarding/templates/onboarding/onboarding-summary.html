@@ -7,7 +7,7 @@
   {% vite_asset 'js/apps/onboarding.js' %}
 {% endblock js %}
 {% block css %}
-  <link href="{% static '@gouvfr/dsfr/dist/dsfr.min.css' %}"
+  <link href="{% static 'dsfr/dist/dsfr.min.css' %}"
         rel="stylesheet"
         type="text/css">
   <link href="{% static '@gouvfr/dsfr/dist/utility/utility.min.css' %}"
@@ -57,7 +57,7 @@
           </div>
         </div>
       </div>
-      <p class="text-uppercase next-steps">Prochaine étapes</p>
+      <p class="text-uppercase next-steps">Prochaines étapes</p>
       <ol class="ms-4 mb-4">
         <li>Prenez quelques minutes pour répondre aux questions suivantes.</li>
         <li>Nos conseillers vous recontacteront pour affiner votre besoin sous quelques semaines.</li>
@@ -66,8 +66,7 @@
       <ul class="fr-btns-group">
         <li>
           <a class="fr-btn fr-btn--primary"
-             href="{% url 'survey-project-session' project_id=project.id %}">Remplir l'état des lieux</a>
-             {% comment %} FIXME ask Sabine {% endcomment %}
+             href="{{ next_url }}">Remplir l'état des lieux</a>
         </li>
       </ul>
     </div>
