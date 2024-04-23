@@ -299,7 +299,7 @@ def prefill_project_submit(request):
     prefill_set_user_data = request.session.get("prefill_set_user")
 
     if not prefill_set_user_data:
-        return redirect(f"{reverse('projects-project-prefill-setuser')}")
+        return redirect(f"{reverse('onboarding-prefill-set-user')}")
 
     form = forms.PrefillProjectForm(request.POST or None)
 

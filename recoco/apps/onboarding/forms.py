@@ -314,7 +314,7 @@ class PrefillProjectForm(DsrcBaseForm):
             },
             "cancel": {
                 "label": "Précédent",
-                "href": reverse("projects-project-prefill-setuser"),
+                "href": reverse("onboarding-prefill-set-user"),
             },
         }
 
