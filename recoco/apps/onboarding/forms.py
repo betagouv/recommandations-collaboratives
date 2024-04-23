@@ -124,6 +124,7 @@ class OnboardingEmailForm(DsrcBaseForm):
         label="Adresse email",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
+        initial="",
     )
 
 
@@ -179,7 +180,6 @@ class OnboardingSignupForm(DsrcBaseForm):
         label="Adresse email",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
-        initial="",
     )
 
     # Password input, with a password widget, show/hide control, and a help text
@@ -236,6 +236,7 @@ class OnboardingProject(DsrcBaseForm):
         label="Adresse",
         required=True,
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
+        initial="",
     )
     postcode = forms.CharField(label="Code postal", initial="", required=True)
 
@@ -248,10 +249,10 @@ class OnboardingProject(DsrcBaseForm):
     description = forms.CharField(label="Description", initial="", required=True)
 
 
-class PrefillSignupForm(DsrcBaseForm):
+class PrefillSetuserForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper.form_id = "id-prefill-signup-form"  # The form id is used for validation, it must be set and unique in the page
+        self.helper.form_id = "id-prefill-setuser-form"  # The form id is used for validation, it must be set and unique in the page
         self.helper.form_method = "post"
         self.helper.action_button = {"submit": {"label": "Suivant"}}
         self.helper.form_tag = False
@@ -313,7 +314,7 @@ class PrefillProjectForm(DsrcBaseForm):
             },
             "cancel": {
                 "label": "Précédent",
-                "href": reverse("projects-project-prefill-signup"),
+                "href": reverse("projects-project-prefill-setuser"),
             },
         }
 

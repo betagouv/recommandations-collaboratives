@@ -7,8 +7,8 @@ import {
 /**
  * Validation schema for the form: OnboardingPrefillSignup
  */
-export const schemaOnboardingPrefillSignupFormValidator = {
-  $id: '#/definitions/OnboardingPrefillSignupFormValidator',
+export const schemaOnboardingPrefillSetuserFormValidator = {
+  $id: '#/definitions/OnboardingPrefillSetuserFormValidator',
   type: 'object',
   properties: {
     first_name: { $ref: '#/definitions/text' },

@@ -24,6 +24,7 @@ function DsrcFormValidator(formId, validationSchema) {
 				console.error('Missing validation schema');
 			}
 
+			const currentForm = document.getElementById(formId);
 			const fields = Object.keys(this.schema.properties);
 			fields.forEach((field) => {
 				this.form[field] = {
@@ -33,7 +34,7 @@ function DsrcFormValidator(formId, validationSchema) {
 					errors: [],
 					touched: false,
 					changed: false,
-					value: '',
+					value: currentForm[field].value,
 				};
 			});
 
