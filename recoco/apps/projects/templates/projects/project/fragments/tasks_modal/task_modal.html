@@ -181,9 +181,17 @@
                                     </template>
                                 </div>
                             </div>
-                            <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">
-                                {% include 'tools/editor.html' with is_task_modal_comment=True %}
-                            </div>
+                            <template x-if="task.public">
+                                <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">
+                                    {% include 'tools/editor.html' with is_task_modal_comment=True %}
+                                </div>
+                            </template>
+                            <template x-if="!task.public">
+                                <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">
+                                    <div class="text-center">
+                                        <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
+                                    </div>
+                            </template>
                         </div>
                     </div>
                 </div>
