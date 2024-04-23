@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     "recoco.apps.invites",
     "recoco.apps.crm",
     "recoco.apps.training",
+    "recoco.apps.metrics",
     "crispy_forms",
 ]
 
@@ -325,5 +326,9 @@ REST_FRAMEWORK = {
     ]
 }
 
+# Materialized views
+MATERIALIZED_VIEWS_SPEC = []
+MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
+MATERIALIZED_VIEWS_PREFIX = "mv"
 
 # eof
