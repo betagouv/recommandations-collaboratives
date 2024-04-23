@@ -122,6 +122,7 @@ class UserProjectStatusAdmin(admin.ModelAdmin):
     list_display = ["project", "user", "status"]
 
     list_filter = ["site"]
+    list_select_related = ("project__commune", "user")
 
 
 @admin.register(models.Topic)
@@ -139,6 +140,7 @@ class NoteAdmin(admin.ModelAdmin):
     search_fields = ["content", "tags", "project__name"]
     list_filter = ["tags", "created_on"]
     list_display = ["created_on", "project_name", "tags"]
+    list_select_related = ("project",)
 
     def project_name(self, o):
         return o.project.name
@@ -149,6 +151,7 @@ class DocumentAdmin(admin.ModelAdmin):
     search_fields = ["description", "the_file"]
     list_filter = ["created_on"]
     list_display = ["created_on", "description", "the_file"]
+    list_select_related = ("project",)
 
 
 # eof

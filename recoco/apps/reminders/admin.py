@@ -21,6 +21,7 @@ class ReminderAdmin(admin.ModelAdmin):
     search_fields = ["project__name", "project__commune__name"]
     list_filter = ["kind", "deadline", "sent_on", "site"]
     list_display = ["deadline", "project", "kind", "sent_on"]
+    list_select_related = ("project__commune",)
 
     actions = ["send_reminder"]
 
