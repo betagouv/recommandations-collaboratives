@@ -398,7 +398,7 @@ def test_create_prefilled_project_set_user_is_not_reachable_without_login(
         site=get_current_site(request),
     )
 
-    url = reverse("onboarding-set-user")
+    url = reverse("onboarding-prefill-set-user")
     response = client.get(url)
     assert response.status_code == 403
 
