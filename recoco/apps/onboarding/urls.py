@@ -11,43 +11,41 @@ from django.urls import path
 
 from . import views
 
-# FIXME rename the following urls removing projects prefix -> OK
-
 urlpatterns = [
     path(
         r"onboarding/",
         views.OnboardingView.as_view(),
-        name="projects-onboarding",
+        name="onboarding",
     ),
     path(
         r"onboarding/signup",
         views.onboarding_signup,
-        name="projects-onboarding-signup",
+        name="onboarding-signup",
     ),
     path(
         r"onboarding/project",
         views.onboarding_project,
-        name="projects-onboarding-project",
+        name="onboarding-project",
     ),
     path(
         r"onboarding/summary/<int:project_id>",
         views.onboarding_summary,
-        name="projects-onboarding-summary",
+        name="onboarding-summary",
     ),
     path(
-        r"onboarding/prefill/setuser",
-        views.create_user_for_project_prefilled,
-        name="projects-project-prefill-setuser",
+        r"onboarding/prefill/signup",
+        views.prefill_project_set_user,
+        name="onboarding-prefill-set-user",
     ),
     path(
         r"onboarding/prefill/project",
-        views.create_project_for_project_prefilled,
-        name="projects-project-prefill-project",
+        views.prefill_project_submit,
+        name="onboarding-prefill",
     ),
     path(
         r"onboarding/<int:project_id>/commune/",
         views.select_commune,
-        name="projects-onboarding-select-commune",
+        name="onboarding-select-commune",
     ),
 ]
 

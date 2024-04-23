@@ -2,10 +2,8 @@ import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from django.utils.http import urlencode
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertContains
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
@@ -35,19 +33,14 @@ baker.generators.add("dynamic_forms.models.FormField", gen_onboarding_func)
 ########################################################################
 # Onboarding page for user
 ########################################################################
-
-
 @pytest.mark.django_db
 def test_onboarding_page_without_login_redirects_to_signin(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
     baker.make(
         home_models.SiteConfiguration,
         site=get_current_site(request),
-        onboarding=onboarding,
     )
 
-    url = reverse("projects-onboarding")
+    url = reverse("onboarding")
     response = client.get(url, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
@@ -55,7 +48,27 @@ def test_onboarding_page_without_login_redirects_to_signin(request, client):
 
 
 @pytest.mark.django_db
-def test_start_onboarding_with_nonexisting_account(request, client):
+def test_onboarding_page_with_logged_in_user_redirects_to_step2(request, client):
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+    )
+
+    with login(client):
+        url = reverse("onboarding")
+        response = client.get(url, follow=True)
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+        assert last_url == reverse("onboarding-project")
+
+
+#########################################
+# Onboarding: Step1, user signnup
+#########################################
+
+
+@pytest.mark.django_db
+def test_onboarding_signup_with_nonexisting_account(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
 
     baker.make(
@@ -67,14 +80,14 @@ def test_start_onboarding_with_nonexisting_account(request, client):
     data = {
         "email": "a@eXampLe.com",
     }
-    response = client.post(reverse("projects-onboarding"), data=data, follow=True)
+    response = client.post(reverse("onboarding"), data=data, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
-    assert last_url == reverse("projects-onboarding-signup")
+    assert last_url == reverse("onboarding-signup")
 
 
 @pytest.mark.django_db
-def test_start_onboarding_with_existing_account(request, client):
+def test_onboarding_signup_with_existing_account(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
 
     baker.make(
@@ -89,19 +102,70 @@ def test_start_onboarding_with_existing_account(request, client):
 
     baker.make(auth.User, email=data["email"].lower(), username=data["email"])
 
-    response = client.post(reverse("projects-onboarding"), data=data, follow=True)
+    response = client.post(reverse("onboarding"), data=data, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
     assert last_url.startswith(reverse("account_login"))
 
 
 @pytest.mark.django_db
-def test_onboarding_signup_redirects_to_project_sub_when_logged(request, client):
+def test_onboarding_signup_redirects_to_project_form_when_logged(request, client):
+    current_site = get_current_site(request)
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+    )
+
     with login(client):
-        response = client.post(reverse("projects-onboarding-signup"), follow=True)
+        response = client.post(reverse("onboarding-signup"), follow=True)
         last_url, status_code = response.redirect_chain[-1]
         assert status_code == 302
-        assert last_url == reverse("projects-onboarding-project")
+        assert last_url == reverse("onboarding-project")
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, client):
+    current_site = get_current_site(request)
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+    )
+
+    data = {
+        "name": "a project",
+        "email": "a@example.com",
+        "phone": "0610101010",
+        "first_name": "john",
+        "last_name": "doe",
+        "org_name": "MyOrg",
+    }
+    response = client.post(reverse("onboarding-signup"), data=data)
+
+    assert response.status_code == 302
+
+    project = projects_models.Project.on_site.first()
+    assert project
+    user = project.members.first()
+
+    assert project.owner == user
+    assert project.submitted_by == user
+
+    # the user and profile are filled according to provided information
+    assert user.first_name == data["first_name"]
+    assert user.last_name == data["last_name"]
+    assert current_site in user.profile.sites.all()
+    assert user.profile.organization.name == data["org_name"]
+    assert user.profile.phone_no == data["phone"]
+
+    # present if logged_in
+    assert int(client.session["_auth_user_id"]) == user.pk
+
+
+#########################################
+# Onboarding: Step2, project info
+#########################################
 
 
 @pytest.mark.django_db
@@ -118,7 +182,7 @@ def test_performing_onboarding_create_a_new_project(request, client):
     }
 
     with login(client):
-        response = client.post(reverse("projects-onboarding-project"), data=data)
+        response = client.post(reverse("onboarding-project"), data=data)
         assert response.status_code == 302
 
     project = projects_models.Project.on_site.first()
@@ -126,155 +190,10 @@ def test_performing_onboarding_create_a_new_project(request, client):
     assert project.name == data["name"]
     assert project.status == "DRAFT"
     assert len(project.ro_key) == 32
-    note = projects_models.Note.objects.all()[0]
-    assert note.project == project
-    assert note.public
-    assert note.content == f"# Demande initiale\n\n{project.description}\n\n\n"
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, client):
-    current_site = get_current_site(request)
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=current_site,
-        onboarding=onboarding,
-    )
-
-    data = {
-        "name": "a project",
-        "email": "a@example.com",
-        "description": "my desc",
-        "postal_code": "59800",
-        "phone": "0610101010",
-        "location": "some place",
-        "first_name": "john",
-        "last_name": "doe",
-        "org_name": "MyOrg",
-    }
-    response = client.post(reverse("projects-onboarding-signup"), data=data)
-
-    assert response.status_code == 302
-
-    project = projects_models.Project.on_site.first()
-    assert project
-    user = project.members.first()
-
-    assert project.owner == user
-    assert project.submitted_by == user
-
-    next_args_for_project_location = urlencode(
-        {"next": reverse("survey-project-session", args=(project.pk,))}
-    )
-    next_url = urlencode(
-        {
-            "next": f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
-        }
-    )
-
-    url = reverse("home-user-setup-password")
-    assert response.url == (f"{url}?{next_url}")
-
-    # the user and profile are filled according to provided information
-    assert user.first_name == data["first_name"]
-    assert user.last_name == data["last_name"]
-    assert current_site in user.profile.sites.all()
-    assert user.profile.organization.name == data["org_name"]
-    assert user.profile.phone_no == data["phone"]
-
-    assert int(client.session["_auth_user_id"]) == user.pk
-
-
-@pytest.mark.django_db
-def test_onboarding_known_not_logged_user_login_and_preserve_data(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
-
-    data = {
-        "name": "a new project for existing user",
-        "email": "a@exAmpLe.Com",
-        "location": "some place",
-        "org_name": "My organization",
-        "phone": "+3893889393399",
-        "first_name": "john",
-        "last_name": "doe",
-        "description": "a description of my new project",
-        "response_0": "blah",
-    }
-
-    # someone exists with this email (which is lower case)
-    email = data["email"].lower()
-    baker.make(auth.User, email=email, username=email)
-
-    # i am not connected
-    response = client.post(reverse("projects-onboarding"), data=data)
-
-    # send me to login to prove i am the one
-    assert response.status_code == 302
-    assert response["Location"].startswith(reverse("account_login"))
-
-    assert client.session["onboarding_existing_data"] == {
-        "first_name": "john",
-        "last_name": "doe",
-        "phone": "+3893889393399",
-        "org_name": "My organization",
-        "email": "a@example.com",
-        "name": "a new project for existing user",
-        "location": "some place",
-        "insee": "",
-        "description": "a description of my new project",
-        "response": {"Vide": "blah"},
-        "postcode": "",
-    }
-
-
-@pytest.mark.django_db
-def test_onboarding_reuse_session_content_when_logged_user_is_back(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
-
-    data = {
-        "first_name": "john",
-        "last_name": "doe",
-        "phone": "+3893889393399",
-        "org_name": "My organization",
-        "email": "a@example.com",
-        "name": "a new project for existing user",
-        "location": "some place",
-        "insee": "",
-        "description": "a description of my new project",
-        "response": {"Vide": "blah"},
-        "postcode": "",
-    }
-
-    with login(client, username=data["email"], email=data["email"]):
-        session = client.session
-        session["onboarding_existing_data"] = data
-        session.save()
-
-        response = client.get(reverse("projects-onboarding"))
-
-    assert response.status_code == 200
-    # data is there when i am back to onboarding
-    assertContains(response, data["name"])
-    assertContains(response, data["description"])
-    assertContains(response, data["location"])
-
-
-@pytest.mark.django_db
-def test_performing_onboarding_stores_initial_info(request, client):
+def test_performing_onboarding_creates_initial_info_note(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
 
     baker.make(
@@ -285,19 +204,12 @@ def test_performing_onboarding_stores_initial_info(request, client):
 
     data = {
         "name": "a project",
-        "email": "a@example.com",
         "description": "my desc",
-        "postal_code": "59800",
+        "postal_code": "62170",
+        "insee": "62040",
         "location": "some place",
-        "first_name": "john",
-        "last_name": "doe",
-        "phone": "0610101010",
-        "org_name": "MyOrg",
-        "response_0": "blah",
-        "impediment_kinds": ["Autre"],
-        "impediments": "some impediment",
     }
-    response = client.post(reverse("projects-onboarding"), data=data)
+    response = client.post(reverse("onboarding"), data=data)
 
     assert response.status_code == 302
 
@@ -310,7 +222,7 @@ def test_performing_onboarding_stores_initial_info(request, client):
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_does_not_allow_account_stealing(request, client):
+def test_performing_onboarding_signup_does_not_allow_account_stealing(request, client):
     user = baker.make(auth.User, username="existing@example.com")
 
     onboarding = onboarding_models.Onboarding.objects.first()
@@ -336,7 +248,7 @@ def test_performing_onboarding_does_not_allow_account_stealing(request, client):
         "impediments": "some impediment",
     }
 
-    response = client.post(reverse("projects-onboarding"), data=data)
+    response = client.post(reverse("onboarding"), data=data)
 
     assert response.status_code == 302
     assert client.session.get("_auth_user_id", None) is None
@@ -378,7 +290,7 @@ def test_performing_onboarding_sends_notification_to_project_moderators(
         "impediments": "some impediment",
     }
 
-    client.post(reverse("projects-onboarding"), data=data)
+    client.post(reverse("onboarding"), data=data)
 
     assert moderator.notifications.count() == 1
 
@@ -396,7 +308,7 @@ def test_performing_onboarding_sets_existing_postal_code(request, client):
     commune = Recipe(geomatics.Commune, postal="12345").make()
     with login(client):
         response = client.post(
-            reverse("projects-onboarding"),
+            reverse("onboarding"),
             data={
                 "name": "a project",
                 "email": "a@example.com",
@@ -447,7 +359,7 @@ def test_performing_onboarding_assigns_current_site_to_organization(request, cli
 
     with login(client):
         response = client.post(
-            reverse("projects-onboarding"),
+            reverse("onboarding"),
             data=data,
         )
 
@@ -468,7 +380,7 @@ def test_performing_onboarding_discard_unknown_postal_code(request, client):
 
     with login(client):
         response = client.post(
-            reverse("projects-onboarding"),
+            reverse("onboarding"),
             data={
                 "name": "a project",
                 "email": "a@example.com",
@@ -493,35 +405,41 @@ def test_performing_onboarding_discard_unknown_postal_code(request, client):
 #################################################################
 # onboarding by an advisor for someone else
 #################################################################
+@pytest.mark.django_db
+def test_create_prefilled_project_set_user_is_not_reachable_without_login(
+    request, client
+):
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+    )
+
+    url = reverse("onboarding-set-user")
+    response = client.get(url)
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
 def test_create_prefilled_project_is_not_reachable_without_login(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
     baker.make(
         home_models.SiteConfiguration,
         site=get_current_site(request),
-        onboarding=onboarding,
     )
 
-    url = reverse("projects-project-prefill")
+    url = reverse("onboarding-prefill")
     response = client.get(url)
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
 def test_create_prefilled_project_is_not_reachable_with_simple_login(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
     baker.make(
         home_models.SiteConfiguration,
         site=get_current_site(request),
-        onboarding=onboarding,
     )
 
     with login(client):
-        response = client.get(reverse("projects-project-prefill"))
+        response = client.get(reverse("onboarding-prefill"))
 
     assert response.status_code == 403
 
@@ -537,7 +455,7 @@ def test_create_prefilled_project_reachable_by_switchtenders(request, client):
     )
 
     with login(client, groups=["example_com_advisor"]):
-        response = client.get(reverse("projects-project-prefill"))
+        response = client.get(reverse("onboarding-prefill"))
 
     assert response.status_code == 200
 
@@ -565,7 +483,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
         "response_0": "blah",
     }
     with login(client, groups=["example_com_advisor"]) as user:
-        response = client.post(reverse("projects-project-prefill"), data=data)
+        response = client.post(reverse("onboarding-prefill"), data=data)
 
     project = projects_models.Project.on_site.all()[0]
     assert project.name == data["name"]
@@ -591,12 +509,10 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
 
 @pytest.mark.django_db
 def test_created_prefilled_project_stores_initial_info(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
     site = get_current_site(request)
     baker.make(
         home_models.SiteConfiguration,
         site=site,
-        onboarding=onboarding,
     )
 
     data = {
@@ -609,13 +525,10 @@ def test_created_prefilled_project_stores_initial_info(request, client):
         "phone": "0610101010",
         "last_name": "doe",
         "org_name": "MyOrg",
-        "response_0": "blah",
-        "impediment_kinds": ["Autre"],
-        "impediments": "some impediment",
     }
 
     with login(client, groups=["example_com_advisor"]):
-        response = client.post(reverse("projects-project-prefill"), data=data)
+        response = client.post(reverse("onboarding-prefill"), data=data)
 
     assert response.status_code == 302
 
@@ -648,7 +561,7 @@ def test_selecting_proper_commune_completes_project_creation(request, client):
 
     with login(client, user=membership.member):
         response = client.post(
-            reverse("projects-onboarding-select-commune", args=[project.id]),
+            reverse("onboarding-select-commune", args=[project.id]),
             data={"commune": selected.id},
         )
     project = projects_models.Project.on_site.get(id=project.id)
