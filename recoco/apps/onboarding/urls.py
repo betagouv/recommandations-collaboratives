@@ -17,7 +17,7 @@ from . import views
 urlpatterns = [
     path(
         r"onboarding/",
-        views.onboarding,
+        views.OnboardingView.as_view(),
         name="projects-onboarding",
     ),
     path(
