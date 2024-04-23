@@ -132,6 +132,7 @@ def onboarding_project(request):
     site_config = get_site_config_or_503(request.site)
 
     form = forms.OnboardingProject(request.POST or None)
+
     question_forms = []
     for question in site_config.onboarding_questions.all():
         form_prefix = f"q{question.id}-"

@@ -226,7 +226,6 @@ class OnboardingProject(DsrcBaseForm):
                 "name",
                 "location",
                 "postcode",
-                "communes",
                 "insee",
                 "description",
             )
@@ -235,19 +234,17 @@ class OnboardingProject(DsrcBaseForm):
     name = forms.CharField(label="Nom du projet", initial="", required=True)
     location = forms.CharField(
         label="Adresse",
-        initial="",
         required=True,
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
     )
     postcode = forms.CharField(label="Code postal", initial="", required=True)
 
-    communes = geomatics.Commune.objects.all()
-    insee = forms.ChoiceField(
+    insee = forms.CharField(
+        max_length=5,
         label="Commune",
-        initial="",
         required=True,
-        choices=[(c.insee, c.name) for c in communes],
     )
+
     description = forms.CharField(label="Description", initial="", required=True)
 
 

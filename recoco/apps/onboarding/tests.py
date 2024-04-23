@@ -119,7 +119,6 @@ def test_performing_onboarding_create_a_new_project(request, client):
 
     with login(client):
         response = client.post(reverse("projects-onboarding-project"), data=data)
-        print(response.content)
         assert response.status_code == 302
 
     project = projects_models.Project.on_site.first()
