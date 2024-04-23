@@ -127,7 +127,7 @@
                     <h4 class="mt-1">
                         Un Projet à nous soumettre ?
                     </h4>
-				            <a class="mt-3 mb-3  btn btn-primary" href="{% url "projects-onboarding" %}" >Prenez contact dès maintenant !</a>
+				            <a class="mt-3 mb-3  btn btn-primary" href="{% url "onboarding" %}" >Prenez contact dès maintenant !</a>
                     <br/>
                     <span class="text-secondary small">Tous les projets déposés sont accompagnés gratuitement par l'équipe UrbanVitaliz.</span>
                 </div>
@@ -137,7 +137,7 @@
     </ul>
 
     {% if projects %}
-    <a class="btn btn-primary btn-sm mb-1 mt-3 d-inline-block float-end"  href="{% url 'projects-onboarding'  %}">
+    <a class="btn btn-primary btn-sm mb-1 mt-3 d-inline-block float-end"  href="{% url 'onboarding'  %}">
         <svg class="bi me-1" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle"/>
         </svg>

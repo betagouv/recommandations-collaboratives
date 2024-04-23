@@ -591,7 +591,7 @@ def test_proper_commune_selection_contains_all_possible_commmunes(request, clien
 
     with login(client, user=membership.member):
         response = client.get(
-            reverse("projects-onboarding-select-commune", args=[project.id]),
+            reverse("onboarding-select-commune", args=[project.id]),
         )
     page = str(response.content)
     for commune in expected:

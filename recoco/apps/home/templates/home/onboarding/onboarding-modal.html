@@ -17,7 +17,7 @@
             {% include "home/onboarding/fragments/site-description.html" %}
             <div x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator)"
                  x-init="init">
-                 <form id="{{ form.helper.form_id }}" method="{{ form.helper.form_method }}"  action="{% url "projects-onboarding" %}">
+                 <form id="{{ form.helper.form_id }}" method="{{ form.helper.form_method }}"  action="{% url "onboarding" %}">
                   <input type="hidden"
                    name="js_enabled"
                    id="{{ form.helper.form_id }}_js_enabled"
