@@ -215,61 +215,6 @@ def onboarding_summary(request, project_id=None):
 ########################################################################
 
 
-# TODO to delete when prefill v2 is deploy
-def create_project_prefilled(request):
-    """Create a new project for someone else"""
-    site_config = get_site_config_or_503(request.site)
-
-    is_switchtender_or_403(request.user)
-
-    form = forms.OnboardingResponseForm(request.POST or None)
-    onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
-
-    # Add fields in JSON to dynamic form rendering field.
-    form.fields["response"].add_fields(onboarding_instance.form)
-
-    if request.method == "POST" and form.is_valid():
-        email = form.cleaned_data.get("email").lower()
-
-        user, is_new_user = auth.User.objects.get_or_create(
-            username=email, defaults={"email": email}
-        )
-        user = update_user(
-            request.site,
-            user,
-            form.cleaned_data.get("first_name"),
-            form.cleaned_data.get("last_name"),
-            form.cleaned_data.get("org_name"),
-            form.cleaned_data.get("phone"),
-        )
-
-        project = create_project_for_user(
-            user=user,
-            data=form.cleaned_data,
-            status="TO_PROCESS",
-            submitted_by=request.user,
-        )
-
-        project.sites.add(request.site)
-
-        onboarding_response = form.save(commit=False)
-        onboarding_response.onboarding = onboarding_instance
-        onboarding_response.project = project
-        onboarding_response.save()
-
-        assign_collaborator(user, project, is_owner=True)
-        assign_advisor(request.user, project, request.site)
-
-        create_initial_note(request.site, onboarding_response)
-
-        invite_user_to_project(request, user, project, is_new_user)
-        notify_new_project(request.site, project, user)
-
-        return redirect("projects-project-detail-knowledge", project_id=project.id)
-
-    return render(request, "onboarding/prefill.html", locals())
-
-
 @login_required
 def create_user_for_project_prefilled(request):
     """Create a new project for someone else - step 1 create user"""
