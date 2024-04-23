@@ -82,6 +82,7 @@ export default function PreviewModal() {
       }
     },
     onEditComment(followup) {
+      this.showEdition = true;
       this.pendingComment = followup.comment;
       this.currentlyEditing = ['followup', followup.id];
       document.querySelector('#comment-text-ref .ProseMirror').focus();
@@ -121,6 +122,10 @@ export default function PreviewModal() {
         );
       }
     },
+    changeShowEdition() {
+      this.showEdition = false;
+    },
+
     getTypeOfModalClass(isDocumented) {
       let typeOfModalClass = '';
 
