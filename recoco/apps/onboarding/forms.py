@@ -249,10 +249,10 @@ class OnboardingProject(DsrcBaseForm):
     description = forms.CharField(label="Description", initial="", required=True)
 
 
-class PrefillSignupForm(DsrcBaseForm):
+class PrefillSetuserForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper.form_id = "id-prefill-signup-form"  # The form id is used for validation, it must be set and unique in the page
+        self.helper.form_id = "id-prefill-setuser-form"  # The form id is used for validation, it must be set and unique in the page
         self.helper.form_method = "post"
         self.helper.action_button = {"submit": {"label": "Suivant"}}
         self.helper.form_tag = False
@@ -314,7 +314,7 @@ class PrefillProjectForm(DsrcBaseForm):
             },
             "cancel": {
                 "label": "Précédent",
-                "href": reverse("projects-project-prefill-signup"),
+                "href": reverse("projects-project-prefill-setuser"),
             },
         }
 

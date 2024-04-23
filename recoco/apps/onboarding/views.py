@@ -222,15 +222,12 @@ def create_user_for_project_prefilled(request):
 
     is_switchtender_or_403(request.user)
 
-    prefill_signup_user_data = request.session.get("prefill_signup_user")
+    prefill_set_user_data = request.session.get("prefill_set_user")
 
-    # FIXME make this form initializable
-    form = forms.PrefillSignupForm(
-        request.POST or None, initial=prefill_signup_user_data
-    )
+    form = forms.PrefillSetuserForm(request.POST or None, initial=prefill_set_user_data)
 
     if request.method == "POST" and form.is_valid():
-        request.session["prefill_signup_user"] = form.cleaned_data
+        request.session["prefill_set_user"] = form.cleaned_data
 
         return redirect(f"{reverse('projects-project-prefill-project')}")
 
@@ -244,10 +241,10 @@ def create_project_for_project_prefilled(request):
 
     is_switchtender_or_403(request.user)
 
-    prefill_signup_user_data = request.session.get("prefill_signup_user")
+    prefill_set_user_data = request.session.get("prefill_set_user")
 
-    if not prefill_signup_user_data:
-        return redirect(f"{reverse('projects-project-prefill-signup')}")
+    if not prefill_set_user_data:
+        return redirect(f"{reverse('projects-project-prefill-setuser')}")
 
     form = forms.PrefillProjectForm(request.POST or None)
 
@@ -280,7 +277,7 @@ def create_project_for_project_prefilled(request):
             }
 
             # User creation
-            email = prefill_signup_user_data.get("email").lower()
+            email = prefill_set_user_data.get("email").lower()
 
             user, is_new_user = auth.User.objects.get_or_create(
                 username=email, defaults={"email": email}
@@ -290,10 +287,10 @@ def create_project_for_project_prefilled(request):
                 user = update_user(
                     site=request.site,
                     user=user,
-                    first_name=prefill_signup_user_data.get("first_name"),
-                    last_name=prefill_signup_user_data.get("last_name"),
-                    org_name=prefill_signup_user_data.get("org_name"),
-                    phone=prefill_signup_user_data.get("phone"),
+                    first_name=prefill_set_user_data.get("first_name"),
+                    last_name=prefill_set_user_data.get("last_name"),
+                    org_name=prefill_set_user_data.get("org_name"),
+                    phone=prefill_set_user_data.get("phone"),
                 )
 
             # Project creation
@@ -318,8 +315,8 @@ def create_project_for_project_prefilled(request):
             notify_new_project(request.site, project, user)
 
             # cleanup now useless prefill existing data if present
-            if "prefill_signup_user" in request.session:
-                del request.session["prefill_signup_user"]
+            if "prefill_set_user" in request.session:
+                del request.session["prefill_set_user"]
 
             return redirect(
                 f"{reverse('projects-onboarding-summary', args=(project.pk,))}"

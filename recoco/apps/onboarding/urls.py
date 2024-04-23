@@ -35,9 +35,9 @@ urlpatterns = [
         name="projects-onboarding-summary",
     ),
     path(
-        r"onboarding/prefill/signup",
+        r"onboarding/prefill/setuser",
         views.create_user_for_project_prefilled,
-        name="projects-project-prefill-signup",
+        name="projects-project-prefill-setuser",
     ),
     path(
         r"onboarding/prefill/project",
