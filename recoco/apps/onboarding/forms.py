@@ -124,6 +124,7 @@ class OnboardingEmailForm(DsrcBaseForm):
         label="Adresse email",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
+        initial="",
     )
 
 
@@ -179,7 +180,6 @@ class OnboardingSignupForm(DsrcBaseForm):
         label="Adresse email",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
-        initial="",
     )
 
     # Password input, with a password widget, show/hide control, and a help text
@@ -236,6 +236,7 @@ class OnboardingProject(DsrcBaseForm):
         label="Adresse",
         required=True,
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
+        initial="",
     )
     postcode = forms.CharField(label="Code postal", initial="", required=True)
 

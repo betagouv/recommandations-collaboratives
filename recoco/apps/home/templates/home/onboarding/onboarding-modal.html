@@ -16,7 +16,20 @@
             <h1 id="onboarding-modal-title" class="fr-modal__title">Solliciter {{ request.site.name }}</h1>
             {% include "home/onboarding/fragments/site-description.html" %}
             <div x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator)"
-                 x-init="init">{% crispy form %}</div>
+                 x-init="init">
+                 <form id="{{ form.helper.form_id }}" method="{{ form.helper.form_method }}"  action="{% url "projects-onboarding" %}">
+                  <input type="hidden"
+                   name="js_enabled"
+                   id="{{ form.helper.form_id }}_js_enabled"
+                   value="false">
+                   <fieldset class="fr-fieldset">
+                    {% csrf_token %}
+
+                   {{ form.email|as_crispy_field }}
+                </fieldset>
+                {% include "dsrc/core/blocks/buttons/button_group.html" %}
+                 </form>
+                </div>
           </div>
         </div>
       </div>

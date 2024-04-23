@@ -82,8 +82,8 @@ def onboarding_signup(request):
 
     if request.user.is_authenticated:
         return redirect(reverse("projects-onboarding-project"))
-    # FIXME existing email is not kept in form
-    existing_email_user = request.session.get("onboarding_email")
+
+    existing_email_user = request.session.get("onboarding_email") or ""
 
     form = forms.OnboardingSignupForm(
         request.POST or None, initial={"email": existing_email_user}
@@ -130,6 +130,10 @@ def onboarding_signup(request):
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)
+
+    # TODO logo
+    # if site_config.email_logo:
+    #     site_logo = build_absolute_url(site_config.email_logo.url)
 
     form = forms.OnboardingProject(request.POST or None)
 
