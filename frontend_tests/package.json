@@ -4,16 +4,17 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test_ui": "./node_modules/cypress/bin/cypress open",
-        "cy:run": "./node_modules/cypress/bin/cypress run",
+        "test_ui": "cypress open",
+        "cy:run": "cypress run",
         "test": "start-server-and-test 'yarn django:start-server --verbosity 0' http://localhost:8000 'yarn run django:update-permissions ; yarn run cy:run'",
-        "django:start-server": "DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py testserver ./cypress/fixtures/settings/siteWithOnboardingAndSurvey.json ./cypress/fixtures/users/users.json ./cypress/fixtures/geomatics/region.json ./cypress/fixtures/geomatics/department.json ./cypress/fixtures/geomatics/commune.json ./cypress/fixtures/projects/projects.json ./cypress/fixtures/projects/projectsMembers.json ./cypress/fixtures/projects/reminders.json ./cypress/fixtures/addressbook/organizations.json ./cypress/fixtures/profiles/profiles.json ./cypress/fixtures/resources/resources.json ./cypress/fixtures/addressbook/contacts.json ./cypress/fixtures/documents/documents.json --noinput",
-        "django:start-server-jb": "DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py runserver",
-        "django:update-permissions": "DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py update_permissions"
+        "django:start-server": "cross-env DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py testserver ./cypress/fixtures/settings/siteWithOnboardingAndSurvey.json ./cypress/fixtures/users/users.json ./cypress/fixtures/geomatics/region.json ./cypress/fixtures/geomatics/department.json ./cypress/fixtures/geomatics/commune.json ./cypress/fixtures/projects/projects.json ./cypress/fixtures/projects/projectsMembers.json ./cypress/fixtures/projects/reminders.json ./cypress/fixtures/addressbook/organizations.json ./cypress/fixtures/profiles/profiles.json ./cypress/fixtures/resources/resources.json ./cypress/fixtures/addressbook/contacts.json ./cypress/fixtures/documents/documents.json --noinput",
+        "django:start-server-jb": "cross-env DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py runserver",
+        "django:update-permissions": "cross-env DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py update_permissions"
     },
     "author": "",
     "license": " GPL-3.0-or-later",
     "devDependencies": {
+        "cross-env": "^7.0.3",
         "cypress": "^13.6.0",
         "cypress-mochawesome-reporter": "^3.8.1",
         "eslint": "^8.56.0",
