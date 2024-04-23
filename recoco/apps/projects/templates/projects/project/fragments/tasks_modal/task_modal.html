@@ -181,7 +181,7 @@
                                     </template>
                                 </div>
                             </div>
-                            <template x-if="task.public">
+                            <template x-if="task.public || showEdition">
                                 <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">
                                     {% include 'tools/editor.html' with is_task_modal_comment=True %}
                                 </div>
