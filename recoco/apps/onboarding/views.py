@@ -84,7 +84,6 @@ def onboarding_signup(request):
     if request.user.is_authenticated:
         return redirect(reverse("onboarding-project"))
 
-    # FIXME existing email is not kept in form
     existing_email_user = request.session.get("onboarding_email") or ""
 
     form = forms.OnboardingSignupForm(
@@ -219,14 +218,15 @@ def onboarding_summary(request, project_id=None):
 # TODO to delete when prefill v2 is deploy
 def OLD_prefill_project_submit(request):
     """Create a new project for someone else"""
-
     site_config = get_site_config_or_503(request.site)
 
     is_switchtender_or_403(request.user)
 
-    prefill_set_user_data = request.session.get("prefill_set_user")
+    form = forms.OnboardingResponseForm(request.POST or None)
+    onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
 
-    form = forms.PrefillSetuserForm(request.POST or None, initial=prefill_set_user_data)
+    # Add fields in JSON to dynamic form rendering field.
+    form.fields["response"].add_fields(onboarding_instance.form)
 
     if request.method == "POST" and form.is_valid():
         email = form.cleaned_data.get("email").lower()
@@ -268,16 +268,13 @@ def OLD_prefill_project_submit(request):
 @login_required
 def prefill_project_set_user(request):
     """Create a new project for someone else - step 1 create user"""
-    # site_config = get_site_config_or_503(request.site)
+    site_config = get_site_config_or_503(request.site)
 
     is_switchtender_or_403(request.user)
 
-    prefill_signup_user_data = request.session.get("prefill_signup_user")
+    prefill_set_user_data = request.session.get("prefill_set_user")
 
-    # FIXME make this form initializable
-    form = forms.PrefillSignupForm(
-        request.POST or None, initial=prefill_signup_user_data
-    )
+    form = forms.PrefillSetuserForm(request.POST or None, initial=prefill_set_user_data)
 
     if request.method == "POST" and form.is_valid():
         request.session["prefill_set_user"] = form.cleaned_data
@@ -297,7 +294,7 @@ def prefill_project_submit(request):
     prefill_set_user_data = request.session.get("prefill_set_user")
 
     if not prefill_set_user_data:
-        return redirect(f"{reverse('projects-project-prefill-setuser')}")
+        return redirect(f"{reverse('onboarding-prefill-set-user')}")
 
     form = forms.PrefillProjectForm(request.POST or None)
 
