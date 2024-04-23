@@ -414,7 +414,7 @@ def test_create_prefilled_project_set_user_is_not_reachable_without_login(
         site=get_current_site(request),
     )
 
-    url = reverse("onboarding-set-user")
+    url = reverse("onboarding-prefill-set-user")
     response = client.get(url)
     assert response.status_code == 403
 
@@ -591,7 +591,7 @@ def test_proper_commune_selection_contains_all_possible_commmunes(request, clien
 
     with login(client, user=membership.member):
         response = client.get(
-            reverse("projects-onboarding-select-commune", args=[project.id]),
+            reverse("onboarding-select-commune", args=[project.id]),
         )
     page = str(response.content)
     for commune in expected:

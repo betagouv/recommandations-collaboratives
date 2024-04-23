@@ -121,7 +121,7 @@ def onboarding_signup(request):
         if "onboarding_email" in request.session:
             del request.session["onboarding_email"]
 
-        return redirect(f"{reverse('projects-onboarding-project')}")
+        return redirect(f"{reverse('onboarding-project')}")
 
     context = {"form": form, "site_config": site_config}
     return render(request, "onboarding/onboarding-signup.html", context)
@@ -183,9 +183,7 @@ def onboarding_project(request):
             if "onboarding_signup" in request.session:
                 del request.session["onboarding_signup"]
 
-            return redirect(
-                f"{reverse('projects-onboarding-summary', args=(project.pk,))}"
-            )
+            return redirect(f"{reverse('onboarding-summary', args=(project.pk,))}")
 
     context = {
         "form": form,
@@ -373,9 +371,7 @@ def prefill_project_submit(request):
             if "prefill_set_user" in request.session:
                 del request.session["prefill_set_user"]
 
-            return redirect(
-                f"{reverse('projects-onboarding-summary', args=(project.pk,))}"
-            )
+            return redirect(f"{reverse('onboarding-summary', args=(project.pk,))}")
 
     return render(request, "onboarding/prefill-project.html", locals())
 
