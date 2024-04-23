@@ -433,7 +433,7 @@ def test_create_prefilled_project_set_user_reachable_by_switchtenders(request, c
 
 
 @pytest.mark.django_db
-def test_create_prefilled_project_set_user_creates_new_account(request, client):
+def test_create_prefilled_project_set_user_memorized_in_session(request, client):
     site = get_current_site(request)
     baker.make(
         home_models.SiteConfiguration,
@@ -445,7 +445,7 @@ def test_create_prefilled_project_set_user_creates_new_account(request, client):
         "first_name": "Camille",
         "last_name": "Dupont",
         "phone": "066666666",
-        "organization": "ACME",
+        "org_name": "ACME",
         "role": "Ouistiti",
     }
 
@@ -453,14 +453,6 @@ def test_create_prefilled_project_set_user_creates_new_account(request, client):
         response = client.post(reverse("onboarding-prefill-set-user"), data)
 
     assert response.status_code == 302
-
-    user = auth.User.objects.get(username=data["email"])
-    assert user.first_name == data["first_name"]
-    assert user.last_name == data["last_name"]
-    assert user.email == data["email"]
-    assert user.profile.phone == data["phone"]
-    assert user.profile.organization == data["ACME"]
-    assert user.profile.organization_position == data["role"]
 
     assert client.session.get("prefill_set_user", None) is not None
 
@@ -500,9 +492,12 @@ def test_create_prefilled_project_reachable_by_switchtenders(request, client):
     )
 
     data = {
+        "email": "my@email.com",
         "first_name": "Camille",
         "last_name": "Dupont",
         "phone": "066666666",
+        "org_name": "ACME",
+        "role": "Ouistiti",
     }
 
     with login(client, groups=["example_com_advisor"]):
@@ -530,39 +525,57 @@ def test_create_prefilled_project_without_user_set_redirects(request, client):
 
 @pytest.mark.django_db
 def test_create_prefilled_project_creates_a_new_project(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
     site = get_current_site(request)
     baker.make(
         home_models.SiteConfiguration,
         site=site,
-        onboarding=onboarding,
     )
 
-    data = {
-        "name": "a project",
-        "email": "a@ExAmple.Com",
-        "location": "some place",
-        "phone": "03939382828",
-        "postcode": "59000",
-        "org_name": "my org",
-        "description": "blah",
-        "first_name": "john",
-        "last_name": "doe",
-        "response_0": "blah",
+    user_data = {
+        "email": "my@email.com",
+        "first_name": "Camille",
+        "last_name": "Dupont",
+        "phone": "066666666",
+        "org_name": "ACME",
+        "role": "Ouistiti",
     }
-    with login(client, groups=["example_com_advisor"]) as user:
-        response = client.post(reverse("onboarding-prefill"), data=data)
 
+    project_data = {
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "blah",
+    }
+
+    with login(client, groups=["example_com_advisor"]) as user:
+        response = client.post(reverse("onboarding-prefill-set-user"), data=user_data)
+        assert response.status_code == 302
+        response = client.post(
+            reverse("onboarding-prefill"), data=project_data, follow=True
+        )
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+
+    # Project
     project = projects_models.Project.on_site.all()[0]
-    assert project.name == data["name"]
+
+    assert last_url == reverse("onboarding-summary", args=[project.pk])
+
+    assert project.name == project_data["name"]
+    assert project.location == project_data["location"]
+    assert project.commune is not None
+    assert project.description == project_data["description"]
+
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
     owner = project.owner
 
-    assert data["email"].lower() == owner.email
-    assert data["first_name"] == owner.first_name
-    assert data["last_name"] == owner.last_name
+    assert user_data["email"].lower() == owner.email
+    assert user_data["email"].lower() == owner.username
+    assert user_data["first_name"] == owner.first_name
+    assert user_data["last_name"] == owner.last_name
     assert site in owner.profile.sites.all()
 
     assert user in project.switchtenders.all()

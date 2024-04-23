@@ -277,7 +277,7 @@ def prefill_project_set_user(request):
     if request.method == "POST" and form.is_valid():
         request.session["prefill_set_user"] = form.cleaned_data
 
-        return redirect(f"{reverse('projects-project-prefill-project')}")
+        return redirect(f"{reverse('onboarding-prefill')}")
 
     return render(request, "onboarding/prefill-user.html", locals())
 
