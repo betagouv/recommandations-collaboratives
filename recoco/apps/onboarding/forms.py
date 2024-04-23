@@ -14,7 +14,6 @@ from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from crispy_forms.layout import Layout, Fieldset
 from recoco.apps.dsrc.forms import DsrcBaseForm
-from recoco.apps.geomatics import models as geomatics
 from django.shortcuts import reverse
 
 from . import models
@@ -324,7 +323,6 @@ class PrefillProjectForm(DsrcBaseForm):
                 "name",
                 "location",
                 "postcode",
-                "communes",
                 "insee",
                 "description",
             )
@@ -338,13 +336,13 @@ class PrefillProjectForm(DsrcBaseForm):
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
     )
     postcode = forms.CharField(label="Code postal", initial="", required=True)
-    communes = geomatics.Commune.objects.all()
-    insee = forms.ChoiceField(
+
+    insee = forms.CharField(
+        max_length=5,
         label="Commune",
-        initial="",
         required=True,
-        choices=[(c.insee, c.name) for c in communes],
     )
+
     description = forms.CharField(label="Description", initial="", required=True)
 
 

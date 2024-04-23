@@ -356,7 +356,7 @@ def prefill_project_submit(request):
 
             # Save survey questions
             for question_form in question_forms:
-                question.save()
+                question_form.save()
 
             assign_collaborator(user, project, is_owner=True)
             assign_advisor(request.user, project, request.site)
