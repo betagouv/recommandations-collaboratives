@@ -14,23 +14,6 @@ from recoco.utils import login
 
 
 ########################################################################
-# Baker addons for using dynamic forms in onboarding
-########################################################################
-
-
-def gen_onboarding_func():
-    return """[{ "type": "text",
-    "required": false,
-    "label": "Text Field",
-    "className": "form-control",
-    "name": "text-1657009260220-0",
-    "subtype": "text" }]"""
-
-
-baker.generators.add("dynamic_forms.models.FormField", gen_onboarding_func)
-
-
-########################################################################
 # Onboarding page for user
 ########################################################################
 @pytest.mark.django_db
@@ -134,29 +117,27 @@ def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, cli
     )
 
     data = {
-        "name": "a project",
         "email": "a@example.com",
         "phone": "0610101010",
+        "role": "Ouistiti",
+        "password": "blah",
         "first_name": "john",
         "last_name": "doe",
         "org_name": "MyOrg",
     }
+
     response = client.post(reverse("onboarding-signup"), data=data)
 
     assert response.status_code == 302
 
-    project = projects_models.Project.on_site.first()
-    assert project
-    user = project.members.first()
-
-    assert project.owner == user
-    assert project.submitted_by == user
-
     # the user and profile are filled according to provided information
+    user = auth.User.objects.get(username=data["email"])
+    assert user.email == data["email"]
     assert user.first_name == data["first_name"]
     assert user.last_name == data["last_name"]
     assert current_site in user.profile.sites.all()
     assert user.profile.organization.name == data["org_name"]
+    assert user.profile.organization_position == data["role"]
     assert user.profile.phone_no == data["phone"]
 
     # present if logged_in
@@ -405,6 +386,9 @@ def test_performing_onboarding_discard_unknown_postal_code(request, client):
 #################################################################
 # onboarding by an advisor for someone else
 #################################################################
+
+
+# -- set user
 @pytest.mark.django_db
 def test_create_prefilled_project_set_user_is_not_reachable_without_login(
     request, client
@@ -419,6 +403,69 @@ def test_create_prefilled_project_set_user_is_not_reachable_without_login(
     assert response.status_code == 403
 
 
+@pytest.mark.django_db
+def test_create_prefilled_project_set_user_is_not_reachable_with_simple_login(
+    request, client
+):
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+    )
+
+    with login(client):
+        response = client.get(reverse("onboarding-set-user"))
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_create_prefilled_project_set_user_reachable_by_switchtenders(request, client):
+    site = get_current_site(request)
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+    )
+
+    with login(client, groups=["example_com_advisor"]):
+        response = client.get(reverse("onboarding-prefill"))
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_create_prefilled_project_set_user_creates_new_account(request, client):
+    site = get_current_site(request)
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+    )
+
+    data = {
+        "email": "my@email.com",
+        "first_name": "Camille",
+        "last_name": "Dupont",
+        "phone": "066666666",
+        "organization": "ACME",
+        "role": "Ouistiti",
+    }
+
+    with login(client, groups=["example_com_advisor"]):
+        response = client.post(reverse("onboarding-prefill-set-user"), data)
+
+    assert response.status_code == 302
+
+    user = auth.User.objects.get(username=data["email"])
+    assert user.first_name == data["first_name"]
+    assert user.last_name == data["last_name"]
+    assert user.email == data["email"]
+    assert user.profile.phone == data["phone"]
+    assert user.profile.organization == data["ACME"]
+    assert user.profile.organization_position == data["role"]
+
+    assert client.session.get("prefill_set_user", None) is not None
+
+
+# -- project
 @pytest.mark.django_db
 def test_create_prefilled_project_is_not_reachable_without_login(request, client):
     baker.make(
@@ -446,18 +493,39 @@ def test_create_prefilled_project_is_not_reachable_with_simple_login(request, cl
 
 @pytest.mark.django_db
 def test_create_prefilled_project_reachable_by_switchtenders(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
     site = get_current_site(request)
     baker.make(
         home_models.SiteConfiguration,
         site=site,
-        onboarding=onboarding,
     )
 
+    data = {
+        "first_name": "Camille",
+        "last_name": "Dupont",
+        "phone": "066666666",
+    }
+
     with login(client, groups=["example_com_advisor"]):
+        response = client.post(reverse("onboarding-prefill-set-user"), data)
         response = client.get(reverse("onboarding-prefill"))
 
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_create_prefilled_project_without_user_set_redirects(request, client):
+    site = get_current_site(request)
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+    )
+
+    with login(client, groups=["example_com_advisor"]):
+        response = client.get(reverse("onboarding-prefill"), follow=True)
+        last_url, status_code = response.redirect_chain[-1]
+
+    assert status_code == 302
+    assert last_url == reverse("onboarding-prefill-set-user")
 
 
 @pytest.mark.django_db
