@@ -241,37 +241,36 @@ def test_performing_onboarding_sends_notification_to_project_moderators(
     request, client
 ):
     current_site = get_current_site(request)
-    onboarding = onboarding_models.Onboarding.objects.first()
 
     baker.make(
         home_models.SiteConfiguration,
         site=current_site,
-        onboarding=onboarding,
     )
 
     staff_group = auth.Group.objects.get(name="example_com_staff")
-    # st_group = auth.Group.objects.get(name="example_com_advisor")
     moderator = Recipe(
         auth.User,
         email="moderator@example.com",
         groups=[staff_group],
     ).make()
 
-    data = {
+    project_data = {
         "name": "a project",
-        "email": "a@example.com",
         "location": "some place",
-        "org_name": "MyOrg",
-        "phone": "0610101010",
-        "description": "my desc",
-        "first_name": "john",
-        "last_name": "doe",
-        "response_0": "blah",
-        "impediment_kinds": ["Autre"],
-        "impediments": "some impediment",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "blah",
     }
 
-    client.post(reverse("onboarding"), data=data)
+    with login(client):
+        response = client.post(
+            reverse("onboarding-project"), data=project_data, follow=True
+        )
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+
+        project = projects_models.Project.objects.last()
+        assert last_url == reverse("onboarding-summary", args=[project.pk])
 
     assert moderator.notifications.count() == 1
 
@@ -413,7 +412,7 @@ def test_create_prefilled_project_set_user_is_not_reachable_with_simple_login(
     )
 
     with login(client):
-        response = client.get(reverse("onboarding-set-user"))
+        response = client.get(reverse("onboarding-prefill-set-user"))
 
     assert response.status_code == 403
 
@@ -531,6 +530,8 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
         site=site,
     )
 
+    baker.make(geomatics.Commune, insee="62044", postal="62170")
+
     user_data = {
         "email": "my@email.com",
         "first_name": "Camille",
@@ -548,7 +549,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
         "description": "blah",
     }
 
-    with login(client, groups=["example_com_advisor"]) as user:
+    with login(client, groups=["example_com_advisor"]) as submitter:
         response = client.post(reverse("onboarding-prefill-set-user"), data=user_data)
         assert response.status_code == 302
         response = client.post(
@@ -570,7 +571,11 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert project.status == "TO_PROCESS"
     assert len(project.ro_key) == 32
 
+    # User
+    user = auth.User.objects.get(username=user_data["email"])
     owner = project.owner
+
+    assert owner == user
 
     assert user_data["email"].lower() == owner.email
     assert user_data["email"].lower() == owner.username
@@ -578,14 +583,12 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert user_data["last_name"] == owner.last_name
     assert site in owner.profile.sites.all()
 
-    assert user in project.switchtenders.all()
+    assert submitter in project.switchtenders.all()
 
-    assert user == project.submitted_by
+    assert submitter == project.submitted_by
 
     invite = invites_models.Invite.objects.first()
     assert invite.project == project
-
-    assert response.status_code == 302
 
 
 @pytest.mark.django_db

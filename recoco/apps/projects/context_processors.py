@@ -40,13 +40,16 @@ def active_project_processor(request):
         )
 
     if active_project:
-        try:
-            site_config = get_site_config_or_503(request.site)
-            session, _ = survey_models.Session.objects.get_or_create(
-                project=active_project, survey=site_config.project_survey
-            )
-        except (survey_models.Survey.DoesNotExist, ImproperlyConfigured):
-            session = None
+        site_config = get_site_config_or_503(request.site)
+        session = None
+
+        if site_config.project_survey:
+            try:
+                session, _ = survey_models.Session.objects.get_or_create(
+                    project=active_project, survey=site_config.project_survey
+                )
+            except (survey_models.Survey.DoesNotExist, ImproperlyConfigured):
+                pass
 
         # Retrieve notification count
         project_notifications = request.user.notifications.filter(

@@ -108,12 +108,13 @@ def onboarding_signup(request):
 
         user.set_password(form.cleaned_data.get("password"))
         user = update_user(
-            request.site,
-            user,
-            form.cleaned_data.get("first_name"),
-            form.cleaned_data.get("last_name"),
-            form.cleaned_data.get("org_name"),
-            form.cleaned_data.get("phone"),
+            site=request.site,
+            user=user,
+            first_name=form.cleaned_data.get("first_name"),
+            last_name=form.cleaned_data.get("last_name"),
+            org_name=form.cleaned_data.get("org_name"),
+            org_position=form.cleaned_data.get("role"),
+            phone=form.cleaned_data.get("phone"),
         )
 
         log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
@@ -199,68 +200,26 @@ def onboarding_summary(request, project_id=None):
     site_config = get_site_config_or_503(request.site)
 
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
-    next_args_for_project_location = urlencode(
-        {"next": reverse("survey-project-session", args=(project.pk,))}
-    )
+
+    if site_config.project_survey:
+        next_args_for_project_location = urlencode(
+            {"next": reverse("survey-project-session", args=(project.pk,))}
+        )
+    else:
+        next_args_for_project_location = urlencode(
+            {"next": reverse("projects-project-detail", args=(project.pk,))}
+        )
+
     next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
 
     context = {"project": project, "next_url": next_url, "site_config": site_config}
+
     return render(request, "onboarding/onboarding-summary.html", context)
 
 
 ########################################################################
 # Advisor onboard someone else
 ########################################################################
-
-
-# TODO to delete when prefill v2 is deploy
-def OLD_prefill_project_submit(request):
-    """Create a new project for someone else"""
-    site_config = get_site_config_or_503(request.site)
-
-    is_switchtender_or_403(request.user)
-
-    form = forms.OnboardingResponseForm(request.POST or None)
-    onboarding_instance = models.Onboarding.objects.get(pk=site_config.onboarding.pk)
-
-    # Add fields in JSON to dynamic form rendering field.
-    form.fields["response"].add_fields(onboarding_instance.form)
-
-    if request.method == "POST" and form.is_valid():
-        email = form.cleaned_data.get("email").lower()
-
-        user, is_new_user = auth.User.objects.get_or_create(
-            username=email, defaults={"email": email}
-        )
-        user = update_user(
-            request.site,
-            user,
-            form.cleaned_data.get("first_name"),
-            form.cleaned_data.get("last_name"),
-            form.cleaned_data.get("org_name"),
-            form.cleaned_data.get("phone"),
-        )
-
-        project = create_project_for_user(
-            user=user,
-            data=form.cleaned_data,
-            status="TO_PROCESS",
-            submitted_by=request.user,
-        )
-
-        project.sites.add(request.site)
-
-        assign_collaborator(user, project, is_owner=True)
-        assign_advisor(request.user, project, request.site)
-
-        # create_initial_note(request.site, onboarding_response)
-
-        invite_user_to_project(request, user, project, is_new_user)
-        notify_new_project(request.site, project, user)
-
-        return redirect("projects-project-detail-knowledge", project_id=project.id)
-
-    return render(request, "onboarding/prefill.html", locals())
 
 
 @login_required
@@ -315,15 +274,6 @@ def prefill_project_submit(request):
             all_forms_valid = all_forms_valid and question_form.is_valid()
 
         if all_forms_valid:
-            project_dict = {
-                "name": form.cleaned_data["name"],
-                "location": form.cleaned_data["location"],
-                "insee": form.cleaned_data["insee"],
-                "org_name": request.user.profile.organization,
-                "phone": request.user.profile.phone_no,
-                "description": form.cleaned_data["description"],
-            }
-
             # User creation
             email = prefill_set_user_data.get("email").lower()
 
@@ -338,13 +288,27 @@ def prefill_project_submit(request):
                     first_name=prefill_set_user_data.get("first_name"),
                     last_name=prefill_set_user_data.get("last_name"),
                     org_name=prefill_set_user_data.get("org_name"),
+                    org_position=prefill_set_user_data.get("role"),
                     phone=prefill_set_user_data.get("phone"),
                 )
+
+            project_dict = {
+                "name": form.cleaned_data["name"],
+                "location": form.cleaned_data["location"],
+                "postcode": form.cleaned_data["postcode"],
+                "insee": form.cleaned_data["insee"],
+                "description": form.cleaned_data["description"],
+            }
+
+            print(project_dict)
 
             # Project creation
 
             project = create_project_for_user(
-                user=request.user, data=project_dict, status="DRAFT"
+                user=user,
+                submitted_by=request.user,
+                data=project_dict,
+                status="TO_PROCESS",
             )
 
             project.sites.add(request.site)
@@ -424,6 +388,7 @@ def update_user(
     first_name: str,
     last_name: str,
     org_name: str,
+    org_position: str,
     phone: str,
 ) -> auth.User:
     """Update and return given user and its profile w/ data from form"""
@@ -438,6 +403,7 @@ def update_user(
 
     profile = user.profile
     profile.organization = profile.organization or organization
+    profile.organization_position = org_position or None
     profile.phone_no = profile.phone_no or phone
     profile.save()
 
