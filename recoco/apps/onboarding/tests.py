@@ -277,35 +277,22 @@ def test_performing_onboarding_sends_notification_to_project_moderators(
 
 @pytest.mark.django_db
 def test_performing_onboarding_sets_existing_postal_code(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
 
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
+    commune = Recipe(geomatics.Commune, postal="12345", insee="12340").make()
 
-    commune = Recipe(geomatics.Commune, postal="12345").make()
+    data = {
+        "name": "a project",
+        "location": "some place",
+        "postcode": commune.postal,
+        "description": "a description",
+    }
+
     with login(client):
-        response = client.post(
-            reverse("onboarding"),
-            data={
-                "name": "a project",
-                "email": "a@example.com",
-                "location": "some place",
-                "org_name": "My Org",
-                "description": "my desc",
-                "phone": "0610101010",
-                "first_name": "john",
-                "last_name": "doe",
-                "postcode": commune.postal,
-                "response_0": "blah",
-                "impediment_kinds": ["Autre"],
-                "impediments": "some impediment",
-            },
-        )
+        response = client.post(reverse("onboarding-project"), data=data)
+        assert response.status_code == 302
 
-    assert response.status_code == 302
     project = projects_models.Project.on_site.all()[0]
     assert project.commune == commune
 
