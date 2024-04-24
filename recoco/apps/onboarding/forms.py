@@ -12,8 +12,6 @@ import os
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
-from crispy_forms.layout import Layout, Fieldset
-from recoco.apps.dsrc.forms import DsrcBaseForm
 
 from . import models
 
@@ -90,5 +88,6 @@ class SelectCommuneForm(forms.Form):
         self.fields["commune"] = forms.ModelChoiceField(
             queryset=communes, widget=forms.RadioSelect, label="Votre commune :"
         )
+
 
 # eof

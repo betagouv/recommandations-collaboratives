@@ -12,14 +12,13 @@ init_django("recoco")
 
 
 from recoco.apps.projects.models import Project
-from django.db.models import Model
 
 
 # %%
 
 
 from django.template import Context, Template
-from IPython.display import display, HTML
+from IPython.display import HTML
 
 
 # %%
