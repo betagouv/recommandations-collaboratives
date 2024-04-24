@@ -174,35 +174,6 @@ def test_performing_onboarding_create_a_new_project(request, client):
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_creates_initial_info_note(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
-
-    data = {
-        "name": "a project",
-        "description": "my desc",
-        "postal_code": "62170",
-        "insee": "62040",
-        "location": "some place",
-    }
-    response = client.post(reverse("onboarding"), data=data)
-
-    assert response.status_code == 302
-
-    project = projects_models.Project.on_site.first()
-    assert project
-
-    note = projects_models.Note.objects.first()
-    assert data["description"] in note.content
-    assert note.public is True
-
-
-@pytest.mark.django_db
 def test_performing_onboarding_signup_does_not_allow_account_stealing(request, client):
     user = baker.make(auth.User, username="existing@example.com")
 
@@ -299,72 +270,46 @@ def test_performing_onboarding_sets_existing_postal_code(request, client):
 
 @pytest.mark.django_db
 def test_performing_onboarding_assigns_current_site_to_organization(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
     baker.make(
         home_models.SiteConfiguration,
         site=get_current_site(request),
-        onboarding=onboarding,
     )
 
-    commune = Recipe(geomatics.Commune, postal="12345").make()
+    commune = Recipe(geomatics.Commune, postal="12345", insee="12340").make()
 
     data = {
         "name": "a project",
-        "email": "a@example.com",
         "location": "some place",
-        "org_name": "My Org",
-        "description": "my desc",
-        "first_name": "john",
-        "last_name": "doe",
-        "phone": "9338383838",
         "postcode": commune.postal,
-        "response_0": "blah",
-        "impediment_kinds": ["Autre"],
-        "impediments": "some impediment",
+        "insee": commune.insee,
+        "org_name": "My Org",
+        "description": "a description",
     }
 
     with login(client):
-        response = client.post(
-            reverse("onboarding"),
-            data=data,
-        )
+        response = client.post(reverse("onboarding-project"), data=data)
+        assert response.status_code == 302
 
-    assert response.status_code == 302
     org = addressbook_models.Organization.on_site.first()
     assert org.name == data["org_name"]
 
 
 @pytest.mark.django_db
 def test_performing_onboarding_discard_unknown_postal_code(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
 
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
+    data = {
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+    }
 
     with login(client):
-        response = client.post(
-            reverse("onboarding"),
-            data={
-                "name": "a project",
-                "email": "a@example.com",
-                "location": "some place",
-                "org_name": "My Org",
-                "description": "my desc",
-                "first_name": "john",
-                "last_name": "doe",
-                "phone": "0610101010",
-                "response_0": "blah",
-                "postcode": "12345",
-                "impediment_kinds": ["Autre"],
-                "impediments": "some impediment",
-            },
-        )
+        response = client.post(reverse("onboarding-project"), data=data)
+        assert response.status_code == 302
 
-    assert response.status_code == 302
     project = projects_models.Project.on_site.all()[0]
     assert project.commune is None
 
@@ -413,7 +358,7 @@ def test_create_prefilled_project_set_user_reachable_by_switchtenders(request, c
     )
 
     with login(client, groups=["example_com_advisor"]):
-        response = client.get(reverse("onboarding-prefill"))
+        response = client.get(reverse("onboarding-prefill-set-user"))
 
     assert response.status_code == 200
 
@@ -576,39 +521,6 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
 
     invite = invites_models.Invite.objects.first()
     assert invite.project == project
-
-
-@pytest.mark.django_db
-def test_created_prefilled_project_stores_initial_info(request, client):
-    site = get_current_site(request)
-    baker.make(
-        home_models.SiteConfiguration,
-        site=site,
-    )
-
-    data = {
-        "name": "a project",
-        "email": "a@example.com",
-        "description": "my desc",
-        "postal_code": "59800",
-        "location": "some place",
-        "first_name": "john",
-        "phone": "0610101010",
-        "last_name": "doe",
-        "org_name": "MyOrg",
-    }
-
-    with login(client, groups=["example_com_advisor"]):
-        response = client.post(reverse("onboarding-prefill"), data=data)
-
-    assert response.status_code == 302
-
-    project = projects_models.Project.on_site.first()
-    assert project
-
-    note = projects_models.Note.objects.first()
-    assert data["description"] in note.content
-    assert note.public is True
 
 
 ########################################################################

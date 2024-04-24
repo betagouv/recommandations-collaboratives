@@ -154,27 +154,19 @@ def onboarding_project(request):
             all_forms_valid = all_forms_valid and question_form.is_valid()
 
         if all_forms_valid:
-            project_dict = {
-                "name": form.cleaned_data["name"],
-                "location": form.cleaned_data["location"],
-                "insee": form.cleaned_data["insee"],
-                "description": form.cleaned_data["description"],
-            }
-
             project = create_project_for_user(
-                user=request.user, data=project_dict, status="DRAFT"
+                user=request.user, data=form.cleaned_data, status="DRAFT"
             )
 
             project.sites.add(request.site)
 
             # Save survey questions
+            # FIXME question_forms are not saved
             for question_form in question_forms:
-                question.save()
+                question_form.save()
 
             assign_collaborator(request.user, project, is_owner=True)
 
-            # FIXME adapt function
-            # create_initial_note(request.site, onboarding_response)
             notify_new_project(request.site, project, request.user)
             email_owner_of_project(request.site, project, request.user)
 
@@ -222,7 +214,6 @@ def onboarding_summary(request, project_id=None):
 ########################################################################
 
 
-@login_required
 def prefill_project_set_user(request):
     """Create a new project for someone else - step 1 create user"""
     site_config = get_site_config_or_503(request.site)
@@ -241,7 +232,6 @@ def prefill_project_set_user(request):
     return render(request, "onboarding/prefill-user.html", locals())
 
 
-@login_required
 def prefill_project_submit(request):
     """Create a new project for someone else - step 2 create project"""
     site_config = get_site_config_or_503(request.site)
@@ -292,36 +282,23 @@ def prefill_project_submit(request):
                     phone=prefill_set_user_data.get("phone"),
                 )
 
-            project_dict = {
-                "name": form.cleaned_data["name"],
-                "location": form.cleaned_data["location"],
-                "postcode": form.cleaned_data["postcode"],
-                "insee": form.cleaned_data["insee"],
-                "description": form.cleaned_data["description"],
-            }
-
-            print(project_dict)
-
             # Project creation
-
             project = create_project_for_user(
                 user=user,
                 submitted_by=request.user,
-                data=project_dict,
+                data=form.cleaned_data,
                 status="TO_PROCESS",
             )
 
             project.sites.add(request.site)
 
             # Save survey questions
+            # FIXME question_forms are not saved
             for question_form in question_forms:
                 question_form.save()
 
             assign_collaborator(user, project, is_owner=True)
             assign_advisor(request.user, project, request.site)
-
-            # FIXME adapt function
-            # create_initial_note(request.site, onboarding_response)
 
             invite_user_to_project(request, user, project, is_new_user)
             notify_new_project(request.site, project, user)
