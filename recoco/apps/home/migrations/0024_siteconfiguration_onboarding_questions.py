@@ -17,7 +17,6 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(
                 blank=True,
                 help_text="Question présentées lors de la saisine",
-                null=True,
                 to="survey.question",
             ),
         ),

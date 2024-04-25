@@ -124,7 +124,6 @@ class SiteConfiguration(models.Model):
     )
     onboarding_questions = models.ManyToManyField(
         "survey.Question",
-        null=True,
         blank=True,
         help_text="Question présentées lors de la saisine",
     )
