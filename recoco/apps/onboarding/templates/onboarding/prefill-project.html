@@ -106,9 +106,9 @@
           </fieldset>
           <!-- Comment -->
           {% if form.comment %}
-            <div class="fr-input-group {% if form.comment.errors %}fr-input-group--error{% endif %}">
-              <label class="fr-label" for="textarea">{{ question_comment_title|default:'Commentaire' }}</label>
-              <textarea class="fr-input" rows="3" id="textarea" name="textarea"></textarea>
+          <div class="fr-input-group {% if form.comment.errors %}fr-input-group--error{% endif %}">
+              <label class="fr-label" for="{{ form.comment.name }}">{{ question_comment_title|default:'Commentaire' }}</label>
+              <textarea class="fr-input" rows="3" id="{{ form.comment.name }}" name="{{ form.comment.name }}"></textarea>
               {% for error in form.comment.errors %}
                 <p id="text-input-error-desc-error" class="fr-error-text">{{ error }}</p>
               {% endfor %}
@@ -117,11 +117,11 @@
           <!-- File upload -->
           {% if form.attachment %}
             <div class="fr-upload-group fr-mb-6w">
-              <label class="fr-label" for="file-upload">
+              <label class="fr-label" for="{{ form.attachment.name }}">
                 {{ question.upload_title }}
-                <span class="fr-hint-text">Taille maximale : 500 Mo. Formats supportés : jpg, png, pdf. Plusieurs fichiers possibles.</span>
+                  <span class="fr-hint-text">Taille maximale : 500 Mo. Formats supportés : jpg, png, pdf. Plusieurs fichiers possibles.</span>
               </label>
-              <input class="fr-upload" type="file" id="file-upload" name="file-upload">
+              <input class="fr-upload" type="file" id="{{ form.attachment.name }}" name="{{ form.attachment.html_name }}">
               {% if form.attachment.value %}
                 Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
               {% endif %}

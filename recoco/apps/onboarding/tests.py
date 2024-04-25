@@ -7,6 +7,7 @@ from model_bakery.recipe import Recipe
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
+from recoco.apps.survey import models as survey_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.invites import models as invites_models
 from recoco.utils import login
@@ -194,7 +195,7 @@ def test_performing_onboarding_signup_with_existing_user_redirects_to_signin(
 
 
 @pytest.mark.django_db
-def test_performing_onboarding_create_a_new_project(request, client):
+def test_performing_onboarding_creates_a_new_project(request, client):
     site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=site)
 
@@ -215,6 +216,50 @@ def test_performing_onboarding_create_a_new_project(request, client):
     assert project.name == data["name"]
     assert project.status == "DRAFT"
     assert len(project.ro_key) == 32
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_with_survey_fills_it(request, client):
+    site = get_current_site(request)
+
+    survey = baker.make(survey_models.Survey)
+
+    survey_simple_question = baker.make(
+        survey_models.Question, question_set__survey=survey
+    )
+    survey_qcm_question = baker.make(
+        survey_models.Question, question_set__survey=survey
+    )
+    baker.make(
+        survey_models.Choice, question=survey_qcm_question, text="no", value="no"
+    )
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding_questions=[survey_simple_question, survey_qcm_question],
+        project_survey=survey,
+    )
+
+    data = {
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+        f"q{survey_simple_question.id}-comment": "blah",
+        f"q{survey_qcm_question.id}-answer": "no",
+    }
+
+    with login(client):
+        response = client.post(reverse("onboarding-project"), data=data)
+        assert response.status_code == 302
+
+    project = projects_models.Project.on_site.first()
+    assert project
+
+    session = project.survey_session
+    assert session
 
 
 @pytest.mark.django_db
@@ -483,6 +528,60 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
 
     invite = invites_models.Invite.objects.first()
     assert invite.project == project
+
+
+@pytest.mark.django_db
+def test_prefill_project_with_survey_fills_it(request, client):
+    site = get_current_site(request)
+
+    survey = baker.make(survey_models.Survey)
+
+    survey_simple_question = baker.make(
+        survey_models.Question, question_set__survey=survey
+    )
+    survey_qcm_question = baker.make(
+        survey_models.Question, question_set__survey=survey
+    )
+    baker.make(
+        survey_models.Choice, question=survey_qcm_question, text="no", value="no"
+    )
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding_questions=[survey_simple_question, survey_qcm_question],
+        project_survey=survey,
+    )
+    user_data = {
+        "email": "my@email.com",
+        "first_name": "Camille",
+        "last_name": "Dupont",
+        "phone": "066666666",
+        "org_name": "ACME",
+        "role": "Ouistiti",
+    }
+
+    data = {
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+        f"q{survey_simple_question.id}-comment": "blah",
+        f"q{survey_qcm_question.id}-answer": "no",
+    }
+
+    with login(client, groups=["example_com_advisor"]):
+        response = client.post(reverse("onboarding-prefill-set-user"), data=user_data)
+        assert response.status_code == 302
+        response = client.post(reverse("onboarding-project"), data=data)
+        assert response.status_code == 302
+
+    project = projects_models.Project.on_site.first()
+    assert project
+
+    session = project.survey_session
+    assert session
 
 
 ########################################################################

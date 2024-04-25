@@ -33,6 +33,7 @@ from recoco.apps.projects.utils import (
     refresh_user_projects_in_session,
 )
 from recoco.apps.survey.forms import AnswerForm
+from recoco.apps.survey import models as survey_models
 
 from recoco.utils import (
     build_absolute_url,
@@ -139,7 +140,7 @@ def onboarding_project(request):
 
     question_forms = []
     for question in site_config.onboarding_questions.all():
-        form_prefix = f"q{question.id}-"
+        form_prefix = f"q{question.id}"
         question_forms.append(
             AnswerForm(
                 question,
@@ -163,9 +164,13 @@ def onboarding_project(request):
             project.sites.add(request.site)
 
             # Save survey questions
-            # FIXME question_forms are not saved
-            for question_form in question_forms:
-                question_form.save()
+            if site_config.project_survey:
+                session, _ = survey_models.Session.objects.get_or_create(
+                    project=project, survey=site_config.project_survey
+                )
+
+                for question_form in question_forms:
+                    question_form.update_session(session, request.user)
 
             assign_collaborator(request.user, project, is_owner=True)
 
@@ -295,9 +300,13 @@ def prefill_project_submit(request):
             project.sites.add(request.site)
 
             # Save survey questions
-            # FIXME question_forms are not saved
-            for question_form in question_forms:
-                question_form.save()
+            if site_config.project_survey:
+                session, _ = survey_models.Session.objects.get_or_create(
+                    project=project, survey=site_config.project_survey
+                )
+
+                for question_form in question_forms:
+                    question_form.update_session(session, request.user)
 
             assign_collaborator(user, project, is_owner=True)
             assign_advisor(request.user, project, request.site)
