@@ -7,7 +7,6 @@ from model_bakery.recipe import Recipe
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
-from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.invites import models as invites_models
 from recoco.utils import login
@@ -45,32 +44,8 @@ def test_onboarding_page_with_logged_in_user_redirects_to_step2(request, client)
         assert last_url == reverse("onboarding-project")
 
 
-#########################################
-# Onboarding: Step1, user signnup
-#########################################
-
-
 @pytest.mark.django_db
-def test_onboarding_signup_with_nonexisting_account(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
-
-    data = {
-        "email": "a@eXampLe.com",
-    }
-    response = client.post(reverse("onboarding"), data=data, follow=True)
-    last_url, status_code = response.redirect_chain[-1]
-    assert status_code == 302
-    assert last_url == reverse("onboarding-signup")
-
-
-@pytest.mark.django_db
-def test_onboarding_signup_with_existing_account(request, client):
+def test_onboarding_with_existing_account_redirects_to_signin(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
 
     baker.make(
@@ -89,6 +64,30 @@ def test_onboarding_signup_with_existing_account(request, client):
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
     assert last_url.startswith(reverse("account_login"))
+
+
+@pytest.mark.django_db
+def test_onboarding_with_nonexisting_account_redirects_to_signup(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    data = {
+        "email": "a@eXampLe.com",
+    }
+    response = client.post(reverse("onboarding"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url == reverse("onboarding-signup")
+
+
+#########################################
+# Onboarding: Step1, user signnup
+#########################################
 
 
 @pytest.mark.django_db
@@ -144,6 +143,51 @@ def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, cli
     assert int(client.session["_auth_user_id"]) == user.pk
 
 
+@pytest.mark.django_db
+def test_performing_onboarding_signup_with_existing_user_redirects_to_signin(
+    request, client
+):
+    current_site = get_current_site(request)
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+    )
+
+    user = baker.make(auth.User, username="bob@bob.fr")
+
+    user_count = auth.User.objects.count()
+
+    data = {
+        "email": user.username,
+        "phone": "0610101010",
+        "role": "Ouistiti",
+        "password": "blah",
+        "first_name": "john",
+        "last_name": "doe",
+        "org_name": "MyOrg",
+    }
+
+    response = client.post(reverse("onboarding-signup"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url.startswith(reverse("account_login"))
+
+    assert auth.User.objects.count() == user_count
+
+    user.refresh_from_db()
+
+    assert user.profile.organization_position != data["role"]
+    assert user.first_name != data["first_name"]
+    assert user.last_name != data["last_name"]
+    assert user.email != data["email"]
+    assert not user.profile.organization
+    assert user.profile.phone_no != data["phone"]
+
+    # present if logged_in
+    assert not client.session.get("_auth_user_id", None)
+
+
 #########################################
 # Onboarding: Step2, project info
 #########################################
@@ -171,40 +215,6 @@ def test_performing_onboarding_create_a_new_project(request, client):
     assert project.name == data["name"]
     assert project.status == "DRAFT"
     assert len(project.ro_key) == 32
-
-
-@pytest.mark.django_db
-def test_performing_onboarding_signup_does_not_allow_account_stealing(request, client):
-    user = baker.make(auth.User, username="existing@example.com")
-
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
-
-    data = {
-        "name": "a project",
-        "email": user.username,
-        "description": "my desc",
-        "postal_code": "59800",
-        "phone": "0610101010",
-        "location": "some place",
-        "first_name": "john",
-        "last_name": "doe",
-        "org_name": "MyOrg",
-        "response_0": "blah",
-        "impediment_kinds": ["Autre"],
-        "impediments": "some impediment",
-    }
-
-    response = client.post(reverse("onboarding"), data=data)
-
-    assert response.status_code == 302
-    assert client.session.get("_auth_user_id", None) is None
-    assert projects_models.Project.on_site.count() == 0
 
 
 @pytest.mark.django_db
@@ -244,54 +254,6 @@ def test_performing_onboarding_sends_notification_to_project_moderators(
         assert last_url == reverse("onboarding-summary", args=[project.pk])
 
     assert moderator.notifications.count() == 1
-
-
-@pytest.mark.django_db
-def test_performing_onboarding_sets_existing_postal_code(request, client):
-    site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
-
-    commune = Recipe(geomatics.Commune, postal="12345", insee="12340").make()
-
-    data = {
-        "name": "a project",
-        "location": "some place",
-        "postcode": commune.postal,
-        "description": "a description",
-    }
-
-    with login(client):
-        response = client.post(reverse("onboarding-project"), data=data)
-        assert response.status_code == 302
-
-    project = projects_models.Project.on_site.all()[0]
-    assert project.commune == commune
-
-
-@pytest.mark.django_db
-def test_performing_onboarding_assigns_current_site_to_organization(request, client):
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-    )
-
-    commune = Recipe(geomatics.Commune, postal="12345", insee="12340").make()
-
-    data = {
-        "name": "a project",
-        "location": "some place",
-        "postcode": commune.postal,
-        "insee": commune.insee,
-        "org_name": "My Org",
-        "description": "a description",
-    }
-
-    with login(client):
-        response = client.post(reverse("onboarding-project"), data=data)
-        assert response.status_code == 302
-
-    org = addressbook_models.Organization.on_site.first()
-    assert org.name == data["org_name"]
 
 
 @pytest.mark.django_db

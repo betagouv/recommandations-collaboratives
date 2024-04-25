@@ -95,9 +95,11 @@ def onboarding_signup(request):
 
         user, is_new_user = auth.User.objects.get_or_create(
             username=email,
-            first_name=form.cleaned_data.get("first_name"),
-            last_name=form.cleaned_data.get("last_name"),
-            defaults={"email": email},
+            defaults={
+                "email": email,
+                "first_name": form.cleaned_data.get("first_name"),
+                "last_name": form.cleaned_data.get("last_name"),
+            },
         )
 
         if not is_new_user:
