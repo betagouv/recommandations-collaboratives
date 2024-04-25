@@ -29,6 +29,22 @@ from recoco.utils import login
 
 from .. import adapters, models, utils
 
+
+@pytest.mark.django_db
+def test_visitor_can_access_home_page(client):
+    url = reverse("home")
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_logged_in_user_can_access_home_page(client):
+    url = reverse("home")
+    with login(client):
+        response = client.get(url)
+        assert response.status_code == 200
+
+
 ########################################################################
 # utility functions
 ########################################################################
