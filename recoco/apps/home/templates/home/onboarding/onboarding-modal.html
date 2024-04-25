@@ -1,5 +1,10 @@
 {% load static %}
 {% load crispy_forms_tags %}
+{% block css %}
+  <link href="{% static 'dsfr/dist/dsfr.min.css' %}"
+        rel="stylesheet"
+        type="text/css">
+{% endblock css %}
 <dialog aria-labelledby="onboarding-modal-title"
         id="onboarding-modal"
         class="fr-modal"
