@@ -10,7 +10,7 @@ describe('I can go to tasks tab', () => {
 
     it('creates a task with a resource and see the resource subtitle', () => {
         cy.visit(`/projects`);
-        cy.contains('commune de test').click({ force: true });
+        cy.contains(taskName).click({ force: true });
         cy.becomeAdvisor();
         // cy.get('[id="project-67"]').click({ force: true });
         cy.contains('Recommandations').click({ force: true });
