@@ -8,9 +8,9 @@ describe('I can go to tasks tab', () => {
     });
 
     it('publishes a task', () => {
+        cy.visit(`/projects`);
+        cy.contains('draft project').first().click({ force: true });
         cy.becomeAdvisor();
-
-        cy.visit(`/project/${currentProject.pk}`);
 
         cy.contains('Recommandations').click({ force: true });
         cy.url().should('include', '/actions');

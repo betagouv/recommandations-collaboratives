@@ -147,9 +147,8 @@ Cypress.Commands.add('createProject', (label) => {
     cy.wait(500);
 
     cy.contains('Envoyer ma demande').click({ force: true });
-    // cy.wait(500);
     // cy.contains('Sauvegarder la localisation').click({ force: true });
-    cy.contains(`${label}`).click({ force: true });
+    // cy.contains(`${label}`).click({ force: true });
 });
 
 Cypress.Commands.add('becomeAdvisor', () => {
