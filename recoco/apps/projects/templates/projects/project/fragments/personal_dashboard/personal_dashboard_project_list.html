@@ -57,6 +57,7 @@
                     <header class="d-flex align-items-center justify-content-between w-100 mb-1">
                         <div class="d-flex align-items-center">
                             <a class="project-link d-flex align-items-center"
+                              data-test-id="project-link"
                                :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', item.project.id)">
                                 <template x-if="item.project.commune">
                                     <span class="fw-bold title-info me-2 location"

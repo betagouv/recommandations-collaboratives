@@ -153,10 +153,11 @@ Cypress.Commands.add('createProject', (label) => {
 });
 
 Cypress.Commands.add('becomeAdvisor', () => {
-    cy.visit('/');
     cy.get('body').then((body) => {
         if (body.find('#positioning-form').length > 0) {
-            cy.contains('Conseiller le projet').click({ force: true });
+            cy.get('[data-test-id="button-join-as-advisor"]').click({
+                force: true,
+            });
         } else {
             assert.isOk('advisor', 'already advisor');
         }
@@ -166,7 +167,6 @@ Cypress.Commands.add('becomeAdvisor', () => {
 Cypress.Commands.add(
     'createTask',
     (label, topic = '', withResource = false) => {
-        // cy.visit('/');
         cy.get('body').then((body) => {
             if (body.find('[data-test-id="submit-task-button"]').length > 0) {
                 cy.contains('Émettre une recommandation').click({
