@@ -6,14 +6,18 @@ const taskName = 'task intent';
 describe('I can go to tasks tab', () => {
     beforeEach(() => {
         cy.login('jean');
-        cy.createProject('task intent');
+        cy.createProject('new task');
     });
 
     it('creates a task with a resource and see the initial comment', () => {
-        cy.becomeAdvisor();
-
         cy.visit(`/projects`);
-        cy.contains('task intent').first().click({ force: true });
+        cy.contains('new task').first().click({ force: true });
+        cy.becomeAdvisor();
+        // cy.wait(1000);
+        // cy.get('[data-test-id]="button-join-as-advisor"').click({
+        //     force: true,
+        // });
+        // cy.contains('Conseiller le projet').click({ force: true });
         cy.contains('Recommandations').click({ force: true });
         cy.url().should('include', '/actions');
 

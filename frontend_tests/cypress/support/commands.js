@@ -147,16 +147,16 @@ Cypress.Commands.add('createProject', (label) => {
     cy.wait(500);
 
     cy.contains('Envoyer ma demande').click({ force: true });
-    // cy.wait(500);
     // cy.contains('Sauvegarder la localisation').click({ force: true });
-    cy.contains(`${label}`).click({ force: true });
+    // cy.contains(`${label}`).click({ force: true });
 });
 
 Cypress.Commands.add('becomeAdvisor', () => {
-    cy.visit('/');
     cy.get('body').then((body) => {
         if (body.find('#positioning-form').length > 0) {
-            cy.contains('Conseiller le projet').click({ force: true });
+            cy.get('[data-test-id="button-join-as-advisor"]').click({
+                force: true,
+            });
         } else {
             assert.isOk('advisor', 'already advisor');
         }
