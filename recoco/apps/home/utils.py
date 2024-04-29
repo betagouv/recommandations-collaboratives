@@ -28,6 +28,7 @@ def get_current_site_sender():
 
     return f"{site_config.sender_name} <{site_config.sender_email}>"
 
+
 def get_current_site_sender_email():
     """Returns the current site email sender"""
     current_site = Site.objects.get_current()

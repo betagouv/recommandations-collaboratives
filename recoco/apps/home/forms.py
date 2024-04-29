@@ -14,8 +14,6 @@ from phonenumber_field.formfields import PhoneNumberField
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from recoco.apps.addressbook import models as addressbook_models
 
-from recoco.apps.dsrc.forms import DsrcBaseForm
-from crispy_forms.layout import Layout, Fieldset
 
 class UVSignupForm(SignupForm):
     field_order = [

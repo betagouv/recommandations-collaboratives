@@ -16,7 +16,7 @@ urlpatterns = [
     path(
         r"dsrc/",
         views.dsrc_form,
-        name="dsrc", ## TODO: Add home page to display links to the different demos
+        name="dsrc",  ## TODO: Add home page to display links to the different demos
     ),
     path(
         r"dsrc-form/",

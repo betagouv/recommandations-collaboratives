@@ -134,18 +134,20 @@ class SiteConfiguration(models.Model):
     legal_address = models.CharField(
         verbose_name="Adresse postale",
         help_text="L'adresse postale est notamment affichée en bas des emails automatiques.",
-        null=True, 
+        null=True,
         blank=True,
-        max_length=100
+        max_length=100,
     )
 
     def logo_upload_path(self, filename):
         return f"images/{self.site.pk}/logo/{filename}"
-    
+
     email_logo = models.ImageField(
-        verbose_name="Logo utilisé pour les emails automatiques", 
+        verbose_name="Logo utilisé pour les emails automatiques",
         help_text="Veuillez fournir une image d'une largeur maximale de 600 pixels et d'un ratio de 4:3.",
-        null=True, blank=True, upload_to=logo_upload_path
+        null=True,
+        blank=True,
+        upload_to=logo_upload_path,
     )
 
     crm_available_tags = TaggableManager(

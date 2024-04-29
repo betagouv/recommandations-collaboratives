@@ -59,7 +59,7 @@ class Project {
 	}
 
 	// Navigation
-	
+
 	navigateToTab(tabName, path) {
 		cy.get(tabName).click({force:true})
 		cy.url().should('include', path)

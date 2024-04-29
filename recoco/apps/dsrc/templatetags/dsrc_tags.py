@@ -29,11 +29,13 @@ from recoco.apps.dsrc.utils import generate_random_id
 
 register = template.Library()
 
+
 @register.filter
 def render_html(field):
     if isinstance(field, HTML):
         return field.render({}, False)
     return field
+
 
 def parse_tag_args(args, kwargs, allowed_keys: list) -> dict:
     """
@@ -50,7 +52,10 @@ def parse_tag_args(args, kwargs, allowed_keys: list) -> dict:
 
     return tag_data
 
-@register.inclusion_tag("dsrc/core/compositions/forms/form_base.html", takes_context=True)
+
+@register.inclusion_tag(
+    "dsrc/core/compositions/forms/form_base.html", takes_context=True
+)
 def dsrc_form(context) -> dict:
     """
     Returns the HTML for a form snippet
@@ -64,7 +69,10 @@ def dsrc_form(context) -> dict:
 
     return context
 
-@register.inclusion_tag("dsrc/core/compositions/forms/form_multistep.html", takes_context=True)
+
+@register.inclusion_tag(
+    "dsrc/core/compositions/forms/form_multistep.html", takes_context=True
+)
 def dsrc_form_multistep(context) -> dict:
     """
     Returns the HTML for a multi step form snippet
@@ -83,6 +91,7 @@ def dsrc_form_multistep(context) -> dict:
 
     return context
 
+
 @register.inclusion_tag("dsrc/core/blocks/inputs/field.html")
 def dsrc_form_field(field) -> dict:
     """
@@ -97,6 +106,7 @@ def dsrc_form_field(field) -> dict:
 
     return {"field": field}
 
+
 @register.inclusion_tag("dsrc/core/compositions/forms/fieldset.html")
 def dsrc_fieldset(fieldset) -> dict:
     """
@@ -110,6 +120,7 @@ def dsrc_fieldset(fieldset) -> dict:
     """
 
     return {"fieldset": fieldset}
+
 
 @register.inclusion_tag("dsrc/core/blocks/inputs/input_text.html")
 def dsrc_input_text(*args, **kwargs) -> dict:
@@ -166,6 +177,7 @@ def dsrc_input_text(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
+
 @register.inclusion_tag("dsrc/core/blocks/buttons/button.html")
 def dsrc_button(*args, **kwargs) -> dict:
     """
@@ -192,7 +204,7 @@ def dsrc_button(*args, **kwargs) -> dict:
     ```
 
     All of the keys of the dict can be passed directly as named parameters of the tag.
-    
+
 
     Use `classes` to override  DSFR / DSRC with site specific styles :
 
@@ -220,7 +232,7 @@ def dsrc_button(*args, **kwargs) -> dict:
         "icon",
         "align",
         "title",
-        "classes"
+        "classes",
     ]
     tag_data = parse_tag_args(args, kwargs, allowed_keys)
 
@@ -229,6 +241,7 @@ def dsrc_button(*args, **kwargs) -> dict:
     if "title" not in tag_data:
         tag_data["title"] = False
     return {"self": tag_data}
+
 
 @register.inclusion_tag("dsrc/core/blocks/inputs/select.html")
 def dsrc_select(*args, **kwargs) -> dict:
@@ -288,7 +301,10 @@ def dsrc_select(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
-@register.inclusion_tag("dsrc/core/compositions/navs/breadcrumb.html", takes_context=True)
+
+@register.inclusion_tag(
+    "dsrc/core/compositions/navs/breadcrumb.html", takes_context=True
+)
 def dsrc_breadcrumb(context: Context, tag_data: dict = {}) -> dict:
     """
     Returns a breadcrumb item. Takes a dict as parameter, with the following structure:
@@ -318,6 +334,7 @@ def dsrc_breadcrumb(context: Context, tag_data: dict = {}) -> dict:
     if "classes" not in tag_data:
         tag_data["classes"] = "dsrc-breadcrumb"
     return {"self": tag_data}
+
 
 @register.inclusion_tag("dsrc/core/blocks/global/link.html")
 def dsrc_link(*args, **kwargs) -> dict:
@@ -372,6 +389,7 @@ def dsrc_link(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
+
 @register.inclusion_tag("dsrc/core/blocks/global/skiplinks.html", takes_context=True)
 def dsrc_skiplinks(context: Context, items: list) -> dict:
     """
@@ -395,6 +413,7 @@ def dsrc_skiplinks(context: Context, items: list) -> dict:
         else:
             items = {}
     return {"self": {"items": items}}
+
 
 @register.inclusion_tag("dsrc/core/compositions/forms/stepper.html")
 def dsrc_stepper(*args, **kwargs) -> dict:
@@ -440,6 +459,7 @@ def dsrc_stepper(*args, **kwargs) -> dict:
         tag_data["classes"] = "dsrc-stepper"
 
     return {"self": tag_data}
+
 
 @register.inclusion_tag("dsrc/core/compositions/content/card.html")
 def dsfr_card(*args, **kwargs) -> dict:
@@ -533,13 +553,17 @@ def dsfr_card(*args, **kwargs) -> dict:
 
     return {"self": tag_data}
 
+
 @register.filter
 def concatenate(value, arg):
     """Concatenate value and arg"""
     return f"{value}{arg}"
 
+
 @register.filter
 def hyphenate(value, arg):
     """Concatenate value and arg with hyphens as separator, if neither is empty"""
     return "-".join(filter(None, [str(value), str(arg)]))
+
+
 # eof

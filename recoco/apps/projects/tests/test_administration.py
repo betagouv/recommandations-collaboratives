@@ -91,6 +91,7 @@ def test_project_update_when_missing_commune(request, client):
     assert "code postal" not in actions[0].description
     assert "commune" not in actions[0].description
 
+
 @pytest.mark.django_db
 def test_project_update_commune(request, client):
     old_commune = Recipe(
@@ -120,7 +121,6 @@ def test_project_update_commune(request, client):
 
     project = models.Project.objects.get(id=project.pk)
     assert project.commune == new_commune
-
 
     actions = action_object_stream(project)
     assert actions.count() == 1

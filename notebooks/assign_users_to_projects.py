@@ -7,7 +7,6 @@
 # %%
 
 
-from django.db.models import Model
 import os
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"  # Pas besoin en dehors de Jupyter
