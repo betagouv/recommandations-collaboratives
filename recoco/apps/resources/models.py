@@ -8,6 +8,7 @@ created: 2021-06-16 10:57:13 CEST
 """
 import datetime
 
+import reversion
 from django.contrib.auth import models as auth
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
@@ -20,11 +21,10 @@ from django.dispatch import receiver
 from django.shortcuts import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
-from taggit.managers import TaggableManager
-from watson import search as watson
-
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
+from taggit.managers import TaggableManager
+from watson import search as watson
 
 from . import apps
 
@@ -62,6 +62,7 @@ class DeletedCategoryOnSiteManager(CurrentSiteManager, DeletedCategoryManager):
     pass
 
 
+@reversion.register(fields=("name", "color", "icon"))
 class Category(models.Model):
     """Représente une categorie de ressource"""
 
@@ -127,8 +128,22 @@ class ResourceOnSiteManager(CurrentSiteManager, ResourceManagerWithQS):
     pass
 
 
+@reversion.register(
+    fields=(
+        "status",
+        "expires_on",
+        "title",
+        "subtitle",
+        "summary",
+        "content",
+        "category",
+        "contacts",
+        "departments",
+    ),
+    follow=("category",),
+)
 class Resource(models.Model):
-    """Représente une ressource pour les utilisateur·ices d'UV"""
+    """Représente une fiche ressource pour les utilisateur·ices"""
 
     DRAFT = 0
     TO_REVIEW = 1

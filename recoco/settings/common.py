@@ -65,6 +65,8 @@ INSTALLED_APPS = [
     "dynamic_forms",
     "watson",
     "phonenumber_field",
+    "reversion",
+    "reversion_compare",
     "cookie_consent",
     "recoco.apps.dsrc",
     "recoco.apps.onboarding",
@@ -141,8 +143,8 @@ DBTEMPLATES_USE_CODEMIRROR = True
 # MULTISITE
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = ('dsrc_crispy_forms')
-CRISPY_TEMPLATE_PACK = 'dsrc_crispy_forms'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "dsrc_crispy_forms"
+CRISPY_TEMPLATE_PACK = "dsrc_crispy_forms"
 
 WSGI_APPLICATION = "recoco.wsgi.application"
 
@@ -239,6 +241,7 @@ MAGICAUTH_TOKEN_DURATION_SECONDS = 60 * 60 * 24 * 3
 MARKDOWNX_MARKDOWN_EXTENSIONS = [
     "markdown.extensions.extra",
     "markdown_link_attr_modifier",
+    "sane_lists",  # https://python-markdown.github.io/extensions/sane_lists/
 ]
 
 MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {

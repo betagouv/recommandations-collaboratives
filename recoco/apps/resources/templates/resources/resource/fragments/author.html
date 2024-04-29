@@ -1,9 +1,18 @@
 {% load humanize %}
+{% load guardian_tags %}
+
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
 
 <div class="d-flex align-items-center">
   <span class="align-middle mb-0">
     par
-    <strong>{{ resource.created_by.get_full_name|default:request.site.name }}</strong>
-    modifiée le <em>{{ resource.updated_on }}</em>
+      <strong>{{ resource.created_by.get_full_name|default:request.site.name }}</strong>
+      {% if "manage_resources" in user_site_perms %}
+      <a href="{% url 'resources-resource-history' resource.pk %}">
+      {% endif %}
+          modifiée le <em>{{ resource.updated_on }}</em>
+      {% if "manage_resources" in user_site_perms %}
+      </a>
+      {% endif %}
   </span>
 </div>

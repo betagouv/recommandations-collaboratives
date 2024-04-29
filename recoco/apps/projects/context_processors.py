@@ -28,6 +28,7 @@ def active_project_processor(request):
         # Retrieve notification count
         project_ct = ContentType.objects.get_for_model(projects_models.Project)
         unread_notifications_for_projects = request.user.notifications.unread().filter(
+            site=request.site,
             public=True,
             target_content_type=project_ct.pk,
         )
