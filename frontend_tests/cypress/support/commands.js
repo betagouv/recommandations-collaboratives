@@ -147,6 +147,8 @@ Cypress.Commands.add('createProject', (label) => {
     cy.wait(500);
 
     cy.contains('Envoyer ma demande').click({ force: true });
+    // cy.wait(500);
+    // cy.contains('Sauvegarder la localisation').click({ force: true });
     cy.contains(`${label}`).click({ force: true });
 });
 
@@ -164,7 +166,7 @@ Cypress.Commands.add('becomeAdvisor', () => {
 Cypress.Commands.add(
     'createTask',
     (label, topic = '', withResource = false) => {
-        cy.visit('/');
+        // cy.visit('/');
         cy.get('body').then((body) => {
             if (body.find('[data-test-id="submit-task-button"]').length > 0) {
                 cy.contains('Émettre une recommandation').click({
