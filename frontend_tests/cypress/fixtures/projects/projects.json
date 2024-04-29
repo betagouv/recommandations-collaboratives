@@ -480,7 +480,7 @@
             "advisors_note_on": "2022-08-29T14:51:12Z",
             "advisors_note_by": 7,
             "location": "",
-            "commune": 42,
+            "commune": null,
             "impediments": "OLD Map with no location data",
             "deleted": null,
             "sites": [1]
