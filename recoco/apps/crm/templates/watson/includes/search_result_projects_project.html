@@ -5,8 +5,10 @@
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
     </svg>
     <div class="d-flex align-items-center">
-        {% if obj.deleted or obj.inactive_since %}
+        {% if obj.deleted %}
         <a href="{% url 'crm-project-details' obj.pk %}" style="text-decoration: line-through;">{{ obj.name }}</a>
+        {% elif obj.inactive_since %}
+        <a href="{% url 'crm-project-details' obj.pk %}">[EN PAUSE] {{ obj.name }}</a>
         {% else %}
         <a href="{% url 'crm-project-details' obj.pk %}">{{ obj.name }}</a>
         {% endif %}

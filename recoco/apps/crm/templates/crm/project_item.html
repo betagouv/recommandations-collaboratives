@@ -5,7 +5,7 @@
         <svg class="bi me-2" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
         </svg>
-        {% if project.deleted or project.inactive_since %}
+        {% if project.deleted %}
         <span style="text-decoration: line-through;">{{ project.name }}</span>
         {% else %}
         <span>{{ project.name }}</span>
