@@ -63,11 +63,12 @@
                 id="{{ form.helper.form_id }}_js_enabled"
                 value="false">
               <fieldset class="fr-fieldset">
+                <legend class="fr-fieldset__legend--regular fr-fieldset__legend">Les champs suivis d'un astérisque (*) sont obligatoires</legend>
                 {% csrf_token %}
                 {{ form.name|as_crispy_field }}
                 {{ form.location|as_crispy_field }}
                 <div class="fr-fieldset__element">
-                  {% include "projects/project/fragments/city_select_dsfr.html" %}
+                  {% include "projects/project/fragments/city_select_dsfr.html" with required=True %}
                 </div>
                 {{ form.description|as_crispy_field }}
               </fieldset>
@@ -77,7 +78,7 @@
                       id="radio-hint"
                       aria-labelledby="radio-hint-legend radio-hint-messages">
               <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
-                      id="radio-hint-legend">{{ form.question.text }}</legend>
+                      id="radio-hint-legend">{{ form.question.text }} *</legend>
               {% for choice in form.fields.answer.choices %}
                 <div class="fr-fieldset__element">
                   {% if not form.question.is_multiple %}

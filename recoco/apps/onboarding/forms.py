@@ -230,14 +230,14 @@ class OnboardingProject(DsrcBaseForm):
             )
         )
 
-    name = forms.CharField(label="Nom du projet", initial="", required=True)
+    name = forms.CharField(label="Nom du projet *", initial="", required=True)
     location = forms.CharField(
-        label="Adresse",
+        label="Adresse *",
         required=True,
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
         initial="",
     )
-    postcode = forms.CharField(label="Code postal", initial="", required=True)
+    postcode = forms.CharField(label="Code postal *", initial="", required=True)
 
     insee = forms.CharField(
         max_length=5,
@@ -245,7 +245,7 @@ class OnboardingProject(DsrcBaseForm):
         required=True,
     )
 
-    description = forms.CharField(label="Description", initial="", required=True)
+    description = forms.CharField(label="Description *", initial="", required=True)
 
 
 class PrefillSetuserForm(DsrcBaseForm):
