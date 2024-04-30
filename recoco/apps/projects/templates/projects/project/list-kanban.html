@@ -90,11 +90,19 @@
                               <span class="position-absolute top-25 start-100 translate-middle badge rounded-pill bg-info"
                                     :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
                             </template>
-                            <div class="fw-semibold">
+                            <template x-if="isInactive(t)" class="fw-semibold">
                               <a class="project-link"
                                  :href="makeProjectURL(t.id)"
-                                 x-text="truncate(t.name)"></a>
-                            </div>
+                                 x-text="truncate(t.name)"
+                                 style="text-decoration: line-through;"
+                                 ></a>
+                              </template>
+                              <template x-if="!isInactive(t)" class="fw-semibold">
+                                <a class="project-link"
+                                   :href="makeProjectURL(t.id)"
+                                   x-text="truncate(t.name)"
+                                   ></a>
+                                </template>
                             <template x-if="t.commune">
                               <div class="fw-bold text-uppercase small">
                                 <span x-text="t.commune.name"></span>
