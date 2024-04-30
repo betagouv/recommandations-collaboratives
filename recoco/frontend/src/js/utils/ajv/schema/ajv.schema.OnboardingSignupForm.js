@@ -11,7 +11,20 @@ export const schemaOnboardingStep1SignupFormValidator = {
   $id: '#/definitions/OnboardingStep1FormValidator',
   type: 'object',
   properties: {
-    first_name: { $ref: '#/definitions/text' },
+    first_name: {
+      allOf: [
+        {
+          type: 'string',
+          minLength: 1,
+          errorMessage: minLengthErrorMessage(1),
+        },
+        {
+          type: 'string',
+          maxLength: 128,
+          errorMessage: maxLengthErrorMessage(128),
+        },
+      ],
+    },
     last_name: {
       allOf: [
         {
