@@ -15,18 +15,6 @@ function CitySearch(required = false) {
     required: required,
 
     init() {
-      // [
-      //   {
-      //     fieldName: 'postcode',
-      //     events: ['focusout', 'input'],
-      //     tests: [{ property: 'length', value: 5 }],
-      //   },
-      //   {
-      //     fieldName: 'insee',
-      //     events: ['change'],
-      //     tests: [{ property: 'length', value: 5 }],
-      //   },
-      // ]
       ['focusout', 'input'].forEach((event) => {
         this.$refs.postcode.addEventListener(event, (e) => {
           const errors = required && e.target.value.length < 5;

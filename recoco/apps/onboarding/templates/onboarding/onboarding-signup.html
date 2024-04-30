@@ -68,14 +68,13 @@
            id="{{ form.helper.form_id }}_js_enabled"
            value="false">
           <fieldset class="fr-fieldset">
-            <legend class="fr-fieldset__legend--regular fr-fieldset__legend">
-              <h6>Créez votre compte</h6>
+            <legend class="fr-fieldset__legend--regular fr-fieldset__legend">Les champs suivis d'un astérisque (*) sont obligatoires
             </legend>
             {% csrf_token %}
             {{ form.first_name|as_crispy_field }}
             {{ form.last_name|as_crispy_field }}
             <div class="fr-fieldset__element">
-              {% include "tools/organization_search.html" with name=form.org_name.name label=form.org_name.label value=form.org_name.value id_for_label=form.org_name.id_for_label errors=form.org_name.errors dsfr=True %}
+              {% include "tools/organization_search.html" with name=form.org_name.name label=form.org_name.label value=form.org_name.value id_for_label=form.org_name.id_for_label errors=form.org_name.errors dsfr=True isRequired=True %}
             </div>
             {{ form.role|as_crispy_field }}
             {{ form.email|as_crispy_field }}

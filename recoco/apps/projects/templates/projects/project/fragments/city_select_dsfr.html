@@ -4,13 +4,13 @@
      x-data="CitySearch({%if isRequired %}true{% endif %})"
      x-init="getPostcode(projectPostcode,projectInsee)">
   <div class="row">
-    <div class="col-6 fr-input-group mb-0" x-ref="formGroupPostcode">
+    <div class="col-6 fr-input-group {% if form.postcode.errors %}fr-input-group--error{% endif %} mb-0" x-ref="formGroupPostcode">
       <label class="fr-label" for="input-project-address">Code postal {% if isRequired%}*{% endif%}</label>
       <input :disabled="isLoading"
              @change.debounce="fetchCities()"
              x-model="postal"
              type="text"
-             class="fr-input {% if form.postcode.errors %}is-invalid{% endif %}"
+             class="fr-input"
              id="input-project-address"
              name="postcode"
              x-ref="postcode"

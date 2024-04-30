@@ -49,14 +49,22 @@ function DsrcFormValidator(formId, validationSchema) {
 							this.errors.length > 0
 						) {
 							event.preventDefault();
-							// Set the focus on the first field with an error
-							const firstErrorField =
-								this.errors[0].instancePath.substring(1);
-							this.form[firstErrorField].is_valid = false;
-							this.form[firstErrorField].errors =
-								this.getFieldErrors(firstErrorField);
-							this.form[firstErrorField].valid_class = 'error';
-							this.$refs[firstErrorField].focus();
+							// Display error messages on each fields
+							this.errors.forEach((error, index) => {
+								console.log('error', error);
+								const currentErrorField =
+									error.instancePath.substring(1);
+								// Set the focus on the first field with an error
+								index === 0 &&
+									this.$refs[currentErrorField].focus();
+								// Set the error class on the field
+
+								this.form[currentErrorField].is_valid = false;
+								this.form[currentErrorField].errors =
+									this.getFieldErrors(currentErrorField);
+								this.form[currentErrorField].valid_class =
+									'error';
+							});
 						}
 					});
 			});
