@@ -6,8 +6,9 @@
   "private": true,
   "scripts": {
     "test": "./node_modules/vitest/vitest.mjs",
-    "dev": "./node_modules/vite/bin/vite.js",
-    "build": "./node_modules/vite/bin/vite.js build"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 3000"
   },
   "dependencies": {
     "@gouvfr/dsfr": "^1.11.2",
