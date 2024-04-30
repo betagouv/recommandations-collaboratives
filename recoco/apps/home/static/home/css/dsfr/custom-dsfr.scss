@@ -584,3 +584,12 @@ a.fr-btn {
 .fr-text-label--blue-cumulus {
   color: #3558a2 !important;
 }
+
+.col-6 {
+
+  &.fr-input-group--error:before,
+  &.fr-input-group--info:before,
+  &.fr-input-group--valid:before {
+    left: 0rem !important;
+  }
+}

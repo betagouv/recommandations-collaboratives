@@ -1,11 +1,11 @@
 {{ form.postcode.value|json_script:"projectPostcode" }}
 {{ form.insee.value|json_script:"projectInsee" }}
 <div class="col-12"
-     x-data="CitySearch()"
+     x-data="CitySearch({%if isRequired %}true{% endif %})"
      x-init="getPostcode(projectPostcode,projectInsee)">
   <div class="row">
-    <div class="col-6 fr-input-group mb-0">
-      <label class="fr-label" for="input-project-address">Code postal {% if required%}*{% endif%}</label>
+    <div class="col-6 fr-input-group mb-0" x-ref="formGroupPostcode">
+      <label class="fr-label" for="input-project-address">Code postal {% if isRequired%}*{% endif%}</label>
       <input :disabled="isLoading"
              @change.debounce="fetchCities()"
              x-model="postal"
@@ -13,12 +13,13 @@
              class="fr-input {% if form.postcode.errors %}is-invalid{% endif %}"
              id="input-project-address"
              name="postcode"
+             x-ref="postcode"
              value="{{ form.postcode.value|default:'' }}"
              required>
       {% for error in form.postcode.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
     </div>
     <div class="col-6 fr-select-group">
-      <label class="fr-label" for="input-project-address">Commune {% if required%}*{% endif%}</label>
+      <label class="fr-label" for="input-project-address">Commune {% if isRequired%}*{% endif%}</label>
       <select required x-ref="insee" name="insee" class="fr-select">
         <template x-if="cities && cities.length > 0">
           <template x-for="city in cities" :key="city.insee">

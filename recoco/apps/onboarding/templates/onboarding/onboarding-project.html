@@ -68,7 +68,7 @@
                 {{ form.name|as_crispy_field }}
                 {{ form.location|as_crispy_field }}
                 <div class="fr-fieldset__element">
-                  {% include "projects/project/fragments/city_select_dsfr.html" with required=True %}
+                  {% include "projects/project/fragments/city_select_dsfr.html" with isRequired=True %}
                 </div>
                 {{ form.description|as_crispy_field }}
               </fieldset>
