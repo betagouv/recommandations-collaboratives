@@ -333,7 +333,7 @@
             "advisors_note_on": "2022-08-29T14:51:12Z",
             "advisors_note_by": 7,
             "location": "861 chemin rural 53",
-            "commune": 2,
+            "commune": 3,
             "impediments": "Map Area Commune",
             "deleted": null,
             "sites": [1]
@@ -362,7 +362,7 @@
             "advisors_note_on": "2022-08-29T14:51:12Z",
             "advisors_note_by": 7,
             "location": "",
-            "commune": 42,
+            "commune": 3,
             "impediments": "Map Area Circle",
             "deleted": null,
             "sites": [1]

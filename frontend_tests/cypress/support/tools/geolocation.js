@@ -6,6 +6,8 @@ const domElements = {
     // Project Location
     PROJECT_LOCATION: '[data-test-id="project-location"]',
     LINK_PROJECT_LOCATION_EDIT: '[data-test-id="link-project-location-edit"]',
+    LINK_PROJECT_LOCATION_EDIT_KNOWLEDGE:
+        '[data-test-id="link-project-location-edit-knowledge"]',
     MESSAGE_LOCATION_UNKNOWN:
         '[data-test-id="message-project-location-unknown"]',
 
@@ -61,10 +63,10 @@ class ProjectLocation {
     // Navigation
 
     navigateToLocationEditPage() {
-        cy.get(this.dom.LINK_PROJECT_LOCATION_EDIT)
+        cy.get(this.dom.LINK_PROJECT_LOCATION_EDIT_KNOWLEDGE)
             .click({ force: true })
             .then(() => {
-                cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
+                cy.wait(600);
                 cy.get(this.dom.PROJECT_MAP_EDIT).should('be.visible');
             });
     }
@@ -88,6 +90,7 @@ class ProjectLocation {
 
     editProjectLocationUsingAddressField(address) {
         cy.get(this.dom.INPUT_ADDRESS_LOCATION_EDIT).focus().type(address);
+        cy.get(this.dom.INPUT_ADDRESS_LOCATION_EDIT).trigger('keyup');
         cy.get(this.dom.SELECT_ADDRESS_LOCATION_EDIT)
             .click({ force: true })
             .then(() => {
@@ -98,8 +101,7 @@ class ProjectLocation {
     }
 
     editProjectLocationUsingInteractiveMap() {
-        // TODO: fix this test
-        cy.get(this.dom.PROJECT_MAP_EDIT).click({ force: true });
+        cy.get(this.dom.PROJECT_MAP_EDIT).click('center');
     }
 
     saveProjectLocation() {
@@ -109,7 +111,7 @@ class ProjectLocation {
     // Verifications
 
     checkMissingCoordinatesMessage(condition = 'not.exist') {
-        cy.get(this.dom.MESSAGE_LOCATION_UNKNOWN).should(condition);
+        cy.get(this.dom.LINK_PROJECT_LOCATION_EDIT).should(condition);
     }
 
     checkMapLayerProjectCoordinates(map = 'map-static') {

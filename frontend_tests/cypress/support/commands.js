@@ -256,6 +256,13 @@ Cypress.Commands.add('navigateToProject', (index) => {
     cy.contains(`${project.name} ${index}`).click({ force: true });
 });
 
+Cypress.Commands.add('hideCookieBannerAndDjango', () => {
+    cy.get('[data-test-id="fr-consent-banner"]')
+        .find('[data-test-id="button-consent-accept-all"]')
+        .click();
+    cy.get('#djHideToolBarButton').click();
+});
+
 /**
  * Verify that image loads and that alt attribute corresponds to ARIA role.
  * Possible role values are:

@@ -8,46 +8,43 @@ import projectLocation from '../../../support/tools/geolocation';
  */
 let currentProject;
 const projectOwner = 'bob';
-const address = '23 Rue Elise Gervais';
+const address = '12 Rue Edouard Vaillant';
 describe('I can edit the location details of a project on the project knowledge tab', () => {
+    beforeEach(() => {
+        cy.visit('/');
+        cy.hideCookieBannerAndDjango();
+    });
+
     it('can access a page to set the project coordinates by entering an address', () => {
         currentProject = projects[12];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`);
 
-        cy.get('[data-test-id="fr-consent-banner"]')
-            .find('[data-test-id="button-consent-accept-all"]')
-            .click()
-            .then(() => {
-                cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
-                // projectLocation.checkMissingCoordinatesMessage('exist')
-                projectLocation.navigateToLocationEditPageFromOverview(); // test link in Overview tab
-                projectLocation.editProjectLocationUsingAddressField(address);
-                projectLocation.saveProjectLocation();
-                projectLocation.checkMapLayerProjectCoordinates();
-                projectLocation.checkMissingCoordinatesMessage('not.exist');
-            });
+        projectLocation.checkMissingCoordinatesMessage('exist');
+        projectLocation.navigateToLocationEditPageFromOverview(); // test link in Overview tab
+        projectLocation.editProjectLocationUsingAddressField(address);
+        projectLocation.saveProjectLocation();
+        projectLocation.checkMapLayerProjectCoordinates();
+        projectLocation.checkMissingCoordinatesMessage('not.exist');
     });
 
-    it.skip('can access a page to set the project coordinates by clicking on a map', () => {
-        // TODO: fix this test: fix function `editProjectLocationUsingInteractiveMap`
+    it('can access a page to set the project coordinates by clicking on a map', () => {
         currentProject = projects[11];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`);
 
-        cy.get('[data-test-id="fr-consent-banner"]')
-            .find('[data-test-id="button-consent-accept-all"]')
-            .click()
-            .then(() => {
-                cy.wait(600);
-                projectLocation.checkMissingCoordinatesMessage('exist');
-                projectView.navigateToKnowledgeTab();
-                projectLocation.navigateToLocationEditPage(); // test link in Knowledge tab
-                projectLocation.editProjectLocationUsingInteractiveMap();
-                projectLocation.saveProjectLocation();
-                projectView.navigateToOverviewTab();
-                projectLocation.checkMapLayerProjectCoordinates();
-                projectLocation.checkMissingCoordinatesMessage('not.exist');
-            });
+        projectLocation.checkMissingCoordinatesMessage('exist');
+        projectView.navigateToKnowledgeTab();
+        projectLocation.navigateToLocationEditPage(); // test link in Knowledge tab
+        cy.log('-----editProjectLocationUsingInteractiveMap ');
+        projectLocation.editProjectLocationUsingInteractiveMap();
+        cy.log('-----saveProjectLocation ');
+        projectLocation.saveProjectLocation();
+        cy.log('-----navigateToOverviewTab ');
+        projectView.navigateToOverviewTab();
+        cy.log('-----checkMapLayerProjectCoordinates ');
+        projectLocation.checkMapLayerProjectCoordinates();
+        cy.log('-----checkMissingCoordinatesMessage ');
+        projectLocation.checkMissingCoordinatesMessage('not.exist');
     });
 });
