@@ -8,7 +8,7 @@ export const schemaOnboardingStep1FormValidator = {
   type: 'object',
   properties: {
     first_name: { $ref: '#/definitions/text' },
-    last_name: { 
+    last_name: {
       allOf: [
         {
           type: 'string',

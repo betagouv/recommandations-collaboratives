@@ -3,11 +3,11 @@ const taskName = "to inprogress"
 
 describe('I can go to tasks tab', () => {
     const TASK_STATUSES = [0, 1, 2, 3]
-    
+
     beforeEach(() => {
 
         cy.visit('/')
-    
+
         cy.login("jean");
         cy.createProject("qsdzed")
     })
@@ -29,13 +29,13 @@ describe('I can go to tasks tab', () => {
         const fromStatus = TASK_STATUSES[0];
         const toStatus = TASK_STATUSES[1];
         const dataTransfer = new DataTransfer()
-        
+
         const fromDataTest = `[data-test-id="board-targetable-${fromStatus}"]`
         const toDataTest = `[data-test-id="board-targetable-${toStatus}"]`
         cy.get(fromDataTest).trigger('dragstart', { dataTransfer })
         cy.get(toDataTest).trigger('drop', { dataTransfer })
-       
-       
+
+
         // TODO : finish this test to trigger api calls
     })
 })

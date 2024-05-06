@@ -18,7 +18,7 @@ describe('I can fill a project survey', () => {
 
         cy.get('[data-test-id="project-navigation-knowledge"]').click({ force: true });
         cy.get('[data-test-id="link-fill-survey"]').first().click({ force: true });
-        
+
         cy.get('[data-test-id="survey-tutorial"]').should.exist;
     })
 
@@ -32,7 +32,7 @@ describe('I can fill a project survey', () => {
         cy.get('#form_answer-1')
             .check({ force: true })
 
-        // Reload the survey: it should load 
+        // Reload the survey: it should load
         cy.get('[data-test-id="button-submit-survey-questionset"]').click({ force: true }).then(() => {
             cy.visit(`/project/${currentProject.pk}`)
             cy.get('[data-test-id="project-navigation-knowledge"]').click({ force: true })

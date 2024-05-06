@@ -97,13 +97,18 @@ def project_administration(request, project_id):
                 if field_name in ["postcode", "insee"]:
                     # get commune attr for related fields
                     if project.commune:
-                        original_value = getattr(project.commune, "postal" if field_name == "postcode" else field_name)
+                        original_value = getattr(
+                            project.commune,
+                            "postal" if field_name == "postcode" else field_name,
+                        )
                     else:
                         original_value = ""
-                else :
+                else:
                     original_value = form.initial[field_name]
                 if str(original_value) != str(submitted_value):
-                    edited_fields.append(form.fields[field_name].label.lower().replace(" du projet", ""))
+                    edited_fields.append(
+                        form.fields[field_name].label.lower().replace(" du projet", "")
+                    )
 
             if edited_fields:
                 action.send(
@@ -113,7 +118,7 @@ def project_administration(request, project_id):
                     action_object=project,
                     target=project,
                 )
-            
+
             instance = form.save(commit=False)
 
             try:

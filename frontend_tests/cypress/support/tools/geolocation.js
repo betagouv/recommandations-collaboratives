@@ -40,7 +40,7 @@ class ProjectLocation {
 	}
 
 	getSelector(map) {
-			let selector 
+			let selector
 			switch(map) {
 				case 'map-static':
 					selector = this.dom.PROJECT_MAP_STATIC;
@@ -52,7 +52,7 @@ class ProjectLocation {
 					selector = this.dom.PROJECT_MAP_EDIT
 					break;
 			}
-			return selector 
+			return selector
 	}
 
 	// Navigation
@@ -121,7 +121,7 @@ class ProjectLocation {
 	}
 
 	checkMapLayerCircle(condition='exist', map='map-static') {
-		let selector 
+		let selector
 		switch(map) {
 			case 'map-static':
 				selector = this.dom.PROJECT_MAP_STATIC

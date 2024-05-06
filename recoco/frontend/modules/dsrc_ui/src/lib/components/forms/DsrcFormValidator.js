@@ -57,7 +57,7 @@ function DsrcFormValidator (
 				});
 			}
       if(!actionButtonFormParam) {
-        // We have to get parameters to display action buttons in form 
+        // We have to get parameters to display action buttons in form
         console.error('Error missing button parameters');
       }
       this.actionButtonFormParam = actionButtonFormParam;

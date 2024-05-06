@@ -34,14 +34,14 @@ class Editor {
 	// Verifications
 
 	/**
-	 * @param {*} disabled = 'be.disabled' if the submit button should be disabled 
+	 * @param {*} disabled = 'be.disabled' if the submit button should be disabled
 	 */
 	checkSubmitComment(disabled='not.be.disabled') {
 		cy.get(this.dom.EDITOR_BUTTON_SUBMIT_NEW_COMMENT).should(disabled)
 	}
 
 	/**
-	 * @param {*} disabled = 'be.disabled' if the submit button should be disabled 
+	 * @param {*} disabled = 'be.disabled' if the submit button should be disabled
 	 */
 	checkSubmitComment(disabled='not.be.disabled') {
 		cy.get(this.dom.EDITOR_BUTTON_SUBMIT_EDIT).click(disabled)

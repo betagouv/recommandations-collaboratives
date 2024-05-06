@@ -54,7 +54,7 @@ Afin de faciliter la lecture des correspondances entre les styles et la biblioth
     |-- core
     |   |-- blocks # styles correspondants à des composants élémentaires et indivisibles: buttons, inputs, icons, etc
     |   |-- compositions # styles correspondants à des composants complexes, faits des `blocks` et d'autres `compsitions` : formulaires, headers, navs, etc
-    |   |-- config # resets, glbals, mixins, utilities 
+    |   |-- config # resets, glbals, mixins, utilities
     |   |-- ext # surcharges de bibliothèques externes, nommées d'après la bibliothèque source à surcharger
     |   |-- layouts # surcharges de bibliothèques externes, nommées d'après la bibliothèque source
     |   `-- pages # surcharges de style pour des pages `home.scss`, `contact.scss` etc

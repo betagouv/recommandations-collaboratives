@@ -6,7 +6,7 @@ describe('As a visitor to a recoco site, I can find a way to contact the site te
 
 	it('Displays a contact form or a contact email', () => {
 			cy.visit(`/contact`)
-		
+
 			cy.get('[data-test-id="contact-form-name"]').type("Cecile Ménard",{force:true})
 			cy.get('[data-test-id="contact-form-email"]').type("cecile@example.com",{force:true})
 			cy.get('[data-test-id="contact-form-subject"]').type("Premier contact",{force:true})

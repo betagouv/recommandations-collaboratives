@@ -23,7 +23,7 @@ export default {
 			])
 		),
 	},
-	output: { 
+	output: {
     dir: './dist/js/',
     format: 'esm',
    },
@@ -34,7 +34,7 @@ export default {
 		terser(), // TODO: env based minification
     commonjs({
       include: /node_modules/,
-      requireReturnsDefault: 'auto', 
+      requireReturnsDefault: 'auto',
     }),
     json()
 	],
