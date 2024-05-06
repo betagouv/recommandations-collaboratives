@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 from guardian.shortcuts import assign_perm
 
 from recoco.apps.home import models
@@ -31,43 +32,44 @@ class Command(BaseCommand):
         if Site.objects.filter(domain=domain).count():
             raise CommandError(f"The domain {domain} already used")
 
-        self.stdout.write("Site creation starts..")
-        site = Site.objects.create(name=name, domain=domain)
+        with transaction.atomic():
+            self.stdout.write("Site creation starts..")
+            site = Site.objects.create(name=name, domain=domain)
 
-        self.stdout.write("Create default project survey..")
-        survey, created = survey_models.Survey.objects.get_or_create(
-            site=site,
-            defaults={
-                "name": f"Questionnaire par défaut de {name}",
-            },
-        )
-
-        if created:
-            # if we just created the survey, create initial sample questions
-            question_set = survey_models.QuestionSet.objects.create(
-                survey=survey, heading="Thématique d'exemple"
-            )
-            survey_models.Question.objects.create(
-                question_set=question_set, text="Ceci est une question exemple"
+            self.stdout.write("Create default project survey..")
+            survey, created = survey_models.Survey.objects.get_or_create(
+                site=site,
+                defaults={
+                    "name": f"Questionnaire par défaut de {name}",
+                },
             )
 
-        self.stdout.write("Create site configuration..")
-        models.SiteConfiguration.objects.create(
-            site=site,
-            project_survey=survey,
-            sender_email=sender_email,
-            sender_name=sender_name,
-            contact_form_recipient=contact_form_recipient,
-            legal_address=legal_address,
-        )
+            if created:
+                # if we just created the survey, create initial sample questions
+                question_set = survey_models.QuestionSet.objects.create(
+                    survey=survey, heading="Thématique d'exemple"
+                )
+                survey_models.Question.objects.create(
+                    question_set=question_set, text="Ceci est une question exemple"
+                )
 
-        # TODO : add questions for onboarding_questions, or not ?
-        
-        self.stdout.write("Create group and permissions..")
-        with settings.SITE_ID.override(site.pk):
-            for group_name, permissions in models.SITE_GROUP_PERMISSIONS.items():
-                group = get_group_for_site(group_name, site, create=True)
-                for perm_name in permissions:
-                    assign_perm(perm_name, group, obj=site)
-                    
-            self.stdout.write(self.style.SUCCESS(f"The site {name} has been created successfully"))
+            self.stdout.write("Create site configuration..")
+            models.SiteConfiguration.objects.create(
+                site=site,
+                project_survey=survey,
+                sender_email=sender_email,
+                sender_name=sender_name,
+                contact_form_recipient=contact_form_recipient,
+                legal_address=legal_address,
+            )
+
+            # TODO : add questions for onboarding_questions, or not ?
+            
+            self.stdout.write("Create group and permissions..")
+            with settings.SITE_ID.override(site.pk):
+                for group_name, permissions in models.SITE_GROUP_PERMISSIONS.items():
+                    group = get_group_for_site(group_name, site, create=True)
+                    for perm_name in permissions:
+                        assign_perm(perm_name, group, obj=site)
+                        
+                self.stdout.write(self.style.SUCCESS(f"The site {name} has been created successfully"))
