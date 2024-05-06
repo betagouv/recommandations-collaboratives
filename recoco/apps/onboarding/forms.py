@@ -212,11 +212,7 @@ class OnboardingProject(DsrcBaseForm):
         self.helper.action_button = {
             "submit": {
                 "label": "Suivant",
-            },
-            "cancel": {
-                "label": "Précédent",
-                "href": reverse("onboarding-signup"),
-            },
+            }
         }
 
         self.helper.layout = Layout(
