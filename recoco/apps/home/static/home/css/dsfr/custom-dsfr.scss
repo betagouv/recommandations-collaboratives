@@ -587,6 +587,9 @@ a.fr-btn {
 
 .col-6 {
 
+  &.fr-select-group--error:before,
+  &.fr-select-group--info:before,
+  &.fr-select-group--valid:before,
   &.fr-input-group--error:before,
   &.fr-input-group--info:before,
   &.fr-input-group--valid:before {

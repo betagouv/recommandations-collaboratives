@@ -7,7 +7,7 @@ import {
 
 Alpine.data('CitySearch', CitySearch);
 
-function CitySearch(required = false) {
+function CitySearch(required = false, requestMethod = 'GET') {
   return {
     // other default properties
     isLoading: false,
@@ -16,18 +16,9 @@ function CitySearch(required = false) {
     required: required,
     currentPostal: null,
     currentInsee: null,
+    requestMethod: requestMethod,
 
     init() {
-      addClassIfNotExists(
-        this.$refs.postcode.parentElement,
-        `fr-input-group--${this.currentPostal ? 'valid' : 'error'}`
-      );
-
-      addClassIfNotExists(
-        this.$refs.insee.parentElement,
-        `fr-input-group--${this.currentInsee ? 'valid' : 'error'}`
-      );
-
       ['focusout', 'input'].forEach((event) => {
         this.$refs.postcode.addEventListener(event, (e) => {
           const errors = required && e.target.value.length < 5;
@@ -47,11 +38,24 @@ function CitySearch(required = false) {
           removeAndAddClassConditionaly(
             errors,
             e.target.parentElement,
-            'fr-input-group--valid',
-            'fr-input-group--error'
+            'fr-select-group--valid',
+            'fr-select-group--error'
           );
         });
       });
+    },
+    validateData(submittedForm = false) {
+      if (this.required && (this.requestMethod === 'POST' || submittedForm)) {
+        addClassIfNotExists(
+          this.$refs.postcode.parentElement,
+          `fr-input-group--${this.currentPostal ? 'valid' : 'error'}`
+        );
+
+        addClassIfNotExists(
+          this.$refs.insee.parentElement,
+          `fr-select-group--${this.currentInsee ? 'valid' : 'error'}`
+        );
+      }
     },
     getPostcode(postcode, insee) {
       const postCodeString = JSON.parse(postcode.textContent);

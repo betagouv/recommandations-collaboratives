@@ -1,8 +1,9 @@
 {{ form.postcode.value|json_script:"projectPostcode" }}
 {{ form.insee.value|json_script:"projectInsee" }}
 <div class="col-12"
-     x-data="CitySearch({% if isRequired %}true{% endif %})"
-     x-init="getPostcode(projectPostcode,projectInsee)">
+     x-data='CitySearch({% if isRequired %}true{% endif %}, "{{ request.method }}")'
+     x-init="getPostcode(projectPostcode,projectInsee)"
+     x-effect='validateData(submittedForm)'>
   <div class="row">
     <div class="col-6 fr-input-group {% if form.postcode.errors %}fr-input-group--error{% endif %} mb-0" x-ref="formGroupPostcode">
       <label class="fr-label" for="input-project-address">Code postal {% if isRequired %}*{% endif %}</label>
