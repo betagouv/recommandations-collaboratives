@@ -25,8 +25,7 @@ class DsrcBaseForm(forms.Form):
                 ):
                     # If the widget is already a Textarea
                     field.widget.attrs = field.widget.attrs | {"classes": "dsrc-input"}
-                # Default: set a TextInput widget with dsrc classes
-                else:
+                elif isinstance(field, forms.TextInput):
                     field.widget = forms.TextInput(attrs={"classes": "dsrc-input"})
             if isinstance(field, forms.BooleanField):
                 # If the widget is already a CheckboxInput
@@ -48,6 +47,7 @@ class DsrcBaseForm(forms.Form):
                 # Default: set a Select widget with dsrc classes
                 else:
                     field.widget = forms.Select(attrs={"classes": "dsrc-select"})
+
             # Add selector patterns used in Cypress tests
             field.widget.attrs = field.widget.attrs | {
                 "field_test_id": f"dsrc_test_{field_name}_field",
@@ -58,8 +58,8 @@ class DsrcBaseForm(forms.Form):
                 "placeholder": field.initial if field.label is None else ""
             }
             field.error_messages = field.error_messages | {
-                "required": "Texte d’erreur obligatoire",
-                "invalid": "Texte de validation",
+                "required": "Champs obligatoire",
+                "invalid": "Champs invalide",
             }
 
     def set_autofocus_on_first_error(self):

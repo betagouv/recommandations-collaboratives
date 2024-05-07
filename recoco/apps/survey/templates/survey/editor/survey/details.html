@@ -50,7 +50,7 @@
 
 
     <ul class="list-group list-group-numbered">
-        {% for question_set in survey.question_sets.all %}
+        {% for question_set in survey.question_sets.all|dictsortreversed:"priority" %}
         <li class="list-group-item d-flex justify-content-between align-items-start">
             <div class="ms-2 me-auto">
                 {% if question_set.icon %}

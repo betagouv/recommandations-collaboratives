@@ -122,6 +122,12 @@ class SiteConfiguration(models.Model):
     onboarding = models.ForeignKey(
         "onboarding.Onboarding", null=True, on_delete=models.SET_NULL
     )
+    onboarding_questions = models.ManyToManyField(
+        "survey.Question",
+        blank=True,
+        help_text="Question présentées lors de la saisine",
+    )
+
     sender_email = models.EmailField(
         help_text="Adresse de l'expéditeur pour les emails automatiques"
     )

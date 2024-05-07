@@ -9,7 +9,7 @@
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
         rel="stylesheet"
         type="text/css">
-  <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
+  <link href="{% static 'dsfr/dist/dsfr.min.css' %}"
         rel="stylesheet"
         type="text/css">
 {% endblock %}
@@ -46,7 +46,7 @@
                   </div>
                 </fieldset>
               </div>
-              {% for cookie_group in object_list  %}
+              {% for cookie_group in object_list %}
                 <div class="fr-consent-service">
                   <fieldset aria-labelledby="finality-1-legend finality-1-desc"
                             role="group"
@@ -55,9 +55,7 @@
                                    padding-top: 0 !important">
                     <div class="d-flex align-items-center justify-content-between w-100">
                       <legend id="finality-{{ cookie_group.varname }}-legend"
-                              class="fr-consent-service__title mt-0 pt-0">
-                        {{ cookie_group.name }}
-                      </legend>
+                              class="fr-consent-service__title mt-0 pt-0">{{ cookie_group.name }}</legend>
                       <div class="flex-grow-1">
                         {% if cookie_group.is_required %}
                           <div class="fr-radio-group d-flex align-items-center justify-content-end flex-grow-1">

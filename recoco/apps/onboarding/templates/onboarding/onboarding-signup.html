@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% load static %}
+{% load sass_tags %}
+{% load crispy_forms_tags %}
+{% block js %}
+  {% vite_asset 'js/apps/onboarding.js' %}
+{% endblock js %}
+{% block css %}
+  <link href="{% static 'dsfr/dist/dsfr.min.css' %}"
+        rel="stylesheet"
+        type="text/css">
+  <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+        rel="stylesheet"
+        type="text/css">
+        <style>
+          label[for="id_captcha"] {
+            display: none;
+          }
+          .g-recaptcha {
+            margin-left: 0.5rem;
+          }
+        </style>
+{% endblock css %}
+{% block title %}
+  | Solliciter l'équipe {{ request.site.name }}
+{% endblock title %}
+{% block og_title %}
+  | Solliciter l'équipe {{ request.site.name }}
+{% endblock og_title %}
+{% block page_title %}
+  Solliciter {{ request.site }}
+{% endblock page_title %}
+{% block tagline %}
+  Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
+{% endblock tagline %}
+{% block content %}
+  <div class="container">
+    <div class="banner mt-6 mb-6 text-center">
+      {% if site_config.email_logo %}
+          <img src="{{ site_config.email_logo.url }}"
+                width="10%"
+                height="auto"
+                alt="Logo {{ request.site.name }}" />
+      {% endif %}
+      <h1>
+        <strong>Déposer votre projet</strong> {{ request.site.name }}
+      </h1>
+    </div>
+    <div class="fr-stepper mb-3">
+      <h2 class="fr-stepper__title">
+        Identifiez-vous
+        <span class="fr-stepper__state">Étape 1 sur 2</span>
+      </h2>
+      <div class="fr-stepper__steps" data-fr-current-step="1" data-fr-steps="2"></div>
+      <p class="fr-stepper__details">
+        <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
+      </p>
+    </div>
+    <div class="container__form d-flex justify-content-center"
+         x-data="AjvValidationSchema('schemaOnboardingStep1SignupFormValidator')">
+      <div class="onboarding__form"
+           x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')"
+           x-init="init">
+        {% include "onboarding/fragments/form-user.html" with include_password_field=True %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}

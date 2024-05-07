@@ -2,7 +2,7 @@ import stylelint from 'stylelint';
 
 const config = {
 	plugins: {
-		// stylelint: { stylelint },
+		// 'stylelint': {stylelint}
 	},
 };
 

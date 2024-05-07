@@ -31,9 +31,16 @@ from . import models
 from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 from .utils import get_current_site_sender_email
 
+from recoco.apps.onboarding.forms import OnboardingEmailForm
+
 
 class HomePageView(TemplateView):
     template_name = "home/home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["onboarding_modal_form"] = OnboardingEmailForm()
+        return context
 
 
 @method_decorator([login_required], name="dispatch")
