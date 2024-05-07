@@ -172,9 +172,7 @@ def test_invite_available_for_everyone(request, client):
 def test_invite_redirects_to_login_if_already_accepted(request, client):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
-    invite = Recipe(
-        models.Invite, site=current_site, accepted_on=timezone.now()
-    ).make()
+    invite = Recipe(models.Invite, site=current_site, accepted_on=timezone.now()).make()
 
     url = reverse("invites-invite-details", args=[invite.pk])
     response = client.get(url)
@@ -205,9 +203,7 @@ def test_invite_does_not_match_existing_account(request, client):
         auth_models.User, username="invited", email="invited@example.com"
     ).make()
 
-    invite = Recipe(
-        models.Invite, site=current_site, email=invited.email
-    ).make()
+    invite = Recipe(models.Invite, site=current_site, email=invited.email).make()
     url = reverse("invites-invite-details", args=[invite.pk])
 
     with login(client):
@@ -222,9 +218,7 @@ def test_invite_matches_existing_account_for_logged_in_user(request, client):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     with login(client) as user:
-        invite = Recipe(
-            models.Invite, site=current_site, email=user.email
-        ).make()
+        invite = Recipe(models.Invite, site=current_site, email=user.email).make()
         url = reverse("invites-invite-details", args=[invite.pk])
         response = client.get(url)
 
@@ -242,9 +236,7 @@ def test_invite_matches_existing_account_redirects_anonyous_user_to_login(
         auth_models.User, username="invited", email="invited@example.com"
     ).make()
 
-    invite = Recipe(
-        models.Invite, site=current_site, email=invited.email
-    ).make()
+    invite = Recipe(models.Invite, site=current_site, email=invited.email).make()
 
     url = reverse("invites-invite-details", args=[invite.pk])
     response = client.get(url)
@@ -272,9 +264,7 @@ def test_accept_invite_matches_existing_account(request, client):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     with login(client) as user:
-        invite = Recipe(
-            models.Invite, site=current_site, email=user.email
-        ).make()
+        invite = Recipe(models.Invite, site=current_site, email=user.email).make()
         url = reverse("invites-invite-accept", args=[invite.pk])
         response = client.post(url)
 

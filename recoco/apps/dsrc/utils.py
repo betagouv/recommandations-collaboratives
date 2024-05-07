@@ -1,6 +1,7 @@
 import random
 import string
 
+
 def generate_random_id(start: str = ""):
     """
     Generates a random alphabetic id.
@@ -9,4 +10,3 @@ def generate_random_id(start: str = ""):
     if start:
         result = "-".join([start, result])
     return result
-

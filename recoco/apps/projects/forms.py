@@ -57,7 +57,7 @@ class ProjectForm(forms.ModelForm):
     """Form for updating the base information of a project"""
 
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
-    insee = forms.CharField(max_length=5, required=False, label="Code Insee")
+    insee = forms.CharField(max_length=5, required=False, label="Commune")
 
     class Meta:
         model = models.Project
@@ -68,6 +68,11 @@ class ProjectForm(forms.ModelForm):
             "location",
             "description",
         ]
+
+        labels = {
+            "location": "Adresse",
+            "description": "Contexte du projet",
+        }
 
 
 class DocumentUploadForm(forms.ModelForm):

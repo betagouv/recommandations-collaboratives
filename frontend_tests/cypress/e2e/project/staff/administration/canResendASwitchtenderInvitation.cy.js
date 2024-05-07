@@ -31,5 +31,5 @@ describe('I can go to administration area of a project and send back an invite f
         cy.get("[data-test-id='administration-advisor-invitation-list']").siblings('ul').children('li').contains(userToInvite.fields.email).parent().parent().parent().siblings().find('#resend-invite-switchtender').click({force:true})
 
         // cy.contains(`Jeannot@test.fr a bien été relancé par courriel.`)
-    })  
+    })
 })

@@ -537,21 +537,21 @@ def test_toggle_off_project_annotation(request, client):
         assert response.status_code == 200
         # unselected tag
         assertContains(
-          response,
-          f'id="checkbox-{slugify(test_tag)}" >',
+            response,
+            f'id="checkbox-{slugify(test_tag)}" >',
         )
         assertContains(
-          response,
-          f'<label class="form-check-label" for="checkbox-{slugify(test_tag)}">{capfirst(test_tag)}',
+            response,
+            f'<label class="form-check-label" for="checkbox-{slugify(test_tag)}">{capfirst(test_tag)}',
         )
         # selected tag
         assertContains(
-          response,
-          f'id="checkbox-{slugify(other_tag)}" checked>',
+            response,
+            f'id="checkbox-{slugify(other_tag)}" checked>',
         )
         assertContains(
-          response,
-          f'<label class="form-check-label" for="checkbox-{slugify(other_tag)}">{capfirst(other_tag)}',
+            response,
+            f'<label class="form-check-label" for="checkbox-{slugify(other_tag)}">{capfirst(other_tag)}',
         )
 
         response = client.post(url, data=data)

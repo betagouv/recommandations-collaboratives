@@ -6,7 +6,7 @@ import projectLocation from '../../../support/tools/geolocation'
  * To run these tests: launch the front end of the application before running the tests
  * TODO: fix baseURL once notfications PR is merged
  */
-let currentProject 
+let currentProject
 const projectOwner = "bob"
 const address = "23 Rue Elise Gervais"
 describe('I can edit the location details of a project on the project knowledge tab', () => {
@@ -14,7 +14,7 @@ describe('I can edit the location details of a project on the project knowledge 
         currentProject = projects[12];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`)
-        
+
         cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click().then(() => {
             cy.wait(600); // TODO: fix by testing loading state (+ add loading spinner)
             projectLocation.checkMissingCoordinatesMessage('exist')
@@ -31,7 +31,7 @@ describe('I can edit the location details of a project on the project knowledge 
         currentProject = projects[11];
         cy.login(projectOwner);
         cy.visit(`/project/${currentProject.pk}`)
-        
+
         cy.get('[data-test-id="fr-consent-banner"]').find('[data-test-id="button-consent-accept-all"]').click().then(() => {
             cy.wait(600);
             projectLocation.checkMissingCoordinatesMessage('exist')

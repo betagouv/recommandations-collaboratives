@@ -8,13 +8,13 @@
  * Use this mixin to declare a set of CSS Custom Properties.
  * You can use this mixin to output different global designs ("themes") while relying on
  * common core CSS functionality to generate layout, typography, color, etc (using $design_tokens)
- * 
+ *
  *
  * Usage:
  * @include generate-css-vars((
  *  base-font-size: 65.5%,
  *  font-family: #{"HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif},
- * 
+ *
  *  primary-color: #33b5e5,
  *  outline-color: #ff500a,
  * ));

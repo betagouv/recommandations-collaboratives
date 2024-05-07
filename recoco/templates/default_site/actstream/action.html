@@ -52,6 +52,11 @@
                   {% endif %}
                 </div>
               {% endif %}
+              {% if action.description %}
+                <div class="d-inline-block">
+                  {{ action.description }}
+                </div>
+              {% endif %}
             {% endif %}
           </span>
         </span>

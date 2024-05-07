@@ -90,6 +90,35 @@ def project_administration(request, project_id):
 
         form = forms.ProjectForm(request.POST, instance=project)
         if form.is_valid():
+            # get list of edited fields to track action
+            edited_fields = []
+            for field_name, submitted_value in form.cleaned_data.items():
+                # Those fields aren't in form.initial because it is a ModelForm for the Project model.
+                if field_name in ["postcode", "insee"]:
+                    # get commune attr for related fields
+                    if project.commune:
+                        original_value = getattr(
+                            project.commune,
+                            "postal" if field_name == "postcode" else field_name,
+                        )
+                    else:
+                        original_value = ""
+                else:
+                    original_value = form.initial[field_name]
+                if str(original_value) != str(submitted_value):
+                    edited_fields.append(
+                        form.fields[field_name].label.lower().replace(" du projet", "")
+                    )
+
+            if edited_fields:
+                action.send(
+                    request.user,
+                    verb=verbs.Project.EDITED,
+                    description=" / ".join(edited_fields),
+                    action_object=project,
+                    target=project,
+                )
+
             instance = form.save(commit=False)
 
             try:

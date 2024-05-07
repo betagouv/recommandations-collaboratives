@@ -21,8 +21,8 @@ INNER JOIN projects_project
     ON projects_task.project_id = projects_project.id
 LEFT JOIN reminders_mail
     ON (reminders_mail.object_id = projects_task.id
-        AND reminders_mail.content_type_id = 10  
-        AND reminders_mail.origin = 1)  
+        AND reminders_mail.content_type_id = 10
+        AND reminders_mail.origin = 1)
 LEFT JOIN taskfollowup
     ON (taskfollowup.task_id = projects_task.id
         AND (projects_project.emails ? taskfollowup.email))

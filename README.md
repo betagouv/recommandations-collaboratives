@@ -107,8 +107,24 @@ Initialisez ou synchronisez la base de données en tapant :
 
 *Les commandes suivantes ne sont pas nécessaire si vous êtes avec Docker.*
 
-Pour lancer l'applicatif en mode `développement`, générez les statiques à l'aide de :
+Pour lancer l'applicatif en mode `développement`:
 
+- compilez le module `dsrc_ui`:
+
+```sh
+cd recoco/frontend/modules/dsrc_ui
+yarn install
+yarn build
+```
+
+- installez les dépendances:
+
+```sh
+cd recoco/frontend
+yarn install
+```
+
+- montez le serveur dev des static sur le port 3000:
 
 ```sh
 cd recoco/frontend && yarn dev

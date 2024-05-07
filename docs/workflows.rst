@@ -54,7 +54,7 @@ Conversations externes
 
       "Message d'un collaborateur" -> "N: aiguilleurs du projet";
 
-   
+
    }
 
 Conversations internes
@@ -66,7 +66,7 @@ Conversations internes
       "N: aiguilleurs du projet"[shape="diamond"];
 
       "Message d'un aiguilleur" -> "N: aiguilleurs du projet";
-   
+
    }
 
 
@@ -83,7 +83,7 @@ A chaque nouvelle notification
    "Emission d'une notification" -> "Ajouter aux notifications de l'usager" [label="pour chaque usager souscrit aux notifications du projet"];
 
    "Ajouter aux notifications de l'usager" -> "Envoyer un mail immédiatement" [label="si notification email immédiate activée"];
-   
+
    }
 
 
@@ -97,5 +97,5 @@ Toutes les semaines
    "Pour chaque notification personnelles non envoyées par email" -> "Compiler" [label="si résumé par email activé"];
 
    "Compiler" -> "Envoyer un mail de résumé immédiatement";
-   
+
    }

@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.db.models.query import QuerySet
+from django.http import HttpRequest
 from model_clone import CloneModelAdmin
 
 from . import models
@@ -13,6 +15,9 @@ class SurveyAdmin(CloneModelAdmin):
     def qs_count(self, obj):
         return obj.question_sets.count()
 
+    def get_queryset(self, request: HttpRequest) -> QuerySet[models.Survey]:
+        return super().get_queryset(request).prefetch_related("question_sets")
+
 
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
@@ -21,6 +26,9 @@ class SessionAdmin(admin.ModelAdmin):
     @admin.display(description="Answers count")
     def answers_count(self, obj):
         return obj.answers.count()
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[models.Session]:
+        return super().get_queryset(request).prefetch_related("answers")
 
 
 class QuestionTabularInline(admin.TabularInline):
@@ -37,10 +45,19 @@ class QuestionSetAdmin(admin.ModelAdmin):
     def q_count(self, obj):
         return obj.questions.count()
 
+    def get_queryset(self, request: HttpRequest) -> QuerySet[models.QuestionSet]:
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("survey")
+            .prefetch_related("questions")
+        )
+
 
 @admin.register(models.Question)
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ["text", "question_set"]
+    list_select_related = ("question_set",)
 
 
 @admin.register(models.Choice)

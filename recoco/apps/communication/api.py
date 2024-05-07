@@ -50,6 +50,7 @@ def create_transaction(transaction_id, recipients, label, related, faked=False):
             related=related,
         )
 
+
 def get_site_params():
     params = {}
     current_site = Site.objects.get_current()
@@ -68,7 +69,7 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
     """Uses Brevo service to send an email using the given template and params"""
     brevo = Brevo()
     try:
-        # try to use the site specific template 
+        # try to use the site specific template
         template = EmailTemplate.on_site.get(name__iexact=template_name)
     except EmailTemplate.DoesNotExist:
         try:
@@ -77,7 +78,8 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
         except EmailTemplate.DoesNotExist:
             current_site = Site.objects.get_current()
             mail_admins(
-                subject="Unable to send email", message=f"{template_name} was not found on {current_site} !"
+                subject="Unable to send email",
+                message=f"{template_name} was not found on {current_site} !",
             )
             return False
 
@@ -85,7 +87,7 @@ def brevo_email(template_name, recipients, params=None, test=False, related=None
     all_params = get_site_params()
     if params:
         all_params.update(params)
-    
+
     response = brevo.send_email(template.sib_id, recipients, all_params, test=test)
 
     if response:

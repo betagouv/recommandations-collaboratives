@@ -32,7 +32,11 @@ urlpatterns = [
     ),
     path(r"mentions-legales", views.LegalsPageView.as_view(), name="legals"),
     path(r"accessibilite", views.AccessibiltyPageView.as_view(), name="accessibility"),
-    path(r"schema-multi-annuel", views.MutliAnnualSchemaPageView.as_view(), name="multi-annual-schema"),
+    path(
+        r"schema-multi-annuel",
+        views.MutliAnnualSchemaPageView.as_view(),
+        name="multi-annual-schema",
+    ),
     path(r"nous-suivre", views.FollowUsPageView.as_view(), name="followus"),
     path(r"contact/", views.contact, name="home-contact"),
     path(r"setup-password/", views.setup_password, name="home-user-setup-password"),

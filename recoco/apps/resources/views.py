@@ -8,9 +8,11 @@ created : 2021-06-16 10:59:08 CEST
 """
 import datetime
 
+import reversion
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db.models import Q
@@ -23,16 +25,12 @@ from django.utils import timezone
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView
 from markdownx.fields import MarkdownxFormField
-from rest_framework import permissions, viewsets
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects
-from recoco.utils import (
-    check_if_advisor,
-    has_perm,
-    has_perm_or_403,
-    is_staff_for_site,
-)
+from recoco.utils import check_if_advisor, has_perm, has_perm_or_403, is_staff_for_site
+from rest_framework import permissions, viewsets
+from reversion_compare.views import HistoryCompareDetailView
 
 from . import models
 from .serializers import ResourceSerializer
@@ -288,8 +286,12 @@ def resource_update(request, resource_id=None):
         if form.is_valid():
             resource = form.save(commit=False)
             resource.updated_on = timezone.now()
-            resource.save()
-            form.save_m2m()
+
+            with reversion.create_revision():
+                reversion.set_user(request.user)
+                resource.save()
+                form.save_m2m()
+
             return redirect(next_url)
     else:
         form = EditResourceForm(instance=resource)
@@ -306,9 +308,12 @@ def resource_create(request):
         if form.is_valid():
             resource = form.save(commit=False)
             resource.created_by = request.user
-            resource.save()
-            resource.sites.add(request.site)
-            form.save_m2m()
+            with reversion.create_revision():
+                reversion.set_user(request.user)
+                resource.save()
+                resource.sites.add(request.site)
+                form.save_m2m()
+
             next_url = reverse("resources-resource-detail", args=[resource.id])
             return redirect(next_url)
     else:
@@ -375,6 +380,19 @@ class EditResourceForm(forms.ModelForm):
             "contacts",
             "expires_on",
         ]
+
+
+# History/Reversion
+class ResourceHistoryCompareView(
+    LoginRequiredMixin, PermissionRequiredMixin, HistoryCompareDetailView
+):
+    model = models.Resource
+    permission_required = "sites.manage_resources"
+    template_name = "resources/resource/history.html"
+
+    def has_permission(self):
+        site = get_current_site(self.request)
+        return self.request.user.has_perm(self.permission_required, site)
 
 
 ########################################################################

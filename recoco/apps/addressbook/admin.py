@@ -1,4 +1,5 @@
 from django.contrib import admin
+from reversion.admin import VersionAdmin
 
 from . import models
 
@@ -11,7 +12,8 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Contact)
-class ContactAdmin(admin.ModelAdmin):
+class ContactAdmin(VersionAdmin):
     search_fields = ["first_name", "last_name", "organization__name"]
     list_display = ["last_name", "first_name", "email", "phone_no", "organization"]
     ordering = ["last_name", "first_name"]
+    list_select_related = ("organization",)
