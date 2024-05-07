@@ -19,6 +19,7 @@ function OrganizationSearch(
     dsfr: dsfr,
     init() {
       this.organization = currentOrganization;
+      if (this.organization) this.validateData(true);
 
       [('focusout', 'input')].forEach((event) => {
         this.$refs.organization.addEventListener(event, (e) => {
