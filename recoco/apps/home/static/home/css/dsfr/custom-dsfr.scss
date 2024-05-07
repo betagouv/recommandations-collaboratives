@@ -450,3 +450,9 @@ a.fr-btn {
   border-left: 4px solid #0063CB;
   padding-left: 1rem;
 }
+
+
+.btn-outline-secondary:hover,
+.btn-outline-primary:hover {
+  color: inherit;
+}
