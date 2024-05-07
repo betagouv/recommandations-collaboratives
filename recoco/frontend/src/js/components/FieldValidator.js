@@ -9,11 +9,9 @@ function FieldValidator(required, value, submittedForm = false) {
     isRequired: required,
     value: value == 'None' ? '' : value,
     init() {
-      console.log('FieldValidator init', this);
       this.validateData(submittedForm);
       ['focusout', 'input'].forEach((event) => {
         this.$el.addEventListener(event, (e) => {
-          console.log('FieldValidator event', e);
           const errors = required && e.target.value.length < 1;
           removeAndAddClassConditionaly(
             errors,
