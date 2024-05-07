@@ -15,6 +15,8 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
+from django.db.models import Q
+
 from recoco.apps.projects import models as projects_models
 
 from .. import models, signals
@@ -91,11 +93,13 @@ class TaskViewSet(viewsets.ModelViewSet):
         ):
             raise PermissionDenied()
 
-        return self.queryset.filter(project_id=project_id).order_by(
-            "-created_on", "-updated_on"
+        return (
+            self.queryset.filter(project_id=project_id)
+            .exclude(Q(public=False) & ~Q(site=self.request.site))
+            .order_by("-created_on", "-updated_on")
         )
 
-    queryset = models.Task.on_site
+    queryset = models.Task.objects
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 
