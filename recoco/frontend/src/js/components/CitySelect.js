@@ -79,13 +79,13 @@ function CitySearch(required = false, requestMethod = 'GET') {
             removeAndAddClassConditionaly(
               true,
               this.$refs.insee.parentElement,
-              'fr-input-group--error',
-              'fr-input-group--valid'
+              'fr-select-group--error',
+              'fr-select-group--valid'
             );
           } else {
             removeClassIfExists(
               this.$refs.insee.parentElement,
-              'fr-input-group--valid'
+              'fr-select-group--valid'
             );
           }
         })

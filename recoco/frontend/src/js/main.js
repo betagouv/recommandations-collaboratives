@@ -14,6 +14,7 @@ import './store/app';
 //Global reused component
 import './components/Notification';
 import './components/Editor';
+import './components/FieldValidator';
 
 //Global CSS
 import '../css/dsfr-custom.css';

@@ -597,6 +597,15 @@ a.fr-btn {
   }
 }
 
+.fr-input-group-- {
+  &error .fr-error-text {
+    display: block;
+  }
+
+  &valid .fr-error-text {
+    display: none;
+  }
+}
 
 .modal-description {
   margin: 1rem 0;
