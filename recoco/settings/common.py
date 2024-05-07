@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "recoco.apps.invites",
     "recoco.apps.crm",
     "recoco.apps.training",
+    "recoco.apps.pages",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -95,7 +96,6 @@ INSTALLED_APPS = [
     "wagtail.search",
     "wagtail.admin",
     "wagtail",
-    "rcm",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -203,7 +203,6 @@ LANGUAGE_CODE = "fr-fr"
 TIME_ZONE = "Europe/Paris"
 
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 
@@ -340,7 +339,10 @@ REST_FRAMEWORK = {
 }
 
 # WAGTAIL
-WAGTAIL_SITE_NAME = "Recoco"
+WAGTAIL_SITE_NAME = "Recommandations Collaboratives"
+WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
+WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 
+# WAGTAILADMIN_BASE_URL = define that
 
 # eof

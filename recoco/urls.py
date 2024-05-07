@@ -12,7 +12,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.urls import include, path, re_path
+from django.urls import include, path
 from magicauth.urls import urlpatterns as magicauth_urls
 from rest_framework import routers
 from wagtail import urls as wagtail_urls
@@ -108,7 +108,7 @@ urlpatterns = [
     path("cookies/", include("cookie_consent.urls")),
     path("cms/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
-    re_path(r"c/", include(wagtail_urls)),
+    path("p/", include(wagtail_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
